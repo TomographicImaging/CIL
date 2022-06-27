@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.framework &#8212; CIL v21.3.0 documentation</title>
+    <title>cil.framework.framework &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -698,10 +698,69 @@
 <span class="sd">        &quot;&quot;&quot;</span>   
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rotation_vec_to_y</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]&#39;&#39;&#39;</span>
+    
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">CreateUnitVector</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+        <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">vec</span><span class="p">[:</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">vec</span><span class="p">[:</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rotation_vec_to_z</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; returns a rotation matrix that will align vec with the z-direction [0,0,1]&#39;&#39;&#39;</span>
+
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">CreateUnitVector</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">vec</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">vec</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
+                <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">vx</span> <span class="o">+</span> <span class="n">vx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vx</span><span class="p">)</span> <span class="o">*</span>  <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">vec</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Vec must have length 3, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)))</span>
+    
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">update_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the components of the system in the reference frame of the rotation axis at position 0</span>
-<span class="sd">        &quot;&quot;&quot;</span>      
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotation_axis position</span>
+<span class="sd">        &#39;&#39;&#39;</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the input origin</span>
+<span class="sd">        &#39;&#39;&#39;</span>   
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;source&#39;</span><span class="p">):</span>              
+            <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">origin</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">origin</span>
+
 
     <span class="k">def</span> <span class="nf">get_centre_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the 2D system configuration corersponding to the centre slice</span>
@@ -755,37 +814,22 @@
         <span class="c1">#rotate axis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_axis_pos</span>
 
-    <span class="k">def</span> <span class="nf">update_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis</span>
-<span class="sd">        &#39;&#39;&#39;</span>         
-        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
 
+    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;cil&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms and rotates the system to backend definitions</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#in this instance defintions are the same</span>
+        <span class="k">if</span> <span class="n">definition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cil&#39;</span><span class="p">,</span><span class="s1">&#39;tigre&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry can be configured for definition = &#39;cil&#39; or &#39;tigre&#39;  only. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis and aligns the ray along the positive Y direction</span>
-<span class="sd">        &#39;&#39;&#39;</span>          
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_reference_frame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
-        <span class="n">ray_vec</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
-        <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ray_vec</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="k">pass</span>
-        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ray_vec</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">ray_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">-</span><span class="n">ray_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
-        
         <span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
 
     <span class="k">def</span> <span class="nf">system_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,</span>
@@ -793,18 +837,14 @@
 <span class="sd">            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets</span>
 <span class="sd">        &#39;&#39;&#39;</span>       
         <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">()</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">)</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">det_unit</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">CreateUnitVector</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> <span class="c1">#pass test if detector is on origin</span>
-            <span class="n">det_unit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dot_prod</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="ow">or</span>\
-            <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_ADVANCED</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">det_unit</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span>
+        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span> 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
 
@@ -872,33 +912,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_axis_pos</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">rotation_axis_direction</span>
 
-    <span class="k">def</span> <span class="nf">update_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">align_z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction</span>
 <span class="sd">        &#39;&#39;&#39;</span>          
-        <span class="c1">#shift detector</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
         <span class="c1">#calculate rotation matrix to align rotation axis direction with z</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span>
-
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">a</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="k">return</span>
-        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">a</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">vx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
-            <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">vx</span> <span class="o">+</span> <span class="n">vx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vx</span><span class="p">)</span> <span class="o">*</span>  <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-        
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
-
-        <span class="c1">#sanity check</span>
-        <span class="n">new_rotation_axis_direction</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new_rotation_axis_direction</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to align reference frame&quot;</span><span class="p">)</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_z</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
         <span class="c1">#apply transform</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
@@ -908,34 +928,23 @@
         <span class="n">new_y</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">set_direction</span><span class="p">(</span><span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the ray direction along the positive Y direction</span>
-<span class="sd">        &#39;&#39;&#39;</span>          
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_reference_frame</span><span class="p">()</span>
 
-        <span class="n">ray_vec</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span>
-        <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;cil&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms and rotates the system to backend definitions</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#in this instance defintions are the same</span>
+        <span class="k">if</span> <span class="n">definition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cil&#39;</span><span class="p">,</span><span class="s1">&#39;tigre&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry can be configured for definition = &#39;cil&#39; or &#39;tigre&#39;  only. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ray_vec</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">pass</span>
-        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ray_vec</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">ray_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ray_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">align_z</span><span class="p">()</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+                
         <span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-
         <span class="n">new_direction_x</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">new_direction_y</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">set_direction</span><span class="p">(</span><span class="n">new_direction_x</span><span class="p">,</span> <span class="n">new_direction_y</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">system_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,</span>
@@ -943,25 +952,24 @@
 <span class="sd">            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets</span>
 <span class="sd">        &#39;&#39;&#39;</span>              
         <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">()</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">)</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">det_unit</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">CreateUnitVector</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> <span class="c1">#pass test if detector is on origin</span>
-            <span class="n">det_unit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span>\
-            <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span>\
-            <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="ow">or</span>\
-            <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">dot_prod_a</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span>
+        <span class="n">dot_prod_b</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="p">)</span>
+        <span class="n">dot_prod_c</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+        <span class="n">dot_prod_d</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_a</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span> <span class="ow">or</span>\
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_b</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span> <span class="ow">or</span>\
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_c</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span> <span class="ow">or</span>\
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_d</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span> 
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_ADVANCED</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">det_unit</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
         
-        <span class="k">return</span> <span class="kc">False</span>
-
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">csv</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
@@ -1006,7 +1014,7 @@
             <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
             <span class="c1">#convert to rotation axis reference frame</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">update_reference_frame</span><span class="p">()</span>
+            <span class="n">temp</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">()</span>
 
             <span class="n">ray_direction</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">detector_position</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
@@ -1047,34 +1055,19 @@
         <span class="c1">#rotate axis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_axis_pos</span>
 
-    <span class="k">def</span> <span class="nf">update_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis</span>
-<span class="sd">        &#39;&#39;&#39;</span>                  
-        <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis and aligns the source position along the negative Y direction</span>
-<span class="sd">        &#39;&#39;&#39;</span>          
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_reference_frame</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;cil&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms and rotates the system to backend definitions</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
-        <span class="n">src_dir</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">CreateUnitVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-
-        <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="k">pass</span>
-        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">definition</span><span class="o">==</span><span class="s1">&#39;cil&#39;</span><span class="p">:</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">definition</span><span class="o">==</span><span class="s1">&#39;tigre&#39;</span><span class="p">:</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">src_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">src_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry can be configured for definition = &#39;cil&#39; or &#39;tigre&#39;  only. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="p">))</span>
 
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
-        
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
@@ -1086,16 +1079,16 @@
 <span class="sd">            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets</span>
 <span class="sd">        &#39;&#39;&#39;</span>           
         <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">()</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">)</span>
         <span class="n">dot_prod</span> <span class="o">=</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_ADVANCED</span>
-        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span> 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
+
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">csv</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
@@ -1182,33 +1175,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_axis_pos</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">rotation_axis_direction</span>
 
-    <span class="k">def</span> <span class="nf">update_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">align_z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction</span>
-<span class="sd">        &#39;&#39;&#39;</span>                  
-        <span class="c1">#shift </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1">#calculate rotation matrix to align rotation axis direction with z</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">a</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="k">return</span>
-        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">a</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">vx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
-            <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">vx</span> <span class="o">+</span> <span class="n">vx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vx</span><span class="p">)</span> <span class="o">*</span>  <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-    
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
-
-        <span class="c1">#sanity check</span>
-        <span class="n">new_rotation_axis_direction</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">new_rotation_axis_direction</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to align reference frame&quot;</span><span class="p">)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>   
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_z</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
     
         <span class="c1">#apply transform</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
@@ -1218,34 +1189,26 @@
         <span class="n">new_y</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">set_direction</span><span class="p">(</span><span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the source direction along the negative Y direction</span>
-<span class="sd">        &#39;&#39;&#39;</span>          
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_reference_frame</span><span class="p">()</span>
 
-        <span class="n">src_dir</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">CreateUnitVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">align_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;cil&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms and rotates the system to backend definitions</span>
+<span class="sd">        &#39;&#39;&#39;</span>            
 
-        <span class="n">axis_rotation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">pass</span>
-        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">align_z</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">definition</span><span class="o">==</span><span class="s1">&#39;cil&#39;</span><span class="p">:</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">definition</span><span class="o">==</span><span class="s1">&#39;tigre&#39;</span><span class="p">:</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">rotation_vec_to_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">src_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">-</span><span class="n">src_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">axis_rotation</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">axis_rotation</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry can be configured for definition = &#39;cil&#39; or &#39;tigre&#39;  only. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="p">))</span>
+                            
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-
         <span class="n">new_direction_x</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">new_direction_y</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">set_direction</span><span class="p">(</span><span class="n">new_direction_x</span><span class="p">,</span> <span class="n">new_direction_y</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">system_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,</span>
@@ -1253,23 +1216,20 @@
 <span class="sd">            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets</span>
 <span class="sd">        &#39;&#39;&#39;</span>       
         <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">()</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">)</span>
 
         <span class="n">dot_prod_a</span> <span class="o">=</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span>
         <span class="n">dot_prod_b</span> <span class="o">=</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="p">)</span>
         <span class="n">dot_prod_c</span> <span class="o">=</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
         <span class="n">dot_prod_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_a</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_b</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_c</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_d</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-6</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_a</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span> <span class="ow">or</span>\
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_b</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span> <span class="ow">or</span>\
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_c</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span> <span class="ow">or</span>\
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dot_prod_d</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span> 
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_ADVANCED</span>
 
-        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span> <span class="ow">or</span>\
-            <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mf">1e-10</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
@@ -1285,7 +1245,7 @@
         
         <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dp1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dp2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">update_reference_frame</span><span class="p">()</span>
+            <span class="n">temp</span><span class="o">.</span><span class="n">align_reference_frame</span><span class="p">()</span>
             <span class="n">source_position</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">detector_position</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">detector_direction_x</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
@@ -1396,7 +1356,7 @@
         <span class="k">if</span> <span class="n">num_pixels_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">num_pixels_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;num_pixels (x,y) must be &gt;= (1,1). Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_pixels_temp</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__num_pixels</span> <span class="o">=</span> <span class="n">num_pixels_temp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__num_pixels</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">num_pixels_temp</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pixel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1431,7 +1391,7 @@
             <span class="k">if</span> <span class="n">pixel_size_temp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">pixel_size_temp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;pixel_size (x,y) at must be &gt; (0.,0.). Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pixel_size_temp</span><span class="p">))</span> 
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__pixel_size</span> <span class="o">=</span> <span class="n">pixel_size_temp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pixel_size</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pixel_size_temp</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1457,7 +1417,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_pixels</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">num_pixels</span> \
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">)</span> \
             <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">)</span> \
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>   
             <span class="k">return</span> <span class="kc">True</span>
@@ -2365,7 +2325,7 @@
 <span class="sd">        :type order: list, sting     </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;astra&#39;</span> <span class="ow">or</span> <span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;tigre&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">ENGINES</span><span class="p">:</span>
             <span class="n">order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>  
 
         <span class="k">try</span><span class="p">:</span>
@@ -2668,7 +2628,70 @@
     <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_binary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">x2</span><span class="o">=</span><span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+
+<div class="viewcode-block" id="DataContainer.sapyb"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.sapyb">[docs]</a>    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;performs a*self + b * y. Can be done in-place</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        a : multiplier for self, can be a number or a numpy array or a DataContainer</span>
+<span class="sd">        y : DataContainer </span>
+<span class="sd">        b : multiplier for y, can be a number or a numpy array or a DataContainer</span>
+<span class="sd">        out : return DataContainer, if None a new DataContainer is returned, default None. </span>
+<span class="sd">            out can be self or y.</span>
+<span class="sd">        num_threads : number of threads to use during the calculation, using the CIL C library</span>
+<span class="sd">        </span>
+<span class="sd">        It will try to use the CIL C library and default to numpy operations, in case the C library does</span>
+<span class="sd">        not handle the types.</span>
+<span class="sd">        </span>
+<span class="sd">        Example:</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        a = 2</span>
+<span class="sd">        b = 3</span>
+<span class="sd">        ig = ImageGeometry(10,11)</span>
+<span class="sd">        x = ig.allocate(1)</span>
+<span class="sd">        y = ig.allocate(2)</span>
+<span class="sd">        out = x.sapyb(a,y,b)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ret_out</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="mf">0.</span>
+            <span class="n">ret_out</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span> <span class="p">]:</span>
+            <span class="c1"># handle with C-lib _axpby</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">out</span>
+                <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">rte</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sapyb defaulting to Python due to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rte</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sapyb defaulting to Python due to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">te</span><span class="p">))</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
+
+        <span class="c1"># cannot be handled by _axpby</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">a</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span></div>
+
+
 <div class="viewcode-block" id="DataContainer.axpby"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Deprecated. Alias of _axpby&#39;&#39;&#39;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The use of axpby is deprecated and will be removed in following version. Use sapyb instead&#39;</span><span class="p">,</span>
+              <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataContainer._axpby"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer._axpby">[docs]</a>    <span class="k">def</span> <span class="nf">_axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;performs axpby with cilacc C library, can be done in-place.</span>
 <span class="sd">        </span>
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
@@ -2716,13 +2739,13 @@
             <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s2">&quot;out array of type </span><span class="si">{0}</span><span class="s2"> does not match requested dtype </span><span class="si">{1}</span><span class="s2">. Using </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ndout</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">ndout</span><span class="o">.</span><span class="n">dtype</span>
         <span class="k">if</span> <span class="n">ndx</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">ndx</span> <span class="o">=</span> <span class="n">ndx</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ndx</span> <span class="o">=</span> <span class="n">ndx</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;safe&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ndy</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">ndy</span> <span class="o">=</span> <span class="n">ndy</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ndy</span> <span class="o">=</span> <span class="n">ndy</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;safe&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">nda</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">nda</span> <span class="o">=</span> <span class="n">nda</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">nda</span> <span class="o">=</span> <span class="n">nda</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;same_kind&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ndb</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">ndb</span> <span class="o">=</span> <span class="n">ndb</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ndb</span> <span class="o">=</span> <span class="n">ndb</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;same_kind&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
             <span class="n">x_p</span> <span class="o">=</span> <span class="n">ndx</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
@@ -3113,7 +3136,7 @@
 
 <span class="k">class</span> <span class="nc">Processor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Defines a generic DataContainer processor</span>
+    <span class="sd">&#39;&#39;&#39;Defines a generic DataContainer processor</span>
 <span class="sd">                       </span>
 <span class="sd">    accepts a DataContainer as input</span>
 <span class="sd">    returns a DataContainer</span>
@@ -3150,6 +3173,15 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Attribute </span><span class="si">{0}</span><span class="s1"> not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
     
     <span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the input data to the processor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input : DataContainer</span>
+<span class="sd">            The input DataContainer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
@@ -3172,7 +3204,19 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implement basic checks for input DataContainer&#39;</span><span class="p">)</span>
         
     <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the configured processor and returns the processed data</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">           Fills the referenced DataContainer with the processed data and suppresses the return</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            The processed data. Suppressed if `out` is passed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">shouldRun</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -3484,6 +3528,9 @@
         <span class="k">return</span> <span class="n">out</span></div></div>
 
 <span class="k">class</span> <span class="nc">DataOrder</span><span class="p">():</span>
+
+    <span class="n">ENGINES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">]</span>
+
     <span class="n">ASTRA_IG_LABELS</span> <span class="o">=</span> <span class="p">[</span><span class="n">ImageGeometry</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_Y</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">]</span>
     <span class="n">TIGRE_IG_LABELS</span> <span class="o">=</span> <span class="p">[</span><span class="n">ImageGeometry</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_Y</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">]</span>
     <span class="n">ASTRA_AG_LABELS</span> <span class="o">=</span> <span class="p">[</span><span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">ANGLE</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">]</span>
@@ -3510,7 +3557,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dim_order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">CIL_IG_LABELS</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown engine expected &#39;tigre&#39; or &#39;astra&#39; got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">engine</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown engine expected one of </span><span class="si">{0}</span><span class="s2"> got </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">DataOrder</span><span class="o">.</span><span class="n">ENGINES</span><span class="p">,</span> <span class="n">engine</span><span class="p">))</span>
         
         <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">dim_order</span><span class="p">:</span>

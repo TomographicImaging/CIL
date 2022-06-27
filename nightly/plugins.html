@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CIL Plugins &#8212; CIL v21.3.0 documentation</title>
+    <title>CIL Plugins &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -537,6 +537,34 @@ reconstruction = fbp.get_ouput()</p>
 </dd>
 </dl>
 <p>Output: ImageData</p>
+<dl class="py method">
+<dt id="cil.plugins.tigre.FBP.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.plugins.tigre.FBP.get_output" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.tigre.FBP.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.plugins.tigre.FBP.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -617,6 +645,34 @@ reconstruction = fbp.get_ouput()</p>
 </dd>
 </dl>
 <p>Output: ImageData</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.FBP.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.FBP.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.get_output" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -665,16 +721,7 @@ reconstruction = fbp.get_ouput()</p>
 <dl class="py method">
 <dt id="cil.plugins.astra.ProjectionOperator.calculate_norm">
 <code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Returns the norm of the LinearOperator calculated by the PowerMethod with default values.</p>
 </dd></dl>
 
 <dl class="py method">

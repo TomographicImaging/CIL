@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; CIL v21.3.0 documentation</title>
+    <title>Index &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -218,7 +218,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.functions.Function.__add__">__add__() (cil.optimisation.functions.Function method)</a>
+
+      <ul>
+        <li><a href="optimisation.html#cil.optimisation.functions.SumFunction.__add__">(cil.optimisation.functions.SumFunction method)</a>
 </li>
+      </ul></li>
       <li><a href="optimisation.html#cil.optimisation.functions.BlockFunction.__call__">__call__() (cil.optimisation.functions.BlockFunction method)</a>
 
       <ul>
@@ -470,8 +474,6 @@
 </li>
         <li><a href="io.html#cil.io.TIFFWriter.__weakref__">(cil.io.TIFFWriter attribute)</a>
 </li>
-        <li><a href="io.html#cil.io.TXRMDataReader.__weakref__">(cil.io.TXRMDataReader attribute)</a>
-</li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.__weakref__">(cil.optimisation.algorithms.Algorithm attribute)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.functions.Function.__weakref__">(cil.optimisation.functions.Function attribute)</a>
@@ -481,6 +483,8 @@
         <li><a href="framework.html#cil.processors.CentreOfRotationCorrector.__weakref__">(cil.processors.CentreOfRotationCorrector attribute)</a>
 </li>
       </ul></li>
+      <li><a href="framework.html#cil.framework.DataContainer._axpby">_axpby() (cil.framework.DataContainer method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -576,15 +580,11 @@
       <li><a href="optimisation.html#cil.optimisation.operators.ChannelwiseOperator.calculate_norm">calculate_norm() (cil.optimisation.operators.ChannelwiseOperator method)</a>
 
       <ul>
-        <li><a href="optimisation.html#cil.optimisation.operators.CompositionOperator.calculate_norm">(cil.optimisation.operators.CompositionOperator method)</a>
-</li>
         <li><a href="optimisation.html#cil.optimisation.operators.DiagonalOperator.calculate_norm">(cil.optimisation.operators.DiagonalOperator method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.operators.IdentityOperator.calculate_norm">(cil.optimisation.operators.IdentityOperator method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.operators.LinearOperator.calculate_norm">(cil.optimisation.operators.LinearOperator method)</a>
-</li>
-        <li><a href="optimisation.html#cil.optimisation.operators.MatrixOperator.calculate_norm">(cil.optimisation.operators.MatrixOperator method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.operators.Operator.calculate_norm">(cil.optimisation.operators.Operator method)</a>
 </li>
@@ -628,8 +628,6 @@
 </li>
       <li><a href="optimisation.html#cil.optimisation.functions.ConstantFunction">ConstantFunction (class in cil.optimisation.functions)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.functions.BlockFunction.convex_conjugate">convex_conjugate() (cil.optimisation.functions.BlockFunction method)</a>
 
       <ul>
@@ -664,6 +662,8 @@
         <li><a href="plugins.html#cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate">(cil.plugins.ccpi_regularisation.functions.TNV method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.copy">copy() (cil.framework.AcquisitionGeometry method)</a>
 
       <ul>
@@ -802,6 +802,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.algorithms.GD">GD (class in cil.optimisation.algorithms)</a>
 </li>
+      <li><a href="utilities.html#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">get() (cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA class method)</a>, <a href="utilities.html#id1">[1]</a>
+
+      <ul>
+        <li><a href="utilities.html#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">(cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA class method)</a>
+</li>
+        <li><a href="utilities.html#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">(cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA class method)</a>
+</li>
+      </ul></li>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.get_centre_slice">get_centre_slice() (cil.framework.AcquisitionGeometry method)</a>
 </li>
       <li><a href="framework.html#cil.framework.DataContainer.get_data_axes_order">get_data_axes_order() (cil.framework.DataContainer method)</a>
@@ -821,8 +829,6 @@
       <ul>
         <li><a href="io.html#cil.io.NikonDataReader.get_geometry">(cil.io.NikonDataReader method)</a>
 </li>
-        <li><a href="io.html#cil.io.TXRMDataReader.get_geometry">(cil.io.TXRMDataReader method)</a>
-</li>
       </ul></li>
       <li><a href="plugins.html#cil.plugins.TomoPhantom.get_ImageData">get_ImageData() (in module cil.plugins.TomoPhantom)</a>
 </li>
@@ -838,16 +844,38 @@
 </li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.get_last_objective">get_last_objective() (cil.optimisation.algorithms.Algorithm method)</a>
 </li>
-      <li><a href="io.html#cil.io.TXRMDataReader.get_metadata">get_metadata() (cil.io.TXRMDataReader method)</a>
-</li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.get_output">get_output() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="plugins.html#cil.plugins.astra.FBP.get_output">(cil.plugins.astra.FBP method)</a>
 </li>
+        <li><a href="plugins.html#cil.plugins.tigre.FBP.get_output">(cil.plugins.tigre.FBP method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.AbsorptionTransmissionConverter.get_output">(cil.processors.AbsorptionTransmissionConverter method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Binner.get_output">(cil.processors.Binner method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Masker.get_output">(cil.processors.Masker method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.MaskGenerator.get_output">(cil.processors.MaskGenerator method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Normaliser.get_output">(cil.processors.Normaliser method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Padder.get_output">(cil.processors.Padder method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.RingRemover.get_output">(cil.processors.RingRemover method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Slicer.get_output">(cil.processors.Slicer method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.TransmissionAbsorptionConverter.get_output">(cil.processors.TransmissionAbsorptionConverter method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.operators.BlockOperator.get_output_shape">get_output_shape() (cil.optimisation.operators.BlockOperator method)</a>
 </li>
       <li><a href="io.html#cil.io.NikonDataReader.get_roi">get_roi() (cil.io.NikonDataReader method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="framework.html#cil.framework.AcquisitionData.get_slice">get_slice() (cil.framework.AcquisitionData method)</a>
 
       <ul>
@@ -982,14 +1010,14 @@
 </li>
       <li><a href="utilities.html#cil.utilities.jupyter.link_islicer">link_islicer (class in cil.utilities.jupyter)</a>
 </li>
+      <li><a href="optimisation.html#cil.optimisation.functions.SumFunction.Lmax">Lmax() (cil.optimisation.functions.SumFunction property)</a>
+</li>
+      <li><a href="utilities.html#cil.utilities.dataexample.TestData.load">load() (cil.utilities.dataexample.TestData method)</a>
+</li>
       <li><a href="io.html#cil.io.NEXUSDataReader.load_data">load_data() (cil.io.NEXUSDataReader method)</a>
 </li>
       <li><a href="io.html#cil.io.NikonDataReader.load_projections">load_projections() (cil.io.NikonDataReader method)</a>
-
-      <ul>
-        <li><a href="io.html#cil.io.TXRMDataReader.load_projections">(cil.io.TXRMDataReader method)</a>
 </li>
-      </ul></li>
       <li><a href="framework.html#cil.framework.DataContainer.log">log() (cil.framework.DataContainer method)</a>
 
       <ul>
@@ -1208,8 +1236,6 @@
 </li>
         <li><a href="io.html#cil.io.TIFFStackReader.read">(cil.io.TIFFStackReader method)</a>
 </li>
-        <li><a href="io.html#cil.io.TXRMDataReader.read">(cil.io.TXRMDataReader method)</a>
-</li>
       </ul></li>
       <li><a href="io.html#cil.io.TIFFStackReader.read_as_AcquisitionData">read_as_AcquisitionData() (cil.io.TIFFStackReader method)</a>
 </li>
@@ -1249,6 +1275,12 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="framework.html#cil.framework.BlockDataContainer.sapyb">sapyb() (cil.framework.BlockDataContainer method)</a>, <a href="optimisation.html#cil.framework.BlockDataContainer.sapyb">[1]</a>
+
+      <ul>
+        <li><a href="framework.html#cil.framework.DataContainer.sapyb">(cil.framework.DataContainer method)</a>
+</li>
+      </ul></li>
       <li><a href="utilities.html#cil.utilities.display.show2D.save">save() (cil.utilities.display.show2D method)</a>
 
       <ul>
@@ -1263,12 +1295,6 @@
 </li>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.set_angles">set_angles() (cil.framework.AcquisitionGeometry method)</a>
 </li>
-      <li><a href="recon.html#cil.recon.FBP.set_backend">set_backend() (cil.recon.FBP method)</a>
-
-      <ul>
-        <li><a href="recon.html#cil.recon.FDK.set_backend">(cil.recon.FDK method)</a>
-</li>
-      </ul></li>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.set_channels">set_channels() (cil.framework.AcquisitionGeometry method)</a>
 </li>
       <li><a href="recon.html#cil.recon.FBP.set_fft_order">set_fft_order() (cil.recon.FBP method)</a>
@@ -1295,13 +1321,37 @@
         <li><a href="recon.html#cil.recon.FDK.set_image_geometry">(cil.recon.FDK method)</a>
 </li>
       </ul></li>
-      <li><a href="recon.html#cil.recon.FBP.set_input">set_input() (cil.recon.FBP method)</a>
+      <li><a href="plugins.html#cil.plugins.astra.FBP.set_input">set_input() (cil.plugins.astra.FBP method)</a>
 
       <ul>
+        <li><a href="plugins.html#cil.plugins.tigre.FBP.set_input">(cil.plugins.tigre.FBP method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.AbsorptionTransmissionConverter.set_input">(cil.processors.AbsorptionTransmissionConverter method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Binner.set_input">(cil.processors.Binner method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Masker.set_input">(cil.processors.Masker method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.MaskGenerator.set_input">(cil.processors.MaskGenerator method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Normaliser.set_input">(cil.processors.Normaliser method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Padder.set_input">(cil.processors.Padder method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.RingRemover.set_input">(cil.processors.RingRemover method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.Slicer.set_input">(cil.processors.Slicer method)</a>
+</li>
+        <li><a href="processors.html#cil.processors.TransmissionAbsorptionConverter.set_input">(cil.processors.TransmissionAbsorptionConverter method)</a>
+</li>
+        <li><a href="recon.html#cil.recon.FBP.set_input">(cil.recon.FBP method)</a>
+</li>
         <li><a href="recon.html#cil.recon.FDK.set_input">(cil.recon.FDK method)</a>
 </li>
       </ul></li>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.set_labels">set_labels() (cil.framework.AcquisitionGeometry method)</a>
+</li>
+      <li><a href="optimisation.html#cil.optimisation.operators.Operator.set_norm">set_norm() (cil.optimisation.operators.Operator method)</a>
 </li>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.set_panel">set_panel() (cil.framework.AcquisitionGeometry method)</a>
 </li>
@@ -1309,12 +1359,12 @@
 </li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.PDHG.set_step_sizes">set_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="io.html#cil.io.NEXUSDataWriter.set_up">set_up() (cil.io.NEXUSDataWriter method)</a>
 
       <ul>
         <li><a href="io.html#cil.io.TIFFStackReader.set_up">(cil.io.TIFFStackReader method)</a>
-</li>
-        <li><a href="io.html#cil.io.TXRMDataReader.set_up">(cil.io.TXRMDataReader method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.set_up">(cil.optimisation.algorithms.Algorithm method)</a>
 </li>
@@ -1329,8 +1379,6 @@
         <li><a href="optimisation.html#cil.optimisation.algorithms.SPDHG.set_up">(cil.optimisation.algorithms.SPDHG method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="framework.html#cil.framework.DataContainer.shape">shape() (cil.framework.DataContainer property)</a>
 </li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.should_stop">should_stop() (cil.optimisation.algorithms.Algorithm method)</a>
@@ -1445,8 +1493,6 @@
         <li><a href="optimisation.html#cil.optimisation.algorithms.SPDHG.update">(cil.optimisation.algorithms.SPDHG method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.update_objective">update_objective() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
@@ -1465,8 +1511,14 @@
         <li><a href="optimisation.html#cil.optimisation.algorithms.SPDHG.update_objective">(cil.optimisation.algorithms.SPDHG method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.update_previous_solution">update_previous_solution() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="optimisation.html#cil.optimisation.algorithms.FISTA.update_previous_solution">(cil.optimisation.algorithms.FISTA method)</a>
 </li>
+      </ul></li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.PDHG.update_step_sizes">update_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>
 </li>
   </ul></td>

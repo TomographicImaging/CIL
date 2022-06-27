@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.Operator &#8212; CIL v21.3.0 documentation</title>
+    <title>cil.optimisation.operators.Operator &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -205,6 +205,7 @@
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <div class="viewcode-block" id="Operator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator">[docs]</a><span class="k">class</span> <span class="nc">Operator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Operator that maps from a space X -&gt; Y&#39;&#39;&#39;</span>
@@ -226,29 +227,32 @@
 <div class="viewcode-block" id="Operator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns the application of the Operator on x&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-<div class="viewcode-block" id="Operator.norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns the norm of the Operator</span>
-<span class="sd">        </span>
-<span class="sd">        Calling norm triggers the calculation of the norm of the operator. Normally this</span>
-<span class="sd">        is a computationally expensive task, therefore we store the result of norm into </span>
-<span class="sd">        a member of the class. If the calculation has already run, following calls to </span>
-<span class="sd">        norm just return the saved member. </span>
-<span class="sd">        It is possible to force recalculation by setting the optional force parameter. Notice that</span>
-<span class="sd">        norm doesn&#39;t take notice of how many iterations or of the initialisation of the PowerMethod, </span>
-<span class="sd">        so in case you want to recalculate by setting a higher number of iterations or changing the</span>
-<span class="sd">        starting point or both you need to set :code:`force=True`</span>
 
-<span class="sd">        :param iterations: number of iterations to run</span>
-<span class="sd">        :type iterations: int, optional, default = 25</span>
-<span class="sd">        :param x_init: starting point for the iteration in the operator domain</span>
-<span class="sd">        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, default None</span>
-<span class="sd">        :parameter force: forces the recalculation of the norm</span>
-<span class="sd">        :type force: boolean, default :code:`False`</span>
+
+<div class="viewcode-block" id="Operator.norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the norm of the Operator. On first call the norm will be calculated using the operator&#39;s calculate_norm</span>
+<span class="sd">        method. Subsequent calls will return the cached norm.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        norm: positive:`float`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;norm: the norm method does not use any parameters.</span><span class="se">\n\</span>
+<span class="s1">                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span></div>
-<div class="viewcode-block" id="Operator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Operator.set_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.set_norm">[docs]</a>    <span class="k">def</span> <span class="nf">set_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets the norm of the operator to a custom value.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="n">norm</span></div>
+
+<div class="viewcode-block" id="Operator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Calculates the norm of the Operator&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 <div class="viewcode-block" id="Operator.range_geometry"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -305,53 +309,130 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
     
 <div class="viewcode-block" id="LinearOperator.PowerMethod"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.PowerMethod">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">x_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Power method to calculate iteratively the Lipschitz constant</span>
+    <span class="k">def</span> <span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>  <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="o">**</span><span class="n">deprecated_args</span><span class="p">):</span>
+
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Power method or Power iteration algorithm </span>
 <span class="sd">        </span>
-<span class="sd">        :param operator: input operator</span>
-<span class="sd">        :type operator: :code:`LinearOperator`</span>
-<span class="sd">        :param iterations: number of iterations to run</span>
-<span class="sd">        :type iteration: int</span>
-<span class="sd">        :param x_init: starting point for the iteration in the operator domain</span>
-<span class="sd">        :returns: tuple with: L, list of L at each iteration, the data the iteration worked on.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="c1"># Initialise random</span>
-        <span class="k">if</span> <span class="n">x_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="sd">        The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,</span>
+<span class="sd">        absolute value in the real case and module in the complex case.        </span>
+<span class="sd">        For the non-square case, the power method is applied for the matrix :math: A^{T}*A.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        operator: LinearOperator</span>
+<span class="sd">        max_iteration: positive:`int`, default=10</span>
+<span class="sd">            Number of iterations for the Power method algorithm.</span>
+<span class="sd">        initial: DataContainer, default = None</span>
+<span class="sd">            Starting point for the Power method.</span>
+<span class="sd">        tolerance: positive:`float`, default = 1e-5</span>
+<span class="sd">            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    </span>
+<span class="sd">        return_all: boolean, default = False</span>
+<span class="sd">            Toggles the verbosity of the return</span>
+<span class="sd">    </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dominant eigenvalue: positive:`float`</span>
+<span class="sd">        number of iterations: positive:`int`</span>
+<span class="sd">            Number of iterations run. Only returned if return_all is True.</span>
+<span class="sd">        eigenvector: DataContainer</span>
+<span class="sd">            Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.</span>
+<span class="sd">        list of eigenvalues: :obj:`list`</span>
+<span class="sd">            List of eigenvalues. Only returned if return_all is True.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------    </span>
+
+<span class="sd">        &gt;&gt;&gt; M = np.array([[1.,0],[1.,2.]])</span>
+<span class="sd">        &gt;&gt;&gt; Mop = MatrixOperator(M)</span>
+<span class="sd">        &gt;&gt;&gt; Mop_norm = Mop.PowerMethod(Mop)</span>
+<span class="sd">        &gt;&gt;&gt; Mop_norm</span>
+<span class="sd">        2.0000654846240296</span>
+
+<span class="sd">        `PowerMethod` is called when we compute the norm of a matrix or a `LinearOperator`.</span>
+
+<span class="sd">        &gt;&gt;&gt; Mop_norm = Mop.norm()</span>
+<span class="sd">        2.0005647295658866</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#deal with deprecated arguments</span>
+        <span class="k">if</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_init&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;PowerMethod: The use of the x_init parameter is deprecated and will be removed in following version. Please use initial instead.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">initial</span> <span class="o">=</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_init&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;PowerMethod: received both initial and the deprecated x_init parameter. Please use initial only.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iterations&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;PowerMethod: The use of the iterations parameter is deprecated and will be removed in following version. Please use max_iteration instead.&#39;</span><span class="p">)</span>      
+            <span class="n">max_iteration</span> <span class="o">=</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iterations&#39;</span><span class="p">)</span>
+
+
+        <span class="c1"># Default case: non-symmetric</span>
+        <span class="n">symmetric</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">==</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">():</span>
+                <span class="n">symmetric</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="c1"># catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">x0</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">x0</span> <span class="o">=</span> <span class="n">x_init</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            
-        <span class="n">x1</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-        <span class="n">y_tmp</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">iterations</span><span class="p">)</span>
-        <span class="c1"># Loop</span>
-        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-            <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">y_tmp</span><span class="p">)</span>
-            <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">y_tmp</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">x1</span><span class="p">)</span>
-            <span class="n">x1norm</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="s1">&#39;squared_norm&#39;</span><span class="p">):</span>
-                <span class="n">s</span><span class="p">[</span><span class="n">it</span><span class="p">]</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="n">x0</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">x0norm</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-                <span class="n">s</span><span class="p">[</span><span class="n">it</span><span class="p">]</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x0norm</span> <span class="o">*</span> <span class="n">x0norm</span><span class="p">)</span> 
-            <span class="n">x1</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="mf">1.0</span><span class="o">/</span><span class="n">x1norm</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">x0</span></div>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<div class="viewcode-block" id="LinearOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns the norm of the LinearOperator as calculated by the PowerMethod</span>
-<span class="sd">        </span>
-<span class="sd">        :param iterations: number of iterations to run</span>
-<span class="sd">        :type iterations: int, optional, default = 25</span>
-<span class="sd">        :param x_init: starting point for the iteration in the operator domain</span>
-<span class="sd">        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, None</span>
-<span class="sd">        :parameter force: forces the recalculation of the norm</span>
-<span class="sd">        :type force: boolean, default :code:`False`</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">x0</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_init&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">iterations</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iterations&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
-        <span class="n">s1</span><span class="p">,</span> <span class="n">sall</span><span class="p">,</span> <span class="n">svec</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">x_init</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">s1</span></div>
+        <span class="n">y_tmp</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+
+        <span class="c1"># Normalize first eigenvector</span>
+        <span class="n">x0_norm</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+        <span class="n">x0</span> <span class="o">/=</span> <span class="n">x0_norm</span>
+
+        <span class="c1"># initial guess for dominant eigenvalue</span>
+        <span class="n">eig_old</span> <span class="o">=</span> <span class="mf">1.</span>
+
+        <span class="n">eig_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_iteration</span> <span class="ow">and</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">):</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+            
+            <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">y_tmp</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>                
+                <span class="c1">#swap datacontainer references</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">x0</span>
+                <span class="n">x0</span> <span class="o">=</span> <span class="n">y_tmp</span>
+                <span class="n">y_tmp</span> <span class="o">=</span> <span class="n">tmp</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">y_tmp</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+            
+            <span class="c1"># Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization</span>
+            <span class="n">x0_norm</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+            <span class="n">x0</span> <span class="o">/=</span> <span class="n">x0_norm</span>
+
+            <span class="n">eig_new</span> <span class="o">=</span>  <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x0_norm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">symmetric</span><span class="p">:</span>
+                <span class="n">eig_new</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eig_new</span><span class="p">)</span>
+
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eig_new</span> <span class="o">-</span> <span class="n">eig_old</span><span class="p">)</span>
+            <span class="n">eig_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eig_new</span><span class="p">)</span>   
+            <span class="n">eig_old</span> <span class="o">=</span> <span class="n">eig_new</span>       
+
+        <span class="k">if</span> <span class="n">return_all</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">eig_new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">eig_list</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">eig_new</span></div>
+            
+
+<div class="viewcode-block" id="LinearOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the norm of the LinearOperator calculated by the PowerMethod with default values.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="LinearOperator.dot_test"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.dot_test">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">dot_test</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">domain_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">range_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -504,7 +585,6 @@
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1">#TODO check if allcating with tmp is faster            </span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>     
 
@@ -514,7 +594,6 @@
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1">#TODO check if allcating with tmp is faster            </span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span> 
         <span class="k">else</span><span class="p">:</span>
@@ -523,9 +602,11 @@
     <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span> 
     
-    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <span class="c1">###############################################################################</span>
 <span class="c1">################   Composition  ###########################################</span>
@@ -644,15 +725,8 @@
             
 
 <div class="viewcode-block" id="CompositionOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span>             </div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span>             </div></div>
             
-<div class="viewcode-block" id="CompositionOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
-            <span class="c1">#return LinearOperator.calculate_norm(self, **kwargs)</span>
-            <span class="n">x0</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_init&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">iterations</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iterations&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
-            <span class="n">s1</span><span class="p">,</span> <span class="n">sall</span><span class="p">,</span> <span class="n">svec</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">x_init</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">s1</span></div></div>
 
 
 

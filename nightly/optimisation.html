@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL v21.3.0 documentation</title>
+    <title>Optimisation framework &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -719,36 +719,67 @@ kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))</p>
 
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.SIRT">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SIRT</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Permalink to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique</p>
-<p>Problem:</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SIRT</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Permalink to this definition">#</a></dt>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id5">[<a class="reference internal" href="#id21" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">4</a>]</span>.</p>
+<p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
+the following problem</p>
 <div class="math notranslate nohighlight">
 \[A x = b\]</div>
+<p>The SIRT algorithm is</p>
+<div class="math notranslate nohighlight">
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),\]</div>
+<p>where <span class="math notranslate nohighlight">\(M = \frac{1}{A*\mathbb{1}}\)</span>, <span class="math notranslate nohighlight">\(D = \frac{1}{A^{T}\mathbb{1}}\)</span>, <span class="math notranslate nohighlight">\(\mathbb{1}\)</span> is a <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> of ones
+and <span class="math notranslate nohighlight">\(\mathrm{prox}_{C}\)</span> is the projection over a set <span class="math notranslate nohighlight">\(C\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>initial</strong> – Initial guess</p></li>
-<li><p><strong>operator</strong> – Linear operator for the inverse problem</p></li>
-<li><p><strong>data</strong> – Acquired data to reconstruct</p></li>
-<li><p><strong>constraint</strong> – <p>Function proximal method
-e.g.  <span class="math notranslate nohighlight">\(x\in[0, 1]\)</span>, <code class="code docutils literal notranslate"><span class="pre">IndicatorBox</span></code> to enforce box constraints</p>
-<blockquote>
-<div><p>Default is <code class="code docutils literal notranslate"><span class="pre">None</span></code>).</p>
-</div></blockquote>
-</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Starting point of the algorithm, default value = Zero DataContainer</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – The operator A.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The data b.</p></li>
+<li><p><strong>lower</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Lower bound constraint, default value = <code class="code docutils literal notranslate"><span class="pre">-inf</span></code>.</p></li>
+<li><p><strong>upper</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Upper bound constraint, default value = <code class="code docutils literal notranslate"><span class="pre">-inf</span></code>.</p></li>
+<li><p><strong>constraint</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a><em>, </em><em>default = None</em>) – A function with <code class="code docutils literal notranslate"><span class="pre">proximal</span></code> method, e.g., <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a> function and <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox.proximal" title="cil.optimisation.functions.IndicatorBox.proximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">IndicatorBox.proximal()</span></code></a>,
+or <a class="reference internal" href="#cil.optimisation.functions.TotalVariation" title="cil.optimisation.functions.TotalVariation"><code class="xref py py-class docutils literal notranslate"><span class="pre">TotalVariation</span></code></a> function and <a class="reference internal" href="#cil.optimisation.functions.TotalVariation.proximal" title="cil.optimisation.functions.TotalVariation.proximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TotalVariation.proximal()</span></code></a>.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments used from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code class="code docutils literal notranslate"><span class="pre">constraint</span></code> is not passed, then <code class="code docutils literal notranslate"><span class="pre">lower</span></code> and <code class="code docutils literal notranslate"><span class="pre">upper</span></code> are looked at and an <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a>
+function is created.</p>
+<p>If <code class="code docutils literal notranslate"><span class="pre">constraint</span></code> is passed, <code class="code docutils literal notranslate"><span class="pre">proximal</span></code> method is required to be implemented.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The preconditioning arrays (weights) <code class="code docutils literal notranslate"><span class="pre">M</span></code> and <code class="code docutils literal notranslate"><span class="pre">D</span></code> used in SIRT are defined as</p>
+<div class="math notranslate nohighlight">
+\[M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}\]</div>
+<div class="math notranslate nohighlight">
+\[D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}\]</div>
+<p>In case of division errors above, <code class="xref py py-meth docutils literal notranslate"><span class="pre">_fix_weights()</span></code> can be used, where <code class="code docutils literal notranslate"><span class="pre">np.nan</span></code>, <code class="code docutils literal notranslate"><span class="pre">+np.inf</span></code> and <code class="code docutils literal notranslate"><span class="pre">-np.inf</span></code> values
+are replaced with 1.0.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[\underset{x}{\mathrm{argmin}} \| x - d\|^{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sirt</span> <span class="o">=</span> <span class="n">SIRT</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">operator</span> <span class="o">=</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.SIRT.update">
 <code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update" title="Permalink to this definition">#</a></dt>
-<dd><p>A single iteration of the algorithm</p>
+<dd><p>Performs a single iteration of the SIRT algorithm</p>
+<div class="math notranslate nohighlight">
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) )\]</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.SIRT.update_objective">
 <code class="sig-name descname"><span class="pre">update_objective</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update_objective" title="Permalink to this definition">#</a></dt>
-<dd><p>calculates the objective with the current solution</p>
+<dd><p>Returns the objective</p>
+<div class="math notranslate nohighlight">
+\[\|A x - b\|^{2}\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -823,6 +854,17 @@ proper variables are passed or later with set_up</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.optimisation.algorithms.FISTA.update_previous_solution">
+<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.update_previous_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_previous_solution" title="Permalink to this definition">#</a></dt>
+<dd><p>Update the previous solution with the current one</p>
+<p>The concrete algorithm calls update_previous_solution. Normally this would
+entail the swapping of pointers:</p>
+<p>tmp = self.x_old
+self.x_old = self.x
+self.x = tmp</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.optimisation.algorithms.FISTA.update_objective">
 <code class="sig-name descname"><span class="pre">update_objective</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_objective" title="Permalink to this definition">#</a></dt>
 <dd><p>calculates the objective with the current solution</p>
@@ -832,8 +874,8 @@ proper variables are passed or later with set_up</p>
 
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.PDHG">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">PDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_axpby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id5">[<a class="reference internal" href="#id22" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id23" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">2</a>]</span>.</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">PDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">#</a></dt>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id6">[<a class="reference internal" href="#id17" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">1</a>]</span>, <span id="id7">[<a class="reference internal" href="#id18" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">2</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -843,7 +885,6 @@ proper variables are passed or later with set_up</p>
 <li><p><strong>sigma</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default=None) – Step size for the dual problem.</p></li>
 <li><p><strong>tau</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default=None) – Step size for the primal problem.</p></li>
 <li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – Initial point for the PDHG algorithm.</p></li>
-<li><p><strong>use_axbpy</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional, default=True) – Computes a*x + b*y in C.</p></li>
 <li><p><strong>gamma_g</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional, default=None) – Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.</p></li>
 <li><p><strong>gamma_fconj</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional, default=None) – Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.</p></li>
 <li><p><strong>**kwargs</strong> – <p>Keyward arguments used from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p>
@@ -852,13 +893,15 @@ proper variables are passed or later with set_up</p>
 </dd>
 <dt>update_objective_interval<span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional, default=1</span></dt><dd><p>Evaluates objectives, e.g., primal/dual/primal-dual gap every <code class="docutils literal notranslate"><span class="pre">update_objective_interval</span></code>.</p>
 </dd>
+<dt>check_convergence<span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>, default=True</span></dt><dd><p>Checks scalar sigma and tau values satisfy convergence criterion</p>
+</dd>
 </dl>
 </p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id7">[<a class="reference internal" href="#id25" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">3</a>]</span>, <span id="id8">[<a class="reference internal" href="#id24" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">4</a>]</span>.</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id8">[<a class="reference internal" href="#id20" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">3</a>]</span>, <span id="id9">[<a class="reference internal" href="#id19" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">5</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -962,26 +1005,9 @@ In the future, these parameters will be properties of the corresponding function
 <p class="admonition-title">Note</p>
 <p>The case where both functions are strongly convex is not available at the moment.</p>
 </div>
-<div class="admonition-todo admonition" id="id9">
+<div class="admonition-todo admonition" id="id10">
 <p class="admonition-title">Todo</p>
 <p>Implement acceleration of PDHG when both functions are strongly convex.</p>
-</div>
-<p class="rubric">References</p>
-<div class="docutils container" id="id10">
-<dl class="citation">
-<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
-<dd><p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
-</dd>
-<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
-<dd><p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
-</dd>
-<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
-<dd><p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
-</dd>
-<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
-<dd><p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
-</dd>
-</dl>
 </div>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.PDHG.update">
@@ -1002,8 +1028,7 @@ In the future, these parameters will be properties of the corresponding function
 </dd>
 </dl>
 <p>The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,
-or correct shape array like objects. Warnings may be given in the case the scalar values passed do not guarantee the algorithm
-convergence.</p>
+or correct shape array like objects.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1057,7 +1082,7 @@ where in the PDHG a proximal and proximal conjugate.</p>
 
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.SPDHG">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SPDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_axpby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SPDHG.html#SPDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SPDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SPDHG.html#SPDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG" title="Permalink to this definition">#</a></dt>
 <dd><p>Stochastic Primal Dual Hybrid Gradient</p>
 <p>Problem:</p>
 <div class="math notranslate nohighlight">
@@ -1065,25 +1090,42 @@ where in the PDHG a proximal and proximal conjugate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – BlockOperator of Linear Operators</p></li>
-<li><p><strong>f</strong> – BlockFunction, each function with “simple” proximal of its conjugate</p></li>
-<li><p><strong>g</strong> – Convex function with “simple” proximal</p></li>
-<li><p><strong>sigma=</strong><strong>(</strong><strong>sigma_i</strong><strong>)</strong> – List of Step size parameters for Dual problem</p></li>
-<li><p><strong>tau</strong> – Step size parameter for Primal problem</p></li>
-<li><p><strong>initial</strong> – Initial guess ( Default initial = 0)</p></li>
-<li><p><strong>prob</strong> – List of probabilities</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.BlockFunction" title="cil.optimisation.functions.BlockFunction"><em>BlockFunction</em></a>) – Each must be a convex function with a “simple” proximal method of its conjugate</p></li>
+<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.BlockOperator" title="cil.optimisation.operators.BlockOperator"><em>BlockOperator</em></a>) – BlockOperator must contain Linear Operators</p></li>
+<li><p><strong>tau</strong> (<em>positive float</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – Step size parameter for Primal problem</p></li>
+<li><p><strong>sigma</strong> (<em>list of positive float</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – List of Step size parameters for Dual problem</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – Initial point for the SPDHG algorithm</p></li>
+<li><p><strong>prob</strong> (<em>list of floats</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – List of probabilities. If None each subset will have probability = 1/number of subsets</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – parameter controlling the trade-off between the primal and dual step sizes</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+<li><p><strong>norms</strong> (<em>list of floats</em>) – precalculated list of norms of the operators</p></li>
 </ul>
 </dd>
 </dl>
-<p>Remark: Convergence is guaranted provided that [2, eq. (12)]:</p>
+<p class="rubric">Example</p>
+<p>Example of usage: See <a class="reference external" href="https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py">https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Convergence is guaranted provided that [2, eq. (12)]:</p>
 <div class="math notranslate nohighlight">
-\[\|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  &lt; p_i for all i\]</div>
+\[\]</div>
+<p>|sigma[i]^{1/2} * K[i] * tau^{1/2} |^2  &lt; p_i for all i</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <dl class="simple">
-<dt>Remark: Notation for primal and dual step-sizes are reversed with comparison</dt><dd><p>to PDGH.py</p>
-</dd>
-<dt>Remark: this code implements serial sampling only, as presented in [2]</dt><dd><p>(to be extended to more general case of [1] as future work)</p>
+<dt>Notation for primal and dual step-sizes are reversed with comparison</dt><dd><p>to PDGH.py</p>
 </dd>
 </dl>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<dl class="simple">
+<dt>this code implements serial sampling only, as presented in [2]</dt><dd><p>(to be extended to more general case of [1] as future work)</p>
+</dd>
+</dl>
+</div>
 <p class="rubric">References</p>
 <p>[1]”Stochastic primal-dual hybrid gradient algorithm with arbitrary
 sampling and imaging applications”,
@@ -1092,24 +1134,29 @@ SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.</p>
 <p>[2]”Faster PET reconstruction with non-smooth priors by randomization and preconditioning”,
 Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
 Physics in Medicine &amp; Biology, Volume 64, Number 22, 2019.</p>
-<p>Example of usage: See <a class="reference external" href="https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py">https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py</a></p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.SPDHG.set_up">
 <code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SPDHG.html#SPDHG.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.set_up" title="Permalink to this definition">#</a></dt>
-<dd><p>initialisation of the algorithm</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – BlockOperator of Linear Operators</p></li>
-<li><p><strong>f</strong> – BlockFunction, each function with “simple” proximal of its conjugate.</p></li>
-<li><p><strong>g</strong> – Convex function with “simple” proximal</p></li>
-<li><p><strong>sigma</strong> – list of Step size parameters for dual problem</p></li>
-<li><p><strong>tau</strong> – Step size parameter for primal problem</p></li>
-<li><p><strong>initial</strong> – Initial guess ( Default initial = 0)</p></li>
-<li><p><strong>prob</strong> – List of probabilities</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>set-up of the algorithm
+:param f: Each must be a convex function with a “simple” proximal method of its conjugate
+:type f: BlockFunction
+:param g: A convex function with a “simple” proximal
+:type g: Function
+:param operator: BlockOperator must contain Linear Operators
+:type operator: BlockOperator
+:param tau: Step size parameter for Primal problem
+:type tau: positive float, optional, default=None
+:param sigma: List of Step size parameters for Dual problem
+:type sigma: list of positive float, optional, default=None
+:param initial: Initial point for the SPDHG algorithm
+:type initial: DataContainer, optional, default=None
+:param prob: List of probabilities. If None each subset will have probability = 1/number of subsets
+:type prob: list of floats, optional, default=None
+:param gamma: parameter controlling the trade-off between the primal and dual step sizes
+:type gamma: float
+:param **kwargs:
+:param norms: precalculated list of norms of the operators
+:type norms: list of floats</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1179,29 +1226,27 @@ A <code class="code docutils literal notranslate"><span class="pre">ScaledOperat
 <dl class="py method">
 <dt id="cil.optimisation.operators.Operator.norm">
 <code class="sig-name descname"><span class="pre">norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the Operator</p>
-<p>Calling norm triggers the calculation of the norm of the operator. Normally this
-is a computationally expensive task, therefore we store the result of norm into
-a member of the class. If the calculation has already run, following calls to
-norm just return the saved member.
-It is possible to force recalculation by setting the optional force parameter. Notice that
-norm doesn’t take notice of how many iterations or of the initialisation of the PowerMethod,
-so in case you want to recalculate by setting a higher number of iterations or changing the
-starting point or both you need to set <code class="code docutils literal notranslate"><span class="pre">force=True</span></code></p>
+<dd><p>Returns the norm of the Operator. On first call the norm will be calculated using the operator’s calculate_norm
+method. Subsequent calls will return the cached norm.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, default None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>norm</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>positive:<cite>float</cite></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.optimisation.operators.Operator.set_norm">
+<code class="sig-name descname"><span class="pre">set_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.set_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.set_norm" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the norm of the operator to a custom value.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.optimisation.operators.Operator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.calculate_norm" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.calculate_norm" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculates the norm of the Operator</p>
 </dd></dl>
 
@@ -1277,35 +1322,50 @@ starting point or both you need to set <code class="code docutils literal notran
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.PowerMethod">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">#</a></dt>
-<dd><p>Power method to calculate iteratively the Lipschitz constant</p>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">#</a></dt>
+<dd><p>Power method or Power iteration algorithm</p>
+<p>The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
+absolute value in the real case and module in the complex case.
+For the non-square case, the power method is applied for the matrix :math: A^{T}*A.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> (<code class="code docutils literal notranslate"><span class="pre">LinearOperator</span></code>) – input operator</p></li>
-<li><p><strong>iterations</strong> – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> – starting point for the iteration in the operator domain</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – </p></li>
+<li><p><strong>max_iteration</strong> (positive:<cite>int</cite>, default=10) – Number of iterations for the Power method algorithm.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Starting point for the Power method.</p></li>
+<li><p><strong>tolerance</strong> (positive:<cite>float</cite>, default = 1e-5) – Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.</p></li>
+<li><p><strong>return_all</strong> (<em>boolean</em><em>, </em><em>default = False</em>) – Toggles the verbosity of the return</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>tuple with: L, list of L at each iteration, the data the iteration worked on.</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>dominant eigenvalue</strong> (positive:<cite>float</cite>)</p></li>
+<li><p><strong>number of iterations</strong> (positive:<cite>int</cite>) – Number of iterations run. Only returned if return_all is True.</p></li>
+<li><p><strong>eigenvector</strong> (<em>DataContainer</em>) – Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.</p></li>
+<li><p><strong>list of eigenvalues</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – List of eigenvalues. Only returned if return_all is True.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mop</span> <span class="o">=</span> <span class="n">MatrixOperator</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mop_norm</span> <span class="o">=</span> <span class="n">Mop</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="n">Mop</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mop_norm</span>
+<span class="go">2.0000654846240296</span>
+</pre></div>
+</div>
+<p><cite>PowerMethod</cite> is called when we compute the norm of a matrix or a <cite>LinearOperator</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Mop_norm</span> <span class="o">=</span> <span class="n">Mop</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+<span class="go">2.0005647295658866</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
-</dd>
-</dl>
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the norm of the LinearOperator calculated by the PowerMethod with default values.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1436,34 +1496,30 @@ For the rest it behaves like the operator it holds.</p>
 <dd><p>Returns if the operator is linear</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="cil.optimisation.operators.CompositionOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#CompositionOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculates the norm of the Operator</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt id="cil.optimisation.operators.DiagonalOperator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">DiagonalOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>DiagonalOperator:  D: X -&gt; X,  takes in a DataContainer or subclass
-thereof, diag, representing elements on the diagonal of a diagonal
-operator. Maps an element of <span class="math notranslate nohighlight">\(x\in X\)</span> onto the element
-<span class="math notranslate nohighlight">\(y \in X,  y = diag*x\)</span>, where * denotes elementwise multiplication.
-In matrix-vector interpretation, if x is a vector of length N, then diag is
-also a vector of length N, and D will be an NxN diagonal matrix with diag
-on its diagonal and zeros everywhere else.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param diagonal</dt>
-<dd class="field-odd"><p>DataContainer with diagonal elements</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">DiagonalOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator" title="Permalink to this definition">#</a></dt>
+<dd><p>Performs an element-wise multiplication, i.e., <a class="reference external" href="https://en.wikipedia.org/wiki/Hadamard_product_(matrices)#:~:text=In%20mathematics%2C%20the%20Hadamard%20product,elements%20i%2C%20j%20of%20the">Hadamard Product</a>
+of a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code> <cite>x</cite> and <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code> <cite>diagonal</cite>, <cite>d</cite> .</p>
+<div class="math notranslate nohighlight">
+\[(D\circ x) = \sum_{i,j}^{M,N} D_{i,j} x_{i, j}\]</div>
+<p>In matrix-vector interpretation, if <cite>D</cite> is a <span class="math notranslate nohighlight">\(M\times N\)</span> dense matrix and is flattened, we have a <span class="math notranslate nohighlight">\(M*N \times M*N\)</span> vector.
+A sparse diagonal matrix, i.e., <code class="xref py py-class docutils literal notranslate"><span class="pre">DigaonalOperator</span></code> can be created if we add the vector above to the main diagonal.
+If the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code> <cite>x</cite> is also flattened, we have a <span class="math notranslate nohighlight">\(M*N\)</span> vector.
+Now, matrix-vector multiplcation is allowed and results to a <span class="math notranslate nohighlight">\((M*N,1)\)</span> vector. After reshaping we recover a <span class="math notranslate nohighlight">\(M\times N\)</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>diagonal</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – DataContainer with the same dimensions as the data to be operated on.</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – Specifies the geometry of the operator domain. If ‘None’ will use the diagonal geometry directly. default=None .</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Creator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1478,19 +1534,19 @@ on its diagonal and zeros everywhere else.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns D(x)</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(D\circ x\)</span></p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.adjoint">
 <code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns D^{*}(y), which is identical to direct, so use direct.</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(D\circ x\)</span></p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.calculate_norm">
 <code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Evaluates operator norm of DiagonalOperator</p>
+<dd><p>Returns the operator norm of DiagonalOperator which is the maximum element in the <cite>diagonal</cite>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1678,41 +1734,22 @@ Y : gm_range ( Default: Y = X )</p>
 <p>only available to linear operators</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="cil.optimisation.operators.MatrixOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MatrixOperator.html#MatrixOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MatrixOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt id="cil.optimisation.operators.MaskOperator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">MaskOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>MaskOperator:  D: X -&gt; X,  takes in a DataContainer or subclass
-thereof, mask, with True or 1.0 representing a value to be
-kept and False or 0.0 a value to be lost/set to zero. Maps an element of
-<span class="math notranslate nohighlight">\(x\in X\)</span> onto the element <span class="math notranslate nohighlight">\(y \in X,  y = mask*x\)</span>,
-where * denotes elementwise multiplication.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param mask</dt>
-<dd class="field-odd"><p>DataContainer of datatype bool or with 1/0 elements</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">MaskOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Boolean array with the same dimensions as the data to be operated on.</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – Specifies the geometry of the operator domain. If ‘None’ will use the mask geometry size and spacing as float32. default = None .</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 <dl class="py method">
 <dt id="cil.optimisation.operators.MaskOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Creator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1960,7 +1997,7 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 </ul>
 </dd>
 </dl>
-<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id27"><span class="problematic" id="id28">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id22"><span class="problematic" id="id23">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 <dl class="py method">
 <dt id="cil.optimisation.functions.Function.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__init__" title="Permalink to this definition">#</a></dt>
@@ -2048,7 +2085,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.Function.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.Function.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id29"><span class="problematic" id="id30">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id24"><span class="problematic" id="id25">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -2061,37 +2098,81 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 
 <dl class="py class">
 <dt id="cil.optimisation.functions.SumFunction">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">SumFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction" title="Permalink to this definition">#</a></dt>
-<dd><p>SumFunction represents the sum of two functions</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">SumFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">functions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction" title="Permalink to this definition">#</a></dt>
+<dd><p>SumFunction represents the sum of <span class="math notranslate nohighlight">\(n\geq2\)</span> functions</p>
 <div class="math notranslate nohighlight">
-\[(F_{1} + F_{2})(x)  = F_{1}(x) + F_{2}(x)\]</div>
+\[(F_{1} + F_{2} + ... + F_{n})(\cdot)  = F_{1}(\cdot) + F_{2}(\cdot) + ... + F_{n}(\cdot)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*functions</strong> (<em>Functions</em>) – Functions to set up a <a class="reference internal" href="#cil.optimisation.functions.SumFunction" title="cil.optimisation.functions.SumFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">SumFunction</span></code></a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the number of function is strictly less than 2.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[F(x) = \|x\|^{2} + \frac{1}{2}\|x - 1\|^{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">L2NormSquared</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f1</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math notranslate nohighlight">
+\[F(x) = \sum_{i=1}^{50} \|x - i\|^{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)])</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">functions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.SumFunction.L" title="Permalink to this definition">#</a></dt>
-<dd><p>Lipschitz constant</p>
+<dd><p>Returns the Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{i} L_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.Lmax">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Lmax</span></code><a class="headerlink" href="#cil.optimisation.functions.SumFunction.Lmax" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the maximum Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \max_{i}\{L_{i}\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.__call__">
 <code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the sum of functions <span class="math notranslate nohighlight">\(F_{1}\)</span> and <span class="math notranslate nohighlight">\(F_{2}\)</span> at x</p>
+<dd><p>Returns the value of the sum of functions at <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <div class="math notranslate nohighlight">
-\[(F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)\]</div>
+\[(F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)\]</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the sum of the gradient of functions <span class="math notranslate nohighlight">\(F_{1}\)</span> and <span class="math notranslate nohighlight">\(F_{2}\)</span> at x,
-if both of them are differentiable</p>
+<dd><p>Returns the value of the sum of the gradient of functions at <span class="math notranslate nohighlight">\(x\)</span>, if all of them are differentiable.</p>
 <div class="math notranslate nohighlight">
-\[(F'_{1} + F'_{2})(x)  = F'_{1}(x) + F'_{2}(x)\]</div>
+\[(F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.__add__">
+<code class="sig-name descname"><span class="pre">__add__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__add__" title="Permalink to this definition">#</a></dt>
+<dd><p>Addition for the SumFunction.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> + <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> is a <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> + <code class="code docutils literal notranslate"><span class="pre">Function</span></code> is a <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code>.</p></li>
+</ul>
 </dd></dl>
 
 </dd></dl>
@@ -2118,7 +2199,7 @@ if both of them are differentiable</p>
 <dt id="cil.optimisation.functions.ScaledFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id31"><span class="problematic" id="id32">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id26"><span class="problematic" id="id27">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2199,7 +2280,10 @@ if both of them are differentiable</p>
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumScalarFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.L" title="Permalink to this definition">#</a></dt>
-<dd><p>Lipschitz constant</p>
+<dd><p>Returns the Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{i} L_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2313,7 +2397,7 @@ for convergence purposes.</p>
 <dt id="cil.optimisation.functions.ConstantFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id33"><span class="problematic" id="id34">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id28"><span class="problematic" id="id29">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2373,7 +2457,7 @@ for convergence purposes.</p>
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id45"><span class="problematic" id="id46">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id40"><span class="problematic" id="id41">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -2411,7 +2495,7 @@ proximal and proximal_conjugate</p>
 <dt id="cil.optimisation.functions.OperatorCompositionFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id35"><span class="problematic" id="id36">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id30"><span class="problematic" id="id31">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2893,7 +2977,7 @@ see <em>TranslateFunction</em>.</p>
 <dt id="cil.optimisation.functions.LeastSquares.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id37"><span class="problematic" id="id38">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id32"><span class="problematic" id="id33">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2986,7 +3070,7 @@ see <em>TranslateFunction</em>.</p>
 <dt id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id39"><span class="problematic" id="id40">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id34"><span class="problematic" id="id35">|x|</span></a>}</p>
 </dd></dl>
 
 </dd></dl>
@@ -3078,7 +3162,7 @@ doi: 10.1109/TIP.2009.2028250.</p>
 <dt id="cil.optimisation.functions.TotalVariation.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id41"><span class="problematic" id="id42">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id36"><span class="problematic" id="id37">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3114,7 +3198,7 @@ problems in the following form:</p>
 </ul>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id47"><span class="problematic" id="id48">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id42"><span class="problematic" id="id43">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
@@ -3125,8 +3209,8 @@ do basic algebra between <a class="reference external" href="framework.html#cil.
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id16"><span class="problematic" id="id17">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id18"><span class="problematic" id="id19">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id11"><span class="problematic" id="id12">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id13"><span class="problematic" id="id14">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -3257,8 +3341,8 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.framework.BlockDataContainer.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.axpby" title="Permalink to this definition">#</a></dt>
+<dt id="cil.framework.BlockDataContainer.sapyb">
+<code class="sig-name descname"><span class="pre">sapyb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.sapyb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.sapyb" title="Permalink to this definition">#</a></dt>
 <dd><p>performs axpby element-wise on the BlockDataContainer containers</p>
 <p>Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</p>
 <dl class="field-list simple">
@@ -3268,10 +3352,23 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <li><p><strong>b</strong> – scalar</p></li>
 <li><p><strong>y</strong> – compatible (Block)DataContainer</p></li>
 <li><p><strong>out</strong> – (Block)DataContainer to store the result</p></li>
-<li><p><strong>dtype</strong> – optional, data type of the DataContainers</p></li>
 </ul>
 </dd>
 </dl>
+<p>a = 2
+b = 3
+ig = ImageGeometry(10,11)
+x = ig.allocate(1)
+y = ig.allocate(2)
+bdc1 = BlockDataContainer(2*x, y)
+bdc2 = BlockDataContainer(x, 2*y)
+out = bdc1.sapyb(a,bdc2,b)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.framework.BlockDataContainer.axpby">
+<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.axpby" title="Permalink to this definition">#</a></dt>
+<dd><p>Deprecated method. Alias of sapyb</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3436,7 +3533,7 @@ can be decomposed along the proximal operators of each function <span class="mat
 <dt id="cil.optimisation.functions.BlockFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.BlockFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id43"><span class="problematic" id="id44">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id38"><span class="problematic" id="id39">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3713,18 +3810,21 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <div class="section" id="references">
 <h3>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h3>
-<div class="docutils container" id="id21">
+<div class="docutils container" id="id16">
 <dl class="citation">
-<dt class="label" id="id22"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
+<dt class="label" id="id17"><span class="brackets"><a class="fn-backref" href="#id6">1</a></span></dt>
 <dd><p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </dd>
-<dt class="label" id="id23"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
+<dt class="label" id="id18"><span class="brackets"><a class="fn-backref" href="#id7">2</a></span></dt>
 <dd><p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </dd>
-<dt class="label" id="id25"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
+<dt class="label" id="id20"><span class="brackets"><a class="fn-backref" href="#id8">3</a></span></dt>
 <dd><p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </dd>
-<dt class="label" id="id24"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
+<dt class="label" id="id21"><span class="brackets"><a class="fn-backref" href="#id5">4</a></span></dt>
+<dd><p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
+</dd>
+<dt class="label" id="id19"><span class="brackets"><a class="fn-backref" href="#id9">5</a></span></dt>
 <dd><p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </dd>
 </dl>

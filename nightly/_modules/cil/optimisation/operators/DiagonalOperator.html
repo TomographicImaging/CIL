@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.DiagonalOperator &#8212; CIL v21.3.0 documentation</title>
+    <title>cil.optimisation.operators.DiagonalOperator &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -207,43 +207,59 @@
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span>
 
 <div class="viewcode-block" id="DiagonalOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.DiagonalOperator">[docs]</a><span class="k">class</span> <span class="nc">DiagonalOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
+
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;DiagonalOperator </span>
+
+<span class="sd">    Performs an element-wise multiplication, i.e., `Hadamard Product &lt;https://en.wikipedia.org/wiki/Hadamard_product_(matrices)#:~:text=In%20mathematics%2C%20the%20Hadamard%20product,elements%20i%2C%20j%20of%20the&gt;`_ </span>
+<span class="sd">    of a :class:`DataContainer` `x` and :class:`DataContainer` `diagonal`, `d` .</span>
+
+<span class="sd">    .. math:: (D\circ x) = \sum_{i,j}^{M,N} D_{i,j} x_{i, j}</span>
+
+<span class="sd">    In matrix-vector interpretation, if `D` is a :math:`M\times N` dense matrix and is flattened, we have a :math:`M*N \times M*N` vector.</span>
+<span class="sd">    A sparse diagonal matrix, i.e., :class:`DigaonalOperator` can be created if we add the vector above to the main diagonal.</span>
+<span class="sd">    If the :class:`DataContainer` `x` is also flattened, we have a :math:`M*N` vector.</span>
+<span class="sd">    Now, matrix-vector multiplcation is allowed and results to a :math:`(M*N,1)` vector. After reshaping we recover a :math:`M\times N` :class:`DataContainer`. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    diagonal : DataContainer</span>
+<span class="sd">        DataContainer with the same dimensions as the data to be operated on.</span>
+<span class="sd">    domain_geometry : ImageGeometry</span>
+<span class="sd">        Specifies the geometry of the operator domain. If &#39;None&#39; will use the diagonal geometry directly. default=None .</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;DiagonalOperator:  D: X -&gt; X,  takes in a DataContainer or subclass </span>
-<span class="sd">    thereof, diag, representing elements on the diagonal of a diagonal </span>
-<span class="sd">    operator. Maps an element of :math:`x\in X` onto the element </span>
-<span class="sd">    :math:`y \in X,  y = diag*x`, where * denotes elementwise multiplication.</span>
-<span class="sd">    In matrix-vector interpretation, if x is a vector of length N, then diag is </span>
-<span class="sd">    also a vector of length N, and D will be an NxN diagonal matrix with diag </span>
-<span class="sd">    on its diagonal and zeros everywhere else.</span>
-<span class="sd">                       </span>
-<span class="sd">        :param diagonal: DataContainer with diagonal elements</span>
-<span class="sd">                       </span>
-<span class="sd">     &#39;&#39;&#39;</span>
-    
-<div class="viewcode-block" id="DiagonalOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.DiagonalOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diagonal</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DiagonalOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">diagonal</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> 
-                                           <span class="n">range_geometry</span><span class="o">=</span><span class="n">diagonal</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<div class="viewcode-block" id="DiagonalOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.DiagonalOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diagonal</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">domain_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">diagonal</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">DiagonalOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span> 
+                                    <span class="n">range_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span> <span class="o">=</span> <span class="n">diagonal</span></div>
 
         
 <div class="viewcode-block" id="DiagonalOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.DiagonalOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         
-        <span class="sd">&#39;&#39;&#39;Returns D(x)&#39;&#39;&#39;</span>
+        <span class="s2">&quot;Returns :math:`D\circ x` &quot;</span>
         
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span> <span class="o">*</span> <span class="n">x</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
     
+
 <div class="viewcode-block" id="DiagonalOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.DiagonalOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         
-        <span class="sd">&#39;&#39;&#39;Returns D^{*}(y), which is identical to direct, so use direct.&#39;&#39;&#39;</span>        
+        <span class="s2">&quot;Returns :math:`D\circ x` &quot;</span>
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
-        
+
+  
 <div class="viewcode-block" id="DiagonalOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.DiagonalOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
-        <span class="sd">&#39;&#39;&#39;Evaluates operator norm of DiagonalOperator&#39;&#39;&#39;</span>
+        <span class="s2">&quot; Returns the operator norm of DiagonalOperator which is the maximum element in the `diagonal`.&quot;</span>
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span><span class="o">.</span><span class="n">max</span><span class="p">()</span></div></div>
 </pre></div>

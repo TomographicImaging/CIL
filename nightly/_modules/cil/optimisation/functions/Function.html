@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.Function &#8212; CIL v21.3.0 documentation</title>
+    <title>cil.optimisation.functions.Function &#8212; CIL 21.4.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -206,6 +206,7 @@
 
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 
 <div class="viewcode-block" id="Function"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function">[docs]</a><span class="k">class</span> <span class="nc">Function</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     
@@ -358,56 +359,155 @@
     
 <div class="viewcode-block" id="SumFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction">[docs]</a><span class="k">class</span> <span class="nc">SumFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
     
-    <span class="sd">&quot;&quot;&quot; SumFunction represents the sum of two functions</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SumFunction represents the sum of :math:`n\geq2` functions</span>
 <span class="sd">    </span>
-<span class="sd">    .. math:: (F_{1} + F_{2})(x)  = F_{1}(x) + F_{2}(x)</span>
-<span class="sd">    </span>
+<span class="sd">    .. math:: (F_{1} + F_{2} + ... + F_{n})(\cdot)  = F_{1}(\cdot) + F_{2}(\cdot) + ... + F_{n}(\cdot)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    *functions : Functions</span>
+<span class="sd">                 Functions to set up a :class:`.SumFunction`</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">            If the number of function is strictly less than 2.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    .. math:: F(x) = \|x\|^{2} + \frac{1}{2}\|x - 1\|^{2}</span>
+
+<span class="sd">    &gt;&gt;&gt; from cil.optimisation.functions import L2NormSquared</span>
+<span class="sd">    &gt;&gt;&gt; from cil.framework import ImageGeometry</span>
+<span class="sd">    &gt;&gt;&gt; f1 = L2NormSquared()</span>
+<span class="sd">    &gt;&gt;&gt; f2 = 0.5 * L2NormSquared(b = ig.allocate(1))</span>
+<span class="sd">    &gt;&gt;&gt; F = SumFunction(f1, f2)</span>
+
+<span class="sd">    .. math:: F(x) = \sum_{i=1}^{50} \|x - i\|^{2}</span>
+
+<span class="sd">    &gt;&gt;&gt; F = SumFunction(*[L2NormSquared(b=i) for i in range(50)])</span>
+
+
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="SumFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function1</span><span class="p">,</span> <span class="n">function2</span> <span class="p">):</span>
+<div class="viewcode-block" id="SumFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">functions</span> <span class="p">):</span>
                 
         <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>        
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">function1</span> <span class="o">=</span> <span class="n">function1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">function2</span> <span class="o">=</span> <span class="n">function2</span></div>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">functions</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least 2 functions need to be passed&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="n">functions</span></div>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Lipschitz constant&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function1</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">function2</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function1</span><span class="o">.</span><span class="n">L</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">function2</span><span class="o">.</span><span class="n">L</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Lipschitz constant for the SumFunction</span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: L = \sum_{i} L_{i}</span>
+
+<span class="sd">        where :math:`L_{i}` is the Lipschitz constant of the smooth function :math:`F_{i}`.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">L</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">L</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span>
+            
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
+
     <span class="nd">@L</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># call base class setter</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">fset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="SumFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Lmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Returns the maximum Lipschitz constant for the SumFunction</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: (F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)</span>
+<span class="sd">        .. math:: L = \max_{i}\{L_{i}\}</span>
+
+<span class="sd">        where :math:`L_{i}` is the Lipschitz constant of the smooth function :math:`F_{i}`.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Lmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Lmax</span>
+
+
+    <span class="nd">@Lmax</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">Lmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># call base class setter</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">Lmax</span><span class="o">.</span><span class="n">fset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span>        
+
+<div class="viewcode-block" id="SumFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the sum of functions at :math:`x`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)</span>
 <span class="sd">                </span>
 <span class="sd">        &quot;&quot;&quot;</span>  
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">function2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-    
+        <span class="n">ret</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
 <div class="viewcode-block" id="SumFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the sum of the gradient of functions :math:`F_{1}` and :math:`F_{2}` at x, </span>
-<span class="sd">        if both of them are differentiable</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the sum of the gradient of functions at :math:`x`, if all of them are differentiable.</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: (F&#39;_{1} + F&#39;_{2})(x)  = F&#39;_{1}(x) + F&#39;_{2}(x)</span>
+<span class="sd">        .. math:: (F&#39;_{1} + F&#39;_{2} + ... + F&#39;_{n})(x) = F&#39;_{1}(x) + F&#39;_{2}(x) + ... + F&#39;_{n}(x)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
-<span class="c1">#        try: </span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>            
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function1</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span>  <span class="bp">self</span><span class="o">.</span><span class="n">function2</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">function1</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">function2</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>                </div></div>
-            
+<div class="viewcode-block" id="SumFunction.__add__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        
+        <span class="sd">&quot;&quot;&quot; Addition for the SumFunction.</span>
+<span class="sd">        </span>
+<span class="sd">        *  :code:`SumFunction` + :code:`SumFunction` is a :code:`SumFunction`.</span>
+<span class="sd">         </span>
+<span class="sd">        *  :code:`SumFunction` + :code:`Function` is a :code:`SumFunction`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SumFunction</span><span class="p">):</span>
+            <span class="n">functions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="n">functions</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Function</span><span class="p">):</span>
+            <span class="n">functions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span>
+            <span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="n">functions</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="ScaledFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction">[docs]</a><span class="k">class</span> <span class="nc">ScaledFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
     
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; ScaledFunction represents the scalar multiplication with a Function.</span>
@@ -778,6 +878,51 @@
 <span class="sd">        &quot;&quot;&quot;</span>        
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">F1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">()</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="n">Function</span><span class="p">()</span>
+
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">F1</span> <span class="o">+</span> <span class="n">F2</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum two function&quot;</span><span class="p">,</span> <span class="n">res1</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="c1"># SumFunction</span>
+    
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">F1</span> <span class="o">+</span> <span class="mi">5</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum function and scalar&quot;</span><span class="p">,</span><span class="n">res2</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="c1"># SumScalarFunction</span>
+    
+    <span class="n">res3</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">F1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum scalar and function&quot;</span><span class="p">,</span><span class="n">res3</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="c1"># SumScalarFunction</span>
+
+    <span class="n">res4</span> <span class="o">=</span> <span class="n">F1</span> <span class="o">+</span> <span class="n">ConstantFunction</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum function and constant&quot;</span><span class="p">,</span><span class="n">res4</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="c1"># SumFunction</span>
+
+    <span class="n">res4</span> <span class="o">=</span> <span class="n">ConstantFunction</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum constant and function&quot;</span><span class="p">,</span><span class="n">res4</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="c1"># SumScalarFunction</span>
+
+    <span class="n">res4</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span> <span class="o">+</span> <span class="mi">5</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum zero function and function&quot;</span><span class="p">,</span><span class="n">res4</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="c1"># SumScalarFunction </span>
+
+    <span class="n">res3</span> <span class="o">=</span> <span class="n">res1</span> <span class="o">+</span> <span class="p">(</span><span class="n">F1</span><span class="o">+</span><span class="n">F2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">res3</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">L2NormSquared</span>
+    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>   
+
+    <span class="n">G</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">f1</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span>
+    <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span>
+
+    <span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">functions</span><span class="p">))</span>
+
+    <span class="c1"># L = F.L </span>
+    <span class="c1"># print(res, L)</span>
 </pre></div>
 
               </div>

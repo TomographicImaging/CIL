@@ -1,4 +1,11 @@
+* 22.0.0
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
+
 * 21.4.1
+
  - Add ndim property for DataContainer class.
  - Removed prints from unittests and cleanup of unittest code.
  - CMake: 

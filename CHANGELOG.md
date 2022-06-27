@@ -1,4 +1,8 @@
-* 21.x.x
+* 22.0.0
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
   - GitHub Actions:
     - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
 

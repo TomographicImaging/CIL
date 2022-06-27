@@ -893,7 +893,13 @@ class TestTotalVariation(unittest.TestCase):
         # check proximal
         x_real = self.ig_real.allocate('random', seed=4) 
         res1 = TV_no_strongly_convex.proximal(x_real, tau=1.0)
+
+
+        tmp_x_real = x_real.copy()
         res2 = TV_strongly_convex.proximal(x_real, tau=1.0)  
+        # check input remain the same after proximal        
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array) 
+
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3) 
 
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
@@ -908,13 +914,19 @@ class TestTotalVariation(unittest.TestCase):
         # check call
         x_real = self.ig_real.allocate('random', seed=4) 
         res1 = FGP_TV_strongly_convex(x_real)
+
         res2 = FGP_TV_no_strongly_convex(x_real) + (FGP_TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
         np.testing.assert_allclose(res1, res2, atol=1e-3)        
 
         # check proximal
         x_real = self.ig_real.allocate('random', seed=4)         
         res1 = FGP_TV_no_strongly_convex.proximal(x_real, tau=1.0)
+
+        tmp_x_real = x_real.copy()
         res2 = FGP_TV_strongly_convex.proximal(x_real, tau=1.0)  
+        # check input remain the same after proximal        
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array) 
+        
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)           
 
     

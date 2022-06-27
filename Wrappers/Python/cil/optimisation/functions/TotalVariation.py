@@ -200,11 +200,17 @@ class TotalVariation(Function):
     def __call__(self, x):
         
         r""" Returns the value of the TotalVariation function at :code:`x` ."""
+
         try:
             self._domain = x.geometry
         except:
             self._domain = x
-        
+
+        # Compute Lipschitz constant provided that domain is not None.
+        # Lipschitz constant dependes on the GradientOperator, which is configured only if domain is not None
+        if self._L is None:
+            self.calculate_Lipschitz()
+
         if self.strong_convexity_constant>0:
             tmp = (self.strong_convexity_constant/2)*x.squared_norm()
         else:
@@ -252,6 +258,11 @@ class TotalVariation(Function):
             self._domain = x.geometry
         except:
             self._domain = x
+
+        # Compute Lipschitz constant provided that domain is not None.
+        # Lipschitz constant dependes on the GradientOperator, which is configured only if domain is not None
+        if self._L is None:
+            self.calculate_Lipschitz()            
         
         # initialise
         t = 1        
@@ -261,9 +272,10 @@ class TotalVariation(Function):
         p1 = self.gradient.range_geometry().allocate(0)
 
         if self.strong_convexity_constant>0:
-            tau /= (1 + tau*self.strong_convexity_constant)
+
             x /= (1 + tau*self.strong_convexity_constant)
-        
+            tau /= 1 + tau*self.strong_convexity_constant
+            
         should_break = False
         for k in range(self.iterations):
                                                                                    
@@ -313,6 +325,11 @@ class TotalVariation(Function):
             if should_break:
                 break
         
+        # restore the values of inputs: tau , x
+        if self.strong_convexity_constant>0:
+            tau *= (1 + tau*self.strong_convexity_constant)
+            x *= (1 + tau*self.strong_convexity_constant)
+
         #clear preallocated projection_P arrays
         self.pptmp = None
         self.pptmp1 = None
@@ -323,8 +340,7 @@ class TotalVariation(Function):
                 print("Stop at {} iterations with tolerance {} .".format(k, error))
             else:
                 print("Stop at {} iterations.".format(k))                
-            
-        
+                    
         self.gradient.adjoint(tmp_q, out=tmp_x)
         tmp_x *= tau
         tmp_x *= self.regularisation_parameter 
@@ -335,21 +351,7 @@ class TotalVariation(Function):
     def convex_conjugate(self,x):   
         r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""             
         return 0.0    
-
-    @property
-    def L(self):
-        r""" Lipschitz constant of the "dual" TV-problem used in the FGP algorithm."""         
-        if self._L is None:
-            self.calculate_Lipschitz()
-        return self._L
-    @L.setter
-    def L(self, value):
-        warnings.warn("You should set the Lipschitz constant with calculate_Lipschitz().")
-        if isinstance(value, (Number,)) and value >= 0:
-            self._L = value
-        else:
-            raise TypeError('The Lipschitz constant is a real positive number')
-
+    
     def calculate_Lipschitz(self):
         r""" Default value for the Lipschitz constant."""
         
@@ -365,7 +367,11 @@ class TotalVariation(Function):
         """
         if self._domain is not None:
             self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
+        else:
+            raise ValueError(" The domain of the TotalVariation is {}. Please use the __call__ or proximal methods first before calling gradient.".format(self._domain))            
+
         return self._gradient
+
     def __rmul__(self, scalar):
         if not isinstance (scalar, Number):
             raise TypeError("scalar: Expectec a number, got {}".format(type(scalar)))

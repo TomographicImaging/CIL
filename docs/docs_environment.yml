@@ -27,4 +27,4 @@ dependencies:
   - ipywidgets
   - tqdm
   - jinja2<3.1
-  
+  - cil-data

@@ -20,4 +20,5 @@ from .NikonDataReader import NikonDataReader
 from .TIFF import TIFFWriter
 from .TIFF import TIFFStackReader
 # from .TIFFStackReader import TIFFStackReader
-from .TXRMDataReader import TXRMDataReader
+from .ZEISSDataReader import ZEISSDataReader
+from .ZEISSDataReader import TXRMDataReader

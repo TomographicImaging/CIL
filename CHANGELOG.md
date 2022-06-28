@@ -1,10 +1,18 @@
+* 22.0.0
+  - Add ndim property for DataContainer class.
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
+  - GitHub Actions:
+    - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
+
 * 21.4.1
- - Add ndim property for DataContainer class.
- - Removed prints from unittests and cleanup of unittest code.
- - CMake: 
-   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
- - TIFF writer uses logging
- - Added unittests for TIFF functionality
+  - Removed prints from unittests and cleanup of unittest code.
+  - CMake: 
+    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+  - TIFF writer uses logging
+  - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version

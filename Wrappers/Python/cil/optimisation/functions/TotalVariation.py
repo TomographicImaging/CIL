@@ -270,11 +270,12 @@ class TotalVariation(Function):
         tmp_q = tmp_p.copy()
         tmp_x = self.gradient.domain_geometry().allocate(0)     
         p1 = self.gradient.range_geometry().allocate(0)
+        tmp_tau = tau
 
         if self.strong_convexity_constant>0:
 
-            x /= (1 + tau*self.strong_convexity_constant)
-            tau /= 1 + tau*self.strong_convexity_constant
+            x /= (1 + tau * self.strong_convexity_constant)
+            tmp_tau = tau/(1 + tau*self.strong_convexity_constant)
             
         should_break = False
         for k in range(self.iterations):
@@ -283,15 +284,15 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
             # axpby now works for matrices
-            tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
+            tmp_x.axpby(-self.regularisation_parameter*tmp_tau, 1.0, x, out=tmp_x)
             self.projection_C(tmp_x, tau=None, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
             if isinstance (tau, (Number, np.float32, np.float64)):
-                p1 *= self.L/(self.regularisation_parameter * tau)
+                p1 *= self.L/(self.regularisation_parameter * tmp_tau)
             else:
                 p1 *= self.L/self.regularisation_parameter
-                p1 /= tau
+                p1 /= tmp_tau
 
             if self.tolerance is not None:
                 
@@ -325,10 +326,9 @@ class TotalVariation(Function):
             if should_break:
                 break
         
-        # restore the values of inputs: tau , x
+        # restore the values of input x
         if self.strong_convexity_constant>0:
-            tau *= (1 + tau*self.strong_convexity_constant)
-            x *= (1 + tau*self.strong_convexity_constant)
+            x *= (1 + tmp_tau*self.strong_convexity_constant)
 
         #clear preallocated projection_P arrays
         self.pptmp = None
@@ -342,7 +342,7 @@ class TotalVariation(Function):
                 print("Stop at {} iterations.".format(k))                
                     
         self.gradient.adjoint(tmp_q, out=tmp_x)
-        tmp_x *= tau
+        tmp_x *= tmp_tau
         tmp_x *= self.regularisation_parameter 
         x.subtract(tmp_x, out=tmp_x)
 

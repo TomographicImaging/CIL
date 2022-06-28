@@ -146,7 +146,7 @@ class Algorithm(object):
         
     def get_output(self):
         '''Returns the solution found'''
-        return self.x
+        return self.x_old
     
     @property
     def solution(self):

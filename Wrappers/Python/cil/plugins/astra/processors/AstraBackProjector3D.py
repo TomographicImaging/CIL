@@ -23,25 +23,28 @@ import numpy as np
 
 
 class AstraBackProjector3D(DataProcessor):
-    '''AstraBackProjector3D
-    
-    Back project AcquisitionData to ImageData using ASTRA proj_geom, vol_geom.
-    
-    Input: AcquisitionData
-    Parameter: proj_geom, vol_geom
-    Output: ImageData
-    '''
 
+    """
+    AstraBackProjector3D configures an ASTRA 3D back projector for GPU.
+
+    Parameters
+    ----------
+
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    """  
     def __init__(self,
                  volume_geometry=None,
-                 sinogram_geometry=None,
-                 proj_geom=None,
-                 vol_geom=None):
+                 sinogram_geometry=None):
         kwargs = {
                   'volume_geometry'  : volume_geometry,
                   'sinogram_geometry'  : sinogram_geometry,
-                  'proj_geom'  : proj_geom,
-                  'vol_geom'  : vol_geom}
+                  'proj_geom'  : None,
+                  'vol_geom'  : None}
         
         #DataProcessor.__init__(self, **kwargs)
         super(AstraBackProjector3D, self).__init__(**kwargs)
@@ -109,19 +112,35 @@ class AstraBackProjector3D(DataProcessor):
             out.fill(arr_out)
 
     def create_backprojection3d_gpu(self, data, proj_geom, vol_geom, returnData=True, vol_id=None):
-        """Create a backprojection of a sinogram (3D) using CUDA.
-            :param data: Sinogram data or ID.
-            :type data: :class:`numpy.ndarray` or :class:`int`
-            :param proj_geom: Projection geometry.
-            :type proj_geom: :class:`dict`
-            :param vol_geom: Volume geometry.
-            :type vol_geom: :class:`dict`
-            :param returnData: If False, only return the ID of the backprojection.
-            :type returnData: :class:`bool`
-            :param vol_id: ID of the np array linked with astra
-            :type vol_id: int, default None
-            :returns: :class:`int` or (:class:`int`, :class:`numpy.ndarray`) -- If ``returnData=False``, returns the ID of the backprojection. Otherwise, returns a tuple containing the ID of the backprojection and the backprojection itself, in that order.
+
         """
+        Call to ASTRA to create a backward projection of an image (3D)
+
+        Parameters
+        ----------
+
+        data : numpy.ndarray or int
+            Image data or ID.
+
+        proj_geom : dict
+            Projection geometry.
+
+        vol_geom : dict
+            Volume geometry.
+
+        returnData : bool
+            If False, only return the ID of the forward projection.
+
+        vol_id : int, default None
+            ID of the np array linked with astra.
+
+        Returns
+        -------
+
+        proj_geom : int or (int, numpy.ndarray)
+            If ``returnData=False``, returns the ID of the back projection. Otherwise returns a tuple containing the ID of the back projection and the back projection itself.
+        """
+
         if isinstance(data, np.ndarray):
             sino_id = data3d.create('-sino', proj_geom, data)
         else:

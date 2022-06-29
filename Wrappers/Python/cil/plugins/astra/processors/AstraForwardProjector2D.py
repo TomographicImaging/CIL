@@ -21,14 +21,26 @@ import astra
 import numpy as np
 
 class AstraForwardProjector2D(DataProcessor):
-    '''AstraForwardProjector2D
-    
-    Forward project ImageData to AcquisitionData using ASTRA proj_id.
-    
-    Input: ImageData
-    Parameter: proj_id
-    Output: AcquisitionData
-    '''
+
+    """
+    AstraForwardProjector2D configures an ASTRA 2D forward projector for CPU and GPU.
+
+    Parameters
+    ----------
+
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    proj_id : the ASTRA projector ID
+        For advances ASTRA users only. The astra_mex_projector ID of the projector, use `astra.astra_create_projector()`
+        
+    device : string, default='gpu'
+        The device to run on 'gpu' or 'cpu'
+
+    """  
     
     def __init__(self,
                  volume_geometry=None,

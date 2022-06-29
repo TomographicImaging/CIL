@@ -22,24 +22,28 @@ from astra import astra_dict, algorithm, data3d
 import numpy as np
 
 class AstraForwardProjector3D(DataProcessor):
-    '''AstraForwardProjector3D
-    
-    Forward project ImageData to AcquisitionData using ASTRA projector.
-    
-    Input: ImageData
-    Output: AcquisitionData
-    '''
+    """
+    AstraForwardProjector3D configures an ASTRA 3D forward projector for GPU.
+
+    Parameters
+    ----------
+
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    """  
 
     def __init__(self,
                  volume_geometry=None,
-                 sinogram_geometry=None,
-                 proj_geom=None,
-                 vol_geom=None):
+                 sinogram_geometry=None):
         kwargs = {
                   'volume_geometry'  : volume_geometry,
                   'sinogram_geometry'  : sinogram_geometry,
-                  'proj_geom'  : proj_geom,
-                  'vol_geom'  : vol_geom,
+                  'proj_geom'  : None,
+                  'vol_geom'  : None,
                   }
         
         super(AstraForwardProjector3D, self).__init__(**kwargs)
@@ -108,19 +112,35 @@ class AstraForwardProjector3D(DataProcessor):
             out.fill(arr_out)
 
     def create_sino3d_gpu(self, data, proj_geom, vol_geom, returnData=True, gpuIndex=None, sino_id=None):
-        """Create a forward projection of an image (3D).
-    :param data: Image data or ID.
-    :type data: :class:`numpy.ndarray` or :class:`int`
-    :param proj_geom: Projection geometry.
-    :type proj_geom: :class:`dict`
-    :param vol_geom: Volume geometry.
-    :type vol_geom: :class:`dict`
-    :param returnData: If False, only return the ID of the forward projection.
-    :type returnData: :class:`bool`
-    :param gpuIndex: Optional GPU index.
-    :type gpuIndex: :class:`int`
-    :returns: :class:`int` or (:class:`int`, :class:`numpy.ndarray`) -- If ``returnData=False``, returns the ID of the forward projection. Otherwise, returns a tuple containing the ID of the forward projection and the forward projection itself, in that order.
-    """
+        """
+        Call to ASTRA to create a forward projection of an image (3D)
+
+        Parameters
+        ----------
+
+        data : numpy.ndarray or int
+            Image data or ID.
+
+        proj_geom : dict
+            Projection geometry.
+
+        vol_geom : dict
+            Volume geometry.
+
+        returnData : bool
+            If False, only return the ID of the forward projection.
+
+        gpuIndex : int, optional
+            Optional GPU index.
+
+        Returns
+        -------
+
+        proj_geom : int or (int, numpy.ndarray)
+            If ``returnData=False``, returns the ID of the forward projection. Otherwise returns a tuple containing the ID of the forward projection and the forward projection itself.
+
+        """
+
 
         if isinstance(data, np.ndarray):
             volume_id = data3d.create('-vol', vol_geom, data)

@@ -20,13 +20,23 @@ import numpy as np
 
 def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
-    '''Set up ASTRA Volume and projection geometry, not stored
+    """
+    Converts CIL 2D geometries to ASTRA 2D vector Geometries.
 
-       :param volume_geometry: ccpi.framework.ImageGeometry
-       :param sinogram_geometry: ccpi.framework.AcquisitionGeometry
-       
-       :returns ASTRA volume and sinogram geometry'''
- 
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    Returns
+    -------
+    astra_volume_geom, astra_projection_geom
+        The ASTRA vol_geom and proj_geom
+
+    """
     sinogram_geometry = sinogram_geometry_in.copy()
     
     #this catches behaviour modified after CIL 21.3.1 
@@ -90,13 +100,17 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
     return vol_geom, proj_geom
 
 def rotation_matrix_z_from_euler(angle, degrees):
-    '''Returns 2D rotation matrix for z axis using direction cosine
+    """
+    Returns 2D rotation matrix for z axis using direction cosine
 
-    :param angle: angle or rotation around z axis
-    :type angle: float
-    :param degrees: if radian or degrees
-    :type bool: defines the unit measure of the angle
-    '''
+    Parameters
+    ----------
+    angle : float
+        angle or rotation around z axis
+
+    degrees : bool
+        if radian or degrees
+    """
     if degrees:
         alpha = angle / 180. * np.pi
     else:

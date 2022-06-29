@@ -24,21 +24,33 @@ import numpy as np
 
 class FBP_Flexible(FDK_Flexible):
 
-    '''FBP_Flexible Filtered Back Projection is a reconstructor for 2D and 3D parallel-beam geometries.
-    It is able to back-project circular trajectories with 2 PI anuglar range and equally spaced anglular steps.
+    """
+    FBP_Flexible Filtered Back Projection performs an FBP reconstruction for 2D and 3D parallel-beam geometries.
+    It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.
 
     This uses the ram-lak filter
     This is a GPU version only
-    
-    Input: Volume Geometry
-           Sinogram Geometry
-                             
-    Example:  fbp = FBP_Flexible(ig, ag)
-              fbp.set_input(data)
-              reconstruction = fbp.get_ouput()
-                           
-    Output: ImageData                                 
-    '''
+
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    Example
+    -------
+    >>> from cil.plugins.astra import FBP_Flexible
+    >>> fbp = FBP_Flexible(image_geometry, data.geometry)
+    >>> fbp.set_input(data)
+    >>> reconstruction = fbp.get_ouput()
+
+    Note
+    ----
+    ASTRA-toolbox provides limited FBP GPU support for offset/rotated geometries.
+    This class creates a pseudo cone-beam geometry in-order to leverage the ASTRA FDK algorithm.
+    """
 
     def __init__(self, volume_geometry, 
                        sinogram_geometry): 
@@ -84,21 +96,29 @@ class FBP_Flexible(FDK_Flexible):
 
 class FBP_CPU(Processor):
 
-    '''FBP_CPU Filtered Back Projection is a reconstructor for 2D parallel-beam geometries.
-    It is able to back-project circular trajectories with equally spaced angular steps.
+    """
+    FBP_CPU Filtered Back Projection performs an FBP reconstruction for 2D parallel-beam geometries.
+    It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.
 
     This uses the ram-lak filter
     This is a CPU version only
-    
-    Input: Volume Geometry
-           Sinogram Geometry
-                             
-    Example:  fbp = FBP_CPU(ig, ag)
-              fbp.set_input(data)
-              reconstruction = fbp.get_ouput()
-                           
-    Output: ImageData                                 
-    '''
+
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    Example
+    -------
+    >>> from cil.plugins.astra import FBP_CPU
+    >>> fbp = FBP_CPU(image_geometry, data.geometry)
+    >>> fbp.set_input(data)
+    >>> reconstruction = fbp.get_ouput()
+    """
+
 
     def __init__(self, volume_geometry, 
                        sinogram_geometry): 
@@ -121,7 +141,7 @@ class FBP_CPU(Processor):
                  .format(self.sinogram_geometry.dimension))
 
         if self.sinogram_geometry.system_description != 'simple':
-            logging.WARNING("FBP will use simple geometry only. Any configuration offsets or rotations will be ignored.")  
+            logging.WARNING("The ASTRA backend FBP will use simple geometry only. Any configuration offsets or rotations may be ignored.")  
 
         return True
 
@@ -130,7 +150,6 @@ class FBP_CPU(Processor):
            
         # Get DATA
         DATA = self.get_input()
-
 
         vol_geom_astra, proj_geom_astra = convert_geometry_to_astra(self.volume_geometry, self.sinogram_geometry)
                            

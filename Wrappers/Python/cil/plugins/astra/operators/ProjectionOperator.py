@@ -44,7 +44,7 @@ class ProjectionOperator(LinearOperator):
 
     >>> from cil.plugins.astra import ProjectionOperator
     >>> PO = ProjectionOperator(image.geometry, data.geometry)
-    >>> foward_projection = PO.direct(image)
+    >>> forward_projection = PO.direct(image)
     >>> backward_projection = PO.adjoint(data)
 
     Notes
@@ -79,9 +79,40 @@ class ProjectionOperator(LinearOperator):
             self.operator = operator
 
     def direct(self, IM, out=None):
+        '''Applies the direct of the operator i.e. the forward projection.
+        
+        Parameters
+        ----------
+        IM : ImageData
+            The image/volume to be projected.
+
+        out : DataContainer, optional
+           Fills the referenced DataContainer with the processed data and suppresses the return
+        
+        Returns
+        -------
+        DataContainer
+            The processed data. Suppressed if `out` is passed
+        '''
+
         return self.operator.direct(IM, out=out)
     
     def adjoint(self, DATA, out=None):
+        '''Applies the adjoint of the operator, i.e. the backward projection.
+
+        Parameters
+        ----------
+        DATA : AcquisitionData
+            The projections/sinograms to be projected.
+
+        out : DataContainer, optional
+           Fills the referenced DataContainer with the processed data and suppresses the return
+        
+        Returns
+        -------
+        DataContainer
+            The processed data. Suppressed if `out` is passed
+        '''
         return self.operator.adjoint(DATA, out=out)
     
     def calculate_norm(self):

@@ -19,12 +19,23 @@ import astra
 import numpy as np
 
 def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
-    '''Set up ASTRA Volume and projection geometry, not stored
+    """
+    Converts CIL geometries to simple ASTRA Geometries. Any offsets/rotations will be ignored.
 
-       :param volume_geometry: ccpi.framework.ImageGeometry
-       :param sinogram_geometry: ccpi.framework.AcquisitionGeometry
-       
-       :returns ASTRA volume and sinogram geometry'''
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    Returns
+    -------
+    astra_volume_geom, astra_projection_geom
+        The ASTRA vol_geom and proj_geom
+
+    """
 
     # determine if the geometry is 2D or 3D
 

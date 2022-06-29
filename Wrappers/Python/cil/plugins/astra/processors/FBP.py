@@ -25,7 +25,7 @@ class FBP(DataProcessor):
     """
     FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.
 
-    The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small anglular steps.
+    The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small angular steps.
 
     Parameters
     ----------
@@ -50,7 +50,7 @@ class FBP(DataProcessor):
 
     Notes
     -----
-    A CPU version is provided for simple 2D parallel-beam geometries only any offsets and rotations in the acquisition geometry will be ignored
+    A CPU version is provided for simple 2D parallel-beam geometries only, any offsets and rotations in the acquisition geometry will be ignored.
 
     This uses the ram-lak filter only.
 

@@ -91,6 +91,6 @@ Projection Operator
 
 .. autoclass:: cil.plugins.astra.ProjectionOperator
    :members:
-   :special-members:
+   :inherited-members:
 
 :ref:`Return Home <mastertoc>`

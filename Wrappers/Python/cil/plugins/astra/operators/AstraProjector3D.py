@@ -21,8 +21,7 @@ from cil.plugins.astra.processors import AstraForwardProjector3D, AstraBackProje
 class AstraProjector3D(LinearOperator):
     """
     AstraProjector3D configures and calls the ASTRA 3D Projectors for GPU. This works with 2D or 3D datasets.
-    
-    It is recommended to use the ProjectionOperator class .
+    It is recommended to use this via the ProjectionOperator Class.
 
     Parameters
     ----------

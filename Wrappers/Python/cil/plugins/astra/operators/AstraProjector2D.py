@@ -22,7 +22,8 @@ from cil.plugins.astra.processors import AstraForwardProjector2D, AstraBackProje
 
 class AstraProjector2D(LinearOperator):
     """
-    AstraProjector2D configures and calls the ASTRA 2D Projectors for CPU and GPU. It is recommended to use the ProjectionOperator Class.
+    AstraProjector2D configures and calls the ASTRA 2D Projectors for CPU and GPU.
+    It is recommended to use this via the ProjectionOperator Class.
 
     Parameters
     ----------

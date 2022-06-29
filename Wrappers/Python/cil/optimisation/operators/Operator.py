@@ -170,19 +170,6 @@ class LinearOperator(Operator):
 
         """
 
-        #deal with deprecated arguments
-        if deprecated_args.get('x_init') is not None:
-            warnings.warn('PowerMethod: The use of the x_init parameter is deprecated and will be removed in following version. Please use initial instead.')
-            if initial is None:
-                initial = deprecated_args.get('x_init')
-            else:
-                raise ValueError('PowerMethod: received both initial and the deprecated x_init parameter. Please use initial only.')
-
-        if deprecated_args.get('iterations') is not None:
-            warnings.warn('PowerMethod: The use of the iterations parameter is deprecated and will be removed in following version. Please use max_iteration instead.')      
-            max_iteration = deprecated_args.get('iterations')
-
-
         # Default case: non-symmetric
         symmetric = False
         try:

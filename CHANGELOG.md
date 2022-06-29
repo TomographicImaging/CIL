@@ -1,4 +1,5 @@
 * 22.0.0
+  - Deprecated: `x_init` removed from the initialisation of the Algorithms and `initial` will be used.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
   - Deprecated:

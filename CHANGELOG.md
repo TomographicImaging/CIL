@@ -1,4 +1,5 @@
 * 22.0.0
+  - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
   - Deprecated:

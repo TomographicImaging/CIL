@@ -3,6 +3,7 @@
     - Modules not moved should be considered deprecated
     - CIL remains licenced as APACHE-2.0
     - Minor bug fixes to the CPU 2D Parallel-beam FBP
+  - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
   - Deprecated:

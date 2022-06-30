@@ -625,7 +625,7 @@ reconstruction = fbp.get_ouput()</p>
 <div class="section" id="astra">
 <h2>ASTRA<a class="headerlink" href="#astra" title="Permalink to this headline">#</a></h2>
 <p>This plugin allows the use of <a class="reference external" href="https://github.com/astra-toolbox/astra-toolbox">ASTRA-toolbox</a>
-(<a class="reference external" href="http://dx.doi.org/10.1364/OE.24.025129">10.1364/OE.24.025129</a>
+(<a class="reference external" href="http://dx.doi.org/10.1364/OE.24.025129">10.1364/OE.24.025129</a>)
 for forward and back projections and filter back projection reconstruction.</p>
 <div class="section" id="id4">
 <h3>FBP<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
@@ -633,18 +633,28 @@ for forward and back projections and filter back projection reconstruction.</p>
 <dl class="py class">
 <dt id="cil.plugins.astra.FBP">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></code><code class="sig-name descname"><span class="pre">FBP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP" title="Permalink to this definition">#</a></dt>
-<dd><p>FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
-It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.</p>
-<p>This uses the ram-lak filter
-A CPU version is provided for simple 2D parallel-beam geometries only (offsets and rotations will be ignored)</p>
-<dl class="simple">
-<dt>Input: Volume Geometry</dt><dd><p>Sinogram Geometry</p>
-</dd>
-<dt>Example:  fbp = FBP(ig, ag, device)</dt><dd><p>fbp.set_input(data)
-reconstruction = fbp.get_ouput()</p>
+<dd><p>FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.</p>
+<p>The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small angular steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volume_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>sinogram_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – A description of the acquisition data</p></li>
+<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default='gpu'</em>) – ‘gpu’ will run on a compatible CUDA capable device using the ASTRA FDK_CUDA algorithm
+‘cpu’ will run on CPU using the ASTRA FBP algorithm - see Notes for limitations</p></li>
+</ul>
 </dd>
 </dl>
-<p>Output: ImageData</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.astra</span> <span class="kn">import</span> <span class="n">FBP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reconstruction</span> <span class="o">=</span> <span class="n">fbp</span><span class="o">.</span><span class="n">get_ouput</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>A CPU version is provided for simple 2D parallel-beam geometries only, any offsets and rotations in the acquisition geometry will be ignored.</p>
+<p>This uses the ram-lak filter only.</p>
 <dl class="py method">
 <dt id="cil.plugins.astra.FBP.set_input">
 <code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.set_input" title="Permalink to this definition">#</a></dt>
@@ -681,41 +691,63 @@ reconstruction = fbp.get_ouput()</p>
 <dl class="py class">
 <dt id="cil.plugins.astra.ProjectionOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></code><code class="sig-name descname"><span class="pre">ProjectionOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>ProjectionOperator wraps ASTRA 3D Projector for GPU, and ASTRA 2D Projectors for CPU. Broadcasts the operator accross all channels.</p>
+<dd><p>ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – The CIL ImageGeometry object describing your reconstruction volume</p></li>
-<li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – The CIL AcquisitionGeometry object describing your sinogram data</p></li>
-<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default='gpu'</em>) – The device to run on ‘gpu’ or ‘cpu’. ‘gpu’ will use the ASTRA 3D Projectors, ‘cpu’ will use the ASTRA 2D Projectors</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – A description of the acquisition data</p></li>
+<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default='gpu'</em>) – ‘gpu’ will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, ‘cpu’ will run on CPU using the ASTRA 2D CPU Projectors</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="cil.plugins.astra.ProjectionOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.astra</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PO</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">forward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">backward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>For multichannel data the ProjectionOperator will broadcast across all channels.</p>
 <dl class="py method">
 <dt id="cil.plugins.astra.ProjectionOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the application of the Operator on x</p>
+<dd><p>Applies the direct of the operator i.e. the forward projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>IM</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – The image/volume to be projected.</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.plugins.astra.ProjectionOperator.adjoint">
 <code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DATA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the adjoint/inverse operation</p>
-<p>only available to linear operators</p>
+<dd><p>Applies the adjoint of the operator, i.e. the backward projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>DATA</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The projections/sinograms to be projected.</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

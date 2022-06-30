@@ -185,52 +185,64 @@
               <div>
                 
   <h1>Source code for cil.plugins.astra.processors.FBP</h1><div class="highlight"><pre>
-<span></span><span class="c1">#========================================================================</span>
-<span class="c1"># Copyright 2019 Science Technology Facilities Council</span>
-<span class="c1"># Copyright 2019 University of Manchester</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2019 - 2022 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2019 - 2022 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1"># This work is part of the Core Imaging Library developed by Science Technology</span>
-<span class="c1"># Facilities Council and University of Manchester</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
-<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1"># you may not use this file except in compliance with the License.</span>
-<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
-<span class="c1">#         http://www.apache.org/licenses/LICENSE-2.0.txt</span>
-<span class="c1">#</span>
-<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1"># See the License for the specific language governing permissions and</span>
-<span class="c1"># limitations under the License.</span>
-<span class="c1">#</span>
-<span class="c1">#=========================================================================</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Flexible</span> <span class="kn">import</span> <span class="n">FBP_Flexible</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FDK_Flexible</span> <span class="kn">import</span> <span class="n">FDK_Flexible</span>
-<span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Simple</span> <span class="kn">import</span> <span class="n">FBP_Simple</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Flexible</span> <span class="kn">import</span> <span class="n">FBP_CPU</span>
 
 <div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
-    <span class="sd">&#39;&#39;&#39;FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.</span>
-<span class="sd">    It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.</span>
 
-<span class="sd">    This uses the ram-lak filter</span>
-<span class="sd">    A CPU version is provided for simple 2D parallel-beam geometries only (offsets and rotations will be ignored)</span>
-<span class="sd">    </span>
-<span class="sd">    Input: Volume Geometry</span>
-<span class="sd">           Sinogram Geometry</span>
-<span class="sd">                             </span>
-<span class="sd">    Example:  fbp = FBP(ig, ag, device)</span>
-<span class="sd">              fbp.set_input(data)</span>
-<span class="sd">              reconstruction = fbp.get_ouput()</span>
-<span class="sd">                           </span>
-<span class="sd">    Output: ImageData                             </span>
+<span class="sd">    The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small angular steps.</span>
 
-<span class="sd">    </span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    volume_geometry : ImageGeometry</span>
+<span class="sd">        A description of the area/volume to reconstruct</span>
+
+<span class="sd">    sinogram_geometry : AcquisitionGeometry</span>
+<span class="sd">        A description of the acquisition data</span>
+
+<span class="sd">    device : string, default=&#39;gpu&#39;</span>
+<span class="sd">        &#39;gpu&#39; will run on a compatible CUDA capable device using the ASTRA FDK_CUDA algorithm</span>
+<span class="sd">        &#39;cpu&#39; will run on CPU using the ASTRA FBP algorithm - see Notes for limitations</span>
+
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from cil.plugins.astra import FBP</span>
+<span class="sd">    &gt;&gt;&gt; fbp = FBP(image_geometry, data.geometry)</span>
+<span class="sd">    &gt;&gt;&gt; fbp.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; reconstruction = fbp.get_ouput()</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    A CPU version is provided for simple 2D parallel-beam geometries only, any offsets and rotations in the acquisition geometry will be ignored.</span>
+
+<span class="sd">    This uses the ram-lak filter only.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span> 
         
@@ -250,7 +262,7 @@
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot process cone-beam data without a GPU&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
-                <span class="n">processor</span> <span class="o">=</span> <span class="n">FBP_Simple</span><span class="p">(</span><span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">,</span>  <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> 
+                <span class="n">processor</span> <span class="o">=</span> <span class="n">FBP_CPU</span><span class="p">(</span><span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">)</span> 
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot process 3D data without a GPU&quot;</span><span class="p">)</span>
 
@@ -267,7 +279,7 @@
     <span class="k">def</span> <span class="nf">get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>       
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
 
-<div class="viewcode-block" id="FBP.get_output"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.FBP.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>       
+<div class="viewcode-block" id="FBP.get_output"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.FBP.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>       

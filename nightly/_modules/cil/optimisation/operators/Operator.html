@@ -208,15 +208,21 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <div class="viewcode-block" id="Operator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator">[docs]</a><span class="k">class</span> <span class="nc">Operator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Operator that maps from a space X -&gt; Y&#39;&#39;&#39;</span>
-<div class="viewcode-block" id="Operator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Creator</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operator that maps from a space X -&gt; Y</span>
 
-<span class="sd">        :param domain_geometry: domain of the operator</span>
-<span class="sd">        :param range_geometry: range of the operator</span>
-<span class="sd">        :type range_geometry: optional, default None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    domain_geometry : ImageGeometry or AcquisitionGeometry</span>
+<span class="sd">        domain of the operator</span>
+
+<span class="sd">    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None</span>
+<span class="sd">        range of the operator </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Operator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_domain_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_range_geometry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;range_geometry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
@@ -296,7 +302,18 @@
 
 
 <div class="viewcode-block" id="LinearOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator">[docs]</a><span class="k">class</span> <span class="nc">LinearOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;A Linear Operator that maps from a space X &lt;-&gt; Y&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Linear operator that maps from a space X &lt;-&gt; Y</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    domain_geometry : ImageGeometry or AcquisitionGeometry</span>
+<span class="sd">        domain of the operator</span>
+
+<span class="sd">    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None</span>
+<span class="sd">        range of the operator </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="LinearOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="LinearOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

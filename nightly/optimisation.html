@@ -1197,18 +1197,18 @@ A <code class="code docutils literal notranslate"><span class="pre">ScaledOperat
 <dt id="cil.optimisation.operators.Operator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">Operator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator" title="Permalink to this definition">#</a></dt>
 <dd><p>Operator that maps from a space X -&gt; Y</p>
-<dl class="py method">
-<dt id="cil.optimisation.operators.Operator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – domain of the operator</p></li>
+<li><p><strong>range_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a><em>, </em><em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="cil.optimisation.operators.Operator.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1292,19 +1292,19 @@ method. Subsequent calls will return the cached norm.</p>
 <dl class="py class">
 <dt id="cil.optimisation.operators.LinearOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">LinearOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>A Linear Operator that maps from a space X &lt;-&gt; Y</p>
-<dl class="py method">
-<dt id="cil.optimisation.operators.LinearOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
+<dd><p>Linear operator that maps from a space X &lt;-&gt; Y</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – domain of the operator</p></li>
+<li><p><strong>range_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a><em>, </em><em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="cil.optimisation.operators.LinearOperator.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1473,15 +1473,7 @@ For the rest it behaves like the operator it holds.</p>
 <dd><dl class="py method">
 <dt id="cil.optimisation.operators.CompositionOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">operators</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#CompositionOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1520,15 +1512,7 @@ Now, matrix-vector multiplcation is allowed and results to a <span class="math n
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1577,15 +1561,7 @@ by creating instead a BlockOperator of ChannelwiseOperators.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.ChannelwiseOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/ChannelwiseOperator.html#ChannelwiseOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ChannelwiseOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1621,15 +1597,7 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.IdentityOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/IdentityOperator.html#IdentityOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.IdentityOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1670,15 +1638,7 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.ZeroOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/ZeroOperator.html#ZeroOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ZeroOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1750,15 +1710,7 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.MaskOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1874,15 +1826,7 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.FiniteDifferenceOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'forward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/FiniteDifferenceOperator.html#FiniteDifferenceOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.FiniteDifferenceOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1907,15 +1851,7 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.SparseFiniteDifferenceOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SparseFiniteDifferenceOperator.html#SparseFiniteDifferenceOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SparseFiniteDifferenceOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">

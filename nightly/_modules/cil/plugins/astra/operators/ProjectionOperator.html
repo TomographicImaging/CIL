@@ -185,26 +185,22 @@
               <div>
                 
   <h1>Source code for cil.plugins.astra.operators.ProjectionOperator</h1><div class="highlight"><pre>
-<span></span><span class="c1">#========================================================================</span>
-<span class="c1"># Copyright 2019 Science Technology Facilities Council</span>
-<span class="c1"># Copyright 2019 University of Manchester</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2019 - 2022 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2019 - 2022 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1"># This work is part of the Core Imaging Library developed by Science Technology</span>
-<span class="c1"># Facilities Council and University of Manchester</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
-<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1"># you may not use this file except in compliance with the License.</span>
-<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
-<span class="c1">#         http://www.apache.org/licenses/LICENSE-2.0.txt</span>
-<span class="c1">#</span>
-<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1"># See the License for the specific language governing permissions and</span>
-<span class="c1"># limitations under the License.</span>
-<span class="c1">#</span>
-<span class="c1">#=========================================================================</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">ChannelwiseOperator</span>
@@ -212,17 +208,38 @@
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector2D</span>
 
 <div class="viewcode-block" id="ProjectionOperator"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator">[docs]</a><span class="k">class</span> <span class="nc">ProjectionOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;ProjectionOperator wraps ASTRA 3D Projector for GPU, and ASTRA 2D Projectors for CPU. Broadcasts the operator accross all channels.</span>
-<span class="sd">    </span>
-<span class="sd">    :param image_geometry: The CIL ImageGeometry object describing your reconstruction volume</span>
-<span class="sd">    :type image_geometry: ImageGeometry</span>
-<span class="sd">    :param acquisition_geometry: The CIL AcquisitionGeometry object describing your sinogram data</span>
-<span class="sd">    :type acquisition_geometry: AcquisitionGeometry</span>
-<span class="sd">    :param device: The device to run on &#39;gpu&#39; or &#39;cpu&#39;. &#39;gpu&#39; will use the ASTRA 3D Projectors, &#39;cpu&#39; will use the ASTRA 2D Projectors</span>
-<span class="sd">    :type device: string, default=&#39;gpu&#39;</span>
-<span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="ProjectionOperator.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    image_geometry : ImageGeometry</span>
+<span class="sd">        A description of the area/volume to reconstruct</span>
+
+<span class="sd">    acquisition_geometry : AcquisitionGeometry</span>
+<span class="sd">        A description of the acquisition data</span>
+
+<span class="sd">    device : string, default=&#39;gpu&#39;</span>
+<span class="sd">        &#39;gpu&#39; will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, &#39;cpu&#39; will run on CPU using the ASTRA 2D CPU Projectors</span>
+
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &gt;&gt;&gt; from cil.plugins.astra import ProjectionOperator</span>
+<span class="sd">    &gt;&gt;&gt; PO = ProjectionOperator(image.geometry, data.geometry)</span>
+<span class="sd">    &gt;&gt;&gt; forward_projection = PO.direct(image)</span>
+<span class="sd">    &gt;&gt;&gt; backward_projection = PO.adjoint(data)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For multichannel data the ProjectionOperator will broadcast across all channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
 
@@ -246,12 +263,43 @@
             <span class="n">operator_full</span> <span class="o">=</span> <span class="n">ChannelwiseOperator</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator_full</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
 
 <div class="viewcode-block" id="ProjectionOperator.direct"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Applies the direct of the operator i.e. the forward projection.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        IM : ImageData</span>
+<span class="sd">            The image/volume to be projected.</span>
+
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">           Fills the referenced DataContainer with the processed data and suppresses the return</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            The processed data. Suppressed if `out` is passed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="ProjectionOperator.adjoint"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Applies the adjoint of the operator, i.e. the backward projection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        DATA : AcquisitionData</span>
+<span class="sd">            The projections/sinograms to be projected.</span>
+
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">           Fills the referenced DataContainer with the processed data and suppresses the return</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            The processed data. Suppressed if `out` is passed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="ProjectionOperator.calculate_norm"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

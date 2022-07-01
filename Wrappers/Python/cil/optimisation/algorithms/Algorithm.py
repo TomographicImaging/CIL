@@ -146,7 +146,16 @@ class Algorithm(object):
         
     def get_output(self):
         '''Returns the solution found'''
-        return self.x_old
+        return self.x
+
+    @property
+    def provable_convergence_condition(self):
+        raise NotImplementedError()
+
+    def _is_provably_convergent(self):
+        """ Check if the algorithm is convergent based on the provable convergence criterion.
+        """
+        return self.provable_convergence_condition    
     
     @property
     def solution(self):

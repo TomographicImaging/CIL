@@ -60,6 +60,7 @@ class ISTA(Algorithm):
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
+
     Examples
     --------
 
@@ -84,20 +85,6 @@ class ISTA(Algorithm):
     @property
     def provable_convergence_condition(self):
         return self.step_size <= 0.99*2.0/self.f.L
-
-    # convergence criterion based on the Lipschitz constant
-    def is_provably_convergent(self):
-        """Check convergence criterion
-        """
-        if isinstance(self.f.L, Number):
-            if self.provable_convergence_condition:
-                return True
-            else:
-                warnings.warn("Convergence criterion is not satisfied.")
-                return False
-        else:
-            raise ValueError("Function f is not differentiable")
-
 
     @property
     def step_size(self):        
@@ -135,10 +122,6 @@ class ISTA(Algorithm):
         # set step_size
         self.set_step_size(step_size=step_size)
 
-        # check convergence criterion for ISTA is satisfied
-        if kwargs.get('check_convergence_criterion', True):
-            self.is_provably_convergent()
-
         logging.info("{} setting up".format(self.__class__.__name__, ))
         
         self.configured = True  
@@ -160,7 +143,6 @@ class ISTA(Algorithm):
         # proximal step
         self.x = self.g.proximal(self.x, self.step_size)
 
-
     def update_previous_solution(self):  
         """ Swap the pointers to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
         """        
@@ -168,6 +150,10 @@ class ISTA(Algorithm):
         self.x_old = self.x
         self.x = tmp
 
+    def get_output(self):
+        " Overrides the base method :func:`~Algorithm.get_output` of the base class :class:`Algorithm`."
+        return self.x_old
+        
     def update_objective(self):
         """ Updates the objective
 
@@ -283,3 +269,24 @@ class FISTA(ISTA):
         
         self.x.subtract(self.x_old, out=self.y)
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y) 
+
+
+if __name__ == "__main__":
+
+    from cil.optimisation.functions import L2NormSquared
+    from cil.framework import ImageGeometry
+    import time
+    f = L2NormSquared()
+    g = L2NormSquared()
+    ig = ImageGeometry(3,4)
+
+    initial = ig.allocate()
+    t1 = time.time()
+    ista = ISTA(initial = initial,  f = f, g = g, step_size=0.1)
+    t2 = time.time()
+    print(t2-t1)
+    
+    t3 = time.time()
+    print(ista.provable_convergence_condition)
+    t4 = time.time()
+    print(t4-t3)    

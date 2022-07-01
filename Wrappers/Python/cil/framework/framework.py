@@ -2019,8 +2019,13 @@ class DataContainer(object):
 
     @property
     def shape(self):
-        '''Returns the shape of the  of the DataContainer'''
+        '''Returns the shape of the DataContainer'''
         return self.array.shape
+
+    @property
+    def ndim(self):
+        '''Returns the ndim of the DataContainer'''
+        return self.array.ndim        
 
     @shape.setter
     def shape(self, val):
@@ -3388,3 +3393,5 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+

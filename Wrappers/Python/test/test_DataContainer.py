@@ -91,6 +91,13 @@ class TestDataContainer(CCPiTestClass):
         ds1 = ds.clone()
         self.assertNotEqual(aid(ds.as_array()), aid(ds1.as_array()))
 
+    def test_ndim(self):
+
+        x_np = numpy.arange(0, 60).reshape(3,4,5)
+        x_cil = DataContainer(x_np)
+        self.assertEqual(x_np.ndim, x_cil.ndim)
+        self.assertEqual(3, x_cil.ndim)
+
     def testInlineAlgebra(self):
         X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
@@ -1210,6 +1217,4 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_array_equal(u.subset(channel=1, vertical=1).as_array(), 3 * a)
 
 
-if __name__ == '__main__':
-    unittest.main()
  

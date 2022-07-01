@@ -21,12 +21,12 @@ test:
     - cvxpy # [ linux and not py36]    
     - scikit-image
     - tomophantom =1.4.10 # [ linux ]
-    - cil-astra =21.4   # [ linux ] 
     - tigre =2.2          # [ not osx ] 
     - packaging
     - ccpi-regulariser=21.0.0   # [ not osx ]
     - numba  # [not osx]
-    
+    - astra-toolbox>=1.9.9.dev5,<2.1
+
   source_files:
     - ./Wrappers/Python/test     # [win]
     - ./Wrappers/Python/test # [not win] 
@@ -76,7 +76,7 @@ requirements:
   #optional packages with version dependancies
   run_constrained:
     - tomophantom=1.4.10
-    - cil-astra=21.4
+    - astra-toolbox>=1.9.9.dev5,<2.1
     - tigre=2.2
     - ccpi-regulariser=21.0.0
 

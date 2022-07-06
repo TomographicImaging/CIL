@@ -100,6 +100,16 @@ class TestISTA(unittest.TestCase):
         res2 = self.f(x) + self.g(x)
         self.assertTrue( res1==res2) 
 
+    def test_provable_condition(self):
+
+        tmp_initial = self.ig.allocate()
+        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10) 
+        self.assertTrue(ista1._is_provably_convergent())
+
+        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10, step_size=30.0) 
+        self.assertFalse(ista1._is_provably_convergent())        
+
+
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
     def test_with_cvxpy(self):
 

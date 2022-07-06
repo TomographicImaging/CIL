@@ -20,6 +20,7 @@ from cil.optimisation.algorithms import Algorithm
 import warnings
 import numpy as np
 from numbers import Number
+import logging
 
 
 
@@ -328,7 +329,7 @@ class PDHG(Algorithm):
             Initial point for the PDHG algorithm.
         theta : Relaxation parameter, Number, default 1.0
         """
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         # Triplet (f, g, K)
         self.f = f
@@ -360,7 +361,7 @@ class PDHG(Algorithm):
             warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
         
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
 
 
     def update_previous_solution(self):

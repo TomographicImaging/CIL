@@ -21,15 +21,21 @@ import functools
 import warnings
 
 class Operator(object):
-    '''Operator that maps from a space X -> Y'''
-    def __init__(self, domain_geometry, **kwargs):
-        r'''
-        Creator
+    """
+    Operator that maps from a space X -> Y
 
-        :param domain_geometry: domain of the operator
-        :param range_geometry: range of the operator
-        :type range_geometry: optional, default None
-        '''
+    Parameters
+    ----------
+
+    domain_geometry : ImageGeometry or AcquisitionGeometry
+        domain of the operator
+
+    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
+        range of the operator 
+    """
+
+    def __init__(self, domain_geometry, **kwargs):
+
         self._norm = None
         self._domain_geometry = domain_geometry
         self._range_geometry = kwargs.get('range_geometry', None)
@@ -109,7 +115,18 @@ class Operator(object):
 
 
 class LinearOperator(Operator):
-    '''A Linear Operator that maps from a space X <-> Y'''
+    """
+    Linear operator that maps from a space X <-> Y
+
+    Parameters
+    ----------
+
+    domain_geometry : ImageGeometry or AcquisitionGeometry
+        domain of the operator
+
+    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
+        range of the operator 
+    """
     def __init__(self, domain_geometry, **kwargs):
         super(LinearOperator, self).__init__(domain_geometry, **kwargs)
     def is_linear(self):

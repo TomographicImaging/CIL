@@ -18,6 +18,7 @@
 import numpy
 from cil.optimisation.algorithms import Algorithm
 import warnings
+import logging
 
 class GD(Algorithm):
     ''' 
@@ -67,7 +68,7 @@ class GD(Algorithm):
         :param initial: initial guess
         :param objective_function: objective function to be minimised
         :param step_size: step size'''
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
             
         self.x = initial.copy()
         self.objective_function = objective_function
@@ -89,7 +90,7 @@ class GD(Algorithm):
         self.x_update = initial.copy()
 
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
 
     def update(self):
         '''Single iteration'''

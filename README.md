@@ -11,7 +11,17 @@ The Core Imaging Library (CIL) is an open-source Python framework for tomographi
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)
 
+
 Jupyter Notebooks usage examples without any local installation are provided in [Binder](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb). Please click the launch binder icon above. For more information, go to [CIL-Demos](https://github.com/TomographicImaging/CIL-Demos) and [https://mybinder.org](https://mybinder.org).
+
+## CIL Videos
+
+ - [PyCon De & PyData Berlin 2022 ](https://2022.pycon.de/), April 2022 :  [Abstract](https://2022.pycon.de/program/GSLJUY/) ,  [Video](https://www.youtube.com/watch?v=Xd4erPj0uEs), [Material](https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/PyData22_deblurring.ipynb).
+
+
+ - [Training School for the Synergistic Image Reconstruction Framework (SIRF) and Core Imaging Library (CIL)](https://www.ccpsynerbi.ac.uk/SIRFCIL2021) June 2021: [Videos](https://www.youtube.com/playlist?list=PLTuAla-OP8WVNPWZfis6BRsWFq_S0bqvp), [Material](https://github.com/TomographicImaging/CIL-Demos/tree/main/training/2021_Fully3D).
+
+- [Synergistic Reconstruction Symposium](https://www.ccpsynerbi.ac.uk/symposium2019), November 2019: [Slides](https://www.ccppetmr.ac.uk/sites/www.ccppetmr.ac.uk/files/Papoutsellis%202.pdf), [Videos](https://www.youtube.com/playlist?list=PLyxAZuV8tuKsOY4DTDzy04DRrwkxBkTYh), [Material](https://github.com/TomographicImaging/CIL-Demos/tree/main/training/2019_SynergisticSymposium).
 
 ## Documentation
 
@@ -29,20 +39,20 @@ To install CIL and the additional packages and plugins needed to run the [CIL de
 
 ```bash
 
-conda create --name cil -c conda-forge -c intel -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom=1.4.10
+conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil astra-toolbox tigre ccpi-regulariser tomophantom=1.4.10
 ```
 
 where,
 
-```ccpi-regulariser``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit).
+```astra-toolbox``` will allow you to use CIL with the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).
 
-```cil-astra``` will give you access to the CIL wrappers to the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).
-
-```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
-
-```tigre``` will allow you to use CIL wrappers to the [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license).
+```tigre``` will allow you to use CIL with the [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license).
 
 ```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector (installing tigre via conda requires 9.2).
+
+```ccpi-regulariser``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit).
+
+```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
 
 ### Dependency
 

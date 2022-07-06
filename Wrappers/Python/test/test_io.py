@@ -62,8 +62,6 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_astra_gpu
     and has_wget
 
 
-logging.basicConfig(level=logging.ERROR)
-
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
 logging.info ("has_olefile {}".format(has_olefile))

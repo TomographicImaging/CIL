@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import unittest
+import unittest, logging
 from cil.optimisation.operators import BlockOperator
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import IdentityOperator
@@ -27,7 +27,6 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 class TestBlockOperator(unittest.TestCase):
 
     def test_BlockOperator(self):
-        print ("test_BlockOperator")
         ig = [ ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) ]
@@ -66,7 +65,7 @@ class TestBlockOperator(unittest.TestCase):
             K = BlockOperator(*ops)
             self.assertFalse(K.column_wise_compatible())
         except ValueError as ve:
-            print (ve)
+            logging.info(str(ve))
             self.assertTrue(True)
         
         try:
@@ -85,17 +84,18 @@ class TestBlockOperator(unittest.TestCase):
             ops += [ IdentityOperator(g, range_geometry=r) for g,r in zip(ig, rg1) ]
 
             K = BlockOperator(*ops, shape=(2,3))
-            print ("K col comp? " , K.column_wise_compatible())
-            print ("K row comp? " , K.row_wise_compatible())
+            logging.info ("K col comp? {}".format(K.column_wise_compatible()))
+            logging.info ("K row comp? {}".format(K.row_wise_compatible()))
             for op in ops:
-                print ("range" , op.range_geometry().shape)
+                logging.info ("range {}".format(op.range_geometry().shape))
             for op in ops:
-                print ("domain" , op.domain_geometry().shape)
+                logging.info ("domain {}".format(op.domain_geometry().shape))
             self.assertFalse(K.row_wise_compatible())
         except ValueError as ve:
-            print (ve)
+            logging.info (str(ve))
             self.assertTrue(True)
             
+
     def test_ScaledBlockOperatorSingleScalar(self):
         ig = [ ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) , \
@@ -166,7 +166,7 @@ class TestBlockOperator(unittest.TestCase):
     def test_IdentityOperator(self):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
-        print (img.shape, ig.shape)
+        logging.info ("{} {}".format(img.shape, ig.shape))
         self.assertTrue(img.shape == (30,20,10))
         self.assertEqual(img.sum(), 0)
         Id = IdentityOperator(ig)
@@ -176,13 +176,12 @@ class TestBlockOperator(unittest.TestCase):
     
     def test_FiniteDiffOperator(self):
         N, M = 200, 300
-
         
         ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)    
         u = ig.allocate('random_int')
         G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
-        print(type(u), u.as_array())    
-        print(G.direct(u).as_array())
+        logging.info("{} {}".format(type(u), str(u.as_array())))    
+        logging.info(str(G.direct(u).as_array()))
 
         # Gradient Operator norm, for one direction should be close to 2
         numpy.testing.assert_allclose(G.norm(), numpy.sqrt(4), atol=0.1)
@@ -191,6 +190,6 @@ class TestBlockOperator(unittest.TestCase):
         ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)
         u1 = ig1.allocate('random_int')
         G1 = FiniteDifferenceOperator(ig1, direction=2, bnd_cond = 'Periodic')
-        print(ig1.shape==u1.shape)
-        print (G1.norm())
+        logging.info(ig1.shape==u1.shape)
+        logging.info(str(G1.norm()))
         numpy.testing.assert_allclose(G1.norm(), numpy.sqrt(4), atol=0.1)

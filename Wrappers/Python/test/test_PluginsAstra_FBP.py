@@ -33,7 +33,7 @@ def setup_parameters(self):
 
     self.backend = 'astra'   
     self.FBP = FBP
-    self.FBP_args={}
+    self.FBP_args={'device':'gpu'}
 
 
 class Test_Cone3D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
@@ -71,6 +71,17 @@ class Test_Parallel2D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
     @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
+        self.Parallel2D()
+        self.tolerance_fbp = 1e-3
+        self.tolerance_fbp_roi = 1e-3
+
+
+class Test_Parallel2D_FBP_CPU(unittest.TestCase, TestCommon_FBP_SIM):
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def setUp(self):
+        setup_parameters(self)
+        self.FBP_args['device'] = 'cpu'
         self.Parallel2D()
         self.tolerance_fbp = 1e-3
         self.tolerance_fbp_roi = 1e-3

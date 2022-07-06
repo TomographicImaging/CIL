@@ -429,6 +429,45 @@ class TestFunction(unittest.TestCase):
         f_no_scaled.proximal_conjugate(U, 1, out=z3)
         self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
 
+    @unittest.skipUnless(has_numba, 'Skipping as numba is not installed')
+    def test_MixedL21Norm_proximal_conjugate_numba(self):
+        numpy.random.seed(1)
+        M, N, K = 2,3,5
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        u1 = ig.allocate('random')
+        u2 = ig.allocate('random')
+        
+        U = BlockDataContainer(u1, u2, shape=(2,1))
+        
+        # Define no scale and scaled
+        f_no_numba = MixedL21Norm()
+        f_no_numba.disable_numba = True
+        f_numba =  MixedL21Norm()  
+        
+        # call
+        
+        a1 = f_no_numba(U)
+        a2 = f_numba(U)
+        self.assertNumpyArrayAlmostEqual(a1,a2)
+        
+        
+        tmp = [ el**2 for el in U.containers ]
+        self.assertBlockDataContainerEqual(BlockDataContainer(*tmp),
+                                           U.power(2))
+        
+        u3 = ig.allocate('random')
+        u4 = ig.allocate('random')
+        z3 = BlockDataContainer(u3, u4, shape=(2,1))
+        
+        f_numba.proximal_conjugate(U, 1, out=z3)
+        print ("z3", z3)
+        
+        z1 = f_numba.proximal_conjugate(U, 1)
+        print ("z1", z1)
+        
+        
+        self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
+
 
     @unittest.skipUnless(has_numba, 'Skipping as numba is not installed')
     def test_MixedL21Norm_step(self):

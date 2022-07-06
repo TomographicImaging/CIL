@@ -50,6 +50,28 @@ try:
             
             tmp[i] = el / a 
         return 0
+
+    #https://github.com/TomographicImaging/CIL/blob/acf3ddf5c61b8e216fe7891d7720f9bbd436c9b3/Wrappers/Python/cil/optimisation/functions/TotalVariation.py#L170-L179
+    @numba.jit(nopython=True)
+    def _proximal_conjugate_numba(tau, out, N, *arr):
+        r'''
+        $$\frac{x}{\max[1, \frac{|x|_2}{\alpha}]}$$
+        '''
+        tmp = out.ravel()
+        for j in numba.prange(tmp.size):
+            el = arr[0][j]
+            tmp[j] = (np.sqrt(el.conjugate() * el) / tau)
+
+        for i in np.arange(1, N):
+            tmparr = arr[i].ravel()
+            for j in numba.prange(tmp.size):
+                el = tmparr[j]
+                tmp[j] += (np.sqrt(el.conjugate() * el) / tau)
+
+                if (i == N-1) and (tmp[j] < 1.):
+                    tmp[j] = 1.
+        return 0
+            
 except ImportError:
     has_numba = False
     
@@ -80,6 +102,8 @@ def _proximal_step_numpy(tmp, tau):
     res.fill(resarray)
     return res
 
+
+
 class MixedL21Norm(Function):
     
     
@@ -88,7 +112,7 @@ class MixedL21Norm(Function):
         where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
     
     """      
-    
+    disable_numba = False
     def __init__(self, **kwargs):
 
         super(MixedL21Norm, self).__init__()  
@@ -145,7 +169,7 @@ class MixedL21Norm(Function):
         """
                 
         tmp = x.pnorm(2)
-        if has_numba and isinstance(tau, Number):
+        if not MixedL21Norm.disable_numba and has_numba and isinstance(tau, Number):
             try: 
                 # may involve a copy if the data is not contiguous
                 tmparr = np.asarray(tmp.as_array(), order='C', dtype=tmp.dtype)
@@ -168,6 +192,30 @@ class MixedL21Norm(Function):
 
         if out is None:
             return res
+
+    # https://github.com/TomographicImaging/CIL/pull/1206#issuecomment-1104558056
+    def proximal_conjugate(self, x, tau, out=None):
+        should_return = False
+        run_default = False
+        if out is None:
+            out = x * 0.
+            should_return = True
+        if not MixedL21Norm.disable_numba and has_numba and isinstance(tau, Number):
+            try: 
+                # may involve a copy if the data is not contiguous
+                tmpout = np.asarray(out[0].as_array(), order='C', dtype=out.dtype)
+                arr = [np.asarray(el.as_array(), order='C', dtype=el.dtype) for el in x]
+                if _proximal_conjugate_numba(tau, tmpout, len(x), *arr) != 0:
+                    # if numba silently crashes
+                    raise RuntimeError('MixedL21Norm.proximal_conjugate: numba silently crashed.')
+                x.divide(tmpout, out=out)
+            except:
+                run_default = True
+        else:
+            run_default = True
+        
+        if run_default:
+            return super().proximal_conjugate(x, tau, out=out)
 
 class SmoothMixedL21Norm(Function):
     

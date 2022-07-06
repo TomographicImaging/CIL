@@ -17,6 +17,7 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
+import logging
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
@@ -141,7 +142,7 @@ class SPDHG(Algorithm):
         norms : list of floats
             precalculated list of norms of the operators
         '''
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
                     
         # algorithmic parameters
         self.f = f
@@ -185,7 +186,10 @@ class SPDHG(Algorithm):
         # relaxation parameter
         self.theta = 1
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+
+        self.subset_history = []
+
+        logging.info("{} configured".format(self.__class__.__name__, ))
         
     def update(self):
         # Gradient descent for the primal variable
@@ -196,6 +200,7 @@ class SPDHG(Algorithm):
         
         # Choose subset
         i = int(np.random.choice(len(self.sigma), 1, p=self.prob))
+        self.subset_history.append(i)
         
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x

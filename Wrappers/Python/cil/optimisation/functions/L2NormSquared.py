@@ -19,6 +19,42 @@ from cil.optimisation.functions import Function
 from cil.framework import DataContainer
 from cil.optimisation.operators import DiagonalOperator
 
+
+has_numba = True
+try:
+    import numba
+    @numba.jit(nopython=True)
+    def _proximal_step_numba(x,b,tau, out):
+        '''Numba implementation of a step in the calculation of the proximal of MixedL21Norm
+        
+        :math:`\mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b `
+
+        Parameters:
+        -----------
+        arr : numpy array, best if contiguous memory. 
+        abstau: float >= 0
+
+        Returns:
+        --------
+        returns 0 if successful
+
+        Note:
+        -----
+        
+        Input arr should be contiguous for best performance'''
+        tmp = x.ravel()
+        # what happens if the 
+        br = b.ravel()
+        for i in numba.prange(tmp.size):
+            out[i] = (x[i]-br[i])/(1+2*tau)+br[i]    
+        return 0
+except ImportError:
+    has_numba = False
+    
+
+
+
+
 class L2NormSquared(Function):
     
     r""" L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`

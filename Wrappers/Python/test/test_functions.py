@@ -404,6 +404,8 @@ class TestFunction(CCPiTestClass):
         
         self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
 
+        z1 = f_no_numba.proximal_conjugate(U, 1)
+        self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
 
     @unittest.skipUnless(has_numba, 'Skipping as numba is not installed')
     def test_MixedL21Norm_step(self):

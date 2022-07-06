@@ -198,17 +198,22 @@ class MixedL21Norm(Function):
         should_return = False
         run_default = False
         if out is None:
-            out = x * 0.
+            dout = x * 0.
             should_return = True
+        else:
+            dout = out
         if not MixedL21Norm.disable_numba and has_numba and isinstance(tau, Number):
             try: 
                 # may involve a copy if the data is not contiguous
-                tmpout = np.asarray(out[0].as_array(), order='C', dtype=out.dtype)
+                tmpout = np.asarray(dout[0].as_array(), order='C', dtype=out.dtype)
                 arr = [np.asarray(el.as_array(), order='C', dtype=el.dtype) for el in x]
                 if _proximal_conjugate_numba(tau, tmpout, len(x), *arr) != 0:
                     # if numba silently crashes
                     raise RuntimeError('MixedL21Norm.proximal_conjugate: numba silently crashed.')
-                x.divide(tmpout, out=out)
+                x.divide(tmpout, out=dout)
+                if should_return:
+                    return dout
+                return
             except:
                 run_default = True
         else:

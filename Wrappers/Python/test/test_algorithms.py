@@ -566,26 +566,7 @@ class TestAlgorithms(CCPiTestClass):
             logging.info(str(ve))
             assert True
 
-            
-    def test_exception_initial_FISTA(self):
-        ig = ImageGeometry(127,139,149)
-        initial = ig.allocate()
-        b = initial.copy()
-        # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
-        identity = IdentityOperator(ig)
-        
-        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
-        opt = {'tol': 1e-4, 'memopt':False}
-        logging.info("initial objective {}".format(norm2sq(initial)))
-        try:
-            alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
-            
+                        
 
     def test_exception_initial_GD(self):
         ig = ImageGeometry(127,139,149)

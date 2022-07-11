@@ -209,6 +209,8 @@
 <span class="kn">import</span> <span class="nn">ctypes</span><span class="o">,</span> <span class="nn">platform</span>
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">util</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 <span class="c1"># check for the extension</span>
 
@@ -3150,6 +3152,7 @@
 <span class="sd">    `store_output` boolian defining whether a copy of the output is stored. Default is False.</span>
 <span class="sd">    If no attributes are modified get_output will return this stored copy bypassing `process`</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;store_output&#39;</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;store_output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
@@ -3189,7 +3192,7 @@
 
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data not compatible&#39;</span><span class="p">)</span>
@@ -3197,8 +3200,6 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">))</span>
     
-    <span class="k">def</span> <span class="nf">clear_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span><span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Checks parameters of the input DataContainer</span>
@@ -3239,7 +3240,7 @@
     
     <span class="k">def</span> <span class="nf">set_input_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">processor</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">processor</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">processor</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">))</span>
@@ -3250,10 +3251,12 @@
 <span class="sd">        It is useful in the case the user has provided a DataProcessor as</span>
 <span class="sd">        input</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">):</span>
-            <span class="n">dsi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input has been deallocated externally&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()),</span> <span class="n">DataProcessor</span><span class="p">):</span>
+            <span class="n">dsi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">dsi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span>
+            <span class="n">dsi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">dsi</span>
         
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -3268,8 +3271,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">clear_input</span><span class="p">()</span>
-        
         <span class="k">return</span> <span class="n">out</span>
 
 

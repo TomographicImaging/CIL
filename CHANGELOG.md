@@ -1,4 +1,7 @@
 * 22.0.0
+  - Removed deprecated method of AcquisitionGeometry constructor
+  - Removed deprecated subset method from DataContainers and Geometry
+  - Removed deprecated kwargs in NikonDataReader
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated
     - CIL remains licenced as APACHE-2.0

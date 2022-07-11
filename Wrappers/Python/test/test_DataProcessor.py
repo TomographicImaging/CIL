@@ -740,19 +740,19 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
     def test_CofR_xcorrelation(self):       
 
         corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
         corr = CofR_xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
     @unittest.skipUnless(has_astra, "ASTRA not installed")
     def test_CofR_image_sharpness_astra(self):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
 
@@ -760,18 +760,18 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
     @unittest.skipUnless(False, "TIGRE not installed")
     def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
         corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
         corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
@@ -871,11 +871,18 @@ class TestDataProcessor(unittest.TestCase):
         ax.get_output(out=dc_out)
         numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
 
-        #check recalculation on input modified (won't pass)
+        #check auto recalculation if input modified (won't pass)
         dc_in2 *= 2
         out_gold = dc_in2*3
         ax.get_output(out=dc_out)
         #numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
+
+        #raise error if input is deleted
+        dc_in2 = dc_in.copy()
+        ax.set_input(dc_in2)
+        del dc_in2
+        with self.assertRaises(ValueError):
+            dc_out = ax.get_output()
 
 
     def test_DataProcessorChaining(self):

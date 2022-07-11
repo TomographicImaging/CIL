@@ -22,6 +22,8 @@ from numbers import Number
 import ctypes, platform
 from ctypes import util
 import math
+import weakref
+
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
 
@@ -2830,6 +2832,7 @@ class Processor(object):
     `store_output` boolian defining whether a copy of the output is stored. Default is False.
     If no attributes are modified get_output will return this stored copy bypassing `process`
     '''
+
     def __init__(self, **attributes):
         if not 'store_output' in attributes.keys():
             attributes['store_output'] = False
@@ -2869,7 +2872,7 @@ class Processor(object):
 
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
-                self.__dict__['input'] = dataset
+                self.__dict__['input'] = weakref.ref(dataset)
                 self.__dict__['shouldRun'] = True
             else:
                 raise ValueError('Input data not compatible')
@@ -2877,8 +2880,6 @@ class Processor(object):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
     
-    def clear_input(self):
-        self.__dict__['input']= None
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
@@ -2919,7 +2920,7 @@ class Processor(object):
     
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
-            self.__dict__['input'] = processor
+            self.__dict__['input'] =  weakref.ref(processor)
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(processor), DataProcessor))
@@ -2930,10 +2931,12 @@ class Processor(object):
         It is useful in the case the user has provided a DataProcessor as
         input
         '''
-        if issubclass(type(self.input), DataProcessor):
-            dsi = self.input.get_output()
+        if self.input() is None:
+            raise ValueError("Input has been deallocated externally")
+        elif issubclass(type(self.input()), DataProcessor):
+            dsi = self.input().get_output()
         else:
-            dsi = self.input
+            dsi = self.input()
         return dsi
         
     def process(self, out=None):
@@ -2948,8 +2951,6 @@ class Processor(object):
         else:
             self.get_output(out=out)
 
-        self.clear_input()
-        
         return out
 
 

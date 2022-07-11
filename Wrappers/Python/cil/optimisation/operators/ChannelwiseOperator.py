@@ -90,13 +90,13 @@ class ChannelwiseOperator(LinearOperator):
             output = self.range_geometry().allocate()
             cury = self.op.range_geometry().allocate()
             for k in range(self.channels):
-                self.op.direct(x.subset(channel=k),cury)
+                self.op.direct(x.get_slice(channel=k),cury)
                 output.fill(cury.as_array(),channel=k)
             return output
         else:
             cury = self.op.range_geometry().allocate()
             for k in range(self.channels):
-                self.op.direct(x.subset(channel=k),cury)
+                self.op.direct(x.get_slice(channel=k),cury)
                 out.fill(cury.as_array(),channel=k)
     
     def adjoint(self,x, out=None):
@@ -109,13 +109,13 @@ class ChannelwiseOperator(LinearOperator):
             output = self.domain_geometry().allocate()
             cury = self.op.domain_geometry().allocate()
             for k in range(self.channels):
-                self.op.adjoint(x.subset(channel=k),cury)
+                self.op.adjoint(x.get_slice(channel=k),cury)
                 output.fill(cury.as_array(),channel=k)
             return output
         else:
             cury = self.op.domain_geometry().allocate()
             for k in range(self.channels):
-                self.op.adjoint(x.subset(channel=k),cury)
+                self.op.adjoint(x.get_slice(channel=k),cury)
                 out.fill(cury.as_array(),channel=k)
         
     def calculate_norm(self, **kwargs):

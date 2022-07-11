@@ -62,8 +62,8 @@ class ProjectionOperator(LinearOperator):
         self.volume_geometry = image_geometry
         self.sinogram_geometry = acquisition_geometry
 
-        sinogram_geometry_sc = acquisition_geometry.subset(channel=0)
-        volume_geometry_sc = image_geometry.subset(channel=0)
+        sinogram_geometry_sc = acquisition_geometry.get_slice(channel=0)
+        volume_geometry_sc = image_geometry.get_slice(channel=0)
 
         if device == 'gpu':
             operator = AstraProjector3D(volume_geometry_sc, sinogram_geometry_sc)

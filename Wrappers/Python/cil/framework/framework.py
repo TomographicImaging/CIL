@@ -191,22 +191,6 @@ class ImageGeometry(object):
         self.dimension_labels = kwargs.get('dimension_labels', None)
         self.dtype = kwargs.get('dtype', numpy.float32)
 
-    def subset(self, dimensions=None, **kw):
-        '''Returns a new sliced and/or reshaped ImageGeometry'''
-
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
-            
-            temp = self.copy()
-            temp.set_labels(dimensions)
-            return temp      
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
@@ -1579,9 +1563,6 @@ class AcquisitionGeometry(object):
 
         return tuple(shape)
 
-    @shape.setter
-    def shape(self, val):
-        print("Deprecated - shape will be set automatically")
 
     @property
     def dimension_labels(self):
@@ -1629,75 +1610,16 @@ class AcquisitionGeometry(object):
 
     @property
     def dtype(self):
-        return self.__dtype
+        return self._dtype
 
     @dtype.setter
     def dtype(self, val):
-        self.__dtype = val       
+        self._dtype = val       
 
 
-    def __init__(self,
-                geom_type, 
-                dimension=None,
-                angles=None, 
-                pixel_num_h=1, 	
-                pixel_size_h=1,
-                pixel_num_v=1,
-                pixel_size_v=1,
-                dist_source_center=None,
-                dist_center_detector=None,
-                channels=1,
-                ** kwargs):
+    def __init__(self):
+        self._dtype = numpy.float32
 
-        """Constructor method
-        """
-
-        # default dtype for the acquisition geometry
-        self.dtype = kwargs.get('dtype', numpy.float32)
-
-        #backward compatibility
-        new_setup = kwargs.get('new_setup', False)
-
-        #set up old geometry        
-        if new_setup is False:
-            self.config = Configuration()
-            
-            if angles is None:
-                raise ValueError("AcquisitionGeometry not configured. Parameter 'angles' is required")
-
-            if geom_type == AcquisitionGeometry.CONE:
-                if dist_source_center is None:
-                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_source_center' is required")
-                if dist_center_detector is None:
-                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_center_detector' is required")
-
-            if pixel_num_v > 1:
-                dimension = 3
-                num_pixels = [pixel_num_h, pixel_num_v]
-                pixel_size = [pixel_size_h, pixel_size_v]
-                if geom_type == AcquisitionGeometry.CONE:
-                    self.config.system = Cone3D(source_pos=[0,-dist_source_center,0], detector_pos=[0,dist_center_detector,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
-                else:
-                    self.config.system = Parallel3D(ray_direction=[0,1,0], detector_pos=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
-            else:
-                dimension = 2
-                num_pixels = [pixel_num_h, 1]
-                pixel_size = [pixel_size_h, pixel_size_h]                
-                if geom_type == AcquisitionGeometry.CONE:
-                    self.config.system = Cone2D(source_pos=[0,-dist_source_center], detector_pos=[0,dist_center_detector], detector_direction_x=[1,0], rotation_axis_pos=[0,0])
-                else:
-                    self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_x=[1,0], rotation_axis_pos=[0,0])
-
-
-            self.config.panel = Panel(num_pixels, pixel_size, 'bottom-left', dimension)  
-            self.config.channels = Channels(channels, channel_labels=None)  
-            self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
-
-            self.dimension_labels = kwargs.get('dimension_labels', None)
-            if self.config.configured:
-                print("AcquisitionGeometry configured using deprecated method")
-            else:
-                raise ValueError("AcquisitionGeometry not configured")
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
         r'''This method configures the angular information of an AcquisitionGeometry object. 
@@ -1771,7 +1693,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry
         '''
-        AG = AcquisitionGeometry('', new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position)
         return AG    
@@ -1791,7 +1713,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry        
      '''    
-        AG = AcquisitionGeometry('', new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
         return AG   
@@ -1815,7 +1737,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry       
      '''
-        AG = AcquisitionGeometry('', new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction)
         return AG            
@@ -1839,7 +1761,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry           
         '''
-        AG = AcquisitionGeometry('',  new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Cone3D(source_position, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction)
         return AG          
@@ -1897,22 +1819,6 @@ class AcquisitionGeometry(object):
     def __str__ (self):
         return str(self.config)
 
-    def subset(self, dimensions=None, **kw):
-        '''Returns a new sliced and/or reshaped AcquisitionGeometry'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
- 
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
-
-            temp = self.copy()
-            temp.set_labels(dimensions)
-            return temp        
 
     def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
         '''
@@ -2095,20 +2001,6 @@ class DataContainer(object):
         '''
         return self.array
 
-    def subset(self, dimensions=None, **kw):
-        '''Creates a DataContainer containing a subset of self according to the 
-        labels in dimensions'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            temp = self.copy()
-            temp.reorder(dimensions)
-            return temp
 
     def get_slice(self,**kw):
         '''
@@ -2204,9 +2096,10 @@ class DataContainer(object):
             elif issubclass(array.__class__ , DataContainer):
                 if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
                     if self.geometry != array.geometry:
-                        numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
+                        array.reorder(array.dimension_labels)
+                        numpy.copyto(self.array, array.array)
                         return
-                numpy.copyto(self.array, array.as_array())
+                numpy.copyto(self.array, array.array)
             else:
                 raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
@@ -2806,19 +2699,6 @@ class ImageData(DataContainer):
     
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
                                
-    def subset(self, dimensions=None, **kw):
-        '''returns a subset of ImageData and regenerates the geometry'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            temp = self.copy()
-            temp.reorder(dimensions)
-            return temp
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
@@ -2905,19 +2785,6 @@ class AcquisitionData(DataContainer):
     
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
   
-    def subset(self, dimensions=None, **kw):
-        '''returns a subset of the AcquisitionData and regenerates the geometry'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            temp = self.copy()
-            temp.reorder(dimensions)
-            return temp
 
     def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
         '''

@@ -92,7 +92,7 @@ class RingRemover(Processor):
             if 'vertical' in geom.dimension_labels:
                                 
                 for i in range(vertical):
-                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i, force=True).as_array(), decNum, wname, sigma) 
+                    tmp_corrected = self.xRemoveStripesVertical(data.get_slice(vertical=i, force=True).as_array(), decNum, wname, sigma) 
                     out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
@@ -108,11 +108,11 @@ class RingRemover(Processor):
                 
                 for i in range(channels):
                     
-                    out_ch_i = out.subset(channel=i)
-                    data_ch_i = data.subset(channel=i)
+                    out_ch_i = out.get_slice(channel=i)
+                    data_ch_i = data.get_slice(channel=i)
                     
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j, force=True).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.get_slice(vertical=j, force=True).as_array(), decNum, wname, sigma)
                         out_ch_i.fill(tmp_corrected, vertical = j)
                         
                     out.fill(out_ch_i.as_array(), channel=i) 
@@ -123,7 +123,7 @@ class RingRemover(Processor):
             # for 2D data                        
             else:
                 for i in range(channels):
-                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self.xRemoveStripesVertical(data.get_slice(channel=i).as_array(), decNum, wname, sigma)
                         out.fill(tmp_corrected, channel = i)
                         if info:
                             print("Finish channel {}".format(i))

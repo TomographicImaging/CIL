@@ -27,7 +27,9 @@ from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
+from cil.processors import CentreOfRotationCorrector
+from cil.processors.CofR_xcorrelation import  CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 
@@ -459,8 +461,8 @@ class TestBinner(unittest.TestCase):
         dimension_labels_binned.remove('channel')
         dimension_labels_binned.remove('vertical')
         
-        AG_binned = AG.subset(vertical='centre')
-        AG_binned = AG_binned.subset(channel=0)
+        AG_binned = AG.get_slice(vertical='centre')
+        AG_binned = AG_binned.get_slice(channel=0)
         AG_binned.config.panel.num_pixels[0] = 45
         AG_binned.config.panel.pixel_size[0] = 0.2
         AG_binned.config.panel.pixel_size[1] = 0.4
@@ -686,8 +688,8 @@ class TestSlicer(unittest.TestCase):
         dimension_labels_sliced.remove('channel')
         dimension_labels_sliced.remove('vertical')
         
-        AG_sliced = AG.subset(vertical='centre')
-        AG_sliced = AG_sliced.subset(channel=1)
+        AG_sliced = AG.get_slice(vertical='centre')
+        AG_sliced = AG_sliced.get_slice(channel=1)
         AG_sliced.config.panel.num_pixels[0] = numpy.arange(10,100,2).shape[0]
         
         self.assertTrue(data_sliced.geometry == AG_sliced)
@@ -885,8 +887,8 @@ class TestDataProcessor(unittest.TestCase):
         a = numpy.asarray([i for i in range( size )])
         a = numpy.reshape(a, shape)
         ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
-        c = ds.subset(Y=0)
-        c = c.subset(['Z','W','X'])
+        c = ds.get_slice(Y=0)
+        c.reorder(['Z','W','X'])
         arr = c.as_array()
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]

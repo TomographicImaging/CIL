@@ -221,13 +221,13 @@ class FGP_TV(TV_Base):
 
         super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
 
+    def _fista_on_dual_rof(self, in_arr, tau):
+        
+        r""" Implements the Fast Gradient Projection algorithm on the dual problem 
+        of the Total Variation Denoising problem (ROF).
 
-    def proximal_numpy(self, in_arr, tau):
+        """    
 
-        if self.strong_convexity_constant>0:
-            in_arr /= (1 + tau*self.strong_convexity_constant)
-            tau /= (1 + tau*self.strong_convexity_constant)
-            
         res , info = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\
@@ -237,11 +237,37 @@ class FGP_TV(TV_Base):
               self.nonnegativity,\
               self.device)
 
-        if self.strong_convexity_constant>0:
-            tau *= (1 + tau*self.strong_convexity_constant)
-            in_arr *= (1 + tau*self.strong_convexity_constant)
-                          
         return res, info
+
+    def proximal_numpy(self, in_arr, tau):
+
+        if self.strong_convexity_constant>0:
+
+            # check if id(x) remains the same after in-place division
+            # check scaled function
+
+            strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
+            in_arr /= strongly_convex_factor
+            tau /= strongly_convex_factor
+        
+        solution = self._fista_on_dual_rof(in_arr, tau)
+
+        if self.strong_convexity_constant>0:
+            in_arr *= strongly_convex_factor
+            tau *= strongly_convex_factor
+
+        return solution
+
+
+
+        # in-place modification of in_arr and tau that will be reverted after the FGP_TV algorithm.
+        # if self.strong_convexity_constant>0:
+        #     strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
+        #     in_arr /= strongly_convex_factor
+        #     tau /= strongly_convex_factor
+
+        # return self._fista_on_dual_rof(arr_tmp, tau_tmp)
+            
     
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar

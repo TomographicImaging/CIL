@@ -837,6 +837,7 @@ class TestTotalVariation(unittest.TestCase):
         self.tv_aniso = TotalVariation(isotropic=False)
         self.ig_real = ImageGeometry(3,4)   
         self.grad = GradientOperator(self.ig_real)  
+        self.alpha_arr = self.ig_real.allocate(0.15)
         
     def test_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
@@ -965,12 +966,7 @@ class TestTotalVariation(unittest.TestCase):
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
         
-        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-
-        ###################################################################
-        ###################################################################
-        ###################################################################
-        ###################################################################    
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4) 
         
         # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
         iters = 408
@@ -995,11 +991,6 @@ class TestTotalVariation(unittest.TestCase):
         # print(t3-t2)
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
         
-        ###################################################################
-        ###################################################################
-        ###################################################################
-        ###################################################################
-    
     
     @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
@@ -1043,6 +1034,17 @@ class TestTotalVariation(unittest.TestCase):
         
         np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=7.5e-2)
 
+    def test_non_scalar_tau_cil_tv(self):
+
+        x_real = self.ig_real.allocate('random', seed=4) 
+
+        # tau is an array filled with alpha = 0.15
+        res1 = self.tv_iso.proximal(x_real, tau = self.alpha_arr)
+
+        # use the alpha * TV
+        res2 = self.tv_scaled.proximal(x_real, tau = 1.0)
+        
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)    
 
 
 class TestKullbackLeiblerNumba(unittest.TestCase):

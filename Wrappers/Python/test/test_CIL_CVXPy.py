@@ -252,7 +252,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         # compare objectives
         f = 0.5*L2NormSquared(b=self.data)
         cil_objective = f(tv_cil) + TV(tv_cil) 
-        np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)         
+        np.testing.assert_allclose(cil_objective, obj.value, atol=1e-1)         
 
 
 

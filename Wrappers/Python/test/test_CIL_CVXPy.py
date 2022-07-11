@@ -229,7 +229,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         alpha = 0.1
 
         # strongly convex constant
-        gamma = 0.1
+        gamma = 0.05
 
         # fidelity term
         fidelity = 0.5 * cvxpy.sum_squares(u_cvx - self.data.array) 
@@ -243,11 +243,11 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)   
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = alpha * TotalVariation(max_iteration=200, strong_convexity_constant = gamma)
+        TV = alpha * TotalVariation(max_iteration = 500, strong_convexity_constant = gamma)
         tv_cil = TV.proximal(self.data, tau=1.0)                
 
         # compare solution
-        np.testing.assert_allclose(tv_cil.array, u_cvx.value,atol=1e-3)                           
+        np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-3)                           
 
         # compare objectives
         f = 0.5*L2NormSquared(b=self.data)

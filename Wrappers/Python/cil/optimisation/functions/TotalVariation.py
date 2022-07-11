@@ -212,14 +212,14 @@ class TotalVariation(Function):
             self.calculate_Lipschitz()
 
         if self.strong_convexity_constant>0:
-            tmp = (self.strong_convexity_constant/2)*x.squared_norm()
+            strongly_convex_term = (self.strong_convexity_constant/2)*x.squared_norm()
         else:
-            tmp = 0
+            strongly_convex_term = 0
 
         if self.isotropic:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum() + tmp
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum() + strongly_convex_term
         else:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() + tmp
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() + strongly_convex_term
     
                         
     def projection_P(self, x, out=None):
@@ -248,19 +248,50 @@ class TotalVariation(Function):
             if out is None:
                 return x.divide(tmp1)
             else:
-                x.divide(tmp1, out=out)                   
-    
-    
+                x.divide(tmp1, out=out)
+
     def proximal(self, x, tau, out = None):
-        
+
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""        
+
+
+        if self.strong_convexity_constant>0:
+
+            # check if id(x) remains the same after in-place division
+            # check scaled function
+            # inplace division with SIRF
+
+            strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
+            x /= strongly_convex_factor
+            tau /= strongly_convex_factor
+        
+        if out is None:
+            solution = self._fista_on_dual_rof(x, tau)
+        else:
+            self._fista_on_dual_rof(x, tau, out = out)
+
+        if self.strong_convexity_constant>0:
+            x *= strongly_convex_factor
+            tau *= strongly_convex_factor
+
+        if out is None:
+            return solution 
+    
+    def _fista_on_dual_rof(self, x, tau, out = None):
+        
+        r""" Implements the Fast Gradient Projection algorithm on the dual problem 
+        of the Total Variation Denoising problem (ROF).
+
+        .. math: \max_{\|y\|_{\infty}<=1.} \frac{1}{2}\|\nabla^{*} y + x \|^{2} - \frac{1}{2}\|x\|^{2}
+
+        """        
         try:
             self._domain = x.geometry
         except:
             self._domain = x
 
         # Compute Lipschitz constant provided that domain is not None.
-        # Lipschitz constant dependes on the GradientOperator, which is configured only if domain is not None
+        # Lipschitz constant depends on the GradientOperator, which is configured only if domain is not None
         if self._L is None:
             self.calculate_Lipschitz()            
         
@@ -270,29 +301,22 @@ class TotalVariation(Function):
         tmp_q = tmp_p.copy()
         tmp_x = self.gradient.domain_geometry().allocate(0)     
         p1 = self.gradient.range_geometry().allocate(0)
-        tmp_tau = tau
-
-        if self.strong_convexity_constant>0:
-
-            x /= (1 + tau * self.strong_convexity_constant)
-            tmp_tau = tau/(1 + tau*self.strong_convexity_constant)
             
         should_break = False
         for k in range(self.iterations):
                                                                                    
             t0 = t
             self.gradient.adjoint(tmp_q, out = tmp_x)
-            
-            # axpby now works for matrices
-            tmp_x.axpby(-self.regularisation_parameter*tmp_tau, 1.0, x, out=tmp_x)
+                        
+            tmp_x.axpby(-self.regularisation_parameter * tau, 1.0, x, out=tmp_x)
             self.projection_C(tmp_x, tau=None, out = tmp_x)                       
-
             self.gradient.direct(tmp_x, out=p1)
-            if isinstance (tau, (Number, np.float32, np.float64)):
-                p1 *= self.L/(self.regularisation_parameter * tmp_tau)
+
+            if isinstance (tau, Number):
+                p1 *= self.L/(self.regularisation_parameter * tau)
             else:
                 p1 *= self.L/self.regularisation_parameter
-                p1 /= tmp_tau
+                p1 /= tau
 
             if self.tolerance is not None:
                 
@@ -313,23 +337,17 @@ class TotalVariation(Function):
 
             self.projection_P(p1, out=p1)
             
-
             t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
             
-            #tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
+            # tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
             p1.subtract(tmp_p, out=tmp_q)
             tmp_q *= (t0-1)/t
-            tmp_q += p1
-            
+            tmp_q += p1            
             tmp_p.fill(p1)
 
             if should_break:
                 break
         
-        # restore the values of input x
-        if self.strong_convexity_constant>0:
-            x *= (1 + tmp_tau*self.strong_convexity_constant)
-
         #clear preallocated projection_P arrays
         self.pptmp = None
         self.pptmp1 = None
@@ -342,11 +360,16 @@ class TotalVariation(Function):
                 print("Stop at {} iterations.".format(k))                
                     
         self.gradient.adjoint(tmp_q, out=tmp_x)
-        tmp_x *= tmp_tau
-        tmp_x *= self.regularisation_parameter 
+
+        if isinstance (tau, Number):
+            tmp_x *= (tau * self.regularisation_parameter)
+        else:
+            tmp_x *= tau
+            tmp_x *= self.regularisation_parameter
+
         x.subtract(tmp_x, out=tmp_x)
 
-        return self.projection_C(tmp_x, tau=None, out=out)  
+        return self.projection_C(tmp_x, tau=None, out=out) 
     
     def convex_conjugate(self,x):   
         r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""             

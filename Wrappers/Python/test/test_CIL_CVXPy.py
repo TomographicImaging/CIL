@@ -247,7 +247,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tv_cil = TV.proximal(self.data, tau=1.0)                
 
         # compare solution
-        np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-3)                           
+        np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-2)                           
 
         # compare objectives
         f = 0.5*L2NormSquared(b=self.data)

@@ -1,5 +1,6 @@
 * 22.0.0
   - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
+  - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated
     - CIL remains licensed as APACHE-2.0

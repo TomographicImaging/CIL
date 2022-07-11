@@ -1,7 +1,8 @@
 * 22.0.0
+  - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated
-    - CIL remains licenced as APACHE-2.0
+    - CIL remains licensed as APACHE-2.0
     - Minor bug fixes to the CPU 2D Parallel-beam FBP
   - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5

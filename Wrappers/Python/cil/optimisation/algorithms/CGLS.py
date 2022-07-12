@@ -51,14 +51,7 @@ class CGLS(Algorithm):
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
         super(CGLS, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
+
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
         if initial is not None and operator is not None and data is not None:

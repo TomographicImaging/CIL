@@ -43,9 +43,7 @@ class TotalVariation(Function):
     .. math:: \mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)
     
     The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-    applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
-
-
+    applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, :cite:`Zhu2010`.
 
 
     Parameters
@@ -256,10 +254,6 @@ class TotalVariation(Function):
 
 
         if self.strong_convexity_constant>0:
-
-            # check if id(x) remains the same after in-place division
-            # check scaled function
-            # inplace division with SIRF
 
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
             x /= strongly_convex_factor

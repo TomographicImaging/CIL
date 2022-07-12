@@ -243,9 +243,6 @@ class FGP_TV(TV_Base):
 
         if self.strong_convexity_constant>0:
 
-            # check if id(x) remains the same after in-place division
-            # check scaled function
-
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
             in_arr /= strongly_convex_factor
             tau /= strongly_convex_factor
@@ -257,18 +254,7 @@ class FGP_TV(TV_Base):
             tau *= strongly_convex_factor
 
         return solution
-
-
-
-        # in-place modification of in_arr and tau that will be reverted after the FGP_TV algorithm.
-        # if self.strong_convexity_constant>0:
-        #     strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
-        #     in_arr /= strongly_convex_factor
-        #     tau /= strongly_convex_factor
-
-        # return self._fista_on_dual_rof(arr_tmp, tau_tmp)
-            
-    
+                
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar
         

@@ -374,19 +374,6 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1">#deal with deprecated arguments</span>
-        <span class="k">if</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_init&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;PowerMethod: The use of the x_init parameter is deprecated and will be removed in following version. Please use initial instead.&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">initial</span> <span class="o">=</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_init&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;PowerMethod: received both initial and the deprecated x_init parameter. Please use initial only.&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iterations&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;PowerMethod: The use of the iterations parameter is deprecated and will be removed in following version. Please use max_iteration instead.&#39;</span><span class="p">)</span>      
-            <span class="n">max_iteration</span> <span class="o">=</span> <span class="n">deprecated_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iterations&#39;</span><span class="p">)</span>
-
-
         <span class="c1"># Default case: non-symmetric</span>
         <span class="n">symmetric</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>

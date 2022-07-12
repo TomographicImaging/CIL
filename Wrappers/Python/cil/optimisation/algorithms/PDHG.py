@@ -222,14 +222,6 @@ class PDHG(Algorithm):
     def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, **kwargs):
 
         super(PDHG, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
 
         if kwargs.get('use_axpby', None) is not None:
                 warnings.warn('The use of the "use_axpby" parameter is deprecated and will not be used by this algorithm',

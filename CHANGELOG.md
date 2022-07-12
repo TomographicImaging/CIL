@@ -1,4 +1,5 @@
 * 22.0.0
+  - TotalVariation: updates gradient operator at each __call__ or proximal call.
   - Deprecated: `x_init` removed from the initialisation of the Algorithms and `initial` will be used.
   - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures

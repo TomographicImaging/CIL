@@ -108,7 +108,6 @@ class TotalVariation(Function):
                         
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__     
 
-        self._gradient = None
         self._domain = None
 
         self.pptmp = None
@@ -300,10 +299,11 @@ class TotalVariation(Function):
         '''creates a gradient operator if not instantiated yet
 
         There is no check that the variable _domain is changed after instantiation (should not be the case)'''
-        if self._gradient is None:
-            if self._domain is not None:
-                self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
-        return self._gradient
+        
+        if self._domain is not None:
+            return GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
+        raise ValueError('')
+        
     def __rmul__(self, scalar):
         if not isinstance (scalar, Number):
             raise TypeError("scalar: Expectec a number, got {}".format(type(scalar)))

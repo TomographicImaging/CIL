@@ -1,5 +1,11 @@
 * 22.0.0
   - Deprecated: `x_init` removed from the initialisation of the Algorithms and `initial` will be used.
+  - DataProcessors use weak-reference to input data
+  - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
+    - Modules not moved should be considered deprecated
+    - CIL remains licensed as APACHE-2.0
+    - Minor bug fixes to the CPU 2D Parallel-beam FBP
+  - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
   - Deprecated:

@@ -300,7 +300,7 @@ class TestAlgorithms(CCPiTestClass):
             return noisy_data, alpha, g
 
         noisy_data, alpha, g = setup(data, dnoise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
          
@@ -324,7 +324,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 1
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm() 
                     
@@ -349,7 +349,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 2
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
    

@@ -89,7 +89,7 @@ class TestPlugin(unittest.TestCase):
     def test_FGP_TV_complex(self):
         data = dataexample.CAMERA.get(size=(256,256))
         datarr = data.as_array()
-        cmpx = np.zeros(data.shape, dtype=np.complex)
+        cmpx = np.zeros(data.shape, dtype=np.complex64)
         cmpx.real = datarr[:]
         cmpx.imag = datarr[:]
         data.array = cmpx

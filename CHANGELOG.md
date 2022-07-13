@@ -1,7 +1,9 @@
 * 22.0.0
-  - Removed deprecated method of AcquisitionGeometry constructor
-  - Removed deprecated subset method from DataContainers and Geometry
-  - Removed deprecated kwargs in NikonDataReader
+  - Removal of deprecated code
+    - AcquisitionGeometry constructor removed, use factory `create` methods instead
+    - Subset method removed, use `get_slice` or `reorder` methods
+    - NikonDataReader `normalize` kwarg removed, use `normalise`
+    - Algorithms initialisation `x_init` kwarg removed, use `initial`
   - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated

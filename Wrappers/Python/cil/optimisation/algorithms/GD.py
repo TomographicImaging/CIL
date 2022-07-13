@@ -46,14 +46,6 @@ class GD(Algorithm):
                      current objective function to 0, default 1e-8, see numpy.isclose
         '''
         super(GD, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
 
         self.alpha = kwargs.get('alpha' , 1e6)
         self.beta = kwargs.get('beta', 0.5)

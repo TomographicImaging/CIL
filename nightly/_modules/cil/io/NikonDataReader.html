@@ -263,10 +263,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fliplr&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         
-        <span class="k">if</span> <span class="s1">&#39;normalize&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normalize&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;&#39;normalize&#39; has now been deprecated. Please use &#39;normalise&#39; instead.&quot;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
                         <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">,</span>
@@ -279,8 +275,7 @@
                <span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
                <span class="n">normalise</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span>
-               <span class="n">fliplr</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+               <span class="n">fliplr</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span>
@@ -288,10 +283,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span> <span class="o">=</span> <span class="n">fliplr</span>
         
-        <span class="k">if</span> <span class="s1">&#39;normalize&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normalize&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;&#39;normalize&#39; has now been deprecated. Please use &#39;normalise&#39; instead.&quot;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Path to xtek file is required.&#39;</span><span class="p">)</span>
         

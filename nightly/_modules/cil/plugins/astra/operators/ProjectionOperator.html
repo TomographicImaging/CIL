@@ -249,8 +249,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span> <span class="o">=</span> <span class="n">image_geometry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
 
-        <span class="n">sinogram_geometry_sc</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">volume_geometry_sc</span> <span class="o">=</span> <span class="n">image_geometry</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sinogram_geometry_sc</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">volume_geometry_sc</span> <span class="o">=</span> <span class="n">image_geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
             <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector3D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span> <span class="n">sinogram_geometry_sc</span><span class="p">)</span>

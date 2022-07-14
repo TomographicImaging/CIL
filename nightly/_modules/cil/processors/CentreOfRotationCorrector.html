@@ -210,13 +210,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class contains factory methods to create a CentreOfRotationCorrector object using the desired algorithm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CentreOfRotationCorrector.xcorr"><a class="viewcode-back" href="../../../processors.html#cil.processors.CentreOfRotationCorrector.xcorr">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">xcorr</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">projection_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ang_tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Alias of xcorrelation. This method has been deprecated. Please use xcorrelation&#39;&#39;&#39;</span>
-
-        <span class="n">processor</span> <span class="o">=</span> <span class="n">CofR_xcorrelation</span><span class="p">(</span><span class="n">slice_index</span><span class="p">,</span> <span class="n">projection_index</span><span class="p">,</span> <span class="n">ang_tol</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">processor</span></div>
-        
+       
 <div class="viewcode-block" id="CentreOfRotationCorrector.xcorrelation"><a class="viewcode-back" href="../../../processors.html#cil.processors.CentreOfRotationCorrector.xcorrelation">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">xcorrelation</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">projection_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ang_tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.</span>

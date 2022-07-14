@@ -346,11 +346,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dtype</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span>
 
     <span class="nd">@dtype</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dtype</span> <span class="o">=</span> <span class="n">val</span>           
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">val</span>           
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
@@ -380,22 +380,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dimension_labels&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ImageGeometry.subset"><a class="viewcode-back" href="../../../framework.html#cil.framework.ImageGeometry.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns a new sliced and/or reshaped ImageGeometry&#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The axes list for subset must contain the dimension_labels </span><span class="si">{0}</span><span class="s1"> got </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">))</span>
-            
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">temp</span>      </div>
 
 <div class="viewcode-block" id="ImageGeometry.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.ImageGeometry.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -1768,9 +1752,6 @@
 
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
-    <span class="nd">@shape</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deprecated - shape will be set automatically&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dimension_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1818,75 +1799,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dtype</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span>
 
     <span class="nd">@dtype</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dtype</span> <span class="o">=</span> <span class="n">val</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">val</span>       
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                <span class="n">geom_type</span><span class="p">,</span> 
-                <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                <span class="n">pixel_num_h</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 	
-                <span class="n">pixel_size_h</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="n">pixel_num_v</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="n">pixel_size_v</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="n">dist_source_center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">dist_center_detector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="o">**</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span>
 
-        <span class="sd">&quot;&quot;&quot;Constructor method</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># default dtype for the acquisition geometry</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-
-        <span class="c1">#backward compatibility</span>
-        <span class="n">new_setup</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;new_setup&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-
-        <span class="c1">#set up old geometry        </span>
-        <span class="k">if</span> <span class="n">new_setup</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
-            
-            <span class="k">if</span> <span class="n">angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AcquisitionGeometry not configured. Parameter &#39;angles&#39; is required&quot;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dist_source_center</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AcquisitionGeometry not configured. Parameter &#39;dist_source_center&#39; is required&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">dist_center_detector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AcquisitionGeometry not configured. Parameter &#39;dist_center_detector&#39; is required&quot;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">pixel_num_v</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">dimension</span> <span class="o">=</span> <span class="mi">3</span>
-                <span class="n">num_pixels</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel_num_h</span><span class="p">,</span> <span class="n">pixel_num_v</span><span class="p">]</span>
-                <span class="n">pixel_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel_size_h</span><span class="p">,</span> <span class="n">pixel_size_v</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone3D</span><span class="p">(</span><span class="n">source_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">dist_source_center</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">dist_center_detector</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotation_axis_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel3D</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotation_axis_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">dimension</span> <span class="o">=</span> <span class="mi">2</span>
-                <span class="n">num_pixels</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel_num_h</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-                <span class="n">pixel_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">pixel_size_h</span><span class="p">,</span> <span class="n">pixel_size_h</span><span class="p">]</span>                
-                <span class="k">if</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone2D</span><span class="p">(</span><span class="n">source_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">dist_source_center</span><span class="p">],</span> <span class="n">detector_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">dist_center_detector</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel2D</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">detector_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="s1">&#39;bottom-left&#39;</span><span class="p">,</span> <span class="n">dimension</span><span class="p">)</span>  
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">Channels</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">channel_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">Angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">ANGLE_UNIT</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">DEGREE</span><span class="p">))</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dimension_labels&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">configured</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;AcquisitionGeometry configured using deprecated method&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AcquisitionGeometry not configured&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AcquisitionGeometry.set_angles"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionGeometry.set_angles">[docs]</a>    <span class="k">def</span> <span class="nf">set_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">initial_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This method configures the angular information of an AcquisitionGeometry object. </span>
@@ -1960,7 +1882,7 @@
 <span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
 <span class="sd">        :rtype: AcquisitionGeometry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">new_setup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel2D</span><span class="p">(</span><span class="n">ray_direction</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span>    </div>
@@ -1980,7 +1902,7 @@
 <span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
 <span class="sd">        :rtype: AcquisitionGeometry        </span>
 <span class="sd">     &#39;&#39;&#39;</span>    
-        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">new_setup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span>   </div>
@@ -2004,7 +1926,7 @@
 <span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
 <span class="sd">        :rtype: AcquisitionGeometry       </span>
 <span class="sd">     &#39;&#39;&#39;</span>
-        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">new_setup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel3D</span><span class="p">(</span><span class="n">ray_direction</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">detector_direction_y</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">rotation_axis_direction</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span>            </div>
@@ -2028,7 +1950,7 @@
 <span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
 <span class="sd">        :rtype: AcquisitionGeometry           </span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="n">new_setup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">detector_direction_y</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">rotation_axis_direction</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span>          </div>
@@ -2086,22 +2008,6 @@
     <span class="k">def</span> <span class="fm">__str__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AcquisitionGeometry.subset"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionGeometry.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns a new sliced and/or reshaped AcquisitionGeometry&#39;&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
- 
-        <span class="k">if</span> <span class="n">dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The axes list for subset must contain the dimension_labels </span><span class="si">{0}</span><span class="s1"> got </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">))</span>
-
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">temp</span>        </div>
 
 <div class="viewcode-block" id="AcquisitionGeometry.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionGeometry.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -2284,20 +2190,6 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span></div>
 
-<div class="viewcode-block" id="DataContainer.subset"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Creates a DataContainer containing a subset of self according to the </span>
-<span class="sd">        labels in dimensions&#39;&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">temp</span></div>
 
 <div class="viewcode-block" id="DataContainer.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -2385,17 +2277,25 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot fill with the provided array.&#39;</span> <span class="o">+</span> \
-                                     <span class="s1">&#39;Expecting </span><span class="si">{0}</span><span class="s1"> got </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                     <span class="s1">&#39;Expecting shape </span><span class="si">{0}</span><span class="s1"> got </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> 
             <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="n">array</span><span class="o">.</span><span class="n">geometry</span><span class="p">:</span>
-                        <span class="n">numpy</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="n">array</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
-                        <span class="k">return</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+                
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">!=</span> <span class="n">array</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input array is not in the same order as destination array. Use &quot;array.reorder()&quot;&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot fill with the provided array.&#39;</span> <span class="o">+</span> \
+                                     <span class="s1">&#39;Expecting shape </span><span class="si">{0}</span><span class="s1"> got </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Can fill only with number, numpy array or DataContainer and subclasses. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2995,19 +2895,6 @@
     
         <span class="nb">super</span><span class="p">(</span><span class="n">ImageData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                                
-<div class="viewcode-block" id="ImageData.subset"><a class="viewcode-back" href="../../../framework.html#cil.framework.ImageData.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns a subset of ImageData and regenerates the geometry&#39;&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">temp</span></div>
 
 <div class="viewcode-block" id="ImageData.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.ImageData.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -3094,19 +2981,6 @@
     
         <span class="nb">super</span><span class="p">(</span><span class="n">AcquisitionData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   
-<div class="viewcode-block" id="AcquisitionData.subset"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionData.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns a subset of the AcquisitionData and regenerates the geometry&#39;&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">temp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">temp</span></div>
 
 <div class="viewcode-block" id="AcquisitionData.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionData.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -3463,11 +3337,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dtype</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span>
 
     <span class="nd">@dtype</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dtype</span> <span class="o">=</span> <span class="n">val</span>      
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">val</span>      
         
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="n">length</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

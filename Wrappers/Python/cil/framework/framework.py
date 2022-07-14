@@ -159,11 +159,11 @@ class ImageGeometry(object):
 
     @property
     def dtype(self):
-        return self.__dtype
+        return self._dtype
 
     @dtype.setter
     def dtype(self, val):
-        self.__dtype = val           
+        self._dtype = val           
 
     def __init__(self, 
                  voxel_num_x=0, 
@@ -2090,18 +2090,25 @@ class DataContainer(object):
             if isinstance(array, numpy.ndarray):
                 if array.shape != self.shape:
                     raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting {0} got {1}'.format(
+                                     'Expecting shape {0} got {1}'.format(
                                      self.shape,array.shape))
                 numpy.copyto(self.array, array)
             elif isinstance(array, Number):
                 self.array.fill(array) 
             elif issubclass(array.__class__ , DataContainer):
-                if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
-                    if self.geometry != array.geometry:
-                        array.reorder(array.dimension_labels)
-                        numpy.copyto(self.array, array.array)
-                        return
-                numpy.copyto(self.array, array.array)
+                
+                try:
+                    if self.dimension_labels != array.dimension_labels:
+                        raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
+                except AttributeError:
+                    pass
+
+                if self.array.shape == array.shape:
+                    numpy.copyto(self.array, array.array)
+                else:
+                    raise ValueError('Cannot fill with the provided array.' + \
+                                     'Expecting shape {0} got {1}'.format(
+                                     self.shape,array.shape))
             else:
                 raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
@@ -3143,11 +3150,11 @@ class VectorGeometry(object):
 
     @property
     def dtype(self):
-        return self.__dtype
+        return self._dtype
 
     @dtype.setter
     def dtype(self, val):
-        self.__dtype = val      
+        self._dtype = val      
         
     def __init__(self, 
                  length, **kwargs):

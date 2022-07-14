@@ -194,7 +194,7 @@ class TestPlugin(unittest.TestCase):
         d = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
         ig = ImageGeometry(160, 135, channels=91)
         data = ig.allocate(None)
-        data.fill(d)
+        data.fill(d.as_array())
         del d
     
         datarr = data.as_array()

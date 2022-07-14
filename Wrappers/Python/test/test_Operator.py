@@ -133,10 +133,10 @@ class TestOperator(CCPiTestClass):
         C.direct(x,y2)
         
         for c in range(channels):
-            numpy.testing.assert_array_equal(y.subset(channel=2).as_array(), \
-                                             (diag*x.subset(channel=2)).as_array())
-            numpy.testing.assert_array_equal(y2.subset(channel=2).as_array(), \
-                                             (diag*x.subset(channel=2)).as_array())
+            numpy.testing.assert_array_equal(y.get_slice(channel=2).as_array(), \
+                                             (diag*x.get_slice(channel=2)).as_array())
+            numpy.testing.assert_array_equal(y2.get_slice(channel=2).as_array(), \
+                                             (diag*x.get_slice(channel=2)).as_array())
         
         
         z = C.adjoint(y)
@@ -145,10 +145,10 @@ class TestOperator(CCPiTestClass):
         C.adjoint(y,z2)
         
         for c in range(channels):
-            numpy.testing.assert_array_equal(z.subset(channel=2).as_array(), \
-                                             (diag*(diag*x.subset(channel=2))).as_array())
-            numpy.testing.assert_array_equal(z2.subset(channel=2).as_array(), \
-                                             (diag*(diag*x.subset(channel=2))).as_array())
+            numpy.testing.assert_array_equal(z.get_slice(channel=2).as_array(), \
+                                             (diag*(diag*x.get_slice(channel=2))).as_array())
+            numpy.testing.assert_array_equal(z2.get_slice(channel=2).as_array(), \
+                                             (diag*(diag*x.get_slice(channel=2))).as_array())
         
         
     def test_BlurringOperator(self):

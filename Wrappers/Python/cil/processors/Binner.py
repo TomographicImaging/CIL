@@ -130,7 +130,7 @@ class Binner(DataProcessor):
                     if n_elements > 1:
                         geometry.config.panel.num_pixels[1] = n_elements
                     else:
-                        geometry = geometry.subset(vertical = (roi_object[idx][1] + roi_object[idx][0]) // 2)
+                        geometry = geometry.get_slice(vertical = (roi_object[idx][1] + roi_object[idx][0]) // 2)
                     geometry.config.panel.pixel_size[1] *= roi_object[idx][2]
                 elif key == 'horizontal':
                     geometry.config.panel.num_pixels[0] = n_elements

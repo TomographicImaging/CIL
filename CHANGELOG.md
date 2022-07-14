@@ -1,5 +1,9 @@
 * 22.0.0
-  - Deprecated: `x_init` removed from the initialisation of the Algorithms and `initial` will be used.
+  - Removal of deprecated code
+    - AcquisitionGeometry constructor removed, use factory `create` methods instead
+    - Subset method removed, use `get_slice` or `reorder` methods
+    - NikonDataReader `normalize` kwarg removed, use `normalise`
+    - Algorithms initialisation `x_init` kwarg removed, use `initial`
   - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated

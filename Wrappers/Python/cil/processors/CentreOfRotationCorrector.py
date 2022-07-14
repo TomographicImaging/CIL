@@ -30,36 +30,112 @@ class CentreOfRotationCorrector(object):
 
         For use on parallel-beam geometry it requires two projections 180 degree apart.
 
-        :param slice_index: An integer defining the vertical slice to run the algorithm on.
-        :type slice_index: int, str='centre', optional
-        :param projection_index: An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
-        :type projection_index: int, optional
-        :param ang_tol: The angular tolerance in degrees between the two input projections 180degree gap
-        :type ang_tol: float, optional
-        :return: returns an AcquisitionData object with an updated AcquisitionGeometry
-        :rtype: AcquisitionData
+        Parameters
+        ----------
+
+        slice_index : int, str='centre', default='centre'
+            An integer defining the vertical slice to run the algorithm on.
+
+        projection_index : int
+            An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
+
+        ang_tol : float, default=0.1
+            The angular tolerance in degrees between the two input projections 180 degree gap
+
+        Example
+        -------
+        >>> from cil.processors import CentreOfRotationCorrector
+        >>> processor = CentreOfRotationCorrector.xcorrelation('centre')
+        >>> processor.set_input(data)
+        >>> data_centred = processor.get_ouput()
+
+        Example
+        -------
+        >>> from cil.processors import CentreOfRotationCorrector
+        >>> processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)
+        >>> processor.set_input(data)
+        >>> processor.get_ouput(out=data)
+
+
+        Example
+        -------
+        >>> from cil.processors import CentreOfRotationCorrector
+        >>> import logging
+        >>> logging.basicConfig(level=logging.WARNING)
+        >>> cil_log_level = logging.getLogger('cil.processors')
+        >>> cil_log_level.setLevel(logging.DEBUG)
+
+        >>> processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)
+        >>> processor.set_input(data)
+        >>> data_centred = processor.get_ouput()
+
+
+        Note
+        ----
+        setting logging to 'debug' will give you more information about the algorithm progress
+
+
+
         '''
+
         processor = CofR_xcorrelation(slice_index, projection_index, ang_tol)
         return processor
 
     @staticmethod
-    def image_sharpness(slice_index='centre', FBP=None, tolerance=0.005, search_range=None, initial_binning=None):
-        r'''This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
+    def image_sharpness(slice_index='centre', backend='astra', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+        """
+        This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
 
-        Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.
+        Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.
 
-        :param slice_index: An integer defining the vertical slice to run the algorithm on.
-        :type slice_index: int, str='centre', optional
-        :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
-        :type FBP: class
-        :param tolerance: The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
-        :type tolerance: float, default = 0.001    
-        :param search_range: The range in pixels to search either side of the panel centre. If `None` the width of the panel/4 is used. 
-        :type search_range: int
-        :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
-        :type initial_binning: int
-        :return: returns an AcquisitionData object with an updated AcquisitionGeometry
-        :rtype: AcquisitionDataS
-        '''
-        processor = CofR_image_sharpness(slice_index=slice_index, FBP=FBP, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
+        Parameters
+        ----------
+
+        slice_index : int, str='centre', default='centre'
+            An integer defining the vertical slice to run the algorithm on.
+
+        backend : str, default='astra'
+            The backend to use for the reconstruction, 'astra' or 'tigre'
+
+        tolerance : float, default=1./200.
+            The tolerance of the fit in pixels, the default is 1/200 of a pixel. This is a stopping criteria, not a statement of accuracy of the algorithm.
+
+        search_range : int, default 0.25*pixels_num_h
+            The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  
+
+        initial_binning : int
+            The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
+
+
+        Kwargs
+        ------
+        FBP : Class
+            Deprecated parameter: the FBP class imported from cil.plugins.[backend].FBP Please use 'backend' instead
+
+
+        Example
+        -------
+        from cil.processors import CentreOfRotationCorrector
+
+        processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
+        processor.set_input(data)
+        data_centred = processor.get_ouput()
+
+
+        Example
+        -------
+        from cil.processors import CentreOfRotationCorrector
+
+        processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
+        processor.set_input(data)
+        processor.get_ouput(out=data)
+
+
+        Note
+        ----
+        For best results data should be 360deg which leads to blurring with incorrect geometry.
+        This method is unreliable on half-scan data with 'tuning-fork' style artifacts.
+
+        """
+        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning, **kwargs)
         return processor

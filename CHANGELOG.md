@@ -1,4 +1,5 @@
 * 22.0.0
+  - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
   - Removal of deprecated code
     - AcquisitionGeometry constructor removed, use factory `create` methods instead
     - Subset method removed, use `get_slice` or `reorder` methods

@@ -461,22 +461,19 @@ class TestDataContainer(CCPiTestClass):
 
 
     def test_AcquisitionData(self):
-        sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', pixel_num_v=3,
-                                        pixel_num_h=5, channels=2)
+        sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
+
         #sino = AcquisitionData(geometry=sgeometry)
         sino = sgeometry.allocate()
         self.assertEqual(sino.shape, (2, 10, 3, 5))
-        
-        ag = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', )        
+           
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((2,3)).set_channels(4)                       
         data = ag.allocate()
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag.shape))
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
         
-        ag2 = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                                geom_type='parallel', 
-                                                dimension_labels=[AcquisitionGeometry.VERTICAL ,
+        ag2 = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((2,3)).set_channels(4)\
+                                 .set_labels([AcquisitionGeometry.VERTICAL ,
                          AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL, AcquisitionGeometry.CHANNEL])
         
         data = ag2.allocate()
@@ -511,10 +508,7 @@ class TestDataContainer(CCPiTestClass):
 
         #vgeometry.allocate('')
     def test_AcquisitionGeometry_allocate(self):
-        ageometry = AcquisitionGeometry(dimension=2, 
-                            angles=numpy.linspace(0, 180, num=10),
-                            geom_type='parallel', pixel_num_v=3,
-                            pixel_num_h=5, channels=2)
+        ageometry = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
         sino = ageometry.allocate(0)
         shape = sino.shape
         self.assertAlmostEqual(0.,sino.as_array()[0][0][0][0])
@@ -670,9 +664,8 @@ class TestDataContainer(CCPiTestClass):
 
 
     def test_AcquisitionDataSubset(self):
-        sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', pixel_num_v=3,
-                                        pixel_num_h=5, channels=2)
+        sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
+
         # expected dimension_labels
         
         self.assertListEqual([AcquisitionGeometry.CHANNEL ,
@@ -1120,9 +1113,8 @@ class TestDataContainer(CCPiTestClass):
                                                 
         self.assertEqual( d1.size, 100 )
         
-        sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', pixel_num_v=3,
-                                        pixel_num_h=5, channels=2)
+        sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
+
         ad = sgeometry.allocate()
 
         self.assertEqual( ad.size, 3*5*10*2 )
@@ -1147,18 +1139,18 @@ class TestDataContainer(CCPiTestClass):
         axis_number = u.get_dimension_axis('horizontal_y')
         
         u.fill(a, horizontal_y=0)
-        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
+        numpy.testing.assert_array_equal(u.get_slice(horizontal_y=0).as_array(), a)
 
         u.fill(2, horizontal_y=1)
-        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+        numpy.testing.assert_array_equal(u.get_slice(horizontal_y=1).as_array(), 2 * a)
 
         u.fill(2, horizontal_y=1)
-        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+        numpy.testing.assert_array_equal(u.get_slice(horizontal_y=1).as_array(), 2 * a)
         
-        b = u.subset(horizontal_y=2)
+        b = u.get_slice(horizontal_y=2)
         b.fill(3)
         u.fill(b, horizontal_y=2)
-        numpy.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
+        numpy.testing.assert_array_equal(u.get_slice(horizontal_y=2).as_array(), 3 * a)
 
 
     def test_fill_dimension_AcquisitionData(self):
@@ -1204,22 +1196,22 @@ class TestDataContainer(CCPiTestClass):
         # (2, 5, 3, 4)
         a = numpy.ones((2,5))
         # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-        b = u.subset(channel=0, vertical=0)
+        b = u.get_slice(channel=0, vertical=0)
         data = u.as_array()
         
         u.fill(a, channel=0, vertical=0)
-        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), a)
+        numpy.testing.assert_array_equal(u.get_slice(channel=0, vertical=0).as_array(), a)
 
         u.fill(2, channel=0, vertical=0)
-        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), 2 * a)
+        numpy.testing.assert_array_equal(u.get_slice(channel=0, vertical=0).as_array(), 2 * a)
 
         u.fill(2, channel=0, vertical=0)
-        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), 2 * a)
+        numpy.testing.assert_array_equal(u.get_slice(channel=0, vertical=0).as_array(), 2 * a)
         
-        b = u.subset(channel=0, vertical=0)
+        b = u.get_slice(channel=0, vertical=0)
         b.fill(3)
         u.fill(b, channel=1, vertical=1)
-        numpy.testing.assert_array_equal(u.subset(channel=1, vertical=1).as_array(), 3 * a)
+        numpy.testing.assert_array_equal(u.get_slice(channel=1, vertical=1).as_array(), 3 * a)
 
 
  

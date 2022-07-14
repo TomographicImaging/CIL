@@ -1020,8 +1020,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         # separate the u1 vertical=0
         f_mask = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask.copy(), eta=eta.copy())
         f_mask_c = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask_c.copy(), eta=eta.copy())
-        f_on_mask = KullbackLeibler(b=g1.subset(horizontal_x=0), use_numba=True, eta=eta.subset(horizontal_x=0))
-        u1_on_mask = u1.subset(horizontal_x=0)
+        f_on_mask = KullbackLeibler(b=g1.get_slice(horizontal_x=0), use_numba=True, eta=eta.get_slice(horizontal_x=0))
+        u1_on_mask = u1.get_slice(horizontal_x=0)
 
         tau = 400.4
         self.tau = tau

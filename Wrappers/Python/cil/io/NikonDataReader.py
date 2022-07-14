@@ -76,10 +76,6 @@ class NikonDataReader(object):
         self.mode = kwargs.get('mode', 'bin')
         self.fliplr = kwargs.get('fliplr', False)
         
-        if 'normalize' in kwargs.keys():
-            self.normalise = kwargs.get('normalize', True)
-            warnings.warn("'normalize' has now been deprecated. Please use 'normalise' instead.")
-
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
                         roi = self.roi,
@@ -92,8 +88,7 @@ class NikonDataReader(object):
                roi = {'angle': -1, 'horizontal': -1, 'vertical': -1},
                normalise = True,
                mode = 'bin',
-               fliplr = False,
-               **kwargs):
+               fliplr = False):
         
         self.file_name = file_name
         self.roi = roi
@@ -101,10 +96,6 @@ class NikonDataReader(object):
         self.mode = mode
         self.fliplr = fliplr
         
-        if 'normalize' in kwargs.keys():
-            self.normalise = kwargs.get('normalize', True)
-            warnings.warn("'normalize' has now been deprecated. Please use 'normalise' instead.")
-
         if self.file_name == None:
             raise Exception('Path to xtekct file is required.')
         

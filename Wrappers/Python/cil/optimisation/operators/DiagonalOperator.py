@@ -74,4 +74,4 @@ class DiagonalOperator(LinearOperator):
         
         " Returns the operator norm of DiagonalOperator which is the maximum element in the `diagonal`."
         
-        return self.diagonal.max()
+        return self.diagonal.abs().max()

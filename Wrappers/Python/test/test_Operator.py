@@ -93,8 +93,18 @@ class TestOperator(CCPiTestClass):
         # Apply adjoint and check whether results equals diag*(diag*x) as expected.
         y = D.adjoint(z)
         numpy.testing.assert_array_equal(y.as_array(), (diag*(diag*x)).as_array())
-        
 
+        # test norm of diagonal
+        norm1 = D.norm()
+        numpy.testing.assert_almost_equal(norm1, numpy.max(diag.array))
+
+        # test norm of diagonal with complex value
+        diag = ig.allocate('random',seed=101, dtype=numpy.complex64)
+        D = DiagonalOperator(diag)
+        norm1 = D.norm()
+        numpy.testing.assert_almost_equal(norm1, numpy.max(numpy.abs(diag.array)))        
+
+    
     def test_MaskOperator(self):
         M = 3
         ig = ImageGeometry(M, M)

@@ -100,6 +100,12 @@ class NEXUSDataWriter(object):
         '''
         write dataset to disk
         '''   
+        # check filename and data have been set:
+        if self.file_name is None:
+            raise Exception('Path to nexus file to write to is required.')
+        if self.data is None:
+            raise Exception('Data to write out must be set.')
+        
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))

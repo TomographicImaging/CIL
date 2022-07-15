@@ -974,7 +974,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         
@@ -985,7 +985,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[4,5] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -995,7 +995,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1009,7 +1009,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
@@ -1019,7 +1019,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1033,7 +1033,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
@@ -1043,7 +1043,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1061,7 +1061,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1070,7 +1070,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1080,7 +1080,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1089,7 +1089,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1098,7 +1098,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1107,7 +1107,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1115,7 +1115,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check movmedian
@@ -1123,7 +1123,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1132,7 +1132,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -1241,7 +1241,7 @@ class TestMasker(unittest.TestCase):
         self.data.as_array()[2,3] = float('inf')
         self.data.as_array()[4,5] = float('nan')
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         

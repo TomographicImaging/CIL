@@ -556,9 +556,14 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(geometry.dtype, numpy.float32)
 
         #print("Change it to complex")
-        geometry.dtype = numpy.complex
-        #print("The {} dtype is now {} ".format(classname , geometry.dtype))         
-        self.assertEqual(geometry.dtype, numpy.complex)
+        geometry.dtype = numpy.complex64
+        self.assertEqual(geometry.dtype, numpy.complex64)
+
+        geometry.dtype = numpy.complex128
+        self.assertEqual(geometry.dtype, numpy.complex128)
+
+        geometry.dtype = complex
+        self.assertEqual(geometry.dtype, complex)
 
         #print("Test {} allocate".format(classname ))
         data = geometry.allocate()
@@ -577,7 +582,7 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(data.dtype, numpy.int64)
 
         #print("The dtype of the {} remain unchanged ig.dtype =  {}".format(classname, geometry.dtype))
-        self.assertEqual(geometry.dtype, numpy.complex)
+        self.assertEqual(geometry.dtype, complex)
 
         self.assertNotEqual(id(geometry), id(data.geometry))
 
@@ -611,7 +616,7 @@ class TestDataContainer(CCPiTestClass):
 
 
     def complex_allocate_geometry_test(self, geometry):
-        data = geometry.allocate(dtype=numpy.complex)
+        data = geometry.allocate(dtype=numpy.complex64)
         r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
         data.fill(r)
         self.assertAlmostEqual(data.squared_norm(), data.size * 2)  

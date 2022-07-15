@@ -100,7 +100,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(M, M)
         x = ig.allocate('random',seed=100)
         
-        mask = ig.allocate(True,dtype=numpy.bool)
+        mask = ig.allocate(True,dtype=bool)
         amask = mask.as_array()
         amask[2,1:3] = False
         amask[0,0] = False
@@ -296,8 +296,8 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2) 
 
         # Gradient Operator (complex)
-        ig = ImageGeometry(30,30, dtype=numpy.complex)
-        Grad = GradientOperator(ig)
+        ig = ImageGeometry(30,30, dtype=complex)
+        Grad = GradientOperator(ig, backend='numpy')
         res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
         numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)         
                     
@@ -447,7 +447,7 @@ class TestGradients(CCPiTestClass):
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
-        Grad2 = GradientOperator(self.ig2, correlation = 'Space')
+        Grad2 = GradientOperator(self.ig2, correlation = 'Space', backend='numpy')
         
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         numpy.random.seed(1)
@@ -464,7 +464,7 @@ class TestGradients(CCPiTestClass):
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
-        Grad2 = GradientOperator(self.ig2, correlation = 'Space')
+        Grad2 = GradientOperator(self.ig2, correlation = 'Space', backend='numpy')
         
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         norm = LinearOperator.PowerMethod(E2, max_iterations=self.iterations)

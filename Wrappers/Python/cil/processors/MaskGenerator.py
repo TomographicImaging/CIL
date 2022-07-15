@@ -218,7 +218,7 @@ class MaskGenerator(DataProcessor):
                 axis_index = None
 
         # intialise mask with all ones
-        mask = numpy.ones(arr.shape, dtype=numpy.bool)
+        mask = numpy.ones(arr.shape, dtype=bool)
         
         # if NaN or +/-Inf
         if self.mode == 'special_values':
@@ -363,7 +363,7 @@ class MaskGenerator(DataProcessor):
         
 
         if out is None:
-            mask = numpy.asarray(mask, dtype=numpy.bool)
+            mask = numpy.asarray(mask, dtype=bool)
             out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
             return out
         else:

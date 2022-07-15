@@ -4,6 +4,7 @@
     - `subset` method removed, use `get_slice` or `reorder` methods
     - NikonDataReader `normalize` kwarg removed, use `normalise`
     - Algorithms initialisation `x_init` kwarg removed, use `initial`
+    - Removed deprecated numpy calls
   - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated

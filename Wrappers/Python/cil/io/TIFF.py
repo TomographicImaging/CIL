@@ -300,7 +300,7 @@ class TIFFStackReader(object):
     def _get_file_type(self, img): 
         mode = img.mode
         if mode == '1':
-            dtype = np.bool
+            dtype = np.bool_
         elif mode == 'L':
             dtype = np.uint8
         elif mode == 'F':
@@ -384,9 +384,9 @@ class TIFFStackReader(object):
                     
         else: # slice mode
             # calculate number of pixels
-            n_rows = np.int(np.ceil((roi_par[1][1] - roi_par[1][0]) / roi_par[1][2]))
-            n_cols = np.int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))
-            num_to_read = np.int(np.ceil((roi_par[0][1] - roi_par[0][0]) / roi_par[0][2]))
+            n_rows = int(np.ceil((roi_par[1][1] - roi_par[1][0]) / roi_par[1][2]))
+            n_cols = int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))
+            num_to_read = int(np.ceil((roi_par[0][1] - roi_par[0][0]) / roi_par[0][2]))
             
             if not self.transpose:
                 im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)

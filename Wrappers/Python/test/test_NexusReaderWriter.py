@@ -92,6 +92,18 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readImageDataAndTest(atol=1e-4)
 
+    def test_write_throws_when_file_is_none(self):
+        with self.assertRaises(Exception) as cm:
+            writer = NEXUSDataWriter(file_name='test_file_name.nxs')
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Data to write out must be set.')
+
+    def test_write_throws_when_data_is_none(self):
+        with self.assertRaises(Exception) as cm:
+            writer = NEXUSDataWriter(data=self.ad2d)
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Path to nexus file to write to is required.')
+
 
     def readImageDataAndTest(self,atol=0):        
         im_size = 5

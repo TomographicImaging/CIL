@@ -296,13 +296,13 @@ class TotalVariation(Function):
     
     @property
     def gradient(self):
-        '''creates a gradient operator if not instantiated yet
+        '''Returns a gradient operator compatible with the internal variable _domain if available
 
         There is no check that the variable _domain is changed after instantiation (should not be the case)'''
         
         if self._domain is not None:
             return GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
-        raise ValueError('')
+        raise ValueError('Cannot return a valid GradientOperator. Please call __call__ or proximal first.')
         
     def __rmul__(self, scalar):
         if not isinstance (scalar, Number):

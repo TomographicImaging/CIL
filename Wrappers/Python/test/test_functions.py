@@ -878,6 +878,11 @@ class TestTotalVariation(unittest.TestCase):
         res2 = self.grad.direct(x_real).pnorm(1).sum()
         np.testing.assert_equal(res1, res2)                
     
+    def test_gradient_not_initialised(self):
+        with self.assertRaises(ValueError):
+            tv = TotalVariation()
+            x_real = self.ig_real.allocate('random', seed=4)  
+            grad = tv.gradient.direct(x_real)
 
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):

@@ -1,6 +1,6 @@
 * 22.0.0
   - Removal of deprecated code
-    - AcquisitionGeometry `__init__` no longer sets up a working geometry, use factory `create` methods instead
+    - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
     - `subset` method removed, use `get_slice` or `reorder` methods
     - NikonDataReader `normalize` kwarg removed, use `normalise`
     - Algorithms initialisation `x_init` kwarg removed, use `initial`

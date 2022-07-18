@@ -45,7 +45,7 @@ system_state = {}
 
 #nvidia
 try:
-    subprocess.check_output('nvidia-smi') == 0
+    subprocess.check_output('nvidia-smi', check=True) == 0
     has_nvidia = True
 except subprocess.CalledProcessError:
     has_nvidia = False

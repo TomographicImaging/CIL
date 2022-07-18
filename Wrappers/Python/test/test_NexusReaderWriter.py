@@ -98,7 +98,7 @@ class TestNexusReaderWriter(unittest.TestCase):
             writer.write()
         self.assertEqual(str(cm.exception), 'Data to write out must be set.')
 
-    def test_write_throws_when_data_is_none(self):
+    def test_write_throws_when_file_is_none(self):
         with self.assertRaises(Exception) as cm:
             writer = NEXUSDataWriter(data=self.ad2d)
             writer.write()

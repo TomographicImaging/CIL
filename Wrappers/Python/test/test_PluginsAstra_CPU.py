@@ -1,40 +1,62 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-
-from utils_projectors import TestCommon_ProjectionOperator_SIM, TestCommon_FBP_SIM
-from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
 import unittest
-from utils import has_gpu_astra, has_astra
+import utils
+setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
+
+from utils_projectors import TestCommon_ProjectionOperator_SIM
+from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+
+
+from utils import has_astra, has_gpu_astra
+from utils import disable_print, enable_prints
+
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
-    from cil.plugins.astra import FBP
-
-has_astra_gpu = has_gpu_astra()
-if not has_astra_gpu:
-    print("Unable to run ASTRA GPU tests")
-
-
+    import astra
+    
 def setup_parameters(self):
 
     self.backend = 'astra'
     self.ProjectionOperator = ProjectionOperator
     self.PO_args={'device':'cpu'}
+
+
+class Test_basic_astra(unittest.TestCase):
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_astra_basic_(self):
+        try:
+            disable_print()
+            astra.test_noCUDA()
+            enable_prints()
+        except:
+            self.assertFalse('ASTRA CPU test failed')
+
+
+    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA and GPU")
+    def test_astra_basic_cuda(self):
+        try:
+            disable_print()
+            astra.test_CUDA()
+            enable_prints()
+        except:
+            self.assertFalse('ASTRA GPU test failed')
 
 
 class Test_Cone2D_Projectors_CPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):

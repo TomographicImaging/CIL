@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 import unittest
+import utils
+setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
+
 import numpy as np
 from cil.utilities import dataexample
 from cil.optimisation.functions import TotalVariation
-import os
-from utils import has_nvidia_smi
+from utils import has_nvidia
 from cil.framework import ImageGeometry
 import logging
 
@@ -317,7 +318,7 @@ class TestPlugin(unittest.TestCase):
         np.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
        
 
-    @unittest.skipUnless(has_regularisation_toolkit and has_nvidia_smi(), "Skipping as CCPi Regularisation Toolkit is not installed")  
+    @unittest.skipUnless(has_regularisation_toolkit and has_nvidia, "Skipping as CCPi Regularisation Toolkit is not installed")  
     def test_TotalVariation_vs_FGP_TV_gpu(self):   
         # Isotropic TV cil
         TV_cil_iso = self.alpha * TotalVariation(max_iteration=self.iterations)

@@ -14,8 +14,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 import unittest
+import utils
+setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from cil.framework import AcquisitionGeometry
 from cil.plugins.astra.utilities import convert_geometry_to_astra

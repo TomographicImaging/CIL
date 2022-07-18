@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 import unittest
+import utils
+setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
+
 from cil.framework import AcquisitionGeometry
 import numpy as np
 import os
@@ -48,7 +50,6 @@ except ImportError as ie:
     has_wget = False
 if has_astra:
     from cil.plugins.astra import FBP
-has_astra_gpu = has_gpu_astra()
 
 # change basedir to point to the location of the walnut dataset which can
 # be downloaded from https://zenodo.org/record/4822516
@@ -58,7 +59,7 @@ filename = os.path.join(basedir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)
 
 
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_astra_gpu and has_file \
+has_prerequisites = has_olefile and has_dxchange and has_astra and has_gpu_astra and has_file \
     and has_wget
 
 

@@ -1,44 +1,42 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+import unittest
+import utils
+setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
-
-import unittest
 from scipy.fft  import fft, ifft
 import numpy as np
 from utils import has_tigre, has_gpu_tigre, has_ipp, has_astra, has_gpu_astra
+
+from cil.recon.Reconstructor import Reconstructor # checks on baseclass
+from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
+from cil.recon import FDK, FBP
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
 
-    from cil.recon.Reconstructor import Reconstructor # checks on baseclass
-    from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
-    from cil.recon import FDK, FBP
-
-has_tigre_gpu = has_gpu_tigre()
-if  not has_tigre_gpu:
+if  not has_gpu_tigre:
     print("Unable to run TIGRE tests")
 
-has_astra_gpu = has_gpu_astra()
-if  not has_astra_gpu:
+if  not has_gpu_astra:
     print("Unable to run ASTRA tests")
     
 class Test_Reconstructor(unittest.TestCase):
@@ -497,7 +495,7 @@ class Test_FDK_results(unittest.TestCase):
         self.ag = self.acq_data.geometry
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_3D(self):
 
         reconstructor = FDK(self.acq_data)
@@ -511,7 +509,7 @@ class Test_FDK_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)     
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_2D(self):
 
         data2D = self.acq_data.get_slice(vertical='centre')
@@ -527,7 +525,7 @@ class Test_FDK_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)   
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_with_tigre(self):
 
         fbp_tigre = FBP_tigre(self.ig, self.ag)
@@ -547,7 +545,7 @@ class Test_FDK_results(unittest.TestCase):
         np.testing.assert_allclose(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_inplace_filtering(self):
 
         reconstructor = FDK(self.acq_data)
@@ -576,7 +574,7 @@ class Test_FBP_results(unittest.TestCase):
         self.ag = self.acq_data.geometry
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_3D_tigre(self):
 
         reconstructor = FBP(self.acq_data)
@@ -590,7 +588,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)  
 
 
-    @unittest.skipUnless(has_astra and has_astra_gpu and has_ipp, "ASTRA or IPP not installed")
+    @unittest.skipUnless(has_astra and has_gpu_astra and has_ipp, "ASTRA or IPP not installed")
     def test_results_3D_astra(self):
 
         self.acq_data.reorder('astra')
@@ -605,7 +603,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)  
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_3D_split(self):
 
         reconstructor = FBP(self.acq_data)
@@ -620,7 +618,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)   
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_2D_tigre(self):
 
         data2D = self.acq_data.get_slice(vertical='centre')
@@ -636,7 +634,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)    
 
 
-    @unittest.skipUnless(has_astra and has_astra_gpu and has_ipp, "ASTRA or IPP not installed")
+    @unittest.skipUnless(has_astra and has_gpu_astra and has_ipp, "ASTRA or IPP not installed")
     def test_results_2D_astra(self):
 
         data2D = self.acq_data.get_slice(vertical='centre')
@@ -653,7 +651,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)    
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_with_tigre(self):
 
         fbp_tigre = FBP_tigre(self.ig, self.ag)
@@ -673,7 +671,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
 
 
-    @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_gpu_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_inplace_filtering(self):
 
         reconstructor = FBP(self.acq_data)

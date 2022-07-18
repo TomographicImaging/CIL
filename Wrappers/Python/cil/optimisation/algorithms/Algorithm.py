@@ -145,7 +145,7 @@ class Algorithm(object):
         pass
         
     def get_output(self):
-        '''Returns the solution found'''
+        " Returns the last iterate which is stored in x "
         return self.x
 
     @property

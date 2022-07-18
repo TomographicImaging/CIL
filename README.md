@@ -32,19 +32,19 @@ The documentation for CIL can be accessed [here](https://tomographicimaging.gith
 Binary installation of CIL can be done with `conda`. Install a new environment using:
 
 ```bash
-conda create --name cil -c conda-forge -c intel -c ccpi cil
+conda create --name cil -c conda-forge -c intel -c ccpi cil=21.4.1 
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```bash
 
-conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil astra-toolbox tigre ccpi-regulariser tomophantom=1.4.10
+conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil=21.4.1 cil-astra tigre ccpi-regulariser tomophantom
 ```
 
 where,
 
-```astra-toolbox``` will allow you to use CIL with the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).
+```cil-astra``` will allow you to use CIL with the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).
 
 ```tigre``` will allow you to use CIL with the [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license).
 

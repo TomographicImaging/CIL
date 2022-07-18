@@ -20,6 +20,7 @@ import logging
 from numbers import Number
 
 
+
 class ISTA(Algorithm):
 
     r"""Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.

@@ -33,13 +33,12 @@ def startTestRun(self):
     #set logging
     logging.basicConfig(level=logging.WARNING, force=True)
 
-
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")
     print("CIL version: ", cil.version.version)
     pprint.pprint(system_state)
-    print("----------------------------------------------------------------------\n", flush=True)
-
+    print("----------------------------------------------------------------------\n")
+    sys.stdout.flush()
 
 # system state dictionary to be populated
 system_state = {}

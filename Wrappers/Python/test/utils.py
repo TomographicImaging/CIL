@@ -83,7 +83,7 @@ system_state['has_ipp']=has_ipp
 
 
 #tigre
-module_info = importlib.util.find_spec("ccpi_regularisation")
+module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
 if module_info is None:
     has_ccpi_regularisation = False
 else:

@@ -360,11 +360,6 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
 
 
-if __name__=="__main__":
 
-    d = KullbackLeiblerSIRF()
-    d.setUp()
-    # d.test_KullbackLeibler_call()
-    d.test_KullbackLeibler_convex_conjugate()
 
 

@@ -20,14 +20,10 @@ setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-from utils import has_gpu_tigre, has_tigre
+from utils import has_tigre, has_nvidia
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
-
-if not has_gpu_tigre:
-    print("Unable to run TIGRE GPU tests")
-
 
 def setup_parameters(self):
 
@@ -38,7 +34,7 @@ def setup_parameters(self):
 
 class Test_Cone3D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -47,7 +43,7 @@ class Test_Cone3D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionOpera
 
 class Test_Cone3D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -56,7 +52,7 @@ class Test_Cone3D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOperato
 
 class Test_Cone3D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -66,7 +62,7 @@ class Test_Cone3D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperato
 
 class Test_Cone2D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -75,7 +71,7 @@ class Test_Cone2D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionOpera
 
 class Test_Cone2D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -84,7 +80,7 @@ class Test_Cone2D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOperato
 
 class Test_Cone2D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -94,7 +90,7 @@ class Test_Cone2D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperato
 
 class Test_Parallel3D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -103,7 +99,7 @@ class Test_Parallel3D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionO
 
 class Test_Parallel3D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -112,7 +108,7 @@ class Test_Parallel3D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Parallel3D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    #@unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    #@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     @unittest.skip("TIGRE backprojector weights bug")
     def setUp(self):
         setup_parameters(self)
@@ -123,7 +119,7 @@ class Test_Parallel3D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Parallel2D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
@@ -132,7 +128,7 @@ class Test_Parallel2D_Projectors_basic(unittest.TestCase, TestCommon_ProjectionO
 
 class Test_Parallel2D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
@@ -141,7 +137,7 @@ class Test_Parallel2D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Parallel2D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    #@unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    #@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     @unittest.skip("TIGRE backprojector weights bug")
     def setUp(self):
         setup_parameters(self)

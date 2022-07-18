@@ -49,24 +49,20 @@ from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 import os, sys, time
 import warnings
+from cil.optimisation.functions import Rosenbrock
+from cil.framework import VectorData, VectorGeometry
+from cil.utilities.quality_measures import mae, mse, psnr
 
 
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 import logging
 from testclass import CCPiTestClass
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import  has_astra
 
-try:
+
+if has_astra:
     from cil.plugins.astra import ProjectionOperator
-    has_astra = True    
-except ImportError as ie:
-    # skip test
-    has_astra = False
-
-has_astra = has_astra and has_gpu_astra
-
-
 
 class TestAlgorithms(CCPiTestClass):
     def setUp(self):
@@ -145,8 +141,6 @@ class TestAlgorithms(CCPiTestClass):
 
 
     def test_GDArmijo2(self):
-        from cil.optimisation.functions import Rosenbrock
-        from cil.framework import VectorData, VectorGeometry
 
         f = Rosenbrock (alpha = 1., beta=100.)
         vg = VectorGeometry(2)
@@ -732,7 +726,6 @@ class TestSPDHG(unittest.TestCase):
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, verbose=0)
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -835,7 +828,6 @@ class TestSPDHG(unittest.TestCase):
         # plt.colorbar()
         # plt.show()
 
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -930,7 +922,6 @@ class TestSPDHG(unittest.TestCase):
         
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())
@@ -1003,8 +994,6 @@ class TestSPDHG(unittest.TestCase):
         )
         algos[1].run(1000, verbose=0)
         
-
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())

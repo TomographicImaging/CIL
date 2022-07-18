@@ -44,35 +44,21 @@ import numpy as np
 from cil.utilities import dataexample
 from cil.utilities import noise
 from testclass import CCPiTestClass
-try:
-    from ccpi.filters import regularisers
-    has_reg_toolkit = True
-except ImportError as ie:
-    has_reg_toolkit = False
-if has_reg_toolkit:
+from cil.utilities.quality_measures import mae
+
+from utils import has_ccpi_regularisation, has_tomophantom, has_numba
+if has_ccpi_regularisation:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
 
-try:
-    import tomophantom
-    from tomophantom import TomoP3D
-    has_tomophantom = True
+if has_tomophantom:
     from cil.plugins import TomoPhantom
-except ImportError as ie:
-    has_tomophantom = False
 
-from cil.utilities.quality_measures import mae
-has_numba = True
-try:
-    import numba
-    # imports the function that uses numba
+if has_numba:
     from cil.optimisation.functions.MixedL21Norm import _proximal_step_numba, _proximal_step_numpy
-except ImportError as ie:
-    has_numba = False
 
 
 class TestFunction(CCPiTestClass):
-           
-
+        
     def test_Function(self):
         numpy.random.seed(10)
         N = 3
@@ -881,10 +867,10 @@ class TestTotalVariation(unittest.TestCase):
         np.testing.assert_equal(res1, res2)                
     
 
-    @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
+    @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
         data = dataexample.SHAPES.get(size=(64,64))
-        ig = data.geometry
+        ig = data.geometryFGP_TV
         ag = ig
 
         np.random.seed(0)
@@ -951,7 +937,7 @@ class TestTotalVariation(unittest.TestCase):
         ###################################################################
     
     
-    @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
+    @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
         # print ("Building 3D phantom using TomoPhantom software")
         model = 13 # select a model number from the library

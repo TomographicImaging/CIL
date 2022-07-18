@@ -20,16 +20,9 @@ setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from cil.framework import ImageGeometry, AcquisitionGeometry
 import numpy as np
-try:
-    import tomophantom
+from utils import has_tomophantom
+if has_tomophantom:
     from cil.plugins import TomoPhantom
-    has_tomophantom = True
-except ImportError as ie:
-    # raise ImportError(ie + "\n\n" + 
-    #                   "This plugin requires the additional package ccpi-regularisation\n" +
-    #                   "Please install it via conda as ccpi-regularisation from the ccpi channel\n"+
-    #                   "Minimal version is 20.04")
-    has_tomophantom = False
 
 
 class TestTomoPhantom2D(unittest.TestCase):

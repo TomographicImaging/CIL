@@ -27,12 +27,9 @@ import numpy.testing
 
 from testclass import CCPiTestClass
 
-try:
-    from cvxpy import *
-    cvx_not_installable = False
-except ImportError:
-    cvx_not_installable = True
-
+from utils import has_cvxpy
+if has_cvxpy:
+    import cvxpy
 
 def aid(x):
     # This function returns the memory
@@ -65,7 +62,7 @@ class TestFunction(CCPiTestClass):
         ig, Phantom = self.create_simple_ImageData()
         x = Phantom.as_array()
         
-        norm2 = Norm2()
+        norm2 = cvxpy.Norm2()
         v1 = norm2(x)
         v2 = norm2(Phantom)
         self.assertEqual(v1, v2)

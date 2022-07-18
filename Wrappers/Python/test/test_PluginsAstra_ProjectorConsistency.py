@@ -20,14 +20,11 @@ setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from cil.framework import AcquisitionGeometry
 import numpy as np
-from utils import has_gpu_astra, has_astra
+from utils import has_astra, has_nvidia
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
-
-if not has_gpu_astra:
-    print("Unable to run ASTRA GPU tests")
 
 class TestAstraConeBeamProjectors(unittest.TestCase):
     def setUp(self): 
@@ -86,7 +83,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         self.golden_data_cs = self.golden_data.get_slice(vertical=self.cs_ind, force=True)
 
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_consistency(self):
     
         # #%% AstraProjector2D cpu
@@ -147,7 +144,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(bp_flex_2.as_array(),zeros.as_array())
 
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator(self):
         
         # #%% AstraProjector2D cpu
@@ -258,7 +255,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         self.golden_data_cs = self.golden_data.get_slice(vertical=self.cs_ind, force=True)
 
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_consistency(self):
     
         # #%% AstraProjector2D cpu
@@ -298,7 +295,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(bp_flex_2.as_array(),zeros.as_array())
 
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator(self):
         
         # #%% AstraProjector2D cpu

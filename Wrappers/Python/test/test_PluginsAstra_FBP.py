@@ -19,15 +19,11 @@ import utils
 setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from utils_projectors import TestCommon_FBP_SIM
-from utils import has_astra, has_gpu_astra
+from utils import has_astra, has_nvidia
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
     from cil.plugins.astra import FBP
-
-if not has_gpu_astra:
-    print("Unable to run ASTRA GPU tests")
-
 
 def setup_parameters(self):
 
@@ -38,7 +34,7 @@ def setup_parameters(self):
 
 class Test_Cone3D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -48,7 +44,7 @@ class Test_Cone3D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Cone2D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -58,7 +54,7 @@ class Test_Cone2D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Parallel3D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -68,7 +64,7 @@ class Test_Parallel3D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Parallel2D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
@@ -78,7 +74,7 @@ class Test_Parallel2D_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Parallel2D_FBP_CPU(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA")
     def setUp(self):
         setup_parameters(self)
         self.FBP_args['device'] = 'cpu'

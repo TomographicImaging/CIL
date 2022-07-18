@@ -21,7 +21,7 @@ import importlib
 
 import logging
 import cil.version
-
+import pprint
 # startTestRun should be imported and used in each test file to change default behaviour
 # it must be in each file as each may get run as an independent process
 # use:
@@ -37,7 +37,7 @@ def startTestRun(self):
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")
     print("CIL version: ", cil.version.version)
-    print(system_state)
+    pprint.pprint(system_state)
     print("----------------------------------------------------------------------\n", flush=True)
 
 # system state dictionary to be populated
@@ -59,10 +59,6 @@ else:
     has_astra = True
 system_state['has_astra']=has_astra
 
-#astra_gpu
-if  has_astra and has_nvidia:
-    has_gpu_astra = True
-
 #tigre
 module_info = importlib.util.find_spec("tigre")
 if module_info is None:
@@ -70,10 +66,6 @@ if module_info is None:
 else:
     has_tigre = True
 system_state['has_tigre']=has_tigre
-
-#tigre_gpu
-if  has_tigre and has_nvidia:
-    has_gpu_tigre = True
 
 #cvxpy
 module_info = importlib.util.find_spec("cvxpy")
@@ -88,6 +80,33 @@ system_state['has_cvxpy']=has_cvxpy
 from cil.framework import cilacc
 has_ipp = hasattr(cilacc, 'filter_projections_avh')
 system_state['has_ipp']=has_ipp
+
+
+#tigre
+module_info = importlib.util.find_spec("ccpi_regularisation")
+if module_info is None:
+    has_ccpi_regularisation = False
+else:
+    has_ccpi_regularisation = True
+system_state['has_ccpi_regularisation']= has_ccpi_regularisation
+
+
+#tomophantom
+module_info = importlib.util.find_spec("tomophantom")
+if module_info is None:
+    has_tomophantom = False
+else:
+    has_tomophantom = True
+system_state['has_tomophantom']= has_tomophantom
+
+
+#has_numba
+module_info = importlib.util.find_spec("numba")
+if module_info is None:
+    has_numba = False
+else:
+    has_numba = True
+system_state['has_numba']= has_numba
 
 
 # to disable prints from 3rd part libraries and tests

@@ -19,15 +19,10 @@ import utils
 setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from utils_projectors import TestCommon_FBP_SIM
-from utils import has_gpu_tigre, has_tigre
+from utils import has_tigre, has_nvidia
 
 if has_tigre:
-    from cil.plugins.tigre import ProjectionOperator
     from cil.plugins.tigre import FBP
-
-if not has_gpu_tigre:
-    print("Unable to run TIGRE GPU tests")
-
 
 def setup_parameters(self):
 
@@ -38,7 +33,7 @@ def setup_parameters(self):
 
 class Test_Cone3D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -48,7 +43,7 @@ class Test_Cone3D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Cone2D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -58,7 +53,7 @@ class Test_Cone2D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Parallel3D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -68,7 +63,7 @@ class Test_Parallel3D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
 class Test_Parallel2D_FBP(unittest.TestCase, TestCommon_FBP_SIM):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()

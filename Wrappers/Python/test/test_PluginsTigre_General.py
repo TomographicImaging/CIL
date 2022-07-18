@@ -23,15 +23,11 @@ from cil.framework.framework import ImageGeometry
 import numpy as np
 from cil.utilities.display import show2D
 
-from utils import has_gpu_tigre, has_tigre
+from utils import has_tigre, has_nvidia
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
     from cil.plugins.tigre import CIL2TIGREGeometry
-
-if not has_gpu_tigre:
-    print("Unable to run TIGRE GPU tests")
-
 
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self): 
@@ -278,7 +274,7 @@ class Test_convert_geometry(unittest.TestCase):
 
 class TestMechanics(unittest.TestCase):
 
-    @unittest.skipUnless(has_gpu_tigre, "Requires TIGRE GPU")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def setUp(self):
         self.ag = AcquisitionGeometry.create_Cone2D([0,-500],[0,500]).set_angles([0]).set_panel(5,1)
 

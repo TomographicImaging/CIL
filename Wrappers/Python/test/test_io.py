@@ -25,12 +25,13 @@ from cil.framework import ImageGeometry
 from cil.io import TXRMDataReader, NEXUSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.processors import Slicer
-from utils import has_gpu_astra, has_astra
+from utils import has_astra, has_nvidia
 from cil.utilities.dataexample import data_dir
 from cil.utilities.quality_measures import mae, mse, psnr
 from cil.utilities import dataexample
 import shutil
 import logging
+import glob
 
 
 has_dxchange = True
@@ -59,7 +60,7 @@ filename = os.path.join(basedir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)
 
 
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_gpu_astra and has_file \
+has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia and has_file \
     and has_wget
 
 
@@ -259,7 +260,6 @@ class TestTIFF(unittest.TestCase):
         writer = TIFFWriter(data=data, file_name=fname)
         writer.write()
 
-        import glob
         for el in glob.glob(os.path.join(self.cwd , "unittest*.tiff")):
             # print (f"modifying {el}")
             with open(el, 'w') as f:

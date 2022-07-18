@@ -33,37 +33,17 @@ from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import has_astra, has_tigre, has_nvidia, has_tomophantom
 
-
-try:
-    import tigre
-    has_tigre = True
-except ModuleNotFoundError:
-    print(  "This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
-    has_tigre = False
-else:
+if has_tigre:
     from cil.plugins.tigre import FBP as TigreFBP
     from cil.plugins.tigre import ProjectionOperator
 
-try:
-    import tomophantom
-    has_tomophantom = True
-except ModuleNotFoundError:
-    print(  "This plugin requires the additional package tomophantom\n" +
-            "Please install it via conda as tomophantom from the ccpi channel\n")
-    has_tomophantom = False
-else:
-    from cil.plugins import TomoPhantom
-
-try:
-    import astra
+if has_astra:
     from cil.plugins.astra import FBP as AstraFBP
-    has_astra = True
-except ModuleNotFoundError:
-    has_astra = False
+
+if has_tomophantom:
+    from cil.plugins import TomoPhantom
 
 
 class TestPadder(unittest.TestCase):
@@ -328,13 +308,6 @@ class TestPadder(unittest.TestCase):
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
     
-    
-
-
-has_astra = has_astra and has_gpu_astra
-has_tigre = has_tigre and has_gpu_tigre
-
-
 class TestBinner(unittest.TestCase):
     def test_Binner(self):
         #test parallel 2D case
@@ -749,7 +722,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS)
@@ -801,7 +774,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.data_offset = Op.direct(phantom)
         self.data_offset.geometry = ag_orig
 
-    @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
+    @unittest.skipUnless(has_tomophantom and has_astra and has_nvidia, "Tomophantom or ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
         corr = CofR_image_sharpness(FBP=AstraFBP)
         ad_out = corr(self.data_0)
@@ -811,7 +784,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-    @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
+    @unittest.skipUnless(has_tomophantom and has_tigre and has_nvidia, "Tomophantom or TIGRE GPU not installed")
     def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
         corr = CofR_image_sharpness(FBP=TigreFBP)
         ad_out = corr(self.data_0)

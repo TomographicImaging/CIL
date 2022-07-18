@@ -25,8 +25,6 @@ from cil.utilities import dataexample
 
 import numpy as np
 import scipy.sparse as sp
-
-
 from utils import has_cvxpy
 
 if has_cvxpy:

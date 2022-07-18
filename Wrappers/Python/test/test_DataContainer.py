@@ -28,6 +28,7 @@ from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 import logging
 from testclass import CCPiTestClass
+import functools
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -754,7 +755,6 @@ class TestDataContainer(CCPiTestClass):
         
         
     def test_multiply_out(self):
-        import functools
         ig = ImageGeometry(10,11,12)
         u = ig.allocate()
         a = numpy.ones(u.shape)

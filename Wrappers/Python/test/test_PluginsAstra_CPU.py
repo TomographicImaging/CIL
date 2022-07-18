@@ -20,11 +20,8 @@ setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-
-
-from utils import has_astra, has_gpu_astra
 from utils import disable_print, enable_prints
-
+from utils import has_astra
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
@@ -47,16 +44,6 @@ class Test_basic_astra(unittest.TestCase):
             enable_prints()
         except:
             self.assertFalse('ASTRA CPU test failed')
-
-
-    @unittest.skipUnless(has_gpu_astra, "Requires ASTRA and GPU")
-    def test_astra_basic_cuda(self):
-        try:
-            disable_print()
-            astra.test_CUDA()
-            enable_prints()
-        except:
-            self.assertFalse('ASTRA GPU test failed')
 
 
 class Test_Cone2D_Projectors_CPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):

@@ -23,13 +23,11 @@ from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
 
 import os
 import numpy as np
+from utils import has_tomophantom
 
-try:
+if has_tomophantom:
     import tomophantom
     from tomophantom import TomoP2D
-    has_tomophantom = True
-except ImportError as ie:
-    has_tomophantom = False
 
 
 class TestL1NormRR(unittest.TestCase):

@@ -39,8 +39,7 @@ def startTestRun(self):
     print("CIL version: ", cil.version.version)
     pprint.pprint(system_state)
     print("----------------------------------------------------------------------\n", flush=True)
-    if has_nvidia:
-        subprocess.run('nvidia-smi')
+
 
 # system state dictionary to be populated
 system_state = {}

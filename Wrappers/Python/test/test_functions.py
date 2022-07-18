@@ -870,7 +870,7 @@ class TestTotalVariation(unittest.TestCase):
     @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
         data = dataexample.SHAPES.get(size=(64,64))
-        ig = data.geometryFGP_TV
+        ig = data.geometry
         ag = ig
 
         np.random.seed(0)

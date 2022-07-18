@@ -92,7 +92,7 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readImageDataAndTest(atol=1e-4)
 
-    def test_write_throws_when_file_is_none(self):
+    def test_write_throws_when_data_is_none(self):
         with self.assertRaises(Exception) as cm:
             writer = NEXUSDataWriter(file_name='test_file_name.nxs')
             writer.write()

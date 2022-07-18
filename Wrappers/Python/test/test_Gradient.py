@@ -44,11 +44,18 @@ class TestGradientOperator(unittest.TestCase):
 
         self.list_geometries = [self.ig_2D, self.ig_2D_chan, self.ig_3D, self.ig_3D_chan,
                                 self.ig_2D_voxel, self.ig_2D_chan_voxel, self.ig_3D_voxel, self.ig_3D_chan_voxel]
-        self.bconditions = ['Neumann', 'Periodic']                                
-        self.backend = ['numpy','c']
-        self.correlation = ['Space','SpaceChannels']
-        self.method = ['forward', 'backward', 'centered']
 
+        test_matrix_backend_numpy = {  'backend':'numpy',
+                                            'bconditions': ['Neumann', 'Periodic'],
+                                            'correlation':['Space','SpaceChannels'],
+                                            'method':['forward', 'backward', 'centered']}
+
+        test_matrix_backend_c ={   'backend':'c',
+                                        'bconditions': ['Neumann', 'Periodic'],
+                                        'correlation':['SpaceChannels'],
+                                        'method':['forward']}
+
+        self.test_backend_configurations = [test_matrix_backend_numpy, test_matrix_backend_c]
 
     def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
 
@@ -64,12 +71,14 @@ class TestGradientOperator(unittest.TestCase):
 
     def test_GradientOperator_linearity(self):
 
-        for geom in self.list_geometries:            
-            for bnd in self.bconditions:
-                for backend in self.backend:
-                    for corr in self.correlation:
-                        for method in self.method:                       
-                                                                                          
+        for config in self.test_backend_configurations:
+            backend = config.get('backend')
+
+            for geom in self.list_geometries:            
+                for bnd in config.get('bconditions'):
+                    for corr in config.get('correlation'):
+                        for method in config.get('method'):                     
+                                                                                            
                             Grad = GradientOperator(geom, 
                                                     bnd_cond = bnd,
                                                     backend = backend, 
@@ -83,52 +92,63 @@ class TestGradientOperator(unittest.TestCase):
                                                             
                             
     def test_GradientOperator_norm(self):
-        for geom in self.list_geometries:            
-            for bnd in self.bconditions:
-                for backend in self.backend:
-                    for corr in self.correlation:
-                        for method in self.method:
+
+        for config in self.test_backend_configurations:
+            backend = config.get('backend')
+
+            for geom in self.list_geometries:            
+                for bnd in config.get('bconditions'):
+                    for corr in config.get('correlation'):
+                        for method in config.get('method'):                     
 
                             if geom.channels == 1:
-                            
-                                if geom.length==2:                                                             
-                                    norm = numpy.sqrt((2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-                                elif geom.length==3:  
-                                    norm = numpy.sqrt((2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)  
+
+                                if geom.length == 2:
+                                    norm = numpy.sqrt(
+                                        (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                elif geom.length == 3:
+                                    norm = numpy.sqrt(
+                                        (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
 
                             else:
 
-                                if corr == 'Space':     
-                                    if geom.length==3:
-                                        norm = numpy.sqrt((2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                if corr == 'Space':
+                                    if geom.length ==3:
+                                        norm = numpy.sqrt(
+                                            (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)                                        
+                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
 
                                 else:
 
-                                    if geom.length==3:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                    if geom.length ==3:
+                                        norm = numpy.sqrt(
+                                            4 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)                                      
+                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
 
-                                                
-                            Grad = GradientOperator(geom, 
-                                                    bnd_cond = bnd,
-                                                    backend = backend, 
-                                                    correlation = corr, method=method)
-                            try:                                                    
-                                numpy.testing.assert_approx_equal(Grad.norm(), norm, significant = 1) 
-                            except AssertionError:    
-                                self.print_assertion_info(geom,bnd,backend,corr,method,None) 
+
+                            Grad = GradientOperator(geom,
+                                                    bnd_cond= bnd,
+                                                    backend = backend,
+                                                    correlation= corr, method=method)
+                            try:
+                                numpy.testing.assert_approx_equal(Grad.norm(), norm, significant = 1)
+                            except AssertionError:
+                                self.print_assertion_info(geom, bnd,backend,corr,method,None) 
                                 raise
 
 
     def test_GradientOperator_in_place_vs_allocate_direct(self):
-        for geom in self.list_geometries:            
-            for bnd in self.bconditions:
-                for backend in self.backend:
-                    for corr in self.correlation:
-                        for method in self.method:   
+
+        for config in self.test_backend_configurations:
+            backend = config.get('backend')
+
+            for geom in self.list_geometries:            
+                for bnd in config.get('bconditions'):
+                    for corr in config.get('correlation'):
+                        for method in config.get('method'):                     
+                        
                             Grad = GradientOperator(geom, 
                                                     bnd_cond = bnd,
                                                     backend = backend, 
@@ -149,11 +169,15 @@ class TestGradientOperator(unittest.TestCase):
 
 
     def test_GradientOperator_in_place_vs_allocate_adjoint(self):
-        for geom in self.list_geometries:            
-            for bnd in self.bconditions:
-                for backend in self.backend:
-                    for corr in self.correlation:
-                        for method in self.method:  
+
+        for config in self.test_backend_configurations:
+            backend = config.get('backend')
+
+            for geom in self.list_geometries:            
+                for bnd in config.get('bconditions'):
+                    for corr in config.get('correlation'):
+                        for method in config.get('method'):                     
+
                             Grad = GradientOperator(geom, 
                                                     bnd_cond = bnd,
                                                     backend = backend, 
@@ -172,22 +196,34 @@ class TestGradientOperator(unittest.TestCase):
 
 
     def test_GradientOperator_range_shape(self):
-        Grad2D = GradientOperator(self.ig_2D)
+        Grad2D = GradientOperator(self.ig_2D, backend='numpy')
         numpy.testing.assert_equal(Grad2D.range.shape, (2,1)) 
 
-        Grad2D = GradientOperator(self.ig_2D_chan, correlation="Space")
+        Grad2D = GradientOperator(self.ig_2D_chan, correlation="Space", backend='numpy')
         numpy.testing.assert_equal(Grad2D.range.shape, (2,1))             
 
-        Grad2D_chan = GradientOperator(self.ig_2D_chan, correlation="SpaceChannels")
+        Grad2D_chan = GradientOperator(self.ig_2D_chan, correlation="SpaceChannels", backend='numpy')
         numpy.testing.assert_equal(Grad2D_chan.range.shape, (3,1))    
 
-        Grad3D = GradientOperator(self.ig_3D)
+        Grad3D = GradientOperator(self.ig_3D, backend='numpy')
         numpy.testing.assert_equal(Grad3D.range.shape, (3,1))   
 
-        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="Space")
+        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="Space", backend='numpy')
         numpy.testing.assert_equal(Grad3D_chan.range.shape, (3,1))  
 
-        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="SpaceChannels")
+        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="SpaceChannels", backend='numpy')
+        numpy.testing.assert_equal(Grad3D_chan.range.shape, (4,1))  
+
+        Grad2D = GradientOperator(self.ig_2D, backend='c')
+        numpy.testing.assert_equal(Grad2D.range.shape, (2,1)) 
+
+        Grad2D_chan = GradientOperator(self.ig_2D_chan, correlation="SpaceChannels", backend='c')
+        numpy.testing.assert_equal(Grad2D_chan.range.shape, (3,1))    
+
+        Grad3D = GradientOperator(self.ig_3D, backend='c')
+        numpy.testing.assert_equal(Grad3D.range.shape, (3,1))   
+
+        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="SpaceChannels", backend='c')
         numpy.testing.assert_equal(Grad3D_chan.range.shape, (4,1))  
 
 
@@ -196,7 +232,7 @@ class TestGradientOperator(unittest.TestCase):
 
             for split in [True, False]:
 
-                Grad = GradientOperator(geom, split = split, correlation="SpaceChannels")
+                Grad = GradientOperator(geom, split = split, correlation="SpaceChannels", backend='c')
 
                 if geom == self.ig_2D:
                     shape = (2,1)
@@ -223,8 +259,8 @@ class TestGradientOperator(unittest.TestCase):
     def test_GradientOperator_split_direct_adjoint(self):        
         # Test split for direct and adjoint in 2D + channels geometry
         geom = self.ig_2D_chan
-        Grad2D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels")
-        Grad2D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels")
+        Grad2D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels", backend='c')
+        Grad2D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels", backend='c')
 
         tmp_x = geom.allocate('random')
         res1 = Grad2D_split_false.direct(tmp_x)
@@ -239,8 +275,8 @@ class TestGradientOperator(unittest.TestCase):
 
         # Test split for direct and adjoint in 3D + channels geometry
         geom = self.ig_3D_chan
-        Grad3D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels")
-        Grad3D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels")
+        Grad3D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels", backend='c')
+        Grad3D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels", backend='c')
 
         tmp_x = geom.allocate('random')
         res1 = Grad3D_split_false.direct(tmp_x)
@@ -256,66 +292,71 @@ class TestGradientOperator(unittest.TestCase):
             
 
     def test_Gradient_operator_numpy_vs_c(self):
-        for geom in self.list_geometries:
-            for bnd in self.bconditions:
-                for corr in self.correlation:
 
-                    Grad_c = GradientOperator(geom, bnd_cond = bnd, correlation= corr, backend = 'c')  
-                    Grad_numpy =  GradientOperator(geom, bnd_cond = bnd, correlation= corr, backend = 'numpy')
+        #only use configurations supported by c backend
+        config = self.test_backend_configurations[1]
 
-                    tmp_x = geom.allocate('random')
-                    res1_c = Grad_c.direct(tmp_x)
-                    res1_np = Grad_numpy.direct(tmp_x)
-                    
-                    # Check direct of numpy vs c in place
-                    for m in range(len(Grad_c.range.geometries)):
+        for geom in self.list_geometries:            
+            for bnd in config.get('bconditions'):
+                for corr in config.get('correlation'):
+                    for method in config.get('method'):                     
+
+                        Grad_c = GradientOperator(geom, bnd_cond = bnd, method=method, correlation= corr, backend = 'c')  
+                        Grad_numpy =  GradientOperator(geom, bnd_cond = bnd, method=method, correlation= corr, backend = 'numpy')
+
+                        tmp_x = geom.allocate('random')
+                        res1_c = Grad_c.direct(tmp_x)
+                        res1_np = Grad_numpy.direct(tmp_x)
+                        
+                        # Check direct of numpy vs c in place
+                        for m in range(len(Grad_c.range.geometries)):
+                            try:
+                                numpy.testing.assert_array_almost_equal(res1_c[m].array, 
+                                                                res1_np[m].array)                            
+                            except:
+                                self.print_assertion_info(geom, bnd, None, None, corr, None) 
+                                raise   
+
+                        res1_c_out = Grad_c.range.allocate()                    
+                        Grad_c.direct(tmp_x, out = res1_c_out)
+
+                        res1_np_out = Grad_numpy.range.allocate()                    
+                        Grad_numpy.direct(tmp_x, out = res1_np_out)     
+                        
+                        # Check direct of numpy vs c allocate
+                        for m in range(len(Grad_c.range.geometries)):
+                            try:
+                                numpy.testing.assert_array_almost_equal(res1_c_out[m].array, 
+                                                                res1_np_out[m].array)                            
+                            except:
+                                self.print_assertion_info(geom, bnd, None, None, corr, None) 
+                                raise  
+
+                        tmp_x = Grad_c.range.allocate('random')
+                        res1_c = Grad_c.adjoint(tmp_x)
+                        res1_np = Grad_numpy.adjoint(tmp_x)
+
+                        # Check adjoint of numpy vs c in place
                         try:
-                            numpy.testing.assert_array_almost_equal(res1_c[m].array, 
-                                                            res1_np[m].array)                            
+                            numpy.testing.assert_array_almost_equal(res1_c.array, 
+                                                            res1_np.array, decimal=5)                            
                         except:
                             self.print_assertion_info(geom, bnd, None, None, corr, None) 
                             raise   
 
-                    res1_c_out = Grad_c.range.allocate()                    
-                    Grad_c.direct(tmp_x, out = res1_c_out)
+                        res1_c_out = Grad_c.domain.allocate()                    
+                        Grad_c.adjoint(tmp_x, out = res1_c_out)
 
-                    res1_np_out = Grad_numpy.range.allocate()                    
-                    Grad_numpy.direct(tmp_x, out = res1_np_out)     
-                    
-                    # Check direct of numpy vs c allocate
-                    for m in range(len(Grad_c.range.geometries)):
+                        res1_np_out = Grad_numpy.domain.allocate()                    
+                        Grad_numpy.adjoint(tmp_x, out = res1_np_out)     
+
+                        # Check adjoint of numpy vs c allocate
                         try:
-                            numpy.testing.assert_array_almost_equal(res1_c_out[m].array, 
-                                                            res1_np_out[m].array)                            
+                            numpy.testing.assert_array_almost_equal(res1_c_out.array, 
+                                                            res1_np_out.array, decimal=5)                            
                         except:
                             self.print_assertion_info(geom, bnd, None, None, corr, None) 
-                            raise  
-
-                    tmp_x = Grad_c.range.allocate('random')
-                    res1_c = Grad_c.adjoint(tmp_x)
-                    res1_np = Grad_numpy.adjoint(tmp_x)
- 
-                    # Check adjoint of numpy vs c in place
-                    try:
-                        numpy.testing.assert_array_almost_equal(res1_c.array, 
-                                                        res1_np.array, decimal=5)                            
-                    except:
-                        self.print_assertion_info(geom, bnd, None, None, corr, None) 
-                        raise   
-
-                    res1_c_out = Grad_c.domain.allocate()                    
-                    Grad_c.adjoint(tmp_x, out = res1_c_out)
-
-                    res1_np_out = Grad_numpy.domain.allocate()                    
-                    Grad_numpy.adjoint(tmp_x, out = res1_np_out)     
-
-                    # Check adjoint of numpy vs c allocate
-                    try:
-                        numpy.testing.assert_array_almost_equal(res1_c_out.array, 
-                                                        res1_np_out.array, decimal=5)                            
-                    except:
-                        self.print_assertion_info(geom, bnd, None, None, corr, None) 
-                        raise    
+                            raise    
 
 
     def test_GradientOperator_for_pseudo_2D_geometries(self):   
@@ -395,10 +436,10 @@ class TestGradientOperator(unittest.TestCase):
 
     def test_GradientOperator_complex_data(self):
         # make complex dtype        
-        self.ig_2D.dtype = numpy.complex
+        self.ig_2D.dtype = numpy.complex64
         x = self.ig_2D.allocate('random')
         
-        Grad = GradientOperator(domain_geometry=self.ig_2D)
+        Grad = GradientOperator(domain_geometry=self.ig_2D, backend='numpy')
 
         res1 = Grad.direct(x)
         res2 = Grad.range.allocate()

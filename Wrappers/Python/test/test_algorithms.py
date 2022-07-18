@@ -349,7 +349,7 @@ class TestAlgorithms(CCPiTestClass):
             return noisy_data, alpha, g
 
         noisy_data, alpha, g = setup(data, dnoise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
          
@@ -373,7 +373,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 1
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm() 
                     
@@ -398,7 +398,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 2
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
    
@@ -601,6 +601,7 @@ class TestAlgorithms(CCPiTestClass):
         self.assertLess(rmse, 4.2e-4)
 
 
+
     def test_exception_initial_CGLS(self):
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
@@ -617,59 +618,17 @@ class TestAlgorithms(CCPiTestClass):
 
                         
 
-    def test_exception_initial_GD(self):
-        ig = ImageGeometry(127,139,149)
-        initial = ig.allocate()
-        b = initial.copy()
-        # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
-        identity = IdentityOperator(ig)
-        
-        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
-        opt = {'tol': 1e-4, 'memopt':False}
-        logging.info("initial objective {}".format(norm2sq(initial)))
-        try:
-            alg = GD(initial=initial, objective_function=norm2sq, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
 
 
-    def test_exception_initial_LADMM(self):
-        ig = ImageGeometry(10,10)
-        # K = Identity(ig)
-        # b = ig.allocate(0)
-        # f = LeastSquares(K, b)
-        # g = IndicatorBox(lower=0)
-        initial = ig.allocate(1)
-        try:
-            algo = LADMM(initial = initial, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
 
 
-    def test_exception_initial_PDHG(self):
-        initial = 1
-        try:
-            algo = PDHG(initial = initial, x_init=initial, f=None, g=None, operator=None)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
 
 
-    def test_exception_initial_SPDHG(self):
-        initial = 1
-        try:
-            algo = SPDHG(initial = initial, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
+
+
+
+
+
             
 
 class TestSIRT(unittest.TestCase):
@@ -736,14 +695,6 @@ class TestSIRT(unittest.TestCase):
         np.testing.assert_almost_equal(alg.solution.min(), 0.1) 
         
 
-    def test_exception_initial_SIRT(self):
-        try:
-            alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2, x_init=self.initial2)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True     
-
 
     def test_SIRT_nan_inf_values(self):
         Aop_nan_inf = self.Aop
@@ -772,7 +723,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         # Select device
         dev = 'cpu'
     
@@ -819,7 +770,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
@@ -867,7 +818,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         # Select device
         dev = 'cpu'
 
@@ -897,8 +848,8 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
-        for i in range(len(list_angles))]
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
+                        for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
@@ -969,7 +920,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         dev = 'cpu'
 
         Aop = ProjectionOperator(ig, ag, dev)
@@ -1004,8 +955,8 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
-        for i in range(len(list_angles))]
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
+                        for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
@@ -1061,7 +1012,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         
         dev = 'cpu'
 

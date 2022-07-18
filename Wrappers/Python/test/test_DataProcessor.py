@@ -27,7 +27,9 @@ from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
+from cil.processors import CentreOfRotationCorrector
+from cil.processors.CofR_xcorrelation import  CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 
@@ -459,8 +461,8 @@ class TestBinner(unittest.TestCase):
         dimension_labels_binned.remove('channel')
         dimension_labels_binned.remove('vertical')
         
-        AG_binned = AG.subset(vertical='centre')
-        AG_binned = AG_binned.subset(channel=0)
+        AG_binned = AG.get_slice(vertical='centre')
+        AG_binned = AG_binned.get_slice(channel=0)
         AG_binned.config.panel.num_pixels[0] = 45
         AG_binned.config.panel.pixel_size[0] = 0.2
         AG_binned.config.panel.pixel_size[1] = 0.4
@@ -686,8 +688,8 @@ class TestSlicer(unittest.TestCase):
         dimension_labels_sliced.remove('channel')
         dimension_labels_sliced.remove('vertical')
         
-        AG_sliced = AG.subset(vertical='centre')
-        AG_sliced = AG_sliced.subset(channel=1)
+        AG_sliced = AG.get_slice(vertical='centre')
+        AG_sliced = AG_sliced.get_slice(channel=1)
         AG_sliced.config.panel.num_pixels[0] = numpy.arange(10,100,2).shape[0]
         
         self.assertTrue(data_sliced.geometry == AG_sliced)
@@ -738,19 +740,19 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
     def test_CofR_xcorrelation(self):       
 
         corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
         corr = CofR_xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
     @unittest.skipUnless(has_astra, "ASTRA not installed")
     def test_CofR_image_sharpness_astra(self):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
 
@@ -758,18 +760,18 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
     @unittest.skipUnless(False, "TIGRE not installed")
     def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
         corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
         corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
-        corr.set_input(self.data_DLS.clone())
+        corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
@@ -869,11 +871,18 @@ class TestDataProcessor(unittest.TestCase):
         ax.get_output(out=dc_out)
         numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
 
-        #check recalculation on input modified (won't pass)
+        #check auto recalculation if input modified (won't pass)
         dc_in2 *= 2
         out_gold = dc_in2*3
         ax.get_output(out=dc_out)
         #numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
+
+        #raise error if input is deleted
+        dc_in2 = dc_in.copy()
+        ax.set_input(dc_in2)
+        del dc_in2
+        with self.assertRaises(ValueError):
+            dc_out = ax.get_output()
 
 
     def test_DataProcessorChaining(self):
@@ -885,8 +894,8 @@ class TestDataProcessor(unittest.TestCase):
         a = numpy.asarray([i for i in range( size )])
         a = numpy.reshape(a, shape)
         ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
-        c = ds.subset(Y=0)
-        c = c.subset(['Z','W','X'])
+        c = ds.get_slice(Y=0)
+        c.reorder(['Z','W','X'])
         arr = c.as_array()
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
@@ -965,7 +974,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         
@@ -976,7 +985,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[4,5] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -986,7 +995,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1000,7 +1009,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
@@ -1010,7 +1019,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1024,7 +1033,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
@@ -1034,7 +1043,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1052,7 +1061,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1061,7 +1070,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1071,7 +1080,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1080,7 +1089,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1089,7 +1098,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1098,7 +1107,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1106,7 +1115,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check movmedian
@@ -1114,7 +1123,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1123,7 +1132,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -1232,7 +1241,7 @@ class TestMasker(unittest.TestCase):
         self.data.as_array()[2,3] = float('inf')
         self.data.as_array()[4,5] = float('nan')
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         

@@ -83,7 +83,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         for i in range(4):
             self.golden_data.fill(array=phantom, vertical=7+i)
 
-        self.golden_data_cs = self.golden_data.subset(vertical=self.cs_ind, force=True)
+        self.golden_data_cs = self.golden_data.get_slice(vertical=self.cs_ind, force=True)
 
 
     @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
@@ -125,8 +125,8 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         #show2D([bp,bp_gpu,bp_flex_2D,fp_flex_3D.get_slice(vertical='centre')])
 
         #comparision foward projection
-        fp_flex_0 = fp_flex_3D.subset(vertical=self.cs_ind, force=True)
-        fp_flex_2 = fp_flex_3D.subset(vertical=self.cs_ind-3, force=True)
+        fp_flex_0 = fp_flex_3D.get_slice(vertical=self.cs_ind, force=True)
+        fp_flex_2 = fp_flex_3D.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ag_slice.allocate(0)
         np.testing.assert_allclose(fp_gpu.as_array(),fp.as_array(), atol=0.8)
@@ -135,9 +135,9 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(fp_flex_2.as_array(),zeros.as_array())
 
         #comparision back projection
-        bp_flex_0 = bp_flex_3D.subset(vertical=self.cs_ind, force=True)
-        bp_flex_1 = bp_flex_3D.subset(vertical=self.cs_ind+3, force=True)
-        bp_flex_2 = bp_flex_3D.subset(vertical=self.cs_ind-3, force=True)
+        bp_flex_0 = bp_flex_3D.get_slice(vertical=self.cs_ind, force=True)
+        bp_flex_1 = bp_flex_3D.get_slice(vertical=self.cs_ind+3, force=True)
+        bp_flex_2 = bp_flex_3D.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ig_2D.allocate(0)
         np.testing.assert_allclose(bp_gpu.as_array(),bp.as_array(),atol=12)
@@ -185,8 +185,8 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         bp_3D = A.adjoint(fp_3D)
 
         #comparision foward projection
-        fp_flex_0 = fp_3D.subset(vertical=self.cs_ind, force=True)
-        fp_flex_2 = fp_3D.subset(vertical=self.cs_ind-3, force=True)
+        fp_flex_0 = fp_3D.get_slice(vertical=self.cs_ind, force=True)
+        fp_flex_2 = fp_3D.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ag_slice.allocate(0)
         np.testing.assert_allclose(fp_gpu.as_array(),fp.as_array(), atol=0.8)
@@ -194,9 +194,9 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(fp_flex_2.as_array(),zeros.as_array())
 
         #comparision back projection
-        bp_flex_0 = bp_3D.subset(vertical=self.cs_ind, force=True)
-        bp_flex_1 = bp_3D.subset(vertical=self.cs_ind+3, force=True)
-        bp_flex_2 = bp_3D.subset(vertical=self.cs_ind-3, force=True)
+        bp_flex_0 = bp_3D.get_slice(vertical=self.cs_ind, force=True)
+        bp_flex_1 = bp_3D.get_slice(vertical=self.cs_ind+3, force=True)
+        bp_flex_2 = bp_3D.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ig_2D.allocate(0)
         np.testing.assert_allclose(bp_gpu.as_array(),bp.as_array(),atol=12)
@@ -255,7 +255,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         for i in range(4):
             self.golden_data.fill(array=phantom, vertical=7+i)
 
-        self.golden_data_cs = self.golden_data.subset(vertical=self.cs_ind, force=True)
+        self.golden_data_cs = self.golden_data.get_slice(vertical=self.cs_ind, force=True)
 
 
     @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
@@ -278,9 +278,9 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         flex_bp = A.adjoint(flex_fp)
 
         #comparision foward projection
-        fp_flex_0 = flex_fp.subset(vertical=self.cs_ind, force=True)
-        fp_flex_1 = flex_fp.subset(vertical=self.cs_ind+3, force=True)
-        fp_flex_2 = flex_fp.subset(vertical=self.cs_ind-3, force=True)
+        fp_flex_0 = flex_fp.get_slice(vertical=self.cs_ind, force=True)
+        fp_flex_1 = flex_fp.get_slice(vertical=self.cs_ind+3, force=True)
+        fp_flex_2 = flex_fp.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ag_slice.allocate(0)
         np.testing.assert_allclose(fp_flex_0.as_array(),fp.as_array(), atol=0.8)
@@ -288,9 +288,9 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(fp_flex_2.as_array(),zeros.as_array())
 
         #comparision back projection
-        bp_flex_0 = flex_bp.subset(vertical=self.cs_ind, force=True)
-        bp_flex_1 = flex_bp.subset(vertical=self.cs_ind+3, force=True)
-        bp_flex_2 = flex_bp.subset(vertical=self.cs_ind-3, force=True)
+        bp_flex_0 = flex_bp.get_slice(vertical=self.cs_ind, force=True)
+        bp_flex_1 = flex_bp.get_slice(vertical=self.cs_ind+3, force=True)
+        bp_flex_2 = flex_bp.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ig_2D.allocate(0)
         np.testing.assert_allclose(bp_flex_0.as_array(),bp.as_array(),atol=12)
@@ -336,8 +336,8 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         bp_3D = A.adjoint(fp_3D)
 
         #comparision foward projection
-        fp_flex_0 = fp_3D.subset(vertical=self.cs_ind, force=True)
-        fp_flex_2 = fp_3D.subset(vertical=self.cs_ind-3, force=True)
+        fp_flex_0 = fp_3D.get_slice(vertical=self.cs_ind, force=True)
+        fp_flex_2 = fp_3D.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ag_slice.allocate(0)
         np.testing.assert_allclose(fp_gpu.as_array(),fp.as_array(), atol=0.8)
@@ -345,9 +345,9 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(fp_flex_2.as_array(),zeros.as_array())
 
         #comparision back projection
-        bp_flex_0 = bp_3D.subset(vertical=self.cs_ind, force=True)
-        bp_flex_1 = bp_3D.subset(vertical=self.cs_ind+3, force=True)
-        bp_flex_2 = bp_3D.subset(vertical=self.cs_ind-3, force=True)
+        bp_flex_0 = bp_3D.get_slice(vertical=self.cs_ind, force=True)
+        bp_flex_1 = bp_3D.get_slice(vertical=self.cs_ind+3, force=True)
+        bp_flex_2 = bp_3D.get_slice(vertical=self.cs_ind-3, force=True)
 
         zeros = self.ig_2D.allocate(0)
         np.testing.assert_allclose(bp_gpu.as_array(),bp.as_array(),atol=12)

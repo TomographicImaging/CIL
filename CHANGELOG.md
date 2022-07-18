@@ -1,8 +1,15 @@
 * 22.0.0
   - Added ISTA algorithm. Improve inheritance of proximal gradient algoritms.
+  - Removal of deprecated code
+    - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
+    - `subset` method removed, use `get_slice` or `reorder` methods
+    - NikonDataReader `normalize` kwarg removed, use `normalise`
+    - Algorithms initialisation `x_init` kwarg removed, use `initial`
+    - Removed deprecated numpy calls
+  - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated
-    - CIL remains licenced as APACHE-2.0
+    - CIL remains licensed as APACHE-2.0
     - Minor bug fixes to the CPU 2D Parallel-beam FBP
   - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5

@@ -206,14 +206,14 @@ class show2D(show_base):
                         cut_slices.reverse()
 
                 try:
-                    if hasattr(data, 'subset'):
+                    if hasattr(data, 'get_slice'):
                         if type(cut_axis[0]) is int:
                             cut_axis[0] = data.dimension_labels[cut_axis[0]]
                         if type(cut_axis[1]) is int:
                             cut_axis[1] = data.dimension_labels[cut_axis[1]]
 
                         temp_dict = {cut_axis[0]:cut_slices[0], cut_axis[1]:cut_slices[1]}
-                        plot_data = data.subset(**temp_dict, force=True)
+                        plot_data = data.get_slice(**temp_dict, force=True)
                     elif hasattr(data,'as_array'):
                         plot_data = data.as_array().take(indices=cut_slices[1], axis=cut_axis[1])
                         plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
@@ -247,11 +247,11 @@ class show2D(show_base):
                     cut_axis = slice_requested[0]
 
                 try:
-                    if hasattr(data, 'subset'):
+                    if hasattr(data, 'get_slice'):
                         if type(cut_axis) is int:
                             cut_axis = data.dimension_labels[cut_axis]
                         temp_dict = {cut_axis:cut_slice}
-                        plot_data = data.subset(**temp_dict, force=True)
+                        plot_data = data.get_slice(**temp_dict, force=True)
                     elif hasattr(data,'as_array'):
                         plot_data = data.as_array().take(indices=cut_slice, axis=cut_axis)
                     else:
@@ -401,6 +401,12 @@ class _Arrow3D(FancyArrowPatch):
         xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
+
+    def do_3d_projection(self, renderer=None):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
+        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
+        return np.min(zs)
 
 class _ShowGeometry(object):
 

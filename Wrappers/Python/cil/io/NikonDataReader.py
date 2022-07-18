@@ -76,10 +76,6 @@ class NikonDataReader(object):
         self.mode = kwargs.get('mode', 'bin')
         self.fliplr = kwargs.get('fliplr', False)
         
-        if 'normalize' in kwargs.keys():
-            self.normalise = kwargs.get('normalize', True)
-            warnings.warn("'normalize' has now been deprecated. Please use 'normalise' instead.")
-
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
                         roi = self.roi,
@@ -92,8 +88,7 @@ class NikonDataReader(object):
                roi = {'angle': -1, 'horizontal': -1, 'vertical': -1},
                normalise = True,
                mode = 'bin',
-               fliplr = False,
-               **kwargs):
+               fliplr = False):
         
         self.file_name = file_name
         self.roi = roi
@@ -101,10 +96,6 @@ class NikonDataReader(object):
         self.mode = mode
         self.fliplr = fliplr
         
-        if 'normalize' in kwargs.keys():
-            self.normalise = kwargs.get('normalize', True)
-            warnings.warn("'normalize' has now been deprecated. Please use 'normalise' instead.")
-
         if self.file_name == None:
             raise Exception('Path to xtek file is required.')
         
@@ -230,8 +221,8 @@ class NikonDataReader(object):
             pixel_size_v = pixel_size_v_0 * self._roi_par[1][2]
             pixel_size_h = pixel_size_h_0 * self._roi_par[2][2]
         else: # slice
-            pixel_num_v = numpy.int(numpy.ceil((self._roi_par[1][1] - self._roi_par[1][0]) / self._roi_par[1][2]))
-            pixel_num_h = numpy.int(numpy.ceil((self._roi_par[2][1] - self._roi_par[2][0]) / self._roi_par[2][2]))
+            pixel_num_v = int(numpy.ceil((self._roi_par[1][1] - self._roi_par[1][0]) / self._roi_par[1][2]))
+            pixel_num_h = int(numpy.ceil((self._roi_par[2][1] - self._roi_par[2][0]) / self._roi_par[2][2]))
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
         

@@ -32,27 +32,27 @@ The documentation for CIL can be accessed [here](https://tomographicimaging.gith
 Binary installation of CIL can be done with `conda`. Install a new environment using:
 
 ```bash
-conda create --name cil -c conda-forge -c intel -c ccpi cil
+conda create --name cil -c conda-forge -c intel -c ccpi cil=21.4.1 
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```bash
 
-conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom=1.4.10
+conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil=21.4.1 cil-astra tigre ccpi-regulariser tomophantom
 ```
 
 where,
 
-```ccpi-regulariser``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit).
+```cil-astra``` will allow you to use CIL with the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).
 
-```cil-astra``` will give you access to the CIL wrappers to the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).
-
-```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
-
-```tigre``` will allow you to use CIL wrappers to the [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license).
+```tigre``` will allow you to use CIL with the [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license).
 
 ```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector (installing tigre via conda requires 9.2).
+
+```ccpi-regulariser``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit).
+
+```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
 
 ### Dependency
 

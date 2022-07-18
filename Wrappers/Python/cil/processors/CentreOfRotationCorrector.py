@@ -23,13 +23,7 @@ class CentreOfRotationCorrector(object):
     """
     This class contains factory methods to create a CentreOfRotationCorrector object using the desired algorithm.
     """
-    @staticmethod
-    def xcorr(slice_index='centre', projection_index=0, ang_tol=0.1):
-        r'''Alias of xcorrelation. This method has been deprecated. Please use xcorrelation'''
-
-        processor = CofR_xcorrelation(slice_index, projection_index, ang_tol)
-        return processor
-        
+       
     @staticmethod
     def xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1):
         r'''This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.

@@ -1,9 +1,29 @@
+* 22.0.0
+  - Removal of deprecated code
+    - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
+    - `subset` method removed, use `get_slice` or `reorder` methods
+    - NikonDataReader `normalize` kwarg removed, use `normalise`
+    - Algorithms initialisation `x_init` kwarg removed, use `initial`
+    - Removed deprecated numpy calls
+  - DataProcessors use weak-reference to input data
+  - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
+    - Modules not moved should be considered deprecated
+    - CIL remains licensed as APACHE-2.0
+    - Minor bug fixes to the CPU 2D Parallel-beam FBP
+  - Add ndim property for DataContainer class.
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
+  - GitHub Actions:
+    - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
+
 * 21.4.1
- - Removed prints from unittests and cleanup of unittest code.
- - CMake: 
-   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
- - TIFF writer uses logging
- - Added unittests for TIFF functionality
+  - Removed prints from unittests and cleanup of unittest code.
+  - CMake: 
+    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+  - TIFF writer uses logging
+  - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version

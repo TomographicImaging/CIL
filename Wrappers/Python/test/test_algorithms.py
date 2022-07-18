@@ -214,6 +214,55 @@ class TestAlgorithms(CCPiTestClass):
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
+    def test_FISTA_update(self):
+
+        # setup linear system to solve
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0,1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b) 
+
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+
+        ig = Aop.domain
+
+        initial = ig.allocate()
+          
+        # ista run 10 iteration
+        tmp_initial = ig.allocate()
+        fista = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=100)  
+        fista.run()
+
+        # fista update method
+        t_old = 1
+
+        step_size = 1.0/f.L
+        x_old = ig.allocate()
+        y_old = ig.allocate()
+
+        for i in range(100):
+
+            x = g.proximal(y_old - step_size * f.gradient(y_old), tau = step_size)
+            t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
+            y = x + ((t_old-1)/t)* ( x - x_old)  
+
+            x_old.fill(x)
+            y_old.fill(y)
+            t_old = t
+        
+        np.testing.assert_allclose(fista.solution.array, x.array, atol=1e-2)      
+    
+        # check objective
+        res1 = fista.objective[-1]
+        res2 = f(x) + g(x)
+        self.assertTrue( res1==res2)         
+
                
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127,139,149)

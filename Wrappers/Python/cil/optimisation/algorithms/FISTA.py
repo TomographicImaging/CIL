@@ -112,6 +112,8 @@ class ISTA(Algorithm):
         """ Set up of the algorithm
         """
 
+        logging.info("{} setting up".format(self.__class__.__name__, ))        
+
         # set up ISTA      
         self.initial = initial
         self.x_old = initial.copy()
@@ -121,8 +123,6 @@ class ISTA(Algorithm):
 
         # set step_size
         self.set_step_size(step_size=step_size)
-
-        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         self.configured = True  
 
@@ -138,20 +138,21 @@ class ISTA(Algorithm):
         """
 
         # gradient step
-        self.x_old.sapyb(1., self.f.gradient(self.x_old), -self.step_size, out=self.x)
+        self.f.gradient(self.x_old, out=self.x)
+        self.x_old.sapyb(1., self.x, -self.step_size, out=self.x_old)
 
         # proximal step
-        self.x = self.g.proximal(self.x, self.step_size)
+        self.g.proximal(self.x_old, self.step_size, out=self.x)
 
     def update_previous_solution(self):  
-        """ Swap the pointers to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
+        """ Swaps the references to current and previous iterate based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
         """        
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
 
     def get_output(self):
-        " Overrides the base method :func:`~Algorithm.get_output` of the base class :class:`Algorithm`."
+        " Returns the last iterate which is stored in x_old "
         return self.x_old
         
     def update_objective(self):
@@ -242,8 +243,7 @@ class FISTA(ISTA):
         self.y = initial.copy()
         self.t = 1
         super(FISTA, self).__init__(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
-
-
+              
     def update(self):
         
         r"""Performs a single iteration of FISTA
@@ -251,8 +251,7 @@ class FISTA(ISTA):
         .. math::
 
             \begin{cases}
-                y_{k} = x_{k} - \alpha\nabla f(x_{k})  \\
-                x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k})\\
+                x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
                 t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
                 y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
             \end{cases}
@@ -260,8 +259,10 @@ class FISTA(ISTA):
         """        
 
         self.t_old = self.t
+
+        self.f.gradient(self.y, out=self.x)
         
-        self.y.sapyb(1., self.f.gradient(self.x_old), -self.step_size, out=self.y)
+        self.y.sapyb(1., self.x, -self.step_size, out=self.y)
         
         self.g.proximal(self.y, self.step_size, out=self.x)
         
@@ -269,5 +270,6 @@ class FISTA(ISTA):
         
         self.x.subtract(self.x_old, out=self.y)
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y) 
+          
 
 

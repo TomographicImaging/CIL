@@ -19,9 +19,12 @@ import utils
 setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from cil.framework import AcquisitionGeometry
-from cil.plugins.astra.utilities import convert_geometry_to_astra
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import numpy as np
+
+from utils import has_astra
+if has_astra:
+    from cil.plugins.astra.utilities import convert_geometry_to_astra
+    from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
 class TestGeometry(unittest.TestCase):
     def setUp(self): 
@@ -71,6 +74,7 @@ class TestGeometry(unittest.TestCase):
         self.ag3 = ag3
         self.ag3_cone = ag3_cone
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_convert_geometry_to_astra(self):
         
         #2D parallel radians
@@ -131,6 +135,7 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(astra_sino['DetectorSpacingY'], self.ag3.pixel_size_h)
         np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag3.angles)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_convert_geometry_to_astra_vec_3D(self):
         #2D parallel radians
         astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag)

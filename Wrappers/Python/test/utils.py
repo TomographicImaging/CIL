@@ -31,7 +31,7 @@ def startTestRun(self):
     """Called once before any tests are executed.
     """
     #set logging
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(level=logging.WARNING, force=True)
 
 
     print("\n----------------------------------------------------------------------")

@@ -83,8 +83,11 @@ has_ipp = hasattr(cilacc, 'filter_projections_avh')
 system_state['has_ipp']=has_ipp
 
 
-#tigre
-module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
+#ccpi-regularisation toolkit
+module_info = importlib.util.find_spec("ccpi")
+if module_info != None:
+    module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
+
 if module_info is None:
     has_ccpi_regularisation = False
 else:

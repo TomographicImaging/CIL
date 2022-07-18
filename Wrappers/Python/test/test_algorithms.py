@@ -602,20 +602,6 @@ class TestAlgorithms(CCPiTestClass):
 
 
 
-    def test_exception_initial_CGLS(self):
-        ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
-        initial = ig.allocate(0.)
-        b = ig.allocate('random')
-        identity = IdentityOperator(ig)
-        
-        try:
-            alg = CGLS(initial=initial, operator=identity, data=b, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
-
                         
 
 

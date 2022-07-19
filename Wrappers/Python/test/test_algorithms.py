@@ -65,22 +65,6 @@ if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
 class TestAlgorithms(CCPiTestClass):
-    def setUp(self):
-        #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
-        #self.filename = '24737_fd.nxs'
-        # we use Identity as the operator and solve the simple least squares 
-        # problem for a random-valued ImageData or AcquisitionData b?  
-        # Then we know the minimiser is b itself
-        
-        # || I x -b ||^2
-        
-        # create an ImageGeometry
-        ig = ImageGeometry(12,13,14)
-        pass
-
-    def tearDown(self):
-        #os.remove(self.filename)
-        pass
     
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
@@ -109,6 +93,28 @@ class TestAlgorithms(CCPiTestClass):
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+    def test_update_interval_0(self):
+        '''
+        Checks that an algorithm runs with no problems when 
+        the update_objective interval is set to 0 and with
+        verbose on / off
+        '''
+        ig = ImageGeometry(12,13,14)
+        initial = ig.allocate()
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        norm2sq = LeastSquares(identity, b)
+        alg = GD(initial=initial, 
+                 objective_function=norm2sq, 
+                 max_iteration=20,
+                 update_objective_interval=0,
+                 atol=1e-9, rtol=1e-6)
+        self.assertTrue(alg.update_objective_interval==0)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg.run(20, verbose=False)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
 
@@ -1158,8 +1164,3 @@ class TestADMM(unittest.TestCase):
         admm.run(verbose=0)
         np.testing.assert_almost_equal(admm.solution.array, pdhg.solution.array,  decimal=3)
 
-
-    def tearDown(self):
-        pass
-
-    

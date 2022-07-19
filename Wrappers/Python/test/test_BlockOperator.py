@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import logging
 from cil.optimisation.operators import BlockOperator
 from cil.framework import BlockDataContainer
@@ -26,6 +24,7 @@ from cil.framework import ImageGeometry, ImageData
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
 
+initialise_tests()
 
 class TestBlockOperator(unittest.TestCase):
 

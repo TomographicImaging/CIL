@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy
 from cil.framework import ImageGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
@@ -26,6 +24,8 @@ import functools
 
 from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
 from testclass import CCPiTestClass as BDCUnittest
+
+initialise_tests()
 
 class TestBlockDataContainer(BDCUnittest):
     def skiptest_BlockDataContainerShape(self):

@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator
@@ -32,6 +30,8 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
+
+initialise_tests()
 
 def dt(steps):
     return steps[-1] - steps[-2]

@@ -15,13 +15,13 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy
 import math
 from cil.framework import AcquisitionGeometry, ImageGeometry
 from cil.framework.framework import SystemConfiguration
+
+initialise_tests()
 
 class Test_AcquisitionGeometry(unittest.TestCase):
     def test_create_Parallel2D(self):

@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.io import TIFFWriter
 from cil.io import TIFFStackReader
 
@@ -25,6 +23,8 @@ from cil.framework import ImageGeometry, AcquisitionGeometry
 import os
 import numpy as np
 import shutil, glob
+
+initialise_tests()
 
 class TIFFReadWriter(unittest.TestCase):
     def setUp(self):

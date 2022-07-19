@@ -15,15 +15,14 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-from utils import has_tigre, has_nvidia
+from utils import has_tigre, has_nvidia, initialise_tests
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
+
+initialise_tests()
 
 def setup_parameters(self):
 

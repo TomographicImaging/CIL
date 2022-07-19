@@ -15,8 +15,6 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
 
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
@@ -46,7 +44,10 @@ from cil.utilities import noise
 from testclass import CCPiTestClass
 from cil.utilities.quality_measures import mae
 
-from utils import has_ccpi_regularisation, has_tomophantom, has_numba
+from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
+
+initialise_tests()
+
 if has_ccpi_regularisation:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
 

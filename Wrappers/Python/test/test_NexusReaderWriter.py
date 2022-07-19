@@ -15,15 +15,15 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import os
 from cil.io import NEXUSDataReader
 from cil.io import NEXUSDataWriter
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy
 import shutil
+
+initialise_tests()
 
 class TestNexusReaderWriter(unittest.TestCase):
     

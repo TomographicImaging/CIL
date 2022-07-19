@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy
 from cil.framework import DataContainer
 from cil.framework import ImageData
@@ -25,6 +23,8 @@ from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
+
+initialise_tests()
 
 class Test_reorder(unittest.TestCase):
     def test_DataContainer(self):

@@ -15,9 +15,6 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 import numpy
 import numpy as np
 from cil.framework import ImageData
@@ -27,7 +24,10 @@ import numpy.testing
 
 from testclass import CCPiTestClass
 
-from utils import has_cvxpy
+from utils import has_cvxpy, initialise_tests
+
+initialise_tests()
+
 if has_cvxpy:
     import cvxpy
 

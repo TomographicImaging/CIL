@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.optimisation.functions import L1Norm, ScaledFunction, SumFunction,\
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
@@ -27,6 +25,8 @@ import numpy
 import numpy as np
 from numbers import Number
 from testclass import CCPiTestClass
+
+initialise_tests()
 
 class TestFunction(CCPiTestClass):
             

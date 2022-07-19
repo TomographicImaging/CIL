@@ -15,12 +15,11 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from cil.framework import AcquisitionGeometry
 import numpy as np
-from utils import has_astra, has_nvidia
+from utils import has_astra, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator

@@ -15,15 +15,15 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from utils_projectors import TestCommon_FBP_SIM
-from utils import has_astra, has_nvidia
+from utils import has_astra, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
     from cil.plugins.astra import FBP
+
 
 def setup_parameters(self):
 

@@ -15,13 +15,12 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
 from utils import disable_print, enable_prints
-from utils import has_astra, has_nvidia
+from utils import has_astra, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator

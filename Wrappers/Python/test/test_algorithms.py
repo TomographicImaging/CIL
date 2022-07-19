@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy
 import numpy as np
 from numpy import nan, inf
@@ -60,6 +58,7 @@ import logging
 from testclass import CCPiTestClass
 from utils import  has_astra
 
+initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator

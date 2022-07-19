@@ -15,11 +15,10 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from utils_projectors import TestCommon_FBP_SIM
-from utils import has_tigre, has_nvidia
+from utils import has_tigre, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_tigre:
     from cil.plugins.tigre import FBP

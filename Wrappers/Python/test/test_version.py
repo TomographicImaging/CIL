@@ -15,8 +15,8 @@
 #  limitations under the License.
  
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
+from utils import initialise_tests
+initialise_tests()
 
 class TestModuleBase(unittest.TestCase):
     def test_version(self):

@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import sys
 import numpy
 from cil.framework import DataContainer
@@ -29,6 +27,8 @@ from timeit import default_timer as timer
 import logging
 from testclass import CCPiTestClass
 import functools
+
+initialise_tests()
 
 def dt(steps):
     return steps[-1] - steps[-2]

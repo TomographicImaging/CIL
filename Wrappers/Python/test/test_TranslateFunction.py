@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.optimisation.functions import L1Norm, \
                                         L2NormSquared, \
                                         TranslateFunction, \
@@ -27,6 +25,8 @@ from cil.framework import ImageGeometry, DataContainer
 import numpy as np
 import logging
 from testclass import CCPiTestClass as TestFunction
+
+initialise_tests()
 
 ''' Here we test SumFunction class for different function
 

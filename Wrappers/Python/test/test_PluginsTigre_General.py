@@ -15,15 +15,14 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from cil.framework import AcquisitionGeometry
 from cil.framework.framework import ImageGeometry
 import numpy as np
 from cil.utilities.display import show2D
 
-from utils import has_tigre, has_nvidia
+from utils import has_tigre, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator

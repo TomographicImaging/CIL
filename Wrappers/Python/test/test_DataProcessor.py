@@ -15,9 +15,6 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 import numpy
 from cil.framework import DataContainer
 from cil.framework import ImageGeometry
@@ -33,7 +30,9 @@ from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 
-from utils import has_astra, has_tigre, has_nvidia, has_tomophantom
+from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests
+
+initialise_tests()
 
 if has_tigre:
     from cil.plugins.tigre import FBP as TigreFBP

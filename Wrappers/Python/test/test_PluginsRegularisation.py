@@ -15,15 +15,15 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 import numpy as np
 from cil.utilities import dataexample
 from cil.optimisation.functions import TotalVariation
 from cil.framework import ImageGeometry
 
-from utils import has_nvidia, has_ccpi_regularisation
+from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
+
+initialise_tests()
+
 if has_ccpi_regularisation:
     from ccpi.filters import regularisers
     from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, FGP_dTV, TNV

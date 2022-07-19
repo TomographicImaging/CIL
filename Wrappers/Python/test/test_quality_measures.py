@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy as np
 from cil.utilities import dataexample
 from cil.utilities import noise
@@ -32,6 +30,7 @@ if version.parse(np.version.version) >= version.parse("1.13"):
 else:
     has_skimage = False
     
+initialise_tests()
 
 class TestQualityMeasures(unittest.TestCase):
     

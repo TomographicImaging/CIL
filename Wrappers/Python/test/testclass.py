@@ -15,11 +15,11 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from cil.framework import DataContainer
 import numpy as np
+from utils import initialise_tests
+
+initialise_tests()
 
 def dt(steps):
     return steps[-1] - steps[-2]

@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy
 from cil.framework import ImageGeometry
 
@@ -25,6 +23,8 @@ from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
 
 import logging
+
+initialise_tests()
 
 class TestGradientOperator(unittest.TestCase):
 

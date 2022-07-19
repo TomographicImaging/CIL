@@ -15,17 +15,15 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.optimisation.functions import L2NormSquared
 from cil.optimisation.functions import TotalVariation
-
 from cil.utilities import dataexample
-
 import numpy as np
 import scipy.sparse as sp
 from utils import has_cvxpy
+
+initialise_tests()
 
 if has_cvxpy:
     import cvxpy

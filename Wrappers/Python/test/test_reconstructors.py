@@ -15,18 +15,17 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 from scipy.fft  import fft, ifft
 import numpy as np
-from utils import has_tigre, has_ipp, has_astra, has_nvidia
+from utils import has_tigre, has_ipp, has_astra, has_nvidia, initialise_tests
 
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
+
+initialise_tests()
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator

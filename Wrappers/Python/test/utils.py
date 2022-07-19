@@ -22,6 +22,7 @@ import importlib
 import logging
 import cil.version
 import pprint
+import unittest
 # startTestRun should be imported and used in each test file to change default behaviour
 # it must be in each file as each may get run as an independent process
 # use:
@@ -39,6 +40,13 @@ def startTestRun(self):
     pprint.pprint(system_state)
     print("----------------------------------------------------------------------\n")
     sys.stdout.flush()
+
+def initialise_tests():
+    """
+    Updates the unittests.TestResults.StartTestRun method with our version.
+    """
+    setattr(unittest.TestResult, 'startTestRun', startTestRun)
+
 
 # system state dictionary to be populated
 system_state = {}

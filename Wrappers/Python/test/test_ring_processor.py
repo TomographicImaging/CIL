@@ -15,15 +15,14 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
 from cil.processors import RingRemover
 from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
 
 import os
 import numpy as np
-from utils import has_tomophantom
+from utils import has_tomophantom, initialise_tests
+
+initialise_tests()
 
 if has_tomophantom:
     import tomophantom

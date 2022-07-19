@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.framework import AcquisitionGeometry
 import numpy as np
 import os
@@ -33,6 +31,7 @@ import shutil
 import logging
 import glob
 
+initialise_tests()
 
 has_dxchange = True
 try:
@@ -51,6 +50,7 @@ except ImportError as ie:
     has_wget = False
 if has_astra:
     from cil.plugins.astra import FBP
+
 
 # change basedir to point to the location of the walnut dataset which can
 # be downloaded from https://zenodo.org/record/4822516

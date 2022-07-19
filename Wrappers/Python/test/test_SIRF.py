@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 import numpy as np
 from numpy.linalg import norm
 import os
@@ -28,6 +26,8 @@ from cil.optimisation.functions import TotalVariation, L2NormSquared
 from cil.optimisation.algorithms import FISTA
 
 from testclass import CCPiTestClass
+
+initialise_tests()
 
 try:
     import sirf.STIR as pet

@@ -15,9 +15,7 @@
 #  limitations under the License.
 
 import unittest
-import utils
-setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
-
+from utils import initialise_tests
 from cil.framework.framework import ImageGeometry,AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
@@ -25,6 +23,8 @@ import os, sys
 from testclass import CCPiTestClass
 import platform
 import numpy as np
+
+initialise_tests()
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 

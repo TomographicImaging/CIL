@@ -300,7 +300,7 @@ class ImageGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                if numpy.iscomplexobj(out.array):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else: 
@@ -516,7 +516,7 @@ class SystemConfiguration(object):
             axis_rotation[0][1] = -math.sin(theta)
             axis_rotation[1][0] = math.sin(theta)
 
-        return numpy.matrix(axis_rotation)
+        return axis_rotation
 
     @staticmethod
     def rotation_vec_to_z(vec):
@@ -543,7 +543,7 @@ class SystemConfiguration(object):
         else:
             raise ValueError("Vec must have length 3, got {}".format(len(vec)))
     
-        return numpy.matrix(axis_rotation)
+        return axis_rotation
 
     def update_reference_frame(self):
         r'''Transforms the system origin to the rotation_axis position
@@ -1872,7 +1872,7 @@ class AcquisitionGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                if numpy.iscomplexobj(out.array):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else:
@@ -2261,10 +2261,7 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         
         if out is None:
-            if isinstance(x2, (int, float, complex, \
-                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
-                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
-                                 numpy.complex)):
+            if isinstance(x2, Number):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
@@ -2294,10 +2291,7 @@ class DataContainer(object):
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: out {} x2 {} expected {}".format( out.shape,x2.shape ,self.shape)))
         elif issubclass(type(out), DataContainer) and \
-             isinstance(x2, (int,float,complex, numpy.int, numpy.int8, \
-                             numpy.int16, numpy.int32, numpy.int64,\
-                             numpy.float, numpy.float16, numpy.float32,\
-                             numpy.float64, numpy.complex)):
+             isinstance(x2, Number):
             if self.check_dimensions(out):
                 kwargs['out']=out.as_array()
                 pwop(self.as_array(), x2, *args, **kwargs )

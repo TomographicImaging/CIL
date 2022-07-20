@@ -1,10 +1,12 @@
 * 22.0.0
   - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
+  - Cleaned up unit test structure and output
   - Removal of deprecated code
-    - AcquisitionGeometry constructor removed, use factory `create` methods instead
-    - Subset method removed, use `get_slice` or `reorder` methods
+    - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
+    - `subset` method removed, use `get_slice` or `reorder` methods
     - NikonDataReader `normalize` kwarg removed, use `normalise`
     - Algorithms initialisation `x_init` kwarg removed, use `initial`
+    - Removed deprecated numpy calls
   - DataProcessors use weak-reference to input data
   - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
     - Modules not moved should be considered deprecated
@@ -13,6 +15,7 @@
   - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Fixes error when update_objective_interval is set to 0 in an algorithm run.
   - Deprecated:
     - TXRMDataReader is deprecated in favour of ZEISSDataReader 
   - GitHub Actions:

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 import unittest
+from utils import initialise_tests
 from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator
@@ -30,6 +30,8 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
+
+initialise_tests()
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -100,7 +102,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(M, M)
         x = ig.allocate('random',seed=100)
         
-        mask = ig.allocate(True,dtype=numpy.bool)
+        mask = ig.allocate(True,dtype=bool)
         amask = mask.as_array()
         amask[2,1:3] = False
         amask[0,0] = False
@@ -296,8 +298,8 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2) 
 
         # Gradient Operator (complex)
-        ig = ImageGeometry(30,30, dtype=numpy.complex)
-        Grad = GradientOperator(ig)
+        ig = ImageGeometry(30,30, dtype=complex)
+        Grad = GradientOperator(ig, backend='numpy')
         res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
         numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)         
                     
@@ -447,7 +449,7 @@ class TestGradients(CCPiTestClass):
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
-        Grad2 = GradientOperator(self.ig2, correlation = 'Space')
+        Grad2 = GradientOperator(self.ig2, correlation = 'Space', backend='numpy')
         
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         numpy.random.seed(1)
@@ -464,7 +466,7 @@ class TestGradients(CCPiTestClass):
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
-        Grad2 = GradientOperator(self.ig2, correlation = 'Space')
+        Grad2 = GradientOperator(self.ig2, correlation = 'Space', backend='numpy')
         
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         norm = LinearOperator.PowerMethod(E2, max_iterations=self.iterations)

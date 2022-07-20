@@ -123,7 +123,7 @@ class NikonDataReader(object):
             roi['vertical'] = -1
                 
         # parse xtekct file
-        with open(self.file_name, 'r') as f:
+        with open(self.file_name, 'r', errors='replace') as f:
             content = f.readlines()    
                 
         content = [x.strip() for x in content]

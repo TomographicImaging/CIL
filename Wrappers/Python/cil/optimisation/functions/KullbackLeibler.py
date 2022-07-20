@@ -91,11 +91,6 @@ class KullbackLeibler(Function):
 
         # default backend numba
         cls.backend = backend
-        # cls.backend = kwargs.get('backend', 'numba')  
-        # if backend in kwargs
-        # cls.backend = kwargs.pop('backend', 'numba')  
-        # cls.backend = backend
-        # inspect.getargspec(func).keywords is not Non
         
         if cls.backend == 'numba':
 
@@ -233,7 +228,10 @@ class KullbackLeibler_numpy(KullbackLeibler):
             out += tmp
             out *= 0.5
 
-# KullbackLeibler numba routines
+####################################
+## KullbackLeibler numba routines ##
+####################################
+
 if has_numba:
     
     @jit(nopython=True)
@@ -407,34 +405,6 @@ if has_numba:
                     accumulator += eta.flat[i] * x_f
         return - accumulator
     
-    # force a jit
-    def force_jit():
-        print ("forcing jit in KL")
-        x = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
-        b = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
-        eta = numpy.zeros_like(x)
-        out = numpy.empty_like(x)
-        mask = x > 0.3
-        tau = 1.
-        tauarr = numpy.ones_like(x)
-        kl_div(b, x, eta)
-        kl_div_mask(b, x, eta, mask)
-
-        kl_gradient(x, b, out, eta)
-        kl_gradient_mask(x, b, out, eta, mask)
-        
-        kl_proximal(x, b, tau, out, eta)
-        kl_proximal_arr(x, b, tauarr, out, eta)
-        kl_proximal_mask(x, b, tau, out, eta, mask)
-        kl_proximal_arr_mask(x, b, tauarr, out, eta, mask)
-        
-        kl_proximal_conjugate(x, b, eta, tau, out)
-        kl_proximal_conjugate_arr(x, b, eta, tauarr, out)
-        kl_proximal_conjugate_mask(x, b, eta, tau, out, mask)
-        kl_proximal_conjugate_arr_mask(x, b, eta, tauarr, out, mask)
-        
-        kl_convex_conjugate(x, b, eta)
-        kl_convex_conjugate_mask(x, b, eta, mask)
     
 class KullbackLeibler_numba(KullbackLeibler):
 
@@ -472,66 +442,57 @@ class KullbackLeibler_numba(KullbackLeibler):
         ----
         To avoid inf values, we :math:`x+\eta>0` is required. 
         
-        """           
+        """     
 
+        should_return = False
         if out is None:
-            out = (x * 0.)
-            out_np = out.as_array()
-            if self.mask is not None:
-                kl_gradient_mask(x.as_array(), self.b.as_array(), out_np, self.eta.as_array(), self.mask)
-            kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
-            out.fill(out_np)
-            return out
-        else:
-            out_np = out.as_array()
-            kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
-            out.fill(out_np)
+            out = x * 0 
+            should_return = True
 
+        out_np = out.as_array() 
+
+        if self.mask is not None:
+            kl_gradient_mask(x.as_array(), self.b.as_array(), out_np, self.eta.as_array(), self.mask)         
+        kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())            
+        out.fill(out_np)
+
+        if should_return:
+            return out        
+        
     def proximal(self, x, tau, out = None):
 
         r"""Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.
         
         :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
                             
-        """        
-        
+        """      
+
+        should_return = False
         if out is None:
-            out = (x * 0.)
-            # out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)
-            out_np = out.as_array()
-            if isinstance(tau, Number):
-                if self.mask is not None:
-                    kl_proximal_mask(x.as_array(), self.b_np, tau, out_np, \
-                        self.eta_np, self.mask)
-                else:
-                    kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+            out = x * 0 
+            should_return = True
+
+        out_np = out.as_array() 
+
+        if isinstance(tau, Number):
+            if self.mask is not None:
+                kl_proximal_mask(x.as_array(), self.b_np, tau, out_np, \
+                    self.eta_np, self.mask)
             else:
-                # it should be a DataContainer
-                if self.mask is not None:
-                    kl_proximal_arr_mask(x.as_array(), self.b_np, tau.as_array(), \
-                        out_np, self.eta_np)
-                else:
-                    kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), \
-                        out_np, self.eta_np)
-            out.fill(out_np)
-            return out
+                kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
         else:
-            out_np = out.as_array()
-            if isinstance(tau, Number):
-                if self.mask is not None:
-                    kl_proximal_mask(x.as_array(), self.b_np, tau, out_np, \
-                        self.eta_np, self.mask)
-                else:
-                    kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+            # it should be a DataContainer
+            if self.mask is not None:
+                kl_proximal_arr_mask(x.as_array(), self.b_np, tau.as_array(), \
+                    out_np, self.eta_np)
             else:
-                # it should be a DataContainer
-                if self.mask is not None:
-                    kl_proximal_arr_mask(x.as_array(), self.b_np, tau.as_array(), \
-                        out_np, self.eta_np, self.mask)
-                else:
-                    kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), out_np, \
-                        self.eta_np)
-            out.fill(out_np)
+                kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), \
+                    out_np, self.eta_np)  
+
+        out.fill(out_np)
+        if should_return:
+            return out                                    
+
 
     def proximal_conjugate(self, x, tau, out = None):
 
@@ -540,41 +501,28 @@ class KullbackLeibler_numba(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
         """        
 
+        should_return = False
         if out is None:
-            out = (x * 0.)
-            # out_np = numpy.empty(out.shape, dtype=numpy.float64)
-            out_np = out.as_array()
-            if isinstance(tau, Number):
-                if self.mask is not None:
-                    kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
-                        tau, out_np, self.mask)
-                else:
-                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, \
-                        tau, out_np)
-            else:
-                if self.mask is not None:
-                    kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
-                        tau.as_array(), out_np, self.mask)
-                else:
-                    kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
-                        tau.as_array(), out_np)
-            out.fill(out_np)
-            return out
-        else:
-            out_np = out.as_array()
-            if isinstance(tau, Number):
-                if self.mask is not None:
-                    kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
-                        tau, out_np, self.mask)
-                else:
-                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, \
-                        out_np)
-            else:
-                if self.mask is not None:
-                    kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
-                        tau.as_array(), out_np, self.mask)
-                else:
-                    kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
-                        tau.as_array(), out_np)
-            out.fill(out_np)
+            out = x * 0 
+            should_return = True
 
+        out_np = out.as_array()              
+
+        if isinstance(tau, Number):
+            if self.mask is not None:
+                kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
+                    tau, out_np, self.mask)
+            else:
+                kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, \
+                    tau, out_np)
+        else:
+            if self.mask is not None:
+                kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
+                    tau.as_array(), out_np, self.mask)
+            else:
+                kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
+                    tau.as_array(), out_np) 
+
+        out.fill(out_np)
+        if should_return:
+            return out 

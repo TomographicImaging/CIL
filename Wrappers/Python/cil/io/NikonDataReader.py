@@ -131,9 +131,11 @@ class NikonDataReader(object):
         #initialise parameters
         detector_offset_h = 0
         detector_offset_v = 0
-        object_offset_x = 0
-        object_roll_deg = 0
         object_tilt_deg = 0
+        object_offset_x = None
+        object_roll_deg = None
+        centre_of_rotation_top = 0
+        centre_of_rotation_bottom = 0
 
         for line in content:
             # filename of TIFF files
@@ -175,14 +177,22 @@ class NikonDataReader(object):
             # detector offset y in units  
             elif line.startswith("DetectorOffsetY"):
                 detector_offset_v = float(line.split('=')[1])
+            #new file format rotation axis offset and angle
             # object offset x in units  
             elif line.startswith("ObjectOffsetX"):
                 object_offset_x = float(line.split('=')[1])
-            # object roll in degrees  
+            # object roll in degrees  (around z)
             elif line.startswith("ObjectRoll"):
                 object_roll_deg = float(line.split('=')[1])
+            # object tilt in degrees  (around x)
             elif line.startswith("ObjectTilt"):
                 object_tilt_deg = float(line.split('=')[1])
+            #old file format rotation axis offset and angle, in mm at the detector
+            elif line.startswith("CentreOfRotationTop"):
+                centre_of_rotation_top = float(line.split('=')[1])
+            elif line.startswith("CentreOfRotationBottom"):
+                centre_of_rotation_bottom = float(line.split('=')[1])
+          
             # directory where data is stored
             elif line.startswith("InputFolderName"):
                 input_folder_name = line.split('=')[1]
@@ -252,7 +262,16 @@ class NikonDataReader(object):
         #convert NikonGeometry to CIL geometry
         angles = -angles - initial_angle + 180
 
-        object_roll = object_roll_deg * np.pi /180.
+        if object_offset_x == None:
+            object_offset_x = (centre_of_rotation_bottom+centre_of_rotation_top)* 0.5 *  source_to_origin /source_to_det
+
+        if object_roll_deg == None:
+            x = (centre_of_rotation_top-centre_of_rotation_bottom)
+            y = pixel_num_v_0 * pixel_size_v_0
+            object_roll = -np.arctan2(x, y)
+        else:
+            object_roll = object_roll_deg * np.pi /180.
+
         object_tilt = -object_tilt_deg * np.pi /180.
 
         tilt_matrix = np.eye(3)

@@ -1,4 +1,5 @@
 * 22.0.0
+  - Cleaned up unit test structure and output
   - Removal of deprecated code
     - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
     - `subset` method removed, use `get_slice` or `reorder` methods

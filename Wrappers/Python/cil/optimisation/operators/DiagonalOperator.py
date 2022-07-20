@@ -72,6 +72,10 @@ class DiagonalOperator(LinearOperator):
   
     def calculate_norm(self, **kwargs):
         
-        " Returns the operator norm of DiagonalOperator which is the maximum element in the `diagonal`."
+        r""" Returns the operator norm of DiagonalOperator which is the :math:`\infty` norm of `diagonal`
         
+        .. math:: \|D\|_{\infty} = \max_{i}\{|D_{i}|\}
+
+        """
+
         return self.diagonal.abs().max()

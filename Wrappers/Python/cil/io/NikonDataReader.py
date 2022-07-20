@@ -234,8 +234,9 @@ class NikonDataReader(object):
             pixel_size_v = pixel_size_v_0 * self._roi_par[1][2]
             pixel_size_h = pixel_size_h_0 * self._roi_par[2][2]
         else: # slice
-            pixel_num_v = np.int(np.ceil((self._roi_par[1][1] - self._roi_par[1][0]) / self._roi_par[1][2]))
-            pixel_num_h = np.int(np.ceil((self._roi_par[2][1] - self._roi_par[2][0]) / self._roi_par[2][2]))
+            pixel_num_v = int(np.ceil((self._roi_par[1][1] - self._roi_par[1][0]) / self._roi_par[1][2]))
+            pixel_num_h = int(np.ceil((self._roi_par[2][1] - self._roi_par[2][0]) / self._roi_par[2][2]))
+
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
         

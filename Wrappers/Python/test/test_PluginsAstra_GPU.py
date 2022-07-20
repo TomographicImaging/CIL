@@ -1,34 +1,30 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-
+import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-import unittest
-from utils import has_gpu_astra, has_astra
+from utils import disable_print, enable_prints
+from utils import has_astra, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
-    from cil.plugins.astra import FBP
-
-has_astra_gpu = has_gpu_astra()
-if not has_astra_gpu:
-    print("Unable to run ASTRA GPU tests")
-
+    import astra
 
 def setup_parameters(self):
 
@@ -36,10 +32,20 @@ def setup_parameters(self):
     self.ProjectionOperator = ProjectionOperator
     self.PO_args={'device':'gpu'}
     
+class Test_basic_astra(unittest.TestCase):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA and GPU")
+    def test_astra_basic_cuda(self):
+        try:
+            disable_print()
+            astra.test_CUDA()
+            enable_prints()
+        except:
+            self.assertFalse('ASTRA GPU test failed')
 
 class Test_Cone3D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -48,7 +54,7 @@ class Test_Cone3D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionO
 
 class Test_Cone3D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -57,7 +63,7 @@ class Test_Cone3D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Cone3D_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
@@ -67,7 +73,7 @@ class Test_Cone3D_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Cone2D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -76,7 +82,7 @@ class Test_Cone2D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionO
 
 class Test_Cone2D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -85,7 +91,7 @@ class Test_Cone2D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Cone2D_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
@@ -95,7 +101,7 @@ class Test_Cone2D_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Parallel3D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -104,7 +110,7 @@ class Test_Parallel3D_Projectors_GPU_basic(unittest.TestCase, TestCommon_Project
 
 class Test_Parallel3D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -113,7 +119,7 @@ class Test_Parallel3D_Projectors_GPU_sim(unittest.TestCase, TestCommon_Projectio
 
 class Test_Parallel3D_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -123,7 +129,7 @@ class Test_Parallel3D_Projectors_GPU_toy(unittest.TestCase, TestCommon_Projectio
 
 class Test_Parallel2D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
@@ -132,7 +138,7 @@ class Test_Parallel2D_Projectors_GPU_basic(unittest.TestCase, TestCommon_Project
 
 class Test_Parallel2D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
@@ -140,7 +146,7 @@ class Test_Parallel2D_Projectors_GPU_sim(unittest.TestCase, TestCommon_Projectio
 
 class Test_Parallel2D_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()

@@ -17,13 +17,10 @@
 
 from cil.framework import Processor, AcquisitionData
 import numpy as np
-from scipy import signal
 
 import logging
-import math
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class CofR_xcorrelation(Processor):
 

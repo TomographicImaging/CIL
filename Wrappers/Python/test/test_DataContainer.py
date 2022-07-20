@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-import sys
 import unittest
+from utils import initialise_tests
+import sys
 import numpy
 from cil.framework import DataContainer
 from cil.framework import ImageData
@@ -26,6 +26,9 @@ from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 import logging
 from testclass import CCPiTestClass
+import functools
+
+initialise_tests()
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -556,9 +559,14 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(geometry.dtype, numpy.float32)
 
         #print("Change it to complex")
-        geometry.dtype = numpy.complex
-        #print("The {} dtype is now {} ".format(classname , geometry.dtype))         
-        self.assertEqual(geometry.dtype, numpy.complex)
+        geometry.dtype = numpy.complex64
+        self.assertEqual(geometry.dtype, numpy.complex64)
+
+        geometry.dtype = numpy.complex128
+        self.assertEqual(geometry.dtype, numpy.complex128)
+
+        geometry.dtype = complex
+        self.assertEqual(geometry.dtype, complex)
 
         #print("Test {} allocate".format(classname ))
         data = geometry.allocate()
@@ -577,7 +585,7 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(data.dtype, numpy.int64)
 
         #print("The dtype of the {} remain unchanged ig.dtype =  {}".format(classname, geometry.dtype))
-        self.assertEqual(geometry.dtype, numpy.complex)
+        self.assertEqual(geometry.dtype, complex)
 
         self.assertNotEqual(id(geometry), id(data.geometry))
 
@@ -611,7 +619,7 @@ class TestDataContainer(CCPiTestClass):
 
 
     def complex_allocate_geometry_test(self, geometry):
-        data = geometry.allocate(dtype=numpy.complex)
+        data = geometry.allocate(dtype=numpy.complex64)
         r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
         data.fill(r)
         self.assertAlmostEqual(data.squared_norm(), data.size * 2)  
@@ -747,7 +755,6 @@ class TestDataContainer(CCPiTestClass):
         
         
     def test_multiply_out(self):
-        import functools
         ig = ImageGeometry(10,11,12)
         u = ig.allocate()
         a = numpy.ones(u.shape)

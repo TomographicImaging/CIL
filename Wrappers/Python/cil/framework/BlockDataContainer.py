@@ -104,10 +104,7 @@ class BlockDataContainer(object):
             return True   
         elif isinstance(other, (list, tuple, numpy.ndarray)) :
             for ot in other:
-                if not isinstance(ot, (Number,\
-                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
-                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
-                                 numpy.complex)):
+                if not isinstance(ot, Number):
                     raise ValueError('List/ numpy array can only contain numbers {}'\
                                      .format(type(ot)))
             return len(self.containers) == len(other)

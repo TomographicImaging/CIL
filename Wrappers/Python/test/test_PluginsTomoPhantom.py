@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+import unittest
 from cil.framework import ImageGeometry, AcquisitionGeometry
 import numpy as np
-import unittest
-try:
-    import tomophantom
+from utils import has_tomophantom, initialise_tests
+
+initialise_tests()
+
+if has_tomophantom:
     from cil.plugins import TomoPhantom
-    has_tomophantom = True
-except ImportError as ie:
-    # raise ImportError(ie + "\n\n" + 
-    #                   "This plugin requires the additional package ccpi-regularisation\n" +
-    #                   "Please install it via conda as ccpi-regularisation from the ccpi channel\n"+
-    #                   "Minimal version is 20.04")
-    has_tomophantom = False
 
 
 class TestTomoPhantom2D(unittest.TestCase):

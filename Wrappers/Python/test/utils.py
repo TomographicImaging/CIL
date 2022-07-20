@@ -23,10 +23,9 @@ import logging
 import cil.version
 import pprint
 import unittest
-# startTestRun should be imported and used in each test file to change default behaviour
-# it must be in each file as each may get run as an independent process
-# use:
-# setattr(unittest.TestResult, 'startTestRun', utils.startTestRun)
+
+# initialise_tests should be imported and called in each test file to change default behaviour
+# it must be in each file as each may get run as an independent processes
 
 def startTestRun(self):
     """Called once before any tests are executed.

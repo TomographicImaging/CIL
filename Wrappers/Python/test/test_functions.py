@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+import unittest
 
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
@@ -30,7 +31,6 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          Rosenbrock, IndicatorBox, TotalVariation       
 from cil.optimisation.functions import BlockFunction                              
 
-import unittest
 import numpy
 import scipy.special
 
@@ -42,35 +42,24 @@ import numpy as np
 from cil.utilities import dataexample
 from cil.utilities import noise
 from testclass import CCPiTestClass
-try:
-    from ccpi.filters import regularisers
-    has_reg_toolkit = True
-except ImportError as ie:
-    has_reg_toolkit = False
-if has_reg_toolkit:
+from cil.utilities.quality_measures import mae
+
+from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
+
+initialise_tests()
+
+if has_ccpi_regularisation:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
 
-try:
-    import tomophantom
-    from tomophantom import TomoP3D
-    has_tomophantom = True
+if has_tomophantom:
     from cil.plugins import TomoPhantom
-except ImportError as ie:
-    has_tomophantom = False
 
-from cil.utilities.quality_measures import mae
-has_numba = True
-try:
-    import numba
-    # imports the function that uses numba
+if has_numba:
     from cil.optimisation.functions.MixedL21Norm import _proximal_step_numba, _proximal_step_numpy
-except ImportError as ie:
-    has_numba = False
 
 
 class TestFunction(CCPiTestClass):
-           
-
+        
     def test_Function(self):
         numpy.random.seed(10)
         N = 3
@@ -879,7 +868,7 @@ class TestTotalVariation(unittest.TestCase):
         np.testing.assert_equal(res1, res2)                
     
 
-    @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
+    @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
         data = dataexample.SHAPES.get(size=(64,64))
         ig = data.geometry
@@ -949,7 +938,7 @@ class TestTotalVariation(unittest.TestCase):
         ###################################################################
     
     
-    @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
+    @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
         # print ("Building 3D phantom using TomoPhantom software")
         model = 13 # select a model number from the library

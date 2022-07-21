@@ -14,19 +14,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 import unittest
 from cil.framework import AcquisitionGeometry
 import numpy as np
-from utils import has_gpu_astra, has_astra
+from utils import has_astra, has_nvidia, initialise_tests
+
+initialise_tests()
 
 if has_astra:
-    from cil.plugins.astra import ProjectionOperator
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
-
-has_astra_gpu = has_gpu_astra()
-if not has_astra_gpu:
-    print("Unable to run ASTRA GPU tests")
 
 class TestAstraProjectors(unittest.TestCase):
     def setUp(self): 
@@ -114,7 +110,7 @@ class TestAstraProjectors(unittest.TestCase):
         self.projector_norm(A)
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_AstraProjector2D_gpu(self):
 
         A = AstraProjector2D(self.ig, self.ag, device = 'gpu')
@@ -124,7 +120,7 @@ class TestAstraProjectors(unittest.TestCase):
         self.projector_norm(A)
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_AstraProjector3D_2Ddata(self):
 
         A = AstraProjector3D(self.ig, self.ag)
@@ -144,7 +140,7 @@ class TestAstraProjectors(unittest.TestCase):
             A = AstraProjector3D(ig_2, self.ag)
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_AstraProjector3D_3Ddata(self):
         # test exists
         A = AstraProjector3D(self.ig3, self.ag3)

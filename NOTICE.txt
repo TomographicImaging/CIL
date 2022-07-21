@@ -16,6 +16,7 @@ Edoardo Pasca (STFC)
 Other contributors:
 Claire Delplancke (UoB)
 Daniil Kazantsev (Diamond Light Source)
+Laura Murgatroyd (STFC)
 Srikanth Nagella (STFC)
 Kris Thielemans (UCL)
 Ryan Warr (UoM)

@@ -26,6 +26,7 @@ if has_astra:
     from cil.plugins.astra import ProjectionOperator
     import astra
 
+
 def setup_parameters(self):
 
     self.backend = 'astra'

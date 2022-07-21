@@ -47,7 +47,7 @@ class ProjectionOperator(LinearOperator):
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
                         
-
+                        
         Parameters
         ----------
 
@@ -57,10 +57,10 @@ class ProjectionOperator(LinearOperator):
         acquisition_geometry : AcquisitionGeometry
             A description of the acquisition data
 
-        direct_method: str,  default 'interpolated'
+        direct_method : str,  default 'interpolated'
             The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
 
-        adjoint_weights str, default 'matched'
+        adjoint_weights : str, default 'matched'
             The weighting method used by the cone-beam backward projector, 'matched' for weights to approximately match the 'interpolated' forward projector, 'FDK' for FDK weights
 
         Example

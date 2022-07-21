@@ -54,7 +54,7 @@ class ProjectionOperator(LinearOperator):
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this operator")
 
-        if image_geometry == None:
+        if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
         super(ProjectionOperator, self).__init__(domain_geometry=image_geometry, range_geometry=acquisition_geometry)

@@ -61,13 +61,17 @@ class FBP(DataProcessor):
 
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-            
+
         if volume_geometry is not None:
             image_geometry = volume_geometry
             logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
 
         if image_geometry == None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
+
+        device = kwargs.get('device', 'gpu')
+        if device != 'gpu':
+            raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
         DataOrder.check_order_for_engine('tigre', image_geometry)
         DataOrder.check_order_for_engine('tigre', acquisition_geometry) 

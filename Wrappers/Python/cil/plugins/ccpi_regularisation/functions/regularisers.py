@@ -48,7 +48,7 @@ class RegulariserFunction(Function):
 
         self.check_input(x)
         arr = x.as_array()
-        if arr.dtype in [np.complex, np.complex64]:
+        if np.iscomplexobj(arr):
             # do real and imag part indep
             in_arr = np.asarray(arr.real, dtype=np.float32, order='C')
             res, info = self.proximal_numpy(in_arr, tau)

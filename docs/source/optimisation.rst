@@ -53,20 +53,41 @@ print to screen of the status of the optimisation.
    :members:
    :private-members:
    :special-members:
+
+GD
+--
 .. autoclass:: cil.optimisation.algorithms.GD
    :members:
+
+CGLS
+----
 .. autoclass:: cil.optimisation.algorithms.CGLS
    :members:
+
+SIRT
+----
 .. autoclass:: cil.optimisation.algorithms.SIRT
    :members: update, update_objective
+
+FISTA
+-----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:
+
+PDHG
+----
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
+
+LADMM
+-----
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
+
+SPDHG
+-----
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
 

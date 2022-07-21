@@ -68,6 +68,9 @@ class NEXUSDataWriter(object):
         '''        
         self.data = data
 
+        if not isinstance(file_name, (str, bytes)):
+            raise TypeError('Path to nexus file must be a path-like object.')
+        
         if not file_name.endswith('nxs') and not file_name.endswith('nex'):
             file_name+='.nxs'
 
@@ -102,9 +105,9 @@ class NEXUSDataWriter(object):
         '''   
         # check filename and data have been set:
         if self.file_name is None:
-            raise Exception('Path to nexus file to write to is required.')
+            raise TypeError('Path to nexus file to write to is required.')
         if self.data is None:
-            raise Exception('Data to write out must be set.')
+            raise TypeError('Data to write out must be set.')
         
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):

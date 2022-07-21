@@ -149,6 +149,7 @@ class TIGREGeometry(Geometry):
             #this is in CIL reference frames as the TIGRE geometry rotates the reconstruction volume to match our definitions
             self.offOrigin[0] += ig.center_z
 
+
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip
             V = system.detector.direction_y[ind] * flip
@@ -163,9 +164,11 @@ class TIGREGeometry(Geometry):
 
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin
-        if 'right' in panel_origin:
+        if 'right' in panel_origin and 'top' in panel_origin:
+            roll += np.pi
+        elif 'right' in panel_origin:
             yaw += np.pi
-        if 'top' in panel_origin:
+        elif 'top' in panel_origin:
             pitch += np.pi
 
         self.rotDetector = np.array((roll, pitch, yaw)) 

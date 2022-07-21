@@ -1,5 +1,6 @@
 * 22.0.0
   - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
+  - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
   - Cleaned up unit test structure and output
   - Removal of deprecated code
     - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead

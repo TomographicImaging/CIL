@@ -186,26 +186,25 @@
                 
   <h1>Source code for cil.plugins.tigre.FBP</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
-<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
-<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
-
-<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1">#   you may not use this file except in compliance with the License.</span>
-<span class="c1">#   You may obtain a copy of the License at</span>
-
-<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
-
-<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1">#   See the License for the specific language governing permissions and</span>
-<span class="c1">#   limitations under the License.</span>
+<span class="c1">#  Copyright 2018 - 2022 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2018 - 2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">ImageData</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">CIL2TIGREGeometry</span>
-
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -217,38 +216,64 @@
 <div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
     <span class="sd">&#39;&#39;&#39;FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.</span>
-<span class="sd">    It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.</span>
+<span class="sd">    It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.</span>
 
 <span class="sd">    This uses the ram-lak filter</span>
 <span class="sd">    This is provided for simple and offset parallel-beam geometries only</span>
 <span class="sd">   </span>
-<span class="sd">    Input: Volume Geometry</span>
-<span class="sd">           Sinogram Geometry</span>
+<span class="sd">    acquisition_geometry : AcquisitionGeometry</span>
+<span class="sd">        A description of the acquisition data</span>
+<span class="sd">    </span>
+<span class="sd">    image_geometry : ImageGeometry, default used if None</span>
+<span class="sd">        A description of the area/volume to reconstruct</span>
 <span class="sd">                             </span>
-<span class="sd">    Example:  fbp = FBP(ig, ag, device)</span>
-<span class="sd">              fbp.set_input(data)</span>
-<span class="sd">              reconstruction = fbp.get_ouput()</span>
-<span class="sd">                           </span>
-<span class="sd">    Output: ImageData                             </span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from cil.plugins.tigre import FBP</span>
+<span class="sd">    &gt;&gt;&gt; fbp = FBP(image_geometry, data.geometry)</span>
+<span class="sd">    &gt;&gt;&gt; fbp.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; reconstruction = fbp.get_ouput()                       </span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">):</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> 
         
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">volume_geometry</span><span class="p">)</span>
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">)</span> 
 
-        <span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span> <span class="o">=</span> <span class="n">CIL2TIGREGeometry</span><span class="o">.</span><span class="n">getTIGREGeometry</span><span class="p">(</span><span class="n">volume_geometry</span><span class="p">,</span><span class="n">sinogram_geometry</span><span class="p">)</span>
+        <span class="n">sinogram_geometry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sinogram_geometry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">volume_geometry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;volume_geometry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">FBP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>  <span class="n">volume_geometry</span> <span class="o">=</span> <span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span> <span class="o">=</span> <span class="n">sinogram_geometry</span><span class="p">,</span>\
+        <span class="k">if</span> <span class="n">sinogram_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">acquisition_geometry</span> <span class="o">=</span> <span class="n">sinogram_geometry</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;sinogram_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this processor&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">volume_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">volume_geometry</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;volume_geometry has been deprecated. Please use image_geometry instead.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">image_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+
+        <span class="n">device</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="o">!=</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;TIGRE FBP is GPU only. Got device = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
+        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span> 
+
+        <span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span> <span class="o">=</span> <span class="n">CIL2TIGREGeometry</span><span class="o">.</span><span class="n">getTIGREGeometry</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">FBP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>  <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="p">,</span>\
                                     <span class="n">tigre_geom</span><span class="o">=</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span><span class="o">=</span><span class="n">tigre_angles</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input data to be single channel, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
-                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">))</span>  
+                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">))</span>  
 
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -258,19 +283,19 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">is2D</span><span class="p">:</span>
             <span class="n">data_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
                 <span class="n">arr_out</span> <span class="o">=</span> <span class="n">fdk</span><span class="p">(</span><span class="n">data_temp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_angles</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">arr_out</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data_temp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_angles</span><span class="p">)</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
                 <span class="n">arr_out</span> <span class="o">=</span> <span class="n">fdk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_angles</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">arr_out</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_angles</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span></div>

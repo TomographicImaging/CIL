@@ -212,11 +212,10 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</span>
 
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
-<span class="sd">    image_geometry : ImageGeometry</span>
+<span class="sd">    image_geometry : ImageGeometry, default used if None</span>
 <span class="sd">        A description of the area/volume to reconstruct</span>
 
 <span class="sd">    acquisition_geometry : AcquisitionGeometry</span>
@@ -225,10 +224,8 @@
 <span class="sd">    device : string, default=&#39;gpu&#39;</span>
 <span class="sd">        &#39;gpu&#39; will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, &#39;cpu&#39; will run on CPU using the ASTRA 2D CPU Projectors</span>
 
-
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-
 <span class="sd">    &gt;&gt;&gt; from cil.plugins.astra import ProjectionOperator</span>
 <span class="sd">    &gt;&gt;&gt; PO = ProjectionOperator(image.geometry, data.geometry)</span>
 <span class="sd">    &gt;&gt;&gt; forward_projection = PO.direct(image)</span>
@@ -239,8 +236,14 @@
 <span class="sd">    For multichannel data the ProjectionOperator will broadcast across all channels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
         
+        <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">image_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
 
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>

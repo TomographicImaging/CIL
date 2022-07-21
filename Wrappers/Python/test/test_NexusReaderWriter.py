@@ -168,7 +168,5 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d
-        
-        
-if __name__ == '__main__':
-    unittest.main()
+
+

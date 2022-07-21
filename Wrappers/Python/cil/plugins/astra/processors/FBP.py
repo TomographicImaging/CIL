@@ -58,7 +58,7 @@ class FBP(DataProcessor):
     """
 
     
-    def __init__(self, image_geometry, acquisition_geometry, device='gpu', **kwargs): 
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs): 
         
 
         sinogram_geometry = kwargs.get('sinogram_geometry', None)

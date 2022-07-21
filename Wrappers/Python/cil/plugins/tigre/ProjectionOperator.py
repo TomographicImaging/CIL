@@ -47,7 +47,7 @@ class ProjectionOperator(LinearOperator):
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
                         
-                        
+
         Parameters
         ----------
 

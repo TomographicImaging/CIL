@@ -75,7 +75,7 @@ class FBP(DataProcessor):
             image_geometry = volume_geometry
             logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
 
-        if image_geometry == None:
+        if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
         DataOrder.check_order_for_engine('astra', image_geometry)

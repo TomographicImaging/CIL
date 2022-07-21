@@ -25,8 +25,6 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.processors import CentreOfRotationCorrector
-from cil.processors.CofR_xcorrelation import  CofR_xcorrelation
-from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 
@@ -710,27 +708,28 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def test_CofR_xcorrelation(self):       
 
-        corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CofR_xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
-        corr = CofR_image_sharpness(search_range=20, backend='astra')
+
+        corr = CentreOfRotationCorrector.image_sharpness(search_range=20, backend='astra')
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)    
 
 
     @unittest.skipUnless(False, "TIGRE not installed")
     def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_image_sharpness(search_range=20, backend='tigre')
+        corr = CentreOfRotationCorrector.image_sharpness(search_range=20, backend='tigre')
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
@@ -782,21 +781,21 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
 
     @unittest.skipUnless(has_tomophantom and has_astra and has_nvidia, "Tomophantom or ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
-        corr = CofR_image_sharpness(backend='astra')
+        corr = CentreOfRotationCorrector.image_sharpness(backend='astra',FBP=FBP)
         ad_out = corr(self.data_0)
         self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-        corr = CofR_image_sharpness(backend='astra')
+        corr = CentreOfRotationCorrector.image_sharpness(backend='astra')
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
     @unittest.skipUnless(has_tomophantom and has_tigre and has_nvidia, "Tomophantom or TIGRE GPU not installed")
     def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_image_sharpness(backend='tigre')
+        corr = CentreOfRotationCorrector.image_sharpness(backend='tigre')
         ad_out = corr(self.data_0)
         self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-        corr = CofR_image_sharpness(backend='tigre')
+        corr = CentreOfRotationCorrector.image_sharpness(backend='tigre')
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 

@@ -14,20 +14,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
-from cil.framework import AcquisitionGeometry
 import unittest
+from cil.framework import AcquisitionGeometry
 import numpy as np
+from utils import has_astra, has_nvidia, initialise_tests
 
-from utils import has_gpu_astra, has_astra
+initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
-
-has_astra_gpu = has_gpu_astra()
-if not has_astra_gpu:
-    print("Unable to run ASTRA GPU tests")
 
 class TestAstraConeBeamProjectors(unittest.TestCase):
     def setUp(self): 
@@ -86,7 +82,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         self.golden_data_cs = self.golden_data.get_slice(vertical=self.cs_ind, force=True)
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_consistency(self):
     
         # #%% AstraProjector2D cpu
@@ -147,7 +143,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(bp_flex_2.as_array(),zeros.as_array())
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator(self):
         
         # #%% AstraProjector2D cpu
@@ -258,7 +254,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         self.golden_data_cs = self.golden_data.get_slice(vertical=self.cs_ind, force=True)
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_consistency(self):
     
         # #%% AstraProjector2D cpu
@@ -298,7 +294,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         np.testing.assert_allclose(bp_flex_2.as_array(),zeros.as_array())
 
 
-    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator(self):
         
         # #%% AstraProjector2D cpu

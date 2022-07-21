@@ -19,6 +19,7 @@ from cil.framework import DataOrder
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
+import logging
 
 class FBP(DataProcessor):
 
@@ -29,10 +30,10 @@ class FBP(DataProcessor):
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    image_geometry : ImageGeometry, default used if None
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    acquisition_geometry : AcquisitionGeometry
         A description of the acquisition data
 
     device : string, default='gpu'
@@ -57,34 +58,52 @@ class FBP(DataProcessor):
     """
 
     
-    def __init__(self, volume_geometry, sinogram_geometry, device='gpu'): 
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs): 
         
-        DataOrder.check_order_for_engine('astra', volume_geometry)
-        DataOrder.check_order_for_engine('astra', sinogram_geometry) 
+
+        sinogram_geometry = kwargs.get('sinogram_geometry', None)
+        volume_geometry = kwargs.get('volume_geometry', None)
+
+        if sinogram_geometry is not None:
+            acquisition_geometry = sinogram_geometry
+            logging.warning("sinogram_geometry has been deprecated. Please use acquisition_geometry instead.")
+
+        if acquisition_geometry is None:
+            raise TypeError("Please specify an acquisition_geometry to configure this processor")
+            
+        if volume_geometry is not None:
+            image_geometry = volume_geometry
+            logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
+
+        if image_geometry is None:
+            image_geometry = acquisition_geometry.get_ImageGeometry()
+
+        DataOrder.check_order_for_engine('astra', image_geometry)
+        DataOrder.check_order_for_engine('astra', acquisition_geometry) 
 
         if device == 'gpu':
-            if sinogram_geometry.geom_type == 'parallel':
-                processor = FBP_Flexible(volume_geometry, sinogram_geometry)
+            if acquisition_geometry.geom_type == 'parallel':
+                processor = FBP_Flexible(image_geometry, acquisition_geometry)
             else:
-                processor = FDK_Flexible(volume_geometry, sinogram_geometry)
+                processor = FDK_Flexible(image_geometry, acquisition_geometry)
             
         else:
             UserWarning("ASTRA back-projector running on CPU will not make use of enhanced geometry parameters")
 
-            if sinogram_geometry.geom_type == 'cone':
+            if acquisition_geometry.geom_type == 'cone':
                 raise NotImplementedError("Cannot process cone-beam data without a GPU")
 
-            if sinogram_geometry.dimension == '2D':
-                processor = FBP_CPU(volume_geometry, sinogram_geometry) 
+            if acquisition_geometry.dimension == '2D':
+                processor = FBP_CPU(image_geometry, acquisition_geometry) 
             else:
                 raise NotImplementedError("Cannot process 3D data without a GPU")
 
-        if sinogram_geometry.channels > 1: 
+        if acquisition_geometry.channels > 1: 
             raise NotImplementedError("Cannot process multi-channel data")
-            #processor_full = ChannelwiseProcessor(processor, self.sinogram_geometry.channels, dimension='prepend')
+            #processor_full = ChannelwiseProcessor(processor, self.acquisition_geometry.channels, dimension='prepend')
             #self.processor = operator_full
         
-        super(FBP, self).__init__( volume_geometry=volume_geometry, sinogram_geometry=sinogram_geometry, device=device, processor=processor)  
+        super(FBP, self).__init__( image_geometry=image_geometry, acquisition_geometry=acquisition_geometry, device=device, processor=processor)  
 
     def set_input(self, dataset):       
         return self.processor.set_input(dataset)

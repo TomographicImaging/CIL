@@ -25,11 +25,10 @@ class ProjectionOperator(LinearOperator):
     """
     ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
 
-
     Parameters
     ----------
 
-    image_geometry : ImageGeometry
+    image_geometry : ImageGeometry, default used if None
         A description of the area/volume to reconstruct
 
     acquisition_geometry : AcquisitionGeometry
@@ -38,10 +37,8 @@ class ProjectionOperator(LinearOperator):
     device : string, default='gpu'
         'gpu' will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, 'cpu' will run on CPU using the ASTRA 2D CPU Projectors
 
-
     Example
     -------
-
     >>> from cil.plugins.astra import ProjectionOperator
     >>> PO = ProjectionOperator(image.geometry, data.geometry)
     >>> forward_projection = PO.direct(image)
@@ -52,8 +49,14 @@ class ProjectionOperator(LinearOperator):
     For multichannel data the ProjectionOperator will broadcast across all channels.
     """
 
-    def __init__(self, image_geometry, acquisition_geometry, device='gpu'):
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
         
+        if acquisition_geometry is None:
+            raise TypeError("Please specify an acquisition_geometry to configure this operator")
+
+        if image_geometry is None:
+            image_geometry = acquisition_geometry.get_ImageGeometry()
+
         super(ProjectionOperator, self).__init__(domain_geometry=image_geometry, range_geometry=acquisition_geometry)
 
         DataOrder.check_order_for_engine('astra', image_geometry)

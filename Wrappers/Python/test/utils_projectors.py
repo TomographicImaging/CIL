@@ -1,3 +1,19 @@
+# -*- coding: utf-8 -*-
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
@@ -427,6 +443,14 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)    
 
 
+    def test_input_arguments(self):
+
+        #default image_geometry, named parameter acquisition_geometry
+        Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
+        fp = Op.direct(self.img_data)
+        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        
+
+
 class TestCommon_FBP_SIM(SimData):
     '''
     FBP tests on simulated data
@@ -446,4 +470,13 @@ class TestCommon_FBP_SIM(SimData):
     def test_FBP_roi(self):
         self.FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
         reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)    
+        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi) 
+
+    
+    def test_input_arguments(self):
+
+        #default image_geometry, named parameter acquisition_geometry
+        self.FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
+        reco = self.FBP(self.acq_data)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
+

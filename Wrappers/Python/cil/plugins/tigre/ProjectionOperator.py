@@ -60,7 +60,7 @@ class ProjectionOperator(LinearOperator):
         direct_method: str,  default 'interpolated'
             The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
 
-        adjoint_weights str, default 'matched'
+        adjoint_weights: str, default 'matched'
             The weighting method used by the cone-beam backward projector, 'matched' for weights to approximately match the 'interpolated' forward projector, 'FDK' for FDK weights
 
         Example

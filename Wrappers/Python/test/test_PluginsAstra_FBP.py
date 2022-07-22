@@ -21,9 +21,7 @@ from utils import has_astra, has_nvidia, initialise_tests
 initialise_tests()
 
 if has_astra:
-    from cil.plugins.astra import ProjectionOperator
     from cil.plugins.astra import FBP
-
 
 def setup_parameters(self):
 

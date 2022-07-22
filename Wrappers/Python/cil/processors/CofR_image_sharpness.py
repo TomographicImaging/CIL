@@ -39,7 +39,7 @@ class CofR_image_sharpness(Processor):
     slice_index : int, str='centre', default='centre'
         An integer defining the vertical slice to run the algorithm on.
 
-    backend : str, default='astra'
+    backend : str, default='tigre'
         The backend to use for the reconstruction, 'astra' or 'tigre'
 
     tolerance : float, default=1./200.
@@ -63,7 +63,7 @@ class CofR_image_sharpness(Processor):
 
     processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
     processor.set_input(data)
-    data_centred = processor.get_ouput()
+    data_centred = processor.get_output()
 
 
     Example
@@ -72,7 +72,7 @@ class CofR_image_sharpness(Processor):
 
     processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
     processor.set_input(data)
-    processor.get_ouput(out=data)
+    processor.get_output(out=data)
 
 
     Note
@@ -83,7 +83,7 @@ class CofR_image_sharpness(Processor):
     """
     _supported_backends = ['astra', 'tigre']
 
-    def __init__(self, slice_index='centre', backend='astra', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
         
 
         FBP = kwargs.get('FBP', None)
@@ -92,8 +92,8 @@ class CofR_image_sharpness(Processor):
                             Please pass backend='astra' or 'tigre'")
 
             if inspect.isclass(FBP):
-                if 'tigre' in str(inspect.getmodule(FBP)):
-                    backend = 'tigre'
+                if 'astra' in str(inspect.getmodule(FBP)):
+                    backend = 'astra'
 
         FBP = self._configure_FBP(backend)
 

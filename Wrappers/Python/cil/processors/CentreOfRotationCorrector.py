@@ -82,7 +82,7 @@ class CentreOfRotationCorrector(object):
         return processor
 
     @staticmethod
-    def image_sharpness(slice_index='centre', backend='astra', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
         """
         This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
 
@@ -94,7 +94,7 @@ class CentreOfRotationCorrector(object):
         slice_index : int, str='centre', default='centre'
             An integer defining the vertical slice to run the algorithm on.
 
-        backend : str, default='astra'
+        backend : str, default='tigre'
             The backend to use for the reconstruction, 'astra' or 'tigre'
 
         tolerance : float, default=1./200.
@@ -107,8 +107,7 @@ class CentreOfRotationCorrector(object):
             The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
 
 
-        Kwargs
-        ------
+        **kwargs:
         FBP : Class
             Deprecated parameter: the FBP class imported from cil.plugins.[backend].FBP Please use 'backend' instead
 
@@ -119,7 +118,7 @@ class CentreOfRotationCorrector(object):
 
         processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
         processor.set_input(data)
-        data_centred = processor.get_ouput()
+        data_centred = processor.get_output()
 
 
         Example
@@ -128,7 +127,7 @@ class CentreOfRotationCorrector(object):
 
         processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
         processor.set_input(data)
-        processor.get_ouput(out=data)
+        processor.get_output(out=data)
 
 
         Note

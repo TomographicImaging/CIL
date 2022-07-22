@@ -118,7 +118,7 @@ class Algorithm(object):
             self.timing.append( time.time() - time0 )
             self.iteration += 1
             
-            self.update_previous_solution()
+            self._update_previous_solution()
             
             if self.iteration >= 0 and self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0:
@@ -127,7 +127,7 @@ class Algorithm(object):
                 self.update_objective()
             
 
-    def update_previous_solution(self):
+    def _update_previous_solution(self):
         """ Update the previous solution with the current one
         
         The concrete algorithm calls update_previous_solution. Normally this would 
@@ -145,17 +145,17 @@ class Algorithm(object):
         pass
         
     def get_output(self):
-        " Returns the last iterate which is stored in x "
+        " Returns the current solution. "
         return self.x
 
-    @property
-    def provable_convergence_condition(self):
-        raise NotImplementedError()
+    
+    def _provable_convergence_condition(self):
+        raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
 
-    def _is_provably_convergent(self):
+    def is_provably_convergent(self):
         """ Check if the algorithm is convergent based on the provable convergence criterion.
         """
-        return self.provable_convergence_condition    
+        return self._provable_convergence_condition()
     
     @property
     def solution(self):

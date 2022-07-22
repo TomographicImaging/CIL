@@ -237,7 +237,7 @@ class TestAlgorithms(CCPiTestClass):
           
         # ista run 10 iteration
         tmp_initial = ig.allocate()
-        fista = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=100)  
+        fista = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=1)  
         fista.run()
 
         # fista update method
@@ -247,7 +247,7 @@ class TestAlgorithms(CCPiTestClass):
         x_old = ig.allocate()
         y_old = ig.allocate()
 
-        for i in range(100):
+        for _ in range(1):
 
             x = g.proximal(y_old - step_size * f.gradient(y_old), tau = step_size)
             t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
@@ -262,7 +262,14 @@ class TestAlgorithms(CCPiTestClass):
         # check objective
         res1 = fista.objective[-1]
         res2 = f(x) + g(x)
-        self.assertTrue( res1==res2)         
+        self.assertTrue( res1==res2)  
+
+        tmp_initial = ig.allocate()
+        fista1 = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=1) 
+        self.assertTrue(fista1.is_provably_convergent())
+
+        fista1 = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=1, step_size=30.0) 
+        self.assertFalse(fista1.is_provably_convergent())          
 
                
     def test_FISTA_Norm2Sq(self):

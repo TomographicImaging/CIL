@@ -83,8 +83,7 @@ class ISTA(Algorithm):
 
     """
 
-    @property
-    def provable_convergence_condition(self):
+    def _provable_convergence_condition(self):
         return self.step_size <= 0.99*2.0/self.f.L
 
     @property
@@ -145,15 +144,15 @@ class ISTA(Algorithm):
         # proximal step
         self.g.proximal(self.x_old, self.step_size, out=self.x)
 
-    def update_previous_solution(self):  
-        """ Swaps the references to current and previous iterate based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
+    def _update_previous_solution(self):  
+        """ Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
         """        
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
 
     def get_output(self):
-        " Returns the last iterate which is stored in x_old "
+        " Returns the current solution. "
         return self.x_old
         
     def update_objective(self):
@@ -235,8 +234,7 @@ class FISTA(ISTA):
         else:
             self._step_size = step_size
 
-    @property
-    def provable_convergence_condition(self):
+    def _provable_convergence_condition(self):
         return self.step_size <= 1./self.f.L
 
     def __init__(self, initial, f, g, step_size = None, **kwargs):
@@ -273,4 +271,18 @@ class FISTA(ISTA):
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y) 
           
 
+if __name__ == "__main__":
+
+    from cil.optimisation.functions import L2NormSquared
+    from cil.optimisation.algorithms import GD
+    from cil.framework import ImageGeometry
+    f = L2NormSquared()
+    g = L2NormSquared()
+    ig = ImageGeometry(3,4,4)
+    initial = ig.allocate()
+    fista = FISTA(initial, f, g, step_size = 1443432)
+    print(fista.is_provably_convergent())
+
+    gd = GD(initial=initial, objective = f, step_size = 1023123)
+    print(gd.is_provably_convergent())
 

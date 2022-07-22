@@ -83,7 +83,7 @@ class TestISTA(unittest.TestCase):
 
         # ista run 10 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10)  
+        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=1)  
         ista.run()
 
         x = tmp_initial.copy()
@@ -104,10 +104,10 @@ class TestISTA(unittest.TestCase):
 
         tmp_initial = self.ig.allocate()
         ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10) 
-        self.assertTrue(ista1._is_provably_convergent())
+        self.assertTrue(ista1.is_provably_convergent())
 
         ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10, step_size=30.0) 
-        self.assertFalse(ista1._is_provably_convergent())        
+        self.assertFalse(ista1.is_provably_convergent())        
 
 
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 

@@ -106,10 +106,9 @@ class CentreOfRotationCorrector(object):
         initial_binning : int, default=None
             The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
 
-
         **kwargs:
-        FBP : Class
-            Deprecated parameter: the FBP class imported from cil.plugins.[backend].FBP Please use 'backend' instead
+            FBP : Class
+                Deprecated parameter: the FBP class imported from cil.plugins.[backend].FBP Please use 'backend' instead
 
 
         Example

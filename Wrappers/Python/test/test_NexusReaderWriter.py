@@ -84,7 +84,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         im = ig.allocate('random',seed=9)
 
         writer = NEXUSDataWriter()
-        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'),
+        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
                       data = im, compression=16)
         writer.write()
 
@@ -109,7 +109,6 @@ class TestNexusReaderWriter(unittest.TestCase):
         with self.assertRaises(TypeError) as cm:
             writer = NEXUSDataWriter(file_name=self.ad2d , data=self.ad2d)
             writer.write()
-        self.assertEqual(str(cm.exception), 'Path to nexus file must be a path-like object.')
 
     def test_write_throws_when_file_path_not_possible(self):
         with self.assertRaises(OSError):

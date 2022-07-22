@@ -67,14 +67,11 @@ class NEXUSDataWriter(object):
         :type compression: int, default 0
         '''        
         self.data = data
-
-        if not isinstance(file_name, (str, bytes)):
-            raise TypeError('Path to nexus file must be a path-like object.')
-        
-        if not file_name.endswith('nxs') and not file_name.endswith('nex'):
-            file_name+='.nxs'
-
         self.file_name = os.path.abspath(file_name)
+
+        if not self.file_name.endswith('nxs') and not self.file_name.endswith('nex'):
+            self.file_name+='.nxs'
+        
         self.compression = compression
         
         if not ((isinstance(self.data, ImageData)) or 

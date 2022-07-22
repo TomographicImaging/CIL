@@ -296,8 +296,6 @@
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.__init__">(cil.optimisation.algorithms.Algorithm method)</a>
 </li>
-        <li><a href="optimisation.html#cil.optimisation.algorithms.FISTA.__init__">(cil.optimisation.algorithms.FISTA method)</a>
-</li>
         <li><a href="optimisation.html#cil.optimisation.functions.BlockFunction.__init__">(cil.optimisation.functions.BlockFunction method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.functions.ConstantFunction.__init__">(cil.optimisation.functions.ConstantFunction method)</a>
@@ -482,6 +480,8 @@
 </li>
       </ul></li>
       <li><a href="framework.html#cil.framework.DataContainer._axpby">_axpby() (cil.framework.DataContainer method)</a>
+</li>
+      <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm._update_previous_solution">_update_previous_solution() (cil.optimisation.algorithms.Algorithm method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -845,6 +845,8 @@
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.get_output">get_output() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="optimisation.html#cil.optimisation.algorithms.ISTA.get_output">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
         <li><a href="plugins.html#cil.plugins.astra.FBP.get_output">(cil.plugins.astra.FBP method)</a>
 </li>
         <li><a href="plugins.html#cil.plugins.tigre.FBP.get_output">(cil.plugins.tigre.FBP method)</a>
@@ -940,8 +942,6 @@
 </li>
       <li><a href="framework.html#cil.framework.BlockDataContainer.is_compatible">is_compatible() (cil.framework.BlockDataContainer method)</a>, <a href="optimisation.html#cil.framework.BlockDataContainer.is_compatible">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.operators.BlockOperator.is_linear">is_linear() (cil.optimisation.operators.BlockOperator method)</a>
 
       <ul>
@@ -954,7 +954,13 @@
         <li><a href="optimisation.html#cil.optimisation.operators.ScaledOperator.is_linear">(cil.optimisation.operators.ScaledOperator method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.is_provably_convergent">is_provably_convergent() (cil.optimisation.algorithms.Algorithm method)</a>
+</li>
       <li><a href="utilities.html#cil.utilities.jupyter.islicer">islicer (class in cil.utilities.jupyter)</a>
+</li>
+      <li><a href="optimisation.html#cil.optimisation.algorithms.ISTA">ISTA (class in cil.optimisation.algorithms)</a>
 </li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.iterations">iterations() (cil.optimisation.algorithms.Algorithm property)</a>
 </li>
@@ -1353,12 +1359,18 @@
 </li>
       <li><a href="optimisation.html#cil.optimisation.operators.Operator.set_norm">set_norm() (cil.optimisation.operators.Operator method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="framework.html#cil.framework.AcquisitionGeometry.set_panel">set_panel() (cil.framework.AcquisitionGeometry method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="recon.html#cil.recon.FBP.set_split_processing">set_split_processing() (cil.recon.FBP method)</a>
 </li>
+      <li><a href="optimisation.html#cil.optimisation.algorithms.FISTA.set_step_size">set_step_size() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="optimisation.html#cil.optimisation.algorithms.ISTA.set_step_size">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.PDHG.set_step_sizes">set_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>
 </li>
       <li><a href="io.html#cil.io.NEXUSDataWriter.set_up">set_up() (cil.io.NEXUSDataWriter method)</a>
@@ -1370,9 +1382,9 @@
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.CGLS.set_up">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
-        <li><a href="optimisation.html#cil.optimisation.algorithms.FISTA.set_up">(cil.optimisation.algorithms.FISTA method)</a>
-</li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.GD.set_up">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="optimisation.html#cil.optimisation.algorithms.ISTA.set_up">(cil.optimisation.algorithms.ISTA method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.LADMM.set_up">(cil.optimisation.algorithms.LADMM method)</a>
 </li>
@@ -1472,6 +1484,8 @@
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.GD.update">(cil.optimisation.algorithms.GD method)</a>
 </li>
+        <li><a href="optimisation.html#cil.optimisation.algorithms.ISTA.update">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.LADMM.update">(cil.optimisation.algorithms.LADMM method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.PDHG.update">(cil.optimisation.algorithms.PDHG method)</a>
@@ -1481,14 +1495,16 @@
         <li><a href="optimisation.html#cil.optimisation.algorithms.SPDHG.update">(cil.optimisation.algorithms.SPDHG method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.update_objective">update_objective() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
         <li><a href="optimisation.html#cil.optimisation.algorithms.CGLS.update_objective">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
-        <li><a href="optimisation.html#cil.optimisation.algorithms.FISTA.update_objective">(cil.optimisation.algorithms.FISTA method)</a>
-</li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.GD.update_objective">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="optimisation.html#cil.optimisation.algorithms.ISTA.update_objective">(cil.optimisation.algorithms.ISTA method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.LADMM.update_objective">(cil.optimisation.algorithms.LADMM method)</a>
 </li>
@@ -1497,14 +1513,6 @@
         <li><a href="optimisation.html#cil.optimisation.algorithms.SIRT.update_objective">(cil.optimisation.algorithms.SIRT method)</a>
 </li>
         <li><a href="optimisation.html#cil.optimisation.algorithms.SPDHG.update_objective">(cil.optimisation.algorithms.SPDHG method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="optimisation.html#cil.optimisation.algorithms.Algorithm.update_previous_solution">update_previous_solution() (cil.optimisation.algorithms.Algorithm method)</a>
-
-      <ul>
-        <li><a href="optimisation.html#cil.optimisation.algorithms.FISTA.update_previous_solution">(cil.optimisation.algorithms.FISTA method)</a>
 </li>
       </ul></li>
       <li><a href="optimisation.html#cil.optimisation.algorithms.PDHG.update_step_sizes">update_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>

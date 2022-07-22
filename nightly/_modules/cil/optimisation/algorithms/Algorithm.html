@@ -305,7 +305,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">timing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time0</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
             
-            <span class="bp">self</span><span class="o">.</span><span class="n">update_previous_solution</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_previous_solution</span><span class="p">()</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>\
                 <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -314,21 +314,35 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span></div>
             
 
-<div class="viewcode-block" id="Algorithm.update_previous_solution"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.update_previous_solution">[docs]</a>    <span class="k">def</span> <span class="nf">update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Update the previous solution with the current one</span>
+<div class="viewcode-block" id="Algorithm._update_previous_solution"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm._update_previous_solution">[docs]</a>    <span class="k">def</span> <span class="nf">_update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update the previous solution with the current one</span>
 <span class="sd">        </span>
 <span class="sd">        The concrete algorithm calls update_previous_solution. Normally this would </span>
 <span class="sd">        entail the swapping of pointers:</span>
 
-<span class="sd">        tmp = self.x_old</span>
-<span class="sd">        self.x_old = self.x</span>
-<span class="sd">        self.x = tmp </span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        .. highlight:: python</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            tmp = self.x_old</span>
+<span class="sd">            self.x_old = self.x</span>
+<span class="sd">            self.x = tmp </span>
+<span class="sd">        </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
         
 <div class="viewcode-block" id="Algorithm.get_output"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns the solution found&#39;&#39;&#39;</span>
+        <span class="s2">&quot; Returns the current solution. &quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span></div>
+
+    
+    <span class="k">def</span> <span class="nf">_provable_convergence_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot; Convergence criterion is not implemented for this algorithm. &quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Algorithm.is_provably_convergent"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.is_provably_convergent">[docs]</a>    <span class="k">def</span> <span class="nf">is_provably_convergent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check if the algorithm is convergent based on the provable convergence criterion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provable_convergence_condition</span><span class="p">()</span></div>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

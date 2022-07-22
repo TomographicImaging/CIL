@@ -20,7 +20,8 @@ Algorithms
 A number of generic algorithm implementations are provided including 
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
-Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
+Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of 
 :code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
@@ -74,6 +75,13 @@ SIRT
    :members: update, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
+ISTA
+----
+.. autoclass:: cil.optimisation.algorithms.ISTA
+   :members:
+   :special-members:
+   :inherited-members: run, update_objective_interval, max_iteration
+   
 FISTA
 -----
 .. autoclass:: cil.optimisation.algorithms.FISTA

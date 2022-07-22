@@ -443,6 +443,14 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)    
 
 
+    def test_input_arguments(self):
+
+        #default image_geometry, named parameter acquisition_geometry
+        Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
+        fp = Op.direct(self.img_data)
+        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        
+
+
 class TestCommon_FBP_SIM(SimData):
     '''
     FBP tests on simulated data
@@ -462,4 +470,13 @@ class TestCommon_FBP_SIM(SimData):
     def test_FBP_roi(self):
         self.FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
         reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)    
+        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi) 
+
+    
+    def test_input_arguments(self):
+
+        #default image_geometry, named parameter acquisition_geometry
+        self.FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
+        reco = self.FBP(self.acq_data)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
+

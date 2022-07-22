@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 import unittest
+from utils import initialise_tests
 import numpy
 import numpy as np
 from numpy import nan, inf
@@ -47,42 +47,23 @@ from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 import os, sys, time
 import warnings
+from cil.optimisation.functions import Rosenbrock
+from cil.framework import VectorData, VectorGeometry
+from cil.utilities.quality_measures import mae, mse, psnr
 
 
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 import logging
 from testclass import CCPiTestClass
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import  has_astra
 
-try:
+initialise_tests()
+
+if has_astra:
     from cil.plugins.astra import ProjectionOperator
-    has_astra = True    
-except ImportError as ie:
-    # skip test
-    has_astra = False
-
-has_astra = has_astra and has_gpu_astra()
-
-
 
 class TestAlgorithms(CCPiTestClass):
-    def setUp(self):
-        #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
-        #self.filename = '24737_fd.nxs'
-        # we use Identity as the operator and solve the simple least squares 
-        # problem for a random-valued ImageData or AcquisitionData b?  
-        # Then we know the minimiser is b itself
-        
-        # || I x -b ||^2
-        
-        # create an ImageGeometry
-        ig = ImageGeometry(12,13,14)
-        pass
-
-    def tearDown(self):
-        #os.remove(self.filename)
-        pass
     
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
@@ -111,6 +92,28 @@ class TestAlgorithms(CCPiTestClass):
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+    def test_update_interval_0(self):
+        '''
+        Checks that an algorithm runs with no problems when 
+        the update_objective interval is set to 0 and with
+        verbose on / off
+        '''
+        ig = ImageGeometry(12,13,14)
+        initial = ig.allocate()
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        norm2sq = LeastSquares(identity, b)
+        alg = GD(initial=initial, 
+                 objective_function=norm2sq, 
+                 max_iteration=20,
+                 update_objective_interval=0,
+                 atol=1e-9, rtol=1e-6)
+        self.assertTrue(alg.update_objective_interval==0)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg.run(20, verbose=False)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
 
@@ -143,8 +146,6 @@ class TestAlgorithms(CCPiTestClass):
 
 
     def test_GDArmijo2(self):
-        from cil.optimisation.functions import Rosenbrock
-        from cil.framework import VectorData, VectorGeometry
 
         f = Rosenbrock (alpha = 1., beta=100.)
         vg = VectorGeometry(2)
@@ -300,7 +301,7 @@ class TestAlgorithms(CCPiTestClass):
             return noisy_data, alpha, g
 
         noisy_data, alpha, g = setup(data, dnoise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
          
@@ -324,7 +325,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 1
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm() 
                     
@@ -349,7 +350,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 2
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
    
@@ -658,7 +659,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         # Select device
         dev = 'cpu'
     
@@ -705,7 +706,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
@@ -730,7 +731,6 @@ class TestSPDHG(unittest.TestCase):
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, verbose=0)
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -753,7 +753,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         # Select device
         dev = 'cpu'
 
@@ -783,8 +783,8 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
-        for i in range(len(list_angles))]
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
+                        for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
@@ -833,7 +833,6 @@ class TestSPDHG(unittest.TestCase):
         # plt.colorbar()
         # plt.show()
 
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -855,7 +854,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         dev = 'cpu'
 
         Aop = ProjectionOperator(ig, ag, dev)
@@ -890,8 +889,8 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
-        for i in range(len(list_angles))]
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
+                        for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
@@ -928,7 +927,6 @@ class TestSPDHG(unittest.TestCase):
         
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())
@@ -947,7 +945,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         
         dev = 'cpu'
 
@@ -1001,8 +999,6 @@ class TestSPDHG(unittest.TestCase):
         )
         algos[1].run(1000, verbose=0)
         
-
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())
@@ -1167,8 +1163,3 @@ class TestADMM(unittest.TestCase):
         admm.run(verbose=0)
         np.testing.assert_almost_equal(admm.solution.array, pdhg.solution.array,  decimal=3)
 
-
-    def tearDown(self):
-        pass
-
-    

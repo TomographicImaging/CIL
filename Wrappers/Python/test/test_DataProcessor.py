@@ -1,22 +1,19 @@
-
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-import sys
 import unittest
 import numpy
 from cil.framework import DataContainer
@@ -27,41 +24,26 @@ from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
+from cil.processors import CentreOfRotationCorrector
+from cil.processors.CofR_xcorrelation import  CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests
 
+initialise_tests()
 
-try:
-    import tigre
-    has_tigre = True
-except ModuleNotFoundError:
-    print(  "This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
-    has_tigre = False
-else:
+if has_tigre:
     from cil.plugins.tigre import FBP as TigreFBP
     from cil.plugins.tigre import ProjectionOperator
 
-try:
-    import tomophantom
-    has_tomophantom = True
-except ModuleNotFoundError:
-    print(  "This plugin requires the additional package tomophantom\n" +
-            "Please install it via conda as tomophantom from the ccpi channel\n")
-    has_tomophantom = False
-else:
-    from cil.plugins import TomoPhantom
-
-try:
-    import astra
+if has_astra:
     from cil.plugins.astra import FBP as AstraFBP
-    has_astra = True
-except ModuleNotFoundError:
-    has_astra = False
+    from cil.plugins.astra import ProjectionOperator as AstraProjectionOperator
+
+if has_tomophantom:
+    from cil.plugins import TomoPhantom
 
 
 class TestPadder(unittest.TestCase):
@@ -326,13 +308,6 @@ class TestPadder(unittest.TestCase):
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
     
-    
-
-
-has_astra = has_astra and has_gpu_astra()
-has_tigre = has_tigre and has_gpu_tigre()
-
-
 class TestBinner(unittest.TestCase):
     def test_Binner(self):
         #test parallel 2D case
@@ -459,8 +434,8 @@ class TestBinner(unittest.TestCase):
         dimension_labels_binned.remove('channel')
         dimension_labels_binned.remove('vertical')
         
-        AG_binned = AG.subset(vertical='centre')
-        AG_binned = AG_binned.subset(channel=0)
+        AG_binned = AG.get_slice(vertical='centre')
+        AG_binned = AG_binned.get_slice(channel=0)
         AG_binned.config.panel.num_pixels[0] = 45
         AG_binned.config.panel.pixel_size[0] = 0.2
         AG_binned.config.panel.pixel_size[1] = 0.4
@@ -686,8 +661,8 @@ class TestSlicer(unittest.TestCase):
         dimension_labels_sliced.remove('channel')
         dimension_labels_sliced.remove('vertical')
         
-        AG_sliced = AG.subset(vertical='centre')
-        AG_sliced = AG_sliced.subset(channel=1)
+        AG_sliced = AG.get_slice(vertical='centre')
+        AG_sliced = AG_sliced.get_slice(channel=1)
         AG_sliced.config.panel.num_pixels[0] = numpy.arange(10,100,2).shape[0]
         
         self.assertTrue(data_sliced.geometry == AG_sliced)
@@ -747,7 +722,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS)
@@ -787,7 +762,11 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         ig = ag_orig.get_ImageGeometry()
         phantom = TomoPhantom.get_ImageData(12, ig)
 
-        Op = ProjectionOperator(ig, ag_orig, direct_method='Siddon')
+        if has_tigre:
+            Op = ProjectionOperator(ig, ag_orig, direct_method='Siddon')
+        else:
+            Op = AstraProjectionOperator(ig, ag_orig)
+
         self.data_0 = Op.direct(phantom)
 
         ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
@@ -795,11 +774,15 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
             .set_angles(angles)\
             .set_labels(['angle', 'horizontal'])
 
-        Op = ProjectionOperator(ig, ag_offset, direct_method='Siddon')
+        if has_tigre:
+            Op = ProjectionOperator(ig, ag_offset, direct_method='Siddon')
+        else:
+            Op = AstraProjectionOperator(ig, ag_offset)        
+            
         self.data_offset = Op.direct(phantom)
         self.data_offset.geometry = ag_orig
 
-    @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
+    @unittest.skipUnless(has_tomophantom and has_astra and has_nvidia, "Tomophantom or ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
         corr = CofR_image_sharpness(FBP=AstraFBP)
         ad_out = corr(self.data_0)
@@ -809,7 +792,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-    @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
+    @unittest.skipUnless(has_tomophantom and has_tigre and has_nvidia, "Tomophantom or TIGRE GPU not installed")
     def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
         corr = CofR_image_sharpness(FBP=TigreFBP)
         ad_out = corr(self.data_0)
@@ -892,8 +875,8 @@ class TestDataProcessor(unittest.TestCase):
         a = numpy.asarray([i for i in range( size )])
         a = numpy.reshape(a, shape)
         ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
-        c = ds.subset(Y=0)
-        c = c.subset(['Z','W','X'])
+        c = ds.get_slice(Y=0)
+        c.reorder(['Z','W','X'])
         arr = c.as_array()
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
@@ -972,7 +955,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         
@@ -983,7 +966,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[4,5] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -993,7 +976,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1007,7 +990,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
@@ -1017,7 +1000,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1031,7 +1014,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
@@ -1041,7 +1024,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[6,8] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1059,7 +1042,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1068,7 +1051,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1078,7 +1061,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
@@ -1087,7 +1070,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1096,7 +1079,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1105,7 +1088,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1113,7 +1096,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check movmedian
@@ -1121,7 +1104,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
@@ -1130,7 +1113,7 @@ class TestMaskGenerator(unittest.TestCase):
         m.set_input(data)
         mask = m.process()
         
-        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -1239,7 +1222,7 @@ class TestMasker(unittest.TestCase):
         self.data.as_array()[2,3] = float('inf')
         self.data.as_array()[4,5] = float('nan')
         
-        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual = numpy.ones((10,10), dtype=bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         

@@ -17,13 +17,10 @@
 
 from cil.framework import Processor, AcquisitionData
 import numpy as np
-from scipy import signal
 
 import logging
-import math
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class CofR_xcorrelation(Processor):
 
@@ -116,9 +113,9 @@ class CofR_xcorrelation(Processor):
         if abs(ang_diff-180) > self.ang_tol:
             raise ValueError('Method requires projections at 180 +/- {0} degrees interval, got {1}.\nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, ang_diff))
 
-        #cross correlate single slice with the 180deg one reveresed
-        data1 = data.subset(angle=0).as_array()
-        data2 = np.flip(data.subset(angle=ind).as_array())
+        #cross correlate single slice with the 180deg one reversed
+        data1 = data.get_slice(angle=0).as_array()
+        data2 = np.flip(data.get_slice(angle=ind).as_array())
 
     
         border = int(data1.size * 0.05)

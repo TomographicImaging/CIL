@@ -103,7 +103,7 @@ class CentreOfRotationCorrector(object):
         search_range : int, default 0.25*pixels_num_h
             The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  
 
-        initial_binning : int
+        initial_binning : int, default=None
             The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
 
 

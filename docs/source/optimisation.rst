@@ -14,8 +14,8 @@ The fundamental components are:
 
 
 
-Algorithm
-=========
+Algorithms
+==========
 
 A number of generic algorithm implementations are provided including 
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
@@ -49,6 +49,8 @@ The :code:`Algorithm` provides the infrastructure to continue iteration, to acce
 objective function in subsequent iterations, the time for each iteration, and to provide a nice 
 print to screen of the status of the optimisation.
 
+Base class
+----------
 .. autoclass:: cil.optimisation.algorithms.Algorithm
    :members:
    :private-members:
@@ -58,41 +60,50 @@ GD
 --
 .. autoclass:: cil.optimisation.algorithms.GD
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
 CGLS
 ----
 .. autoclass:: cil.optimisation.algorithms.CGLS
-   :members:
+   :members: 
+   :inherited-members: run, update_objective_interval, max_iteration
 
 SIRT
 ----
 .. autoclass:: cil.optimisation.algorithms.SIRT
    :members: update, update_objective
+   :inherited-members: run, update_objective_interval, max_iteration
 
 FISTA
 -----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
 PDHG
 ----
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
+   :inherited-members: run, update_objective_interval, max_iteration
 
 LADMM
 -----
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
 SPDHG
 -----
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
-Operator
-========
+
+
+Operators
+=========
 The two most important methods are :code:`direct` and :code:`adjoint` 
 methods that describe the result of applying the operator, and its 
 adjoint respectively, onto a compatible :code:`DataContainer` input. 
@@ -181,8 +192,8 @@ In the following the required classes for the implementation of the :code:`Gradi
 
 
 
-Function
-========
+Functions
+=========
 
 A :code:`Function` represents a mathematical function of one or more inputs 
 and is intended to accept :code:`DataContainers` as input as well as any 

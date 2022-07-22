@@ -356,16 +356,16 @@ class PDHG(Algorithm):
         logging.info("{} configured".format(self.__class__.__name__, ))
 
 
-    def update_previous_solution(self):
-        # swap the pointers to current and previous solution
+    def _update_previous_solution(self):
+        """ Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
+        """  
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
 
 
     def get_output(self):
-        '''Returns the solution found'''
-        # returns the current solution
+        " Returns the current solution. "
         return self.x_old
 
 

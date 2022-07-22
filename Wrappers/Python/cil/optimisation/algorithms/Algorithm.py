@@ -288,7 +288,8 @@ class Algorithm(object):
                 if callback is not None:
                     callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
-                if (self.iteration % print_interval == 0) or self.iteration % self.update_objective_interval == 0:
+                if (print_interval != 0 and self.iteration % print_interval == 0) or \
+                        ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):
                     print (self.verbose_output(very_verbose))
 
         if verbose:

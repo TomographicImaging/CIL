@@ -1,5 +1,8 @@
 * 22.0.0
   - Added ISTA algorithm. Improve inheritance of proximal gradient algoritms.
+  - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes
+  - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
+  - Cleaned up unit test structure and output
   - Removal of deprecated code
     - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
     - `subset` method removed, use `get_slice` or `reorder` methods
@@ -14,6 +17,7 @@
   - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Fixes error when update_objective_interval is set to 0 in an algorithm run.
   - Deprecated:
     - TXRMDataReader is deprecated in favour of ZEISSDataReader 
   - GitHub Actions:

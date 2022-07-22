@@ -895,7 +895,7 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3) 
 
-    @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
+    @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
     def test_strongly_convex_CIL_FGP_TV(self):
 
         FGP_TV_no_strongly_convex = self.alpha * FGP_TV()

@@ -60,9 +60,9 @@ class TotalVariation(Function):
         Correlation between `Space` and/or `SpaceChannels` for the :class:`.GradientOperator`.
     backend :  :obj:`str`, default = `c`      
         Backend to compute the :class:`.GradientOperator`
-    lower : :obj:`'float`, default = `-np.inf`
+    lower : :obj:`'float`, default = None
         A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.
-    upper : :obj:`'float`, default = `np.inf`
+    upper : :obj:`'float`, default = None
         A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.  
     isotropic : :obj:`boolean`, default = True
         Use either isotropic or anisotropic definition of TV.
@@ -133,21 +133,26 @@ class TotalVariation(Function):
 
     """   
     
+
+
+
+
     
     def __init__(self,
                  max_iteration=100, 
                  tolerance = None, 
                  correlation = "Space",
                  backend = "c",
-                 lower = -np.inf, 
-                 upper = np.inf,
+                 lower = None,
+                 upper = None,
                  isotropic = True,
                  split = False,
                  info = False, 
                  strong_convexity_constant = 0):
-        
 
+        
         super(TotalVariation, self).__init__(L = None)
+
         # Regularising parameter = alpha
         self.regularisation_parameter = 1.
         
@@ -165,6 +170,10 @@ class TotalVariation(Function):
         self.backend = backend        
         
         # Define orthogonal projection onto the convex set C
+        if lower is None:
+            lower = -np.inf
+        if upper is None:
+            upper = np.inf            
         self.lower = lower
         self.upper = upper
         self.projection_C = IndicatorBox(lower, upper).proximal
@@ -230,7 +239,7 @@ class TotalVariation(Function):
         tmp1 = self.pptmp1
         tmp1 *= 0
         
-        if self.isotropic:
+        if self.isotropic:            
             for el in x.containers:
                 el.conjugate().multiply(el, out=tmp)
                 tmp1.add(tmp, out=tmp1)
@@ -246,7 +255,7 @@ class TotalVariation(Function):
             if out is None:
                 return x.divide(tmp1)
             else:
-                x.divide(tmp1, out=out)
+                x.divide(tmp1, out=out)    
 
     def proximal(self, x, tau, out = None):
 

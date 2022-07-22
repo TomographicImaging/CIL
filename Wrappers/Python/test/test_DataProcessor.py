@@ -781,7 +781,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
 
     @unittest.skipUnless(has_tomophantom and has_astra and has_nvidia, "Tomophantom or ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
-        corr = CentreOfRotationCorrector.image_sharpness(backend='astra',FBP=FBP)
+        corr = CentreOfRotationCorrector.image_sharpness(backend='astra')
         ad_out = corr(self.data_0)
         self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 

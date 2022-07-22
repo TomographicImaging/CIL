@@ -17,6 +17,7 @@
   - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Raise exception if filename or data haven't been set in NexusDataWriter
   - Fixes error when update_objective_interval is set to 0 in an algorithm run.
   - Deprecated:
     - TXRMDataReader is deprecated in favour of ZEISSDataReader 

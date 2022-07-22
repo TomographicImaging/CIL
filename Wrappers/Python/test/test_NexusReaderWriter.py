@@ -84,7 +84,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         im = ig.allocate('random',seed=9)
 
         writer = NEXUSDataWriter()
-        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'),
+        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
                       data = im, compression=16)
         writer.write()
 
@@ -92,6 +92,28 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertTrue(writer.compression == 16)
 
         self.readImageDataAndTest(atol=1e-4)
+
+    def test_write_throws_when_data_is_none(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(file_name='test_file_name.nxs')
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Data to write out must be set.')
+
+    def test_write_throws_when_file_is_none(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(data=self.ad2d)
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Path to nexus file to write to is required.')
+
+    def test_write_throws_when_file_is_not_path_like(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(file_name=self.ad2d , data=self.ad2d)
+            writer.write()
+
+    def test_write_throws_when_file_path_not_possible(self):
+        with self.assertRaises(OSError):
+            writer = NEXUSDataWriter(file_name="_/_/_" , data=self.ad2d)
+            writer.write()
 
 
     def readImageDataAndTest(self,atol=0):        
@@ -145,7 +167,5 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d
-        
-        
-if __name__ == '__main__':
-    unittest.main()
+
+

@@ -1,5 +1,6 @@
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions.
+  - Added ISTA algorithm. Improve inheritance of proximal gradient algoritms.
   - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes
   - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
   - Cleaned up unit test structure and output
@@ -17,6 +18,7 @@
   - Add ndim property for DataContainer class.
   - Fixes show_geometry compatibility issue with matplotlib 3.5
   - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Raise exception if filename or data haven't been set in NexusDataWriter
   - Fixes error when update_objective_interval is set to 0 in an algorithm run.
   - Deprecated:
     - TXRMDataReader is deprecated in favour of ZEISSDataReader 
@@ -24,11 +26,11 @@
     - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
 
 * 21.4.1
-  - Removed prints from unittests and cleanup of unittest code.
-  - CMake: 
-    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
-  - TIFF writer uses logging
-  - Added unittests for TIFF functionality
+ - Removed prints from unittests and cleanup of unittest code.
+ - CMake: 
+   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+ - TIFF writer uses logging
+ - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version

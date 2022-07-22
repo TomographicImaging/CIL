@@ -89,7 +89,7 @@ class TestISTA(unittest.TestCase):
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
-        for _ in range(10):         
+        for _ in range(1):         
             x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
             x_old.fill(x)
 

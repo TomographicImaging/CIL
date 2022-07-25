@@ -24,8 +24,8 @@ Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
 and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of 
-:code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
-the generic optimisation problem to be solved.
+instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to 
+define a specific instance of the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop. 
 The user can provide a stopping criterion different than the default max_iteration.
 

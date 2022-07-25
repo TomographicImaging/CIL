@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cil.optimisation.functions import Function, IndicatorBox, MixedL21Norm
+from cil.optimisation.functions import Function, IndicatorBox, MixedL21Norm, MixedL11Norm
 from cil.optimisation.operators import GradientOperator
 import numpy as np
 from numbers import Number
@@ -181,9 +181,6 @@ class TotalVariation(Function):
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__     
         self._gradient = None
         self._domain = None
-
-        self.pptmp = None
-        self.pptmp1 = None
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
@@ -193,6 +190,12 @@ class TotalVariation(Function):
 
         # Strong convexity for TV
         self.strong_convexity_constant = strong_convexity_constant
+
+        # Define Total variation norm
+        if self.isotropic:
+            self.func = MixedL21Norm()
+        else:
+            self.func = MixedL11Norm()
 
     @property
     def regularisation_parameter(self):
@@ -223,40 +226,9 @@ class TotalVariation(Function):
         else:
             strongly_convex_term = 0
 
-        if self.isotropic:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum() + strongly_convex_term
-        else:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() + strongly_convex_term
-    
-                        
-    def projection_P(self, x, out=None):
-                       
-        r""" Returns the proximal operator of the convex conjugate of the :class:`.MixedL21Norm` at :code:`x`.
-        """
-        
-        # preallocated in proximal
-        tmp = self.pptmp
-        tmp1 = self.pptmp1
-        tmp1 *= 0
-        
-        if self.isotropic:            
-            for el in x.containers:
-                el.conjugate().multiply(el, out=tmp)
-                tmp1.add(tmp, out=tmp1)
-            tmp1.sqrt(out=tmp1)
-            tmp1.maximum(1.0, out=tmp1)
-            if out is None:
-                return x.divide(tmp1)
-            else:
-                x.divide(tmp1, out=out)
-        else:
-            tmp1 = x.abs()
-            tmp1.maximum(1.0, out=tmp1) 
-            if out is None:
-                return x.divide(tmp1)
-            else:
-                x.divide(tmp1, out=out)    
+        return self.regularisation_parameter * self.func(self.gradient.direct(x)) + strongly_convex_term
 
+                            
     def proximal(self, x, tau, out = None):
 
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""        
@@ -333,13 +305,11 @@ class TotalVariation(Function):
                     p1 += tmp_q
             else:
                 p1 += tmp_q
-            if k == 0:
-                # preallocate for projection_P
-                self.pptmp = p1.get_item(0) * 0
-                self.pptmp1 = self.pptmp.copy()
 
-            self.projection_P(p1, out=p1)
-            
+            # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixeL21Norm (isotropic case),
+            # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.
+            p1 =  self.func.proximal_conjugate(p1, tau = 1.0)
+                       
             t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
             
             # tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
@@ -350,11 +320,7 @@ class TotalVariation(Function):
 
             if should_break:
                 break
-        
-        #clear preallocated projection_P arrays
-        self.pptmp = None
-        self.pptmp1 = None
-        
+                
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:
             if self.tolerance is not None:

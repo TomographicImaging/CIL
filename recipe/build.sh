@@ -1,9 +1,3 @@
-mkdir -p ${SRC_DIR}/cil/Wrappers/Python
-cp -r "${RECIPE_DIR}/../Wrappers/Python/test" ${SRC_DIR}/cil/Wrappers/Python
-
-mkdir ${SRC_DIR}/build_framework
-cd ${SRC_DIR}/build_framework
-
 if [ `python -c "from __future__ import print_function; import platform; print (platform.system())"`  == "Darwin" ] ;
 then 
   echo "Darwin"; 

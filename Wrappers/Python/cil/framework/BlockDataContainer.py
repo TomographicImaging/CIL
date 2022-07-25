@@ -48,7 +48,7 @@ class BlockDataContainer(object):
     MULTIPLY  = 'multiply'
     DIVIDE    = 'divide'
     POWER     = 'power'
-    AXPBY     = 'axpby'
+    SAPYB     = 'sapyb'
     MAXIMUM   = 'maximum'
     MINIMUM   = 'minimum'
     ABS       = 'abs'
@@ -57,6 +57,11 @@ class BlockDataContainer(object):
     CONJUGATE = 'conjugate'
     __array_priority__ = 1
     __container_priority__ = 2
+
+    @property
+    def dtype(self):
+        return tuple(i.dtype for i in self.containers)    
+
     def __init__(self, *args, **kwargs):
         ''''''
         self.containers = args
@@ -99,10 +104,7 @@ class BlockDataContainer(object):
             return True   
         elif isinstance(other, (list, tuple, numpy.ndarray)) :
             for ot in other:
-                if not isinstance(ot, (Number,\
-                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
-                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
-                                 numpy.complex)):
+                if not isinstance(ot, Number):
                     raise ValueError('List/ numpy array can only contain numbers {}'\
                                      .format(type(ot)))
             return len(self.containers) == len(other)
@@ -207,7 +209,7 @@ class BlockDataContainer(object):
         else:
             return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 
-    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+    def sapyb(self, a, y, b, out, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -216,12 +218,30 @@ class BlockDataContainer(object):
         :param b: scalar
         :param y: compatible (Block)DataContainer
         :param out: (Block)DataContainer to store the result
-        :param dtype: optional, data type of the DataContainers
+        
+
+        Example:
+        --------
+
+        a = 2
+        b = 3
+        ig = ImageGeometry(10,11)
+        x = ig.allocate(1)
+        y = ig.allocate(2)
+        bdc1 = BlockDataContainer(2*x, y)
+        bdc2 = BlockDataContainer(x, 2*y)
+        out = bdc1.sapyb(a,bdc2,b)
         '''
         if out is None:
             raise ValueError("out container cannot be None")
-        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype, 'num_threads': NUM_THREADS}
-        self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
+        kwargs = {'a':a, 'b':b, 'out':out, 'num_threads': NUM_THREADS}
+        self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
+
+
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+        '''Deprecated method. Alias of sapyb'''
+        return self.sapyb(a,y,b,out,num_threads)
+
 
 
     def binary_operations(self, operation, other, *args, **kwargs):
@@ -267,13 +287,13 @@ class BlockDataContainer(object):
             else:
                 return type(self)(*res, shape=self.shape)
         elif isinstance(other, (list, tuple, numpy.ndarray, BlockDataContainer)):
-            # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
             if isinstance(other, BlockDataContainer):
                 the_other = other.containers
             else:
                 the_other = other
+
             for i,zel in enumerate(zip ( self.containers, the_other) ):
                 el = zel[0]
                 ot = zel[1]
@@ -291,18 +311,28 @@ class BlockDataContainer(object):
                     op = el.maximum
                 elif operation == BlockDataContainer.MINIMUM:
                     op = el.minimum
-                elif operation == BlockDataContainer.AXPBY:
+                elif operation == BlockDataContainer.SAPYB:
                     if not isinstance(other, BlockDataContainer):
                         raise ValueError("{} cannot handle {}".format(operation, type(other)))
-                    op = el.axpby
+                    op = el.sapyb
                 else:
                     raise ValueError('Unsupported operation', operation)
+
                 if out is not None:
-                    kw['out'] = out.get_item(i)
-                    if operation == BlockDataContainer.AXPBY:
-                        kw['y'] = ot
-                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], dtype=kw['dtype'], num_threads=kw['num_threads'])
+                    if operation == BlockDataContainer.SAPYB:
+                        if isinstance(kw['a'], BlockDataContainer):
+                            a = kw['a'].get_item(i)
+                        else:
+                            a = kw['a']
+
+                        if isinstance(kw['b'], BlockDataContainer):
+                            b = kw['b'].get_item(i)
+                        else:
+                            b = kw['b']
+
+                        el.sapyb(a, ot, b, out.get_item(i), num_threads=kw['num_threads'])
                     else:
+                        kw['out'] = out.get_item(i)
                         op(ot, *args, **kw)
                 else:
                     res.append(op(ot, *args, **kw))
@@ -310,12 +340,11 @@ class BlockDataContainer(object):
                 return
             else:
                 return type(self)(*res, shape=self.shape)
-            return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
-            if operation != BlockDataContainer.AXPBY:
-                # remove keyworded argument related to AXPBY
+            if operation != BlockDataContainer.SAPYB:
+                # remove keyworded argument related to SAPYB
                 for k in ['a','b','y', 'num_threads', 'dtype']:
                     if k in kw.keys():
                         kw.pop(k)
@@ -336,12 +365,23 @@ class BlockDataContainer(object):
                     op = el.maximum
                 elif operation == BlockDataContainer.MINIMUM:
                     op = el.minimum
-                elif operation == BlockDataContainer.AXPBY:
-                    # As out cannot be None, it is safe to continue the 
-                    # for loop after the call to axpby
-                    kw['out'] = out.get_item(i)
-                    el.axpby(kw['a'], kw['b'], other, kw['out'], kw['dtype'], kw['num_threads'])
+                elif operation == BlockDataContainer.SAPYB:
+
+                    if isinstance(kw['a'], BlockDataContainer):
+                        a = kw['a'].get_item(i)
+                    else:
+                        a = kw['a']
+
+                    if isinstance(kw['b'], BlockDataContainer):
+                        b = kw['b'].get_item(i)
+                    else:
+                        b = kw['b']
+
+                    el.sapyb(a, other, b, out.get_item(i), kw['num_threads'])
+
+                    # As axpyb cannot return anything we `continue` to skip the rest of the code block
                     continue
+
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
@@ -349,6 +389,7 @@ class BlockDataContainer(object):
                     op(other, *args, **kw)
                 else:
                     res.append(op(other, *args, **kw))
+
             if out is not None:
                 return
             else:
@@ -427,7 +468,7 @@ class BlockDataContainer(object):
         if p==1:            
             return sum(self.abs())        
         elif p==2:                 
-            tmp = functools.reduce(lambda a,b: a + b*b, self.containers, self.get_item(0) * 0 ).sqrt()            
+            tmp = functools.reduce(lambda a,b: a + b.conjugate()*b, self.containers, self.get_item(0) * 0 ).sqrt()            
             return tmp      
         else:
             return ValueError('Not implemented')

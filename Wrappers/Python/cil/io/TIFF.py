@@ -30,6 +30,10 @@ import glob
 import re
 import numpy as np
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
     
@@ -69,8 +73,8 @@ class TIFFWriter(object):
             )[0]
         
         self.dir_name = os.path.dirname(file_name)
-        print ("dir_name" , self.dir_name)
-        print ("file_name", self.file_name)
+        logger.info ("dir_name {}".format(self.dir_name))
+        logger.info ("file_name {}".format(self.file_name))
         self.counter_offset = counter_offset
         
         if not ((isinstance(self.data_container, ImageData)) or 
@@ -271,10 +275,10 @@ class TIFFStackReader(object):
         elif os.path.isfile(file_name):
             self._tiff_files = [file_name]
         elif os.path.isdir(file_name): 
-            self._tiff_files = glob.glob(os.path.join(file_name,"*.tif"))
+            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tif"))
             
             if not self._tiff_files:
-                self._tiff_files = glob.glob(os.path.join(file_name,"*.tiff"))
+                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tiff"))
 
             if not self._tiff_files:
                 raise Exception("No tiff files were found in the directory \n{}".format(file_name))
@@ -296,7 +300,7 @@ class TIFFStackReader(object):
     def _get_file_type(self, img): 
         mode = img.mode
         if mode == '1':
-            dtype = np.bool
+            dtype = np.bool_
         elif mode == 'L':
             dtype = np.uint8
         elif mode == 'F':
@@ -364,11 +368,9 @@ class TIFFStackReader(object):
                     index = int(roi_par[0][0] + i * roi_par[0][2] + j)
                     filename = os.path.abspath(self._tiff_files[index])
 
-                    try:
-                        raw += np.asarray(Image.open(filename), dtype = self.dtype)
-                    except:
-                        print('Error reading\n {}\n file.'.format(filename))
-                        raise
+                    arr = Image.open(filename)
+                    raw += np.asarray(arr, dtype = self.dtype)
+                    
                         
                 shape = (n_rows, roi_par[1][2], 
                          n_cols, roi_par[2][2])
@@ -382,9 +384,9 @@ class TIFFStackReader(object):
                     
         else: # slice mode
             # calculate number of pixels
-            n_rows = np.int(np.ceil((roi_par[1][1] - roi_par[1][0]) / roi_par[1][2]))
-            n_cols = np.int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))
-            num_to_read = np.int(np.ceil((roi_par[0][1] - roi_par[0][0]) / roi_par[0][2]))
+            n_rows = int(np.ceil((roi_par[1][1] - roi_par[1][0]) / roi_par[1][2]))
+            n_cols = int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))
+            num_to_read = int(np.ceil((roi_par[0][1] - roi_par[0][0]) / roi_par[0][2]))
             
             if not self.transpose:
                 im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)

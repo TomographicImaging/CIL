@@ -9,7 +9,7 @@
 
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-#   Unless required by applicable law or agreed to in writing, software
+#   Unless required by applicable law or agreed to in writing, software 
 #   distributed under the License is distributed on an "AS IS" BASIS,
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
@@ -22,8 +22,11 @@ from numbers import Number
 import ctypes, platform
 from ctypes import util
 import math
+import weakref
+
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
+
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'
 elif platform.system() == 'Windows':
@@ -35,12 +38,6 @@ else:
     raise ValueError('Not supported platform, ', platform.system())
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
-
-#default nThreads
-# import multiprocessing
-# cpus = multiprocessing.cpu_count()
-# NUM_THREADS = max(int(cpus/2),1)
-
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -137,7 +134,7 @@ class ImageGeometry(object):
                         .format(labels_default,labels))
                     
             self.__dimension_labels = tuple(labels)
-
+        
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
@@ -160,6 +157,14 @@ class ImageGeometry(object):
         
         return False
 
+    @property
+    def dtype(self):
+        return self._dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self._dtype = val           
+
     def __init__(self, 
                  voxel_num_x=0, 
                  voxel_num_y=0, 
@@ -173,12 +178,12 @@ class ImageGeometry(object):
                  channels=1, 
                  **kwargs):
         
-        self.voxel_num_x = voxel_num_x
-        self.voxel_num_y = voxel_num_y
-        self.voxel_num_z = voxel_num_z
-        self.voxel_size_x = voxel_size_x
-        self.voxel_size_y = voxel_size_y
-        self.voxel_size_z = voxel_size_z
+        self.voxel_num_x = int(voxel_num_x)
+        self.voxel_num_y = int(voxel_num_y)
+        self.voxel_num_z = int(voxel_num_z)
+        self.voxel_size_x = float(voxel_size_x)
+        self.voxel_size_y = float(voxel_size_y)
+        self.voxel_size_z = float(voxel_size_z)
         self.center_x = center_x
         self.center_y = center_y
         self.center_z = center_z  
@@ -186,23 +191,8 @@ class ImageGeometry(object):
         self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
+        self.dtype = kwargs.get('dtype', numpy.float32)
 
-    def subset(self, dimensions=None, **kw):
-        '''Returns a new sliced and/or reshaped ImageGeometry'''
-
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
-            
-            temp = self.copy()
-            temp.set_labels(dimensions)
-            return temp      
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
@@ -285,13 +275,15 @@ class ImageGeometry(object):
 
         return repres
     def allocate(self, value=0, **kwargs):
-        '''allocates an ImageData according to the size expressed in the instance'''
-        if value == 'random_int':
-            dtype = kwargs.get('dtype', numpy.int32)
-            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-                raise ValueError('Expecting int type, got {}'.format(dtype))
-        else:
-            dtype = kwargs.get('dtype', numpy.float32)
+        '''allocates an ImageData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block, default 0
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        '''
+
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
@@ -308,7 +300,7 @@ class ImageGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                if numpy.iscomplexobj(out.array):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else: 
@@ -318,25 +310,15 @@ class ImageGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
 
         return out
-    # The following methods return 2 members of the class, therefore I 
-    # don't think we need to implement them. 
-    # Additionally using __len__ is confusing as one would think this is 
-    # an iterable. 
-    #def __len__(self):
-    #    '''returns the length of the geometry'''
-    #    return self.length
-    #def shape(self):
-    #    '''Returns the shape of the array of the ImageData it describes'''
-    #    return self.shape
-        
-
+    
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
      '''
@@ -355,7 +337,11 @@ class ComponentDescription(object):
     @staticmethod   
     def CreateUnitVector(val):
         vec = ComponentDescription.CreateVector(val)
-        vec = (vec/numpy.sqrt(vec.dot(vec)))
+        dot_product = vec.dot(vec)
+        if abs(dot_product)>1e-8:
+            vec = (vec/numpy.sqrt(dot_product))
+        else:
+            raise ValueError("Can't return a unit vector of a zero magnitude vector")
         return vec
 
     def length_check(self, val):
@@ -453,6 +439,11 @@ class Detector2D(PositionVector):
 class SystemConfiguration(object):
     r'''This is a generic class to hold the description of a tomography system
      '''
+
+    SYSTEM_SIMPLE = 'simple' 
+    SYSTEM_OFFSET = 'offset' 
+    SYSTEM_ADVANCED = 'advanced' 
+
     @property
     def dimension(self):
         if self._dimension == 2:
@@ -506,10 +497,69 @@ class SystemConfiguration(object):
         """   
         raise NotImplementedError
 
+    @staticmethod
+    def rotation_vec_to_y(vec):
+        ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]'''
+    
+        vec = ComponentDescription.CreateUnitVector(vec)
+
+        axis_rotation = numpy.eye(len(vec))
+
+        if numpy.allclose(vec[:2],[0,1]):
+            pass
+        elif numpy.allclose(vec[:2],[0,-1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(vec[0],vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        return axis_rotation
+
+    @staticmethod
+    def rotation_vec_to_z(vec):
+        ''' returns a rotation matrix that will align vec with the z-direction [0,0,1]'''
+
+        vec = ComponentDescription.CreateUnitVector(vec)
+
+        if len(vec) == 2:
+            return numpy.array([[1, 0],[0, 1]])
+
+        elif len(vec) == 3:
+            axis_rotation = numpy.eye(3)
+
+            if numpy.allclose(vec,[0,0,1]):
+                pass
+            elif numpy.allclose(vec,[0,0,-1]):
+                axis_rotation = numpy.eye(3)
+                axis_rotation[1][1] = -1
+                axis_rotation[2][2] = -1
+            else:
+                vx = numpy.array([[0, 0, -vec[0]], [0, 0, -vec[1]], [vec[0], vec[1], 0]])
+                axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + vec[2])
+
+        else:
+            raise ValueError("Vec must have length 3, got {}".format(len(vec)))
+    
+        return axis_rotation
+
     def update_reference_frame(self):
-        """Returns the components of the system in the reference frame of the rotation axis at position 0
-        """      
-        raise NotImplementedError
+        r'''Transforms the system origin to the rotation_axis position
+        '''   
+        self.set_origin(self.rotation_axis.position)
+
+
+    def set_origin(self, origin):
+        r'''Transforms the system origin to the input origin
+        '''   
+        if hasattr(self,'source'):              
+            self.source.position -= origin
+
+        self.detector.position -= origin
+        self.rotation_axis.position -= origin
+
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
@@ -523,6 +573,13 @@ class SystemConfiguration(object):
         :return: returns [dist_source_center, dist_center_detector, magnification],  [0] distance from the source to the rotate axis, [1] distance from the rotate axis to the detector, [2] magnification of the system
         :rtype: list
         '''
+        raise NotImplementedError
+  
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''         
         raise NotImplementedError
 
     def copy(self):
@@ -556,11 +613,40 @@ class Parallel2D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
-    def update_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis
-        '''         
-        self.detector.position -= self.rotation_axis.position
-        self.rotation_axis.position = [0,0]
+
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''
+        #in this instance defintions are the same
+        if definition not in ['cil','tigre']:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+
+        self.set_origin(self.rotation_axis.position)
+
+        rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
+
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(2,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
+        self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''       
+        new = self.copy()
+        new.align_reference_frame('cil')
+
+        dot_prod = new.ray.direction.dot(new.detector.direction_x)
+
+        if abs(dot_prod)>1e-10:
+            return SystemConfiguration.SYSTEM_ADVANCED
+        elif abs(new.detector.position[0])>1e-10:
+            return SystemConfiguration.SYSTEM_OFFSET 
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+
 
     def __str__(self):
         def csv(val):
@@ -625,33 +711,13 @@ class Parallel3D(SystemConfiguration):
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
 
-    def update_reference_frame(self):
+    def align_z(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''          
-        #shift detector
-        self.detector.position = (self.detector.position - self.rotation_axis.position)
-        self.rotation_axis.position = [0,0,0]
+        self.set_origin(self.rotation_axis.position)
 
         #calculate rotation matrix to align rotation axis direction with z
-        a = self.rotation_axis.direction
-
-        if numpy.allclose(a,[0,0,1]):
-            return
-        elif numpy.allclose(a,[0,0,-1]):
-            axis_rotation = numpy.eye(3)
-            axis_rotation[1][1] = -1
-            axis_rotation[2][2] = -1
-        else:
-            vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
-            axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-        
-        rotation_matrix = numpy.matrix(axis_rotation)
-
-        #sanity check
-        new_rotation_axis_direction = rotation_matrix.dot(self.rotation_axis.direction.reshape(3,1))
-
-        if not numpy.allclose(new_rotation_axis_direction.flatten(), [0,0,1], atol=1e-7):
-            raise ValueError("Failed to align reference frame")
+        rotation_matrix = SystemConfiguration.rotation_vec_to_z(self.rotation_axis.direction)
 
         #apply transform
         self.rotation_axis.direction = [0,0,1]
@@ -660,6 +726,49 @@ class Parallel3D(SystemConfiguration):
         new_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
+
+
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''
+        #in this instance defintions are the same
+        if definition not in ['cil','tigre']:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+
+        self.align_z()
+        rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
+                
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
+        new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
+        new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
+        self.detector.set_direction(new_direction_x, new_direction_y)
+
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''              
+        new = self.copy()
+        new.align_reference_frame('cil')
+
+
+        dot_prod_a = new.ray.direction.dot(new.detector.direction_x)
+        dot_prod_b = new.ray.direction.dot(new.detector.direction_y)
+        dot_prod_c = new.detector.direction_x.dot(new.rotation_axis.direction)
+        dot_prod_d = new.ray.direction.dot(new.rotation_axis.direction)
+
+        if abs(dot_prod_a)>1e-10 or\
+            abs(dot_prod_b)>1e-10 or\
+            abs(dot_prod_c)>1e-10 or\
+            abs(dot_prod_d)>1e-10: 
+            return SystemConfiguration.SYSTEM_ADVANCED
+        elif abs(new.detector.position[0])>1e-6:
+            return SystemConfiguration.SYSTEM_OFFSET
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+        
 
     def __str__(self):
         def csv(val):
@@ -704,7 +813,7 @@ class Parallel3D(SystemConfiguration):
             temp = self.copy()
 
             #convert to rotation axis reference frame
-            temp.update_reference_frame()
+            temp.align_reference_frame()
 
             ray_direction = temp.ray.direction[0:2]
             detector_position = temp.detector.position[0:2]
@@ -745,12 +854,40 @@ class Cone2D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
-    def update_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis
-        '''                  
-        self.source.position -= self.rotation_axis.position
-        self.detector.position -= self.rotation_axis.position
-        self.rotation_axis.position = [0,0]
+
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''
+        self.set_origin(self.rotation_axis.position)
+
+        if definition=='cil':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
+        elif definition=='tigre':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
+        else:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(2,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
+        self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''           
+        new = self.copy()
+        new.align_reference_frame('cil')
+        dot_prod = (new.detector.position - new.source.position).dot(new.detector.direction_x)
+
+        if abs(dot_prod)>1e-10:
+            return SystemConfiguration.SYSTEM_ADVANCED
+        elif abs(new.detector.position[0])>1e-10:
+            return SystemConfiguration.SYSTEM_OFFSET 
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+
 
     def __str__(self):
         def csv(val):
@@ -837,33 +974,11 @@ class Cone3D(SystemConfiguration):
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
 
-    def update_reference_frame(self):
+    def align_z(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
-        '''                  
-        #shift 
-        self.detector.position = (self.detector.position - self.rotation_axis.position)
-        self.source.position = (self.source.position - self.rotation_axis.position)
-        self.rotation_axis.position = [0,0,0]
-
-        #calculate rotation matrix to align rotation axis direction with z
-        a = self.rotation_axis.direction
-        if numpy.allclose(a,[0,0,1]):
-            return
-        elif numpy.allclose(a,[0,0,-1]):
-            axis_rotation = numpy.eye(3)
-            axis_rotation[1][1] = -1
-            axis_rotation[2][2] = -1
-        else:
-            vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
-            axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-    
-        rotation_matrix = numpy.matrix(axis_rotation)
-
-        #sanity check
-        new_rotation_axis_direction = rotation_matrix.dot(self.rotation_axis.direction.reshape(3,1))
-
-        if not numpy.allclose(new_rotation_axis_direction.flatten(), [0,0,1], atol=1e-7):
-            raise ValueError("Failed to align reference frame")
+        '''
+        self.set_origin(self.rotation_axis.position)   
+        rotation_matrix = SystemConfiguration.rotation_vec_to_z(self.rotation_axis.direction)
     
         #apply transform
         self.rotation_axis.direction = [0,0,1]
@@ -873,17 +988,63 @@ class Cone3D(SystemConfiguration):
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
+
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''            
+
+        self.align_z()
+
+        if definition=='cil':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
+        elif definition=='tigre':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
+        else:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+                            
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
+        new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
+        new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
+        self.detector.set_direction(new_direction_x, new_direction_y)
+
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''       
+        new = self.copy()
+        new.align_reference_frame('cil')
+
+        dot_prod_a = (new.detector.position - new.source.position).dot(new.detector.direction_x)
+        dot_prod_b = (new.detector.position - new.source.position).dot(new.detector.direction_y)
+        dot_prod_c = (new.detector.direction_x).dot(new.rotation_axis.direction)
+        dot_prod_d = (new.detector.position - new.source.position).dot(new.rotation_axis.direction)
+
+        if abs(dot_prod_a)>1e-10 or\
+            abs(dot_prod_b)>1e-10 or\
+            abs(dot_prod_c)>1e-10 or\
+            abs(dot_prod_d)>1e-10: 
+            return SystemConfiguration.SYSTEM_ADVANCED
+
+        elif abs(new.detector.position[0])>1e-10:
+            return SystemConfiguration.SYSTEM_OFFSET
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+
+
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """ 
-        #requires the rotate axis to be perpendicular to the detector, and parallel to detector_direction_y
+        #requires the rotate axis to be perpendicular to the normal of the detector, and perpendicular to detector_direction_x
         vec1= numpy.cross(self.detector.direction_x, self.detector.direction_y)  
         dp1 = self.rotation_axis.direction.dot(vec1)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)
         
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
             temp = self.copy()
-            temp.update_reference_frame()
+            temp.align_reference_frame()
             source_position = temp.source.position[0:2]
             detector_position = temp.detector.position[0:2]
             detector_direction_x = temp.detector.direction_x[0:2]
@@ -994,7 +1155,7 @@ class Panel(object):
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
             raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
         else:
-            self.__num_pixels = num_pixels_temp
+            self.__num_pixels = numpy.array(num_pixels_temp, dtype=numpy.int16)
 
     @property
     def pixel_size(self):
@@ -1029,7 +1190,7 @@ class Panel(object):
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
-        self.__pixel_size = pixel_size_temp
+        self.__pixel_size = numpy.array(pixel_size_temp)
 
     @property
     def origin(self):
@@ -1055,7 +1216,7 @@ class Panel(object):
         if not isinstance(other, self.__class__):
             return False
         
-        if self.num_pixels == other.num_pixels \
+        if numpy.array_equal(self.num_pixels, other.num_pixels) \
             and numpy.allclose(self.pixel_size, other.pixel_size) \
             and self.origin == other.origin:   
             return True
@@ -1277,6 +1438,7 @@ class Configuration(object):
 
         return False
 
+
 class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
     
@@ -1325,6 +1487,10 @@ class AcquisitionGeometry(object):
     @property
     def geom_type(self):
         return self.config.system.geometry
+
+    @property
+    def num_projections(self):
+        return len(self.angles)       
 
     @property
     def pixel_num_h(self):
@@ -1399,9 +1565,6 @@ class AcquisitionGeometry(object):
 
         return tuple(shape)
 
-    @shape.setter
-    def shape(self, val):
-        print("Deprecated - shape will be set automatically")
 
     @property
     def dimension_labels(self):
@@ -1443,65 +1606,22 @@ class AcquisitionGeometry(object):
             self.__dimension_labels = tuple(val)
 
 
-    def __init__(self,
-                geom_type, 
-                dimension=None,
-                angles=None, 
-                pixel_num_h=1, 	
-                pixel_size_h=1,
-                pixel_num_v=1,
-                pixel_size_v=1,
-                dist_source_center=None,
-                dist_center_detector=None,
-                channels=1,
-                ** kwargs):
+    @property
+    def system_description(self):
+        return self.config.system.system_description()
 
-        """Constructor method
-        """
+    @property
+    def dtype(self):
+        return self._dtype
 
-        #backward compatibility
-        new_setup = kwargs.get('new_setup', False)
-
-        #set up old geometry        
-        if new_setup is False:
-            self.config = Configuration()
-            
-            if angles is None:
-                raise ValueError("AcquisitionGeometry not configured. Parameter 'angles' is required")
-
-            if geom_type == AcquisitionGeometry.CONE:
-                if dist_source_center is None:
-                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_source_center' is required")
-                if dist_center_detector is None:
-                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_center_detector' is required")
-
-            if pixel_num_v > 1:
-                dimension = 3
-                num_pixels = [pixel_num_h, pixel_num_v]
-                pixel_size = [pixel_size_h, pixel_size_v]
-                if geom_type == AcquisitionGeometry.CONE:
-                    self.config.system = Cone3D(source_pos=[0,-dist_source_center,0], detector_pos=[0,dist_center_detector,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
-                else:
-                    self.config.system = Parallel3D(ray_direction=[0,1,0], detector_pos=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
-            else:
-                dimension = 2
-                num_pixels = [pixel_num_h, 1]
-                pixel_size = [pixel_size_h, pixel_size_h]                
-                if geom_type == AcquisitionGeometry.CONE:
-                    self.config.system = Cone2D(source_pos=[0,-dist_source_center], detector_pos=[0,dist_center_detector], detector_direction_x=[1,0], rotation_axis_pos=[0,0])
-                else:
-                    self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_x=[1,0], rotation_axis_pos=[0,0])
+    @dtype.setter
+    def dtype(self, val):
+        self._dtype = val       
 
 
-            self.config.panel = Panel(num_pixels, pixel_size, 'bottom-left', dimension)  
-            self.config.channels = Channels(channels, channel_labels=None)  
-            self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
+    def __init__(self):
+        self._dtype = numpy.float32
 
-            self.dimension_labels = kwargs.get('dimension_labels', None)
-            if self.config.configured:
-                print("AcquisitionGeometry configured using deprecated method")
-            else:
-                raise ValueError("AcquisitionGeometry not configured")
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
         r'''This method configures the angular information of an AcquisitionGeometry object. 
@@ -1575,7 +1695,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry
         '''
-        AG = AcquisitionGeometry('', new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position)
         return AG    
@@ -1595,7 +1715,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry        
      '''    
-        AG = AcquisitionGeometry('', new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
         return AG   
@@ -1619,7 +1739,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry       
      '''
-        AG = AcquisitionGeometry('', new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction)
         return AG            
@@ -1643,7 +1763,7 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry           
         '''
-        AG = AcquisitionGeometry('',  new_setup=True)
+        AG = AcquisitionGeometry()
         AG.config = Configuration()
         AG.config.system = Cone3D(source_position, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction)
         return AG          
@@ -1701,22 +1821,6 @@ class AcquisitionGeometry(object):
     def __str__ (self):
         return str(self.config)
 
-    def subset(self, dimensions=None, **kw):
-        '''Returns a new sliced and/or reshaped AcquisitionGeometry'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
- 
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
-
-            temp = self.copy()
-            temp.set_labels(dimensions)
-            return temp        
 
     def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
         '''
@@ -1748,17 +1852,10 @@ class AcquisitionGeometry(object):
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
         :type value: number or string, default None allocates empty memory block
-        :param dimension_labels: labels for the dimension axis
-        :type list: default None
         :param dtype: numerical type to allocate
         :type dtype: numpy type, default numpy.float32
         '''
-        if value == 'random_int':
-            dtype = kwargs.get('dtype', numpy.int32)
-            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-                raise ValueError('Expecting int type, got {}'.format(dtype))
-        else:
-            dtype = kwargs.get('dtype', numpy.float32)
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
@@ -1775,7 +1872,7 @@ class AcquisitionGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                if numpy.iscomplexobj(out.array):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else:
@@ -1785,7 +1882,8 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
             else:
@@ -1822,15 +1920,20 @@ class DataContainer(object):
     def dimension_labels(self, val):
         if val is None:
             self.__dimension_labels = None
-        elif len(val)==self.number_of_dimensions:
+        elif len(list(val))==self.number_of_dimensions:
             self.__dimension_labels = tuple(val)
         else:
-            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, labels))
+            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
     @property
     def shape(self):
-        '''Returns the shape of the  of the DataContainer'''
+        '''Returns the shape of the DataContainer'''
         return self.array.shape
+
+    @property
+    def ndim(self):
+        '''Returns the ndim of the DataContainer'''
+        return self.array.ndim        
 
     @shape.setter
     def shape(self, val):
@@ -1843,7 +1946,9 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the type of the data array'''
+        '''Returns the dtype of the data array. 
+           If geometry exists, the dtype of the geometry = dtype of the array'''                          
+        self.geometry.dtype = self.array.dtype       
         return self.array.dtype
 
     @property
@@ -1869,9 +1974,13 @@ class DataContainer(object):
         if type(self) is DataContainer:
             self.dimension_labels = dimension_labels
 
-        # finally copy the geometry
+        # finally copy the geometry, and force dtype of the geometry of the data = the dype of the data
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
+            try:
+                self.geometry.dtype = self.dtype            
+            except:
+                pass    
         
     def get_dimension_size(self, dimension_label):
 
@@ -1894,20 +2003,6 @@ class DataContainer(object):
         '''
         return self.array
 
-    def subset(self, dimensions=None, **kw):
-        '''Creates a DataContainer containing a subset of self according to the 
-        labels in dimensions'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            temp = self.copy()
-            temp.reorder(dimensions)
-            return temp
 
     def get_slice(self,**kw):
         '''
@@ -1942,7 +2037,7 @@ class DataContainer(object):
         :type order: list, sting     
         '''
 
-        if order == 'astra' or order == 'tigre':
+        if order in DataOrder.ENGINES:
             order = DataOrder.get_order_for_engine(order, self.geometry)  
 
         try:
@@ -1995,17 +2090,25 @@ class DataContainer(object):
             if isinstance(array, numpy.ndarray):
                 if array.shape != self.shape:
                     raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting {0} got {1}'.format(
+                                     'Expecting shape {0} got {1}'.format(
                                      self.shape,array.shape))
                 numpy.copyto(self.array, array)
             elif isinstance(array, Number):
                 self.array.fill(array) 
             elif issubclass(array.__class__ , DataContainer):
-                if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
-                    if self.geometry != array.geometry:
-                        numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
-                        return
-                numpy.copyto(self.array, array.as_array())
+                
+                try:
+                    if self.dimension_labels != array.dimension_labels:
+                        raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
+                except AttributeError:
+                    pass
+
+                if self.array.shape == array.shape:
+                    numpy.copyto(self.array, array.array)
+                else:
+                    raise ValueError('Cannot fill with the provided array.' + \
+                                     'Expecting shape {0} got {1}'.format(
+                                     self.shape,array.shape))
             else:
                 raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
@@ -2158,10 +2261,7 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         
         if out is None:
-            if isinstance(x2, (int, float, complex, \
-                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
-                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
-                                 numpy.complex)):
+            if isinstance(x2, Number):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
@@ -2191,10 +2291,7 @@ class DataContainer(object):
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: out {} x2 {} expected {}".format( out.shape,x2.shape ,self.shape)))
         elif issubclass(type(out), DataContainer) and \
-             isinstance(x2, (int,float,complex, numpy.int, numpy.int8, \
-                             numpy.int16, numpy.int32, numpy.int64,\
-                             numpy.float, numpy.float16, numpy.float32,\
-                             numpy.float64, numpy.complex)):
+             isinstance(x2, Number):
             if self.check_dimensions(out):
                 kwargs['out']=out.as_array()
                 pwop(self.as_array(), x2, *args, **kwargs )
@@ -2245,7 +2342,70 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
+
+    def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
+        '''performs a*self + b * y. Can be done in-place
+        
+        Parameters
+        ----------
+        a : multiplier for self, can be a number or a numpy array or a DataContainer
+        y : DataContainer 
+        b : multiplier for y, can be a number or a numpy array or a DataContainer
+        out : return DataContainer, if None a new DataContainer is returned, default None. 
+            out can be self or y.
+        num_threads : number of threads to use during the calculation, using the CIL C library
+        
+        It will try to use the CIL C library and default to numpy operations, in case the C library does
+        not handle the types.
+        
+        Example:
+        -------
+
+        a = 2
+        b = 3
+        ig = ImageGeometry(10,11)
+        x = ig.allocate(1)
+        y = ig.allocate(2)
+        out = x.sapyb(a,y,b)
+        '''
+        ret_out = False
+        
+        if out is None:
+            out = self * 0.
+            ret_out = True
+
+        if out.dtype in [ numpy.float32, numpy.float64 ]:
+            # handle with C-lib _axpby
+            try:
+                self._axpby(a, b, y, out, out.dtype, num_threads)
+                if ret_out:
+                    return out
+                return
+            except RuntimeError as rte:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
+            except TypeError as te:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+            finally:
+                pass
+        
+
+        # cannot be handled by _axpby
+        ax = self * a
+        y.multiply(b, out=out)
+        out.add(ax, out=out)
+        
+        if ret_out:
+            return out
+
+
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''Deprecated. Alias of _axpby'''
+        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
+              DeprecationWarning)
+        self._axpby(a,b,y,out, dtype, num_threads)
+
+
+    def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -2293,13 +2453,13 @@ class DataContainer(object):
             raise Warning("out array of type {0} does not match requested dtype {1}. Using {0}".format(ndout.dtype, dtype))
             dtype = ndout.dtype
         if ndx.dtype != dtype:
-            ndx = ndx.astype(dtype)
+            ndx = ndx.astype(dtype, casting='safe')
         if ndy.dtype != dtype:
-            ndy = ndy.astype(dtype)
+            ndy = ndy.astype(dtype, casting='safe')
         if nda.dtype != dtype:
-            nda = nda.astype(dtype)
+            nda = nda.astype(dtype, casting='same_kind')
         if ndb.dtype != dtype:
-            ndb = ndb.astype(dtype)
+            ndb = ndb.astype(dtype, casting='same_kind')
 
         if dtype == numpy.float32:
             x_p = ndx.ctypes.data_as(c_float_p)
@@ -2389,11 +2549,6 @@ class DataContainer(object):
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
-    
-    #def __abs__(self):
-    #    operation = FM.OPERATION.ABS
-    #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
-    # __abs__
     
     ## reductions
     def sum(self, *args, **kwargs):
@@ -2518,10 +2673,13 @@ class ImageData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
               DeprecationWarning)
+
         dtype = kwargs.get('dtype', numpy.float32)
+    
 
         if geometry is None:
-            raise AttributeError("ImageGeometry requires a geometry")
+            raise AttributeError("ImageData requires a geometry")
+            
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
@@ -2542,21 +2700,8 @@ class ImageData(DataContainer):
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
-        super(ImageData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
+        super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
                                
-    def subset(self, dimensions=None, **kw):
-        '''returns a subset of ImageData and regenerates the geometry'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            temp = self.copy()
-            temp.reorder(dimensions)
-            return temp
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
@@ -2565,12 +2710,25 @@ class ImageData(DataContainer):
         try:
             geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
         except ValueError:
-            if kw_force:
+            if force:
                 geometry_new = None
             else:
                 raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")
 
-        out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+        #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
+        if vertical == 'centre':
+            dim = self.geometry.dimension_labels.index('vertical')  
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(numpy.floor(centre_slice_pos))
+            
+            w2 = centre_slice_pos - ind0
+            out = DataContainer.get_slice(self, channel=channel, vertical=ind0, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+            
+            if w2 > 0:
+                out2 = DataContainer.get_slice(self, channel=channel, vertical=ind0 + 1, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+                out = out * (1 - w2) + out2 * w2
+        else:
+            out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
 
         if len(out.shape) == 1 or geometry_new is None:
             return out
@@ -2606,6 +2764,7 @@ class AcquisitionData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
               DeprecationWarning)
+
         dtype = kwargs.get('dtype', numpy.float32)
 
         if geometry is None:
@@ -2626,25 +2785,9 @@ class AcquisitionData(DataContainer):
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
-
-        if array.ndim not in [2,3,4]:
-            raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
   
-    def subset(self, dimensions=None, **kw):
-        '''returns a subset of the AcquisitionData and regenerates the geometry'''
-        
-        if not kw.get('suppress_warning', False):
-            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
-              DeprecationWarning)
-
-        if dimensions is None:
-            return self.get_slice(**kw)
-        else:
-            temp = self.copy()
-            temp.reorder(dimensions)
-            return temp
 
     def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
         '''
@@ -2656,21 +2799,21 @@ class AcquisitionData(DataContainer):
             if force:
                 geometry_new = None
             else:
-                print(ve)
                 raise ValueError ("Unable to return slice of requested AcquisitionData. Use 'force=True' to return DataContainer instead.")
 
         #get new data
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         if vertical == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
-            if self.geometry.shape[dim] > 1:   
-                centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
-                ind0 = int(numpy.floor(centre_slice_pos))
-                w2 = centre_slice_pos - ind0
-                out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
-                if w2 > 0:
-                    out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
-                    out = out * (1 - w2) + out2 * w2
+            
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(numpy.floor(centre_slice_pos))
+            w2 = centre_slice_pos - ind0
+            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
+            
+            if w2 > 0:
+                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
+                out = out * (1 - w2) + out2 * w2
         else:
             out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
 
@@ -2681,7 +2824,7 @@ class AcquisitionData(DataContainer):
 
 class Processor(object):
 
-    r'''Defines a generic DataContainer processor
+    '''Defines a generic DataContainer processor
                        
     accepts a DataContainer as input
     returns a DataContainer
@@ -2690,6 +2833,7 @@ class Processor(object):
     `store_output` boolian defining whether a copy of the output is stored. Default is False.
     If no attributes are modified get_output will return this stored copy bypassing `process`
     '''
+
     def __init__(self, **attributes):
         if not 'store_output' in attributes.keys():
             attributes['store_output'] = False
@@ -2718,9 +2862,18 @@ class Processor(object):
             raise KeyError('Attribute {0} not found'.format(name))
     
     def set_input(self, dataset):
+        """
+        Set the input data to the processor
+
+        Parameters
+        ----------
+        input : DataContainer
+            The input DataContainer
+        """
+
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
-                self.__dict__['input'] = dataset
+                self.__dict__['input'] = weakref.ref(dataset)
                 self.__dict__['shouldRun'] = True
             else:
                 raise ValueError('Input data not compatible')
@@ -2728,8 +2881,6 @@ class Processor(object):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
     
-    def clear_input(self):
-        self.__dict__['input']= None
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
@@ -2740,7 +2891,19 @@ class Processor(object):
         raise NotImplementedError('Implement basic checks for input DataContainer')
         
     def get_output(self, out=None):
+        """
+        Runs the configured processor and returns the processed data
+
+        Parameters
+        ----------
+        out : DataContainer, optional
+           Fills the referenced DataContainer with the processed data and suppresses the return
         
+        Returns
+        -------
+        DataContainer
+            The processed data. Suppressed if `out` is passed
+        """
         if self.output is None or self.shouldRun:
             if out is None:
                 out = self.process()
@@ -2758,7 +2921,7 @@ class Processor(object):
     
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
-            self.__dict__['input'] = processor
+            self.__dict__['input'] =  weakref.ref(processor)
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(processor), DataProcessor))
@@ -2769,10 +2932,12 @@ class Processor(object):
         It is useful in the case the user has provided a DataProcessor as
         input
         '''
-        if issubclass(type(self.input), DataProcessor):
-            dsi = self.input.get_output()
+        if self.input() is None:
+            raise ValueError("Input has been deallocated externally")
+        elif issubclass(type(self.input()), DataProcessor):
+            dsi = self.input().get_output()
         else:
-            dsi = self.input
+            dsi = self.input()
         return dsi
         
     def process(self, out=None):
@@ -2787,8 +2952,6 @@ class Processor(object):
         else:
             self.get_output(out=out)
 
-        self.clear_input()
-        
         return out
 
 
@@ -2947,6 +3110,7 @@ class VectorData(DataContainer):
 
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)
+
         dtype = kwargs.get('dtype', numpy.float32)
         
         if self.geometry is None:
@@ -2977,13 +3141,21 @@ class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
+
+    @property
+    def dtype(self):
+        return self._dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self._dtype = val      
         
     def __init__(self, 
                  length, **kwargs):
         
         self.length = length
         self.shape = (length, )
-
+        self.dtype = kwargs.get('dtype', numpy.float32)
         self.dimension_labels = kwargs.get('dimension_labels', None)
         
     def clone(self):
@@ -3006,9 +3178,20 @@ class VectorGeometry(object):
         return False
 
     def allocate(self, value=0, **kwargs):
-        '''allocates an VectorData according to the size expressed in the instance'''
-        self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self.copy(), dtype=self.dtype)
+        '''allocates an VectorData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        :param seed: seed for the random number generator
+        :type seed: int, default None
+        :param max_value: max value of the random int array
+        :type max_value: int, default 100'''
+
+        dtype = kwargs.get('dtype', self.dtype)
+        # self.dtype = kwargs.get('dtype', numpy.float32)
+        out = VectorData(geometry=self.copy(), dtype=dtype)
         if isinstance(value, Number):
             if value != 0:
                 out += value
@@ -3023,7 +3206,8 @@ class VectorGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))             
             elif value is None:
                 pass
             else:
@@ -3031,6 +3215,9 @@ class VectorGeometry(object):
         return out
 
 class DataOrder():
+
+    ENGINES = ['astra','tigre','cil']
+
     ASTRA_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
     TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
     ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
@@ -3050,9 +3237,14 @@ class DataOrder():
             if isinstance(geometry, AcquisitionGeometry):
                 dim_order = DataOrder.TIGRE_AG_LABELS
             else:
-                dim_order = DataOrder.TIGRE_IG_LABELS   
+                dim_order = DataOrder.TIGRE_IG_LABELS
+        elif engine == 'cil':
+            if isinstance(geometry, AcquisitionGeometry):
+                dim_order = DataOrder.CIL_AG_LABELS
+            else:
+                dim_order = DataOrder.CIL_IG_LABELS
         else:
-            raise ValueError("Unknown engine expected 'tigre' or 'astra' got {}".format(engine))
+            raise ValueError("Unknown engine expected one of {0} got {1}".format(DataOrder.ENGINES, engine))
         
         dimensions = []
         for label in dim_order:
@@ -3070,3 +3262,5 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+

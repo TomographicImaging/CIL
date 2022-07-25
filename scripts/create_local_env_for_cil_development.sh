@@ -26,4 +26,4 @@ set -x
 
 conda create --name $name cmake python=$python numpy=$numpy scipy matplotlib \
   h5py pillow libgcc-ng dxchange olefile pywavelets python-wget scikit-image \
-  packaging tomophantom numba -c conda-forge -c ccpi -c defaults --override-channels
+  packaging  numba ipp ipp-devel ipp-include tqdm -c conda-forge -c intel  -c defaults --override-channels

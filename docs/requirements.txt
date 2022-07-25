@@ -1,6 +1,0 @@
-sphinx_rtd_theme
-numpy
-scipy
-matplotlib >=3.3.0,<=3.4.2 # temporary fix due to issue with installing matplotlib version 3.4.3
-olefile
-pywavelets

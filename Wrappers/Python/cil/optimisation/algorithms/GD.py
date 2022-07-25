@@ -18,6 +18,7 @@
 import numpy
 from cil.optimisation.algorithms import Algorithm
 import warnings
+import logging
 
 class GD(Algorithm):
     ''' 
@@ -45,14 +46,6 @@ class GD(Algorithm):
                      current objective function to 0, default 1e-8, see numpy.isclose
         '''
         super(GD, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
 
         self.alpha = kwargs.get('alpha' , 1e6)
         self.beta = kwargs.get('beta', 0.5)
@@ -67,7 +60,7 @@ class GD(Algorithm):
         :param initial: initial guess
         :param objective_function: objective function to be minimised
         :param step_size: step size'''
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
             
         self.x = initial.copy()
         self.objective_function = objective_function
@@ -89,7 +82,7 @@ class GD(Algorithm):
         self.x_update = initial.copy()
 
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
 
     def update(self):
         '''Single iteration'''
@@ -100,10 +93,8 @@ class GD(Algorithm):
             # the next update and solution are calculated within the armijo_rule
             self.step_size = self.armijo_rule()
         else:
-            self.x_update *= -self.step_size
-            self.x += self.x_update
+            self.x.sapyb(1.0, self.x_update, -self.step_size, out=self.x)
         
-    
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))

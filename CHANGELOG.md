@@ -1,6 +1,72 @@
-* 21.2.1
+* 22.0.0
+  - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
+  - Added ISTA algorithm. Improve inheritance of proximal gradient algorithms.
+  - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes
+  - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
+  - Cleaned up unit test structure and output
+  - Removal of deprecated code
+    - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
+    - `subset` method removed, use `get_slice` or `reorder` methods
+    - NikonDataReader `normalize` kwarg removed, use `normalise`
+    - Algorithms initialisation `x_init` kwarg removed, use `initial`
+    - Removed deprecated numpy calls
+  - DataProcessors use weak-reference to input data
+  - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
+    - Modules not moved should be considered deprecated
+    - CIL remains licensed as APACHE-2.0
+    - Minor bug fixes to the CPU 2D Parallel-beam FBP
+  - Add ndim property for DataContainer class.
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Raise exception if filename or data haven't been set in NexusDataWriter
+  - Fixes error when update_objective_interval is set to 0 in an algorithm run.
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
+  - GitHub Actions:
+    - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
+
+* 21.4.1
+ - Removed prints from unittests and cleanup of unittest code.
+ - CMake: 
+   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+ - TIFF writer uses logging
+ - Added unittests for TIFF functionality
+
+* 21.4.0
+  - PEP 440 compliant version
+  - CMake fix due to use of pip install. 
+  - Recon.FBP allows 'astra' backend 
+  - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
+  - CofR image_sharpness improved for large datasets
+  - Geometry alignmentment fix for 2D datasets
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
+  - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
+  - Allow use of square brackets in file paths to TIFF and Nikon datasets
+
+* 21.3.1
+  - Added matplotlib version dependency to conda recipe
+  - Fixed TIGRE wrappers for geometry with a virtual detector
+  - Fixed TIGRE wrappers for cone-beam geometry with tilted rotation axis
+
+* 21.3.0
+  - Accelerated PDHG which handles strong convexity of functions
+  - TotalVariation Function handles SIRF ImageData
+  - Simulated datasets and volume added to DataExamples
+  - TIGRE wrappers for parallel-beam geometry added
+  - NEXUSWriter and NEXUSReader offer (8bit and 16bit) compression of data
+  - show2D show_geom now return an object that can be saved with a `save` method
+  - GradientOperator can be now used with SIRF DataContainers, both PET and MR
+  - Add anisotropy in TotalVariation function
+  - CCPi Regularisation plugin is refactored, only FGP_TV, FGP_dTV, TGV and TNV are exposed. Docstrings and functionality unit tests are added. Tests of the functions are meant to be in the CCPi-Regularisation toolkit itself.
+  - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
+  - Fix GradientOperator to handle pseudo 2D CIL geometries
+  - Created recon module with FBP and FDK using fast filtering library and TIGRE backprojectors
+  - Added Intel IPP based library for filtering step of FBP
   - PDHG memory optimisation
   - ScaledFunction memory Optimisation
+  - The github actions are merged into one action with multiple jobs
+  - The conda build job uploads an artifact of the build tar.bz file which is later used by the documentation build job - which installs the package into a miniconda environment.
+  - Documentation pages for recon, astra and cil-plugins are published.
 
 * 21.2.0
   - add version string from git describe

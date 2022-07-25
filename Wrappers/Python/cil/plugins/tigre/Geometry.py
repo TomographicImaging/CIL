@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
@@ -35,9 +34,16 @@ class CIL2TIGREGeometry(object):
         if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
             angles *= (np.pi/180.) 
 
-        angles *= -1 #negate rotation
-        angles -= np.pi/2 #rotate imagegeometry 90deg
-        angles -= tg.theta #compensate for image geometry definitions
+        #convert CIL to TIGRE angles s
+        angles = -(angles + np.pi/2 +tg.theta )
+
+        #angles in range -pi->pi
+        for i, a in enumerate(angles):
+            while a < -np.pi:
+                a += 2 * np.pi
+            while a >= np.pi:
+                a -= 2 * np.pi
+            angles[i] = a
 
         return tg, angles
 
@@ -49,78 +55,50 @@ class TIGREGeometry(Geometry):
 
         ag_in = ag.copy()
         system = ag_in.config.system
-        system.update_reference_frame()
-
-        #rotate and translate system to match tigre definitions
-        if ag_in.geom_type == 'cone':
-            if ag_in.dimension=='3D':    
-                z = system.source.position[2]
-                translate = np.asarray([0,0,-z])
-                system.source.position += translate
-                system.detector.position += translate
-                system.rotation_axis.position += translate
-
-                #align source along negative y
-                a = system.source.position
-                a = a / np.sqrt(a.dot(a))
-                b = np.array([0.0, -1.0, 0.0])
-
-                if np.allclose(a,b):
-                    axis_rotation = np.eye(3)
-                elif np.allclose(a,-b):
-                    axis_rotation = np.eye(3) #pi rotation around either axis
-                    axis_rotation[0][0] = -1
-                    axis_rotation[2][2] = -1
-                else:
-                    v = np.cross(a, b)
-                    s = np.linalg.norm(v)
-                    c = np.dot(a, b) 
-                    vx = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]]) 
-                    axis_rotation = np.eye(3) + vx + vx.dot(vx) * (1-c)/(s**2) 
-
-                r = np.array(axis_rotation)
-                system.source.position = r.dot(system.source.position.reshape(3,1))
-                system.detector.position = r.dot(system.detector.position.reshape(3,1))
-                system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(3,1))
-                new_x = r.dot(system.detector.direction_x.reshape(3,1)) 
-                new_y = r.dot(system.detector.direction_y.reshape(3,1))
-                system.detector.set_direction(new_x, new_y)
-            else:    
-                #align source along negative y
-                a = system.source.position
-                a = a / np.sqrt(a.dot(a))
-                b = np.array([0.0, -1.0])
-
-                if np.allclose(a,b):
-                    axis_rotation = np.eye(2)
-                elif np.allclose(a,-b):
-                    axis_rotation = np.eye(2)
-                    axis_rotation[0][0] = -1
-                else:
-                    theta = np.arctan2(a[0], a[1]) + np.pi
-                    axis_rotation = np.eye(2)
-                    axis_rotation[0][0] = axis_rotation[1][1] = np.cos(theta)
-                    axis_rotation[0][1] = -np.sin(theta)
-                    axis_rotation[1][0] = np.sin(theta)   
-
-                r = np.array(axis_rotation)
-                system.source.position = r.dot(system.source.position.reshape(2,1))
-                system.detector.position = r.dot(system.detector.position.reshape(2,1))
-                system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(2,1))
-                system.detector.direction_x = r.dot(system.detector.direction_x.reshape(2,1)) 
+        system.align_reference_frame('tigre')
 
 
-            #distance source to origin
-            DSO = -system.source.position[1]
-            DSD = DSO + system.detector.position[1]
+        #TIGRE's interpolation fp must have the detector outside the reconstruction volume otherwise the ray is clipped 
+        #https://github.com/CERN/TIGRE/issues/353
+        lenx = (ig.voxel_num_x * ig.voxel_size_x)
+        leny = (ig.voxel_num_y * ig.voxel_size_y)
+        lenz = (ig.voxel_num_z * ig.voxel_size_z)
+    
+        panel_width = max(ag_in.config.panel.num_pixels * ag_in.config.panel.pixel_size)*0.5
+        clearance_len =  np.sqrt(lenx**2 + leny**2 + lenz**2)/2 + panel_width
+
+        if ag_in.geom_type == 'cone':  
+
+            if system.detector.position[1] < clearance_len:
+        
+                src = system.source.position.astype(np.float64)
+                vec1 = system.detector.position.astype(np.float64) - src
+
+                mag_new = (clearance_len - src[1]) /-src[1]
+                scale = mag_new / ag_in.magnification
+                scale=np.ceil(scale)
+
+                system.detector.position = src + vec1 * scale
+                ag_in.config.panel.pixel_size[0] *= scale
+                ag_in.config.panel.pixel_size[1] *= scale            
+
+            self.DSO = -system.source.position[1]       
+            self.DSD = self.DSO + system.detector.position[1]
+            self.mode = 'cone'
 
         else:
-            raise NotImplementedError("TIGRE only wrapped for cone-beam tomography in CIL")
+            if ag_in.system_description == 'advanced':
+                raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
+            self.DSO = clearance_len
+            self.DSD = 2*clearance_len
+            self.mode = 'parallel'
 
-        self.DSD = DSD
-        self.DSO = DSO
-       
+        # number of voxels (vx)
+        self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_y, ig.voxel_num_x] )
+        # size of each voxel (mm)
+        self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_y, ig.voxel_size_x]  )
+
         # Detector parameters
         # (V,U) number of pixels        (px)
         self.nDetector = np.array(ag_in.config.panel.num_pixels[::-1])
@@ -128,22 +106,22 @@ class TIGREGeometry(Geometry):
         self.dDetector = np.array(ag_in.config.panel.pixel_size[::-1])
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
-        # number of voxels              (vx)
-        self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_y, ig.voxel_num_x] )
-        # size of each voxel            (mm)
-        self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_y, ig.voxel_size_x]  )
-
 
         if ag_in.dimension == '2D':
-            #fix IG
+            self.is2D = True
+
+            #fix IG to single slice in z
             self.nVoxel[0]=1
             self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
 
-            self.is2D = True
+            self.offOrigin = np.array( [0, 0, 0] )
+
             # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-            self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
-            self.offDetector = np.array( [0, system.detector.position[0] , 0 ]) #y component in DSD
-            
+            if ag_in.geom_type == 'cone':  
+                self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ])
+            else:
+                self.offDetector = np.array( [0, system.detector.position[0], 0 ]) 
+
             #convert roll, pitch, yaw
             U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
             roll = 0
@@ -156,9 +134,21 @@ class TIGREGeometry(Geometry):
             ind = np.asarray([2, 0, 1])
             flip = np.asarray([1, 1, -1])
 
-            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
-            self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0]) #y component in DSD
-            
+            if ag_in.geom_type == 'cone':
+                #TIGRE origin is at a point on the rotate axis that is in a perpendicular plane containing the source
+                #As rotation axis is aligned with z this is the x-y plane
+                #We have aligned the y axis with the source->rotate axis direction
+                self.offOrigin = np.array( [-system.source.position[2], 0, 0])
+                self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
+            else:
+                self.offOrigin = np.array( [0,0,0] )
+                self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
+
+            #shift origin z to match image geometry
+            #this is in CIL reference frames as the TIGRE geometry rotates the reconstruction volume to match our definitions
+            self.offOrigin[0] += ig.center_z
+
+
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip
             V = system.detector.direction_y[ind] * flip
@@ -166,12 +156,18 @@ class TIGREGeometry(Geometry):
             roll = np.arctan2(-V[1], V[0])
             pitch = np.arcsin(V[2])
             yaw = np.arctan2(-U[2],U[1])
- 
+
+        #shift origin to match image geometry
+        self.offOrigin[1] += ig.center_y
+        self.offOrigin[2] += ig.center_x
+
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin
-        if 'right' in panel_origin:
+        if 'right' in panel_origin and 'top' in panel_origin:
+            roll += np.pi
+        elif 'right' in panel_origin:
             yaw += np.pi
-        if 'top' in panel_origin:
+        elif 'top' in panel_origin:
             pitch += np.pi
 
         self.rotDetector = np.array((roll, pitch, yaw)) 
@@ -181,8 +177,3 @@ class TIGREGeometry(Geometry):
 
         # Auxiliary
         self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)
-        # Mode
-        # parallel, cone
-        self.mode = ag_in.config.system.geometry
-
-        

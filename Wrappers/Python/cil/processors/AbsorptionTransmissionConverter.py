@@ -23,14 +23,13 @@ import numpy
 
 class AbsorptionTransmissionConverter(DataProcessor):
 
-    r'''Processor to convert from absorption measurements to transmission
+    '''Processor to convert from absorption measurements to transmission
+    
     :param white_level: A float defining incidence intensity in the Beer-Lambert law.
     :type white_level: float, optional
     :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
     :rtype: AcquisitionData, ImageData or DataContainer
-    '''
-    
-    '''
+
     Processor first multiplies data by -1, then calculates exponent 
     and scales result by white_level (default=1)
     '''

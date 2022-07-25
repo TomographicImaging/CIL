@@ -334,12 +334,12 @@ class KullbackLeibler(Function):
                 if self.mask is not None:
                     kl_gradient_mask(x.as_array(), self.b.as_array(), out_np, self.eta.as_array(), self.mask)
                 kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
-                # out.fill(out_np)
+                out.fill(out_np)
                 return out
             else:
                 out_np = out.as_array()
                 kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
-                # out.fill(out_np)
+                out.fill(out_np)
         else:                           
             tmp_sum_array = (x + self.eta).as_array()
             if out is None:   

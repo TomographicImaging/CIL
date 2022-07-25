@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-import sys
 import unittest
+from utils import initialise_tests
 import numpy
 import math
 from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework.framework import SystemConfiguration
+
+initialise_tests()
 
 class Test_AcquisitionGeometry(unittest.TestCase):
     def test_create_Parallel2D(self):
@@ -186,13 +188,13 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         #default
         AG.set_panel([1000,2000])
-        self.assertEqual(AG.config.panel.num_pixels, [1000,2000])
-        self.assertEqual(AG.config.panel.pixel_size, [1.,1.])
+        numpy.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
+        numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [1,1])
 
         #values
         AG.set_panel([1000,2000],[0.1,0.2])
-        self.assertEqual(AG.config.panel.num_pixels, [1000,2000])
-        self.assertEqual(AG.config.panel.pixel_size, [0.1,0.2])
+        numpy.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
+        numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [0.1,0.2])
 
         #set 2D panel with 3D geometry
         with self.assertRaises(ValueError):
@@ -346,16 +348,145 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertEqual(IG, IG_gold)
 
 
-class Test_Parallel2D(unittest.TestCase):
-    
-    def test_update_reference_frame(self):
-        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0.,1000.], rotation_axis_position=[5.,2.])
-        AG.config.system.update_reference_frame()
+class AlignGeometries(unittest.TestCase):
 
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+    def test_set_origin(self):
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-50,0], detector_position=[0.,100.,0])\
+            .set_panel(num_pixels=[50,50])    
+
+        self.assertTrue(True)
+
+
+    def test_rotation_vec_to_y(self):
+
+        M = SystemConfiguration.rotation_vec_to_y([0,1])
+        a = numpy.array([[1, 0],[0, 1]])
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        
+        M = SystemConfiguration.rotation_vec_to_y([0,-1])
+        a = numpy.array([[-1, 0],[0, -1]])
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([1,1])
+        a = numpy.array([[0.70710678, -0.70710678],[0.70710678, 0.70710678]])
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([1,-1])
+        a = numpy.array([[-0.70710678, -0.70710678],[0.70710678, -0.70710678]])
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([0,1,0])
+        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])        
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([0,-1,0])
+        a = numpy.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([0,1,1])
+        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])     
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([0,-1,1])
+        a = numpy.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([1,1,0])
+        a = numpy.array([[0.70710678, -0.70710678, 0],[0.70710678, 0.70710678, 0],[0, 0, 1]])       
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([1,-1,0])
+        a = numpy.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])               
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_y([1,-1,1])
+        a = numpy.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])       
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+
+    def test_rotation_vec_z(self):
+
+        M = SystemConfiguration.rotation_vec_to_z([0,0,1])
+        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])   
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([0,0,-1])
+        a = numpy.array([[1, 0, 0],[0, -1, 0],[0, 0, -1]])           
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([1,0,0])
+        a = numpy.array([[0, 0, -1],[0, 1, 0],[1, 0, 0]])           
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([-1,0,0])
+        a = numpy.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]])           
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([0,1,0])
+        a = numpy.array([[1, 0, 0],[0, 0, -1],[0, 1, 0]])           
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([0,-1,0])
+        a = numpy.array([[1, 0, 0],[0, 0, 1],[0, -1, 0]])  
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([1,-1,0])
+        a = numpy.array([[0.5, 0.5, -0.70710678],[0.5, 0.5, 0.70710678],[0.70710678, -0.70710678, 0]])          
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([1,0,1])
+        a = numpy.array([[0.70710678, 0, -0.70710678],[0,1,0],[0.70710678, 0, 0.70710678]])          
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([0,1,-1])
+        a = numpy.array([[1,0,0],[0, -0.70710678, -0.70710678],[0, 0.70710678, -0.70710678]])          
+
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+        M = SystemConfiguration.rotation_vec_to_z([-1,-1,-1])
+        a = numpy.array([[0.21132491, -0.78867509, 0.57735025],[ -0.78867509, 0.21132491, 0.57735025],[-0.57735025, -0.57735025, -0.57735025]])          
+
+        numpy.testing.assert_allclose(M,a, atol=1e-6)
+
+
+class Test_Parallel2D(unittest.TestCase):
+
+
+    def test_align_reference_frame_cil(self):
+    
+        ag = AcquisitionGeometry.create_Parallel2D(ray_direction=[0,-1], detector_position=[0.,-100.], rotation_axis_position=[10.,5.])
+        ag.config.system.align_reference_frame('cil')
+
+        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.position, [10,105], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [-1,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+
+
+    def test_align_reference_frame_tigre(self):
+
+        ag = AcquisitionGeometry.create_Parallel2D(ray_direction=[0,-1], detector_position=[0.,-100.], rotation_axis_position=[10.,5.])
+        ag.config.system.align_reference_frame('tigre')
+
+        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.position, [10,105], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [-1,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+
+
+    def test_system_description(self):
+        AG = AcquisitionGeometry.create_Parallel2D()
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[5,0], rotation_axis_position=[5,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Parallel2D(ray_direction=[1,1])
+        self.assertTrue(AG.system_description=='advanced')
+
+        AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[5,0])
+        self.assertTrue(AG.system_description=='offset')
 
     def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Parallel2D()
@@ -370,25 +501,45 @@ class Test_Parallel2D(unittest.TestCase):
         self.assertEqual(out, [None, None, 1]) 
 
 class Test_Parallel3D(unittest.TestCase):
-    
-    def test_update_reference_frame(self):
-        #translate origin
-        AG = AcquisitionGeometry.create_Parallel3D(detector_position=[0.,1000.,0], rotation_axis_position=[5.,2.,4.])
-        AG.config.system.update_reference_frame()
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998,-4], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
 
-        #align Z axis with rotate axis
-        AG = AcquisitionGeometry.create_Parallel3D(detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,0.], rotation_axis_direction=[0,1,0])
-        AG.config.system.update_reference_frame()
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,1000], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,-1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+    def test_align_reference_frame_cil(self):
+        
+        ag = AcquisitionGeometry.create_Parallel3D(ray_direction=[0,-1,0], detector_position=[0.,-100.,0], rotation_axis_position=[10.,5.,0], rotation_axis_direction=[0,0,-1])
+        ag.config.system.align_reference_frame('cil')
+
+        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1, 0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.position, [-10,105,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+
+
+    def test_align_reference_frame_tigre(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D(ray_direction=[0,-1,0], detector_position=[0.,-100.,0], rotation_axis_position=[10.,5.,0], rotation_axis_direction=[0,0,-1])
+        ag.config.system.align_reference_frame('tigre')
+
+        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1, 0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.position, [-10,105,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        numpy.testing.assert_allclose(ag.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+
+
+    def test_system_description(self):
+        AG = AcquisitionGeometry.create_Parallel3D()
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Parallel3D(detector_position=[5,0,0], rotation_axis_position=[5,0,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[5,0,0])
+        self.assertTrue(AG.system_description=='offset')
+
+        AG = AcquisitionGeometry.create_Parallel3D(ray_direction = [1,1,0])
+        self.assertTrue(AG.system_description=='advanced')
 
 
     def test_get_centre_slice(self):
@@ -420,14 +571,57 @@ class Test_Parallel3D(unittest.TestCase):
 
 class Test_Cone2D(unittest.TestCase):
     
-    def test_update_reference_frame(self):
-        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,2.])
-        AG.config.system.update_reference_frame()
+    def test_align_reference_frame_cil(self):
 
-        numpy.testing.assert_allclose(AG.config.system.source.position, [-5,-502], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0], rtol=1E-6)
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,50], detector_position=[0.,-100.], rotation_axis_position=[5.,2.])
+        AG.set_panel(100)
+
+        AG.config.system.align_reference_frame('cil')
+
+        numpy.testing.assert_allclose(AG.config.system.source.position, [5,-48], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.position, [5,102], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [-1,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+
+
+    def test_align_reference_frame_tigre(self):
+
+        ag = AcquisitionGeometry.create_Cone2D(source_position=[0,50], detector_position=[0.,-100.], rotation_axis_position=[5.,2])
+        ag.set_panel(100)
+
+        ag_align = ag.copy()
+        ag_align.config.system.align_reference_frame('tigre')
+
+        numpy.testing.assert_allclose(ag_align.config.system.source.position, [0,-ag.dist_source_center], atol=1E-6)
+        numpy.testing.assert_allclose(ag_align.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        
+        cos_theta = abs(ag.config.system.source.position[1]-ag.config.system.rotation_axis.position[1])/ ag.dist_source_center
+        sin_theta = math.sin(math.acos(cos_theta))
+
+        vec = ag.config.system.detector.position-ag.config.system.source.position
+        tmp = abs(vec[1])*cos_theta
+        det_y = tmp - ag.dist_source_center
+        det_x =numpy.sqrt(vec[1] ** 2 - tmp **2)
+        
+        numpy.testing.assert_allclose(ag_align.config.system.detector.position, [det_x, det_y], rtol=1E-6)
+
+        dir_x = -ag.config.system.detector.direction_x[0] * cos_theta
+        dir_y = ag.config.system.detector.direction_x[0] * sin_theta
+        numpy.testing.assert_allclose(ag_align.config.system.detector.direction_x, [dir_x, dir_y], rtol=1E-6)
+        
+
+    def test_system_description(self):
+        AG = AcquisitionGeometry.create_Cone2D(source_position = [0,-50],detector_position=[0,100])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position = [5,-50],detector_position=[5,100], rotation_axis_position=[5,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position = [5,-50],detector_position=[0,100])
+        self.assertTrue(AG.system_description=='advanced')
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position = [0,-50],detector_position=[0,100], rotation_axis_position=[5,0])
+        self.assertTrue(AG.system_description=='offset')
 
     def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
@@ -471,24 +665,45 @@ class Test_Cone2D(unittest.TestCase):
 
 class Test_Cone3D(unittest.TestCase):
     
-    def test_update_reference_frame(self):
-        #translate origin
-        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0],detector_position=[0.,1000.,0], rotation_axis_position=[5.,2.,4.])
-        AG.config.system.update_reference_frame()
-        numpy.testing.assert_allclose(AG.config.system.source.position, [-5,-502,-4], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998,-4], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+    def test_align_reference_frame_cil(self):
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[5,500,0],detector_position=[5.,-1000.,0], rotation_axis_position=[5,0,0], rotation_axis_direction=[0,0,-1])
+        AG.config.system.align_reference_frame('cil')
 
-        #align Z axis with rotate axis
-        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0],detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,0.], rotation_axis_direction=[0,1,0])
-        AG.config.system.update_reference_frame()
-        numpy.testing.assert_allclose(AG.config.system.source.position, [0,0,-500], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,1000], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.source.position, [0,-500, 0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,1000,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,-1,0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+
+
+    def test_align_reference_frame_tigre(self):
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[5,500,0],detector_position=[5.,-1000.,0], rotation_axis_position=[5,0,0], rotation_axis_direction=[0,0,-1])
+        AG.config.system.align_reference_frame('tigre')
+
+        numpy.testing.assert_allclose(AG.config.system.source.position, [0,-500, 0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,1000,0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+
+
+    def test_system_description(self):
+        AG = AcquisitionGeometry.create_Cone3D(source_position = [0,-50,0],detector_position=[0,100,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position = [-50,0,0],detector_position=[100,0,0], detector_direction_x=[0,-1,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position = [5,-50,0],detector_position=[5,100,0], rotation_axis_position=[5,0,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position = [5,-50,0],detector_position=[0,100,0])
+        self.assertTrue(AG.system_description=='advanced')
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position = [0,-50,0],detector_position=[0,100,0], rotation_axis_position=[5,0,0])
+        self.assertTrue(AG.system_description=='offset')
 
     def test_get_centre_slice(self):
         #returns the 2D version

@@ -82,7 +82,6 @@ class CGLS(Algorithm):
 
         self.gamma = self.norms0**2
         self.normx = self.x.norm()
-        self.xmax = self.normx   
         
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
@@ -111,7 +110,6 @@ class CGLS(Algorithm):
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
         self.normx = self.x.norm()
-        self.xmax = numpy.maximum(self.xmax, self.normx)
                     
                     
     def update_objective(self):

@@ -28,32 +28,34 @@ logger = logging.getLogger(__name__)
 
 class CofR_image_sharpness(Processor):
 
-    """
-    This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
+    """This creates a CentreOfRotationCorrector processor.
+    
+    The processor will find the centre offset by maximising the sharpness of a reconstructed slice.
 
     Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.
 
     Parameters
     ----------
 
-    slice_index : int, str='centre', default='centre'
-        An integer defining the vertical slice to run the algorithm on.
+    slice_index : int, str, default='centre'
+        An integer defining the vertical slice to run the algorithm on. The special case slice 'centre' is the default.
 
-    backend : str, default='tigre'
-        The backend to use for the reconstruction, 'astra' or 'tigre'
+    backend : {'tigre', 'astra'}
+        The backend to use for the reconstruction
 
-    tolerance : float, default=1./200.
+    tolerance : float, default=0.005
         The tolerance of the fit in pixels, the default is 1/200 of a pixel. This is a stopping criteria, not a statement of accuracy of the algorithm.
 
-    search_range : int, default 0.25*pixels_num_h
+    search_range : int
         The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  
 
     initial_binning : int
-        The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
+        The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
 
-    **kwargs:
-        FBP : Class
-            Deprecated parameter: the FBP class imported from cil.plugins.[backend].FBP Please use 'backend' instead
+    Other Parameters
+    ----------------
+    **kwargs : dict
+        FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
 
 
     Example

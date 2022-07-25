@@ -202,13 +202,14 @@
 <span class="c1">#   See the License for the specific language governing permissions and</span>
 <span class="c1">#   limitations under the License.</span>
 
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span>
 <span class="kn">from</span> <span class="nn">cil.processors.CofR_xcorrelation</span> <span class="kn">import</span> <span class="n">CofR_xcorrelation</span>
 <span class="kn">from</span> <span class="nn">cil.processors.CofR_image_sharpness</span> <span class="kn">import</span> <span class="n">CofR_image_sharpness</span>
 
 
-<div class="viewcode-block" id="CentreOfRotationCorrector"><a class="viewcode-back" href="../../../processors.html#cil.processors.CentreOfRotationCorrector">[docs]</a><span class="k">class</span> <span class="nc">CentreOfRotationCorrector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="CentreOfRotationCorrector"><a class="viewcode-back" href="../../../processors.html#cil.processors.CentreOfRotationCorrector">[docs]</a><span class="k">class</span> <span class="nc">CentreOfRotationCorrector</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class contains factory methods to create a CentreOfRotationCorrector object using the desired algorithm.</span>
+<span class="sd">    This class contains methods to create a CentreOfRotationCorrector processor using the desired algorithm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
        
 <div class="viewcode-block" id="CentreOfRotationCorrector.xcorrelation"><a class="viewcode-back" href="../../../processors.html#cil.processors.CentreOfRotationCorrector.xcorrelation">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -217,38 +218,114 @@
 
 <span class="sd">        For use on parallel-beam geometry it requires two projections 180 degree apart.</span>
 
-<span class="sd">        :param slice_index: An integer defining the vertical slice to run the algorithm on.</span>
-<span class="sd">        :type slice_index: int, str=&#39;centre&#39;, optional</span>
-<span class="sd">        :param projection_index: An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.</span>
-<span class="sd">        :type projection_index: int, optional</span>
-<span class="sd">        :param ang_tol: The angular tolerance in degrees between the two input projections 180degree gap</span>
-<span class="sd">        :type ang_tol: float, optional</span>
-<span class="sd">        :return: returns an AcquisitionData object with an updated AcquisitionGeometry</span>
-<span class="sd">        :rtype: AcquisitionData</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        slice_index : int, str=&#39;centre&#39;, default=&#39;centre&#39;</span>
+<span class="sd">            An integer defining the vertical slice to run the algorithm on.</span>
+
+<span class="sd">        projection_index : int</span>
+<span class="sd">            An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.</span>
+
+<span class="sd">        ang_tol : float, default=0.1</span>
+<span class="sd">            The angular tolerance in degrees between the two input projections 180 degree gap</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; from cil.processors import CentreOfRotationCorrector</span>
+<span class="sd">        &gt;&gt;&gt; processor = CentreOfRotationCorrector.xcorrelation(&#39;centre&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_centred = processor.get_ouput()</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; from cil.processors import CentreOfRotationCorrector</span>
+<span class="sd">        &gt;&gt;&gt; processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; processor.get_ouput(out=data)</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; from cil.processors import CentreOfRotationCorrector</span>
+<span class="sd">        &gt;&gt;&gt; import logging</span>
+<span class="sd">        &gt;&gt;&gt; logging.basicConfig(level=logging.WARNING)</span>
+<span class="sd">        &gt;&gt;&gt; cil_log_level = logging.getLogger(&#39;cil.processors&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; cil_log_level.setLevel(logging.DEBUG)</span>
+
+<span class="sd">        &gt;&gt;&gt; processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_centred = processor.get_ouput()</span>
+
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        setting logging to &#39;debug&#39; will give you more information about the algorithm progress</span>
+
+
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">CofR_xcorrelation</span><span class="p">(</span><span class="n">slice_index</span><span class="p">,</span> <span class="n">projection_index</span><span class="p">,</span> <span class="n">ang_tol</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
 
+
 <div class="viewcode-block" id="CentreOfRotationCorrector.image_sharpness"><a class="viewcode-back" href="../../../processors.html#cil.processors.CentreOfRotationCorrector.image_sharpness">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">FBP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.</span>
+    <span class="k">def</span> <span class="nf">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This creates a CentreOfRotationCorrector processor.</span>
+<span class="sd">        </span>
+<span class="sd">        The processor will find the centre offset by maximising the sharpness of a reconstructed slice.</span>
 
-<span class="sd">        Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.</span>
+<span class="sd">        Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.</span>
 
-<span class="sd">        :param slice_index: An integer defining the vertical slice to run the algorithm on.</span>
-<span class="sd">        :type slice_index: int, str=&#39;centre&#39;, optional</span>
-<span class="sd">        :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  </span>
-<span class="sd">        :type FBP: class</span>
-<span class="sd">        :param tolerance: The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.</span>
-<span class="sd">        :type tolerance: float, default = 0.001    </span>
-<span class="sd">        :param search_range: The range in pixels to search either side of the panel centre. If `None` the width of the panel/4 is used. </span>
-<span class="sd">        :type search_range: int</span>
-<span class="sd">        :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to &lt;128 pixels. Note the fine search will be on unbinned data.</span>
-<span class="sd">        :type initial_binning: int</span>
-<span class="sd">        :return: returns an AcquisitionData object with an updated AcquisitionGeometry</span>
-<span class="sd">        :rtype: AcquisitionDataS</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">processor</span> <span class="o">=</span> <span class="n">CofR_image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="n">slice_index</span><span class="p">,</span> <span class="n">FBP</span><span class="o">=</span><span class="n">FBP</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="n">search_range</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="n">initial_binning</span><span class="p">)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        slice_index : int, str, default=&#39;centre&#39;</span>
+<span class="sd">            An integer defining the vertical slice to run the algorithm on. The special case slice &#39;centre&#39; is the default.</span>
+
+<span class="sd">        backend : {&#39;tigre&#39;, &#39;astra&#39;}</span>
+<span class="sd">            The backend to use for the reconstruction</span>
+
+<span class="sd">        tolerance : float, default=0.005</span>
+<span class="sd">            The tolerance of the fit in pixels, the default is 1/200 of a pixel. This is a stopping criteria, not a statement of accuracy of the algorithm.</span>
+
+<span class="sd">        search_range : int</span>
+<span class="sd">            The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  </span>
+
+<span class="sd">        initial_binning : int</span>
+<span class="sd">            The size of the bins for the initial search. If `None` will bin the image to a step corresponding to &lt;128 pixels. The fine search will be on unbinned data.</span>
+
+<span class="sd">        Other Parameters</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use &#39;backend&#39; instead</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        from cil.processors import CentreOfRotationCorrector</span>
+
+<span class="sd">        processor = CentreOfRotationCorrector.image_sharpness(&#39;centre&#39;, &#39;tigre&#39;)</span>
+<span class="sd">        processor.set_input(data)</span>
+<span class="sd">        data_centred = processor.get_output()</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        from cil.processors import CentreOfRotationCorrector</span>
+
+<span class="sd">        processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, &#39;astra&#39;)</span>
+<span class="sd">        processor.set_input(data)</span>
+<span class="sd">        processor.get_output(out=data)</span>
+
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        For best results data should be 360deg which leads to blurring with incorrect geometry.</span>
+<span class="sd">        This method is unreliable on half-scan data with &#39;tuning-fork&#39; style artifacts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">CofR_image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="n">slice_index</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="n">search_range</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="n">initial_binning</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div></div>
 </pre></div>
 

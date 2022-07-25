@@ -18,6 +18,7 @@ from cil.optimisation.operators import GradientOperator
 import numpy as np
 from numbers import Number
 import warnings
+import logging
 
 
 
@@ -184,6 +185,8 @@ class TotalVariation(Function):
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
+        if self.info:
+            warnings.warn(" `info` is deprecate. Please use logging instead.")
 
         # splitting Gradient
         self.split = split
@@ -324,9 +327,9 @@ class TotalVariation(Function):
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:
             if self.tolerance is not None:
-                print("Stop at {} iterations with tolerance {} .".format(k, error))
+                logging.info("Stop at {} iterations with tolerance {} .".format(k, error))
             else:
-                print("Stop at {} iterations.".format(k))                
+                logging.info("Stop at {} iterations.".format(k))                
                     
         self.gradient.adjoint(tmp_q, out=tmp_x)
 

@@ -18,11 +18,12 @@ from cil.optimisation.functions import KullbackLeibler
 from cil.framework import ImageGeometry
 import numpy
 import scipy
-has_numba = True
-try:
+from utils import has_numba, initialise_tests
+
+initialise_tests()
+
+if has_numba:
     import numba
-except ImportError as ie:
-    has_numba = False
 
 class TestKullbackLeiblerNumpy(unittest.TestCase):
     

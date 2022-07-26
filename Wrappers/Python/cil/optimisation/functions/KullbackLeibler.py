@@ -37,22 +37,20 @@ class KullbackLeibler(Function):
             \end{cases}  
 
     where the :math:`0\log0 := 0` convention is used.  
-              
-    **kwargs
-        b : DataContainer, non-negative      
-            Translates the function at point :code:`b`.
-        mask : DataContainer, default = None
-               Mask for the data :code:`b`
-        eta : DataContainer, default = array of zeros
-              Background noise
 
-    Raises
-    ------
-    ValueError
-        If :code:`b` is None.
-    ValueError
-        If :code:`b` is not None and has negative values.        
-                                            
+    Parameters
+    ----------    
+
+    b : DataContainer, non-negative      
+        Translates the function at point `b`.  
+    eta : DataContainer, default = 0
+        Background noise        
+    mask : DataContainer, default = None
+        Mask for the data `b`
+    backend : {'numba','numpy'}, optional
+        Backend for the KullbackLeibler methods. Numba is the default backend.       
+
+                                             
     
     Note
     ----
@@ -86,23 +84,23 @@ class KullbackLeibler(Function):
                         
     """     
 
-    def __new__(cls, b, eta = None, mask = None, backend = None):
+    def __new__(cls, b, eta = None, mask = None, backend = 'numba'):
 
         # default backend numba
         cls.backend = backend
         
         if cls.backend == 'numba':
 
-            if not has_numba:
-                raise ValueError(" Numba is not installed. ")
+            if not has_numba:                
+                raise ValueError("Numba is not installed.")
             else:          
-                logging.info(" Numba backend is used. ")      
+                logging.info("Numba backend is used.")      
                 return super(KullbackLeibler, cls).__new__(KullbackLeibler_numba)
         else:
-            logging.info(" Numpy backend is used. ") 
+            logging.info("Numpy backend is used.") 
             return super(KullbackLeibler, cls).__new__(KullbackLeibler_numpy)
 
-    def __init__(self, b, eta = None, mask = None, backend = None):
+    def __init__(self, b, eta = None, mask = None, backend = 'numba'):
 
         self.b = b
         self.eta = eta
@@ -111,8 +109,8 @@ class KullbackLeibler(Function):
         if self.eta is None:
             self.eta = self.b * 0.0
 
-        if (self.b.as_array() < 0).any():            
-            raise ValueError(" Input data should be non-negative.")         
+        if np.any(self.b.as_array() < 0):            
+            raise ValueError("Input data should be non-negative.")         
 
         if KullbackLeibler.backend == 'numba':
 

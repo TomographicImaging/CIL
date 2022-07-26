@@ -24,7 +24,6 @@ test:
     - tigre =2.2          # [ not osx ] 
     - packaging
     - ccpi-regulariser=21.0.0   # [ not osx ]
-    - numba  # [not osx]
     - astra-toolbox>=1.9.9.dev5,<2.1
 
   source_files:
@@ -72,6 +71,7 @@ requirements:
     - cil-data >=21.3.0
     - ipp
     - tqdm
+    - numba
 
   #optional packages with version dependancies
   run_constrained:

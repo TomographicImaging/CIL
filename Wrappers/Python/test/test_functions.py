@@ -867,7 +867,7 @@ class TestTotalVariation(unittest.TestCase):
         
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
-        np.testing.assert_equal(res1, res2)     
+        np.testing.assert_almost_equal(res1, res2, decimal = 3)     
 
     def test_strongly_convex_TV(self):
 

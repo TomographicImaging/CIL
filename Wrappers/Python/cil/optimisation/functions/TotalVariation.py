@@ -276,7 +276,10 @@ class TotalVariation(Function):
         tmp_q = self.gradient.range_geometry().allocate(0)
 
         #modify tau
-        tau.multiply(self.regularisation_parameter, out=tau)
+        if isinstance(tau, Number):
+            tau = self.regularisation_parameter * tau
+        else:
+            tau.multiply(self.regularisation_parameter, out=tau)
 
         should_return = False
         if out is None:

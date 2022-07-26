@@ -109,7 +109,7 @@ class KullbackLeibler(Function):
         if self.eta is None:
             self.eta = self.b * 0.0
 
-        if np.any(self.b.as_array() < 0):            
+        if numpy.any(self.b.as_array() < 0):            
             raise ValueError("Input data should be non-negative.")         
 
         if KullbackLeibler.backend == 'numba':

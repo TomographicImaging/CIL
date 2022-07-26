@@ -118,7 +118,7 @@ class Algorithm(object):
             self.timing.append( time.time() - time0 )
             self.iteration += 1
             
-            self.update_previous_solution()
+            self._update_previous_solution()
             
             if self.iteration >= 0 and self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0:
@@ -127,21 +127,35 @@ class Algorithm(object):
                 self.update_objective()
             
 
-    def update_previous_solution(self):
-        '''Update the previous solution with the current one
+    def _update_previous_solution(self):
+        """ Update the previous solution with the current one
         
         The concrete algorithm calls update_previous_solution. Normally this would 
         entail the swapping of pointers:
 
-        tmp = self.x_old
-        self.x_old = self.x
-        self.x = tmp 
-        '''
+        .. highlight:: python
+        .. code-block:: python
+
+            tmp = self.x_old
+            self.x_old = self.x
+            self.x = tmp 
+        
+
+        """
         pass
         
     def get_output(self):
-        '''Returns the solution found'''
+        " Returns the current solution. "
         return self.x
+
+    
+    def _provable_convergence_condition(self):
+        raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
+
+    def is_provably_convergent(self):
+        """ Check if the algorithm is convergent based on the provable convergence criterion.
+        """
+        return self._provable_convergence_condition()
     
     @property
     def solution(self):
@@ -274,7 +288,8 @@ class Algorithm(object):
                 if callback is not None:
                     callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
-                if (self.iteration % print_interval == 0) or self.iteration % self.update_objective_interval == 0:
+                if (print_interval != 0 and self.iteration % print_interval == 0) or \
+                        ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):
                     print (self.verbose_output(very_verbose))
 
         if verbose:

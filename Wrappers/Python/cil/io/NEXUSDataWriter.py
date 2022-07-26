@@ -67,11 +67,11 @@ class NEXUSDataWriter(object):
         :type compression: int, default 0
         '''        
         self.data = data
-
-        if not file_name.endswith('nxs') and not file_name.endswith('nex'):
-            file_name+='.nxs'
-
         self.file_name = os.path.abspath(file_name)
+
+        if not self.file_name.endswith('nxs') and not self.file_name.endswith('nex'):
+            self.file_name+='.nxs'
+        
         self.compression = compression
         
         if not ((isinstance(self.data, ImageData)) or 
@@ -100,6 +100,12 @@ class NEXUSDataWriter(object):
         '''
         write dataset to disk
         '''   
+        # check filename and data have been set:
+        if self.file_name is None:
+            raise TypeError('Path to nexus file to write to is required.')
+        if self.data is None:
+            raise TypeError('Data to write out must be set.')
+        
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))

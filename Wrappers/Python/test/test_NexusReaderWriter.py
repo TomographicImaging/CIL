@@ -1,28 +1,29 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 import unittest
+from utils import initialise_tests
 import os
 from cil.io import NEXUSDataReader
 from cil.io import NEXUSDataWriter
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy
 import shutil
-    
+
+initialise_tests()
 
 class TestNexusReaderWriter(unittest.TestCase):
     
@@ -83,7 +84,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         im = ig.allocate('random',seed=9)
 
         writer = NEXUSDataWriter()
-        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'),
+        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
                       data = im, compression=16)
         writer.write()
 
@@ -91,6 +92,28 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertTrue(writer.compression == 16)
 
         self.readImageDataAndTest(atol=1e-4)
+
+    def test_write_throws_when_data_is_none(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(file_name='test_file_name.nxs')
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Data to write out must be set.')
+
+    def test_write_throws_when_file_is_none(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(data=self.ad2d)
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Path to nexus file to write to is required.')
+
+    def test_write_throws_when_file_is_not_path_like(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(file_name=self.ad2d , data=self.ad2d)
+            writer.write()
+
+    def test_write_throws_when_file_path_not_possible(self):
+        with self.assertRaises(OSError):
+            writer = NEXUSDataWriter(file_name="_/_/_" , data=self.ad2d)
+            writer.write()
 
 
     def readImageDataAndTest(self,atol=0):        
@@ -144,7 +167,5 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d
-        
-        
-if __name__ == '__main__':
-    unittest.main()
+
+

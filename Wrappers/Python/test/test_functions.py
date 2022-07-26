@@ -16,6 +16,7 @@
 
 import unittest
 
+
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
@@ -828,6 +829,7 @@ class TestTotalVariation(unittest.TestCase):
         self.tv_aniso = TotalVariation(isotropic=False)
         self.ig_real = ImageGeometry(3,4)   
         self.grad = GradientOperator(self.ig_real)  
+        self.alpha_arr = self.ig_real.allocate(0.15)
         
     def test_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
@@ -865,7 +867,61 @@ class TestTotalVariation(unittest.TestCase):
         
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
-        np.testing.assert_equal(res1, res2)                
+        np.testing.assert_almost_equal(res1, res2, decimal = 3)     
+
+    def test_strongly_convex_TV(self):
+
+        TV_no_strongly_convex = self.alpha * TotalVariation()
+        self.assertEqual(TV_no_strongly_convex.strong_convexity_constant, 0)
+
+        # TV as strongly convex, with "small" strongly convex constant
+        TV_strongly_convex = self.alpha * TotalVariation(strong_convexity_constant=1e-4)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = TV_strongly_convex(x_real)
+        res2 = TV_no_strongly_convex(x_real) + (TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)        
+
+        # check proximal
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = TV_no_strongly_convex.proximal(x_real, tau=1.0)
+
+
+        tmp_x_real = x_real.copy()
+        res2 = TV_strongly_convex.proximal(x_real, tau=1.0)  
+        # check input remain the same after proximal        
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array) 
+
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3) 
+
+    @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
+    def test_strongly_convex_CIL_FGP_TV(self):
+
+        FGP_TV_no_strongly_convex = self.alpha * FGP_TV()
+        self.assertEqual(FGP_TV_no_strongly_convex.strong_convexity_constant, 0)
+
+        # TV as strongly convex, with "small" strongly convex constant
+        FGP_TV_strongly_convex = self.alpha * FGP_TV(strong_convexity_constant=1e-3)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = FGP_TV_strongly_convex(x_real)
+
+        res2 = FGP_TV_no_strongly_convex(x_real) + (FGP_TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)        
+
+        # check proximal
+        x_real = self.ig_real.allocate('random', seed=4)         
+        res1 = FGP_TV_no_strongly_convex.proximal(x_real, tau=1.0)
+
+        tmp_x_real = x_real.copy()
+        res2 = FGP_TV_strongly_convex.proximal(x_real, tau=1.0)  
+        # check input remain the same after proximal        
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array) 
+        
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)           
+
     
 
     @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
@@ -902,12 +958,7 @@ class TestTotalVariation(unittest.TestCase):
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
         
-        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-
-        ###################################################################
-        ###################################################################
-        ###################################################################
-        ###################################################################    
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4) 
         
         # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
         iters = 408
@@ -932,11 +983,6 @@ class TestTotalVariation(unittest.TestCase):
         # print(t3-t2)
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
         
-        ###################################################################
-        ###################################################################
-        ###################################################################
-        ###################################################################
-    
     
     @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
@@ -979,6 +1025,18 @@ class TestTotalVariation(unittest.TestCase):
         # print (t3-t2)
         
         np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=7.5e-2)
+
+    def test_non_scalar_tau_cil_tv(self):
+
+        x_real = self.ig_real.allocate('random', seed=4) 
+
+        # tau is an array filled with alpha = 0.15
+        res1 = self.tv_iso.proximal(x_real, tau = self.alpha_arr)
+
+        # use the alpha * TV
+        res2 = self.tv_scaled.proximal(x_real, tau = 1.0)
+        
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)    
 
 
 class TestLeastSquares(unittest.TestCase):

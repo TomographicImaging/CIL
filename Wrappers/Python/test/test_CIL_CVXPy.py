@@ -152,7 +152,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             return cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u), DY @ cvxpy.vec(u)]), 2, axis = 0))
         else:
             return cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u), DY @ cvxpy.vec(u)]), 1, axis = 0)) 
-
+    
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def test_cil_vs_cvxpy_totalvariation_isotropic(self):
 
@@ -215,7 +215,42 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             # compare objectives
             f = 0.5*L2NormSquared(b=self.data)
             cil_objective = f(tv_cil) + TV(tv_cil)*(3)
-            np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)              
+            np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3) 
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
+    def test_cil_vs_cvxpy_totalvariation_strongly_convex(self):  
+
+        # solution
+        u_cvx = cvxpy.Variable(self.data.shape)
+
+        # regularisation parameter
+        alpha = 0.1
+
+        # strongly convex constant
+        gamma = 0.05
+
+        # fidelity term
+        fidelity = 0.5 * cvxpy.sum_squares(u_cvx - self.data.array) 
+        regulariser = alpha * self.tv_cvxpy_regulariser(u_cvx) +  (gamma/2) * cvxpy.sum_squares(u_cvx)
+
+        # objective
+        obj =  cvxpy.Minimize( regulariser +  fidelity)
+        prob = cvxpy.Problem(obj, constraints = [])
+
+        # Choose solver ( SCS, MOSEK(license needed) )
+        tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)   
+
+        # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
+        TV = alpha * TotalVariation(max_iteration = 500, strong_convexity_constant = gamma)
+        tv_cil = TV.proximal(self.data, tau=1.0)                
+
+        # compare solution
+        np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-2)                           
+
+        # compare objectives
+        f = 0.5*L2NormSquared(b=self.data)
+        cil_objective = f(tv_cil) + TV(tv_cil) 
+        np.testing.assert_allclose(cil_objective, obj.value, atol=1e-1)         
 
 
 

@@ -76,6 +76,56 @@ eprint = {https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192}
 }
 
 
+@ARTICLE{BeckTeboulle_a,
+  author={Beck, Amir and Teboulle, Marc},
+  journal={IEEE Transactions on Image Processing}, 
+  title={Fast Gradient-Based Algorithms for Constrained Total Variation Image Denoising and Deblurring Problems}, 
+  year={2009},
+  volume={18},
+  number={11},
+  pages={2419-2434},
+  doi={10.1109/TIP.2009.2028250}}
+
+
+@article{BeckTeboulle_b,
+author = {Beck, Amir and Teboulle, Marc},
+title = {A Fast Iterative Shrinkage-Thresholding Algorithm for Linear Inverse Problems},
+journal = {SIAM Journal on Imaging Sciences},
+volume = {2},
+number = {1},
+pages = {183-202},
+year = {2009},
+doi = {10.1137/080716542},
+
+URL = { 
+        https://doi.org/10.1137/080716542
+    
+},
+eprint = { 
+        https://doi.org/10.1137/080716542
+    
+}
+,
+    abstract = { We consider the class of iterative shrinkage-thresholding algorithms (ISTA) for solving linear inverse problems arising in signal/image processing. This class of methods, which can be viewed as an extension of the classical gradient algorithm, is attractive due to its simplicity and thus is adequate for solving large-scale problems even with dense matrix data. However, such methods are also known to converge quite slowly. In this paper we present a new fast iterative shrinkage-thresholding algorithm (FISTA) which preserves the computational simplicity of ISTA but with a global rate of convergence which is proven to be significantly better, both theoretically and practically. Initial promising numerical results for wavelet-based image deblurring demonstrate the capabilities of FISTA which is shown to be faster than ISTA by several orders of magnitude. }
+}
+
+
+@Article{Rasch2020,
+author={Rasch, Julian
+and Chambolle, Antonin},
+title={Inexact first-order primal--dual algorithms},
+journal={Computational Optimization and Applications},
+year={2020},
+month={Jun},
+day={01},
+volume={76},
+number={2},
+pages={381-430},
+abstract={We investigate the convergence of a recently popular class of first-order primal--dual algorithms for saddle point problems under the presence of errors in the proximal maps and gradients. We study several types of errors and show that, provided a sufficient decay of these errors, the same convergence rates as for the error-free algorithm can be established. More precisely, we prove the (optimal) {\$}{\$}O{\backslash}left( 1/N{\backslash}right){\$}{\$} convergence to a saddle point in finite dimensions for the class of non-smooth problems considered in this paper, and prove a {\$}{\$}O{\backslash}left( 1/N^2{\backslash}right){\$}{\$} or even linear {\$}{\$}O{\backslash}left( {\backslash}theta ^N{\backslash}right){\$}{\$} convergence rate if either the primal or dual objective respectively both are strongly convex. Moreover we show that also under a slower decay of errors we can establish rates, however slower and directly depending on the decay of the errors. We demonstrate the performance and practical use of the algorithms on the example of nested algorithms and show how they can be used to split the global objective more efficiently.},
+issn={1573-2894},
+doi={10.1007/s10589-020-00186-y},
+url={https://doi.org/10.1007/s10589-020-00186-y}}
+
 @book{Kak2001,
   doi = {10.1137/1.9780898719277},
   url = {https://doi.org/10.1137/1.9780898719277},
@@ -83,7 +133,24 @@ eprint = {https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192}
   month = jan,
   publisher = {Society for Industrial and Applied Mathematics},
   author = {Avinash C. Kak and Malcolm Slaney},
-  title = {Principles of Computerized Tomographic Imaging}
+  title = {Principles of Computerized Tomographic Imaging}}
+
+@Article{Zhu2010,
+author={Zhu, Mingqiang
+and Wright, Stephen J.
+and Chan, Tony F.},
+title={Duality-based algorithms for total-variation-regularized image restoration},
+journal={Computational Optimization and Applications},
+year={2010},
+month={Nov},
+day={01},
+volume={47},
+number={3},
+pages={377-400},
+abstract={Image restoration models based on total variation (TV) have become popular since their introduction by Rudin, Osher, and Fatemi (ROF) in 1992. The dual formulation of this model has a quadratic objective with separable constraints, making projections onto the feasible set easy to compute. This paper proposes application of gradient projection (GP) algorithms to the dual formulation. We test variants of GP with different step length selection and line search strategies, including techniques based on the Barzilai-Borwein method. Global convergence can in some cases be proved by appealing to existing theory. We also propose a sequential quadratic programming (SQP) approach that takes account of the curvature of the boundary of the dual feasible set. Computational experiments show that the proposed approaches perform well in a wide range of applications and that some are significantly faster than previously proposed methods, particularly when only modest accuracy in the solution is required.},
+issn={1573-2894},
+doi={10.1007/s10589-008-9225-2},
+url={https://doi.org/10.1007/s10589-008-9225-2}
 }
 
 @ARTICLE{BeckTeboulle_a,

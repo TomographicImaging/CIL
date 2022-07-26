@@ -1,4 +1,6 @@
 * 22.0.0
+  - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects.
+  - Numba added as a CIL requirement.
   - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
   - Added ISTA algorithm. Improve inheritance of proximal gradient algorithms.
   - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes

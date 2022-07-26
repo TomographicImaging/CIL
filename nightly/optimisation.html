@@ -3856,8 +3856,8 @@ proximal and proximal_conjugate</p>
 <h3>KullbackLeibler<a class="headerlink" href="#kullbackleibler" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.optimisation.functions.KullbackLeibler">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">KullbackLeibler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler" title="Permalink to this definition">#</a></dt>
-<dd><p>Kullback Leibler divergence function is defined as:</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">KullbackLeibler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler" title="Permalink to this definition">#</a></dt>
+<dd><p>Kullback Leibler</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}F(u, v)
 = \begin{cases}
@@ -3865,78 +3865,54 @@ u \log(\frac{u}{v}) - u + v &amp; \mbox{ if } u &gt; 0, v &gt; 0\\
 v &amp; \mbox{ if } u = 0, v \ge 0 \\
 \infty, &amp; \mbox{otherwise}
 \end{cases}\end{split}\]</div>
-<p>where we use the <span class="math notranslate nohighlight">\(0\log0 := 0\)</span> convention.</p>
-<p>At the moment, we use build-in implemention of scipy, see
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html</a></p>
-<p>The Kullback-Leibler function is used as a fidelity term in minimisation problems where the
-acquired data follow Poisson distribution. If we denote the acquired data with <span class="math notranslate nohighlight">\(b\)</span>
+<p>where the <span class="math notranslate nohighlight">\(0\log0 := 0\)</span> convention is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>non-negative</em>) – Translates the function at point <cite>b</cite>.</p></li>
+<li><p><strong>eta</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = 0</em>) – Background noise</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Mask for the data <cite>b</cite></p></li>
+<li><p><strong>backend</strong> (<em>{'numba'</em><em>,</em><em>'numpy'}</em><em>, </em><em>optional</em>) – Backend for the KullbackLeibler methods. Numba is the default backend.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Kullback-Leibler function is used in practice as a fidelity term in minimisation problems where the
+acquired data follow Poisson distribution. If we denote the acquired data with <code class="code docutils literal notranslate"><span class="pre">b</span></code>
 then, we write</p>
-<blockquote>
-<div><div class="math notranslate nohighlight">
+<div class="math notranslate nohighlight">
 \[\underset{i}{\sum} F(b_{i}, (v + \eta)_{i})\]</div>
 <p>where, <span class="math notranslate nohighlight">\(\eta\)</span> is an additional noise.</p>
-<p>Example: In the case of Positron Emission Tomography reconstruction <span class="math notranslate nohighlight">\(\eta\)</span> represents
+<p>In the case of Positron Emission Tomography reconstruction <span class="math notranslate nohighlight">\(\eta\)</span> represents
 scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
 fidelity measures the distance between <span class="math notranslate nohighlight">\(\mathcal{A}v + \eta\)</span> and acquisition data <span class="math notranslate nohighlight">\(b\)</span>, where
-<span class="math notranslate nohighlight">\(\mathcal{A}\)</span> is the projection operator.</p>
-<p>This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction
-in the PET-MR software , see <a class="reference external" href="https://github.com/CCPPETMR">https://github.com/CCPPETMR</a> and for more details in</p>
-</div></blockquote>
-<p><a class="reference external" href="http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html">http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html</a></p>
+<span class="math notranslate nohighlight">\(\mathcal{A}\)</span> is the projection operator. This is related to <a class="reference external" href="http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html">PoissonLogLikelihoodWithLinearModelForMean</a> ,
+definition that is used in PET reconstruction in the <a class="reference external" href="https://github.com/SyneRBI/SIRF">SIRF</a> software.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default implementation uses the build-in function <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html">kl_div</a> from scipy.
+The methods of the <a class="reference internal" href="#cil.optimisation.functions.KullbackLeibler" title="cil.optimisation.functions.KullbackLeibler"><code class="xref py py-class docutils literal notranslate"><span class="pre">KullbackLeibler</span></code></a> are accelerated provided that <a class="reference external" href="https://numba.pydata.org/">numba</a> library is installed.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">KullbackLeibler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.functions.KullbackLeibler.__new__">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">__new__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__new__" title="Permalink to this definition">#</a></dt>
+<dd><p>Create and return a new object.  See help(type) for accurate signature.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="cil.optimisation.functions.KullbackLeibler.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.
-To avoid infinity values, we consider only pixels/voxels for <span class="math notranslate nohighlight">\(x+\eta\geq0\)</span>.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.log">
-<code class="sig-name descname"><span class="pre">log</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datacontainer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.log" title="Permalink to this definition">#</a></dt>
-<dd><p>calculates the in-place log of the datacontainer</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.gradient">
-<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the gradient of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[F'(b, x + \eta) = 1 - \frac{b}{x+\eta}\]</div>
-<p>We require the <span class="math notranslate nohighlight">\(x+\eta&gt;0\)</span> otherwise we have inf values.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.convex_conjugate">
-<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.convex_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the convex conjugate of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[F^{*}(b, x + \eta) = - b \log(1-x^{*}) - &lt;x^{*}, \eta&gt;\]</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.proximal">
-<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the proximal operator of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)\]</div>
-<p>The proximal for the convex conjugate of <span class="math notranslate nohighlight">\(F\)</span> is</p>
-<div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})\]</div>
-<p>where <span class="math notranslate nohighlight">\(z = x + \tau \eta\)</span></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.proximal_conjugate">
-<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.proximal_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Proximal operator of the convex conjugate of KullbackLeibler at x:</p>
-<div class="math notranslate nohighlight">
-\[prox_{\tau * f^{*}}(x)\]</div>
 </dd></dl>
 
 </dd></dl>

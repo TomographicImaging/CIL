@@ -1,6 +1,7 @@
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions.
-  - Added ISTA algorithm. Improve inheritance of proximal gradient algoritms.
+  - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
+  - Added ISTA algorithm. Improve inheritance of proximal gradient algorithms.
   - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes
   - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
   - Cleaned up unit test structure and output

@@ -129,15 +129,9 @@ class TotalVariation(Function):
     >>> TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)
     >>> sol = TV.proxima(b, tau = 1.0)    
 
-
-
     """   
-    
 
 
-
-
-    
     def __init__(self,
                  max_iteration=100, 
                  tolerance = None, 
@@ -204,7 +198,7 @@ class TotalVariation(Function):
     @regularisation_parameter.setter
     def regularisation_parameter(self, value):
         if not isinstance(value, Number):
-            raise TypeError("regularisation_parameter: expectec a number, got {}".format(type(value)))
+            raise TypeError("regularisation_parameter: expected a number, got {}".format(type(value)))
         self._regularisation_parameter = value
 
     def __call__(self, x):
@@ -252,6 +246,7 @@ class TotalVariation(Function):
         if out is None:
             return solution 
     
+
     def _fista_on_dual_rof(self, x, tau, out = None):
         
         r""" Implements the Fast Gradient Projection algorithm on the dual problem 
@@ -272,74 +267,69 @@ class TotalVariation(Function):
         
         # initialise
         t = 1        
-        tmp_p = self.gradient.range_geometry().allocate(0)  
-        tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate(0)     
+
         p1 = self.gradient.range_geometry().allocate(0)
-            
+        p2 = self.gradient.range_geometry().allocate(0)  
+        tmp_q = self.gradient.range_geometry().allocate(0)
+
+        #modify tau
+        tau.multiply(self.regularisation_parameter, out=tau)
+
+        should_return = False
+        if out is None:
+            should_return = True
+            out = self.gradient.domain_geometry().allocate(0)   
+
         should_break = False
         for k in range(self.iterations):
                                                                                    
             t0 = t
-            self.gradient.adjoint(tmp_q, out = tmp_x)
-                        
-            tmp_x.axpby(-self.regularisation_parameter * tau, 1.0, x, out=tmp_x)
-            self.projection_C(tmp_x, tau=None, out = tmp_x)                       
-            self.gradient.direct(tmp_x, out=p1)
-
-            if isinstance (tau, Number):
-                p1 *= self.L/(self.regularisation_parameter * tau)
-            else:
-                p1 *= self.L/self.regularisation_parameter
-                p1 /= tau
-
-            if self.tolerance is not None:
-                
-                if k%5==0:
-                    error = p1.norm()
-                    p1 += tmp_q
-                    error /= p1.norm()
-                    if error<=self.tolerance:                           
-                        should_break = True
-                else:
-                    p1 += tmp_q
-            else:
-                p1 += tmp_q
-
-            # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixeL21Norm (isotropic case),
-            # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.
-            p1 =  self.func.proximal_conjugate(p1, tau = 1.0)
-                       
-            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
-            
-            # tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
-            p1.subtract(tmp_p, out=tmp_q)
-            tmp_q *= (t0-1)/t
-            tmp_q += p1            
-            tmp_p.fill(p1)
+            self.gradient.adjoint(tmp_q, out = out)
+            out.sapyb(-tau, x, 1.0, out=out)
+            self.projection_C(out, tau=None, out = out)
 
             if should_break:
                 break
-                
+
+            self.gradient.direct(out, out=p1)
+
+            multip = self.L/tau
+            p1.multiply(multip,out=p1)
+            
+            tmp_q += p1
+
+            if self.tolerance is not None and k%5==0:
+                error = p1.norm()
+                error /= tmp_q.norm()
+                if error <= self.tolerance:                           
+                    should_break = True
+
+            # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixedL21Norm (isotropic case),
+            # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.
+            self.func.proximal_conjugate(tmp_q, 1.0, out=p1)
+                       
+            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
+            
+            p1.subtract(p2, out=tmp_q)
+            tmp_q *= (t0-1)/t
+            tmp_q += p1
+
+            #switch p1 and p2 references
+            tmp = p1
+            p1 = p2
+            p2 = tmp
+
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:
             if self.tolerance is not None:
                 print("Stop at {} iterations with tolerance {} .".format(k, error))
             else:
                 print("Stop at {} iterations.".format(k))                
-                    
-        self.gradient.adjoint(tmp_q, out=tmp_x)
 
-        if isinstance (tau, Number):
-            tmp_x *= (tau * self.regularisation_parameter)
-        else:
-            tmp_x *= tau
-            tmp_x *= self.regularisation_parameter
+        if should_return:
+            return out
 
-        x.subtract(tmp_x, out=tmp_x)
 
-        return self.projection_C(tmp_x, tau=None, out=out) 
-    
     def convex_conjugate(self,x):   
         r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""             
         return 0.0    
@@ -366,6 +356,6 @@ class TotalVariation(Function):
 
     def __rmul__(self, scalar):
         if not isinstance (scalar, Number):
-            raise TypeError("scalar: Expectec a number, got {}".format(type(scalar)))
+            raise TypeError("scalar: Expected a number, got {}".format(type(scalar)))
         self.regularisation_parameter = scalar
         return self

@@ -185,22 +185,20 @@
               <div>
                 
   <h1>Source code for cil.plugins.ccpi_regularisation.functions.regularisers</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
-<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
-<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+<span></span><span class="c1"># Copyright 2022 United Kingdom Research and Innovation</span>
+<span class="c1"># Copyright 2022 The University of Manchester</span>
 
-<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1">#   you may not use this file except in compliance with the License.</span>
-<span class="c1">#   You may obtain a copy of the License at</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
 
-<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
 
-<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1">#   See the License for the specific language governing permissions and</span>
-<span class="c1">#   limitations under the License.</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">ccpi.filters</span> <span class="kn">import</span> <span class="n">regularisers</span>
@@ -220,18 +218,28 @@
 
 <span class="k">class</span> <span class="nc">RegulariserFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Generic proximal method for a RegulariserFunction</span>
+ 
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Generic proximal method for a RegulariserFunction</span>
+
+<span class="sd">        .. math:: \mathrm{prox}_{\tau f}(x) := \argmin_{z} f(x) + \frac{1}{2}\|z - x \|^{2}</span>
 <span class="sd">        </span>
-<span class="sd">        :param x: image to be regularised</span>
-<span class="sd">        :type x: an ImageData</span>
-<span class="sd">        :param tau: </span>
-<span class="sd">        :type tau: Number</span>
-<span class="sd">        :param out: a placeholder for the result</span>
-<span class="sd">        :type out: same as x: ImageData</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        x : DataContainer</span>
+<span class="sd">            Input of the proximal operator</span>
+<span class="sd">        tau : Number</span>
+<span class="sd">            Positive parameter of the proximal operator</span>
+<span class="sd">        out : DataContainer</span>
+<span class="sd">            Output :class:`Datacontainer` in which the result is placed.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----    </span>
 <span class="sd">        </span>
-<span class="sd">        If the ImageData contains complex data, rather than the default float32, the regularisation</span>
-<span class="sd">        is run indipendently on the real and imaginary part.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        If the :class:`ImageData` contains complex data, rather than the default `float32`, the regularisation</span>
+<span class="sd">        is run independently on the real and imaginary part.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
@@ -267,33 +275,121 @@
         <span class="k">pass</span>
 
 <span class="k">class</span> <span class="nc">TV_Base</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
+
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total Variation regulariser</span>
+
+<span class="sd">    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1}</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    </span>
+<span class="sd">    strong_convexity_constant : Number </span>
+<span class="sd">                              Positive parameter that allows Total variation regulariser to be strongly convex. Default = 0.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    By definition, Total variation is a convex function. However,</span>
+<span class="sd">    adding a strongly convex term makes it a strongly convex function.</span>
+<span class="sd">    Then, we say that `TV` is a :math:`\gamma&gt;0` strongly convex function i.e., </span>
+
+<span class="sd">    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="n">strong_convexity_constant</span>
+
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">in_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
         <span class="n">EnergyValTV</span> <span class="o">=</span> <span class="n">TV_ENERGY</span><span class="p">(</span><span class="n">in_arr</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">EnergyValTV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">EnergyValTV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">EnergyValTV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>     
         <span class="k">return</span> <span class="mf">0.0</span>
 
 
 <div class="viewcode-block" id="FGP_TV"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.FGP_TV">[docs]</a><span class="k">class</span> <span class="nc">FGP_TV</span><span class="p">(</span><span class="n">TV_Base</span><span class="p">):</span>
-<div class="viewcode-block" id="FGP_TV.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.FGP_TV.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Creator of FGP_TV Function</span>
+
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Fast Gradient Projection Total Variation (FGP_TV)</span>
+
+<span class="sd">        The :class:`FGP_TV` computes the proximal operator of the Total variation regulariser</span>
+
+<span class="sd">        .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .</span>
+<span class="sd">        </span>
+<span class="sd">        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm </span>
+<span class="sd">        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
 
 
-<span class="sd">        :param alpha: regularisation parameter</span>
-<span class="sd">        :type alpha: number, default 1</span>
-<span class="sd">        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm</span>
-<span class="sd">        :type isotropic: boolean, default True, can range between 1 and 2</span>
-<span class="sd">        :param nonnegativity: Whether to add the non-negativity constraint</span>
-<span class="sd">        :type nonnegativity: boolean, default True</span>
-<span class="sd">        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached</span>
-<span class="sd">        :type max_iteration: integer, default 100</span>
-<span class="sd">        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.</span>
-<span class="sd">        :type tolerance: float, default 0</span>
-<span class="sd">        :param device: determines if the code runs on CPU or GPU</span>
-<span class="sd">        :type device: string, default &#39;cpu&#39;, can be &#39;gpu&#39; if GPU is installed</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        alpha : :obj:`Number` (positive), default = 1.0 .</span>
+<span class="sd">                Total variation regularisation parameter. </span>
+
+<span class="sd">        max_iteration : :obj:`int`. Default = 100 .</span>
+<span class="sd">                Maximum number of iterations for the Fast Gradient Projection algorithm.</span>
+
+<span class="sd">        isotropic : :obj:`boolean`. Default = True .</span>
+<span class="sd">                    Isotropic or Anisotropic definition of the Total variation regulariser.</span>
+
+<span class="sd">                    .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})</span>
+
+<span class="sd">                    .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})</span>
+
+<span class="sd">        nonnegativity : :obj:`boolean`. Default = True .</span>
+<span class="sd">                        Non-negativity constraint for the solution of the FGP algorithm.</span>
+
+<span class="sd">        tolerance : :obj:`float`, Default = 0 .</span>
+<span class="sd">                    Stopping criterion for the FGP algorithm.</span>
+<span class="sd">                    </span>
+<span class="sd">                    .. math:: \|x^{k+1} - x^{k}\|_{2} &lt; \mathrm{tolerance}</span>
+
+<span class="sd">        device : :obj:`str`, Default = &#39;cpu&#39; .</span>
+<span class="sd">                FGP_TV algorithm runs on `cpu` or `gpu`.</span>
+
+<span class="sd">        strong_convexity_constant : :obj:`float`, default = 0</span>
+<span class="sd">                A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. </span>
+<span class="sd">                Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is</span>
+
+<span class="sd">                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow</span>
+
+<span class="sd">                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) </span>
+
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        .. math:: \underset{u\qeq0}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha TV(u)</span>
+
+
+<span class="sd">        &gt;&gt;&gt; G = alpha * FGP_TV(max_iteration=100, device=&#39;gpu&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; sol = G.proximal(b)</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+
+<span class="sd">        The :class:`FGP_TV` regularisation does not incorparate information on the :class:`ImageGeometry`, i.e., pixel/voxel size.</span>
+<span class="sd">        Therefore a rescaled parameter should be used to match the same solution computed using :class:`~cil.optimisation.functions.TotalVariation`.</span>
+
+<span class="sd">        &gt;&gt;&gt; G1 = (alpha/ig.voxel_size_x) * FGP_TV(max_iteration=100, device=&#39;gpu&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; G2 = alpha * TotalVariation(max_iteration=100, lower=0.)</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :class:`~cil.optimisation.functions.TotalVariation`</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        
         <span class="k">if</span> <span class="n">isotropic</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">methodTV</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
@@ -308,9 +404,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span> <span class="o">=</span> <span class="n">max_iteration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nonnegativity</span> <span class="o">=</span> <span class="n">nonnegativity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span> <span class="c1"># string for &#39;cpu&#39; or &#39;gpu&#39;</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span> 
 
-    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FGP_TV</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">strong_convexity_constant</span><span class="o">=</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Implements the Fast Gradient Projection algorithm on the dual problem </span>
+<span class="sd">        of the Total Variation Denoising problem (ROF).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>    
+
         <span class="n">res</span> <span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">regularisers</span><span class="o">.</span><span class="n">FGP_TV</span><span class="p">(</span>\
               <span class="n">in_arr</span><span class="p">,</span>\
               <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">tau</span><span class="p">,</span>\
@@ -319,9 +423,26 @@
               <span class="bp">self</span><span class="o">.</span><span class="n">methodTV</span><span class="p">,</span>\
               <span class="bp">self</span><span class="o">.</span><span class="n">nonnegativity</span><span class="p">,</span>\
               <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">info</span>
-    
-<div class="viewcode-block" id="FGP_TV.__rmul__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.FGP_TV.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">strongly_convex_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
+            <span class="n">in_arr</span> <span class="o">/=</span> <span class="n">strongly_convex_factor</span>
+            <span class="n">tau</span> <span class="o">/=</span> <span class="n">strongly_convex_factor</span>
+        
+        <span class="n">solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fista_on_dual_rof</span><span class="p">(</span><span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">in_arr</span> <span class="o">*=</span> <span class="n">strongly_convex_factor</span>
+            <span class="n">tau</span> <span class="o">*=</span> <span class="n">strongly_convex_factor</span>
+
+        <span class="k">return</span> <span class="n">solution</span>
+                
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 <span class="sd">        </span>
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
@@ -329,7 +450,7 @@
             <span class="k">raise</span> <span class="bp">NotImplemented</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*=</span> <span class="n">scalar</span>
-            <span class="k">return</span> <span class="bp">self</span></div>
+            <span class="k">return</span> <span class="bp">self</span>
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> cannot work on more than 3D. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">))</span></div>
@@ -546,6 +667,7 @@
         <span class="k">if</span> <span class="p">(</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="ow">not</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;TNV requires 2D+channel data. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span></div></div>
         
+
 </pre></div>
 
               </div>

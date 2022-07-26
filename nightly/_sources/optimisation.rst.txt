@@ -337,6 +337,13 @@ Smooth Mixed L21 norm
    :members:
    :special-members:   
 
+Mixed L11 norm
+---------------------
+
+.. autoclass:: cil.optimisation.functions.MixedL11Norm
+   :members:
+   :special-members:      
+
 Total variation
 ---------------
 

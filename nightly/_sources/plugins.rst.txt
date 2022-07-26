@@ -14,8 +14,7 @@ Total variation
 ---------------
  
 .. autoclass:: cil.plugins.ccpi_regularisation.functions.FGP_TV
-   :members:
-   :special-members:
+
 
 Other regularisation functions
 ------------------------------

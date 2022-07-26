@@ -20,7 +20,6 @@ import scipy.special
 import logging
 
 try:
-    import numba
     from numba import jit, prange
     has_numba = True
 except ImportError as ie:
@@ -153,19 +152,20 @@ class KullbackLeibler_numpy(KullbackLeibler):
         
         """         
 
-        tmp_sum_array = (x + self.eta).as_array()
-
-        if out is None:   
-            tmp_out = x * 0.0
-            tmp_out.as_array()[tmp_sum_array>0] = \
-                1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
-            return tmp_out
+        should_return=False
+        if out is None:
+            out = x.add(self.eta)
+            should_return=True
         else:
-            x.add(self.eta, out=out)
-            out_array = out.clone().as_array()
-            out_array[tmp_sum_array>0] = 1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
-            out.fill(out_array)
+            x.add(self.eta,out=out)
 
+        arr = out.as_array()
+        arr[arr>0] = 1 - self.b.as_array()[arr>0]/arr[arr>0]
+
+        out.fill(arr)
+
+        if should_return:
+            return out        
 
     def convex_conjugate(self, x):
 

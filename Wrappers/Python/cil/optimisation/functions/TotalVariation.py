@@ -275,11 +275,13 @@ class TotalVariation(Function):
         p2 = self.gradient.range_geometry().allocate(0)  
         tmp_q = self.gradient.range_geometry().allocate(0)
 
-        #modify tau
+        # multiply tau by -1 * regularisation_parameter here so it's not recomputed every iteration
+        # when tau is an array this is done inplace so reverted at the end
         if isinstance(tau, Number):
-            tau = self.regularisation_parameter * tau
+            tau_reg_neg = -self.regularisation_parameter * tau
         else:
-            tau.multiply(self.regularisation_parameter, out=tau)
+            tau_reg_neg = tau
+            tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
 
         should_return = False
         if out is None:
@@ -291,7 +293,7 @@ class TotalVariation(Function):
                                                                                    
             t0 = t
             self.gradient.adjoint(tmp_q, out = out)
-            out.sapyb(-tau, x, 1.0, out=out)
+            out.sapyb(tau_reg_neg, x, 1.0, out=out)
             self.projection_C(out, tau=None, out = out)
 
             if should_break:
@@ -299,7 +301,7 @@ class TotalVariation(Function):
 
             self.gradient.direct(out, out=p1)
 
-            multip = self.L/tau
+            multip = (-self.L)/tau_reg_neg
             p1.multiply(multip,out=p1)
             
             tmp_q += p1
@@ -331,6 +333,10 @@ class TotalVariation(Function):
                 logging.info("Stop at {} iterations with tolerance {} .".format(k, error))
             else:
                 logging.info("Stop at {} iterations.".format(k))                
+
+        # return tau to its original state if it was modified
+        if id(tau_reg_neg) == id(tau):
+            tau_reg_neg.divide(-self.regularisation_parameter, out=tau)
 
         if should_return:
             return out

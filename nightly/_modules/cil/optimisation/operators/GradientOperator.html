@@ -268,24 +268,26 @@
         <span class="c1"># Default correlation for the gradient coupling</span>
         <span class="n">correlation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">CORRELATION_SPACE</span><span class="p">)</span>
 
-        <span class="c1"># Add assumed attributes if there is no CIL geometry (i.e. SIRF objects)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="s1">&#39;channels&#39;</span><span class="p">):</span>
+        <span class="c1"># Add attributes for SIRF data where there is no CIL geometry</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
             <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>        
+                       
+        <span class="c1"># Space correlation on multichannel data call numpy backend</span>
+        <span class="k">if</span> <span class="n">correlation</span> <span class="o">==</span> <span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1">#numpy implementation only for now</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;correlation=&#39;Space&#39; on multi-channel dataset will use `numpy` backend&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="s1">&#39;dimension_labels&#39;</span><span class="p">):</span>
-            <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>       
-
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">C</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">correlation</span> <span class="o">==</span> <span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend cannot use correlation=&#39;Space&#39; on multi-channel dataset - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend is only for arrays of datatype float32 - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend is only implemented for forward differences - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
-   
+        <span class="c1"># Complex data will use numpy backend</span>
+        <span class="k">if</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">]:</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Complex geometries will use `numpy` backend&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Method = </span><span class="si">{}</span><span class="s2"> implemented on `numpy` backend. Other methods are backward/centered.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>            
+            
         <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">NUMPY</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">Gradient_numpy</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">bnd_cond</span><span class="o">=</span><span class="n">bnd_cond</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -511,7 +513,7 @@
         
         <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_C</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span> 
                                          <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span> 
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with </span><span class="si">{}</span><span class="s2"> threads&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">)))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with &quot;</span><span class="p">,</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">),</span><span class="s2">&quot; threads&quot;</span><span class="p">)</span>               
 
     <span class="nd">@staticmethod</span> 
     <span class="k">def</span> <span class="nf">datacontainer_as_c_pointer</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>

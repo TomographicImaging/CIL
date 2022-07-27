@@ -76,14 +76,16 @@ class TestTomoPhantom2D(unittest.TestCase):
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_MC2D(self):
         model = 100
-        self.ag.set_channels(3)
+        self.ig.channels =3
         phantom = TomoPhantom.get_ImageData(model, self.ig)
         assert phantom.geometry.channels == self.ig.channels
         assert phantom.shape == self.ig.shape
+
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_is_model_temporal(self):
         model = 100
         assert TomoPhantom.is_model_temporal(model, num_dims=2)
+
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_get_model_num_channels(self):
         model = 100

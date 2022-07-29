@@ -1,13 +1,13 @@
 * 22.0.0
-  - Strongly convex functionality in TotalVariation and FGP_TV Functions.
-  - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects.
-  - Numba added as a CIL requirement.
+  - Strongly convex functionality in TotalVariation and FGP_TV Functions
+  - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects
+  - Numba added as a CIL requirement
   - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
-  - Added ISTA algorithm. Improve inheritance of proximal gradient algorithms.
+  - Added ISTA algorithm. Improve inheritance of proximal gradient algorithms
   - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes
   - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
   - Cleaned up unit test structure and output
-  - Removal of deprecated code
+  - Removal of deprecated code:
     - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
     - `subset` method removed, use `get_slice` or `reorder` methods
     - NikonDataReader `normalize` kwarg removed, use `normalise`
@@ -18,15 +18,15 @@
     - Modules not moved should be considered deprecated
     - CIL remains licensed as APACHE-2.0
     - Minor bug fixes to the CPU 2D Parallel-beam FBP
-  - Add ndim property for DataContainer class.
+  - Add ndim property for DataContainer class
   - Fixes show_geometry compatibility issue with matplotlib 3.5
-  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality
   - Raise exception if filename or data haven't been set in NexusDataWriter
-  - Fixes error when update_objective_interval is set to 0 in an algorithm run.
+  - Fixes error when update_objective_interval is set to 0 in an algorithm run
   - Deprecated:
     - TXRMDataReader is deprecated in favour of ZEISSDataReader 
   - GitHub Actions:
-    - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
+    - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master
 
 * 21.4.1
  - Removed prints from unittests and cleanup of unittest code.

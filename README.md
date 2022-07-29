@@ -73,7 +73,6 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 
 # Building CIL from source code 
 
-
 ## Getting the code
 
 In case of development it is useful to be able to build the software directly. You should clone this repository as
@@ -87,6 +86,7 @@ The use of `--recurse-submodule` is necessary if the user wants the examples dat
 git submodule update --init
 ```
 
+## Build dependencies
 To create a conda environment with all the dependencies for building CIL run:
 
 ```bash
@@ -102,25 +102,28 @@ And then install CIL in to this environment using CMAKE.
 
 
 ## Build with CMake
+
 CMake and a C++ compiler are required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
 ```bash
-
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
 cmake --build . --target install
 ```
 
-The user then needs to add the path to `<install_directory>/lib` where the library is installed to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system
+If targeting an active conda environment then the `<install_directory>` can be set to `${CONDA_PREFIX}`.
 
-By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters 
+If not installing to a conda environment then the user will also need to set the locations of the IPP library and includes, and the path to CIL.
+
+By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters:
+
 ```bash
 
 cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
 ```
 
-If targeting an active conda environment then the `<install_directory>` can be set to `${CONDA_PREFIX}`.
+The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.
 
 
 # References

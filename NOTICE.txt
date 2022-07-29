@@ -3,7 +3,8 @@ Copyright 2017-2022 Rutherford Appleton Laboratory STFC
 Copyright 2017-2022 University of Manchester
 
 This software product is developed for the Collaborative Computational 
-Project in Tomographic Imaging CCPi (http://www.ccpi.ac.uk/) at RAL STFC (http://www.stfc.ac.uk), University of Manchester
+Project in Tomographic Imaging CCPi (http://www.ccpi.ac.uk/) with
+substantial contributions by UKRI-STFC and The University of Manchester.
 and other contributing institutions.
 
 Main contributors in alphabetical order:

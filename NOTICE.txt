@@ -1,5 +1,5 @@
 CCPi Core Imaging Library (CIL).
-Copyright 2017-2022 Rutherford Appleton Laboratory STFC
+Copyright 2017-2022 United Kingdom Research and Innovation
 Copyright 2017-2022 University of Manchester
 
 This software product is developed for the Collaborative Computational 

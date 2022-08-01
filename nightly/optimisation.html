@@ -557,20 +557,28 @@ method will stop when the stopping cryterion is met.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.Algorithm.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.update_previous_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.update_previous_solution" title="Permalink to this definition">#</a></dt>
+<dt id="cil.optimisation.algorithms.Algorithm._update_previous_solution">
+<code class="sig-name descname"><span class="pre">_update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm._update_previous_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm._update_previous_solution" title="Permalink to this definition">#</a></dt>
 <dd><p>Update the previous solution with the current one</p>
 <p>The concrete algorithm calls update_previous_solution. Normally this would
 entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tmp</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.Algorithm.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.Algorithm.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.is_provably_convergent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -732,7 +740,13 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.GD.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.GD.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -795,17 +809,6 @@ prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.GD.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
 </dd></dl>
 
 <dl class="py method">
@@ -904,7 +907,13 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.CGLS.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.CGLS.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -970,17 +979,6 @@ prints to screen both primal and dual</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.CGLS.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.algorithms.CGLS.verbose_output">
 <code class="sig-name descname"><span class="pre">verbose_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.verbose_output" title="Permalink to this definition">#</a></dt>
 <dd><p>Creates a nice tabulated output</p>
@@ -994,7 +992,7 @@ self.x = tmp</p>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SIRT</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Permalink to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id20" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">4</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id30" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">6</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1086,7 +1084,13 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.SIRT.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.SIRT.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1159,17 +1163,6 @@ prints to screen both primal and dual</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.SIRT.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.algorithms.SIRT.verbose_output">
 <code class="sig-name descname"><span class="pre">verbose_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.verbose_output" title="Permalink to this definition">#</a></dt>
 <dd><p>Creates a nice tabulated output</p>
@@ -1180,67 +1173,407 @@ self.x = tmp</p>
 </div>
 <div class="section" id="ista">
 <h3>ISTA<a class="headerlink" href="#ista" title="Permalink to this headline">#</a></h3>
-</div>
-<div class="section" id="fista">
-<h3>FISTA<a class="headerlink" href="#fista" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
-<dt id="cil.optimisation.algorithms.FISTA">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">FISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">initial=None</span></em>, <em class="sig-param"><span class="pre">f=None</span></em>, <em class="sig-param"><span class="pre">g=&lt;cil.optimisation.functions.Function.ZeroFunction</span> <span class="pre">object&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Permalink to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm</p>
-<p>Problem :</p>
+<dt id="cil.optimisation.algorithms.ISTA">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">ISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Permalink to this definition">#</a></dt>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id28" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id27" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<p>Iterative Shrinkage-Thresholding Algorithm (ISTA)</p>
+<div class="math notranslate nohighlight">
+\[x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))\]</div>
+<p>is used to solve</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
-<div class="line-block">
-<div class="line"><br /></div>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator and <span class="math notranslate nohighlight">\(\alpha^{k}\)</span>
+is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> per iteration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a constant step size, i.e., <span class="math notranslate nohighlight">\(a^{k}=a\)</span> for <span class="math notranslate nohighlight">\(k\geq1\)</span>, convergence of ISTA
+is guaranteed if</p>
+<div class="math notranslate nohighlight">
+\[\alpha\in(0, \frac{2}{L}),\]</div>
+<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[]</span>.</p>
 </div>
-<p>Parameters :</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param initial</dt>
-<dd class="field-odd"><p>Initial guess ( Default initial = 0)</p>
-</dd>
-<dt class="field-even">param f</dt>
-<dd class="field-even"><p>Differentiable function</p>
-</dd>
-<dt class="field-odd">param g</dt>
-<dd class="field-odd"><p>Convex function with ” simple ” proximal operator</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Reference:</p>
-<blockquote>
-<div><p>Beck, A. and Teboulle, M., 2009. A fast iterative shrinkage-thresholding
-algorithm for linear inverse problems.
-SIAM journal on imaging sciences,2(1), pp.183-202.</p>
-</div></blockquote>
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.FISTA.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">initial=None</span></em>, <em class="sig-param"><span class="pre">f=None</span></em>, <em class="sig-param"><span class="pre">g=&lt;cil.optimisation.functions.Function.ZeroFunction</span> <span class="pre">object&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>FISTA algorithm creator</p>
-<p>initialisation can be done at creation time if all
-proper variables are passed or later with set_up</p>
-<p>Optional parameters:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>initial</strong> – Initial guess ( Default initial = 0)</p></li>
-<li><p><strong>f</strong> – Differentiable function</p></li>
-<li><p><strong>g</strong> – Convex function with ” simple ” proximal operator</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess of ISTA.</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function</p></li>
+<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Convex function with <em>simple</em> proximal operator</p></li>
+<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Step size for the gradient step of ISTA.
+The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is <span class="math notranslate nohighlight">\(\frac{0.99 * 2}{L}.\)</span></p></li>
+<li><p><strong>kwargs</strong> (<em>Keyword arguments</em>) – Arguments from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[\underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">Aop</span><span class="o">.</span><span class="n">domain</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ista</span> <span class="o">=</span> <span class="n">ISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ista</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cil.optimisation.algorithms.FISTA" title="cil.optimisation.algorithms.FISTA"><code class="xref py py-class docutils literal notranslate"><span class="pre">FISTA</span></code></a>, <a class="reference internal" href="#cil.optimisation.algorithms.GD" title="cil.optimisation.algorithms.GD"><code class="xref py py-class docutils literal notranslate"><span class="pre">GD</span></code></a></p>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.set_step_size">
+<code class="sig-name descname"><span class="pre">set_step_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA.set_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.set_step_size" title="Permalink to this definition">#</a></dt>
+<dd><p>Set default step size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Constructor</p>
+<p>Set the minimal number of parameters:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_iteration</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – maximum number of iterations</p></li>
+<li><p><strong>update_objectice_interval</strong> – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
+<li><p><strong>log_file</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – log verbose output to file</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.FISTA.set_up">
-<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">initial</span></em>, <em class="sig-param"><span class="pre">f</span></em>, <em class="sig-param"><span class="pre">g=&lt;cil.optimisation.functions.Function.ZeroFunction</span> <span class="pre">object&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.set_up" title="Permalink to this definition">#</a></dt>
-<dd><p>initialisation of the algorithm</p>
+<dt id="cil.optimisation.algorithms.ISTA.set_up">
+<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.set_up" title="Permalink to this definition">#</a></dt>
+<dd><p>Set up of the algorithm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.update">
+<code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.update" title="Permalink to this definition">#</a></dt>
+<dd><p>Performs a single iteration of ISTA</p>
+<div class="math notranslate nohighlight">
+\[x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.get_output" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.update_objective">
+<code class="sig-name descname"><span class="pre">update_objective</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.update_objective" title="Permalink to this definition">#</a></dt>
+<dd><p>Updates the objective</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__delattr__">
+<code class="sig-name descname"><span class="pre">__delattr__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__delattr__" title="Permalink to this definition">#</a></dt>
+<dd><p>Implement delattr(self, name).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__dir__">
+<code class="sig-name descname"><span class="pre">__dir__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__dir__" title="Permalink to this definition">#</a></dt>
+<dd><p>Default dir() implementation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__eq__">
+<code class="sig-name descname"><span class="pre">__eq__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__eq__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__format__">
+<code class="sig-name descname"><span class="pre">__format__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">format_spec</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__format__" title="Permalink to this definition">#</a></dt>
+<dd><p>Default object formatter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__ge__">
+<code class="sig-name descname"><span class="pre">__ge__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__ge__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return self&gt;=value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__getattribute__">
+<code class="sig-name descname"><span class="pre">__getattribute__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__getattribute__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return getattr(self, name).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__gt__">
+<code class="sig-name descname"><span class="pre">__gt__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__gt__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return self&gt;value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__hash__">
+<code class="sig-name descname"><span class="pre">__hash__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__hash__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return hash(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__init_subclass__">
+<code class="sig-name descname"><span class="pre">__init_subclass__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__init_subclass__" title="Permalink to this definition">#</a></dt>
+<dd><p>This method is called when a class is subclassed.</p>
+<p>The default implementation does nothing. It may be
+overridden to extend subclasses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__iter__">
+<code class="sig-name descname"><span class="pre">__iter__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__iter__" title="Permalink to this definition">#</a></dt>
+<dd><p>Algorithm is an iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__le__">
+<code class="sig-name descname"><span class="pre">__le__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__le__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return self&lt;=value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__lt__">
+<code class="sig-name descname"><span class="pre">__lt__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__lt__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return self&lt;value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__ne__">
+<code class="sig-name descname"><span class="pre">__ne__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__ne__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return self!=value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__new__">
+<code class="sig-name descname"><span class="pre">__new__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__new__" title="Permalink to this definition">#</a></dt>
+<dd><p>Create and return a new object.  See help(type) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__next__">
+<code class="sig-name descname"><span class="pre">__next__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__next__" title="Permalink to this definition">#</a></dt>
+<dd><p>Algorithm is an iterable</p>
+<p>calling this method triggers update and update_objective</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__reduce__">
+<code class="sig-name descname"><span class="pre">__reduce__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__reduce__" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper for pickle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__reduce_ex__">
+<code class="sig-name descname"><span class="pre">__reduce_ex__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">protocol</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__reduce_ex__" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper for pickle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__repr__">
+<code class="sig-name descname"><span class="pre">__repr__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__repr__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__setattr__">
+<code class="sig-name descname"><span class="pre">__setattr__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em>, <em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">/</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__setattr__" title="Permalink to this definition">#</a></dt>
+<dd><p>Implement setattr(self, name, value).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__sizeof__">
+<code class="sig-name descname"><span class="pre">__sizeof__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__sizeof__" title="Permalink to this definition">#</a></dt>
+<dd><p>Size of object in memory, in bytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__str__">
+<code class="sig-name descname"><span class="pre">__str__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__str__" title="Permalink to this definition">#</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.__subclasshook__">
+<code class="sig-name descname"><span class="pre">__subclasshook__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__subclasshook__" title="Permalink to this definition">#</a></dt>
+<dd><p>Abstract classes can override this to customize issubclass().</p>
+<p>This is invoked early on by abc.ABCMeta.__subclasscheck__().
+It should return True, False or NotImplemented.  If it returns
+NotImplemented, the normal algorithm is used.  Otherwise, it
+overrides the normal algorithm (and the outcome is cached).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cil.optimisation.algorithms.ISTA.__weakref__">
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__weakref__" title="Permalink to this definition">#</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.get_last_loss">
+<code class="sig-name descname"><span class="pre">get_last_loss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.get_last_loss" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the last stored value of the loss function</p>
+<p>if update_objective_interval is 1 it is the value of the objective at the current
+iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.get_last_objective">
+<code class="sig-name descname"><span class="pre">get_last_objective</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.get_last_objective" title="Permalink to this definition">#</a></dt>
+<dd><p>alias to get_last_loss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.iterations">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">iterations</span></code><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.iterations" title="Permalink to this definition">#</a></dt>
+<dd><p>returns the iterations at which the objective has been evaluated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.loss">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">loss</span></code><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.loss" title="Permalink to this definition">#</a></dt>
+<dd><p>returns the list of the values of the objective during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when
+the update_objective_interval &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.max_iteration">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">max_iteration</span></code><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.max_iteration" title="Permalink to this definition">#</a></dt>
+<dd><p>gets the maximum number of iterations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.max_iteration_stop_cryterion">
+<code class="sig-name descname"><span class="pre">max_iteration_stop_cryterion</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.max_iteration_stop_cryterion" title="Permalink to this definition">#</a></dt>
+<dd><p>default stop cryterion for iterative algorithm: max_iteration reached</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.next">
+<code class="sig-name descname"><span class="pre">next</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.next" title="Permalink to this definition">#</a></dt>
+<dd><p>Algorithm is an iterable</p>
+<p>python2 backwards compatibility</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.objective">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">objective</span></code><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.objective" title="Permalink to this definition">#</a></dt>
+<dd><p>alias of loss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.run">
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.run" title="Permalink to this definition">#</a></dt>
+<dd><p>run n iterations and update the user with the callback if specified</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>initial</strong> – Initial guess ( Default initial = 0)</p></li>
-<li><p><strong>f</strong> – Differentiable function</p></li>
-<li><p><strong>g</strong> – Convex function with ” simple ” proximal operator</p></li>
+<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
+run until max_iteration or until stop criterion is reached</p></li>
+<li><p><strong>verbose</strong> – sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose</p></li>
+<li><p><strong>callback</strong> – is a function that receives: current iteration number,
+last objective function value and the current solution and gets executed at each update_objective_interval</p></li>
+<li><p><strong>print_interval</strong> – integer, controls every how many iteration there’s a print to
+screen. Notice that printing will not evaluate the objective function
+and so the print might be out of sync wrt the calculation of the objective.
+In such cases nan will be printed.</p></li>
+<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
+prints to screen both primal and dual</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.should_stop">
+<code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.should_stop" title="Permalink to this definition">#</a></dt>
+<dd><p>default stopping cryterion: number of iterations</p>
+<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.ISTA.verbose_output">
+<code class="sig-name descname"><span class="pre">verbose_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.verbose_output" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a nice tabulated output</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fista">
+<h3>FISTA<a class="headerlink" href="#fista" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt id="cil.optimisation.algorithms.FISTA">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">FISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Permalink to this definition">#</a></dt>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id28" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id27" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+    y_{k} = x_{k} - \alpha\nabla f(x_{k})  \\
+    x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k})\\
+    t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
+    y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
+\end{cases}\end{split}\]</div>
+<p>is used to solve</p>
+<div class="math notranslate nohighlight">
+\[\min_{x} f(x) + g(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator and <span class="math notranslate nohighlight">\(\alpha^{k}\)</span>
+is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> per iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Starting point of the algorithm</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function</p></li>
+<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Convex function with <em>simple</em> proximal operator</p></li>
+<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Step size for the gradient step of FISTA.
+The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is <span class="math notranslate nohighlight">\(\frac{1}{L}\)</span>.</p></li>
+<li><p><strong>kwargs</strong> (<em>Keyword arguments</em>) – Arguments from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[\underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">Aop</span><span class="o">.</span><span class="n">domain</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fista</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fista</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cil.optimisation.algorithms.FISTA" title="cil.optimisation.algorithms.FISTA"><code class="xref py py-class docutils literal notranslate"><span class="pre">FISTA</span></code></a>, <a class="reference internal" href="#cil.optimisation.algorithms.GD" title="cil.optimisation.algorithms.GD"><code class="xref py py-class docutils literal notranslate"><span class="pre">GD</span></code></a></p>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.FISTA.set_step_size">
+<code class="sig-name descname"><span class="pre">set_step_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.set_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.set_step_size" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the default step size</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.FISTA.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Constructor</p>
+<p>Set the minimal number of parameters:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_iteration</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – maximum number of iterations</p></li>
+<li><p><strong>update_objectice_interval</strong> – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
+<li><p><strong>log_file</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – log verbose output to file</p></li>
 </ul>
 </dd>
 </dl>
@@ -1249,24 +1582,13 @@ proper variables are passed or later with set_up</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.FISTA.update">
 <code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update" title="Permalink to this definition">#</a></dt>
-<dd><p>A single iteration of the algorithm</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.FISTA.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.update_previous_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.FISTA.update_objective">
-<code class="sig-name descname"><span class="pre">update_objective</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_objective" title="Permalink to this definition">#</a></dt>
-<dd><p>calculates the objective with the current solution</p>
+<dd><p>Performs a single iteration of FISTA</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+    x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+    t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
+    y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
+\end{cases}\end{split}\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1431,7 +1753,13 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.FISTA.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.FISTA.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1497,10 +1825,24 @@ prints to screen both primal and dual</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.optimisation.algorithms.FISTA.set_up">
+<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.set_up" title="Permalink to this definition">#</a></dt>
+<dd><p>Set up of the algorithm</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.optimisation.algorithms.FISTA.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping cryterion: number of iterations</p>
 <p>The user can change this in concrete implementatition of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.FISTA.update_objective">
+<code class="sig-name descname"><span class="pre">update_objective</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_objective" title="Permalink to this definition">#</a></dt>
+<dd><p>Updates the objective</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1517,7 +1859,7 @@ prints to screen both primal and dual</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">PDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id2">[<a class="reference internal" href="#id13" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id14" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">2</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id7">[<a class="reference internal" href="#id23" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id8">[<a class="reference internal" href="#id24" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">4</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1543,7 +1885,7 @@ prints to screen both primal and dual</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id4">[<a class="reference internal" href="#id16" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">3</a>]</span>, <span id="id5">[<a class="reference internal" href="#id15" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">5</a>]</span>.</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id9">[<a class="reference internal" href="#id26" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">5</a>]</span>, <span id="id10">[<a class="reference internal" href="#id25" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">7</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -1647,7 +1989,7 @@ In the future, these parameters will be properties of the corresponding function
 <p class="admonition-title">Note</p>
 <p>The case where both functions are strongly convex is not available at the moment.</p>
 </div>
-<div class="admonition-todo admonition" id="id6">
+<div class="admonition-todo admonition" id="id11">
 <p class="admonition-title">Todo</p>
 <p>Implement acceleration of PDHG when both functions are strongly convex.</p>
 </div>
@@ -1693,20 +2035,9 @@ In the future, these parameters will be properties of the corresponding function
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.PDHG.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.update_previous_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.algorithms.PDHG.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1775,6 +2106,12 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dt id="cil.optimisation.algorithms.PDHG.get_last_objective">
 <code class="sig-name descname"><span class="pre">get_last_objective</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.get_last_objective" title="Permalink to this definition">#</a></dt>
 <dd><p>alias to get_last_loss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.PDHG.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1901,7 +2238,13 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.LADMM.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.LADMM.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1971,17 +2314,6 @@ prints to screen both primal and dual</p></li>
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping cryterion: number of iterations</p>
 <p>The user can change this in concrete implementatition of iterative algorithms.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.LADMM.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2109,7 +2441,13 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py method">
 <dt id="cil.optimisation.algorithms.SPDHG.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.get_output" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution found</p>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.algorithms.SPDHG.is_provably_convergent">
+<code class="sig-name descname"><span class="pre">is_provably_convergent</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.is_provably_convergent" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2176,17 +2514,6 @@ prints to screen both primal and dual</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.SPDHG.update_previous_solution">
-<code class="sig-name descname"><span class="pre">update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.algorithms.SPDHG.verbose_output">
 <code class="sig-name descname"><span class="pre">verbose_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.verbose_output" title="Permalink to this definition">#</a></dt>
 <dd><p>Creates a nice tabulated output</p>
@@ -2213,18 +2540,18 @@ A <code class="code docutils literal notranslate"><span class="pre">ScaledOperat
 <dt id="cil.optimisation.operators.Operator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">Operator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator" title="Permalink to this definition">#</a></dt>
 <dd><p>Operator that maps from a space X -&gt; Y</p>
-<dl class="py method">
-<dt id="cil.optimisation.operators.Operator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – domain of the operator</p></li>
+<li><p><strong>range_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a><em>, </em><em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="cil.optimisation.operators.Operator.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2308,19 +2635,19 @@ method. Subsequent calls will return the cached norm.</p>
 <dl class="py class">
 <dt id="cil.optimisation.operators.LinearOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">LinearOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>A Linear Operator that maps from a space X &lt;-&gt; Y</p>
-<dl class="py method">
-<dt id="cil.optimisation.operators.LinearOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
+<dd><p>Linear operator that maps from a space X &lt;-&gt; Y</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – domain of the operator</p></li>
+<li><p><strong>range_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a><em>, </em><em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="cil.optimisation.operators.LinearOperator.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2404,7 +2731,7 @@ For the non-square case, the power method is applied for the matrix :math: A^{T}
 <p>:type : int, default = 1
 :param tolerance: Check if the following expression is below the tolerance
 .. math:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span><span class="o">|/</span><span class="p">(</span>\<span class="o">|</span><span class="n">A</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">x</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">y</span>\<span class="o">|</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span><span class="o">|/</span><span class="p">(</span>\<span class="o">|</span><span class="n">A</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">x</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">y</span>\<span class="o">|</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
 </pre></div>
 </div>
 <p>:type : float, default 1e-6
@@ -2489,15 +2816,7 @@ For the rest it behaves like the operator it holds.</p>
 <dd><dl class="py method">
 <dt id="cil.optimisation.operators.CompositionOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">operators</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#CompositionOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2536,15 +2855,7 @@ Now, matrix-vector multiplcation is allowed and results to a <span class="math n
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2562,7 +2873,9 @@ Now, matrix-vector multiplcation is allowed and results to a <span class="math n
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.calculate_norm">
 <code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the operator norm of DiagonalOperator which is the maximum element in the <cite>diagonal</cite>.</p>
+<dd><p>Returns the operator norm of DiagonalOperator which is the <span class="math notranslate nohighlight">\(\infty\)</span> norm of <cite>diagonal</cite></p>
+<div class="math notranslate nohighlight">
+\[\|D\|_{\infty} = \max_{i}\{|D_{i}|\}\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -2593,15 +2906,7 @@ by creating instead a BlockOperator of ChannelwiseOperators.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.ChannelwiseOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/ChannelwiseOperator.html#ChannelwiseOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ChannelwiseOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2637,15 +2942,7 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.IdentityOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/IdentityOperator.html#IdentityOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.IdentityOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2686,15 +2983,7 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.ZeroOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/ZeroOperator.html#ZeroOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ZeroOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2766,15 +3055,7 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.MaskOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2817,7 +3098,7 @@ If ‘True’, and backend ‘C’ will return a BlockDataContainer with grouped
 </ul>
 <p>Example (2D):
 .. math:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">nabla</span> <span class="p">:</span> <span class="n">X</span> <span class="o">-&gt;</span> <span class="n">Y</span> \\
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>\<span class="n">nabla</span> <span class="p">:</span> <span class="n">X</span> <span class="o">-&gt;</span> <span class="n">Y</span> \\
 <span class="n">u</span>\<span class="ow">in</span> <span class="n">X</span><span class="p">,</span> \<span class="n">nabla</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">partial_</span><span class="p">{</span><span class="n">y</span><span class="p">}</span> <span class="n">u</span><span class="p">,</span> \<span class="n">partial_</span><span class="p">{</span><span class="n">x</span><span class="p">}</span> <span class="n">u</span><span class="p">]</span> \\
 <span class="n">u</span><span class="o">^</span><span class="p">{</span><span class="o">*</span><span class="p">}</span>\<span class="ow">in</span> <span class="n">Y</span><span class="p">,</span> \<span class="n">nabla</span><span class="o">^</span><span class="p">{</span><span class="o">*</span><span class="p">}(</span><span class="n">u</span><span class="o">^</span><span class="p">{</span><span class="o">*</span><span class="p">})</span> <span class="o">=</span> \<span class="n">partial_</span><span class="p">{</span><span class="n">y</span><span class="p">}</span> <span class="n">v1</span> <span class="o">+</span> \<span class="n">partial_</span><span class="p">{</span><span class="n">x</span><span class="p">}</span> <span class="n">v2</span>
 </pre></div>
@@ -2890,15 +3171,7 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.FiniteDifferenceOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'forward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/FiniteDifferenceOperator.html#FiniteDifferenceOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.FiniteDifferenceOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2923,15 +3196,7 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.SparseFiniteDifferenceOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SparseFiniteDifferenceOperator.html#SparseFiniteDifferenceOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SparseFiniteDifferenceOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3013,7 +3278,7 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 </ul>
 </dd>
 </dl>
-<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id22"><span class="problematic" id="id23">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id32"><span class="problematic" id="id33">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 <dl class="py method">
 <dt id="cil.optimisation.functions.Function.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__init__" title="Permalink to this definition">#</a></dt>
@@ -3101,7 +3366,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.Function.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.Function.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id24"><span class="problematic" id="id25">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id34"><span class="problematic" id="id35">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -3215,7 +3480,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.ScaledFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id26"><span class="problematic" id="id27">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id36"><span class="problematic" id="id37">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3413,7 +3678,7 @@ for convergence purposes.</p>
 <dt id="cil.optimisation.functions.ConstantFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id28"><span class="problematic" id="id29">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id38"><span class="problematic" id="id39">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3473,7 +3738,7 @@ for convergence purposes.</p>
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id40"><span class="problematic" id="id41">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id48"><span class="problematic" id="id49">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -3511,7 +3776,7 @@ proximal and proximal_conjugate</p>
 <dt id="cil.optimisation.functions.OperatorCompositionFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id30"><span class="problematic" id="id31">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id40"><span class="problematic" id="id41">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3597,8 +3862,8 @@ proximal and proximal_conjugate</p>
 <h3>KullbackLeibler<a class="headerlink" href="#kullbackleibler" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.optimisation.functions.KullbackLeibler">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">KullbackLeibler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler" title="Permalink to this definition">#</a></dt>
-<dd><p>Kullback Leibler divergence function is defined as:</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">KullbackLeibler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler" title="Permalink to this definition">#</a></dt>
+<dd><p>Kullback Leibler</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}F(u, v)
 = \begin{cases}
@@ -3606,78 +3871,54 @@ u \log(\frac{u}{v}) - u + v &amp; \mbox{ if } u &gt; 0, v &gt; 0\\
 v &amp; \mbox{ if } u = 0, v \ge 0 \\
 \infty, &amp; \mbox{otherwise}
 \end{cases}\end{split}\]</div>
-<p>where we use the <span class="math notranslate nohighlight">\(0\log0 := 0\)</span> convention.</p>
-<p>At the moment, we use build-in implemention of scipy, see
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html</a></p>
-<p>The Kullback-Leibler function is used as a fidelity term in minimisation problems where the
-acquired data follow Poisson distribution. If we denote the acquired data with <span class="math notranslate nohighlight">\(b\)</span>
+<p>where the <span class="math notranslate nohighlight">\(0\log0 := 0\)</span> convention is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>non-negative</em>) – Translates the function at point <cite>b</cite>.</p></li>
+<li><p><strong>eta</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = 0</em>) – Background noise</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Mask for the data <cite>b</cite></p></li>
+<li><p><strong>backend</strong> (<em>{'numba'</em><em>,</em><em>'numpy'}</em><em>, </em><em>optional</em>) – Backend for the KullbackLeibler methods. Numba is the default backend.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Kullback-Leibler function is used in practice as a fidelity term in minimisation problems where the
+acquired data follow Poisson distribution. If we denote the acquired data with <code class="code docutils literal notranslate"><span class="pre">b</span></code>
 then, we write</p>
-<blockquote>
-<div><div class="math notranslate nohighlight">
+<div class="math notranslate nohighlight">
 \[\underset{i}{\sum} F(b_{i}, (v + \eta)_{i})\]</div>
 <p>where, <span class="math notranslate nohighlight">\(\eta\)</span> is an additional noise.</p>
-<p>Example: In the case of Positron Emission Tomography reconstruction <span class="math notranslate nohighlight">\(\eta\)</span> represents
+<p>In the case of Positron Emission Tomography reconstruction <span class="math notranslate nohighlight">\(\eta\)</span> represents
 scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
 fidelity measures the distance between <span class="math notranslate nohighlight">\(\mathcal{A}v + \eta\)</span> and acquisition data <span class="math notranslate nohighlight">\(b\)</span>, where
-<span class="math notranslate nohighlight">\(\mathcal{A}\)</span> is the projection operator.</p>
-<p>This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction
-in the PET-MR software , see <a class="reference external" href="https://github.com/CCPPETMR">https://github.com/CCPPETMR</a> and for more details in</p>
-</div></blockquote>
-<p><a class="reference external" href="http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html">http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html</a></p>
+<span class="math notranslate nohighlight">\(\mathcal{A}\)</span> is the projection operator. This is related to <a class="reference external" href="http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html">PoissonLogLikelihoodWithLinearModelForMean</a> ,
+definition that is used in PET reconstruction in the <a class="reference external" href="https://github.com/SyneRBI/SIRF">SIRF</a> software.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default implementation uses the build-in function <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html">kl_div</a> from scipy.
+The methods of the <a class="reference internal" href="#cil.optimisation.functions.KullbackLeibler" title="cil.optimisation.functions.KullbackLeibler"><code class="xref py py-class docutils literal notranslate"><span class="pre">KullbackLeibler</span></code></a> are accelerated provided that <a class="reference external" href="https://numba.pydata.org/">numba</a> library is installed.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">KullbackLeibler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.functions.KullbackLeibler.__new__">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">__new__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__new__" title="Permalink to this definition">#</a></dt>
+<dd><p>Create and return a new object.  See help(type) for accurate signature.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="cil.optimisation.functions.KullbackLeibler.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.
-To avoid infinity values, we consider only pixels/voxels for <span class="math notranslate nohighlight">\(x+\eta\geq0\)</span>.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.log">
-<code class="sig-name descname"><span class="pre">log</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datacontainer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.log" title="Permalink to this definition">#</a></dt>
-<dd><p>calculates the in-place log of the datacontainer</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.gradient">
-<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the gradient of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[F'(b, x + \eta) = 1 - \frac{b}{x+\eta}\]</div>
-<p>We require the <span class="math notranslate nohighlight">\(x+\eta&gt;0\)</span> otherwise we have inf values.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.convex_conjugate">
-<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.convex_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the convex conjugate of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[F^{*}(b, x + \eta) = - b \log(1-x^{*}) - &lt;x^{*}, \eta&gt;\]</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.proximal">
-<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the proximal operator of the KullbackLeibler function at <span class="math notranslate nohighlight">\((b, x + \eta)\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)\]</div>
-<p>The proximal for the convex conjugate of <span class="math notranslate nohighlight">\(F\)</span> is</p>
-<div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})\]</div>
-<p>where <span class="math notranslate nohighlight">\(z = x + \tau \eta\)</span></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.proximal_conjugate">
-<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.proximal_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Proximal operator of the convex conjugate of KullbackLeibler at x:</p>
-<div class="math notranslate nohighlight">
-\[prox_{\tau * f^{*}}(x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3993,7 +4234,7 @@ see <em>TranslateFunction</em>.</p>
 <dt id="cil.optimisation.functions.LeastSquares.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id32"><span class="problematic" id="id33">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id42"><span class="problematic" id="id43">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4086,7 +4327,7 @@ see <em>TranslateFunction</em>.</p>
 <dt id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id34"><span class="problematic" id="id35">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id44"><span class="problematic" id="id45">|x|</span></a>}</p>
 </dd></dl>
 
 </dd></dl>
@@ -4094,101 +4335,171 @@ see <em>TranslateFunction</em>.</p>
 </div>
 <div class="section" id="mixed-l11-norm">
 <h3>Mixed L11 norm<a class="headerlink" href="#mixed-l11-norm" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt id="cil.optimisation.functions.MixedL11Norm">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">MixedL11Norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm" title="Permalink to this definition">#</a></dt>
+<dd><p>MixedL11Norm function</p>
+<div class="math notranslate nohighlight">
+\[F(x) = ||x||_{1,1} = \sum |x_{1}| + |x_{2}| + \cdots + |x_{n}|\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MixedL11Norm is a separable function, therefore it can also be defined using the <a class="reference internal" href="#cil.optimisation.functions.BlockFunction" title="cil.optimisation.functions.BlockFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockFunction</span></code></a>.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cil.optimisation.functions.L1Norm" title="cil.optimisation.functions.L1Norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1Norm</span></code></a>, <a class="reference internal" href="#cil.optimisation.functions.MixedL21Norm" title="cil.optimisation.functions.MixedL21Norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MixedL21Norm</span></code></a></p>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.__call__" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the MixedL11Norm function at x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the proximal operator of the MixedL11Norm function at x.</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)\]</div>
+<p>where,</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="total-variation">
 <h3>Total variation<a class="headerlink" href="#total-variation" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.optimisation.functions.TotalVariation">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">TotalVariation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation" title="Permalink to this definition">#</a></dt>
-<dd><p>Fast Gradient Projection algorithm for Total Variation(TV) regularisation</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">TotalVariation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation" title="Permalink to this definition">#</a></dt>
+<dd><p>Total variation Function</p>
 <div class="math notranslate nohighlight">
-\[\min_{x} \frac{1}{2}||x-b||^{2}_{2} + \tau\alpha TV(x)\]</div>
-<p>:param : param max_iteration: max iterations of FGP algorithm
-:param : type max_iteration: int, default 100
-:param : param tolerance: Stopping criterion
-:param : type tolerance: float, default <cite>None</cite>
-:param : param correlation: Correlation between <cite>Space</cite> and/or <cite>SpaceChannels</cite> for the GradientOperator
-:param : type correlation: str, default ‘Space’
-:param : param backend: Backend to compute finite differences for the GradientOperator
-:param : type backend: str, default ‘c’
-:param : param lower: lower bound for the orthogonal projection onto the convex set C
-:param : type lower: Number, default <cite>-np.inf</cite>
-:param : param upper: upper bound for the orthogonal projection onto the convex set C
-:param : type upper: Number, default <cite>+np.inf</cite>
-:param : param isotropic: L2 norm is used for Gradient Operator (isotropic)
-:param : type isotropic: bool, default <cite>True</cite></p>
-<blockquote>
-<div><div class="math notranslate nohighlight">
-\[\sum \sqrt{(\partial_y u)^{2} + (\partial_x u)^2} \mbox{ (isotropic) }\]</div>
+\[\mathrm{TV}(u) := \|\nabla u\|_{2,1} = \sum \|\nabla u\|_{2},\, (\mbox{isotropic})\]</div>
 <div class="math notranslate nohighlight">
-\[\sum |\partial_y u| + |\partial_x u| \mbox{ (anisotropic) }\]</div>
-</div></blockquote>
-<p>:param : param split: splits the Gradient into spatial Gradient and spectral Gradient for multichannel data
-:param : type split: bool, default <cite>False</cite>
-:param : param info: force a print to screen stating the stop
-:param : type info: bool, default <cite>False</cite>
-:param : Example:
-:param TV = alpha * TotalVariation():
-:param sol = TV.proximal:
-:type sol = TV.proximal: data, tau = 1.0
-:param .. note:: <cite>tau</cite> can be a number or an array. The latter case implies that step-size preconditioning is applied.:</p>
-<p>Reference:</p>
-<blockquote>
-<div><p>A. Beck and M. Teboulle, “Fast Gradient-Based Algorithms for Constrained Total Variation
-Image Denoising and Deblurring Problems,” in IEEE Transactions on Image Processing,
-vol. 18, no. 11, pp. 2419-2434, Nov. 2009,
-doi: 10.1109/TIP.2009.2028250.</p>
-</div></blockquote>
+\[\mathrm{TV}(u) := \|\nabla u\|_{1,1} = \sum \|\nabla u\|_{1}\, (\mbox{anisotropic})\]</div>
+<p class="rubric">Notes</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">TotalVariation</span></code> (TV) <code class="code docutils literal notranslate"><span class="pre">Function</span></code> acts as a compositite function, i.e.,
+the composition of the <a class="reference internal" href="#cil.optimisation.functions.MixedL21Norm" title="cil.optimisation.functions.MixedL21Norm"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixedL21Norm</span></code></a> fuction and the <a class="reference internal" href="#cil.optimisation.operators.GradientOperator" title="cil.optimisation.operators.GradientOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientOperator</span></code></a> operator,</p>
+<div class="math notranslate nohighlight">
+\[f(u) = \|u\|_{2,1}, \Rightarrow (f\circ\nabla)(u) = f(\nabla x) = \mathrm{TV}(u)\]</div>
+<p>In that case, the proximal operator of TV does not have an exact solution and we use an iterative
+algorithm to solve:</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
+<p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
+applied to the _dual <a href="#id50"><span class="problematic" id="id51">problem_</span></a> of the above problem, see <span id="id12">[<a class="reference internal" href="#id28" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id13">[<a class="reference internal" href="#id27" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id14">[<a class="reference internal" href="#id31" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">9</a>]</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_iteration</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default = 100) – Maximum number of iterations for the FGP algorithm.</p></li>
+<li><p><strong>tolerance</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – <p>Stopping criterion for the FGP algorithm.</p>
+<div class="math notranslate nohighlight">
+\[\|x^{k+1} - x^{k}\|_{2} &lt; \mathrm{tolerance}\]</div>
+</p></li>
+<li><p><strong>correlation</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default = <cite>Space</cite>) – Correlation between <cite>Space</cite> and/or <cite>SpaceChannels</cite> for the <a class="reference internal" href="#cil.optimisation.operators.GradientOperator" title="cil.optimisation.operators.GradientOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientOperator</span></code></a>.</p></li>
+<li><p><strong>backend</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default = <cite>c</cite>) – Backend to compute the <a class="reference internal" href="#cil.optimisation.operators.GradientOperator" title="cil.optimisation.operators.GradientOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientOperator</span></code></a></p></li>
+<li><p><strong>lower</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">'float</span></code>, default = None) – A constraint is enforced using the <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a> function, e.g., <code class="code docutils literal notranslate"><span class="pre">IndicatorBox(lower,</span> <span class="pre">upper)</span></code>.</p></li>
+<li><p><strong>upper</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">'float</span></code>, default = None) – A constraint is enforced using the <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a> function, e.g., <code class="code docutils literal notranslate"><span class="pre">IndicatorBox(lower,</span> <span class="pre">upper)</span></code>.</p></li>
+<li><p><strong>isotropic</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>, default = True) – <p>Use either isotropic or anisotropic definition of TV.</p>
+<div class="math notranslate nohighlight">
+\[|x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})\]</div>
+<div class="math notranslate nohighlight">
+\[|x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})\]</div>
+</p></li>
+<li><p><strong>split</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>, default = False) – Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.</p></li>
+<li><p><strong>info</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>, default = False) – Information is printed for the stopping criterion of the FGP algorithm</p></li>
+<li><p><strong>strong_convexity_constant</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = 0) – <p>A strongly convex term weighted by the <code class="code docutils literal notranslate"><span class="pre">strong_convexity_constant</span></code> (<span class="math notranslate nohighlight">\(\gamma\)</span>) parameter is added to the Total variation.
+Now the <code class="code docutils literal notranslate"><span class="pre">TotalVariation</span></code> function is <span class="math notranslate nohighlight">\(\gamma\)</span> - strongly convex and the proximal operator is</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow\]</div>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u)\]</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case where the Total variation becomes a <span class="math notranslate nohighlight">\(\gamma\)</span> - strongly convex function, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
+<p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
+For more information, see <span id="id15">[<a class="reference internal" href="#id29" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">8</a>]</span>, <span id="id16">[<a class="reference internal" href="#id23" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha\|\nabla u\|_{2,1}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TV</span> <span class="o">=</span> <span class="n">TotalVariation</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sol</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proxima</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha\|\nabla u\|_{1,1} + \mathbb{I}_{C}(u)\]</div>
+<p>where <span class="math notranslate nohighlight">\(C = \{1.0\leq u\leq 2.0\}\)</span>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TV</span> <span class="o">=</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sol</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proxima</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + (\alpha\|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2})\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gamma</span> <span class="o">=</span> <span class="mf">1e-3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sol</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proxima</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.__call__">
 <code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the alpha * TV(x)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.TotalVariation.projection_C">
-<code class="sig-name descname"><span class="pre">projection_C</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.projection_C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.projection_C" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns orthogonal projection onto the convex set C</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.TotalVariation.projection_P">
-<code class="sig-name descname"><span class="pre">projection_P</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.projection_P"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.projection_P" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the projection P onto |cdot|_{infty}</p>
+<dd><p>Returns the value of the TotalVariation function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> .</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the solution of the FGP_TV algorithm</p>
+<dd><p>Returns the proximal operator of the TotalVariation function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> .</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.convex_conjugate">
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.convex_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)\]</div>
+<dd><p>Returns the value of convex conjugate of the TotalVariation function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> .</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.TotalVariation.L">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.L" title="Permalink to this definition">#</a></dt>
-<dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id36"><span class="problematic" id="id37">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<dt id="cil.optimisation.functions.TotalVariation.calculate_Lipschitz">
+<code class="sig-name descname"><span class="pre">calculate_Lipschitz</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.calculate_Lipschitz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.calculate_Lipschitz" title="Permalink to this definition">#</a></dt>
+<dd><p>Default value for the Lipschitz constant.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.gradient">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>creates a gradient operator if not instantiated yet</p>
-<p>There is no check that the variable _domain is changed after instantiation (should not be the case)</p>
+<dd><p>GradientOperator is created if it is not instantiated yet. The domain of the <cite>_gradient</cite>,
+is created in the <cite>__call__</cite> and <cite>proximal</cite> methods.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4217,7 +4528,7 @@ problems in the following form:</p>
 </ul>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id42"><span class="problematic" id="id43">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id52"><span class="problematic" id="id53">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
@@ -4228,8 +4539,8 @@ do basic algebra between <a class="reference external" href="framework.html#cil.
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id7"><span class="problematic" id="id8">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id9"><span class="problematic" id="id10">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id17"><span class="problematic" id="id18">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id19"><span class="problematic" id="id20">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -4552,7 +4863,7 @@ can be decomposed along the proximal operators of each function <span class="mat
 <dt id="cil.optimisation.functions.BlockFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.BlockFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id38"><span class="problematic" id="id39">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id46"><span class="problematic" id="id47">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4829,22 +5140,34 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <div class="section" id="references">
 <h3>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h3>
-<div class="docutils container" id="id12">
+<div class="docutils container" id="id22">
 <dl class="citation">
-<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dt class="label" id="id28"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id12">3</a>)</span></dt>
+<dd><p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. URL: <a class="reference external" href="https://doi.org/10.1137/080716542">https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/080716542">arXiv:https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
+</dd>
+<dt class="label" id="id27"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id6">2</a>,<a href="#id13">3</a>)</span></dt>
+<dd><p>Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. <em>IEEE Transactions on Image Processing</em>, 18(11):2419–2434, 2009. <a class="reference external" href="https://doi.org/10.1109/TIP.2009.2028250">doi:10.1109/TIP.2009.2028250</a>.</p>
+</dd>
+<dt class="label" id="id23"><span class="brackets">3</span><span class="fn-backref">(<a href="#id7">1</a>,<a href="#id16">2</a>)</span></dt>
 <dd><p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </dd>
-<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dt class="label" id="id24"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
 <dd><p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </dd>
-<dt class="label" id="id16"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
+<dt class="label" id="id26"><span class="brackets"><a class="fn-backref" href="#id9">5</a></span></dt>
 <dd><p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </dd>
-<dt class="label" id="id20"><span class="brackets"><a class="fn-backref" href="#id1">4</a></span></dt>
+<dt class="label" id="id30"><span class="brackets"><a class="fn-backref" href="#id1">6</a></span></dt>
 <dd><p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </dd>
-<dt class="label" id="id15"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
+<dt class="label" id="id25"><span class="brackets"><a class="fn-backref" href="#id10">7</a></span></dt>
 <dd><p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
+</dd>
+<dt class="label" id="id29"><span class="brackets"><a class="fn-backref" href="#id15">8</a></span></dt>
+<dd><p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
+</dd>
+<dt class="label" id="id31"><span class="brackets"><a class="fn-backref" href="#id14">9</a></span></dt>
+<dd><p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </dd>
 </dl>
 </div>

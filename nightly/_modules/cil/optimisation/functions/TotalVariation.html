@@ -185,93 +185,156 @@
               <div>
                 
   <h1>Source code for cil.optimisation.functions.TotalVariation</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
-<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
-<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+<span></span><span class="c1"># Copyright 2022 United Kingdom Research and Innovation</span>
+<span class="c1"># Copyright 2022 The University of Manchester</span>
 
-<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1">#   you may not use this file except in compliance with the License.</span>
-<span class="c1">#   You may obtain a copy of the License at</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
 
-<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
 
-<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1">#   See the License for the specific language governing permissions and</span>
-<span class="c1">#   limitations under the License.</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">IndicatorBox</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">IndicatorBox</span><span class="p">,</span> <span class="n">MixedL21Norm</span><span class="p">,</span> <span class="n">MixedL11Norm</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">GradientOperator</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 
 
 <div class="viewcode-block" id="TotalVariation"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation">[docs]</a><span class="k">class</span> <span class="nc">TotalVariation</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
     
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Fast Gradient Projection algorithm for Total Variation(TV) regularisation</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total variation Function</span>
+
+<span class="sd">    .. math:: \mathrm{TV}(u) := \|\nabla u\|_{2,1} = \sum \|\nabla u\|_{2},\, (\mbox{isotropic})</span>
+
+<span class="sd">    .. math:: \mathrm{TV}(u) := \|\nabla u\|_{1,1} = \sum \|\nabla u\|_{1}\, (\mbox{anisotropic})</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The :code:`TotalVariation` (TV) :code:`Function` acts as a compositite function, i.e.,</span>
+<span class="sd">    the composition of the :class:`.MixedL21Norm` fuction and the :class:`.GradientOperator` operator,</span>
+
+<span class="sd">    .. math:: f(u) = \|u\|_{2,1}, \Rightarrow (f\circ\nabla)(u) = f(\nabla x) = \mathrm{TV}(u)</span>
+
+<span class="sd">    In that case, the proximal operator of TV does not have an exact solution and we use an iterative </span>
+<span class="sd">    algorithm to solve:</span>
+
+<span class="sd">    .. math:: \mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)</span>
 <span class="sd">    </span>
-<span class="sd">    .. math::  \min_{x} \frac{1}{2}||x-b||^{2}_{2} + \tau\alpha TV(x)</span>
-<span class="sd">                </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">      </span>
-<span class="sd">      :param max_iteration: max iterations of FGP algorithm</span>
-<span class="sd">      :type max_iteration: int, default 100</span>
-<span class="sd">      :param tolerance: Stopping criterion</span>
-<span class="sd">      :type tolerance: float, default `None` </span>
-<span class="sd">      :param correlation: Correlation between `Space` and/or `SpaceChannels` for the GradientOperator</span>
-<span class="sd">      :type correlation: str, default &#39;Space&#39;</span>
-<span class="sd">      :param backend: Backend to compute finite differences for the GradientOperator</span>
-<span class="sd">      :type backend: str, default &#39;c&#39;</span>
-<span class="sd">      :param lower: lower bound for the orthogonal projection onto the convex set C</span>
-<span class="sd">      :type lower: Number, default `-np.inf`</span>
-<span class="sd">      :param upper: upper bound for the orthogonal projection onto the convex set C</span>
-<span class="sd">      :type upper: Number, default `+np.inf`</span>
-<span class="sd">      :param isotropic: L2 norm is used for Gradient Operator (isotropic) </span>
-<span class="sd">      :type isotropic: bool, default `True` </span>
-<span class="sd">      </span>
-<span class="sd">                        .. math:: \sum \sqrt{(\partial_y u)^{2} + (\partial_x u)^2} \mbox{ (isotropic) }</span>
+<span class="sd">    The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)</span>
+<span class="sd">    applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, :cite:`Zhu2010`.</span>
 
-<span class="sd">                        .. math:: \sum |\partial_y u| + |\partial_x u| \mbox{ (anisotropic) }</span>
-<span class="sd">       </span>
-<span class="sd">      :param split: splits the Gradient into spatial Gradient and spectral Gradient for multichannel data</span>
-<span class="sd">      :type split: bool, default `False`           </span>
-<span class="sd">      :param info: force a print to screen stating the stop</span>
-<span class="sd">      :type info: bool, default `False`</span>
 
-<span class="sd">      :Example:</span>
-<span class="sd"> </span>
-<span class="sd">      TV = alpha * TotalVariation()</span>
-<span class="sd">      sol = TV.proximal(data, tau = 1.0) </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
 
-<span class="sd">      .. note:: `tau` can be a number or an array. The latter case implies that step-size preconditioning is applied.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">      </span>
-<span class="sd">        A. Beck and M. Teboulle, &quot;Fast Gradient-Based Algorithms for Constrained Total Variation </span>
-<span class="sd">        Image Denoising and Deblurring Problems,&quot; in IEEE Transactions on Image Processing,</span>
-<span class="sd">        vol. 18, no. 11, pp. 2419-2434, Nov. 2009, </span>
-<span class="sd">        doi: 10.1109/TIP.2009.2028250.</span>
+<span class="sd">    max_iteration : :obj:`int`, default = 100</span>
+<span class="sd">        Maximum number of iterations for the FGP algorithm.</span>
+<span class="sd">    tolerance : :obj:`float`, default = None</span>
+<span class="sd">        Stopping criterion for the FGP algorithm.</span>
 <span class="sd">        </span>
-<span class="sd">    &#39;&#39;&#39;</span>    
-    
-    
+<span class="sd">        .. math:: \|x^{k+1} - x^{k}\|_{2} &lt; \mathrm{tolerance}</span>
+
+<span class="sd">    correlation : :obj:`str`, default = `Space`</span>
+<span class="sd">        Correlation between `Space` and/or `SpaceChannels` for the :class:`.GradientOperator`.</span>
+<span class="sd">    backend :  :obj:`str`, default = `c`      </span>
+<span class="sd">        Backend to compute the :class:`.GradientOperator`</span>
+<span class="sd">    lower : :obj:`&#39;float`, default = None</span>
+<span class="sd">        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.</span>
+<span class="sd">    upper : :obj:`&#39;float`, default = None</span>
+<span class="sd">        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.  </span>
+<span class="sd">    isotropic : :obj:`boolean`, default = True</span>
+<span class="sd">        Use either isotropic or anisotropic definition of TV.</span>
+
+<span class="sd">        .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})</span>
+
+<span class="sd">        .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})</span>
+
+<span class="sd">    split : :obj:`boolean`, default = False</span>
+<span class="sd">        Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.</span>
+
+<span class="sd">    info : :obj:`boolean`, default = False</span>
+<span class="sd">        Information is printed for the stopping criterion of the FGP algorithm</span>
+
+<span class="sd">    strong_convexity_constant : :obj:`float`, default = 0</span>
+<span class="sd">        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. </span>
+<span class="sd">        Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is</span>
+
+<span class="sd">        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow</span>
+
+<span class="sd">        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) </span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    In the case where the Total variation becomes a :math:`\gamma` - strongly convex function, i.e.,</span>
+
+<span class="sd">    .. math:: \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}</span>
+
+<span class="sd">    :math:`\gamma` should be relatively small, so as the second term above will not act as an additional regulariser.</span>
+<span class="sd">    For more information, see :cite:`Rasch2020`, :cite:`CP2011`.</span>
+
+
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha\|\nabla u\|_{2,1}</span>
+
+<span class="sd">    &gt;&gt;&gt; alpha = 2.0</span>
+<span class="sd">    &gt;&gt;&gt; TV = TotalVariation()</span>
+<span class="sd">    &gt;&gt;&gt; sol = TV.proxima(b, tau = alpha)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha\|\nabla u\|_{1,1} + \mathbb{I}_{C}(u)</span>
+
+<span class="sd">    where :math:`C = \{1.0\leq u\leq 2.0\}`.</span>
+
+<span class="sd">    &gt;&gt;&gt; alpha = 2.0</span>
+<span class="sd">    &gt;&gt;&gt; TV = TotalVariation(isotropic=False, lower=1.0, upper=2.0)</span>
+<span class="sd">    &gt;&gt;&gt; sol = TV.proxima(b, tau = alpha)    </span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + (\alpha\|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2})</span>
+
+<span class="sd">    &gt;&gt;&gt; alpha = 2.0</span>
+<span class="sd">    &gt;&gt;&gt; gamma = 1e-3</span>
+<span class="sd">    &gt;&gt;&gt; TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)</span>
+<span class="sd">    &gt;&gt;&gt; sol = TV.proxima(b, tau = 1.0)    </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>   
+
+
 <div class="viewcode-block" id="TotalVariation.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
                  <span class="n">tolerance</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
                  <span class="n">correlation</span> <span class="o">=</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span>
                  <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
-                 <span class="n">lower</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> 
-                 <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+                 <span class="n">lower</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">upper</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">isotropic</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">split</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">info</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        
+                 <span class="n">info</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 
+        
         <span class="nb">super</span><span class="p">(</span><span class="n">TotalVariation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="c1"># Regularising parameter = alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">=</span> <span class="mf">1.</span>
         
@@ -289,23 +352,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>        
         
         <span class="c1"># Define orthogonal projection onto the convex set C</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>            
         <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">=</span> <span class="n">lower</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">upper</span> <span class="o">=</span> <span class="n">upper</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_proj_C</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span><span class="o">.</span><span class="n">proximal</span>
-                        
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span><span class="o">.</span><span class="n">proximal</span>
+             
         <span class="c1"># Setup GradientOperator as None. This is to avoid domain argument in the __init__     </span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="c1"># Print stopping information (iterations and tolerance error) of FGP_TV  </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot; `info` is deprecate. Please use logging instead.&quot;</span><span class="p">)</span>
 
         <span class="c1"># splitting Gradient</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
+
+        <span class="c1"># Strong convexity for TV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="n">strong_convexity_constant</span>
+
+        <span class="c1"># Define Total variation norm</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">MixedL21Norm</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">MixedL11Norm</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">regularisation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -314,191 +388,176 @@
     <span class="nd">@regularisation_parameter</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">regularisation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;regularisation_parameter: expectec a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;regularisation_parameter: expected a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_regularisation_parameter</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="TotalVariation.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39; Returns the value of the \alpha * TV(x)&#39;&#39;&#39;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="c1"># evaluate objective function of TV gradient</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> </div>
-    
-    
-<div class="viewcode-block" id="TotalVariation.projection_C"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.projection_C">[docs]</a>    <span class="k">def</span> <span class="nf">projection_C</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>   
-                     
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39; Returns orthogonal projection onto the convex set C&#39;&#39;&#39;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the value of the TotalVariation function at :code:`x` .&quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_proj_C</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
-                        
-<div class="viewcode-block" id="TotalVariation.projection_P"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.projection_P">[docs]</a>    <span class="k">def</span> <span class="nf">projection_P</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-                       
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39; Returns the projection P onto \|\cdot\|_{\infty} &#39;&#39;&#39;</span>  
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span>
-        
-        <span class="c1"># preallocated in proximal</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span>
-        <span class="n">tmp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span>
-        <span class="n">tmp1</span> <span class="o">*=</span> <span class="mi">0</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">containers</span><span class="p">:</span>
-                <span class="n">el</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="p">)</span>
-                <span class="n">tmp1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span>
-            <span class="n">tmp1</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span>
-            <span class="n">tmp1</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp1</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="c1"># Compute Lipschitz constant provided that domain is not None.</span>
+        <span class="c1"># Lipschitz constant dependes on the GradientOperator, which is configured only if domain is not None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_Lipschitz</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">strongly_convex_term</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">tmp1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
-            <span class="n">tmp1</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span> 
-            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp1</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>                   </div>
-    
-    
+            <span class="n">strongly_convex_term</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="n">strongly_convex_term</span></div>
+
+                            
 <div class="viewcode-block" id="TotalVariation.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the proximal operator of the TotalVariation function at :code:`x` .&quot;&quot;&quot;</span>        
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">strongly_convex_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">/=</span> <span class="n">strongly_convex_factor</span>
+            <span class="n">tau</span> <span class="o">/=</span> <span class="n">strongly_convex_factor</span>
         
-        <span class="sd">&#39;&#39;&#39; Returns the solution of the FGP_TV algorithm &#39;&#39;&#39;</span>         
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fista_on_dual_rof</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fista_on_dual_rof</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">*=</span> <span class="n">strongly_convex_factor</span>
+            <span class="n">tau</span> <span class="o">*=</span> <span class="n">strongly_convex_factor</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">solution</span> </div>
+    
+
+    <span class="k">def</span> <span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Implements the Fast Gradient Projection algorithm on the dual problem </span>
+<span class="sd">        of the Total Variation Denoising problem (ROF).</span>
+
+<span class="sd">        .. math: \max_{\|y\|_{\infty}&lt;=1.} \frac{1}{2}\|\nabla^{*} y + x \|^{2} - \frac{1}{2}\|x\|^{2}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span>
+
+        <span class="c1"># Compute Lipschitz constant provided that domain is not None.</span>
+        <span class="c1"># Lipschitz constant depends on the GradientOperator, which is configured only if domain is not None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_Lipschitz</span><span class="p">()</span>            
         
         <span class="c1"># initialise</span>
         <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>        
-        <span class="n">tmp_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  
-        <span class="n">tmp_q</span> <span class="o">=</span> <span class="n">tmp_p</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">tmp_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>     
+
         <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        
+        <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  
+        <span class="n">tmp_q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># multiply tau by -1 * regularisation_parameter here so it&#39;s not recomputed every iteration</span>
+        <span class="c1"># when tau is an array this is done inplace so reverted at the end</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+            <span class="n">tau_reg_neg</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="n">tau</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tau_reg_neg</span> <span class="o">=</span> <span class="n">tau</span>
+            <span class="n">tau</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tau_reg_neg</span><span class="p">)</span>
+
+        <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   
 
         <span class="n">should_break</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
                                                                                    
             <span class="n">t0</span> <span class="o">=</span> <span class="n">t</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tmp_x</span><span class="p">)</span>
-            
-            <span class="c1"># axpby now works for matrices</span>
-            <span class="n">tmp_x</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span><span class="o">*</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_x</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tmp_x</span><span class="p">)</span>                       
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="p">(</span><span class="n">Number</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)):</span>
-                <span class="n">p1</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="n">tau</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">p1</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span>
-                <span class="n">p1</span> <span class="o">/=</span> <span class="n">tau</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                
-                <span class="k">if</span> <span class="n">k</span><span class="o">%</span><span class="mi">5</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                    <span class="n">error</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-                    <span class="n">p1</span> <span class="o">+=</span> <span class="n">tmp_q</span>
-                    <span class="n">error</span> <span class="o">/=</span> <span class="n">p1</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">error</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>                           
-                        <span class="n">should_break</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">p1</span> <span class="o">+=</span> <span class="n">tmp_q</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">p1</span> <span class="o">+=</span> <span class="n">tmp_q</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="c1"># preallocate for projection_P</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">projection_P</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
-            
-
-            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">t0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
-            
-            <span class="c1">#tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))</span>
-            <span class="n">p1</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">tmp_p</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_q</span><span class="p">)</span>
-            <span class="n">tmp_q</span> <span class="o">*=</span> <span class="p">(</span><span class="n">t0</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">t</span>
-            <span class="n">tmp_q</span> <span class="o">+=</span> <span class="n">p1</span>
-            
-            <span class="n">tmp_p</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">tau_reg_neg</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">should_break</span><span class="p">:</span>
                 <span class="k">break</span>
-        
-        <span class="c1">#clear preallocated projection_P arrays</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+
+            <span class="n">multip</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span><span class="o">/</span><span class="n">tau_reg_neg</span>
+            <span class="n">p1</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">multip</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+            
+            <span class="n">tmp_q</span> <span class="o">+=</span> <span class="n">p1</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k</span><span class="o">%</span><span class="mi">5</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+                <span class="n">error</span> <span class="o">/=</span> <span class="n">tmp_q</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">error</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>                           
+                    <span class="n">should_break</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixedL21Norm (isotropic case),</span>
+            <span class="c1"># or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+                       
+            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">t0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+            
+            <span class="n">p1</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_q</span><span class="p">)</span>
+            <span class="n">tmp_q</span> <span class="o">*=</span> <span class="p">(</span><span class="n">t0</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">t</span>
+            <span class="n">tmp_q</span> <span class="o">+=</span> <span class="n">p1</span>
+
+            <span class="c1">#switch p1 and p2 references</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">p1</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">p2</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="n">tmp</span>
+
         <span class="c1"># Print stopping information (iterations and tolerance error) of FGP_TV     </span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations with tolerance </span><span class="si">{}</span><span class="s2"> .&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations with tolerance </span><span class="si">{}</span><span class="s2"> .&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>                
-            
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>                        
-            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_x</span><span class="p">)</span>
-            <span class="n">tmp_x</span> <span class="o">*=</span> <span class="n">tau</span>
-            <span class="n">tmp_x</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> 
-            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_x</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>          
-            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">*=</span><span class="n">tau</span>
-            <span class="n">out</span><span class="o">*=</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="TotalVariation.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>        
-        <span class="k">return</span> <span class="mf">0.0</span>    </div>
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_Lipschitz</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
-    <span class="nd">@L</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;You should set the Lipschitz constant with calculate_Lipschitz().&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Number</span><span class="p">,))</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The Lipschitz constant is a real positive number&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>                
 
-    <span class="k">def</span> <span class="nf">calculate_Lipschitz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># return tau to its original state if it was modified</span>
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau_reg_neg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau</span><span class="p">):</span>
+            <span class="n">tau_reg_neg</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span>
+
+
+<div class="viewcode-block" id="TotalVariation.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>   
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the value of convex conjugate of the TotalVariation function at :code:`x` .&quot;&quot;&quot;</span>             
+        <span class="k">return</span> <span class="mf">0.0</span>    </div>
+    
+<div class="viewcode-block" id="TotalVariation.calculate_Lipschitz"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.calculate_Lipschitz">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_Lipschitz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Default value for the Lipschitz constant.&quot;&quot;&quot;</span>
+        
         <span class="c1"># Compute the Lipschitz parameter from the operator if possible</span>
         <span class="c1"># Leave it initialised to None otherwise</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span>  </div>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;creates a gradient operator if not instantiated yet</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; GradientOperator is created if it is not instantiated yet. The domain of the `_gradient`,</span>
+<span class="sd">        is created in the `__call__` and `proximal` methods. </span>
 
-<span class="sd">        There is no check that the variable _domain is changed after instantiation (should not be the case)&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">,</span> <span class="n">correlation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">,</span> <span class="n">correlation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot; The domain of the TotalVariation is </span><span class="si">{}</span><span class="s2">. Please use the __call__ or proximal methods first before calling gradient.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">))</span>            
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span>
+
 <div class="viewcode-block" id="TotalVariation.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;scalar: Expectec a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scalar</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;scalar: Expected a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scalar</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">=</span> <span class="n">scalar</span>
         <span class="k">return</span> <span class="bp">self</span></div></div>
-
-    
-
 </pre></div>
 
               </div>

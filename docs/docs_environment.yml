@@ -23,7 +23,7 @@ dependencies:
   - sphinx-copybutton=0.3
   - astra-toolbox>=1.9.9.dev5,<2.1
   - ccpi-regulariser=21.0.0
-  - tomophantom=1.4.10
+  - tomophantom=2.0.0
   - ipywidgets
   - tqdm
   - jinja2<3.1

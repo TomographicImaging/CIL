@@ -1,0 +1,23 @@
+name: readthedocs
+channels:
+  - conda-forge
+  - intel
+  - ccpi
+  - defaults
+dependencies:    
+  - python
+  - numpy
+  - scipy >=1.4.0
+  - matplotlib >=3.3.0
+  - h5py
+  - pillow
+  - libgcc-ng     
+  - libstdcxx-ng  
+  - _openmp_mutex 
+  - dxchange
+  - olefile >=0.46
+  - pywavelets
+  - cil-data >=21.3.0
+  - ipp
+  - tqdm
+  - numba

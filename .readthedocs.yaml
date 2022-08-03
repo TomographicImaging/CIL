@@ -1,4 +1,4 @@
 version: 2
 
 conda:
-  environment: docs/docs_environment.yml
+  environment: docs/env_readthedocs.yml

@@ -364,10 +364,10 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 
 	return 0;
 }
-int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
 	//runs over full data in x, y, z. then correctects elements for bounday conditions and sums
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
 	int z_dim = nz - 1;
@@ -386,12 +386,12 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 		tempZ = (float *)malloc(volume * sizeof(float));
 	}
 
-	long c;
+	long long c;
 	for (c = 0; c < nc; c++) //just calculating x, y and z in each channel here
 	{
 #pragma omp parallel
 		{
-			long ind, k;
+			long long ind, k;
 
 			//run over all and then fix boundaries
 #pragma omp for
@@ -409,7 +409,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (long long i = 0; i < nx; i++)
 				{
 					tempY[(k * ny * nx) + i] = -inimageY[(k * ny * nx) + i] + inimageY[(k * ny * nx) + nx * (ny - 1) + i];
 				}
@@ -417,7 +417,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int j = 0; j < ny; j++)
+				for (long long j = 0; j < ny; j++)
 				{
 					tempX[k * ny * nx + j * nx] = -inimageX[k * ny * nx + j * nx] + inimageX[k * ny * nx + j * nx + nx - 1];
 				}
@@ -427,7 +427,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 			{
 
 #pragma omp for
-				for (ind = nx * ny; ind < nx * ny * nz; ind++)
+				for (ind = nx * ny; ind < volume; ind++)
 				{
 					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
 				}
@@ -467,7 +467,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 1; c < nc; c++)
 		{

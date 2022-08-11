@@ -1,3 +1,6 @@
+* Next
+  - Fix segfault in GradientOperator (fdiff_direct_neumann)
+
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions
   - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects

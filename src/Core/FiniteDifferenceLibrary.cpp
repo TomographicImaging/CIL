@@ -15,32 +15,33 @@ DLL_EXPORT int openMPtest(int nThreads)
 	return nThreads_running;
 }
 
-int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	const float *inimage = inimagefull;
 	float *outimageX = outimageXfull;
 	float *outimageY = outimageYfull;
 	float *outimageZ = outimageZfull;
 
-	size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
-	size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
+	const size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
+	const size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
 
-	long c;
+	// For openMP in MSVC loop variables must be signed
+	long long c;
 	
-	int z_dim = nz > 1 ? 1: 0;
+	const bool z_dim = nz > 1 ? 1: 0;
 
 	for (c = 0; c < nc; c++)
 	{
 #pragma omp parallel
 		{
-			long ind, k, j, i;
+			long long ind, k, j, i;
 			float pix0;
 			//run over all and then fix boundaries
 
 #pragma omp for nowait
-			for (ind = 0; ind < nx * ny * (nz - 1); ind++)
+			for (ind = 0; ind < offset1; ind++)
 			{
 				pix0 = -inimage[ind];
 				outimageX[ind] = pix0 + inimage[ind + 1];
@@ -100,7 +101,7 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 0; c < nc - 1; c++)
 		{

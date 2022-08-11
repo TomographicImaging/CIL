@@ -239,10 +239,10 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 
 	return 0;
 }
-int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
 	//runs over full data in x, y, z. then corrects elements for bounday conditions and sums
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
 	int z_dim = nz - 1;
@@ -261,20 +261,20 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 		tempZ = (float *)malloc(volume * sizeof(float));
 	}
 
-	long c;
+	long long c;
 	for (c = 0; c < nc; c++) //just calculating x, y and z in each channel here
 	{
 #pragma omp parallel
 		{
-			long ind, k;
+			long long ind, k;
 
 #pragma omp for
-			for (ind = 1; ind < nx * ny * nz; ind++)
+			for (ind = 1; ind < volume; ind++)
 			{
 				tempX[ind] = -inimageX[ind] + inimageX[ind - 1];
 			}
 #pragma omp for
-			for (ind = nx; ind < nx * ny * nz; ind++)
+			for (ind = nx; ind < volume; ind++)
 			{
 				tempY[ind] = -inimageY[ind] + inimageY[ind - nx];
 			}
@@ -283,7 +283,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int j = 0; j < ny; j++)
+				for (long long j = 0; j < ny; j++)
 				{
 					tempX[k * ny * nx + j * nx] = -inimageX[k * ny * nx + j * nx];
 					tempX[k * ny * nx + j * nx + nx - 1] = inimageX[k * ny * nx + j * nx + nx - 2];
@@ -292,7 +292,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (long long i = 0; i < nx; i++)
 				{
 					tempY[(k * ny * nx) + i] = -inimageY[(k * ny * nx) + i];
 					tempY[(k * ny * nx) + nx * (ny - 1) + i] = inimageY[(k * ny * nx) + nx * (ny - 2) + i];
@@ -302,7 +302,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 			if (z_dim)
 			{
 #pragma omp for
-				for (ind = nx * ny; ind < nx * ny * nz; ind++)
+				for (ind = nx * ny; ind < volume; ind++)
 				{
 					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
 				}
@@ -342,7 +342,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 	//	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 1; c < nc - 1; c++)
 		{

@@ -132,8 +132,8 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 	float *outimageY = outimageYfull;
 	float *outimageZ = outimageZfull;
 
-	int offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
-	int offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
+	size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
+	size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
 
 	long c;
 	for (c = 0; c < nc; c++)
@@ -177,8 +177,8 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					int ind1 = (k * ny * nx);
-					int ind2 = ind1 + (ny - 1) * nx;
+					size_t ind1 = (k * ny * nx);
+					size_t ind2 = ind1 + (ny - 1) * nx;
 
 					outimageY[ind2 + i] = -inimage[ind2 + i] + inimage[ind1 + i];
 				}
@@ -189,8 +189,8 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 			{
 				for (int j = 0; j < ny; j++)
 				{
-					int ind1 = k * ny * nx + j * nx;
-					int ind2 = ind1 + nx - 1;
+					size_t ind1 = k * ny * nx + j * nx;
+					size_t ind2 = ind1 + nx - 1;
 
 					outimageX[ind2] = -inimage[ind2] + inimage[ind1];
 				}

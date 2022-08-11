@@ -24,8 +24,8 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 	float *outimageY = outimageYfull;
 	float *outimageZ = outimageZfull;
 
-	int offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
-	int offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
+	size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
+	size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
 
 	long c;
 	

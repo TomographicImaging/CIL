@@ -30,7 +30,7 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 	// For openMP in MSVC loop variables must be signed
 	long long c;
 	
-	const bool z_dim = nz > 1 ? 1: 0;
+	const bool z_dim = nz > 1;
 
 	for (c = 0; c < nc; c++)
 	{
@@ -136,6 +136,8 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 	const size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
 	const size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
 
+	const bool z_dim = nz > 1;
+
 	long long c;
 	for (c = 0; c < nc; c++)
 	{
@@ -197,7 +199,7 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 				}
 			}
 
-			if (nz > 1)
+			if (z_dim)
 			{
 #pragma omp for nowait
 				for (ind = 0; ind < ny * nx; ind++)
@@ -245,7 +247,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 	const size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
-	int z_dim = nz - 1;
+	const bool z_dim = nz > 1;
 
 	float *outimage = outimagefull;
 	const float *inimageX = inimageXfull;
@@ -370,7 +372,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	const size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
-	int z_dim = nz - 1;
+	const bool z_dim = nz > 1;
 
 	float *outimage = outimagefull;
 	const float *inimageX = inimageXfull;

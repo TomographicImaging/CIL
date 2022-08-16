@@ -15,9 +15,9 @@ extern "C" {
 #endif
 
 DLL_EXPORT int openMPtest(int nThreads);
-DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, long nc, long nz, long ny, long nx, int boundary, int direction, int nThreads);
-DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads);
-DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, long ny, long nx, int boundary, int direction, int nThreads);
+DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nc, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads);
+DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads);
+DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, size_t ny, size_t nx, int boundary, int direction, int nThreads);
 
 #ifdef __cplusplus
 }

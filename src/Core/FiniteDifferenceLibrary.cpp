@@ -489,7 +489,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	return 0;
 }
 
-DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, long nc, long nz, long ny, long nx, int boundary, int direction, int nThreads)
+DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nc, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -512,7 +512,7 @@ DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, flo
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads)
+DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -535,7 +535,7 @@ DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, flo
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, long ny, long nx, int boundary, int direction, int nThreads)
+DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);

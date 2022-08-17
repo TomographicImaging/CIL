@@ -206,11 +206,12 @@ class SumFunction(Function):
     """
     
     def __init__(self, *functions ):
-                
-        super(SumFunction, self).__init__()        
-        if len(functions) < 2:
+                       
+        self.num_functions = len(functions)
+        if self.num_functions < 2:
             raise ValueError('At least 2 functions need to be passed')
         self.functions = functions
+        super(SumFunction, self).__init__() 
         
     @property
     def L(self):

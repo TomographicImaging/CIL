@@ -228,6 +228,10 @@ Base classes
    :members:
    :special-members: 
 
+.. autoclass:: cil.optimisation.functions.SubsetSumFunction
+   :members:
+   :special-members:    
+
 .. autoclass:: cil.optimisation.functions.ScaledFunction
    :members:
    :special-members:

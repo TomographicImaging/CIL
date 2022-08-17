@@ -301,6 +301,11 @@ class SumFunction(Function):
                 else:
                     out += f.gradient(x)
 
+    def __getitem__(self, ind):
+        """  Return the function in the :code:`ind` index.
+        """
+        return self.functions[ind]                     
+
     def __add__(self, other):
         
         """ Addition for the SumFunction.
@@ -321,7 +326,88 @@ class SumFunction(Function):
         else:
             return super(SumFunction, self).__add__(other)
 
+class SubsetSumFunction(SumFunction):
 
+    r"""SubsetSumFunction represents the following sum 
+    
+    .. math:: \frac{1}{n}\sum_{i=1}^{n} F_{i} = \frac{1}{n}(F_{1} + F_{2} + ... + F_{n})
+
+    where :math:`n` is the number of subsets.
+
+    Parameters:
+    -----------
+    functions : list(functions) 
+                A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method.
+    sampling : :obj:`string`, Default = :code:`random`
+               Selection process for each function in the list. It can be :code:`random` or :code:`sequential`. 
+    replacement : :obj:`boolean`. Default = :code:`True`
+               The same subset can be selected when :code:`replacement=True`. 
+                
+    Example
+    -------
+
+    .. math:: \sum_{i=1}^{n} F_{i}(x) = \sum_{i=1}^{n}\|A_{i} x - b_{i}\|^{2}
+
+    >>> f = SubsetSumFunction([LeastSquares(Ai, b=bi)]*n for Ai,bi in zip(A_subsets, b_subsets))   
+  
+    """
+    
+    def __init__(self, functions, 
+                 sampling = "random",
+                 replacement = True,
+                 subset_init = -1):    
+        
+        super(SubsetSumFunction, self).__init__(*functions)
+        
+        self.subset_num = subset_init
+        self.data_passes = [0]
+        self.sampling = sampling  
+        self.replacement = replacement
+        self.enumerate_functions = list(range(self.num_subsets))
+                                                            
+    @property
+    def num_subsets(self):
+        return self.num_functions
+
+    def __call__(self, x):
+        r"""Returns the value of the averaged sum of functions at :math:`x`.		
+        		
+        .. math:: \frac{1}{n}(F_{1} + F_{2} + ... + F_{n}))(x) = \frac{1}{n} * ( F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
+        """
+                		
+        return (1/self.num_subsets) * super(SubsetSumFunction, self).__call__(x)      
+        
+    def _full_gradient(self, x, out=None):
+        r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
+        return (1/self.num_subsets) * super(SubsetSumFunction, self).gradient(x, out=out)
+        
+    def gradient(self, x, out=None):
+        """ Computes the gradient for each subset function at :code:`x`."""      
+        raise NotImplemented
+               
+    def next_subset(self):
+        
+        """ Selects the next subset according to :code:`sampling`.          
+        """
+        
+        if self.sampling=="random" :
+            
+            if self.replacement is False:
+                self.subset_num = np.random.choice(self.enumerate_functions)
+                self.enumerate_functions.remove(self.subset_num)
+                if len(self.enumerate_functions)==0:
+                    self.enumerate_functions = list(range(self.num_subsets))                
+            else:
+                self.subset_num = np.random.randint(0, self.num_subsets)
+                
+        elif self.sampling=="sequential":                                                                          
+            if self.subset_num + 1 >= self.num_subsets:
+                self.subset_num = 0                
+            else:
+                self.subset_num += 1         
+        else:
+            raise NotImplementedError("Only {} and {} are implemented at the moment.".format("random","sequential"))          
+                                  
 class ScaledFunction(Function):
     
     r""" ScaledFunction represents the scalar multiplication with a Function.

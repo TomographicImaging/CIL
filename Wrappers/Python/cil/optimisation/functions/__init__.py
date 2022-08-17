@@ -17,6 +17,7 @@
 
 from .Function import Function
 from .Function import SumFunction
+from .Function import SubsetSumFunction
 from .Function import ScaledFunction
 from .Function import SumScalarFunction
 from .Function import ConstantFunction
@@ -33,3 +34,4 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
+from .SGDFunction import SGDFunction

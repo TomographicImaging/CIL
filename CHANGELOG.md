@@ -1,3 +1,5 @@
+* 22.x.x
+ - added multiple colormaps to show2D
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions
   - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects

@@ -35,3 +35,7 @@ from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
 from .SGDFunction import SGDFunction
+from .SAGFunction import SAGFunction
+from .SAGAFunction import SAGAFunction
+
+

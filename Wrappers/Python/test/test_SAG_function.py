@@ -45,7 +45,7 @@ class TestSAGFunction(unittest.TestCase):
             
         self.F = LeastSquares(self.Aop, b=self.bop, c = 0.5/self.n_subsets) 
         self.ig = self.Aop.domain
-        self.precond = self.ig.allocate(1.0)
+        self.precond = lambda i, x: 3./self.ig.allocate(2.5)
         self.F_SAG = SAGFunction(self.fi_cil, replacement = True, precond = self.precond)           
 
         self.initial = self.ig.allocate()          
@@ -69,7 +69,7 @@ class TestSAGFunction(unittest.TestCase):
         tmp_sag.functions[tmp_sag.subset_num].gradient(x, out=tmp_sag.tmp1)
         tmp_sag.tmp1.sapyb(1., tmp_sag.subset_gradients[tmp_sag.subset_num], -1., out=tmp_sag.tmp2)
         tmp_sag.tmp2.sapyb(1./tmp_sag.num_subsets, tmp_sag.full_gradient, 1.,  out=out2)
-        out2.multiply(self.precond,out=out2)
+        out2 *= self.precond(tmp_sag.tmp2.subset_num, 3./self.ig.allocate(2.5))
 
         # update subset_gradient in the subset_num
         # update full gradient

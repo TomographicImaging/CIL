@@ -54,7 +54,7 @@ class SAGFunction(SubsetSumFunction):
         self.allocate_memory = False
         super(SAGFunction, self).__init__(functions, sampling = sampling, replacement=replacement)
 
-    def gradient(self, x, out=None):
+    def gradient(self, x, out):
 
         """
         Returns a variance-reduced approximate gradient.        
@@ -78,27 +78,17 @@ class SAGFunction(SubsetSumFunction):
         self.tmp1.sapyb(1., self.subset_gradients[self.subset_num], -1., out=self.tmp2)
 
         # Compute the output : 1/num_subsets * tmp2 + full_gradient
-        if out is None:
-            ret = 0.0 * self.tmp2
-            self.tmp2.sapyb(1./self.num_subsets, self.full_gradient, 1., out=ret)
-        else:
-            self.tmp2.sapyb(1./self.num_subsets, self.full_gradient, 1., out=out)
+        self.tmp2.sapyb(1./self.num_subsets, self.full_gradient, 1., out=out)
 
         # Apply preconditioning
-        if self.precond is not None:            
-            if out is None:
-                ret.multiply(self.precond,out=ret)
-            else:
-                out.multiply(self.precond,out=out)
+        if self.precond is not None:
+            out.multiply(self.precond(self.subset_num, x), out=out) 
 
         # Update subset gradients in memory: store the computed gradient F_{subset_num} (x) in self.subset_gradients[self.subset_num]
         self.subset_gradients[self.subset_num].fill(self.tmp1)
 
         # Update the full gradient estimator: add 1/num_subsets * (gradient F_{subset_num} (x) - subset_gradient_in_memory_{subset_num}) to the current full_gradient
         self.full_gradient.sapyb(1., self.tmp2, 1./self.num_subsets, out=self.full_gradient)
-
-        if out is None:
-            return ret  
 
     def initialise_memory(self, x):
 

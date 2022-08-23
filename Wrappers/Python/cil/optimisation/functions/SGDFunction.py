@@ -51,7 +51,7 @@ class SGDFunction(SubsetSumFunction):
         super(SGDFunction, self).__init__(functions, sampling = sampling, replacement = replacement)
         self.precond = precond
 
-    def gradient(self, x, out=None):
+    def gradient(self, x, out):
         
         """ Returns the gradient of the selected function at :code:`x`. The function is selected using the :meth:`~SubsetSumFunction.next_subset`
         """
@@ -60,19 +60,9 @@ class SGDFunction(SubsetSumFunction):
         self.next_subset()
         
         # Compute new gradient for current subset
-        if out is None:
-            ret = 0.0 * x
-            self.functions[self.subset_num].gradient(x, out=ret)
-        else:
-            self.functions[self.subset_num].gradient(x, out=out)
+        self.functions[self.subset_num].gradient(x, out=out)
 
         # Apply preconditioning
         if self.precond is not None:
-            if out is None:
-                ret.multiply(self.precond(self.subset_num, x),out=ret)
-            else:
-                out.multiply(self.precond(self.subset_num, x),out=out)            
-
-        if out is None:
-            return ret
+            out.multiply(self.precond(self.subset_num, x), out=out)            
         

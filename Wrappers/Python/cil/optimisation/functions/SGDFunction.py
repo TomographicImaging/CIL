@@ -67,11 +67,11 @@ class SGDFunction(SubsetSumFunction):
             self.functions[self.subset_num].gradient(x, out=out)
 
         # Apply preconditioning
-        if self.precond is not None:            
+        if self.precond is not None:
             if out is None:
-                ret.multiply(self.precond,out=ret)
+                ret.multiply(self.precond(self.subset_num, x),out=ret)
             else:
-                out.multiply(self.precond,out=out)
+                out.multiply(self.precond(self.subset_num, x),out=out)            
 
         if out is None:
             return ret

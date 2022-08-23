@@ -26,8 +26,8 @@ class TestSGDFunction(unittest.TestCase):
 
         self.Aop = MatrixOperator(Anp)
         self.bop = VectorData(bnp) 
-        ig = self.Aop.domain        
-        self.x_cil = ig.allocate('random')
+        self.ig = self.Aop.domain        
+        self.x_cil = self.ig.allocate('random')
 
         self.fi_cil = []
         for i in range(self.n_subsets):   
@@ -38,8 +38,8 @@ class TestSGDFunction(unittest.TestCase):
         self.f = (1/self.n_subsets) * LeastSquares(self.Aop, b=self.bop, c=1.0)
         self.f_SGD = SGDFunction(self.fi_cil, sampling="sequential")
 
-        precond = ig.allocate(1.0)
-        self.f_SGD_precond = SGDFunction(self.fi_cil, sampling="sequential", precond=precond)
+        self.precond = lambda i, x: 3./self.ig.allocate(2.5)
+        self.f_SGD_precond = SGDFunction(self.fi_cil, sampling="sequential", precond=self.precond)
 
     def test_gradient(self):
 
@@ -56,11 +56,11 @@ class TestSGDFunction(unittest.TestCase):
         out4 = self.x_cil.geometry.allocate()
 
         # With preconditioning
-        self.f_SGD_precond.gradient(self.x_cil, out=out1)
+        self.f_SGD_precond.gradient(self.x_cil, out=out3)
 
-        self.f_SGD_precond[self.f_SGD.subset_num].gradient(self.x_cil, out=out2)
-        out2.multiply(self.f_SGD_precond.precond, out=out2)
-        np.testing.assert_allclose(out1.array, out2.array, atol=1e-3)         
+        self.f_SGD_precond[self.f_SGD.subset_num].gradient(self.x_cil, out=out4)
+        out4*=self.precond(self.f_SGD_precond.subset_num, 3./self.ig.allocate(2.5))
+        np.testing.assert_allclose(out3.array, out4.array, atol=1e-3)         
 
 
 

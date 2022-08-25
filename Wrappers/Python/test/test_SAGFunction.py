@@ -60,8 +60,8 @@ class TestSAGFunction(unittest.TestCase):
         # use the gradient method for one iteration
         self.F_SAG.gradient(x, out=out1)
         
-        # run all steps of the SAG gradient method, one iteration
-        tmp_sag = SAGFunction(self.fi_cil, replacement = True)     
+        # run all steps of the SAG gradient method for one iteration
+        tmp_sag = SAGFunction(self.fi_cil, replacement = True, precond = self.precond)     
 
         # x is passed but the gradient initial point = None, hence initial is 0
         tmp_sag.initialise_memory(self.ig.allocate()) 
@@ -69,7 +69,7 @@ class TestSAGFunction(unittest.TestCase):
         tmp_sag.functions[tmp_sag.subset_num].gradient(x, out=tmp_sag.tmp1)
         tmp_sag.tmp1.sapyb(1., tmp_sag.subset_gradients[tmp_sag.subset_num], -1., out=tmp_sag.tmp2)
         tmp_sag.tmp2.sapyb(1./tmp_sag.num_subsets, tmp_sag.full_gradient, 1.,  out=out2)
-        out2 *= self.precond(tmp_sag.tmp2.subset_num, 3./self.ig.allocate(2.5))
+        out2 *= self.precond(tmp_sag.subset_num, 3./self.ig.allocate(2.5))
 
         # update subset_gradient in the subset_num
         # update full gradient
@@ -77,10 +77,10 @@ class TestSAGFunction(unittest.TestCase):
         tmp_sag.full_gradient.sapyb(1., tmp_sag.tmp2, 1./tmp_sag.num_subsets, out=tmp_sag.full_gradient)
 
         np.testing.assert_allclose(tmp_sag.subset_gradients[tmp_sag.subset_num].array, 
-                                   self.n_subsets * out1.array, atol=1e-3)
+                                   tmp_sag.tmp1.array, atol=1e-3)
 
         np.testing.assert_allclose(tmp_sag.full_gradient.array, 
-                                   out1.array, atol=1e-3)                                     
+                                   self.F_SAG.full_gradient.array, atol=1e-3)                                     
 
         np.testing.assert_allclose(out1.array, out2.array, atol=1e-3)                                     
 

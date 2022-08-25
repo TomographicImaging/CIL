@@ -1,7 +1,7 @@
 import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.functions import LeastSquares, SubsetSumFunction, SAGFunction
+from cil.optimisation.functions import LeastSquares, SubsetSumFunction, SAGAFunction
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
 import numpy as np                  
@@ -13,7 +13,7 @@ from utils import has_cvxpy
 if has_cvxpy:
     import cvxpy
 
-class TestSAGFunction(unittest.TestCase):
+class TestSAGAFunction(unittest.TestCase):
                     
     def setUp(self):
         
@@ -45,8 +45,8 @@ class TestSAGFunction(unittest.TestCase):
             
         self.F = LeastSquares(self.Aop, b=self.bop, c = 0.5/self.n_subsets) 
         self.ig = self.Aop.domain
-        self.precond = lambda i, x: self.ig.allocate(1.)
-        self.F_SAG = SAGFunction(self.fi_cil, replacement = True, precond = self.precond)           
+        self.precond = lambda i, x: 3./self.ig.allocate(2.5)
+        self.F_SAGA = SAGAFunction(self.fi_cil, replacement = True, precond = self.precond)           
 
         self.initial = self.ig.allocate()          
 
@@ -58,17 +58,17 @@ class TestSAGFunction(unittest.TestCase):
         x = self.ig.allocate('random', seed = 10)
 
         # use the gradient method for one iteration
-        self.F_SAG.gradient(x, out=out1)
+        self.F_SAGA.gradient(x, out=out1)
         
         # run all steps of the SAG gradient method for one iteration
-        tmp_sag = SAGFunction(self.fi_cil, replacement = True, precond = self.precond)     
+        tmp_sag = SAGAFunction(self.fi_cil, replacement = True, precond = self.precond)     
 
         # x is passed but the gradient initial point = None, hence initial is 0
         tmp_sag.initialise_memory(self.ig.allocate()) 
         tmp_sag.next_subset()
         tmp_sag.functions[tmp_sag.subset_num].gradient(x, out=tmp_sag.tmp1)
         tmp_sag.tmp1.sapyb(1., tmp_sag.subset_gradients[tmp_sag.subset_num], -1., out=tmp_sag.tmp2)
-        tmp_sag.tmp2.sapyb(1./tmp_sag.num_subsets, tmp_sag.full_gradient, 1.,  out=out2)
+        tmp_sag.tmp2.sapyb(1., tmp_sag.full_gradient, 1.,  out=out2)
         out2 *= self.precond(tmp_sag.subset_num, 3./self.ig.allocate(2.5))
 
         # update subset_gradient in the subset_num
@@ -80,7 +80,7 @@ class TestSAGFunction(unittest.TestCase):
                                    tmp_sag.tmp1.array, atol=1e-3)
 
         np.testing.assert_allclose(tmp_sag.full_gradient.array, 
-                                   self.F_SAG.full_gradient.array, atol=1e-3)                                     
+                                   self.F_SAGA.full_gradient.array, atol=1e-3)                                     
 
         np.testing.assert_allclose(out1.array, out2.array, atol=1e-3)                                     
 
@@ -92,17 +92,16 @@ class TestSAGFunction(unittest.TestCase):
         p = cvxpy.Problem(objective)
         p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
 
-        step_size = 1./self.F.L # Theoretical step size = 1./(16*self.F_SAG.L) 
+        step_size = 0.001 # Theoretical step size = 1./(3*self.F_SAGA.Lmax) 
         epochs = 100
-        sag = GD(initial = self.initial, objective_function = self.F_SAG, step_size = step_size,
+        saga = GD(initial = self.initial, objective_function = self.F_SAGA, step_size = step_size,
                     max_iteration = epochs * self.n_subsets, 
-                    update_objective_interval = epochs * self.n_subsets)
-        sag.run(verbose=0)    
+                    update_objective_interval =  epochs * self.n_subsets)
+        saga.run(verbose=0)    
 
-        np.testing.assert_allclose(p.value, sag.objective[-1], atol=1e-1)
+        np.testing.assert_allclose(p.value, saga.objective[-1], atol=1e-1)
 
-        np.testing.assert_allclose(u_cvxpy.value, sag.solution.array, atol=1e-1)
-
+        np.testing.assert_allclose(u_cvxpy.value, saga.solution.array, atol=1e-1)
 
 
 

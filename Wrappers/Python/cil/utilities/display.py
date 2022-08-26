@@ -358,8 +358,8 @@ class show2D(show_base):
 
                     ang = subplot.data.geometry.config.angles
 
-                    labels_new = [str(i) for i in np.take(ang.angle_data, location_new)]
-                    axes[i].set_yticklabels(labels_new)
+                    labels_new = ["{:.2f}".format(i) for i in np.take(ang.angle_data, location_new)]
+                    axes[i].set_yticks(location_new, labels=labels_new)
                     
                     axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
 

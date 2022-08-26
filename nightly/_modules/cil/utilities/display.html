@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.display &#8212; CIL 21.4.1 documentation</title>
+    <title>cil.utilities.display &#8212; CIL 22.0.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -302,8 +302,9 @@
 <span class="sd">        The axis labels for each figure e.g. (&#39;x&#39;,&#39;y&#39;)</span>
 <span class="sd">    origin: string, list of strings</span>
 <span class="sd">        Sets the display origin. &#39;lower/upper-left/right&#39;</span>
-<span class="sd">    cmap: str</span>
-<span class="sd">        Sets the colour map of the plot (see matplotlib.pyplot)</span>
+<span class="sd">    cmap: str, list or tuple of strings</span>
+<span class="sd">        Sets the colour map of the plot (see matplotlib.pyplot). If passed a list or tuple of the</span>
+<span class="sd">        length of datacontainers, allows to set a different color map for each datacontainer.</span>
 <span class="sd">    num_cols: int</span>
 <span class="sd">        Sets the number of columns of subplots to display</span>
 <span class="sd">    size: tuple</span>
@@ -528,8 +529,11 @@
 
             <span class="c1">#set origin</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">data_origin</span><span class="p">,</span> <span class="n">extent</span> <span class="o">=</span> <span class="n">set_origin</span><span class="p">(</span><span class="n">subplot</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">subplot</span><span class="o">.</span><span class="n">origin</span><span class="p">)</span>
-            
-            <span class="n">sp</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">data_origin</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmap</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">dcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dcmap</span> <span class="o">=</span> <span class="n">cmap</span>
+            <span class="n">sp</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">dcmap</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">data_origin</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
 
             <span class="n">im_ratio</span> <span class="o">=</span> <span class="n">subplot</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">subplot</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 

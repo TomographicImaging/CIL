@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Utilities &#8212; CIL 21.4.1 documentation</title>
+    <title>Utilities &#8212; CIL 22.0.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -603,7 +603,8 @@ If no slice_list is passed a 3D dataset will display the centre slice of the out
 <li><p><strong>fix_range</strong> (<em>boolian</em><em>, </em><em>tuple</em><em>, </em><em>list of tuples</em>) – Sets the display range of the data. <cite>True</cite> sets all plots to the global (min, max).</p></li>
 <li><p><strong>axis_labels</strong> (<em>tuple</em><em>, </em><em>list of tuples</em><em>, </em><em>optional</em>) – The axis labels for each figure e.g. (‘x’,’y’)</p></li>
 <li><p><strong>origin</strong> (<em>string</em><em>, </em><em>list of strings</em>) – Sets the display origin. ‘lower/upper-left/right’</p></li>
-<li><p><strong>cmap</strong> (<em>str</em>) – Sets the colour map of the plot (see matplotlib.pyplot)</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em>, </em><em>list</em><em> or </em><em>tuple of strings</em>) – Sets the colour map of the plot (see matplotlib.pyplot). If passed a list or tuple of the
+length of datacontainers, allows to set a different color map for each datacontainer.</p></li>
 <li><p><strong>num_cols</strong> (<em>int</em>) – Sets the number of columns of subplots to display</p></li>
 <li><p><strong>size</strong> (<em>tuple</em>) – Figure size in inches</p></li>
 </ul>

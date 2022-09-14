@@ -1,9 +1,13 @@
+
+* 21.4.2
+  - Fix segfault in GradientOperator due to parameter overflows on windows systems
+
 * 21.4.1
- - Removed prints from unittests and cleanup of unittest code.
- - CMake: 
+  - Removed prints from unittests and cleanup of unittest code.
+  - CMake: 
    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
- - TIFF writer uses logging
- - Added unittests for TIFF functionality
+  - TIFF writer uses logging
+  - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version

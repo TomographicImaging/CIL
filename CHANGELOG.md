@@ -1,7 +1,8 @@
-* 22.x.x
+* 22.1.0
   - added multiple colormaps to show2D
   - Fix segfault in GradientOperator due to parameter overflows on windows systems
-  
+  - Fix angle display precision and matplotlib warning for sinograms with show2D
+
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions
   - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects

@@ -115,8 +115,9 @@ class show2D(show_base):
         The axis labels for each figure e.g. ('x','y')
     origin: string, list of strings
         Sets the display origin. 'lower/upper-left/right'
-    cmap: str
-        Sets the colour map of the plot (see matplotlib.pyplot)
+    cmap: str, list or tuple of strings
+        Sets the colour map of the plot (see matplotlib.pyplot). If passed a list or tuple of the
+        length of datacontainers, allows to set a different color map for each datacontainer.
     num_cols: int
         Sets the number of columns of subplots to display
     size: tuple
@@ -341,8 +342,11 @@ class show2D(show_base):
 
             #set origin
             data, data_origin, extent = set_origin(subplot.data, subplot.origin)
-            
-            sp = axes[i].imshow(data, cmap=cmap, origin=data_origin, extent=extent)
+            if isinstance(cmap, (list, tuple)):
+                dcmap = cmap[i]
+            else:
+                dcmap = cmap
+            sp = axes[i].imshow(data, cmap=dcmap, origin=data_origin, extent=extent)
 
             im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
 
@@ -354,8 +358,8 @@ class show2D(show_base):
 
                     ang = subplot.data.geometry.config.angles
 
-                    labels_new = [str(i) for i in np.take(ang.angle_data, location_new)]
-                    axes[i].set_yticklabels(labels_new)
+                    labels_new = ["{:.2f}".format(i) for i in np.take(ang.angle_data, location_new)]
+                    axes[i].set_yticks(location_new, labels=labels_new)
                     
                     axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
 

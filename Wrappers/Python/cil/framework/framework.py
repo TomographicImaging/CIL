@@ -973,16 +973,20 @@ class Cone2D(SystemConfiguration):
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''           
+        
+        vec_a = ComponentDescription.CreateUnitVector(self.detector.position - self.source.position)
 
-        vec_a = ComponentDescription.CreateUnitVector(self.detector.position - self.rotation_axis.position)
-        vec_b = ComponentDescription.CreateUnitVector(self.detector.position - self.source.position)
+        dot_prod_a = vec_a.dot(self.detector.direction_x)
 
-        dot_prod_a = vec_b.dot(self.detector.direction_x)
-        dot_prod_b = vec_b.dot(vec_a)
+        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
+            dot_prod_b = 1
+        else:
+            vec_b = ComponentDescription.CreateUnitVector(self.detector.position - self.rotation_axis.position)
+            dot_prod_b = vec_a.dot(vec_b)
 
         if abs(dot_prod_a)>1e-10: #test perpendicular
             config = SystemConfiguration.SYSTEM_ADVANCED
-        elif abs(dot_prod_b - 1)>1e-10: #test parallel
+        elif (1 - abs(dot_prod_b))>1e-10: #test parallel
             config = SystemConfiguration.SYSTEM_OFFSET 
         else:
             config = SystemConfiguration.SYSTEM_SIMPLE
@@ -1149,16 +1153,18 @@ class Cone3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
 
-        vec_a = ComponentDescription.CreateUnitVector(self.detector.position - self.rotation_axis.position)
-        vec_b = ComponentDescription.CreateUnitVector(self.detector.position - self.source.position)
+        vec_a = ComponentDescription.CreateUnitVector(self.detector.position - self.source.position)
 
-        dot_prod_a = vec_b.dot(self.detector.direction_x)
-        dot_prod_b = vec_b.dot(self.detector.direction_y)
+        dot_prod_a = vec_a.dot(self.detector.direction_x)
+        dot_prod_b = vec_a.dot(self.detector.direction_y)
         dot_prod_c = (self.detector.direction_x).dot(self.rotation_axis.direction)
-        dot_prod_d = vec_b.dot(self.rotation_axis.direction)
+        dot_prod_d = vec_a.dot(self.rotation_axis.direction)
 
-        dot_prod_e = vec_b.dot(vec_a)
-
+        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
+            dot_prod_e = 1
+        else:
+            vec_b = ComponentDescription.CreateUnitVector(self.detector.position - self.rotation_axis.position)
+            dot_prod_e = vec_a.dot(vec_b)
 
         if abs(dot_prod_a)>1e-10 or\
             abs(dot_prod_b)>1e-10 or\
@@ -1166,7 +1172,7 @@ class Cone3D(SystemConfiguration):
             abs(dot_prod_d)>1e-10: #test perpendicular
             config =  SystemConfiguration.SYSTEM_ADVANCED
 
-        elif abs(dot_prod_e - 1)>1e-10:#test parallel
+        elif (1 - abs(dot_prod_e))>1e-10:#test parallel
             config = SystemConfiguration.SYSTEM_OFFSET
         else:
             config = SystemConfiguration.SYSTEM_SIMPLE

@@ -1,3 +1,9 @@
+* 22.1.0
+  - use assert_allclose in test_DataContainer
+  - added multiple colormaps to show2D
+  - Fix segfault in GradientOperator due to parameter overflows on windows systems
+  - Fix angle display precision and matplotlib warning for sinograms with show2D
+
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions
   - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects
@@ -27,7 +33,7 @@
     - TXRMDataReader is deprecated in favour of ZEISSDataReader 
   - GitHub Actions:
     - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master
-
+    
 * 21.4.1
  - Removed prints from unittests and cleanup of unittest code.
  - CMake: 

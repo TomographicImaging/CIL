@@ -1071,21 +1071,16 @@ class Cone2D(SystemConfiguration):
         return self
 
     def calculate_magnification(self):
-        #64bit for maths
-        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
-        source_position = self.source.position.astype(numpy.float64)
-        detector_position = self.detector.position.astype(numpy.float64)
-        direction_x = self.detector.direction_x.astype(numpy.float64)
 
-        ab = (rotation_axis_position - source_position)
+        ab = (self.rotation_axis.position - self.source.position)
         dist_source_center = float(numpy.sqrt(ab.dot(ab)))
 
         ab_unit = ab / numpy.sqrt(ab.dot(ab))
 
-        n = ComponentDescription.create_vector([direction_x[1], -direction_x[0]]).astype(numpy.float64)
+        n = self.detector.normal
 
         #perpendicular distance between source and detector centre
-        sd = float((detector_position - source_position).dot(n))
+        sd = float((self.detector.position - self.source.position).dot(n))
         ratio = float(ab_unit.dot(n))
 
         source_to_detector = sd / ratio

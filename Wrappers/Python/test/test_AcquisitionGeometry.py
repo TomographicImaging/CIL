@@ -652,24 +652,24 @@ class Test_Cone2D(unittest.TestCase):
     def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
         out = AG.config.system.calculate_magnification()
-        self.assertEqual(out, [500, 1000, 3]) 
+        numpy.testing.assert_almost_equal(out, [500, 1000, 3]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.,250.])
         out = AG.config.system.calculate_magnification()
-        self.assertEqual(out, [750, 750, 2]) 
+        numpy.testing.assert_almost_equal(out, [750, 750, 2]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,0.])
         out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
-        self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
+        numpy.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,0.],detector_direction_x=[math.sqrt(5),math.sqrt(5)])
         out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
 
-        ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position).astype(numpy.float64)/source_to_object
+        ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position)/source_to_object
 
         #source_position + d * ab = detector_position + t * detector_direction_x
         #x: d *  ab[0] =  t * detector_direction_x[0]
@@ -680,7 +680,7 @@ class Test_Cone2D(unittest.TestCase):
 
         source_to_detector = 1500 / (ab[1]  - ab[0])
 
-        self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
+        numpy.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
     def test_calculate_centre_of_rotation(self):
         pass

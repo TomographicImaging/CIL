@@ -108,7 +108,7 @@ class ImageGeometry(object):
                             self.voxel_num_x]
 
         try:
-            labels = list(self.__dimension_labels)
+            labels = list(self._dimension_labels)
         except AttributeError:
             labels = labels_default.copy()
 
@@ -134,7 +134,7 @@ class ImageGeometry(object):
                     raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'\
                         .format(labels_default,labels))
                     
-            self.__dimension_labels = tuple(labels)
+            self._dimension_labels = tuple(labels)
         
     def __eq__(self, other):
 
@@ -324,10 +324,10 @@ class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
      '''
     def __init__ (self, dof):
-        self.__dof = dof
+        self._dof = dof
 
     @staticmethod  
-    def CreateVector(val):
+    def create_vector(val):
         try:
             vec = numpy.asarray(val, dtype=numpy.float64).reshape(len(val))
         except:
@@ -336,8 +336,8 @@ class ComponentDescription(object):
         return vec
 
     @staticmethod   
-    def CreateUnitVector(val):
-        vec = ComponentDescription.CreateVector(val)
+    def create_unit_vector(val):
+        vec = ComponentDescription.create_vector(val)
         dot_product = vec.dot(vec)
         if abs(dot_product)>1e-8:
             vec = (vec/numpy.sqrt(dot_product))
@@ -349,10 +349,25 @@ class ComponentDescription(object):
         try:
             val_length = len(val)
         except:
-            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self._dof,val))
         
-        if val_length != self.__dof:
-            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
+        if val_length != self._dof:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self._dof,val))
+
+    @staticmethod   
+    def test_perpendicular(vector1, vector2):
+        dor_prod = vector1.dot(vector2)
+        if abs(dor_prod) <1e-10:
+            return True
+        return False
+
+    @staticmethod   
+    def test_parallel(vector1, vector2):
+        '''For unit vectors only. Returns true if directions are opposite'''
+        dor_prod = vector1.dot(vector2)
+        if 1- abs(dor_prod) <1e-10:
+            return True
+        return False
 
 class PositionVector(ComponentDescription):
     r'''This class creates a component of a tomography system with a position attribute
@@ -360,14 +375,14 @@ class PositionVector(ComponentDescription):
     @property
     def position(self):
         try:
-            return self.__position
+            return self._position
         except:
             raise AttributeError
 
     @position.setter
     def position(self, val):  
         self.length_check(val)
-        self.__position = ComponentDescription.CreateVector(val)
+        self._position = ComponentDescription.create_vector(val)
 
 
 class DirectionVector(ComponentDescription):
@@ -376,14 +391,14 @@ class DirectionVector(ComponentDescription):
     @property
     def direction(self):      
         try:
-            return self.__direction
+            return self._direction
         except:
             raise AttributeError
 
     @direction.setter
     def direction(self, val):
         self.length_check(val)    
-        self.__direction = ComponentDescription.CreateUnitVector(val)
+        self._direction = ComponentDescription.create_unit_vector(val)
 
  
 class PositionDirectionVector(PositionVector, DirectionVector):
@@ -397,14 +412,22 @@ class Detector1D(PositionVector):
     @property
     def direction_x(self):
         try:
-            return self.__direction_x
+            return self._direction_x
         except:
             raise AttributeError
 
     @direction_x.setter
     def direction_x(self, val):
         self.length_check(val)
-        self.__direction_x = ComponentDescription.CreateUnitVector(val)
+        self._direction_x = ComponentDescription.create_unit_vector(val)
+
+    @property
+    def normal(self):
+        try:
+            return ComponentDescription.create_unit_vector([self._direction_x[1], -self._direction_x[0]])
+        except:
+            raise AttributeError
+
 
 class Detector2D(PositionVector):
     r'''This class creates a component of a tomography system with position, direction_x and direction_y attributes used for 2D panels
@@ -412,30 +435,37 @@ class Detector2D(PositionVector):
     @property
     def direction_x(self):
         try:
-            return self.__direction_x
+            return self._direction_x
         except:
             raise AttributeError
 
     @property
     def direction_y(self):
         try:
-            return self.__direction_y
+            return self._direction_y
+        except:
+            raise AttributeError
+
+    @property
+    def normal(self):
+        try:
+            return numpy.cross(self._direction_x, self._direction_y)
         except:
             raise AttributeError
 
     def set_direction(self, x, y):
         self.length_check(x)
-        x = ComponentDescription.CreateUnitVector(x)
+        x = ComponentDescription.create_unit_vector(x)
 
         self.length_check(y)
-        y = ComponentDescription.CreateUnitVector(y)
+        y = ComponentDescription.create_unit_vector(y)
 
         dot_product = x.dot(y)
         if not numpy.isclose(dot_product, 0):
             raise ValueError("vectors detector.direction_x and detector.direction_y must be orthogonal")
 
-        self.__direction_y = y        
-        self.__direction_x = x
+        self._direction_y = y        
+        self._direction_x = x
 
 class SystemConfiguration(object):
     r'''This is a generic class to hold the description of a tomography system
@@ -461,14 +491,14 @@ class SystemConfiguration(object):
 
     @property
     def geometry(self):
-        return self.__geometry
+        return self._geometry
 
     @geometry.setter
     def geometry(self,val):
         if val != AcquisitionGeometry.CONE and val != AcquisitionGeometry.PARALLEL:
             raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
         else:
-            self.__geometry = val
+            self._geometry = val
 
     def __init__(self, dof, geometry, units='units'): 
         """Initialises the system component attributes for the acquisition type
@@ -503,7 +533,7 @@ class SystemConfiguration(object):
     def rotation_vec_to_y(vec):
         ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]'''
     
-        vec = ComponentDescription.CreateUnitVector(vec)
+        vec = ComponentDescription.create_unit_vector(vec)
 
         axis_rotation = numpy.eye(len(vec))
 
@@ -524,7 +554,7 @@ class SystemConfiguration(object):
     def rotation_vec_to_z(vec):
         ''' returns a rotation matrix that will align vec with the z-direction [0,0,1]'''
 
-        vec = ComponentDescription.CreateUnitVector(vec)
+        vec = ComponentDescription.create_unit_vector(vec)
 
         if len(vec) == 2:
             return numpy.array([[1, 0],[0, 1]])
@@ -645,23 +675,25 @@ class Parallel2D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
 
-        dot_prod_a = self.ray.direction.dot(self.detector.direction_x)
 
+        rays_perpendicular_detector = ComponentDescription.test_parallel(self.ray.direction, self.detector.normal)
+
+        #rotation axis position + ray direction hits detector position
         if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
-            dot_prod_b = 1
+            rotation_axis_centred = True
         else:
-            vec_a = ComponentDescription.CreateUnitVector(self.rotation_axis.position - self.detector.position)
-            dot_prod_b = self.ray.direction.dot(vec_a)
+            vec_a = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position)
+            rotation_axis_centred = ComponentDescription.test_parallel(self.ray.direction, vec_a)
 
-
-        if abs(dot_prod_a)>1e-10: #test not perpendicular
+        if not rays_perpendicular_detector: 
             config = SystemConfiguration.SYSTEM_ADVANCED
-        elif abs(dot_prod_b - 1)>1e-10: #test parallel 
-            config = SystemConfiguration.SYSTEM_OFFSET 
+        elif not rotation_axis_centred:
+            config =  SystemConfiguration.SYSTEM_OFFSET
         else:
-            config = SystemConfiguration.SYSTEM_SIMPLE
+            config =  SystemConfiguration.SYSTEM_SIMPLE
 
         return config
+
 
     def calculate_centre_of_rotation(self):
         """ Returns the position, on the detector, of the projection of the rotation axis in units
@@ -798,24 +830,40 @@ class Parallel3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''              
 
-        dot_prod_a = self.ray.direction.dot(self.detector.direction_x)
-        dot_prod_b = self.ray.direction.dot(self.detector.direction_y)
-        dot_prod_c = self.detector.direction_x.dot(self.rotation_axis.direction)
-        dot_prod_d = self.ray.direction.dot(self.rotation_axis.direction)
 
+        '''
+        simple
+         - rays perpendicular to detector
+         - rotation axis parallel to detector y
+         - rotation axis position + ray direction hits detector with no x offset (y offsets allowed)
+        offset
+         - rays perpendicular to detector
+         - rotation axis parallel to detector y
+        rolled
+         - rays perpendicular to detector
+         - rays perpendicular to rotation axis
+        advanced
+         - not rays perpendicular to detector (for parallel just equates to an effective pixel size change?)
+         or 
+         - not rays perpendicular to rotation axis  (tilted, i.e. laminography)
+        '''
+
+        rays_perpendicular_detector = ComponentDescription.test_parallel(self.ray.direction, self.detector.normal)
+        rays_perpendicular_rotation = ComponentDescription.test_perpendicular(self.ray.direction, self.rotation_axis.direction)
+        rotation_parallel_detector_y = ComponentDescription.test_parallel(self.rotation_axis.direction, self.detector.direction_y)
+
+        #rotation axis to detector is parallel with ray
         if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
-            dot_prod_e = 1
+            rotation_axis_centred = True
         else:
-            vec_a = ComponentDescription.CreateUnitVector(self.rotation_axis.position - self.detector.position)
-            dot_prod_e = self.ray.direction.dot(vec_a)
+            vec_a = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position )
+            rotation_axis_centred = ComponentDescription.test_parallel(self.ray.direction, vec_a)
 
-
-        if abs(dot_prod_a)>1e-10 or\
-            abs(dot_prod_b)>1e-10 or\
-            abs(dot_prod_c)>1e-10 or\
-            abs(dot_prod_d)>1e-10: 
+        if not rays_perpendicular_detector or\
+            not rays_perpendicular_rotation or\
+            not rotation_parallel_detector_y: 
             config = SystemConfiguration.SYSTEM_ADVANCED
-        elif abs(dot_prod_e - 1)>1e-10:
+        elif not rotation_axis_centred:
             config =  SystemConfiguration.SYSTEM_OFFSET
         else:
             config =  SystemConfiguration.SYSTEM_SIMPLE
@@ -973,26 +1021,26 @@ class Cone2D(SystemConfiguration):
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''           
-        
-        vec_a = ComponentDescription.CreateUnitVector(self.detector.position - self.source.position)
 
-        dot_prod_a = vec_a.dot(self.detector.direction_x)
+        vec_src2det = ComponentDescription.create_unit_vector(self.detector.position - self.source.position)
 
-        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
-            dot_prod_b = 1
+        principal_ray_centred = ComponentDescription.test_parallel(vec_src2det, self.detector.normal)
+
+        #rotation axis to detector is parallel with centre ray
+        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal
+            rotation_axis_centred = True
         else:
-            vec_b = ComponentDescription.CreateUnitVector(self.detector.position - self.rotation_axis.position)
-            dot_prod_b = vec_a.dot(vec_b)
+            vec_b = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position )
+            rotation_axis_centred = ComponentDescription.test_parallel(vec_src2det, vec_b)
 
-        if abs(dot_prod_a)>1e-10: #test perpendicular
+        if not principal_ray_centred:
             config = SystemConfiguration.SYSTEM_ADVANCED
-        elif (1 - abs(dot_prod_b))>1e-10: #test parallel
-            config = SystemConfiguration.SYSTEM_OFFSET 
+        elif not rotation_axis_centred:
+            config =  SystemConfiguration.SYSTEM_OFFSET
         else:
-            config = SystemConfiguration.SYSTEM_SIMPLE
+            config =  SystemConfiguration.SYSTEM_SIMPLE
 
         return config
-
 
     def __str__(self):
         def csv(val):
@@ -1034,7 +1082,7 @@ class Cone2D(SystemConfiguration):
 
         ab_unit = ab / numpy.sqrt(ab.dot(ab))
 
-        n = ComponentDescription.CreateVector([direction_x[1], -direction_x[0]]).astype(numpy.float64)
+        n = ComponentDescription.create_vector([direction_x[1], -direction_x[0]]).astype(numpy.float64)
 
         #perpendicular distance between source and detector centre
         sd = float((detector_position - source_position).dot(n))
@@ -1153,39 +1201,35 @@ class Cone3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
 
-        vec_a = ComponentDescription.CreateUnitVector(self.detector.position - self.source.position)
+        vec_src2det = ComponentDescription.create_unit_vector(self.detector.position - self.source.position)
 
-        dot_prod_a = vec_a.dot(self.detector.direction_x)
-        dot_prod_b = vec_a.dot(self.detector.direction_y)
-        dot_prod_c = (self.detector.direction_x).dot(self.rotation_axis.direction)
-        dot_prod_d = vec_a.dot(self.rotation_axis.direction)
+        principal_ray_centred = ComponentDescription.test_parallel(vec_src2det, self.detector.normal)
+        centre_ray_perpendicular_rotation = ComponentDescription.test_perpendicular(vec_src2det, self.rotation_axis.direction)
+        rotation_parallel_detector_y = ComponentDescription.test_parallel(self.rotation_axis.direction, self.detector.direction_y)
 
-        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
-            dot_prod_e = 1
+        #rotation axis to detector is parallel with centre ray
+        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal
+            rotation_axis_centred = True
         else:
-            vec_b = ComponentDescription.CreateUnitVector(self.detector.position - self.rotation_axis.position)
-            dot_prod_e = vec_a.dot(vec_b)
+            vec_b = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position )
+            rotation_axis_centred = ComponentDescription.test_parallel(vec_src2det, vec_b)
 
-        if abs(dot_prod_a)>1e-10 or\
-            abs(dot_prod_b)>1e-10 or\
-            abs(dot_prod_c)>1e-10 or\
-            abs(dot_prod_d)>1e-10: #test perpendicular
-            config =  SystemConfiguration.SYSTEM_ADVANCED
-
-        elif (1 - abs(dot_prod_e))>1e-10:#test parallel
-            config = SystemConfiguration.SYSTEM_OFFSET
+        if not principal_ray_centred or\
+            not centre_ray_perpendicular_rotation or\
+            not rotation_parallel_detector_y: 
+            config = SystemConfiguration.SYSTEM_ADVANCED
+        elif not rotation_axis_centred:
+            config =  SystemConfiguration.SYSTEM_OFFSET
         else:
-            config = SystemConfiguration.SYSTEM_SIMPLE
+            config =  SystemConfiguration.SYSTEM_SIMPLE
 
         return config
-
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
         """ 
         #requires the rotate axis to be perpendicular to the normal of the detector, and perpendicular to detector_direction_x
-        vec1= numpy.cross(self.detector.direction_x, self.detector.direction_y)  
-        dp1 = self.rotation_axis.direction.dot(vec1)
+        dp1 = self.rotation_axis.direction.dot(self.detector.normal)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)
         
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
@@ -1232,24 +1276,15 @@ class Cone3D(SystemConfiguration):
 
     def calculate_magnification(self):
     
-        #64bit for maths
-        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
-        source_position = self.source.position.astype(numpy.float64)
-        detector_position = self.detector.position.astype(numpy.float64)
-        direction_x = self.detector.direction_x.astype(numpy.float64)
-
-        ab = (rotation_axis_position - source_position)
+        ab = (self.rotation_axis.position - self.source.position)
         dist_source_center = float(numpy.sqrt(ab.dot(ab)))
 
         ab_unit = ab / numpy.sqrt(ab.dot(ab))
 
-        #dey y and det x are perpendicular unit vectors so n is a unit vector
-        #unit vector orthogonal to the detector
-        direction_y = self.detector.direction_y.astype(numpy.float64)
-        n = numpy.cross(direction_x,direction_y)
+        n = self.detector.normal
 
         #perpendicular distance between source and detector centre
-        sd = float((detector_position - source_position).dot(n))
+        sd = float((self.detector.position - self.source.position).dot(n))
         ratio = float(ab_unit.dot(n))
 
         source_to_detector = sd / ratio
@@ -1313,7 +1348,7 @@ class Panel(object):
 
     @property
     def num_pixels(self):
-        return self.__num_pixels
+        return self._num_pixels
 
     @num_pixels.setter
     def num_pixels(self, val):
@@ -1343,11 +1378,11 @@ class Panel(object):
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
             raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
         else:
-            self.__num_pixels = numpy.array(num_pixels_temp, dtype=numpy.int16)
+            self._num_pixels = numpy.array(num_pixels_temp, dtype=numpy.int16)
 
     @property
     def pixel_size(self):
-        return self.__pixel_size
+        return self._pixel_size
 
     @pixel_size.setter
     def pixel_size(self, val):
@@ -1378,17 +1413,17 @@ class Panel(object):
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
-        self.__pixel_size = numpy.array(pixel_size_temp)
+        self._pixel_size = numpy.array(pixel_size_temp)
 
     @property
     def origin(self):
-        return self.__origin
+        return self._origin
 
     @origin.setter
     def origin(self, val):
         allowed = ['top-left', 'top-right','bottom-left','bottom-right']
         if val in allowed:
-            self.__origin=val
+            self._origin=val
         else:
             raise ValueError('origin expected one of {0}. Got {1}'.format(allowed, val))
 
@@ -1431,7 +1466,7 @@ class Channels(object):
 
     @property
     def num_channels(self):
-        return self.__num_channels
+        return self._num_channels
 
     @num_channels.setter
     def num_channels(self, val):      
@@ -1441,20 +1476,20 @@ class Channels(object):
             raise ValueError('num_channels expected a positive integer. Got {}'.format(type(val)))
 
         if val > 0:
-            self.__num_channels = val
+            self._num_channels = val
         else:
             raise ValueError('num_channels expected a positive integer. Got {}'.format(val))
 
     @property
     def channel_labels(self):
-        return self.__channel_labels
+        return self._channel_labels
 
     @channel_labels.setter
     def channel_labels(self, val):      
-        if val is None or len(val) == self.__num_channels:
-            self.__channel_labels = val  
+        if val is None or len(val) == self._num_channels:
+            self._channel_labels = val  
         else:
-            raise ValueError('labels expected to have length {0}. Got {1}'.format(self.__num_channels, len(val)))
+            raise ValueError('labels expected to have length {0}. Got {1}'.format(self._num_channels, len(val)))
 
     def __str__(self):
         repres = "Channel configuration:\n"             
@@ -1500,7 +1535,7 @@ class Angles(object):
 
     @property
     def angle_data(self):
-        return self.__angle_data
+        return self._angle_data
 
     @angle_data.setter
     def angle_data(self, val):
@@ -1516,13 +1551,13 @@ class Angles(object):
 
             finally:
                 try:
-                    self.__angle_data = numpy.asarray(val, dtype=numpy.float32)
+                    self._angle_data = numpy.asarray(val, dtype=numpy.float32)
                 except:
                     raise ValueError('angle_data expected to be a list of floats') 
 
     @property
     def initial_angle(self):
-        return self.__initial_angle
+        return self._initial_angle
 
     @initial_angle.setter
     def initial_angle(self, val):
@@ -1531,18 +1566,18 @@ class Angles(object):
         except:
             raise TypeError('initial_angle expected a float. Got {0}'.format(type(val)))
 
-        self.__initial_angle = val
+        self._initial_angle = val
 
     @property
     def angle_unit(self):
-        return self.__angle_unit
+        return self._angle_unit
 
     @angle_unit.setter
     def angle_unit(self,val):
         if val != AcquisitionGeometry.DEGREE and val != AcquisitionGeometry.RADIAN:
             raise ValueError('angle_unit = {} not recognised please specify \'degree\' or \'radian\''.format(val))
         else:
-            self.__angle_unit = val
+            self._angle_unit = val
 
     def __str__(self):
         repres = "Acquisition description:\n"
@@ -1766,7 +1801,7 @@ class AcquisitionGeometry(object):
                             ]
 
         try:
-            labels = list(self.__dimension_labels)
+            labels = list(self._dimension_labels)
         except AttributeError:
             labels = labels_default.copy()
 
@@ -1792,7 +1827,7 @@ class AcquisitionGeometry(object):
                 if x not in labels_default:
                     raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
                     
-            self.__dimension_labels = tuple(val)
+            self._dimension_labels = tuple(val)
 
 
     @property
@@ -2180,20 +2215,20 @@ class DataContainer(object):
     @property
     def dimension_labels(self):
 
-        if self.__dimension_labels is None:
+        if self._dimension_labels is None:
             default_labels = [0]*self.number_of_dimensions
             for i in range(self.number_of_dimensions):
                 default_labels[i] = 'dimension_{0:02}'.format(i)
             return tuple(default_labels)
         else:
-            return self.__dimension_labels
+            return self._dimension_labels
       
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is None:
-            self.__dimension_labels = None
+            self._dimension_labels = None
         elif len(list(val))==self.number_of_dimensions:
-            self.__dimension_labels = tuple(val)
+            self._dimension_labels = tuple(val)
         else:
             raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
@@ -2921,11 +2956,11 @@ class ImageData(DataContainer):
 
     @property
     def geometry(self):
-        return self.__geometry
+        return self._geometry
 
     @geometry.setter
     def geometry(self, val):
-        self.__geometry = val
+        self._geometry = val
 
     @property
     def dimension_labels(self):
@@ -3013,11 +3048,11 @@ class AcquisitionData(DataContainer):
 
     @property
     def geometry(self):
-        return self.__geometry
+        return self._geometry
 
     @geometry.setter
     def geometry(self, val):
-        self.__geometry = val
+        self._geometry = val
 
     @property
     def dimension_labels(self):
@@ -3360,25 +3395,25 @@ class VectorData(DataContainer):
 
     @property
     def geometry(self):
-        return self.__geometry
+        return self._geometry
 
     @geometry.setter
     def geometry(self, val):
-        self.__geometry = val
+        self._geometry = val
 
     @property
     def dimension_labels(self):
         if hasattr(self,'geometry'):
             return self.geometry.dimension_labels
         else:
-            return self.__dimension_labels
+            return self._dimension_labels
 
     @dimension_labels.setter
     def dimension_labels(self, val):
         if hasattr(self,'geometry'):
             self.geometry.dimension_labels = val
         
-        self.__dimension_labels = val
+        self._dimension_labels = val
 
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)

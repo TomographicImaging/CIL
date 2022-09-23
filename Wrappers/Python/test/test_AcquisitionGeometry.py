@@ -233,6 +233,12 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertEqual(AG.dimension_labels, ('horizontal','channel','vertical'))
         self.assertEqual(AG.shape, (2,4,3))
 
+    def test_set_centre_of_rotation(self):
+        pass
+
+    def test_get_centre_of_rotation(self):
+        pass
+
     def test_equal(self):
         AG = AcquisitionGeometry.create_Parallel3D()
         AG.set_channels(4, ['a','b','c','d'])
@@ -500,6 +506,13 @@ class Test_Parallel2D(unittest.TestCase):
         out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [None, None, 1]) 
 
+    def test_calculate_centre_of_rotation(self):
+        pass
+
+    def test_get_centre_of_rotation(self):
+        pass
+
+
 class Test_Parallel3D(unittest.TestCase):
 
     def test_align_reference_frame_cil(self):
@@ -568,6 +581,12 @@ class Test_Parallel3D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Parallel3D()
         out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [None, None, 1]) 
+
+    def test_calculate_centre_of_rotation(self):
+        pass
+
+    def test_get_centre_of_rotation(self):
+        pass
 
 class Test_Cone2D(unittest.TestCase):
     
@@ -662,6 +681,12 @@ class Test_Cone2D(unittest.TestCase):
         source_to_detector = 1500 / (ab[1]  - ab[0])
 
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
+
+    def test_calculate_centre_of_rotation(self):
+        pass
+
+    def test_get_centre_of_rotation(self):
+        pass
 
 class Test_Cone3D(unittest.TestCase):
     
@@ -774,4 +799,8 @@ class Test_Cone3D(unittest.TestCase):
         source_to_detector = 1500 / (ab[1]  - ab[0])
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
+    def test_calculate_centre_of_rotation(self):
+        pass
 
+    def test_get_centre_of_rotation(self):
+        pass

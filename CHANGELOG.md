@@ -1,4 +1,5 @@
 * 22.1.0
+  - use assert_allclose in test_DataContainer
   - added multiple colormaps to show2D
   - Fix segfault in GradientOperator due to parameter overflows on windows systems
   - Fix angle display precision and matplotlib warning for sinograms with show2D

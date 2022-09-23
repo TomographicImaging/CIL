@@ -418,12 +418,12 @@ class TestDataContainer(CCPiTestClass):
 
 
     def test_exp_log(self):
-        a0 = numpy.asarray([1 for i in range(2*3*4)])
+        a0 = numpy.asarray([1. for i in range(2*3*4)])
                 
         ds0 = DataContainer(numpy.reshape(a0,(2,3,4)), suppress_warning=True)
         # ds1 = DataContainer(numpy.reshape(a1,(2,3,4)), suppress_warning=True)
         b = ds0.exp().log()
-        numpy.testing.assert_array_equal(ds0.as_array(), b.as_array())
+        numpy.testing.assert_allclose(ds0.as_array(), b.as_array())
         
         self.assertEqual(ds0.exp().as_array()[0][0][0], numpy.exp(1))
         self.assertEqual(ds0.log().as_array()[0][0][0], 0.)
@@ -663,7 +663,7 @@ class TestDataContainer(CCPiTestClass):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         image1 = vgeometry.allocate('random', seed=0)
         image2 = vgeometry.allocate('random', seed=0)
-        numpy.testing.assert_array_equal(image1.as_array(), image2.as_array())
+        numpy.testing.assert_allclose(image1.as_array(), image2.as_array())
 
 
     def test_AcquisitionDataSubset(self):
@@ -775,7 +775,7 @@ class TestDataContainer(CCPiTestClass):
         
         u.multiply(2, out=u)
         c = b * 2
-        numpy.testing.assert_array_equal(u.as_array(), c)
+        numpy.testing.assert_allclose(u.as_array(), c)
 
 
     def test_axpby(self):
@@ -788,7 +788,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 2 * [1] + 1 * [2] = [4]
         d1.axpby(a,b,d2,out)
         res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
     
     
     def test_axpby2(self):
@@ -802,7 +802,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 2 * [1] + 1 * [2] = [4]
         d1.axpby(a,b,d2,out, num_threads=4)
         res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
     
     
     def test_axpby3(self):
@@ -816,7 +816,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 2 * [1] + 1 * [2] = [4]
         d1.axpby(a,b,d2,out)
         res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
     
     
     def test_axpby4(self):
@@ -830,7 +830,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 2 * [1] + 1 * [2] = [4]
         d1.axpby(a,b,d2,out)
         res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
     
     
     def test_axpby5(self):
@@ -844,7 +844,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 2 * [1] + 1 * [2] = [4]
         d1.axpby(a,b,d2,out)
         res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
     
     
     def test_axpby6(self):
@@ -864,7 +864,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 1 + -1 = 0
         d1.axpby(a,b,d2,out)
         res = numpy.zeros_like(d1.as_array())
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
     
     
     def test_axpby7(self):
@@ -885,7 +885,7 @@ class TestDataContainer(CCPiTestClass):
         # equals to 1 + -1 = 0
         d1.axpby(a,b,d2,out, dtype=numpy.float64)
         res = numpy.zeros_like(d1.as_array())
-        numpy.testing.assert_array_equal(res, out.as_array())
+        numpy.testing.assert_allclose(res, out.as_array())
 
 
     def test_sapyb_datacontainer_f(self):

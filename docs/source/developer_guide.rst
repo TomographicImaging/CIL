@@ -40,15 +40,51 @@ Other methods
 Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name. 
 All methods should follow the convention of small caps underscore separated words.
 
-Docstrings
-==========
+Documentation
+=============
 
+Docstrings
+----------
 
 The Core Imaging Library follows the `NumpyDoc <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_
-style with the `PyData Sphinx html theme <https://pydata-sphinx-theme.readthedocs.io/en/latest/>`_.
-
+style with the `PyData Sphinx HTML theme <https://pydata-sphinx-theme.readthedocs.io/en/latest/>`_.
 When contributing your code please refer to `this <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_ link 
-for docstring formatting and this rendered `example <https://numpydoc.readthedocs.io/en/latest/example.html#example>`_ .
+for docstring formatting and this rendered `example <https://numpydoc.readthedocs.io/en/latest/example.html#example>`_.
+
+Building documentation locally
+------------------------------
+
+The easiest way to test changes to documentation is to build the docs locally. To do this, you will need a working ``cil`` installation.
+For development of the documentation embedded within the source code itself (e.g. docstrings), you should build ``cil`` from source.
+
+The following steps can be used to create an environment that is suitable for building ``cil`` and its documentation, and to start
+a HTTP server to view the documentation.
+
+#. Clone ``cil`` repo
+#. Update conda with ``conda update -n base -c defaults conda``
+#. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
+#. Go to ``docs`` folder
+#. Install packages from ``docs/docs_environment.yml`` (with 'name' changed to ENVIRONMENT_NAME) using ``conda env update -f docs_environment.yml``
+#. ``make html``
+#. Go to build directory (``build/html`` by default)
+#. Start a HTTP server to serve documentation
+
+Example:
+::
+  git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+  cd CIL
+  sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+  mkdir build
+  cd build
+  conda activate ENVIRONMENT_NAME
+  cmake .. -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+  cmake --build . --target install
+  cd ../docs/
+  conda update -n base -c defaults conda
+  conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
+  make html
+  cd build/html
+  python3 -m http.server
 
 
 Contributions guidelines

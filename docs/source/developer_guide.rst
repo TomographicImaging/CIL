@@ -46,10 +46,29 @@ Documentation
 Docstrings
 ----------
 
-The Core Imaging Library follows the `NumpyDoc <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_
+The Core Imaging Library (CIL) follows the `NumpyDoc <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_
 style with the `PyData Sphinx HTML theme <https://pydata-sphinx-theme.readthedocs.io/en/latest/>`_.
 When contributing your code please refer to `this <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_ link 
 for docstring formatting and this rendered `example <https://numpydoc.readthedocs.io/en/latest/example.html#example>`_.
+
+Example from ``cil``
+^^^^^^^^^^^^^^^^^^^^
+
+The following provides an example of the docstring format used within ``cil``, and the rendered documentation generated from it.
+
+Source
+""""""
+
+.. literalinclude:: ../../Wrappers/Python/cil/recon/FBP.py
+   :caption: `FBP.run method from cil.io.recon.FBP`
+   :language: python
+   :pyobject: FBP.run
+
+Rendered
+""""""""
+
+.. automethod:: cil.recon.FBP.FBP.run
+
 
 Building documentation locally
 ------------------------------
@@ -71,6 +90,7 @@ a HTTP server to view the documentation.
 
 Example:
 ::
+
   git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
   cd CIL
   sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME

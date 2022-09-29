@@ -26,6 +26,9 @@ import numpy as np
 import os
 import olefile
 import logging
+dxchange_logger = logging.getLogger('dxchange')
+dxchange_logger.setLevel(logging.ERROR)
+
 import dxchange
 import warnings
 

@@ -222,14 +222,6 @@ class PDHG(Algorithm):
     def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, **kwargs):
 
         super(PDHG, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
 
         if kwargs.get('use_axpby', None) is not None:
                 warnings.warn('The use of the "use_axpby" parameter is deprecated and will not be used by this algorithm',
@@ -364,16 +356,16 @@ class PDHG(Algorithm):
         logging.info("{} configured".format(self.__class__.__name__, ))
 
 
-    def update_previous_solution(self):
-        # swap the pointers to current and previous solution
+    def _update_previous_solution(self):
+        """ Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
+        """  
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
 
 
     def get_output(self):
-        '''Returns the solution found'''
-        # returns the current solution
+        " Returns the current solution. "
         return self.x_old
 
 

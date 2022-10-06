@@ -11,6 +11,8 @@ When opening or modifying a pull request to master, a single variant is built an
 
 The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
 
+It looks for conda-build dependencies in the channels listed [here](https://github.com/TomographicImaging/CIL/blob/f66a2e94fc65efb47889338025e85b805406b376/.github/workflows/conda_and_docs_build.yml#L55). If you add any new dependencies, the appropriate channels need to be added to this line.
+
 An artifact of the resulting tar.bz2 file is made available in the 'Summary' section of the action. It is called `cil-package`. This is used by the **docs_build** job. It can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page. Clicking on `cil-package` allows you to download a zip folder containing the tar.bz2 file.
 
 ## Building/Publishing Documentation: docs_build and docs_publish jobs

@@ -81,26 +81,24 @@ class GradientOperator(LinearOperator):
         # Default correlation for the gradient coupling
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
 
-        # Add attributes for SIRF data where there is no CIL geometry
-        if not isinstance(domain_geometry, ImageGeometry):
+        # Add assumed attributes if there is no CIL geometry (i.e. SIRF objects)
+        if not hasattr(domain_geometry, 'channels'):
             domain_geometry.channels = 1
-            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)        
-                       
-        # Space correlation on multichannel data call numpy backend
-        if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
-            #numpy implementation only for now
-            backend = NUMPY
-            logging.info("correlation='Space' on multi-channel dataset will use `numpy` backend")
 
-        # Complex data will use numpy backend
-        if domain_geometry.dtype in [np.complex, np.complex64]:
-            backend = NUMPY
-            logging.info("Complex geometries will use `numpy` backend")
-        
-        if method != 'forward':
-            backend = NUMPY
-            logging.info("Method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
-            
+        if not hasattr(domain_geometry, 'dimension_labels'):
+            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)       
+
+        if backend == C:
+            if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
+                backend = NUMPY
+                logging.warning("C backend cannot use correlation='Space' on multi-channel dataset - defaulting to `numpy` backend")
+            elif domain_geometry.dtype != np.float32:
+                backend = NUMPY
+                logging.warning("C backend is only for arrays of datatype float32 - defaulting to `numpy` backend")
+            elif method != 'forward':
+                backend = NUMPY
+                logging.warning("C backend is only implemented for forward differences - defaulting to `numpy` backend")
+   
         if backend == NUMPY:
             self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
         else:
@@ -242,10 +240,10 @@ cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_long,
-                       ctypes.c_long,
-                       ctypes.c_long,
-                       ctypes.c_long,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
@@ -254,9 +252,9 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_long,
-                       ctypes.c_long,
-                       ctypes.c_long,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
@@ -264,8 +262,8 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_long,
-                       ctypes.c_long,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]

@@ -15,7 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import Function       
+from cil.optimisation.functions import Function    
+from cil.framework import BlockDataContainer   
 import numpy as np
 
  
@@ -23,16 +24,20 @@ def soft_shrinkage(x, tau, out=None):
     
     r"""Returns the value of the soft-shrinkage operator at x.
     """
-    
+
+    should_return = False
     if out is None:
-        return x.sign() * (x.abs() - tau).maximum(0) 
+        out = x.abs()
+        should_return = True
     else:
         x.abs(out = out)
-        out -= tau
-        out.maximum(0, out = out)
-        out *= x.sign()  
-        
+    out -= tau
+    out.maximum(0, out = out)
+    out *= x.sign()   
 
+    if should_return:
+        return out        
+    
 class L1Norm(Function):
     
     r"""L1Norm function
@@ -128,5 +133,57 @@ class L1Norm(Function):
                 soft_shrinkage(x - self.b, tau, out = out)
                 out += self.b
             else:
-                soft_shrinkage(x, tau, out = out)       
+                soft_shrinkage(x, tau, out = out)   
+
+
+class MixedL11Norm(Function):
+
+    r"""MixedL11Norm function
+                     
+    .. math:: F(x) = ||x||_{1,1} = \sum |x_{1}| + |x_{2}| + \cdots + |x_{n}|
+
+    Note
+    ----
+    MixedL11Norm is a separable function, therefore it can also be defined using the :class:`BlockFunction`.
+
+
+    See Also
+    --------
+    L1Norm, MixedL21Norm
+
+
+    """   
+
+    def __init__(self, **kwargs):
+        super(MixedL11Norm, self).__init__(**kwargs)
+
+    def __call__(self, x):
+
+        r"""Returns the value of the MixedL11Norm function at x. 
+
+        :param x: :code:`BlockDataContainer`                                           
+        """
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+                    
+        return x.abs().sum()
+        
+    def proximal(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the MixedL11Norm function at x.
+                
+        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
+    
+        where,
+        
+        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}
+                            
+        """      
+
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))         
+
+        return soft_shrinkage(x, tau, out = out) 
+
+
 

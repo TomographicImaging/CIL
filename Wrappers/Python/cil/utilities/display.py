@@ -115,8 +115,9 @@ class show2D(show_base):
         The axis labels for each figure e.g. ('x','y')
     origin: string, list of strings
         Sets the display origin. 'lower/upper-left/right'
-    cmap: str
-        Sets the colour map of the plot (see matplotlib.pyplot)
+    cmap: str, list or tuple of strings
+        Sets the colour map of the plot (see matplotlib.pyplot). If passed a list or tuple of the
+        length of datacontainers, allows to set a different color map for each datacontainer.
     num_cols: int
         Sets the number of columns of subplots to display
     size: tuple
@@ -206,14 +207,14 @@ class show2D(show_base):
                         cut_slices.reverse()
 
                 try:
-                    if hasattr(data, 'subset'):
+                    if hasattr(data, 'get_slice'):
                         if type(cut_axis[0]) is int:
                             cut_axis[0] = data.dimension_labels[cut_axis[0]]
                         if type(cut_axis[1]) is int:
                             cut_axis[1] = data.dimension_labels[cut_axis[1]]
 
                         temp_dict = {cut_axis[0]:cut_slices[0], cut_axis[1]:cut_slices[1]}
-                        plot_data = data.subset(**temp_dict, force=True)
+                        plot_data = data.get_slice(**temp_dict, force=True)
                     elif hasattr(data,'as_array'):
                         plot_data = data.as_array().take(indices=cut_slices[1], axis=cut_axis[1])
                         plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
@@ -247,11 +248,11 @@ class show2D(show_base):
                     cut_axis = slice_requested[0]
 
                 try:
-                    if hasattr(data, 'subset'):
+                    if hasattr(data, 'get_slice'):
                         if type(cut_axis) is int:
                             cut_axis = data.dimension_labels[cut_axis]
                         temp_dict = {cut_axis:cut_slice}
-                        plot_data = data.subset(**temp_dict, force=True)
+                        plot_data = data.get_slice(**temp_dict, force=True)
                     elif hasattr(data,'as_array'):
                         plot_data = data.as_array().take(indices=cut_slice, axis=cut_axis)
                     else:
@@ -341,8 +342,11 @@ class show2D(show_base):
 
             #set origin
             data, data_origin, extent = set_origin(subplot.data, subplot.origin)
-            
-            sp = axes[i].imshow(data, cmap=cmap, origin=data_origin, extent=extent)
+            if isinstance(cmap, (list, tuple)):
+                dcmap = cmap[i]
+            else:
+                dcmap = cmap
+            sp = axes[i].imshow(data, cmap=dcmap, origin=data_origin, extent=extent)
 
             im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
 
@@ -354,8 +358,8 @@ class show2D(show_base):
 
                     ang = subplot.data.geometry.config.angles
 
-                    labels_new = [str(i) for i in np.take(ang.angle_data, location_new)]
-                    axes[i].set_yticklabels(labels_new)
+                    labels_new = ["{:.2f}".format(i) for i in np.take(ang.angle_data, location_new)]
+                    axes[i].set_yticks(location_new, labels=labels_new)
                     
                     axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
 
@@ -401,6 +405,12 @@ class _Arrow3D(FancyArrowPatch):
         xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
+
+    def do_3d_projection(self, renderer=None):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
+        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
+        return np.min(zs)
 
 class _ShowGeometry(object):
 

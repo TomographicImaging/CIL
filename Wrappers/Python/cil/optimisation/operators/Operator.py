@@ -21,15 +21,21 @@ import functools
 import warnings
 
 class Operator(object):
-    '''Operator that maps from a space X -> Y'''
-    def __init__(self, domain_geometry, **kwargs):
-        r'''
-        Creator
+    """
+    Operator that maps from a space X -> Y
 
-        :param domain_geometry: domain of the operator
-        :param range_geometry: range of the operator
-        :type range_geometry: optional, default None
-        '''
+    Parameters
+    ----------
+
+    domain_geometry : ImageGeometry or AcquisitionGeometry
+        domain of the operator
+
+    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
+        range of the operator 
+    """
+
+    def __init__(self, domain_geometry, **kwargs):
+
         self._norm = None
         self._domain_geometry = domain_geometry
         self._range_geometry = kwargs.get('range_geometry', None)
@@ -109,7 +115,18 @@ class Operator(object):
 
 
 class LinearOperator(Operator):
-    '''A Linear Operator that maps from a space X <-> Y'''
+    """
+    Linear operator that maps from a space X <-> Y
+
+    Parameters
+    ----------
+
+    domain_geometry : ImageGeometry or AcquisitionGeometry
+        domain of the operator
+
+    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
+        range of the operator 
+    """
     def __init__(self, domain_geometry, **kwargs):
         super(LinearOperator, self).__init__(domain_geometry, **kwargs)
     def is_linear(self):
@@ -169,19 +186,6 @@ class LinearOperator(Operator):
         2.0005647295658866
 
         """
-
-        #deal with deprecated arguments
-        if deprecated_args.get('x_init') is not None:
-            warnings.warn('PowerMethod: The use of the x_init parameter is deprecated and will be removed in following version. Please use initial instead.')
-            if initial is None:
-                initial = deprecated_args.get('x_init')
-            else:
-                raise ValueError('PowerMethod: received both initial and the deprecated x_init parameter. Please use initial only.')
-
-        if deprecated_args.get('iterations') is not None:
-            warnings.warn('PowerMethod: The use of the iterations parameter is deprecated and will be removed in following version. Please use max_iteration instead.')      
-            max_iteration = deprecated_args.get('iterations')
-
 
         # Default case: non-symmetric
         symmetric = False

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+import unittest
 
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
@@ -30,7 +32,6 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          Rosenbrock, IndicatorBox, TotalVariation       
 from cil.optimisation.functions import BlockFunction                              
 
-import unittest
 import numpy
 import scipy.special
 
@@ -42,35 +43,24 @@ import numpy as np
 from cil.utilities import dataexample
 from cil.utilities import noise
 from testclass import CCPiTestClass
-try:
-    from ccpi.filters import regularisers
-    has_reg_toolkit = True
-except ImportError as ie:
-    has_reg_toolkit = False
-if has_reg_toolkit:
+from cil.utilities.quality_measures import mae
+
+from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
+
+initialise_tests()
+
+if has_ccpi_regularisation:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
 
-try:
-    import tomophantom
-    from tomophantom import TomoP3D
-    has_tomophantom = True
+if has_tomophantom:
     from cil.plugins import TomoPhantom
-except ImportError as ie:
-    has_tomophantom = False
 
-from cil.utilities.quality_measures import mae
-has_numba = True
-try:
-    import numba
-    # imports the function that uses numba
+if has_numba:
     from cil.optimisation.functions.MixedL21Norm import _proximal_step_numba, _proximal_step_numpy
-except ImportError as ie:
-    has_numba = False
 
 
 class TestFunction(CCPiTestClass):
-           
-
+        
     def test_Function(self):
         numpy.random.seed(10)
         N = 3
@@ -439,7 +429,7 @@ class TestFunction(CCPiTestClass):
         b1 = ig.allocate('random', seed = 1000)
         
         # with no data
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             f = KullbackLeibler()   
             
         with self.assertRaises(ValueError):        
@@ -839,6 +829,7 @@ class TestTotalVariation(unittest.TestCase):
         self.tv_aniso = TotalVariation(isotropic=False)
         self.ig_real = ImageGeometry(3,4)   
         self.grad = GradientOperator(self.ig_real)  
+        self.alpha_arr = self.ig_real.allocate(0.15)
         
     def test_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
@@ -876,10 +867,64 @@ class TestTotalVariation(unittest.TestCase):
         
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
-        np.testing.assert_equal(res1, res2)                
+        np.testing.assert_almost_equal(res1, res2, decimal = 3)     
+
+    def test_strongly_convex_TV(self):
+
+        TV_no_strongly_convex = self.alpha * TotalVariation()
+        self.assertEqual(TV_no_strongly_convex.strong_convexity_constant, 0)
+
+        # TV as strongly convex, with "small" strongly convex constant
+        TV_strongly_convex = self.alpha * TotalVariation(strong_convexity_constant=1e-4)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = TV_strongly_convex(x_real)
+        res2 = TV_no_strongly_convex(x_real) + (TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)        
+
+        # check proximal
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = TV_no_strongly_convex.proximal(x_real, tau=1.0)
+
+
+        tmp_x_real = x_real.copy()
+        res2 = TV_strongly_convex.proximal(x_real, tau=1.0)  
+        # check input remain the same after proximal        
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array) 
+
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3) 
+
+    @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
+    def test_strongly_convex_CIL_FGP_TV(self):
+
+        FGP_TV_no_strongly_convex = self.alpha * FGP_TV()
+        self.assertEqual(FGP_TV_no_strongly_convex.strong_convexity_constant, 0)
+
+        # TV as strongly convex, with "small" strongly convex constant
+        FGP_TV_strongly_convex = self.alpha * FGP_TV(strong_convexity_constant=1e-3)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = FGP_TV_strongly_convex(x_real)
+
+        res2 = FGP_TV_no_strongly_convex(x_real) + (FGP_TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)        
+
+        # check proximal
+        x_real = self.ig_real.allocate('random', seed=4)         
+        res1 = FGP_TV_no_strongly_convex.proximal(x_real, tau=1.0)
+
+        tmp_x_real = x_real.copy()
+        res2 = FGP_TV_strongly_convex.proximal(x_real, tau=1.0)  
+        # check input remain the same after proximal        
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array) 
+        
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)           
+
     
 
-    @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
+    @unittest.skipUnless(has_ccpi_regularisation, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
         data = dataexample.SHAPES.get(size=(64,64))
         ig = data.geometry
@@ -913,12 +958,7 @@ class TestTotalVariation(unittest.TestCase):
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
         
-        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-
-        ###################################################################
-        ###################################################################
-        ###################################################################
-        ###################################################################    
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4) 
         
         # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
         iters = 408
@@ -943,13 +983,8 @@ class TestTotalVariation(unittest.TestCase):
         # print(t3-t2)
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
         
-        ###################################################################
-        ###################################################################
-        ###################################################################
-        ###################################################################
     
-    
-    @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
+    @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
         # print ("Building 3D phantom using TomoPhantom software")
         model = 13 # select a model number from the library
@@ -991,186 +1026,17 @@ class TestTotalVariation(unittest.TestCase):
         
         np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=7.5e-2)
 
+    def test_non_scalar_tau_cil_tv(self):
 
-class TestKullbackLeiblerNumba(unittest.TestCase):
-    def setUp(self):
-        #numpy.random.seed(1)
-        M, N, K =  2, 3, 4
-        ig = ImageGeometry(N, M)
+        x_real = self.ig_real.allocate('random', seed=4) 
+
+        # tau is an array filled with alpha = 0.15
+        res1 = self.tv_iso.proximal(x_real, tau = self.alpha_arr)
+
+        # use the alpha * TV
+        res2 = self.tv_scaled.proximal(x_real, tau = 1.0)
         
-        u1 = ig.allocate('random', seed = 500)
-        u1 = ig.allocate(0.2)  
-        #g1 = ig.allocate('random', seed = 100)
-        g1 = ig.allocate(1)
-
-        b1 = ig.allocate('random', seed = 1000)
-        eta = ig.allocate(1e-3)
-
-        mask = ig.allocate(1)
-
-        mask.fill(0, horizontal_x=0)
-
-        mask_c = ig.allocate(0)
-        mask_c.fill(1, horizontal_x=0)
-
-        f = KullbackLeibler(b=g1, use_numba=True, eta=eta)
-        f_np = KullbackLeibler(b=g1, use_numba=False, eta=eta)
-
-        # mask is on vartical=0
-        # separate the u1 vertical=0
-        f_mask = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask.copy(), eta=eta.copy())
-        f_mask_c = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask_c.copy(), eta=eta.copy())
-        f_on_mask = KullbackLeibler(b=g1.subset(horizontal_x=0), use_numba=True, eta=eta.subset(horizontal_x=0))
-        u1_on_mask = u1.subset(horizontal_x=0)
-
-        tau = 400.4
-        self.tau = tau
-        self.u1 = u1
-        self.g1 = g1
-        self.b1 = b1
-        self.eta = eta
-        self.f = f
-        self.f_np = f_np
-        self.mask = mask
-        self.mask_c = mask_c
-        self.f_mask = f_mask
-        self.f_mask_c = f_mask_c
-        self.f_on_mask = f_on_mask
-        self.u1_on_mask = u1_on_mask
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_call(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-
-        numpy.testing.assert_allclose(f(u1), f_np(u1),  rtol=1e-5)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_call_mask(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-        g1 = self.g1
-        mask = self.mask
-
-        u1_on_mask = self.u1_on_mask
-        f_on_mask = self.f_on_mask
-        f_mask = self.f_mask
-        f_mask_c = self.f_mask_c
-        
-        numpy.testing.assert_allclose(f_mask(u1) + f_mask_c(u1), f(u1),  rtol=1e-5)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_proximal(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-
-        numpy.testing.assert_allclose(f.proximal(u1,tau=tau).as_array(), 
-                                      f_np.proximal(u1,tau=tau).as_array(), rtol=7e-3)
-        numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=tau).as_array(), 
-        f_np.proximal(u1,tau=tau).as_array(), decimal=4)
-        
-    
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_proximal_arr(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.u1.copy()
-        tau.fill(self.tau)
-        u1 = self.u1
-        a = f.proximal(u1,tau=self.tau)
-        b = f.proximal(u1,tau=tau)
-        numpy.testing.assert_allclose(f.proximal(u1,tau=self.tau).as_array(), 
-                                      f.proximal(u1,tau=tau).as_array(), rtol=7e-3)
-        numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=self.tau).as_array(), 
-                                                f.proximal(u1,tau=tau).as_array(), decimal=4)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_gradient(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-
-        numpy.testing.assert_allclose(f.gradient(u1).as_array(), f_np.gradient(u1).as_array(), rtol=1e-3)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_convex_conjugate(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-
-        numpy.testing.assert_allclose(f.convex_conjugate(u1), f_np.convex_conjugate(u1), rtol=1e-3)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_proximal_conjugate_arr(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-
-        numpy.testing.assert_allclose(f.proximal_conjugate(u1,tau=tau).as_array(), 
-                        f_np.proximal_conjugate(u1,tau=tau).as_array(), rtol=1e-3)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_convex_conjugate_mask(self):
-        f = self.f
-        tau = self.tau
-        u1 = self.u1
-
-        mask = self.mask
-        f_mask = self.f_mask
-        f_mask_c = self.f_mask_c
-        f_on_mask = self.f_on_mask
-        u1_on_mask = self.u1_on_mask
-
-        numpy.testing.assert_allclose(
-            f.convex_conjugate(u1), 
-            f_mask.convex_conjugate(u1) + f_mask_c.convex_conjugate(u1) ,\
-                 rtol=1e-3)
-
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_proximal_conjugate_mask(self):
-        f = self.f
-        f_mask = self.f_mask
-        f_mask_c = self.f_mask_c
-        x = self.u1
-        m = self.mask
-        m_c = self.mask_c
-        tau = self.tau
-
-        out = x * 0
-        out_c = x * 0
-        f_mask_c.proximal_conjugate(x,tau=tau, out=out_c)
-        f_mask.proximal_conjugate(x,tau=tau, out=out)
-        numpy.testing.assert_allclose(f.proximal_conjugate(x,tau=tau).as_array(), 
-                                      (out + out_c).as_array(), rtol=7e-3)
-        # print ("f.prox_conj\n"       , f.proximal_conjugate(x,tau=tau).as_array())
-        # print ("f_mask.prox_conj\n"  , out.as_array())
-        # print ("f_mask_c.prox_conj\n", out_c.as_array())
-        b = f_mask_c.proximal_conjugate(x,tau=tau)
-        a = f_mask.proximal_conjugate(x,tau=tau)
-        numpy.testing.assert_allclose(f.proximal_conjugate(x,tau=tau).as_array(), 
-                                      (f_mask.proximal_conjugate(x,tau=tau) +\
-                                      f_mask_c.proximal_conjugate(x, tau=tau)) .as_array(), rtol=7e-3)
-
-
-    def tearDown(self):
-        pass
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)    
 
 
 class TestLeastSquares(unittest.TestCase):

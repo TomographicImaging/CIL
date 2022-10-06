@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
@@ -149,6 +148,7 @@ class TIGREGeometry(Geometry):
             #this is in CIL reference frames as the TIGRE geometry rotates the reconstruction volume to match our definitions
             self.offOrigin[0] += ig.center_z
 
+
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip
             V = system.detector.direction_y[ind] * flip
@@ -163,9 +163,11 @@ class TIGREGeometry(Geometry):
 
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin
-        if 'right' in panel_origin:
+        if 'right' in panel_origin and 'top' in panel_origin:
+            roll += np.pi
+        elif 'right' in panel_origin:
             yaw += np.pi
-        if 'top' in panel_origin:
+        elif 'top' in panel_origin:
             pitch += np.pi
 
         self.rotDetector = np.array((roll, pitch, yaw)) 

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2018 - 2022 United Kingdom Research and Innovation
+#  Copyright 2018 - 2022 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
 import unittest
+from utils import initialise_tests
 import numpy
 import numpy as np
 from numpy import nan, inf
@@ -47,42 +47,23 @@ from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 import os, sys, time
 import warnings
+from cil.optimisation.functions import Rosenbrock
+from cil.framework import VectorData, VectorGeometry
+from cil.utilities.quality_measures import mae, mse, psnr
 
 
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 import logging
 from testclass import CCPiTestClass
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import  has_astra
 
-try:
+initialise_tests()
+
+if has_astra:
     from cil.plugins.astra import ProjectionOperator
-    has_astra = True    
-except ImportError as ie:
-    # skip test
-    has_astra = False
-
-has_astra = has_astra and has_gpu_astra()
-
-
 
 class TestAlgorithms(CCPiTestClass):
-    def setUp(self):
-        #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
-        #self.filename = '24737_fd.nxs'
-        # we use Identity as the operator and solve the simple least squares 
-        # problem for a random-valued ImageData or AcquisitionData b?  
-        # Then we know the minimiser is b itself
-        
-        # || I x -b ||^2
-        
-        # create an ImageGeometry
-        ig = ImageGeometry(12,13,14)
-        pass
-
-    def tearDown(self):
-        #os.remove(self.filename)
-        pass
     
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
@@ -111,6 +92,28 @@ class TestAlgorithms(CCPiTestClass):
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+    def test_update_interval_0(self):
+        '''
+        Checks that an algorithm runs with no problems when 
+        the update_objective interval is set to 0 and with
+        verbose on / off
+        '''
+        ig = ImageGeometry(12,13,14)
+        initial = ig.allocate()
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        norm2sq = LeastSquares(identity, b)
+        alg = GD(initial=initial, 
+                 objective_function=norm2sq, 
+                 max_iteration=20,
+                 update_objective_interval=0,
+                 atol=1e-9, rtol=1e-6)
+        self.assertTrue(alg.update_objective_interval==0)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg.run(20, verbose=False)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
 
@@ -143,8 +146,6 @@ class TestAlgorithms(CCPiTestClass):
 
 
     def test_GDArmijo2(self):
-        from cil.optimisation.functions import Rosenbrock
-        from cil.framework import VectorData, VectorGeometry
 
         f = Rosenbrock (alpha = 1., beta=100.)
         vg = VectorGeometry(2)
@@ -213,6 +214,62 @@ class TestAlgorithms(CCPiTestClass):
 
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+    def test_FISTA_update(self):
+
+        # setup linear system to solve
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0,1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b) 
+
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+
+        ig = Aop.domain
+
+        initial = ig.allocate()
+          
+        # ista run 10 iteration
+        tmp_initial = ig.allocate()
+        fista = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=1)  
+        fista.run()
+
+        # fista update method
+        t_old = 1
+
+        step_size = 1.0/f.L
+        x_old = ig.allocate()
+        y_old = ig.allocate()
+
+        for _ in range(1):
+
+            x = g.proximal(y_old - step_size * f.gradient(y_old), tau = step_size)
+            t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
+            y = x + ((t_old-1)/t)* ( x - x_old)  
+
+            x_old.fill(x)
+            y_old.fill(y)
+            t_old = t
+        
+        np.testing.assert_allclose(fista.solution.array, x.array, atol=1e-2)      
+    
+        # check objective
+        res1 = fista.objective[-1]
+        res2 = f(x) + g(x)
+        self.assertTrue( res1==res2)  
+
+        tmp_initial = ig.allocate()
+        fista1 = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=1) 
+        self.assertTrue(fista1.is_provably_convergent())
+
+        fista1 = FISTA(initial = tmp_initial, f = f, g = g, max_iteration=1, step_size=30.0) 
+        self.assertFalse(fista1.is_provably_convergent())          
 
                
     def test_FISTA_Norm2Sq(self):
@@ -300,7 +357,7 @@ class TestAlgorithms(CCPiTestClass):
             return noisy_data, alpha, g
 
         noisy_data, alpha, g = setup(data, dnoise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
          
@@ -324,7 +381,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 1
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm() 
                     
@@ -349,7 +406,7 @@ class TestAlgorithms(CCPiTestClass):
         which_noise = 2
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
 
         f1 =  alpha * MixedL21Norm()
    
@@ -552,94 +609,20 @@ class TestAlgorithms(CCPiTestClass):
         self.assertLess(rmse, 4.2e-4)
 
 
-    def test_exception_initial_CGLS(self):
-        ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
-        initial = ig.allocate(0.)
-        b = ig.allocate('random')
-        identity = IdentityOperator(ig)
-        
-        try:
-            alg = CGLS(initial=initial, operator=identity, data=b, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
 
-            
-    def test_exception_initial_FISTA(self):
-        ig = ImageGeometry(127,139,149)
-        initial = ig.allocate()
-        b = initial.copy()
-        # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
-        identity = IdentityOperator(ig)
-        
-        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
-        opt = {'tol': 1e-4, 'memopt':False}
-        logging.info("initial objective {}".format(norm2sq(initial)))
-        try:
-            alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
-            
-
-    def test_exception_initial_GD(self):
-        ig = ImageGeometry(127,139,149)
-        initial = ig.allocate()
-        b = initial.copy()
-        # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
-        identity = IdentityOperator(ig)
-        
-        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
-        opt = {'tol': 1e-4, 'memopt':False}
-        logging.info("initial objective {}".format(norm2sq(initial)))
-        try:
-            alg = GD(initial=initial, objective_function=norm2sq, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
+                        
 
 
-    def test_exception_initial_LADMM(self):
-        ig = ImageGeometry(10,10)
-        # K = Identity(ig)
-        # b = ig.allocate(0)
-        # f = LeastSquares(K, b)
-        # g = IndicatorBox(lower=0)
-        initial = ig.allocate(1)
-        try:
-            algo = LADMM(initial = initial, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
 
 
-    def test_exception_initial_PDHG(self):
-        initial = 1
-        try:
-            algo = PDHG(initial = initial, x_init=initial, f=None, g=None, operator=None)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
 
 
-    def test_exception_initial_SPDHG(self):
-        initial = 1
-        try:
-            algo = SPDHG(initial = initial, x_init=initial)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True
+
+
+
+
+
+
             
 
 class TestSIRT(unittest.TestCase):
@@ -706,14 +689,6 @@ class TestSIRT(unittest.TestCase):
         np.testing.assert_almost_equal(alg.solution.min(), 0.1) 
         
 
-    def test_exception_initial_SIRT(self):
-        try:
-            alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2, x_init=self.initial2)
-            assert False
-        except ValueError as ve:
-            logging.info(str(ve))
-            assert True     
-
 
     def test_SIRT_nan_inf_values(self):
         Aop_nan_inf = self.Aop
@@ -742,7 +717,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         # Select device
         dev = 'cpu'
     
@@ -789,7 +764,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
@@ -814,7 +789,6 @@ class TestSPDHG(unittest.TestCase):
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, verbose=0)
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -837,7 +811,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         # Select device
         dev = 'cpu'
 
@@ -867,8 +841,8 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
-        for i in range(len(list_angles))]
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
+                        for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
@@ -917,7 +891,6 @@ class TestSPDHG(unittest.TestCase):
         # plt.colorbar()
         # plt.show()
 
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -939,7 +912,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         dev = 'cpu'
 
         Aop = ProjectionOperator(ig, ag, dev)
@@ -974,8 +947,8 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
-        for i in range(len(list_angles))]
+        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
+                        for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
@@ -1012,7 +985,6 @@ class TestSPDHG(unittest.TestCase):
         
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())
@@ -1031,7 +1003,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
         
         dev = 'cpu'
 
@@ -1085,8 +1057,6 @@ class TestSPDHG(unittest.TestCase):
         )
         algos[1].run(1000, verbose=0)
         
-
-        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())
@@ -1167,7 +1137,7 @@ class TestADMM(unittest.TestCase):
     
 
         self.fidelities = [ 0.5 * L2NormSquared(b=noisy_data), L1Norm(b=noisy_data), 
-            KullbackLeibler(b=noisy_data, use_numba=False)]
+            KullbackLeibler(b=noisy_data, backend="numpy")]
 
         F = self.alpha * MixedL21Norm()
         K = GradientOperator(ig)
@@ -1225,7 +1195,7 @@ class TestADMM(unittest.TestCase):
 
         # fidelity = 0.5 * L2NormSquared(b=noisy_data)
         # fidelity = L1Norm(b=noisy_data)
-        fidelity = KullbackLeibler(b=noisy_data, use_numba=False)
+        fidelity = KullbackLeibler(b=noisy_data, backend="numpy")
 
         # Setup and run the PDHG algorithm
         F = BlockFunction(alpha * MixedL21Norm(),fidelity)
@@ -1251,8 +1221,3 @@ class TestADMM(unittest.TestCase):
         admm.run(verbose=0)
         np.testing.assert_almost_equal(admm.solution.array, pdhg.solution.array,  decimal=3)
 
-
-    def tearDown(self):
-        pass
-
-    

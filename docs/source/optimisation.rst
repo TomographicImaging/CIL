@@ -14,17 +14,18 @@ The fundamental components are:
 
 
 
-Algorithm
-=========
+Algorithms
+==========
 
 A number of generic algorithm implementations are provided including 
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
-Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
+Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of 
-:code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
-the generic optimisation problem to be solved.
+instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to 
+define a specific instance of the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop. 
 The user can provide a stopping criterion different than the default max_iteration.
 
@@ -49,29 +50,68 @@ The :code:`Algorithm` provides the infrastructure to continue iteration, to acce
 objective function in subsequent iterations, the time for each iteration, and to provide a nice 
 print to screen of the status of the optimisation.
 
+Base class
+----------
 .. autoclass:: cil.optimisation.algorithms.Algorithm
    :members:
    :private-members:
    :special-members:
+
+GD
+--
 .. autoclass:: cil.optimisation.algorithms.GD
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+CGLS
+----
 .. autoclass:: cil.optimisation.algorithms.CGLS
-   :members:
+   :members: 
+   :inherited-members: run, update_objective_interval, max_iteration
+
+SIRT
+----
 .. autoclass:: cil.optimisation.algorithms.SIRT
    :members: update, update_objective
+   :inherited-members: run, update_objective_interval, max_iteration
+
+ISTA
+----
+.. autoclass:: cil.optimisation.algorithms.ISTA
+   :members:
+   :special-members:
+   :inherited-members: run, update_objective_interval, max_iteration
+   
+FISTA
+-----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+PDHG
+----
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
+   :inherited-members: run, update_objective_interval, max_iteration
+
+LADMM
+-----
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+SPDHG
+-----
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
-Operator
-========
+
+
+Operators
+=========
 The two most important methods are :code:`direct` and :code:`adjoint` 
 methods that describe the result of applying the operator, and its 
 adjoint respectively, onto a compatible :code:`DataContainer` input. 
@@ -160,8 +200,8 @@ In the following the required classes for the implementation of the :code:`Gradi
 
 
 
-Function
-========
+Functions
+=========
 
 A :code:`Function` represents a mathematical function of one or more inputs 
 and is intended to accept :code:`DataContainers` as input as well as any 
@@ -297,7 +337,14 @@ Smooth Mixed L21 norm
    :members:
    :special-members:   
 
-Total Variation
+Mixed L11 norm
+---------------------
+
+.. autoclass:: cil.optimisation.functions.MixedL11Norm
+   :members:
+   :special-members:      
+
+Total variation
 ---------------
 
 .. autoclass:: cil.optimisation.functions.TotalVariation

@@ -233,11 +233,15 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertEqual(AG.dimension_labels, ('horizontal','channel','vertical'))
         self.assertEqual(AG.shape, (2,4,3))
 
+    def test_centre_of_rotation(self):
+        pass
+    
     def test_set_centre_of_rotation(self):
         pass
 
-    def test_get_centre_of_rotation(self):
+    def test_set_centre_of_rotation_by_slice(self):
         pass
+
 
     def test_equal(self):
         AG = AcquisitionGeometry.create_Parallel3D()
@@ -507,9 +511,35 @@ class Test_Parallel2D(unittest.TestCase):
         self.assertEqual(out, [None, None, 1]) 
 
     def test_calculate_centre_of_rotation(self):
-        pass
+        AG = AcquisitionGeometry.create_Parallel2D()
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'units')}
+        self.assertDictEqual(gold, out, "Failed basic")
 
-    def test_get_centre_of_rotation(self):
+        AG = AcquisitionGeometry.create_Parallel2D(units='mm')
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'mm')}
+        self.assertDictEqual(gold, out, "Failed basic, with units")
+
+        AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[0.5,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(0.5, out['offset'][0], 5, "Failed positive offset")
+
+        AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[-0.5,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-0.5, out['offset'][0], 5, "Failed negative offset")
+
+        AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[0.5,0.], detector_direction_x=[-1,0])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-0.5, out['offset'][0], 5, "Failed detector direction")        
+
+        theta = math.pi/4 #detector angle
+        distance = 0.5 / math.cos(theta)
+        AG = AcquisitionGeometry.create_Parallel2D(detector_direction_x=[0.5,0.5],rotation_axis_position=[0.5,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(distance, out['offset'][0], 5, "Failed with rotated detector")
+
+    def test_set_centre_of_rotation(self):
         pass
 
 
@@ -583,9 +613,58 @@ class Test_Parallel3D(unittest.TestCase):
         self.assertEqual(out, [None, None, 1]) 
 
     def test_calculate_centre_of_rotation(self):
-        pass
 
-    def test_get_centre_of_rotation(self):
+        AG = AcquisitionGeometry.create_Parallel3D()
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'units'), 'angle':(0,'degree')}
+        self.assertDictEqual(gold, out, "Failed basic")
+
+        AG = AcquisitionGeometry.create_Parallel3D(units='mm')
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'mm'), 'angle':(0,'degree')}
+        self.assertDictEqual(gold, out, "Failed basic, with units")
+
+        AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(0.5, out['offset'][0], 5, "Failed positive offset")
+        self.assertAlmostEqual(45, out['angle'][0], 5, "Failed positive angle")
+
+        AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[-0.5,0.,0.], rotation_axis_direction=[-0.5,0,0.5])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-0.5, out['offset'][0], 5, "Failed negative offset")
+        self.assertAlmostEqual(-45, out['angle'][0], 5, "Failed negative angle")
+
+        AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_x=[-1,0,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-0.5, out['offset'][0], 5, "Failed detector direction_x: offset")        
+        self.assertAlmostEqual(-45, out['angle'][0], 5, "Failed detector direction_x: angle")
+
+        AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_y=[0,0,-1])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(0.5, out['offset'][0], 5, "Failed detector direction_y: offset")        
+        self.assertAlmostEqual(135, out['angle'][0], 5, "Failed detector direction_y: angle") #from det_y axis to rotate axis, taking in to account direction
+
+        AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[-0.5,0,-0.5], detector_direction_y=[0,0,-1])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(0.5, out['offset'][0], 5, "Failed invert rotate axis: offset")        
+        self.assertAlmostEqual(-45, out['angle'][0], 5, "Failed invert rotate axis: angle")
+
+
+        theta = math.pi/4 #detector angle
+        distance = 0.5 / math.cos(theta)
+        AG = AcquisitionGeometry.create_Parallel3D(detector_direction_x=[0.5,0.5,0.],rotation_axis_position=[0.5,0.,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(distance,'units')}
+        self.assertAlmostEqual(distance, out['offset'][0], 5, "Failed rotated detector: offset")
+        self.assertAlmostEqual(0, out['angle'][0], 5, "Failed rotated detector: angle")
+
+        AG = AcquisitionGeometry.create_Parallel3D(detector_direction_y=[0.0,-0.5,0.5],rotation_axis_position=[0.5,0.,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(0.5, out['offset'][0], 5, "Failed tilted detector: offset")
+        self.assertAlmostEqual(0, out['angle'][0], 5, "Failed tilted detector: angle")
+
+
+    def test_set_centre_of_rotation(self):
         pass
 
 class Test_Cone2D(unittest.TestCase):
@@ -683,9 +762,42 @@ class Test_Cone2D(unittest.TestCase):
         numpy.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
     def test_calculate_centre_of_rotation(self):
-        pass
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'units')}
+        self.assertDictEqual(gold, out, "Failed basic")
 
-    def test_get_centre_of_rotation(self):
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], units='mm')
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'mm')}
+        self.assertDictEqual(gold, out, "Failed basic, with units")
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.5,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(1.5, out['offset'][0], 5, "Failed positive offset")
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[-0.5,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-1.5, out['offset'][0], 5, "Failed negative offset")
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.5,0.], detector_direction_x=[-1,0])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-1.5, out['offset'][0], 5, "Failed detector direction")
+
+        #offset * mag = 1
+        theta = math.pi/4 #detector angle
+        phi = math.atan2(1,1000) #ray through rotation axis angle
+
+        L = math.sin(theta)
+        X1 = L / math.tan(theta)
+        X2 = L / math.tan(math.pi/2 - theta- phi)
+        distance = X1 + X2
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,500.], detector_direction_x=[0.5,0.5],rotation_axis_position=[0.5,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(distance, out['offset'][0], 5, "Failed with rotated detector")
+
+    def test_set_centre_of_rotation(self):
         pass
 
 class Test_Cone3D(unittest.TestCase):
@@ -800,7 +912,71 @@ class Test_Cone3D(unittest.TestCase):
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
     def test_calculate_centre_of_rotation(self):
-        pass
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0])
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'units'), 'angle':(0,'degree')}
+        self.assertDictEqual(gold, out, "Failed basic")
 
-    def test_get_centre_of_rotation(self):
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0],units='mm')
+        out = AG.config.system.calculate_centre_of_rotation()
+        gold = {'offset':(0,'mm'), 'angle':(0,'degree')}
+        self.assertDictEqual(gold, out, "Failed basic, with units")
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(1.5, out['offset'][0], 5, "Failed positive offset")
+        self.assertAlmostEqual(45, out['angle'][0], 5, "Failed positive angle")
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[-0.5,0.,0.], rotation_axis_direction=[-0.5,0,0.5])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-1.5, out['offset'][0], 5, "Failed negative offset")
+        self.assertAlmostEqual(-45, out['angle'][0], 5, "Failed negative angle")
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_x=[-1,0,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(-1.5, out['offset'][0], 5, "Failed detector direction_x: offset")        
+        self.assertAlmostEqual(-45, out['angle'][0], 5, "Failed detector direction_x: angle")
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_y=[0,0,-1])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(1.5, out['offset'][0], 5, "Failed detector direction_y: offset")        
+        self.assertAlmostEqual(135, out['angle'][0], 5, "Failed detector direction_y: angle") #from det_y axis to rotate axis, taking in to account direction
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[-0.5,0,-0.5], detector_direction_y=[0,0,-1])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(1.5, out['offset'][0], 5, "Failed invert rotate axis: offset")        
+        self.assertAlmostEqual(-45, out['angle'][0], 5, "Failed invert rotate axis: angle")
+
+
+        #offset * mag = 1
+        theta = math.pi/4 #detector angle
+        phi = math.atan2(1,1000) #ray through rotation axis angle
+
+        L = math.sin(theta)
+        X1 = L / math.tan(theta)
+        X2 = L / math.tan(math.pi/2 - theta- phi)
+        distance = X1 + X2
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0], detector_direction_x=[0.5,0.5,0],rotation_axis_position=[0.5,0.,0])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(distance, out['offset'][0], 5, "Failed with rotated detector")
+        self.assertAlmostEqual(0, out['angle'][0], 5, "Failed rotated detector: angle")
+
+
+        #offset * mag = 1
+        theta = math.pi/4 #detector angle
+        phi = math.atan2(1,1000) #ray through rotation axis angle
+        psi = math.atan2(1,500) 
+        Y = 2 * math.sin(math.pi/2-psi) / math.sin(math.pi/2-theta+psi)
+        L = -Y * math.sin(theta)
+
+        X = L * math.tan(phi)
+        angle = math.atan2(X,Y)*180./math.pi
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0], detector_direction_y=[0.0,-0.5,0.5],rotation_axis_position=[0.5,0.,0.])
+        out = AG.config.system.calculate_centre_of_rotation()
+        self.assertAlmostEqual(1.0, out['offset'][0], 5, "Failed tilted detector: offset")
+        self.assertAlmostEqual(angle, out['angle'][0], 5, "Failed tilted detector: angle")
+
+    def test_set_centre_of_rotation(self):
         pass

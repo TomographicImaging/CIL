@@ -455,7 +455,7 @@ class Test_FBP(unittest.TestCase):
         np.testing.assert_allclose(weights,weights_new)
 
 
-    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    @unittest.skipUnless(has_astra and has_ipp, "ASTRA or IPP not installed")
     def test_set_backend(self):
 
         ag = AcquisitionGeometry.create_Parallel3D()\
@@ -678,3 +678,4 @@ class Test_FBP_results(unittest.TestCase):
 
         diff = (data_filtered - self.acq_data).abs().mean()
         self.assertGreater(diff,0.8)
+

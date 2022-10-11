@@ -2062,7 +2062,7 @@ class AcquisitionGeometry(object):
         return {'offset': (offset, offset_units), 'angle': (angle, ang_units)}
 
 
-    def set_centre_of_rotation(self, offset, distance_units='default', angle=0, angle_units='radian'): 
+    def set_centre_of_rotation(self, offset=0.0, distance_units='default', angle=0.0, angle_units='radian'): 
         """
         Configures the system geometry to have the requested centre of rotation offset at the detector.
 
@@ -2073,7 +2073,7 @@ class AcquisitionGeometry(object):
 
         Parameters
         ----------
-        offset: float
+        offset: float, default 0.0
             The position of the centre of rotation along the detector x_axis at y=0
 
         distance_units : string, default='default'
@@ -2103,10 +2103,10 @@ class AcquisitionGeometry(object):
         else:
             raise ValueError("`angle_units` is not recognised. Must be 'radian' or 'degree'. Got {}".format(angle_units))
 
-        if 'default':
+        if distance_units =='default':
             offset_distance = offset
-        elif distance_units=='pixels':
-            offset_distance = offset_distance * self.config.panel.pixel_size[0]
+        elif distance_units =='pixels':
+            offset_distance = offset * self.config.panel.pixel_size[0]
         else:
             raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
 
@@ -2160,9 +2160,9 @@ class AcquisitionGeometry(object):
                 raise ValueError("Cannot calculate angle. Please specify `slice_index1` and `slice_index2` to define a rotated axis")
 
             offset_x_y0 = offset1 -slice_index1 * (offset2 - offset1)/(slice_index2-slice_index1)
-            angle = numpy.degrees(math.atan2(offset2 - offset1, slice_index2 - slice_index1))
+            angle = math.atan2(offset2 - offset1, slice_index2 - slice_index1)
 
-        self.set_centre_of_rotation(offset_x_y0, angle)
+        self.set_centre_of_rotation(offset_x_y0, 'pixels', angle, 'radian')
 
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):

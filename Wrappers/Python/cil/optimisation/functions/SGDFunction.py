@@ -21,7 +21,7 @@ class SGDFunction(SubsetSumFunction):
 
     r""" Stochastic Gradient Descent Function (SGDFunction) 
 
-    The SDGFunction represents the objective function :math:`\frac{1}{n}\sum_{i=1}^{n}F_{i}(x)`, where
+    The SDGFunction represents the objective function :math:`\sum_{i=1}^{n}F_{i}(x)`, where
     :math:`n` denotes the number of subsets. 
     
     Parameters:
@@ -32,8 +32,6 @@ class SGDFunction(SubsetSumFunction):
                Selection process for each function in the list. It can be :code:`random` or :code:`sequential`. 
     replacement : :obj:`boolean`. Default = :code:`True`
                The same subset can be selected when :code:`replacement=True`. 
-    precond : DataContainer
-               A preconditioner, i.e, an array that multiplies the output from the gradient of the selected function :math:`\partial_F_{i}(x)`.
     
     Note
     ----
@@ -46,10 +44,9 @@ class SGDFunction(SubsetSumFunction):
     
 """
   
-    def __init__(self, functions, sampling = "random", replacement = False, precond=None):
+    def __init__(self, functions, sampling = "random", replacement = False):
 
         super(SGDFunction, self).__init__(functions, sampling = sampling, replacement = replacement)
-        self.precond = precond
 
     def gradient(self, x, out):
         
@@ -61,8 +58,5 @@ class SGDFunction(SubsetSumFunction):
         
         # Compute new gradient for current subset
         self.functions[self.subset_num].gradient(x, out=out)
-
-        # Apply preconditioning
-        if self.precond is not None:
-            out.multiply(self.precond(self.subset_num, x), out=out)            
+        out*=self.num_subsets         
         

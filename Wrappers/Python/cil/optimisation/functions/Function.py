@@ -330,7 +330,7 @@ class SubsetSumFunction(SumFunction):
 
     r"""SubsetSumFunction represents the following sum 
     
-    .. math:: \frac{1}{n}\sum_{i=1}^{n} F_{i} = \frac{1}{n}(F_{1} + F_{2} + ... + F_{n})
+    .. math:: \sum_{i=1}^{n} F_{i} = \frac{1}{n}(F_{1} + F_{2} + ... + F_{n})
 
     where :math:`n` is the number of subsets.
 
@@ -348,7 +348,7 @@ class SubsetSumFunction(SumFunction):
 
     .. math:: \sum_{i=1}^{n} F_{i}(x) = \sum_{i=1}^{n}\|A_{i} x - b_{i}\|^{2}
 
-    >>> f = SubsetSumFunction([LeastSquares(Ai, b=bi)]*n for Ai,bi in zip(A_subsets, b_subsets))   
+    >>> f = SubsetSumFunction([LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets))   
   
     """
     
@@ -375,11 +375,11 @@ class SubsetSumFunction(SumFunction):
         .. math:: \frac{1}{n}(F_{1} + F_{2} + ... + F_{n}))(x) = \frac{1}{n} * ( F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
         """
                 		
-        return (1/self.num_subsets) * super(SubsetSumFunction, self).__call__(x)      
+        return super(SubsetSumFunction, self).__call__(x)      
         
     def _full_gradient(self, x, out=None):
         r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
-        return (1/self.num_subsets) * super(SubsetSumFunction, self).gradient(x, out=out)
+        return super(SubsetSumFunction, self).gradient(x, out=out)
         
     def gradient(self, x, out=None):
         """ Computes the gradient for each subset function at :code:`x`."""      

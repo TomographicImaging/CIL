@@ -696,7 +696,14 @@ class Parallel2D(SystemConfiguration):
 
 
     def rotation_axis_on_detector(self):
-        #calculate the point the rotation axis intersects with the detector
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the world coordinate system
+
+        Returns
+        -------
+        PositionVector
+            Position in the 3D system
+        """
         Pv = self.rotation_axis.position
         ratio = (self.detector.position - Pv).dot(self.detector.normal) / self.ray.direction.dot(self.detector.normal)
         out = PositionVector(2)
@@ -704,18 +711,33 @@ class Parallel2D(SystemConfiguration):
         return out
 
     def calculate_centre_of_rotation(self):
-        """ Returns the position, on the detector, of the projection of the rotation axis in units
         """
+        Calculates the position, on the detector, of the projection of the rotation axis in the detector coordinate system
+
+        Note
+        ----
+         - Origin is in the centre of the detector
+         - Axes directions are specified by detector.direction_x, detector.direction_y
+         - Units are the units of distance used to specify the component's positions
+
+        Returns
+        -------
+        Float
+            Offset position along the detector x_axis at y=0
+        Float
+            Angle between the y_axis and the rotation axis projection, in radians
+        """
+
         #convert to the detector coordinate system
         dp1 = self.rotation_axis_on_detector().position - self.detector.position
         offset = self.detector.direction_x.dot(dp1)
 
-        return {'offset': (offset, self.units)}
+        return (offset, 0.0)
 
     def set_centre_of_rotation(self, offset):
         """ Configures the geometry to have the requested centre of rotation offset at the detector
         """
-        offset_current = self.calculate_centre_of_rotation()['offset'][0]
+        offset_current = self.calculate_centre_of_rotation()[0]
         offset_new = offset - offset_current
 
         self.rotation_axis.position = self.rotation_axis.position + offset_new * self.detector.direction_x
@@ -924,6 +946,14 @@ class Parallel3D(SystemConfiguration):
 
 
     def rotation_axis_on_detector(self):
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the world coordinate system
+
+        Returns
+        -------
+        PositionDirectionVector
+            Position and direction in the 3D system
+        """
         #calculate the rotation axis line with the detector
         vec_a = self.ray.direction
 
@@ -943,7 +973,21 @@ class Parallel3D(SystemConfiguration):
 
 
     def calculate_centre_of_rotation(self):
-        """ Returns the position, on the detector, of the projection of the rotation axis in units
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the detector coordinate system
+
+        Note
+        ----
+         - Origin is in the centre of the detector
+         - Axes directions are specified by detector.direction_x, detector.direction_y
+         - Units are the units of distance used to specify the component's positions
+
+        Returns
+        -------
+        Float
+            Offset position along the detector x_axis at y=0
+        Float
+            Angle between the y_axis and the rotation axis projection, in radians
         """
         rotate_axis_projection = self.rotation_axis_on_detector()
 
@@ -965,36 +1009,42 @@ class Parallel3D(SystemConfiguration):
         #x_y0 = -y1/m + x1 
         offset_x_y0 = x1 -y1 * (x2 - x1)/(y2-y1)
 
-        angle = numpy.degrees(math.atan2(x2 - x1, y2 - y1))
+        angle = math.atan2(x2 - x1, y2 - y1)
         offset = offset_x_y0
 
-        return {'offset': (offset, self.units), 'angle': (angle, 'degree')}
+        return (offset, angle)
 
     def set_centre_of_rotation(self, offset, angle):
         """ Configures the geometry to have the requested centre of rotation offset at the detector
         """
-        cofr_current = self.calculate_centre_of_rotation()
 
-        #reset position
-        self.rotation_axis.position = self.rotation_axis.position - cofr_current['offset'][0] * self.detector.direction_x
+        #two points on the detector
+        x1 = offset
+        y1 = 0
+        x2 = offset + math.tan(angle)
+        y2 = 1
 
-        #set rotation
-        angle_current =  numpy.radians(cofr_current['angle'][0])
-        angle_new = angle - angle_current
+        #convert to 3d coordinates in system frame
+        p1 = self.detector.position + x1 * self.detector.direction_x + y1 * self.detector.direction_y
+        p2 = self.detector.position + x2 * self.detector.direction_x + y2 * self.detector.direction_y
 
-        Rotation_matrix = numpy.eye(3)
-        Rotation_matrix[0][0] = Rotation_matrix[2][2] = math.cos(angle_new)
-        Rotation_matrix[0][2] = -math.sin(angle_new)
-        Rotation_matrix[2][0] = math.sin(angle_new)
+        # find where vec p1 + t * ray dirn intersects plane defined by rotate axis (pos and dir) and det_x direction
 
-        det_x = Rotation_matrix.dot(self.detector.direction_x)
-        det_y = Rotation_matrix.dot(self.detector.direction_y)
+        vector_pos=p1
+        vec_dirn=self.ray.direction
+        plane_pos=self.rotation_axis.position
+        plane_normal = numpy.cross(self.detector.direction_x, self.rotation_axis.direction)
 
-        self.detector.set_direction(det_x, det_y)
 
-        #set position
-        self.rotation_axis.position = self.rotation_axis.position + offset * self.detector.direction_x
+        ratio = (plane_pos - vector_pos).dot(plane_normal) / vec_dirn.dot(plane_normal)
+        p1_on_plane = vector_pos + vec_dirn * ratio
 
+        vector_pos=p2
+        ratio = (plane_pos - vector_pos).dot(plane_normal) / vec_dirn.dot(plane_normal)
+        p2_on_plane = vector_pos + vec_dirn * ratio
+
+        self.rotation_axis.position = p1_on_plane
+        self.rotation_axis.direction = p2_on_plane - p1_on_plane
 
 
 class Cone2D(SystemConfiguration):
@@ -1119,6 +1169,14 @@ class Cone2D(SystemConfiguration):
         return [dist_source_center, dist_center_detector, magnification]
 
     def rotation_axis_on_detector(self):
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the world coordinate system
+
+        Returns
+        -------
+        PositionVector
+            Position in the 3D system
+        """
         #calculate the point the rotation axis intersects with the detector
         vec_a = self.rotation_axis.position - self.source.position
 
@@ -1132,18 +1190,32 @@ class Cone2D(SystemConfiguration):
 
 
     def calculate_centre_of_rotation(self):
-        """ Returns the position, on the detector, of the projection of the rotation axis in units
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the detector coordinate system
+
+        Note
+        ----
+         - Origin is in the centre of the detector
+         - Axes directions are specified by detector.direction_x, detector.direction_y
+         - Units are the units of distance used to specify the component's positions
+
+        Returns
+        -------
+        Float
+            Offset position along the detector x_axis at y=0
+        Float
+            Angle between the y_axis and the rotation axis projection, in radians
         """
         #convert to the detector coordinate system
         dp1 = self.rotation_axis_on_detector().position - self.detector.position
         offset = self.detector.direction_x.dot(dp1)
 
-        return {'offset': (offset, self.units)}
+        return (offset, 0.0)
 
     def set_centre_of_rotation(self, offset):
         """ Configures the geometry to have the requested centre of rotation offset at the detector
         """
-        offset_current = self.calculate_centre_of_rotation()['offset'][0]
+        offset_current = self.calculate_centre_of_rotation()[0]
         offset_new = offset - offset_current
 
         cofr_shift = offset_new * self.detector.direction_x /self.calculate_magnification()[2]
@@ -1318,7 +1390,14 @@ class Cone3D(SystemConfiguration):
         return [dist_source_center, dist_center_detector, magnification]
 
     def rotation_axis_on_detector(self):
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the world coordinate system
 
+        Returns
+        -------
+        PositionDirectionVector
+            Position and direction in the 3D system
+        """
         #calculate the intersection with the detector, of source to pv
         Pv = self.rotation_axis.position
         vec_a = Pv - self.source.position
@@ -1337,7 +1416,21 @@ class Cone3D(SystemConfiguration):
         return out
 
     def calculate_centre_of_rotation(self):
-        """ Returns the position, on the detector, of the projection of the rotation axis in units
+        """
+        Calculates the position, on the detector, of the projection of the rotation axis in the detector coordinate system
+
+        Note
+        ----
+         - Origin is in the centre of the detector
+         - Axes directions are specified by detector.direction_x, detector.direction_y
+         - Units are the units of distance used to specify the component's positions
+
+        Returns
+        -------
+        Float
+            Offset position along the detector x_axis at y=0
+        Float
+            Angle between the y_axis and the rotation axis projection, in radians
         """
         rotate_axis_projection = self.rotation_axis_on_detector()
 
@@ -1359,10 +1452,10 @@ class Cone3D(SystemConfiguration):
         #x_y0 = -y1/m + x1 
         offset_x_y0 = x1 -y1 * (x2 - x1)/(y2-y1)
 
-        angle = numpy.degrees(math.atan2(x2 - x1, y2 - y1))
+        angle = math.atan2(x2 - x1, y2 - y1)
         offset = offset_x_y0
 
-        return {'offset': (offset, self.units), 'angle': (angle, 'degree')}
+        return (offset, angle)
 
 
     def set_centre_of_rotation(self, offset, angle):
@@ -1381,16 +1474,19 @@ class Cone3D(SystemConfiguration):
         # vectors from source define plane
         sp1 = p1 - self.source.position
         sp2 = p2 - self.source.position
-        normal = numpy.cross(sp1, sp2)
 
-        # translate rotation axis in detector direction_x until it intersects with plane
-        ratio = (self.source.position - self.rotation_axis.position).dot(normal) / self.detector.direction_x.dot(normal)
-        self.rotation_axis.position = self.rotation_axis.position + self.detector.direction_x * ratio
+        #find vector intersection with a plane defined by rotate axis (pos and dir) and det_x direction
+        plane_normal = numpy.cross(self.rotation_axis.direction, self.detector.direction_x)
 
-        # translate 2nd point on rotation axis in detector direction_x until it intersects with plane
-        ratio = (self.source.position - (self.rotation_axis.position + self.rotation_axis.direction)).dot(normal) / self.detector.direction_x.dot(normal)
-        rotation_point2 = (self.rotation_axis.position + self.rotation_axis.direction) + self.detector.direction_x * ratio
-        self.rotation_axis.direction = rotation_point2 - self.rotation_axis.position
+        ratio = (self.rotation_axis.position - self.source.position).dot(plane_normal) / sp1.dot(plane_normal)
+        p1_on_plane = self.source.position + sp1 * ratio
+
+        ratio = (self.rotation_axis.position - self.source.position).dot(plane_normal) / sp2.dot(plane_normal)
+        p2_on_plane = self.source.position + sp2 * ratio
+
+        self.rotation_axis.position = p1_on_plane
+        self.rotation_axis.direction = p2_on_plane - p1_on_plane
+
 
 class Panel(object):
     r'''This is a class describing the panel of the system. 
@@ -1670,12 +1766,12 @@ class Configuration(object):
     r'''This class holds the description of the system components. 
      '''
 
-    def __init__(self, units_distance='units'):
+    def __init__(self, units_distance='units distance'):
         self.system = None #has distances
         self.angles = None #has angles
         self.panel = None #has distances
         self.channels = Channels(1, None)
-        self.units = {'distance':units_distance}
+        self.units = units_distance
 
     @property
     def configured(self):
@@ -1703,6 +1799,8 @@ class Configuration(object):
             repres += str(self.panel)
             repres += str(self.channels)
             repres += str(self.angles)
+
+            repres += "Distances in units: {}".format(self.units)
         
         return repres
 
@@ -1899,84 +1997,173 @@ class AcquisitionGeometry(object):
     def dtype(self, val):
         self._dtype = val       
 
-    @property
-    def centre_of_rotation(self):
-        '''returns offset and angle of the projection of the rotation axis on to the detector
-        Offset is in pixels at the detector
-        Return: dictionary
-            (offset, angle)
-        '''
-
-        if hasattr(self.config.system, 'calculate_centre_of_rotation'):
-            cofr = self.config.system.calculate_centre_of_rotation()
-
-            #scale to pixels
-            if cofr['offset'][1] != 'pixels':
-                cofr['offset'] = (cofr['offset'][0] / self.config.panel.pixel_size[0], 'pixels' )
-            return cofr
-        else:
-            raise NotImplementedError
-
 
     def __init__(self):
         self._dtype = numpy.float32
 
 
-    def set_centre_of_rotation(self, offset, angle=(0, 'degree')): 
-        """ Configures the geometry to have the requested centre of rotation offset in pixels at the detector
+    def get_centre_of_rotation(self, distance_units='default', angle_units='radian'):
+        """
+        Returns the system centre of rotation offset at the detector
+
+        Note
+        ----
+         - Origin is in the centre of the detector
+         - Axes directions are specified by detector.direction_x, detector.direction_y
+
+        Parameters
+        ----------
+        distance_units : string, default='default'
+            Units of distance used to calculate the return values.
+            'default' uses the same units the system and panel were specified in.
+            'pixels' uses pixels sizes in the horizontal and vertical directions as appropriate.
+        angle_units : string
+            Units to return the angle in. Can take 'radian' or 'degree'.
+
+        Returns
+        -------
+        Dictionary
+            {'offset': (offset, distance_units), 'angle': (angle, angle_units)}
+            where,
+            'offset' gives the position along the detector x_axis at y=0
+            'angle' gives the angle between the y_axis and the projection of the rotation axis on the detector
         """
 
-        if not hasattr(self.config.system, 'set_centre_of_rotation'):
-            raise NotImplementedError()
-        
-        if angle[1] not in ['degree', 'radian']:
-            raise ValueError("Expected angular units of 'degree' or 'radian' got {}".format(angle[1]))
-
-        if self.dimension == '2D':
-            self.config.system.set_centre_of_rotation(offset*self.config.panel.pixel_size[0])
-
+        if hasattr(self.config.system, 'calculate_centre_of_rotation'):
+            offset_distance, angle_rad = self.config.system.calculate_centre_of_rotation()
         else:
-            if angle[1] == 'radian':
-                angle_rad = angle[0]
-            else: 
-                angle_rad = numpy.radians(angle[0]) 
+            raise NotImplementedError
 
-            self.config.system.set_centre_of_rotation(offset*self.config.panel.pixel_size[0], angle_rad)
+        if distance_units == 'default':
+            offset = offset_distance
+            offset_units = self.config.units
+        elif distance_units == 'pixels':
+
+            offset = offset_distance/ self.config.panel.pixel_size[0]
+            offset_units = 'pixels'
+
+            if self.dimension == '3D' and self.config.panel.pixel_size[0] != self.config.panel.pixel_size[1]:
+                #if aspect ratio of pixels isn't 1:1 need to convert angle by new ratio
+                y_pix = 1 /self.config.panel.pixel_size[1]
+                x_pix = math.tan(angle_rad)/self.config.panel.pixel_size[0]
+                angle_rad = math.atan2(x_pix,y_pix)
+        else:
+            raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
+
+        if angle_units == 'radian':
+            angle = angle_rad
+            ang_units = 'radian'
+        elif angle_units == 'degree':
+            angle = numpy.degrees(angle_rad)
+            ang_units = 'degree'
+        else:
+            raise ValueError("`angle_units` is not recognised. Must be 'radian' or 'degree'. Got {}".format(angle_units))
+
+        return {'offset': (offset, offset_units), 'angle': (angle, ang_units)}
 
 
-    def set_centre_of_rotation_by_slice(self, offset1, slice_index1, offset2, slice_index2): 
-        """ Configures the geometry to have the requested centre of rotation offset at the detector
-        Examples:
-        #offset1=(pixel_offset, slice_ind),offset2=(pixel_offset, slice_ind)
+    def set_centre_of_rotation(self, offset, distance_units='default', angle=0, angle_units='radian'): 
+        """
+        Configures the system geometry to have the requested centre of rotation offset at the detector.
+
+        Note
+        ----
+         - Origin is in the centre of the detector
+         - Axes directions are specified by detector.direction_x, detector.direction_y
+
+        Parameters
+        ----------
+        offset: float
+            The position of the centre of rotation along the detector x_axis at y=0
+
+        distance_units : string, default='default'
+            Units the offset is specified in. Can be 'default'or 'pixels'.
+            'default' interprets the input as same units the system and panel were specified in.
+            'pixels' interprets the input in horizontal pixels.
+
+        angle: float, default=0.0
+            The angle between the detector y_axis and the rotation axis direction on the detector
+
+            Notes
+            -----
+            If aspect ratio of pixels is not 1:1 ensure the angle is calculated from the x and y values in the correct units.
+
+        angle_units : string, default='radian'
+            Units the angle is specified in. Can take 'radian' or 'degree'.
 
         """
 
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
             raise NotImplementedError()
         
+        if angle_units == 'radian':
+            angle_rad = angle
+        elif angle_units == 'degree':
+            angle_rad = numpy.radians(angle)
+        else:
+            raise ValueError("`angle_units` is not recognised. Must be 'radian' or 'degree'. Got {}".format(angle_units))
+
+        if 'default':
+            offset_distance = offset
+        elif distance_units=='pixels':
+            offset_distance = offset_distance * self.config.panel.pixel_size[0]
+        else:
+            raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
+
         if self.dimension == '2D':
-            logging.WARNING("Only offset1 is being used")
-            self.set_centre_of_rotation(offset1)
-            
-        offset = (offset1+offset2)/2 #not true, need to calculate in right place? centre detector?
-        angle = (offset2-offset1) / (slice_index2-slice_index1)
-        self.set_centre_of_rotation(offset, angle)
+            self.config.system.set_centre_of_rotation(offset_distance)
+        else:
+            self.config.system.set_centre_of_rotation(offset_distance, angle_rad)
 
 
-    # def set_centre_of_rotation(self, cofr): 
-    #     '''Used to shift the centre of rotation. Updates the system geometry to these values. Offset is in pixels at the detector.'
+    def set_centre_of_rotation_by_slice(self, offset1, slice_index1=None, offset2=None, slice_index2=None): 
+        """
+        Configures the system geometry to have the requested centre of rotation offset at the detector.
         
-    #     Examples:
-    #     #cofr=pixel_offset
-    #     #cofr=(pixel_offset, angle, angle_units)
-    #     #cofr=[(pixel_offset, slice_ind),(pixel_offset, slice_ind)]
+        If two slices are passed the rotation axis will be rotated to pass through both points.
 
-    #     '''
+        Note
+        ----
+         - Offset is specified in pixels
+         - Offset can be sub-pixels
+         - Offset direction is specified by detector.direction_x
 
-    #     if not hasattr(self.config.system, 'set_centre_of_rotation'):
-    #         raise NotImplementedError
+        Parameters
+        ----------
+        offset1: float
+            The offset from the centre of the detector to the projected rotation position at slice_index_1
+        
+        slice_index1: int, optional
+            The slice number of offset1
 
-    #     pass
+        offset2: float, optional
+            The offset from the centre of the detector to the projected rotation position at slice_index_2
+        
+        slice_index2: int, optional
+            The slice number of offset2
+        """
+        
+
+        if not hasattr(self.config.system, 'set_centre_of_rotation'):
+            raise NotImplementedError()
+        
+        if self.dimension == '2D':
+            if offset2 is not None:
+                logging.WARNING("Only offset1 is being used")
+            self.set_centre_of_rotation(offset1)
+        
+        if offset2 is None or offset1 == offset2:
+            offset_x_y0 = offset1
+            angle = 0
+        else:
+            if slice_index1 is None or slice_index2 is None or slice_index1 == slice_index2:
+                raise ValueError("Cannot calculate angle. Please specify `slice_index1` and `slice_index2` to define a rotated axis")
+
+            offset_x_y0 = offset1 -slice_index1 * (offset2 - offset1)/(slice_index2-slice_index1)
+            angle = numpy.degrees(math.atan2(offset2 - offset1, slice_index2 - slice_index1))
+
+        self.set_centre_of_rotation(offset_x_y0, angle)
+
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
         r'''This method configures the angular information of an AcquisitionGeometry object. 
@@ -2036,7 +2223,7 @@ class AcquisitionGeometry(object):
         return self
  
     @staticmethod
-    def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_x=[1, 0], rotation_axis_position=[0, 0], units='units'):
+    def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_x=[1, 0], rotation_axis_position=[0, 0], units='units distance'):
         r'''This creates the AcquisitionGeometry for a parallel beam 2D tomographic system
 
         :param ray_direction: A 2D vector describing the x-ray direction (x,y)
@@ -2058,7 +2245,7 @@ class AcquisitionGeometry(object):
         return AG    
 
     @staticmethod
-    def create_Cone2D(source_position, detector_position, detector_direction_x=[1,0], rotation_axis_position=[0,0], units='units'):
+    def create_Cone2D(source_position, detector_position, detector_direction_x=[1,0], rotation_axis_position=[0,0], units='units distance'):
         r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system          
 
         :param source_position: A 2D vector describing the position of the source (x,y)
@@ -2080,7 +2267,7 @@ class AcquisitionGeometry(object):
         return AG   
 
     @staticmethod
-    def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units'):
+    def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
         r'''This creates the AcquisitionGeometry for a parallel beam 3D tomographic system
                        
         :param ray_direction: A 3D vector describing the x-ray direction (x,y,z)
@@ -2106,7 +2293,7 @@ class AcquisitionGeometry(object):
         return AG            
 
     @staticmethod
-    def create_Cone3D(source_position, detector_position, detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units'):
+    def create_Cone3D(source_position, detector_position, detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
         r'''This creates the AcquisitionGeometry for a cone beam 3D tomographic system
                         
         :param source_position: A 3D vector describing the position of the source (x,y,z)

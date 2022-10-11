@@ -268,12 +268,91 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertDictEqual(gold1_3D, out1, "Failed Cone3D")
         self.assertDictEqual(gold2_3D, out2, "Failed Cone3D")
 
+        with self.assertRaises(ValueError):
+            ag.get_centre_of_rotation(distance_units='bad input')
+
+        with self.assertRaises(ValueError):
+            ag.get_centre_of_rotation(angle_units='bad input')
+
 
     def test_set_centre_of_rotation(self):
-        pass
+        # Functionality is tested in specific implementations
+        # this checks the pixel size scaling and return format for each geometry type
+        
+        gold_2D = {'offset':(0.25,'units distance'), 'angle':(0.0,'radian')}
+        gold_3D = {'offset':(0.25,'units distance'), 'angle':(math.pi/4,'radian')}
+
+        #check outputs for each geometry type
+        ag = AcquisitionGeometry.create_Parallel2D().set_panel(10,0.5)
+        ag.set_centre_of_rotation(0.25)
+        out = ag.get_centre_of_rotation()
+        self.assertDictEqual(gold_2D, out, "Failed Parallel2D default")
+
+        ag.set_centre_of_rotation(0.5, 'pixels')
+        out = ag.get_centre_of_rotation()
+        self.assertDictEqual(gold_2D, out, "Failed Parallel2D unit")
+
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([10,10],[0.5,0.5])
+        ag.set_centre_of_rotation(0.25, angle=math.pi/4)
+        out = ag.get_centre_of_rotation()
+        self.assertDictEqual(gold_3D, out, "Failed Parallel3D default")
+
+        ag.set_centre_of_rotation(0.5, 'pixels', 45, 'degree')
+        out = ag.get_centre_of_rotation()        
+        self.assertDictEqual(gold_3D, out, "Failed Parallel3D units")
+
+        ag = AcquisitionGeometry.create_Cone2D([0,-50], [0,50]).set_panel(10,0.5)
+        ag.set_centre_of_rotation(0.25)
+        out = ag.get_centre_of_rotation()
+        self.assertDictEqual(gold_2D, out, "Failed Cone2D default")
+
+        ag.set_centre_of_rotation(0.5, 'pixels')
+        out = ag.get_centre_of_rotation()       
+        self.assertDictEqual(gold_2D, out, "Failed Cone2D units")
+
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0], [0,50,0]).set_panel([10,10],[0.5,0.5])
+        ag.set_centre_of_rotation(0.25, angle=math.pi/4)
+        out = ag.get_centre_of_rotation()
+        self.assertDictEqual(gold_3D, out, "Failed Cone3D default")
+
+        ag.set_centre_of_rotation(0.5,'pixels', 45, 'degree')
+        out = ag.get_centre_of_rotation()        
+        self.assertDictEqual(gold_3D, out, "Failed Cone3D units")
+
+        with self.assertRaises(ValueError):
+            ag.set_centre_of_rotation(distance_units='bad input')
+
+        with self.assertRaises(ValueError):
+            ag.set_centre_of_rotation(angle_units='bad input')
+
 
     def test_set_centre_of_rotation_by_slice(self):
-        pass
+        # Functionality is tested in specific implementations
+        # this checks the pixel size scaling and return format for each geometry type
+        
+        gold_2D = {'offset':(0.25,'units distance'), 'angle':(0.0,'radian')}
+        gold_3D = {'offset':(0.25,'units distance'), 'angle':(math.pi/4,'radian')}
+
+        #check outputs for each geometry type
+        ag = AcquisitionGeometry.create_Parallel2D().set_panel(10,0.5)
+        ag.set_centre_of_rotation_by_slice(0.5)
+        out = ag.get_centre_of_rotation()
+        self.assertDictEqual(gold_2D, out, "Failed Parallel2D")
+
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([10,10],[0.5,0.5])
+        ag.set_centre_of_rotation_by_slice(-4.5, -5, 5.5, 5)
+        out = ag.get_centre_of_rotation()        
+        self.assertDictEqual(gold_3D, out, "Failed Parallel3D")
+
+        ag = AcquisitionGeometry.create_Cone2D([0,-50], [0,50]).set_panel(10,0.5)
+        ag.set_centre_of_rotation_by_slice(0.5)
+        out = ag.get_centre_of_rotation()       
+        self.assertDictEqual(gold_2D, out, "Failed Cone2D")
+
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0], [0,50,0]).set_panel([10,10],[0.5,0.5])
+        ag.set_centre_of_rotation_by_slice(-4.5, -5, 5.5, 5)
+        out = ag.get_centre_of_rotation()        
+        self.assertDictEqual(gold_3D, out, "Failed Cone3D")
 
 
     def test_equal(self):

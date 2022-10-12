@@ -46,10 +46,9 @@ class SGDFunction(SubsetSumFunction):
     
 """
   
-    def __init__(self, functions, sampling = "random", replacement = False, precond=None):
+    def __init__(self, functions, sampling = "random", replacement = False):
 
         super(SGDFunction, self).__init__(functions, sampling = sampling, replacement = replacement)
-        self.precond = precond
 
     def gradient(self, x, out):
         
@@ -61,8 +60,6 @@ class SGDFunction(SubsetSumFunction):
         
         # Compute new gradient for current subset
         self.functions[self.subset_num].gradient(x, out=out)
-
-        # Apply preconditioning
-        if self.precond is not None:
-            out.multiply(self.precond(self.subset_num, x), out=out)            
+        out *= self.num_subsets
+       
         

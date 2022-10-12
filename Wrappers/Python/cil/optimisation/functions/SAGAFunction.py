@@ -48,8 +48,7 @@ class SAGAFunction(SAGFunction):
     """
 
     def __init__(self, functions, sampling = "random", precond=None, replacement = False, gradient_initial_point=None):
-
-        self.precond = precond     
+  
         self.gradient_initial_point = gradient_initial_point
         self.allocate_memory = False
         super(SAGFunction, self).__init__(functions, sampling = sampling, replacement=replacement)
@@ -98,17 +97,13 @@ class SAGAFunction(SAGFunction):
         self.tmp1.sapyb(1., self.subset_gradients[self.subset_num], -1., out=self.tmp2)
 
         # Compute the output : tmp2 + full_gradient
-        self.tmp2.sapyb(1., self.full_gradient, 1., out=out)
-
-        # Apply preconditioning
-        if self.precond is not None:
-            out.multiply(self.precond(self.subset_num, x), out=out) 
+        self.tmp2.sapyb(self.num_subsets, self.full_gradient, 1., out=out)
 
         # Update subset gradients in memory: store the computed gradient F_{subset_num} (x) in self.subset_gradients[self.subset_num]
         self.subset_gradients[self.subset_num].fill(self.tmp1)
 
-        # Update the full gradient estimator: add 1/num_subsets * (gradient F_{subset_num} (x) - subset_gradient_in_memory_{subset_num}) to the current full_gradient
-        self.full_gradient.sapyb(1., self.tmp2, 1./self.num_subsets, out=self.full_gradient)
+        # Update the full gradient estimator: add (gradient F_{subset_num} (x) - subset_gradient_in_memory_{subset_num}) to the current full_gradient
+        self.full_gradient.sapyb(1., self.tmp2, 1., out=self.full_gradient)
        
 
     

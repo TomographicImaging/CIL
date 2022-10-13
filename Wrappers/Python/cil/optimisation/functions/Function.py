@@ -370,19 +370,24 @@ class SubsetSumFunction(SumFunction):
         return self.num_functions
 
     def __call__(self, x):
-        r"""Returns the value of the averaged sum of functions at :math:`x`.		
-        		
-        .. math:: \frac{1}{n}(F_{1} + F_{2} + ... + F_{n}))(x) = \frac{1}{n} * ( F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
+
+        r"""Returns the value of the sum of functions at :math:`x`.		
+
+        .. math:: \sum_{i=1}^{n}(F_{i}(x)) = (F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
+
         """
                 		
         return super(SubsetSumFunction, self).__call__(x)      
         
     def _full_gradient(self, x, out=None):
+
         r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
         return super(SubsetSumFunction, self).gradient(x, out=out)
         
     def gradient(self, x, out=None):
+
         """ Computes the gradient for each subset function at :code:`x`."""      
+
         raise NotImplemented
                
     def next_subset(self):

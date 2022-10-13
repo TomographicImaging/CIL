@@ -35,7 +35,7 @@ class TestSubsetSumFunction(unittest.TestCase):
             bi_cil = VectorData(bi[i])
             self.fi_cil.append(LeastSquares(Ai_cil, bi_cil, c=1.0))
 
-        self.f = (1/self.n_subsets) * LeastSquares(self.Aop, b=self.bop, c=1.0)
+        self.f = LeastSquares(self.Aop, b=self.bop, c=1.0)
         self.f_subset_sum_function = SubsetSumFunction(self.fi_cil)
         self.f_subset_sum_function_no_replacement = SubsetSumFunction(self.fi_cil, sampling="random", replacement=False) 
         self.f_subset_sum_function_sequential = SubsetSumFunction(self.fi_cil, sampling="sequential")              

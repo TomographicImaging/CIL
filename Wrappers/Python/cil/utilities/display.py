@@ -17,7 +17,7 @@
 
 
 #%%
-from cil.framework import AcquisitionGeometry, AcquisitionData, BlockDataContainer
+from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, BlockDataContainer
 import numpy as np
 import warnings
 
@@ -91,6 +91,179 @@ class show_base(object):
             print("Unable to save image. Permissions denied: {}".format(path_full))
         except:
             print("Unable to save image")
+
+
+class show1D(show_base):
+    """
+    This creates 1D plots of pixel flux.
+
+    Parameters
+    ----------
+
+    Attributes
+    ----------
+    figure : matplotlib.figure.Figure
+
+    """
+    def __init__(self, data, line_coords=None, label=None, title=None,
+                color=None, size=(8,6), force=True):
+
+        self.figure = self._line_plot(data, line_coords=line_coords, label=label,
+                                    title=title, color=color, size=size, force=force)
+
+    def _extract_vector(self, data, coords, **kwargs):
+        """
+        Extracts a 1D vector by slicing multi-dimensional data using the
+        coordinates provided.
+
+        Parameters
+        ----------
+        data : AcquisitionData, ImageData or numpy.ndarray
+            Multi-dimensional data to be reduced to 1D.
+        coords : dict
+            The dimensions and coordinates used for slicing. If `data` is
+            an AcquisitionData or ImageData, this should comprise
+            dimensions from `data.dimension_labels`. If `data` is a
+            numpy.ndarray, integers representing the axes should be used
+            instead.
+
+        Other Parameters
+        ----------------
+        **kwargs : dict, optional
+            Additional parameters passed to AcquisitionData.get_slice or
+            ImageData.get_slice, dependings on the type of `data`.
+
+        Returns
+        -------
+        vector : numpy.ndarray
+            The 1-dimensional pixel flux data extracted from `data`.
+        """
+        vector = None
+        possible_dimensions = None
+
+        if isinstance(data, np.ndarray):
+            possible_dimensions = [i for i in range(len(data.shape))]
+        elif isinstance(data, AcquisitionData) or isinstance(data, ImageData):
+            possible_dimensions = data.dimension_labels
+
+        remaining_dimensions = set(possible_dimensions) - set(coords.keys())
+        if len(remaining_dimensions) > 1:
+            raise ValueError(f'One remaining dimension required, \
+                                found {remaining_dimensions}')
+
+        if isinstance(data, np.ndarray):
+
+            s = data
+            for d, i in coords.items():
+                if d not in possible_dimensions:
+                    raise ValueError(f'Unexpected key "{d}", not in \
+                                        {possible_dimensions}')
+                else:
+                    s = s.take(indices=i, axis=d)
+
+            vector = s
+
+        elif isinstance(data, AcquisitionData) or isinstance(data, ImageData):
+
+            sliceme = {**kwargs}
+            for k,v in coords.items():
+                if k not in possible_dimensions:
+                    raise ValueError(f'Unexpected key "{k}", not in \
+                                        {possible_dimensions}')
+                else:
+                    sliceme[k] = v
+
+            vector = data.get_slice(**sliceme).as_array()
+
+        return vector
+
+    def _line_plot(self, data, line_coords=None, label=None,
+                    title=None, color=None, size=(8,6), force=True):
+        """
+        Creates and displays a 1D plot of pixel flux from multi-dimensional
+        data and slicing information.
+
+        Parameters
+        ----------
+        data : AcquisitionData, ImageData, list/tuple of AcquisitionData or
+        ImageData, BlockDataContainers?
+            _description_
+        line_coords : list of tuples
+            _description_, by default None
+        label : str, list of str, optional
+            _description_, by default None
+        title : str, optional
+            _description_, by default None
+        color : str, list of str, optional
+            _description_, by default None
+        size : tuple, optional
+            _description_, by default (15,15)
+        force : bool, optional
+            _description_, by default False
+
+        Returns
+        -------
+            matplotlib.figure.Figure
+        """
+
+        kwargs = {'force': force}
+
+        multi = False
+        is_1d = False
+        if issubclass(data.__class__, (list, tuple)): # TODO: support BlockDataContainers
+            multi = True
+
+            dimensions = len(data[0].shape)
+            if len(data[0].shape) == 1:
+                is_1d = True
+
+            for ds in data:
+                if len(ds.shape) != dimensions:
+                    raise ValueError('Datasets have inconsistent dimensions')
+
+            if color is None:
+                color = [None for _ in data]
+            if label is None:
+                label = [None for _ in data]
+        else:
+            if len(data.shape) == 1:
+                is_1d = True
+
+        dims = {}
+        if not is_1d:
+            try:
+                for el in line_coords:
+                    dims[el[0]] = el[1]
+            except TypeError:
+                raise TypeError(f'Expected list of tuples for slicing, \
+                                received {type(line_coords)}')
+
+        fig, ax = plt.subplots(1, 1, figsize=size)
+        if multi:
+            for i, el in enumerate(data):
+                if is_1d:
+                    ax.plot(el, color=color, label=label)
+                else:
+                    ax.plot(self._extract_vector(el, dims, **kwargs),
+                            color=color[i], label=label[i])
+        else:
+            if is_1d:
+                ax.plot(data, color=color, label=label)
+            else:
+                ax.plot(self._extract_vector(data, dims, **kwargs),
+                            color=color, label=label)
+
+        ax.set_title(title)
+        ax.set_xlabel(f'Pixel')
+        ax.set_ylabel('Pixel value')
+
+        fig2 = plt.gcf()
+
+        if label: plt.legend()
+        plt.show()
+
+        return fig2
+
 
 class show2D(show_base):
     '''This plots 2D slices from cil DataContainer types.

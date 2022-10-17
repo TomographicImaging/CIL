@@ -10,7 +10,7 @@ The framework comprises:
 * :code:`cil.optimisation` module allows the user to create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.
 * :code:`cil.plugins` module which allows CIL to use selected functionality from ASTRA, TIGRE, TomoPhantom and the Regularisation Toolkit
 * :code:`cil.processors` module contains tools for data manipulation and common CT pre-processoing steps
-* :code:`cil.recon` module contains an optimised FDK/FBP reconstructors, making using the both CIL accelerated libraries and and Tigre/ASTRA backprojectors
+* :code:`cil.recon` module contains an optimised FDK/FBP reconstructors, making using the both CIL accelerated libraries and the Tigre/ASTRA back-projectors
 * :code:`cil.utilities` module contains a selection of display tools for 2D and 3D data, as well as real and simulated test datasets
 
 

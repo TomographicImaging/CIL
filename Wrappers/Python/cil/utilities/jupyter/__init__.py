@@ -34,7 +34,7 @@ from cil.utilities.display import set_origin
 def display_slice(container, direction, title, cmap, size, axis_labels, origin):
     
         
-    def get_slice_3D(x, minmax):
+    def get_slice_3D(x, minmax, roi_hdir, roi_vdir):
         
         if direction == 0:
             img = container[x]
@@ -74,9 +74,11 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
         ax.set_xlabel(x_label)     
         ax.set_ylabel(y_label)
 
-        img, data_origin, extent = set_origin(img, origin)
-        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, extent=extent)
+        img, data_origin, _ = set_origin(img, origin)
+        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect='auto')#, extent=(*roi_hdir, *roi_vdir))
         aximg.set_clim(minmax)
+        ax.set_xlim(*roi_hdir)
+        ax.set_ylim(*roi_vdir)
         ax.set_title(dtitle + " {}".format(x))
         # colorbar
         ax = fig.add_subplot(gs[0, 1])
@@ -159,6 +161,38 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=
                                 readout=True,
                                 readout_format='.1e',
                             )
+
+    dirs_remaining = [i for i in range(3) if i != direction]
+    h_dir, v_dir = dirs_remaining[1], dirs_remaining[0]
+    h_dir_size = container.shape[h_dir]
+    v_dir_size = container.shape[v_dir]
+
+    roi_select_hdir = widgets.IntRangeSlider(
+        value=[0, h_dir_size-1],
+        min=0,
+        max=h_dir_size-1,
+        step=1,
+        description=f'roi_{axis_labels[h_dir]}',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='d',
+    )
+
+    roi_select_vdir = widgets.IntRangeSlider(
+        value=[0, v_dir_size-1],
+        min=0,
+        max=v_dir_size-1,
+        step=1,
+        description=f'roi_{axis_labels[v_dir]}',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='d',
+    )
+
     interact(display_slice(container, 
                            direction, 
                            title=title, 
@@ -166,7 +200,9 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=
                            # minmax=(amin, amax),
                            size=size, axis_labels=axis_labels,
                            origin=origin),
-                           x=slider, minmax=min_max)
+                           x=slider, minmax=min_max,
+                           roi_hdir=roi_select_hdir,
+                           roi_vdir=roi_select_vdir)
     
     return slider
     

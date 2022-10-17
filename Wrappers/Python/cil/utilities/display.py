@@ -95,10 +95,25 @@ class show_base(object):
 
 class show1D(show_base):
     """
-    This creates 1D plots of pixel flux.
+    This creates 1D plots of pixel values by slicing multi-dimensional data.
 
     Parameters
-    ----------
+        ----------
+        data : AcquisitionData, ImageData, list/tuple of AcquisitionData or
+        ImageData
+            Multi-dimensional data to be reduced to 1D.
+        line_coords : list of tuples
+            (dimension, coordinate) pairs for slicing `data`, by default None
+        label : str, list of str, optional
+            Label(s) to use in the plot's legend, by default None
+        title : str, optional
+            A title for the plot, by default None
+        color : str, list of str, optional
+            Color(s) for each line plot, by default None
+        size : tuple, optional
+            The size of the figure, by default (8,6)
+        force : bool, optional
+            Passed to `get_slice`, by default True
 
     Attributes
     ----------
@@ -148,16 +163,16 @@ class show1D(show_base):
 
         remaining_dimensions = set(possible_dimensions) - set(coords.keys())
         if len(remaining_dimensions) > 1:
-            raise ValueError(f'One remaining dimension required, \
-                                found {remaining_dimensions}')
+            raise ValueError(f'One remaining dimension required, ' \
+                            f'found {len(remaining_dimensions)}: {remaining_dimensions}')
 
         if isinstance(data, np.ndarray):
 
             s = data
             for d, i in coords.items():
                 if d not in possible_dimensions:
-                    raise ValueError(f'Unexpected key "{d}", not in \
-                                        {possible_dimensions}')
+                    raise ValueError(f'Unexpected key "{d}", not in ' \
+                                    f'{possible_dimensions}')
                 else:
                     s = s.take(indices=i, axis=d)
 
@@ -168,8 +183,8 @@ class show1D(show_base):
             sliceme = {**kwargs}
             for k,v in coords.items():
                 if k not in possible_dimensions:
-                    raise ValueError(f'Unexpected key "{k}", not in \
-                                        {possible_dimensions}')
+                    raise ValueError(f'Unexpected key "{k}", not in ' \
+                                    f'{possible_dimensions}')
                 else:
                     sliceme[k] = v
 
@@ -189,17 +204,17 @@ class show1D(show_base):
         ImageData, BlockDataContainers?
             _description_
         line_coords : list of tuples
-            _description_, by default None
+            (dimension, coordinate) pairs for slicing `data`, by default None
         label : str, list of str, optional
-            _description_, by default None
+            Label(s) to use in the plot's legend, by default None
         title : str, optional
-            _description_, by default None
+            A title for the plot, by default None
         color : str, list of str, optional
-            _description_, by default None
+            Color(s) for each line plot, by default None
         size : tuple, optional
-            _description_, by default (15,15)
+            The size of the figure, by default (8,6)
         force : bool, optional
-            _description_, by default False
+            Passed to `get_slice`, by default True
 
         Returns
         -------
@@ -235,9 +250,10 @@ class show1D(show_base):
                 for el in line_coords:
                     dims[el[0]] = el[1]
             except TypeError:
-                raise TypeError(f'Expected list of tuples for slicing, \
-                                received {type(line_coords)}')
+                raise TypeError(f'Expected list of tuples for slicing, ' \
+                                f'received {type(line_coords)}')
 
+        # TODO support VectorData
         fig, ax = plt.subplots(1, 1, figsize=size)
         if multi:
             for i, el in enumerate(data):

@@ -1440,34 +1440,18 @@ class Configuration(object):
 
 
 class AcquisitionGeometry(object):
-    r'''This class holds the AcquisitionGeometry of the system.
+    """This class holds the AcquisitionGeometry of the system.
     
-    Please initialise using factory:
-    AcquisitionGeometry.create_Parallel2D
-    AcquisitionGeometry.create_Cone3D
-    AcquisitionGeometry.create_Parallel2D
-    AcquisitionGeometry.create_Cone3D
+    Please initialise the AcquisitionGeometry using the using the static methods:
 
+    `AcquisitionGeometry.create_Parallel2D()`
 
-    These initialisation parameters will be deprecated in a future release.    
-    :param geom_type: A description of the system type 'cone' or 'parallel'
-    :type geom_type: string
-    :param pixel_num_h: Number of pixels in the horizontal direction
-    :type pixel_num_h: int, optional
-    :param pixel_num_v: Number of pixels in the vertical direction
-    :type pixel_num_v: int, optional    
-    :param pixel_size_h: Size of pixels in the horizontal direction
-    :type pixel_size_h: float, optional    
-    :param pixel_size_v: Size of pixels in the vertical direction
-    :type pixel_size_v: float, optional       
-    :param chanels: Number of channels
-    :type chanels: int, optional       
-    :param dist_source_center: Distance from the source to the origin
-    :type dist_source_center: float, optional
-    :param dist_center_detector: Distance from the origin to the centre of the detector
-    :type dist_center_detector: float, optional
+    `AcquisitionGeometry.create_Cone3D()`
 
-    '''
+    `AcquisitionGeometry.create_Parallel2D()`
+
+    `AcquisitionGeometry.create_Cone3D()`
+    """
 
     RANDOM = 'random'
     RANDOM_INT = 'random_int'

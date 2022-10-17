@@ -69,6 +69,12 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="framework.html">
   Framework
  </a>
@@ -145,6 +151,7 @@
 <h3><a href="index.html">Table of Contents</a></h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Optimisation framework</a><ul>
@@ -4526,9 +4533,38 @@ problems in the following form:</p>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a></p></li>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.operators.BlockOperators">BlockOperator</a></p></li>
 </ul>
+<p>The block framework allows writing more advanced <a href="#id52"><span class="problematic" id="id53">`optimisation problems`_</span></a>. Consider the typical
+<a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
+<p>where,</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is the projection operator</p></li>
+<li><p><span class="math notranslate nohighlight">\(b\)</span> is the acquired data</p></li>
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is the unknown image to be solved for</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the regularisation parameter</p></li>
+<li><p><span class="math notranslate nohighlight">\(L\)</span> is a regularisation operator</p></li>
+</ul>
+<p>The first term measures the fidelity of the solution to the data. The second term meausures the
+fidelity to the prior knowledge we have imposed on the system, operator <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p>This can be re-written equivalently in the block matrix form:</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}\binom{A}{\alpha L} u - \binom{b}{0}\end{Vmatrix}^2_2\]</div>
+<p>With the definitions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tilde{A} = \binom{A}{\alpha L}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{b} = \binom{b}{0}\)</span></p></li>
+</ul>
+<p>this can now be recognised as a least squares problem which can be solved by any algorithm in the <code class="code docutils literal notranslate"><span class="pre">cil.optimisation</span></code>
+which can solve least squares problem, e.g. CGLS.</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}\tilde{A} u - \tilde{b}\end{Vmatrix}^2_2\]</div>
+<p>To be able to express our optimisation problems in the matrix form above, we developed the so-called,
+Block Framework comprising 4 main actors: <code class="code docutils literal notranslate"><span class="pre">BlockGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id52"><span class="problematic" id="id53">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id54"><span class="problematic" id="id55">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>

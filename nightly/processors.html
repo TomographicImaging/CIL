@@ -68,6 +68,12 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="framework.html">
   Framework
  </a>
@@ -144,6 +150,7 @@
 <h3><a href="index.html">Table of Contents</a></h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
@@ -158,7 +165,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#pre-processors">Pre-processors</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#centre-of-rotation-correction">Centre Of Rotation Correction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#centre-of-rotation-corrector">Centre Of Rotation Corrector</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#data-normaliser">Data Normaliser</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
@@ -247,8 +254,8 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#centre-of-rotation-correction">
-     Centre Of Rotation Correction
+    <a class="reference internal nav-link" href="#centre-of-rotation-corrector">
+     Centre Of Rotation Corrector
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
@@ -764,8 +771,21 @@ MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</p>
 <div class="section" id="pre-processors">
 <h2>Pre-processors<a class="headerlink" href="#pre-processors" title="Permalink to this headline">#</a></h2>
 <p>These processors can be used with <cite>AcquisitionData</cite> objects</p>
-<div class="section" id="centre-of-rotation-correction">
-<h3>Centre Of Rotation Correction<a class="headerlink" href="#centre-of-rotation-correction" title="Permalink to this headline">#</a></h3>
+<div class="section" id="centre-of-rotation-corrector">
+<h3>Centre Of Rotation Corrector<a class="headerlink" href="#centre-of-rotation-corrector" title="Permalink to this headline">#</a></h3>
+<p>In the ideal alignment of a CT instrument, the projection of the axis of rotation onto the
+detector coincides with the vertical midline of the detector. In prtactise this is hard to acheive
+due to misalignments and/or kinematic errors in positioning of CT instrument components.
+A slight offset of the center of rotation with respect to the theoretical position will contribute
+to the loss of resolution; in more severe cases, it will cause severe artifacts in the reconstructed
+volume (double-borders).</p>
+<p><code class="code docutils literal notranslate"><span class="pre">CentreOfRotationCorrector</span></code> can be used to estimate the offset of center of rotation from the data.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">CentreOfRotationCorrector</span></code> supports both parallel and cone-beam geometry with 2 different algorithms:</p>
+<ul class="simple">
+<li><p>Cross-correlation, is suitable for single slice parallel-beam geometry. It requires two projections 180 degree apart.</p></li>
+<li><p>Image sharpness method, which maximising the sharpness of a reconstructed slice. It can be used on single</p></li>
+</ul>
+<p>slice parallel-beam, and centre-slice of cone-beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.</p>
 <dl class="py class">
 <dt id="cil.processors.CentreOfRotationCorrector">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">CentreOfRotationCorrector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector" title="Permalink to this definition">#</a></dt>

@@ -32,64 +32,60 @@ from cil.utilities.display import set_origin
 
 
 def display_slice(container, direction, title, cmap, size, axis_labels, origin):
-    
-        
+
+
     def get_slice_3D(x, minmax, roi_hdir, roi_vdir):
-        
+
         if direction == 0:
             img = container[x]
-            x_lim = container.shape[2]
-            y_lim = container.shape[1]
             x_label = axis_labels[2]
-            y_label = axis_labels[1] 
-            
+            y_label = axis_labels[1]
+
         elif direction == 1:
             img = container[:,x,:]
-            x_lim = container.shape[2]
-            y_lim = container.shape[0] 
             x_label = axis_labels[2]
-            y_label = axis_labels[0]             
-            
+            y_label = axis_labels[0]
+
         elif direction == 2:
             img = container[:,:,x]
-            x_lim = container.shape[1]
-            y_lim = container.shape[0]    
             x_label = axis_labels[1]
-            y_label = axis_labels[0]             
-        
+            y_label = axis_labels[0]
+
         if size is None:
             fig = plt.figure()
         else:
             fig = plt.figure(figsize=size)
-        
+
+        dtitle = ''
         if isinstance(title, (list, tuple)):
             dtitle = title[x]
         else:
             dtitle = title
-        
+
         gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=(1,.05), height_ratios=(1,))
         # image
         ax = fig.add_subplot(gs[0, 0])
-      
-        ax.set_xlabel(x_label)     
+
+        ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
 
         img, data_origin, _ = set_origin(img, origin)
-        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect='auto')#, extent=(*roi_hdir, *roi_vdir))
+        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect='auto')
         aximg.set_clim(minmax)
         ax.set_xlim(*roi_hdir)
         ax.set_ylim(*roi_vdir)
-        ax.set_title(dtitle + " {}".format(x))
+        ax.set_title(f'{dtitle} {x}')
         # colorbar
         ax = fig.add_subplot(gs[0, 1])
         plt.colorbar(aximg, cax=ax)
         plt.tight_layout()
         plt.show(fig)
-        
+
     return get_slice_3D
 
-    
-def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower-left'):
+
+def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
+            minmax=None, size=None, axis_labels=None, origin='lower-left'):
     """
     Creates an interactive slider that slices a 3D volume along an axis.
 
@@ -127,10 +123,10 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=
     slider : ipywidgets.IntSlider
         The slider whose value determines the slice on display.
     """
-    
+
     if axis_labels is None:
         if hasattr(data, "dimension_labels"):
-            axis_labels = [data.dimension_labels[0],data.dimension_labels[1],data.dimension_labels[2]]
+            axis_labels = [*data.dimension_labels]
         else:
             axis_labels = ['X', 'Y', 'Z']
 
@@ -140,41 +136,48 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=
         container = data
     elif hasattr(data, "as_array"):
         container = data.as_array()
-        
+
     if not isinstance (direction, int):
         if direction in data.dimension_labels:
-            direction = data.get_dimension_axis(direction)                             
+            direction = data.get_dimension_axis(direction)
 
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
-        
-    slider = widgets.IntSlider(min=0, max=data.shape[direction]-1, step=1, 
-                             value=slice_number, continuous_update=False, description=axis_labels[direction])
+
+    slider = widgets.IntSlider(
+        min=0,
+        max=data.shape[direction]-1,
+        step=1,
+        value=slice_number,
+        continuous_update=False,
+        description=axis_labels[direction]
+    )
+
     amax = container.max()
     amin = container.min()
-    if minmax is None:    
+    if minmax is None:
         cmax = amax
         cmin = amin
     else:
         cmin = min(minmax)
         cmax = max(minmax)
-    
+
     if isinstance (size, (int, float)):
         default_ratio = 6./8.
         size = ( size , size * default_ratio )
-    
+
     min_max = widgets.FloatRangeSlider(
-                                value=[cmin, cmax],
-                                min=amin,
-                                max=amax,
-                                step=(amax-amin)/100.,
-                                description='display window',
-                                disabled=False,
-                                continuous_update=False,
-                                orientation='horizontal',
-                                readout=True,
-                                readout_format='.1e',
-                            )
+        value=[cmin, cmax],
+        min=amin,
+        max=amax,
+        step=(amax-amin)/100.,
+        description='display window',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.1e',
+    )
 
     dirs_remaining = [i for i in range(3) if i != direction]
     h_dir, v_dir = dirs_remaining[1], dirs_remaining[0]
@@ -207,19 +210,18 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=
         readout_format='d',
     )
 
-    interact(display_slice(container, 
-                           direction, 
-                           title=title, 
-                           cmap=cmap, 
-                           # minmax=(amin, amax),
+    interact(display_slice(container,
+                           direction,
+                           title=title,
+                           cmap=cmap,
                            size=size, axis_labels=axis_labels,
                            origin=origin),
                            x=slider, minmax=min_max,
                            roi_hdir=roi_select_hdir,
                            roi_vdir=roi_select_vdir)
-    
+
     return slider
-    
+
 
 def link_islicer(*args):
     '''links islicers IntSlider widgets

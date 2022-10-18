@@ -90,29 +90,43 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
 
     
 def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower-left'):
+    """
+    Creates an interactive slider that slices a 3D volume along an axis.
 
-    '''Creates an interactive integer slider that slices a 3D volume along direction
-    
-    
     Parameters
     ----------
-    data: DataContainer or numpy array
-    direction: int
-        Axis to slice on. Can be 0,1,2 or the axis label 
-    title: str
-        optional title for the display
-    slice_number: int, optional
-        start slice number, defaults to center slice
-    cmap: matplotlib color map
-        set the colour map
-    minmax: tuple
-        colorbar (min, max) values, defaults to min max of container
-    size: int or tuple 
-        specify the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio
-    origin: str, default 'lower-left'
-        Sets the display origin in form 'lower/upper-left/right' 
-    '''
+    data : DataContainer or numpy.ndarray
+        A 3-dimensional dataset from which 2-dimensional slices will be
+        shown
+    direction : int
+        Axis to slice on. Can be 0,1,2 or the axis label, default 0
+    title : str, list of str or tuple of str, default=''
+        Title for the display
+    slice_number : int, optional
+        Start slice number (default is None, which results in the center
+        slice being shown initially)
+    cmap : str or matplotlib.colors.Colormap, default='gray'
+        Set the colour map
+    minmax : tuple
+        Colorbar (min, max) values, default None (uses the min, max of
+        values in `data`)
+    size : int or tuple, optional
+        Specify the figure size in inches. If `int` this specifies the
+        width, and scales the height in order to keep the standard
+        `matplotlib` aspect ratio, default None (use the default matplotlib
+        figure size)
+    axis_labels : list of str, optional
+        The axis labels to use for each of the 3 dimensions in the data
+        (default is None, resulting in labels extracted from the data, or
+        ['X','Y','Z'] if no labels are present)
+    origin : {'lower-left', 'upper-left', 'lower-right', 'upper-right'}
+        Sets the display origin
 
+    Returns
+    -------
+    slider : ipywidgets.IntSlider
+        The slider whose value determines the slice on display.
+    """
     
     if axis_labels is None:
         if hasattr(data, "dimension_labels"):

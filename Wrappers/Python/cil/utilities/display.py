@@ -17,7 +17,8 @@
 
 
 #%%
-from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, BlockDataContainer
+from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData
+from cil.framework import DataContainer, BlockDataContainer
 import numpy as np
 import warnings
 
@@ -95,15 +96,16 @@ class show_base(object):
 
 class show1D(show_base):
     """
-    This creates 1D plots of pixel values by slicing multi-dimensional data.
+    This creates 1D plots of pixel values by slicing multi-dimensional
+    data.
 
     Parameters
         ----------
-        data : AcquisitionData, ImageData, list/tuple of AcquisitionData or
-        ImageData
+        data : DataContainer, list of DataContainer, tuple of DataContainer
             Multi-dimensional data to be reduced to 1D.
         line_coords : list of tuples
-            (dimension, coordinate) pairs for slicing `data`, by default None
+            (dimension, coordinate) pairs for slicing `data`, by default
+            None
         label : str, list of str, optional
             Label(s) to use in the plot's legend, by default None
         title : str, optional
@@ -126,31 +128,26 @@ class show1D(show_base):
         self.figure = self._line_plot(data, line_coords=line_coords, label=label,
                                     title=title, color=color, size=size, force=force)
 
-    def _extract_vector(self, data, coords, **kwargs):
+    def _extract_vector(self, data, coords, force=True):
         """
         Extracts a 1D vector by slicing multi-dimensional data using the
         coordinates provided.
 
         Parameters
         ----------
-        data : AcquisitionData, ImageData or numpy.ndarray
+        data : DataContainer or numpy.ndarray
             Multi-dimensional data to be reduced to 1D.
         coords : dict
-            The dimensions and coordinates used for slicing. If `data` is
-            an AcquisitionData or ImageData, this should comprise
-            dimensions from `data.dimension_labels`. If `data` is a
-            numpy.ndarray, integers representing the axes should be used
-            instead.
-
-        Other Parameters
-        ----------------
-        **kwargs : dict, optional
-            Additional parameters passed to AcquisitionData.get_slice or
-            ImageData.get_slice, dependings on the type of `data`.
+            The dimensions and coordinates used for slicing. If `data` is a
+            DataContainer, this should comprise dimensions from
+            `data.dimension_labels`. If `data` is a numpy.ndarray, integers
+            representing the axes should be used instead.
+        force : bool, default=True
+            Passed to `get_slice`
 
         Returns
         -------
-        vector : numpy.ndarray
+        numpy.ndarray
             The 1-dimensional pixel flux data extracted from `data`.
         """
         vector = None
@@ -158,8 +155,15 @@ class show1D(show_base):
 
         if isinstance(data, np.ndarray):
             possible_dimensions = [i for i in range(len(data.shape))]
-        elif isinstance(data, AcquisitionData) or isinstance(data, ImageData):
+            if len(possible_dimensions) == 1:
+                return data
+        elif isinstance(data, DataContainer):
             possible_dimensions = data.dimension_labels
+            if len(possible_dimensions) == 1:
+                return data.as_array()
+
+        if coords is None:
+            raise TypeError(f'Must provide slicing coordinates for multi-dimensional data')
 
         remaining_dimensions = set(possible_dimensions) - set(coords.keys())
         if len(remaining_dimensions) > 1:
@@ -167,7 +171,6 @@ class show1D(show_base):
                             f'found {len(remaining_dimensions)}: {remaining_dimensions}')
 
         if isinstance(data, np.ndarray):
-
             s = data
             for d, i in coords.items():
                 if d not in possible_dimensions:
@@ -178,15 +181,17 @@ class show1D(show_base):
 
             vector = s
 
-        elif isinstance(data, AcquisitionData) or isinstance(data, ImageData):
-
-            sliceme = {**kwargs}
+        elif isinstance(data, DataContainer):
+            sliceme = {}
             for k,v in coords.items():
                 if k not in possible_dimensions:
                     raise ValueError(f'Unexpected key "{k}", not in ' \
                                     f'{possible_dimensions}')
                 else:
                     sliceme[k] = v
+
+            if isinstance(data, AcquisitionData) or isinstance(data, ImageData):
+                sliceme['force'] = force
 
             vector = data.get_slice(**sliceme).as_array()
 
@@ -200,28 +205,28 @@ class show1D(show_base):
 
         Parameters
         ----------
-        data : AcquisitionData, ImageData, list/tuple of AcquisitionData or
-        ImageData, BlockDataContainers?
-            _description_
-        line_coords : list of tuples
-            (dimension, coordinate) pairs for slicing `data`, by default None
-        label : str, list of str, optional
-            Label(s) to use in the plot's legend, by default None
-        title : str, optional
-            A title for the plot, by default None
-        color : str, list of str, optional
-            Color(s) for each line plot, by default None
-        size : tuple, optional
-            The size of the figure, by default (8,6)
-        force : bool, optional
-            Passed to `get_slice`, by default True
+        data : DataContainer, list of DataContainer or tuple of
+        DataContainer
+            The data to be sliced and plotted
+        line_coords : list of tuples, optional
+            (dimension, coordinate) pairs for slicing `data` (default is
+            None, which is only valid when 1D data is passed)
+        label : str, list of str, default=None
+            Label(s) to use in the plot's legend
+        title : str, default=None
+            A title for the plot
+        color : str, list of str, default=None
+            Color(s) for each line plot
+        size : tuple, default=(8,6)
+            The size of the figure
+        force : bool, default=True
+            Passed to `get_slice`
 
         Returns
         -------
-            matplotlib.figure.Figure
+        matplotlib.figure.Figure
+            The figure created to plot the 1D data
         """
-
-        kwargs = {'force': force}
 
         multi = False
         is_1d = False
@@ -253,21 +258,14 @@ class show1D(show_base):
                 raise TypeError(f'Expected list of tuples for slicing, ' \
                                 f'received {type(line_coords)}')
 
-        # TODO support VectorData
         fig, ax = plt.subplots(1, 1, figsize=size)
         if multi:
             for i, el in enumerate(data):
-                if is_1d:
-                    ax.plot(el, color=color, label=label)
-                else:
-                    ax.plot(self._extract_vector(el, dims, **kwargs),
-                            color=color[i], label=label[i])
+                ax.plot(self._extract_vector(el, dims, force),
+                        color=color[i], label=label[i])
         else:
-            if is_1d:
-                ax.plot(data, color=color, label=label)
-            else:
-                ax.plot(self._extract_vector(data, dims, **kwargs),
-                            color=color, label=label)
+            ax.plot(self._extract_vector(data, dims, force),
+                    color=color, label=label)
 
         ax.set_title(title)
         ax.set_xlabel(f'Pixel')

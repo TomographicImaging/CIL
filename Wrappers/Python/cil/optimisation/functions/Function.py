@@ -330,7 +330,7 @@ class SubsetSumFunction(SumFunction):
 
     r"""SubsetSumFunction represents the following sum 
     
-    .. math:: \sum_{i=1}^{n} F_{i} = \frac{1}{n}(F_{1} + F_{2} + ... + F_{n})
+    .. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
 
     where :math:`n` is the number of subsets.
 
@@ -342,6 +342,10 @@ class SubsetSumFunction(SumFunction):
                Selection process for each function in the list. It can be :code:`random` or :code:`sequential`. 
     replacement : :obj:`boolean`. Default = :code:`True`
                The same subset can be selected when :code:`replacement=True`. 
+    suffle : :obj:`string`. Default = :code:`random`.
+             This is only for the :code:`replacement=False` case. For :code:`suffle="single"`, we permute the list only once.
+             For :code:`suffle="random"`, we permute the list of subsets after one epoch. 
+
                 
     Example
     -------
@@ -355,16 +359,27 @@ class SubsetSumFunction(SumFunction):
     def __init__(self, functions, 
                  sampling = "random",
                  replacement = True,
-                 subset_init = -1):    
+                 suffle = "random"):    
         
         super(SubsetSumFunction, self).__init__(*functions)
         
-        self.subset_num = subset_init
-        self.data_passes = [0]
-        self.sampling = sampling  
+        self.sampling = sampling
         self.replacement = replacement
-        self.enumerate_functions = list(range(self.num_subsets))
-                                                            
+        self.suffle = suffle        
+        self.data_passes = [0]
+        self.subsets_used = []
+        self.subset_num = -1
+        self.index = 0
+                            
+        if self.replacement is False:
+                        
+            # create a list of subsets without replacement, first permutation
+            self.list_of_subsets = np.random.choice(range(self.num_subsets),self.num_subsets, replace=False)            
+                       
+            if self.suffle not in ["random","single"]:
+                raise NotImplementedError("Only {} and {} are implemented for the replacement=False case.".format("random","single"))            
+                        
+                                                                
     @property
     def num_subsets(self):
         return self.num_functions
@@ -392,26 +407,36 @@ class SubsetSumFunction(SumFunction):
                
     def next_subset(self):
         
-        """ Selects the next subset according to :code:`sampling`.          
-        """
-        
         if self.sampling=="random" :
             
             if self.replacement is False:
-                self.subset_num = np.random.choice(self.enumerate_functions)
-                self.enumerate_functions.remove(self.subset_num)
-                if len(self.enumerate_functions)==0:
-                    self.enumerate_functions = list(range(self.num_subsets))                
-            else:
-                self.subset_num = np.random.randint(0, self.num_subsets)
                 
-        elif self.sampling=="sequential":                                                                          
+                # list of subsets already permuted
+                self.subset_num = self.list_of_subsets[self.index]
+                self.index+=1                
+                                
+                if self.index == self.num_subsets:
+                    self.index=0
+                    
+                    # For random suffle, at the end of each epoch, we permute the list again                    
+                    if self.suffle=="random":                    
+                        self.list_of_subsets = np.random.choice(range(self.num_subsets),self.num_subsets, replace=False)                              
+                                                        
+            else:
+                
+                # at each iteration (not epoch) a subset is randomly selected
+                self.subset_num = np.random.randint(0, self.num_subsets)
+            
+        elif self.sampling=="sequential":    
+            
             if self.subset_num + 1 >= self.num_subsets:
                 self.subset_num = 0                
             else:
                 self.subset_num += 1         
         else:
             raise NotImplementedError("Only {} and {} are implemented at the moment.".format("random","sequential"))          
+            
+        self.subsets_used.append(self.subset_num)
                                   
 class ScaledFunction(Function):
     

@@ -44,9 +44,9 @@ class SGDFunction(SubsetSumFunction):
     
 """
   
-    def __init__(self, functions, sampling = "random", replacement = False):
+    def __init__(self, functions, sampling = "random", replacement = False, suffle="random"):
 
-        super(SGDFunction, self).__init__(functions, sampling = sampling, replacement = replacement)
+        super(SGDFunction, self).__init__(functions, sampling = sampling, replacement = replacement, suffle=suffle)
 
     def gradient(self, x, out):
         

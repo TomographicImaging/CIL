@@ -36,10 +36,12 @@ class TestSubsetSumFunction(unittest.TestCase):
             self.fi_cil.append(LeastSquares(Ai_cil, bi_cil, c=1.0))
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=1.0)
-        self.f_subset_sum_function = SubsetSumFunction(self.fi_cil)
-        self.f_subset_sum_function_no_replacement = SubsetSumFunction(self.fi_cil, sampling="random", replacement=False) 
+        self.f_subset_sum_function = SubsetSumFunction(self.fi_cil) # default with replacement
         self.f_subset_sum_function_sequential = SubsetSumFunction(self.fi_cil, sampling="sequential")              
 
+        self.f_subset_sum_function_random_suffle = SubsetSumFunction(self.fi_cil, sampling="random", replacement=False, suffle="random") 
+        self.f_subset_sum_function_single_suffle = SubsetSumFunction(self.fi_cil, sampling="random", replacement=False, suffle="single")         
+ 
     def test_call_method(self):
         
         res1 = self.f(self.x_cil)
@@ -52,36 +54,46 @@ class TestSubsetSumFunction(unittest.TestCase):
         res2 = self.f_subset_sum_function._full_gradient(self.x_cil)
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)        
 
-    def test_sampling(self):
+    def test_sampling_sequential(self):
 
         # check sequential selection
         for i in range(self.n_subsets):
             self.f_subset_sum_function_sequential.next_subset()
             np.testing.assert_equal(self.f_subset_sum_function_sequential.subset_num, i)
 
-        # check random selection with no replacement
-        epochs = 2
-        choices = [[],[]]
-        for i in range(epochs):
-            for j in range(self.n_subsets):
-                self.f_subset_sum_function_no_replacement.next_subset()
-                choices[i].append(self.f_subset_sum_function_no_replacement.subset_num)
-        self.assertTrue( len(set(choices[0]))== len(set(choices[1])))
+    def test_sampling_random_with_replacement(self):
 
         # check random selection with replacement
-        epochs = 2
-        choices = [[],[]]
+        epochs = 3
+        choices = []
         for i in range(epochs):
             for j in range(self.n_subsets):
                 self.f_subset_sum_function.next_subset()
-                choices[i].append(self.f_subset_sum_function.subset_num)
-        self.assertTrue( len(set(choices[0]))!= len(set(choices[1])))  
+                choices.append(self.f_subset_sum_function.subset_num)
+        self.assertTrue( choices == self.f_subset_sum_function.subsets_used)          
 
-        with self.assertRaises(NotImplementedError):
-            f=SubsetSumFunction(self.fi_cil, sampling="not implemented")
-            f.next_subset()
+    def test_sampling_random_without_replacement_random_suffle(self):
 
-              
+        # check random selection with no replacement
+        epochs = 3
+        choices = []
+        for i in range(epochs):
+            for j in range(self.n_subsets):
+                self.f_subset_sum_function_random_suffle.next_subset()
+                choices.append(self.f_subset_sum_function_random_suffle.subset_num)
+        self.assertTrue( choices == self.f_subset_sum_function_random_suffle.subsets_used)  
+
+    def test_sampling_random_without_replacement_single_suffle(self):
+
+        # check random selection with no replacement
+        epochs = 3
+        choices = []
+        for i in range(epochs):
+            for j in range(self.n_subsets):
+                self.f_subset_sum_function_single_suffle.next_subset()
+                choices.append(self.f_subset_sum_function_single_suffle.subset_num)
+        self.assertTrue( choices == self.f_subset_sum_function_single_suffle.subsets_used)         
+
 
 
 

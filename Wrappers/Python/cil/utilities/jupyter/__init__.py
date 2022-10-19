@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 try:
-    from ipywidgets import interact, interactive, fixed, interact_manual
+    from ipywidgets import interactive_output
     import ipywidgets as widgets
 except ImportError as ie:
     raise ImportError(ie , "\n\n", 
@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy
 
-from IPython.display import HTML
+from IPython.display import HTML, display
 import random
 from cil.utilities.display import set_origin
 
@@ -210,17 +210,24 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         readout_format='d',
     )
 
-    interact(display_slice(container,
-                           direction,
-                           title=title,
-                           cmap=cmap,
-                           size=size, axis_labels=axis_labels,
-                           origin=origin),
-                           x=slider, minmax=min_max,
-                           roi_hdir=roi_select_hdir,
-                           roi_vdir=roi_select_vdir)
+    adv_sliders = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir])
+    accordion = widgets.Accordion(children=[adv_sliders], titles=('Advanced',))
 
-    return slider
+    out = interactive_output(
+        display_slice(container,
+            direction,
+            title=title,
+            cmap=cmap,
+            size=size,
+            axis_labels=axis_labels,
+            origin=origin),
+        {'x': slider,
+        'minmax': min_max,
+        'roi_hdir': roi_select_hdir,
+        'roi_vdir': roi_select_vdir})
+
+    display(slider)
+    display(accordion, out)
 
 
 def link_islicer(*args):

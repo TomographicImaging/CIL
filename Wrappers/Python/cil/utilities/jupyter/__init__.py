@@ -34,7 +34,7 @@ from cil.utilities.display import set_origin
 def display_slice(container, direction, title, cmap, size, axis_labels, origin):
 
 
-    def get_slice_3D(x, minmax, roi_hdir, roi_vdir):
+    def get_slice_3D(x, minmax, roi_hdir, roi_vdir, equal_aspect):
 
         if direction == 0:
             img = container[x]
@@ -70,7 +70,12 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
         ax.set_ylabel(y_label)
 
         img, data_origin, _ = set_origin(img, origin)
-        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect='auto')
+
+        aspect = 'equal'
+        if not equal_aspect:
+            aspect = 'auto'
+
+        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect=aspect)
         aximg.set_clim(minmax)
         ax.set_xlim(*roi_hdir)
         ax.set_ylim(*roi_vdir)
@@ -210,11 +215,18 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         readout_format='d',
     )
 
-    adv_sliders = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir])
+    equal_aspect = widgets.Checkbox(
+        value=True,
+        description='Aspect ratio = 1',
+        disabled=False,
+        indent=False)
+
+    adv_sliders = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir, equal_aspect])
     accordion = widgets.Accordion(children=[adv_sliders], titles=('Advanced',))
 
     out = interactive_output(
-        display_slice(container,
+        display_slice(
+            container,
             direction,
             title=title,
             cmap=cmap,
@@ -224,7 +236,8 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         {'x': slider,
         'minmax': min_max,
         'roi_hdir': roi_select_hdir,
-        'roi_vdir': roi_select_vdir})
+        'roi_vdir': roi_select_vdir,
+        'equal_aspect': equal_aspect})
 
     display(slider)
     display(accordion, out)

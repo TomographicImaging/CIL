@@ -114,6 +114,9 @@ class show1D(show_base):
             Color(s) for each line plot, by default None
         size : tuple, optional
             The size of the figure, by default (8,6)
+        axis_labels : tuple of str, list of str, default=('Pixel','Pixel
+        value')
+            Axis labels in the form (x_axis_label,y_axis_label)
         force : bool, optional
             Passed to `get_slice`, by default True
 
@@ -123,10 +126,13 @@ class show1D(show_base):
 
     """
     def __init__(self, data, line_coords=None, label=None, title=None,
-                color=None, size=(8,6), force=True):
+                 color=None, axis_labels=('Pixel', 'Pixel value'),
+                 size=(8,6), force=True):
 
         self.figure = self._line_plot(data, line_coords=line_coords, label=label,
-                                    title=title, color=color, size=size, force=force)
+                                      title=title, color=color,
+                                      axis_labels=axis_labels,
+                                      size=size, force=force)
 
     def _extract_vector(self, data, coords, force=True):
         """
@@ -198,7 +204,8 @@ class show1D(show_base):
         return vector
 
     def _line_plot(self, data, line_coords=None, label=None,
-                    title=None, color=None, size=(8,6), force=True):
+                   title=None, color=None, size=(8,6),
+                   axis_labels=('Pixel', 'Pixel value'), force=True):
         """
         Creates and displays a 1D plot of pixel flux from multi-dimensional
         data and slicing information.
@@ -219,6 +226,9 @@ class show1D(show_base):
             Color(s) for each line plot
         size : tuple, default=(8,6)
             The size of the figure
+        axis_labels : tuple of str, list of str, default=('Pixel','Pixel
+        value')
+            Axis labels in the form (x_axis_label,y_axis_label)
         force : bool, default=True
             Passed to `get_slice`
 
@@ -268,12 +278,16 @@ class show1D(show_base):
                     color=color, label=label)
 
         ax.set_title(title)
-        ax.set_xlabel(f'Pixel')
-        ax.set_ylabel('Pixel value')
+        ax.set_xlabel(axis_labels[0]) # TODO determine axis labels from dimensions
+        ax.set_ylabel(axis_labels[1])
 
         fig2 = plt.gcf()
 
-        if label: plt.legend()
+        valid_labels = 0
+        if isinstance(label, list):
+            valid_labels = len([l for l in label if l is not None])
+
+        if valid_labels: plt.legend()
         plt.show()
 
         return fig2

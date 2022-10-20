@@ -217,9 +217,12 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
 
     equal_aspect = widgets.Checkbox(
         value=True,
-        description='Aspect ratio = 1',
+        description='Aspect ratio = 1 (unchecking this may ' +
+                    'cause the image to appear stretched)',
         disabled=False,
-        indent=False)
+        indent=False,
+        layout=widgets.Layout(width='auto'),
+    )
 
     adv_sliders = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir, equal_aspect])
     accordion = widgets.Accordion(children=[adv_sliders], titles=('Advanced',))

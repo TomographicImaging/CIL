@@ -90,7 +90,8 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
 
 
 def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
-            minmax=None, size=None, axis_labels=None, origin='lower-left'):
+            minmax=None, size=None, axis_labels=None, origin='lower-left',
+            play_interval=500):
     """
     Creates an interactive slider that slices a 3D volume along an axis.
 
@@ -122,6 +123,9 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         ['X','Y','Z'] if no labels are present)
     origin : {'lower-left', 'upper-left', 'lower-right', 'upper-right'}
         Sets the display origin
+    play_interval : int, default=500
+        The interval of time (in ms) a slice is selected for when iterating
+        through a set of them
 
     Returns
     -------
@@ -157,6 +161,15 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         continuous_update=False,
         description=axis_labels[direction]
     )
+    play_slices = widgets.Play(
+        min=0,
+        max=data.shape[direction]-1,
+        step=1,
+        interval=play_interval,
+        value=slice_number,
+        disabled=False,
+    )
+    widgets.jslink((play_slices, 'value'), (slider, 'value'))
 
     amax = container.max()
     amin = container.min()
@@ -242,7 +255,7 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         'roi_vdir': roi_select_vdir,
         'equal_aspect': equal_aspect})
 
-    display(slider)
+    display(widgets.HBox([play_slices, slider]))
     display(accordion, out)
 
 

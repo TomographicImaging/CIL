@@ -1,3 +1,6 @@
+* Next
+  - Added common pre-set filters for `recon.FBP` and `recon.FDK`
+
 * 22.1.0
   - use assert_allclose in test_DataContainer
   - added multiple colormaps to show2D

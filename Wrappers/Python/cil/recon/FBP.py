@@ -148,15 +148,22 @@ class GenericFilteredBackProjection(Reconstructor):
                 #create default filter type of new length
                 self.set_filter(self._filter)
         
+    @property
+    def preset_filters(self):
+        return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
  
-    def set_filter(self, filter='ram-lak'):
+    def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
-        Set the filter used by the reconstruction. 
+        Set the filter used by the reconstruction.
+
+        Pre-set filters are defined in the frequency domain.        
+        Pre-set filters are: 'ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'
         
         Parameters
         ----------
-        filter: string, numpy.ndarray, default='ram-lak'
-            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+        filter: string, numpy.ndarray, default='ram-lak'with a custom filter or a string indicating the pre-set filter to use.
+        cutoff: float
+            The cut-off frequency of the filter. The filter will be 0 outside this range rect(-frequency_cutoff, frequency_cutoff)
 
         Notes
         -----
@@ -167,15 +174,15 @@ class GenericFilteredBackProjection(Reconstructor):
         - [0] The DC frequency component
         - [1:N/2] positive frequencies
         - [N/2:N-1] negative frequencies
+
+        The frequencies
         """
 
-        if type(filter)==str and filter in ['ram-lak']:
-            self._filter = filter
 
-            if filter == 'ram-lak':
-                filter_length = 2**self.fft_order
-                freq = fftfreq(filter_length)
-                self._filter_array = np.asarray( [ np.abs(2*el) for el in freq ] ,dtype=np.float32)
+        if type(filter)==str and filter in self.preset_filters:
+            self._filter = filter
+            self._filter_cutoff = cutoff
+            self._filter_array = None
 
         elif type(filter)==np.ndarray:
             try:
@@ -210,7 +217,27 @@ class GenericFilteredBackProjection(Reconstructor):
         The array can be modified and passed back using set_filter()
         """
 
-        return self._filter_array
+        if self._filter == 'custom':
+            return self._filter_array
+
+        filter_length = 2**self.fft_order         
+        freq = fftfreq(filter_length,0.5)
+
+        ramp = abs(freq)
+        ramp[ramp>self._filter_cutoff]=0
+
+        if self._filter == 'ram-lak':
+            filter_array = ramp
+        if self._filter == 'shepp-logan':
+            filter_array = ramp * np.sinc(ramp/2)
+        elif self._filter == 'cosine':
+            filter_array = ramp * np.cos(ramp*np.pi/2)
+        elif self._filter == 'hamming':
+            filter_array = ramp * (0.54 + 0.46 * np.cos(ramp*np.pi))
+        elif self._filter == 'hann':
+            filter_array = ramp * (0.5 + 0.5 * np.cos(ramp*np.pi))
+
+        return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order) 
         
     def _calculate_weights(self):
         return NotImplementedError
@@ -365,7 +392,9 @@ class FDK(GenericFilteredBackProjection):
 
         repres += "\nReconstruction Options:\n"    
         repres += "\tBackend: {}\n".format(self._backend)        
-        repres += "\tFilter: {}\n".format(self._filter)        
+        repres += "\tFilter: {}\n".format(self._filter)
+        if self._filter != 'custom':
+            repres += "\tFilter cut-off frequency: {}\n".format(self._filter_cutoff)
         repres += "\tFFT order: {}\n".format(self._fft_order)        
         repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
 
@@ -576,7 +605,9 @@ class FBP(GenericFilteredBackProjection):
 
         repres += "\nReconstruction Options:\n"    
         repres += "\tBackend: {}\n".format(self._backend)        
-        repres += "\tFilter: {}\n".format(self._filter)        
+        repres += "\tFilter: {}\n".format(self._filter)
+        if self._filter != 'custom':
+            repres += "\tFilter cut-off frequency: {}\n".format(self._filter_cutoff)
         repres += "\tFFT order: {}\n".format(self._fft_order)        
         repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
         repres += "\tSplit processing: {}\n".format(self._slices_per_chunk) 

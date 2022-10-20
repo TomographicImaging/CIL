@@ -219,6 +219,62 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
 
+        for x in reconstructor.preset_filters:
+            reconstructor.set_filter(x)
+            self.assertEqual(reconstructor.filter, x, msg='Mismatch on test: Filter {0}'.format(x))
+            self.assertEqual(reconstructor._filter_cutoff, 1.0, msg='Mismatch on test: Filter {0}'.format(x))
+
+        reconstructor.set_filter('ram-lak', 0.5)
+        self.assertEqual(reconstructor._filter_cutoff, 0.5)
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_get_filter_array(self):
+
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
+
+        reconstructor.set_filter('ram-lak', 1.0)
+        arr = reconstructor.get_filter_array()
+
+        arr_hand = 2*np.arange(2**reconstructor.fft_order//2+1) / 2**reconstructor.fft_order
+        ramp = np.concatenate((arr_hand, arr_hand[1:-1][::-1]))
+
+        np.testing.assert_almost_equal(ramp, arr)
+
+        reconstructor.set_filter('ram-lak', 0.5)
+        arr = reconstructor.get_filter_array()
+        filter_gold = ramp.copy()
+        filter_gold[filter_gold>0.5]=0
+        np.testing.assert_almost_equal(filter_gold, arr)
+
+        reconstructor.set_filter('shepp-logan', 0.5)
+        arr = reconstructor.get_filter_array()
+        filter_gold = ramp.copy()
+        filter_gold[filter_gold>0.5]=0
+        filter_gold *= np.sinc(filter_gold/2)
+        np.testing.assert_almost_equal(filter_gold, arr)
+
+        reconstructor.set_filter('cosine', 0.5)
+        arr = reconstructor.get_filter_array()
+        filter_gold = ramp.copy()
+        filter_gold[filter_gold>0.5]=0
+        filter_gold *= np.cos(filter_gold*np.pi/2)
+        np.testing.assert_almost_equal(filter_gold, arr)
+
+        reconstructor.set_filter('hamming', 0.5)
+        arr = reconstructor.get_filter_array()
+        filter_gold = ramp.copy()
+        filter_gold[filter_gold>0.5]=0
+        filter_gold *= (0.54 + 0.46 * np.cos(filter_gold*np.pi))
+        np.testing.assert_almost_equal(filter_gold, arr)
+
+        reconstructor.set_filter('hann', 0.5)
+        arr = reconstructor.get_filter_array()
+        filter_gold = ramp.copy()
+        filter_gold[filter_gold>0.5]=0
+        filter_gold *= (0.5 + 0.5 * np.cos(filter_gold*np.pi))
+        np.testing.assert_almost_equal(filter_gold, arr)
+
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_set_fft_order(self):
@@ -287,6 +343,9 @@ class Test_FDK(unittest.TestCase):
         reconstructor.set_fft_order(10)
         with self.assertRaises(ValueError):
             reconstructor._pre_filtering(self.ad3D)
+
+        with self.assertRaises(ValueError):
+            reconstructor.set_filter(filter[1:-1])
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "Prerequisites not met")
@@ -392,6 +451,8 @@ class Test_FBP(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor._pre_filtering(self.ad3D)
 
+        with self.assertRaises(ValueError):
+            reconstructor.set_filter(filter[1:-1])
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_split_processing(self):

@@ -1,7 +1,7 @@
 import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.functions import LeastSquares, SubsetSumFunction, SGDFunction
+from cil.optimisation.functions import LeastSquares, SubsetSumFunction, SGFunction
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
 import numpy as np                  
@@ -13,7 +13,7 @@ from utils import has_cvxpy
 if has_cvxpy:
     import cvxpy
 
-class TestSGDFunction(unittest.TestCase):
+class TestSGFunction(unittest.TestCase):
                     
 
     def setUp(self):
@@ -46,7 +46,7 @@ class TestSGDFunction(unittest.TestCase):
         self.F = LeastSquares(self.Aop, b=self.bop, c = 0.5) 
         
         self.ig = self.Aop.domain
-        self.F_SGD = SGDFunction(self.fi_cil, replacement = True)           
+        self.F_SG = SGFunction(self.fi_cil, replacement = True)           
 
         self.initial = self.ig.allocate()  
 
@@ -57,9 +57,9 @@ class TestSGDFunction(unittest.TestCase):
 
         x = self.ig.allocate('random')
 
-        self.F_SGD.gradient(x, out=out1)
+        self.F_SG.gradient(x, out=out1)
 
-        self.F_SGD[self.F_SGD.subset_num].gradient(x, out=out2)
+        self.F_SG[self.F_SG.subset_num].gradient(x, out=out2)
         out2*=self.n_subsets
 
         np.testing.assert_allclose(out1.array, out2.array, atol=1e-4) 
@@ -72,10 +72,10 @@ class TestSGDFunction(unittest.TestCase):
         p = cvxpy.Problem(objective)
         p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
 
-        step_size = 1./self.F_SGD.L
+        step_size = 1./self.F_SG.L
 
         epochs = 200
-        sgd = GD(initial = self.initial, objective_function = self.F_SGD, step_size = step_size,
+        sgd = GD(initial = self.initial, objective_function = self.F_SG, step_size = step_size,
                     max_iteration = epochs * self.n_subsets, 
                     update_objective_interval = epochs * self.n_subsets)
         sgd.run(verbose=0)    

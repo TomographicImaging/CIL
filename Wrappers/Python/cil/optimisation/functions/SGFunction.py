@@ -17,7 +17,7 @@
 
 from cil.optimisation.functions import SubsetSumFunction
 
-class SGDFunction(SubsetSumFunction):
+class SGFunction(SubsetSumFunction):
 
     r""" Stochastic Gradient Descent Function (SGDFunction) 
 
@@ -46,7 +46,7 @@ class SGDFunction(SubsetSumFunction):
   
     def __init__(self, functions, sampling = "random", replacement = False, suffle="random"):
 
-        super(SGDFunction, self).__init__(functions, sampling = sampling, replacement = replacement, suffle=suffle)
+        super(SGFunction, self).__init__(functions, sampling = sampling, replacement = replacement, suffle=suffle)
 
     def gradient(self, x, out):
         

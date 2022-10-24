@@ -34,4 +34,4 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
-from .SGDFunction import SGDFunction
+from .SGFunction import SGFunction

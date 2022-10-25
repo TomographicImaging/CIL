@@ -394,7 +394,7 @@ class SubsetSumFunction(SumFunction):
                 		
         return super(SubsetSumFunction, self).__call__(x)      
         
-    def _full_gradient(self, x, out=None):
+    def full_gradient(self, x, out=None):
 
         r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
         return super(SubsetSumFunction, self).gradient(x, out=out)

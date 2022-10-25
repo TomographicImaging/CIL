@@ -51,7 +51,7 @@ class TestSubsetSumFunction(unittest.TestCase):
     def test_full_gradient(self):
         
         res1 = self.f.gradient(self.x_cil)
-        res2 = self.f_subset_sum_function._full_gradient(self.x_cil)
+        res2 = self.f_subset_sum_function.full_gradient(self.x_cil)
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)        
 
     def test_sampling_sequential(self):

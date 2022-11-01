@@ -1,3 +1,6 @@
+* 22.x.x
+  - update conda build action to v2.0.0
+
 * 22.1.0
   - use assert_allclose in test_DataContainer
   - added multiple colormaps to show2D

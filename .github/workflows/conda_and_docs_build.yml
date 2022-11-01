@@ -52,7 +52,7 @@ jobs:
         ARTIFACT_NAME: 'DocumentationHTML'
         PACKAGE_FOLDER_PATH: 'conda_package'
         PACKAGE_NAME: 'cil'
-        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
+        PACKAGE_CONDA_CHANNELS: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
         BUILD_SUBDIR_NAME: 'nightly'
   docs_publish:
     needs: docs_build

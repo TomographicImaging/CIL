@@ -238,7 +238,9 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     )
 
     adv_sliders = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir, equal_aspect])
-    accordion = widgets.Accordion(children=[adv_sliders], titles=('Advanced',))
+    tab = widgets.Tab(children=[widgets.HBox([play_slices, slider]), adv_sliders])
+    for i, t in enumerate(['Basic', 'Advanced']):
+        tab.set_title(i, t)
 
     out = interactive_output(
         display_slice(
@@ -255,8 +257,7 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         'roi_vdir': roi_select_vdir,
         'equal_aspect': equal_aspect})
 
-    display(widgets.HBox([play_slices, slider]))
-    display(accordion, out)
+    display(tab, out)
 
 
 def link_islicer(*args):

@@ -100,25 +100,24 @@ class show1D(show_base):
     data.
 
     Parameters
-        ----------
-        data : DataContainer, list of DataContainer, tuple of DataContainer
-            Multi-dimensional data to be reduced to 1D.
-        line_coords : list of tuples
-            (dimension, coordinate) pairs for slicing `data`, by default
-            None
-        label : str, list of str, optional
-            Label(s) to use in the plot's legend, by default None
-        title : str, optional
-            A title for the plot, by default None
-        color : str, list of str, optional
-            Color(s) for each line plot, by default None
-        size : tuple, optional
-            The size of the figure, by default (8,6)
-        axis_labels : tuple of str, list of str, default=('Pixel','Pixel
-        value')
-            Axis labels in the form (x_axis_label,y_axis_label)
-        force : bool, optional
-            Passed to `get_slice`, by default True
+    ----------
+    data : DataContainer, list of DataContainer, tuple of DataContainer
+        Multi-dimensional data to be reduced to 1D.
+    line_coords : list of tuples, default=None
+        (dimension, coordinate) pairs for slicing `data`
+    label : str, list of str, default=None
+        Label(s) to use in the plot's legend
+    title : str, default None
+        A title for the plot
+    color : str, list of str, default=None
+        Color(s) for each line plot
+    size : tuple, default=(8,6)
+        The size of the figure
+    axis_labels : tuple of str, list of str, default=('Pixel','Pixel
+    value')
+        Axis labels in the form (x_axis_label,y_axis_label)
+    force : bool, default=True
+        Passed to `get_slice`
 
     Attributes
     ----------

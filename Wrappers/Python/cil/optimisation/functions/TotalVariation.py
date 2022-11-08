@@ -369,5 +369,5 @@ class TotalVariation(Function):
     def __rmul__(self, scalar):
         if not isinstance (scalar, Number):
             raise TypeError("scalar: Expected a number, got {}".format(type(scalar)))
-        self.regularisation_parameter = scalar
+        self.regularisation_parameter *= scalar
         return self

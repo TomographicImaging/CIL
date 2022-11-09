@@ -563,7 +563,7 @@
 <div class="viewcode-block" id="TotalVariation.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;scalar: Expected a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scalar</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">=</span> <span class="n">scalar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*=</span> <span class="n">scalar</span>
         <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 

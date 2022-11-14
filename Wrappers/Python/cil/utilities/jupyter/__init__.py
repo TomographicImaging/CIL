@@ -189,12 +189,12 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         min=amin,
         max=amax,
         step=(amax-amin)/100.,
-        description='display window',
+        description='Min/max',
         disabled=False,
         continuous_update=False,
         orientation='horizontal',
         readout=True,
-        readout_format='.1e',
+        readout_format='.1f',
     )
 
     dirs_remaining = [i for i in range(3) if i != direction]
@@ -237,10 +237,8 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         layout=widgets.Layout(width='auto'),
     )
 
-    adv_sliders = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir, equal_aspect])
-    tab = widgets.Tab(children=[widgets.HBox([play_slices, slider]), adv_sliders])
-    for i, t in enumerate(['Basic', 'Advanced']):
-        tab.set_title(i, t)
+    basic_widgets = widgets.HBox([play_slices, slider])
+    adv_widgets = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir, equal_aspect])
 
     out = interactive_output(
         display_slice(
@@ -257,7 +255,15 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         'roi_vdir': roi_select_vdir,
         'equal_aspect': equal_aspect})
 
-    display(tab, out)
+    box_layout = widgets.Layout(
+        display='flex',
+        flex_flow='column',
+        align_items='center',
+        justify_content='center',
+    )
+    box = widgets.Box(children=[basic_widgets, out, adv_widgets], layout=box_layout)
+
+    display(box)
 
 
 def link_islicer(*args):

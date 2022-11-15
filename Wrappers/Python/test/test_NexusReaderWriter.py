@@ -162,8 +162,6 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.pixel_size_h, self.ag3d.pixel_size_h, 'AcquisitionGeometry.pixel_size_h is not correct')
         self.assertEqual(ag3d.pixel_num_v, self.ag3d.pixel_num_v, 'AcquisitionGeometry.pixel_num_v is not correct')
         self.assertEqual(ag3d.pixel_size_v, self.ag3d.pixel_size_v, 'AcquisitionGeometry.pixel_size_v is not correct')
-        self.assertEqual(ag3d.dist_source_center, self.ag3d.dist_source_center, 'AcquisitionGeometry.dist_source_center is not correct')
-        self.assertEqual(ag3d.dist_center_detector, self.ag3d.dist_center_detector, 'AcquisitionGeometry.dist_center_detector is not correct')
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d

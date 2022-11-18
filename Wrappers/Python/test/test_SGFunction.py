@@ -1,7 +1,8 @@
 import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.functions import LeastSquares, SubsetSumFunction, SGFunction
+from cil.optimisation.functions import LeastSquares, SGFunction
+from cil.optimisation.utilities import FunctionNumberGenerator
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
 import numpy as np                  
@@ -46,7 +47,9 @@ class TestSGFunction(unittest.TestCase):
         self.F = LeastSquares(self.Aop, b=self.bop, c = 0.5) 
         
         self.ig = self.Aop.domain
-        self.F_SG = SGFunction(self.fi_cil, replacement = True)           
+
+        generator = FunctionNumberGenerator(self.n_subsets)
+        self.F_SG = SGFunction(self.fi_cil, generator)           
 
         self.initial = self.ig.allocate()  
 
@@ -59,7 +62,7 @@ class TestSGFunction(unittest.TestCase):
 
         self.F_SG.gradient(x, out=out1)
 
-        self.F_SG[self.F_SG.subset_num].gradient(x, out=out2)
+        self.F_SG[self.F_SG.function_num].gradient(x, out=out2)
         out2*=self.n_subsets
 
         np.testing.assert_allclose(out1.array, out2.array, atol=1e-4) 

@@ -20,6 +20,7 @@ import warnings
 from numbers import Number
 import numpy as np
 from functools import reduce
+from cil.optimisation.utilities import FunctionNumberGenerator
 
 class Function(object):
     
@@ -326,63 +327,50 @@ class SumFunction(Function):
         else:
             return super(SumFunction, self).__add__(other)
 
-class SubsetSumFunction(SumFunction):
+class ApproximateGradientSumFunction(SumFunction):
 
-    r"""SubsetSumFunction represents the following sum 
+    r"""ApproximateGradientSumFunction represents the following sum 
     
     .. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
 
-    where :math:`n` is the number of subsets.
+    where :math:`n` is the number of functions.
 
     Parameters:
     -----------
     functions : list(functions) 
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method.
-    sampling : :obj:`string`, Default = :code:`random`
-               Selection process for each function in the list. It can be :code:`random` or :code:`sequential`. 
-    replacement : :obj:`boolean`. Default = :code:`True`
-               The same subset can be selected when :code:`replacement=True`. 
-    suffle : :obj:`string`. Default = :code:`random`.
-             This is only for the :code:`replacement=False` case. For :code:`suffle="single"`, we permute the list only once.
-             For :code:`suffle="random"`, we permute the list of subsets after one epoch. 
-
+    selection : :obj:`string`, Default = :code:`random`. It can be :code:`random`, :code:`random_permutation`,  :code:`fixed_permutation`.
+               Selection method for each function in the list.                 
+               -  :code:`random`: Every function is selected randomly with replacement.
+               -  :code:`random_permutation`: Every function is selected randomly without replacement. After selecting all the functions in the list, i.e., after one epoch, the list is randomly permuted.
+               -  :code:`fixed_permuation`: Every function is selected randomly without replacement and the list of function is permuted only once.
                 
     Example
     -------
 
     .. math:: \sum_{i=1}^{n} F_{i}(x) = \sum_{i=1}^{n}\|A_{i} x - b_{i}\|^{2}
 
-    >>> f = SubsetSumFunction([LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets))   
+    >>> list_of_functions = [LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets))   
+    >>> f = ApproximateGradientSumFunction(list_of_functions) 
+
+    >>> list_of_functions = [LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets)) 
+    >>> fng = FunctionNumberGenetor(len(list_of_function), sampling_method="fixed_permutation")
+    >>> f = ApproximateGradientSumFunction(list_of_functions, fng)   
   
+
     """
     
-    def __init__(self, functions, 
-                 sampling = "random",
-                 replacement = True,
-                 suffle = "random"):    
+    def __init__(self, functions, selection=None):    
         
-        super(SubsetSumFunction, self).__init__(*functions)
+        super(ApproximateGradientSumFunction, self).__init__(*functions)
         
-        self.sampling = sampling
-        self.replacement = replacement
-        self.suffle = suffle        
-        self.data_passes = [0]
-        self.subsets_used = []
-        self.subset_num = -1
-        self.index = 0
-                            
-        if self.replacement is False:
-                        
-            # create a list of subsets without replacement, first permutation
-            self.list_of_subsets = np.random.choice(range(self.num_subsets),self.num_subsets, replace=False)            
-                       
-            if self.suffle not in ["random","single"]:
-                raise NotImplementedError("Only {} and {} are implemented for the replacement=False case.".format("random","single"))            
-                        
-                                                                
-    @property
-    def num_subsets(self):
-        return self.num_functions
+        self.functions_used = []   
+        self.functions_passes = [0] 
+
+        if isinstance(selection, str):
+            self.selection = FunctionNumberGenerator(len(functions), sampling_method=selection )
+        else:
+            self.selection = selection    
 
     def __call__(self, x):
 
@@ -392,51 +380,28 @@ class SubsetSumFunction(SumFunction):
 
         """
                 		
-        return super(SubsetSumFunction, self).__call__(x)      
+        return super(ApproximateGradientSumFunction, self).__call__(x)      
         
     def full_gradient(self, x, out=None):
 
         r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
-        return super(SubsetSumFunction, self).gradient(x, out=out)
+        return super(ApproximateGradientSumFunction, self).gradient(x, out=out)
         
+    def approximate_gradient(self, function_num, x,  out=None):
+
+        """ Computes the gradient for each selected function at :code:`x`."""      
+        raise NotImplemented
+
     def gradient(self, x, out=None):
 
-        """ Computes the gradient for each subset function at :code:`x`."""      
-
-        raise NotImplemented
+        self.next_function_num()
+        return self.approximate_gradient(self.function_num, x, out=out)
                
-    def next_subset(self):
+    def next_function_num(self):
         
-        if self.sampling=="random" :
-            
-            if self.replacement is False:
-                
-                # list of subsets already permuted
-                self.subset_num = self.list_of_subsets[self.index]
-                self.index+=1                
-                                
-                if self.index == self.num_subsets:
-                    self.index=0
-                    
-                    # For random suffle, at the end of each epoch, we permute the list again                    
-                    if self.suffle=="random":                    
-                        self.list_of_subsets = np.random.choice(range(self.num_subsets),self.num_subsets, replace=False)                              
-                                                        
-            else:
-                
-                # at each iteration (not epoch) a subset is randomly selected
-                self.subset_num = np.random.randint(0, self.num_subsets)
-            
-        elif self.sampling=="sequential":    
-            
-            if self.subset_num + 1 >= self.num_subsets:
-                self.subset_num = 0                
-            else:
-                self.subset_num += 1         
-        else:
-            raise NotImplementedError("Only {} and {} are implemented at the moment.".format("random","sequential"))          
-            
-        self.subsets_used.append(self.subset_num)
+        # Select the next function using the selection:=function_number_generator        
+        self.function_num = next(self.selection)
+        self.functions_used.append(self.function_num)
                                   
 class ScaledFunction(Function):
     

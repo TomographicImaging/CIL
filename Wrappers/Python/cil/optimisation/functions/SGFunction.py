@@ -15,13 +15,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import SubsetSumFunction
+from cil.optimisation.functions import ApproximateGradientSumFunction
 
-class SGFunction(SubsetSumFunction):
+class SGFunction(ApproximateGradientSumFunction):
 
-    r""" Stochastic Gradient Descent Function (SGDFunction) 
+    r""" Stochastic Gradient Function (SGFunction) 
 
-    The SDGFunction represents the objective function :math:`\sum_{i=1}^{n}F_{i}(x)`, where
+    The SGFunction represents the objective function :math:`\sum_{i=1}^{n}F_{i}(x)`, where
     :math:`n` denotes the number of subsets. 
     
     Parameters:
@@ -36,7 +36,7 @@ class SGFunction(SubsetSumFunction):
     Note
     ----
         
-    The :meth:`~SGDFunction.gradient` computes the `gradient` of one function from the list :math:`[F_{1},\cdots,F_{n}]`,
+    The :meth:`~SGFunction.gradient` computes the `gradient` of one function from the list :math:`[F_{1},\cdots,F_{n}]`,
     
     .. math:: \partial F_{i}(x) .
 
@@ -44,19 +44,15 @@ class SGFunction(SubsetSumFunction):
     
 """
   
-    def __init__(self, functions, sampling = "random", replacement = False, suffle="random"):
+    def __init__(self, functions, selection="random"):
 
-        super(SGFunction, self).__init__(functions, sampling = sampling, replacement = replacement, suffle=suffle)
+        super(SGFunction, self).__init__(functions, selection)
 
-    def gradient(self, x, out):
+    def approximate_gradient(self,subset_num, x, out):
         
         """ Returns the gradient of the selected function at :code:`x`. The function is selected using the :meth:`~SubsetSumFunction.next_subset`
-        """
-
-        # Select the next subset
-        self.next_subset()
-        
-        # Compute new gradient for current subset
-        self.functions[self.subset_num].gradient(x, out=out)
-        out*=self.num_subsets         
+        """        
+        # Compute new gradient for current function
+        self.functions[self.function_num].gradient(x, out=out)
+        out*=self.num_functions
         

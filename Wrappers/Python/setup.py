@@ -34,7 +34,6 @@ setup(
               'cil.optimisation.functions',
               'cil.optimisation.algorithms',
               'cil.optimisation.operators',
-              'cil.optimisation.utilities',
               'cil.processors',
               'cil.utilities', 'cil.utilities.jupyter',
               'cil.plugins', 

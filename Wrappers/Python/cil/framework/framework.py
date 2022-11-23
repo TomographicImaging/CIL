@@ -98,11 +98,15 @@ class ImageGeometry(object):
         return len(self.dimension_labels)
 
     @property
+    def ndim(self):
+        return len(self.dimension_labels)
+
+    @property
     def dimension_labels(self):
         
         labels_default = DataOrder.CIL_IG_LABELS
 
-        shape_default = [   self.channels - 1, #channels default is 1
+        shape_default = [   self.channels,
                             self.voxel_num_z,
                             self.voxel_num_y,
                             self.voxel_num_x]
@@ -113,7 +117,7 @@ class ImageGeometry(object):
             labels = labels_default.copy()
 
         for i, x in enumerate(shape_default):
-            if x == 0:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1928,7 +1932,6 @@ class AcquisitionGeometry(object):
 
         return tuple(shape)
 
-
     @property
     def dimension_labels(self):
         labels_default = DataOrder.CIL_AG_LABELS
@@ -1947,7 +1950,7 @@ class AcquisitionGeometry(object):
         #remove from list labels where len == 1
         #
         for i, x in enumerate(shape_default):
-            if x == 1:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1968,6 +1971,9 @@ class AcquisitionGeometry(object):
                     
             self._dimension_labels = tuple(val)
 
+    @property
+    def ndim(self):
+        return len(self.dimension_labels)
 
     @property
     def system_description(self):

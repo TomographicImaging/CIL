@@ -83,7 +83,7 @@ class Binner(DataProcessor):
 
     def check_input(self, data):
 
-        if issubclass(data, (ImageData,AcquisitionData)):
+        if isinstance(data, (ImageData,AcquisitionData)):
             self.data_array = True
             self.geometry = data.geometry
 
@@ -117,6 +117,7 @@ class Binner(DataProcessor):
     def _bin_acquisition_geometry(self):
 
         geometry_new = self.geometry.copy()
+        system_detector = geometry_new.config.system.detector
 
         processed_dims = self.processed_dims.copy()
 
@@ -128,7 +129,11 @@ class Binner(DataProcessor):
                 n_elements = len(roi)
 
                 if n_elements > 1:
+                    
+                    centre_offset = geometry_new.config.panel.pixel_size[1] * ((n_elements * roi.step)*0.5 + roi.start - geometry_new.config.panel.num_pixels[1] * 0.5 )
+
                     geometry_new.config.panel.num_pixels[1] = n_elements
+                    system_detector.position = system_detector.position + centre_offset * system_detector.direction_y
                 else:
                     geometry_new = geometry_new.get_slice(vertical = (roi.start + roi.step/2))
 
@@ -152,8 +157,12 @@ class Binner(DataProcessor):
                 geometry_new.config.angles.angle_data = self.geometry.angles[roi.start:roi.start+n_elements*roi.step].reshape(shape).mean(1)
                 
             elif axis == 'horizontal':
+
+                centre_offset = geometry_new.config.panel.pixel_size[0] * ( (n_elements * roi.step)*0.5 + roi.start - geometry_new.config.panel.num_pixels[0] * 0.5 )
+
                 geometry_new.config.panel.num_pixels[0] = n_elements
                 geometry_new.config.panel.pixel_size[0] *= roi.step
+                system_detector.position = system_detector.position + centre_offset * system_detector.direction_x
 
         return geometry_new
 

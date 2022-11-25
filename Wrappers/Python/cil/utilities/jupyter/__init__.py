@@ -73,7 +73,7 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
 
         aspect = 'equal'
         if not equal_aspect:
-            aspect = 'auto'
+            aspect = (roi_hdir[1] - roi_hdir[0]) / (roi_vdir[1] - roi_vdir[0])
 
         aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect=aspect)
         aximg.set_clim(minmax)

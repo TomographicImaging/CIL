@@ -38,7 +38,7 @@ jobs:
       run: |
         ls
     - name: Download artifact of the conda package.
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3.0.1
       with:
         name: 'cil-package'
         path: 'conda_package'
@@ -60,7 +60,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact of the html output.
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3.0.1
       with:
         name: DocumentationHTML
         path: docs/build

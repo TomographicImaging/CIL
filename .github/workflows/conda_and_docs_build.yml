@@ -23,7 +23,7 @@ jobs:
         convert_win: false
         convert_osx: false
     - name: Upload artifact of the conda package.
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3.1.1
       with:
         name: cil-package
         path: recipe/linux-64/cil*

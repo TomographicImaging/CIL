@@ -47,7 +47,7 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.7
-    - uses: lauramurgatroyd/build-sphinx-action@set_output_update
+    - uses: lauramurgatroyd/build-sphinx-action@set_output_update 
       with:
         DOCS_PATH: 'docs'
         CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'

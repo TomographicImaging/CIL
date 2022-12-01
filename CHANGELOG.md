@@ -3,6 +3,11 @@
     - `get_centre_of_rotation()` calculates the centre of rotation of the system
     - `set_centre_of_rotation()` sets the system centre of rotation with an offset and angle
     - `set_centre_of_rotation_by_slice()` sets the system centre of rotation with offsets from two slices
+  - Github Actions:
+    - Update version of upload_artifact github action to version 3.1.1
+    - Update version of download_artifact github action to version 3.0.1
+    - Update version of checkout github action to version 3.1.0
+    - Update build-sphinx action to version 0.1.3
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

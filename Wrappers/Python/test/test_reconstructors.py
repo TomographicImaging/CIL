@@ -209,6 +209,17 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter("unsupported_filter")
 
+        # test all supported filters are set
+        for x in reconstructor.preset_filters:
+            reconstructor.set_filter(x)
+            self.assertEqual(reconstructor.filter, x, msg='Mismatch on test: Filter {0}'.format(x))
+            self.assertEqual(reconstructor._filter_cutoff, 1.0, msg='Mismatch on test: Filter {0}'.format(x))
+
+        # test filter cut-off is set
+        reconstructor.set_filter('ram-lak', 0.5)
+        self.assertEqual(reconstructor._filter_cutoff, 0.5,msg='Filter cut-off frequency mismatch')
+
+        # test custom array is set
         filter = reconstructor.get_filter_array()
         filter_new =filter *0.5
         reconstructor.set_filter(filter_new)
@@ -218,14 +229,6 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
-
-        for x in reconstructor.preset_filters:
-            reconstructor.set_filter(x)
-            self.assertEqual(reconstructor.filter, x, msg='Mismatch on test: Filter {0}'.format(x))
-            self.assertEqual(reconstructor._filter_cutoff, 1.0, msg='Mismatch on test: Filter {0}'.format(x))
-
-        reconstructor.set_filter('ram-lak', 0.5)
-        self.assertEqual(reconstructor._filter_cutoff, 0.5)
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")

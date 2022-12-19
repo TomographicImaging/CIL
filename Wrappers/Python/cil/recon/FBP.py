@@ -174,8 +174,6 @@ class GenericFilteredBackProjection(Reconstructor):
         - [0] The DC frequency component
         - [1:N/2] positive frequencies
         - [N/2:N-1] negative frequencies
-
-        The frequencies
         """
 
 

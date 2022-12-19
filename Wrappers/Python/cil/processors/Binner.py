@@ -16,6 +16,7 @@
 #   limitations under the License.
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
 import numpy as np
+import weakref
 
 class Binner(DataProcessor):
 
@@ -81,6 +82,27 @@ class Binner(DataProcessor):
         super(Binner, self).__init__(**kwargs)
     
 
+    def set_input(self, dataset):
+        """
+        Set the input data to the processor
+
+        Parameters
+        ----------
+        input : DataContainer
+            The input DataContainer
+        """
+
+        if issubclass(type(dataset), DataContainer) or isinstance(dataset,(AcquisitionGeometry,ImageGeometry)):
+            if self.check_input(dataset):
+                self.__dict__['input'] = weakref.ref(dataset)
+                self.__dict__['shouldRun'] = True
+            else:
+                raise ValueError('Input data not compatible')
+        else:
+            raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(type(dataset), DataContainer))
+
+
     def check_input(self, data):
 
         if isinstance(data, (ImageData,AcquisitionData)):
@@ -135,6 +157,11 @@ class Binner(DataProcessor):
                     geometry_new.config.panel.num_pixels[1] = n_elements
                     system_detector.position = system_detector.position + centre_offset * system_detector.direction_y
                 else:
+
+                    #I assume this doesn't work. get_slice needs to return the full geometry at this position
+                    #i.e. needs to calculate cofr at this position - allow for not ints! this is just the geometry.
+                    # what happens if it's cone beam and off centre? This could be handled with a 3D geometry!
+                    # does a 3d geometry with vertical = 1 work out of the box?! try this....
                     geometry_new = geometry_new.get_slice(vertical = (roi.start + roi.step/2))
 
                 geometry_new.config.panel.pixel_size[1] *= roi.step
@@ -201,7 +228,7 @@ class Binner(DataProcessor):
 
         shape_binned = []
         for i in range(len(shape_in)):
-            shape_binned.append(shape_in[i][self.roi_ordered[i]])
+            shape_binned.append(len(self.roi_ordered[i]))
         return shape_binned
 
 
@@ -240,6 +267,14 @@ class Binner(DataProcessor):
                 binned_array[:] = slice_resized
 
             count +=1
+
+    def _bin_array_ipp(self, data, binned_array):
+
+
+        #bin_array(binned_array,dimC,dimZ,dimY,dimX ,startC,startZ,startY,startX,stepC,stepZ,stepY,stepX, data, dim_in_C,dim_in_Z,dim_in_Y,dim_in_X)
+
+
+        pass
 
 
     def _construct_roi_object(self, ndim, dimension_labels, shape):

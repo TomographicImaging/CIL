@@ -2486,9 +2486,7 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the dtype of the data array. 
-           If geometry exists, the dtype of the geometry = dtype of the array'''                          
-        self.geometry.dtype = self.array.dtype       
+        '''Returns the dtype of the data array.'''
         return self.array.dtype
 
     @property

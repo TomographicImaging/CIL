@@ -33,3 +33,9 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
+from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
+from .SGFunction import SGFunction
+from .SAGFunction import SAGFunction
+from .SAGAFunction import SAGAFunction
+
+

@@ -211,6 +211,7 @@ class SumFunction(Function):
         if len(functions) < 2:
             raise ValueError('At least 2 functions need to be passed')
         self.functions = functions
+        self.num_functions = len(self.functions)
         
     @property
     def L(self):

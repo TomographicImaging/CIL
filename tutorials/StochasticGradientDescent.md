@@ -1,9 +1,16 @@
 
-# Stochastic Gradient Descent for Tomography reconstruction
+# (Draft) Stochastic Gradient Descent for Tomography reconstruction
 
-We will use the Stochastic Optimisation framework in CIL to reconstruct real X-ray data  with Total Variation regularisation. We solve the following problem:
+In this tutorial, we use the Stochastic Optimisation framework in CIL to reconstruct real X-ray data  with Total Variation regularisation. We will solve the following problem:
 
 $$\min_{u}\quad\frac{1}{2} \|A u - d\|^{2} + \alpha\,\mathrm{TV}(u)$$
+
+using:
+
+- the `FISTA` algorithm to obtain an **optimal** solution
+- (Deterministic) ISTA
+- Proximal Stochastic Gradient Descent
+- Proximal Mini-Batch Stochastic Gradient Descent
 
 ### Import Libraries
 
@@ -22,7 +29,7 @@ import numpy as np
 
 ```
 
-We first read our tomographic data. We use the [Walnut Dataset](https://zenodo.org/record/4822516#.Y6Gu_OxBw0p) for this task. 
+We first read our tomographic data. We use the [Walnut Dataset](https://zenodo.org/record/4822516#.Y6Gu_OxBw0p) for this task. Download the dataset and change the `pathname`.
 
 ```python
 data_name = "valnut_tomo-A.txrm"
@@ -63,9 +70,8 @@ A = ProjectionOperator(ig2D, ag2D, device = "gpu")
 
 The Acquisition and Image Geometries have the following shape:
 
-Acquisition Geometry 2D: (800, 392) with labels ('angle', 'horizontal')
-
-Image Geometry 2D: (392, 392) with labels ('horizontal_y', 'horizontal_x')
+    Acquisition Geometry 2D: (800, 392) with labels ('angle', 'horizontal')
+    Image Geometry 2D: (392, 392) with labels ('horizontal_y', 'horizontal_x')
 
 
 We start with an analytic reconstruction:
@@ -75,10 +81,12 @@ fbp_recon = FBP(ig2D, ag2D)(data)
 show2D(fbp_recon, cmap="inferno", origin="upper", fix_range=(0,0.06))
 ```
 
+![](fdk_recon.png)
+
 We compute an _optimal_ solution for the above problem using the FISTA algorithm with Total variation regularisation and large number of iterations.
 
 ```python
-alpha = 0.003 # for walnut
+alpha = 0.003 
 G = (alpha/ig2D.voxel_size_x) * FGP_TV(max_iteration = 100, device="gpu") 
 ```
 
@@ -86,7 +94,7 @@ G = (alpha/ig2D.voxel_size_x) * FGP_TV(max_iteration = 100, device="gpu")
 
 initial = ig2D.allocate()
 F_FISTA = LeastSquares(A, b = data, c = 0.5)
-step_size_ista = 1./F_FISTA.L
+step_size_fista = 1./F_FISTA.L
 fista = FISTA(initial = initial, f=F_FISTA, step_size = step_size_ista, g=G, update_objective_interval = 1000, 
             max_iteration = 1000)
 fista.run(verbose=1)
@@ -94,11 +102,15 @@ optimal = fista.solution
 show2D(fista.solution, cmap="inferno", origin="upper")
 ```
 
-In our stochastic framework, we replace 
+![](fista_recon.png)
 
-$$\|Au-d\|^{2}$$
+### Stochastic setup
 
-by $$\sum_{i=1}^{n}(A_{i}u-d_{i})^{2} = \sum_{i=1}^{n}f_{i}(u)$$, where $n$ is the number of subsets.
+For the stochastic framework, we solve
+
+$$\min_{u}\quad \sum_{i=1}^{n} \frac{1}{2} \|\|A_{i} u - d_{i}\|\|^{2} + \alpha\mathrm{TV}(u),$$
+
+where $n$ is the number of subsets.
 
 ```python
 num_subsets = 400
@@ -108,6 +120,11 @@ From a total of 800 projection angles we create 400 subsets of size 2 randomly w
 
 ```python
 list_of_batches = RandomSampling(len(data.geometry.angles), batch_size=2, replace=False, seed=10)
+```
+
+We use the following `function` to split our acquisition data into 400 chunks:
+
+```python
 
 def split_acquisition_data(data, selection):
     
@@ -154,9 +171,9 @@ ISTA.update_objective =  update_objective_optimal
 
 In the following, we run the following algorithms for 20 epochs:
 
-- ISTA
-- SGD
-- Mini-Batch SGD
+- (Deterministic) ISTA = Proximal Gradient Descent
+- Proximal Stochastic Gradient Descent
+- Proximal Mini-Batch Stochastic Gradient Descent
 
 ```python
 num_epochs = 20

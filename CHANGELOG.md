@@ -8,13 +8,13 @@
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
+  - ROI selection, aspect ratio toggle and Play widget added to islicer
 
 * 22.1.0
   - use assert_allclose in test_DataContainer
   - added multiple colormaps to show2D
   - Fix segfault in GradientOperator due to parameter overflows on windows systems
   - Fix angle display precision and matplotlib warning for sinograms with show2D
-  - ROI selection and aspect ratio toggle added to islicer
 
 * 22.0.0
   - Strongly convex functionality in TotalVariation and FGP_TV Functions

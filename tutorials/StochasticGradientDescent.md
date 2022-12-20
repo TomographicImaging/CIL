@@ -41,7 +41,7 @@ The [Walnut Dataset](https://zenodo.org/record/4822516#.Y6Gu_OxBw0p) is a 3D vol
 data2D = data3D.get_slice(vertical='centre')
 
 # Select every 2 angles
-sliced_data = Slicer(roi={'angle':(0,1601,2)})(data2D)
+sliced_data = Slicer(roi={'angle':(0,1600,2)})(data2D)
 
 # Reduce background regions
 binned_data = Binner(roi={'horizontal':(120,-120,2)})(sliced_data)
@@ -63,10 +63,10 @@ A = ProjectionOperator(ig2D, ag2D, device = "gpu")
 
 The Acquisition and Image Geometries have the following shape:
 
-```bash
- Acquisition Geometry 2D: (800, 392) with labels ('angle', 'horizontal')
- Image Geometry 2D: (392, 392) with labels ('horizontal_y', 'horizontal_x')
-```
+Acquisition Geometry 2D: (800, 392) with labels ('angle', 'horizontal')
+
+Image Geometry 2D: (392, 392) with labels ('horizontal_y', 'horizontal_x')
+
 
 We start with an analytic reconstruction:
 
@@ -122,7 +122,7 @@ def split_acquisition_data(data, selection):
         
     return split_data
 
-tmp_data = split_acquisition_data(data, rs_data)
+tmp_data = split_acquisition_data(data, list_of_batches)
 
 ```
 
@@ -200,7 +200,13 @@ proxSGD2.run(verbose=1)
 
 ```
 
+![](diff_optimal_solution.png)
 
+![](diff_optimal_objective.png)
+
+![](recons.png)
+
+![](diff_recons_optimal.png)
 
 
 

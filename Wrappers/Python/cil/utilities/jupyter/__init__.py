@@ -236,7 +236,7 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
 
     equal_aspect = widgets.Checkbox(
         value=True,
-        description='Aspect ratio = 1 (unchecking this may ' +
+        description='Pixel aspect ratio = 1 (unchecking this may ' +
                     'cause the image to appear stretched)',
         disabled=False,
         indent=False,

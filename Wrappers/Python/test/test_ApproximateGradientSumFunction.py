@@ -2,7 +2,6 @@ import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.functions import LeastSquares, ApproximateGradientSumFunction
-from cil.optimisation.utilities import FunctionNumberGenerator
 from cil.framework import VectorData
 import numpy as np                  
                   

@@ -16,6 +16,7 @@
 #   limitations under the License.
 
 from cil.optimisation.functions import ApproximateGradientSumFunction
+import numbers
 
 class SGFunction(ApproximateGradientSumFunction):
 
@@ -34,7 +35,7 @@ class SGFunction(ApproximateGradientSumFunction):
         """        
 
         # single function 
-        if isinstance(self.function_num, int):
+        if isinstance(self.function_num, numbers.Number):
             self.functions[self.function_num].gradient(x, out=out)
 
         # mini-batch, i.e., collection of functions
@@ -43,4 +44,6 @@ class SGFunction(ApproximateGradientSumFunction):
             for i in self.function_num:
                 sum_grad += self.functions[i].gradient(x)
             out.fill(sum_grad)
-        out*=self.num_functions
+            
+        out*=self.selection.num_batches
+

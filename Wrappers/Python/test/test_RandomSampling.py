@@ -35,7 +35,7 @@ class TestRandomSampling(unittest.TestCase):
         list_generated_seed_19 = [0, 7, 9, 7, 3, 5, 8, 3, 4, 9]
 
         # check static method
-        sm_rs_uniform = RandomSampling.uniform(self.len_list, seed=19)
+        sm_rs_uniform = RandomSampling.uniform(self.len_list, seed=self.seed)
         
         tmp1 = []
         for _ in range(10):
@@ -49,12 +49,17 @@ class TestRandomSampling(unittest.TestCase):
     def test_random_sampling_uniform_without_replacement(self):
 
         list_generated_seed_19 = [7, 8, 9, 2, 1, 4, 6, 5, 0, 3]
+
+        # check static method
+        sm_rs_uniform_without_replacement = RandomSampling.uniform_no_replacement(self.len_list, seed=self.seed)        
         
         tmp1 = []
         for _ in range(10):
             next(self.rs_uniform_without_replacement)
+            next(sm_rs_uniform_without_replacement)
 
         self.assertListEqual(self.rs_uniform_without_replacement.indices_used, list_generated_seed_19)        
+        self.assertListEqual(self.rs_uniform_without_replacement.indices_used, sm_rs_uniform_without_replacement.indices_used)        
 
     def test_random_sampling_uniform_with_replacement_batch(self):
 
@@ -92,64 +97,5 @@ class TestRandomSampling(unittest.TestCase):
 
 
 
-
-    
-
-    # def test_random_sampling_uniform_with_replacement_batch(self):
-        
-    #     tmp1 = []
-    #     for _ in range(10):
-    #         next(self.rs_batch)
-    #         next(self.rs_with_batch_class)
-
-    #     self.assertListEqual(self.rs_batch.indices_used[0], self.rs_with_batch_class.indices_used[0])        
-           
-
-    #     # tmp2 = []
-    #     # for _ in range(10):
-    #     #     tmp2.append(next(self.rs2)) 
-
-    #     # print(tmp1)
-    #     # print(tmp2)        
-
-    #     # epochs = 1
-    #     # list_of_selected_ind = []
-    #     # for i in range(self.len_list*epochs):
-    #     #     next(rs1)
-    #     #     next(rs2)
-
-    #     # np.random.seed(19)
-    #     # tmp = np.random.choice(self.len_list,size=self.len_list,replace=True)
-    #     # for i in range(self.len_list*epochs):
-
-    #     #     list_of_selected_ind.append(tmp[i])
-
-        
-    #     # print(self.rs1.indices_used)
-    #     # print(self.rs2.indices_used)
-    #     # print(list_of_selected_ind)        
-                
-                
-    
-    # # def test_random_sampling_uniform_without_replacement(self):
-        
-
-
-    # #     epochs = 1
-    # #     list_of_selected_ind = []
-    # #     for i in range(self.len_list*epochs):
-    # #         next(rs1)
-    # #         next(rs2)
-
-    # #     np.random.seed(19)
-    # #     tmp = np.random.choice(self.len_list,size=self.len_list,replace=False)
-    # #     for i in range(self.len_list*epochs):
-
-    # #         list_of_selected_ind.append(tmp[i])
-
-    # #     self.assertListEqual(rs1.indices_used, rs2.indices_used)
-    # #     self.assertListEqual(list_of_selected_ind, rs2.indices_used)
-    # #     self.assertListEqual(rs1.indices_used, list_of_selected_ind)
-        
 
     

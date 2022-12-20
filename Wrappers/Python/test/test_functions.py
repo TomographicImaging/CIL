@@ -852,6 +852,12 @@ class TestTotalVariation(unittest.TestCase):
         alpha = 'string'
         with self.assertRaises(TypeError):
             tv = alpha * TotalVariation()
+
+    def test_rmul3(self):
+        self.assertEqual(self.alpha, self.tv_scaled.regularisation_parameter)
+        alpha = 2.
+        tv2 = alpha * self.tv_scaled
+        self.assertEqual(self.alpha * alpha, tv2.regularisation_parameter)
             
 
     def test_call_real_isotropic(self):

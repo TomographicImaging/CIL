@@ -1,15 +1,11 @@
 import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.functions import LeastSquares
+from cil.optimisation.functions import LeastSquares, SGFunction
+from cil.optimisation.utilities import RandomSampling
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
 import numpy as np    
-
-##
-from cil.optimisation.utilities import RandomSampling
-from cil.optimisation.functions import SGFunction
-##
 
 initialise_tests()
 

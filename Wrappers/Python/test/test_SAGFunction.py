@@ -1,20 +1,21 @@
 import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.functions import LeastSquares, SAGAFunction
+from cil.optimisation.functions import LeastSquares, SAGFunction
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
-from cil.optimisation.utilities import RandomSampling
-import numpy as np                  
+import numpy as np            
+from cil.optimisation.utilities import RandomSampling      
                   
 initialise_tests()
+
 
 from utils import has_cvxpy
 
 if has_cvxpy:
     import cvxpy
 
-class TestSAGAFunction(unittest.TestCase):
+class TestSAGFunction(unittest.TestCase):
                     
     def setUp(self):
         
@@ -42,7 +43,7 @@ class TestSAGAFunction(unittest.TestCase):
         self.F = LeastSquares(self.Aop, b=self.bop, c = 0.5) 
         self.ig = self.Aop.domain
         generator = RandomSampling.uniform(self.n_subsets)
-        self.F_SAGA = SAGAFunction(self.fi_cil, generator)           
+        self.F_SAG = SAGFunction(self.fi_cil, generator)           
 
         self.initial = self.ig.allocate()          
 
@@ -90,14 +91,14 @@ class TestSAGAFunction(unittest.TestCase):
 
         step_size = 0.0001 
         epochs = 100
-        saga = GD(initial = self.initial, objective_function = self.F_SAGA, step_size = step_size,
+        sag = GD(initial = self.initial, objective_function = self.F_SAG, step_size = step_size,
                     max_iteration = epochs * self.n_subsets, 
                     update_objective_interval =  epochs * self.n_subsets)
-        saga.run(verbose=0)    
+        sag.run(verbose=0)    
 
-        np.testing.assert_allclose(p.value, saga.objective[-1], atol=1e-1)
+        np.testing.assert_allclose(p.value, sag.objective[-1], atol=1e-1)
 
-        np.testing.assert_allclose(u_cvxpy.value, saga.solution.array, atol=1e-1)
+        np.testing.assert_allclose(u_cvxpy.value, sag.solution.array, atol=1e-1)
 
 
 

@@ -71,11 +71,11 @@ class ApproximateGradientSumFunction(SumFunction):
     def gradient(self, x, out=None):
 
         """ Computes the gradient for each selected function at :code:`x`."""   
-        self.next_selected_function()
+        self.next_function()
         return self.approximate_gradient(self.function_num, x, out=out)
                
-    def next_selected_function(self):
+    def next_function(self):
         
-        """ Selects the next function from the list of :code:`functions` using the :code:`selection`."""        
+        """ Selects the next function or the next batch of functions from the list of :code:`functions` using the :code:`selection`."""        
         self.function_num = next(self.selection)
         self.functions_used.append(self.function_num)

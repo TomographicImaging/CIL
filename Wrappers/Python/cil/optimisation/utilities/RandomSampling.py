@@ -16,6 +16,7 @@
 #   limitations under the License.
 
 import numpy as np
+import logging
 
 class RandomSampling():
     
@@ -36,20 +37,23 @@ class RandomSampling():
         if self.equal_size_batches:
             self.num_batches = self.num_indices//self.batch_size
         else:
+            logging.warning("Batch size is not constant")
             self.num_batches = (self.num_indices//self.batch_size)+1        
         self.prob = prob
         self.replace = replace
         self.shuffle = shuffle
         self.indices_used = []
         self.index = 0
-        np.random.seed(seed)
-                            
-        if self.replace is False: 
-            self.list_of_indices = np.random.choice(num_indices, size=self.num_indices, p=prob, replace=False)                                        
-        else:
-            if shuffle is True and self.batch_size==1:
-                raise ValueError("Shuffle is used only with replace=False")   
-            self.list_of_indices = np.random.choice(num_indices, size=self.num_indices, p=prob, replace=True)         
+        self.seed = seed
+        self.rng = np.random.default_rng(self.seed)
+        self.list_of_indices =  self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace) 
+                    
+        # if self.replace is False: 
+        #     self.list_of_indices = self.rng.choice(num_indices, size=self.num_indices, p=prob, replace=False)                                        
+        # else:
+        #     if shuffle is True and self.batch_size==1:
+        #         raise ValueError("Shuffle is used only with replace=False")   
+        #     self.list_of_indices = self.rng.choice(num_indices, size=self.num_indices, p=prob, replace=True)         
             
         if self.batch_size>1: 
             self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
@@ -102,22 +106,31 @@ class RandomBatch(RandomSampling):
             
     def __next__(self):
         
-        tmp = list(self.partition_list[self.index])
-        self.indices_used.append(tmp)         
+        tmp_list = list(self.partition_list[self.index])
+        self.indices_used.append(tmp_list)         
         self.index+=1
         
         if self.index==len(self.partition_list):
             self.index=0            
             
             if self.shuffle is True:
-                self.list_of_indices = np.random.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace)        
+                self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace)        
                 self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]
                                                
-        return tmp
+        return tmp_list
     
 class RandomIndex(RandomSampling):   
     
     def __next__(self):
+
+        # index_num = self.list_of_indices[self.index]
+        # self.index+=1   
+
+        # if self.index == self.num_indices:
+        #     self.index = 0                
+        #     if self.shuffle is True:                    
+        #         self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)         
+
         
         if self.replace is False:
 
@@ -127,13 +140,28 @@ class RandomIndex(RandomSampling):
             if self.index == self.num_indices:
                 self.index = 0                
                 if self.shuffle is True:                    
-                    self.list_of_indices = np.random.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)                                                                                         
+                    self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)                                                                                         
         else:
 
-            index_num = np.random.choice(self.num_indices, size=1, p=self.prob, replace=True).item()
+            index_num = self.rng.choice(self.num_indices, size=1, p=self.prob, replace=True).item()
 
         self.indices_used.append(index_num)
 
         return index_num  
         
-    
+if __name__ == "__main__":
+
+    rs1 = RandomSampling(10, batch_size=2, replace=False, seed=19)
+    rs2 = RandomIndex(10, seed=19)
+
+    tmp1 = []
+    for _ in range(10):
+        tmp1.append(next(rs1))
+
+    tmp2 = []
+    for _ in range(10):
+        tmp2.append(next(rs2))        
+
+
+    print(tmp1)
+    # print(tmp2)

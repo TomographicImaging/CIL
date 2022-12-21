@@ -95,7 +95,7 @@ G = (alpha/ig2D.voxel_size_x) * FGP_TV(max_iteration = 100, device="gpu")
 initial = ig2D.allocate()
 F_FISTA = LeastSquares(A, b = data, c = 0.5)
 step_size_fista = 1./F_FISTA.L
-fista = FISTA(initial = initial, f=F_FISTA, step_size = step_size_ista, g=G, update_objective_interval = 1000, 
+fista = FISTA(initial = initial, f=F_FISTA, step_size = step_size_fista, g=G, update_objective_interval = 1000, 
             max_iteration = 1000)
 fista.run(verbose=1)
 optimal = fista.solution
@@ -145,7 +145,7 @@ tmp_data = split_acquisition_data(data, list_of_batches)
 
 ### Note
 
-The code above works only in CIL, because SIRF does not have a `.geometry` attribute. However, since we have a list that is randomly permuted without replacement we can use the following code for [`SIRF`](https://github.com/TomographicImaging/Hackathon-000-Stochastic-Algorithms/blob/main/contrib/SIRF_subsets_algos_ParallelProj.ipynb).:
+The code above works only in CIL, because SIRF does not have a `.geometry` attribute. However, since we have a list that is randomly permuted without replacement we can use the following code for [`SIRF`](https://github.com/TomographicImaging/Hackathon-000-Stochastic-Algorithms/blob/main/contrib/SIRF_subsets_algos_ParallelProj.ipynb):
 
 ```python
 
@@ -220,8 +220,8 @@ step_size_ista = 0.0003
 rs1 = RandomSampling.uniform(len(f_subsets)) 
 F1 = SGFunction(f_subsets, selection=rs1)
 proxSGD1 = ISTA(initial = initial, f=F1, step_size = step_size_ista, g=G, 
-            update_objective_interval = n_subsets, 
-            max_iteration = n_epochs*n_subsets)
+            update_objective_interval = num_subsets, 
+            max_iteration = num_epochs*num_subsets)
 proxSGD1.run(verbose=1)
 ```
 ### Proximal Mini-Batch SGD

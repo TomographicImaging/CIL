@@ -143,6 +143,28 @@ tmp_data = split_acquisition_data(data, list_of_batches)
 
 ```
 
+### Note
+
+The code above works only in CIL, because SIRF does not have a `.geometry` attribute. However, since we have a list that is randomly permuted without replacement we can use the following code for [`SIRF`](https://github.com/TomographicImaging/Hackathon-000-Stochastic-Algorithms/blob/main/contrib/SIRF_subsets_algos_ParallelProj.ipynb).:
+
+```python
+
+def split_acquisition_data(data, selection):
+    
+    split_data = []
+    split_background = []
+    
+    for i in selection.partition_list:
+        data_subset = acquired_data.get_subset(i)
+        eta_sirf = background_term.get_subset(i)
+        split_data.append(data_subset)
+        split_background.append(eta_sirf)
+        
+    return split_data
+
+tmp_data, tmp_background = split_acquisition_data(data, list_of_batches)
+```
+
 For every subset, we need to form the $f_{i}$ functions which depend on operator $A_{i}$ and the acqusition data $d_{i}$.
 
 ```python
@@ -172,8 +194,8 @@ ISTA.update_objective =  update_objective_optimal
 In the following, we run the following algorithms for 20 epochs:
 
 - (Deterministic) ISTA = Proximal Gradient Descent
-- Proximal Stochastic Gradient Descent
-- Proximal Mini-Batch Stochastic Gradient Descent
+- Proximal Stochastic Gradient Descent: Uniform sampling with replacement
+- Proximal Mini-Batch Stochastic Gradient Descent: Uniform sampling with replacement with `batch_size = 5`
 
 ```python
 num_epochs = 20

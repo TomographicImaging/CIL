@@ -165,8 +165,8 @@ int bin_2D(const float* data_in, const size_t* shape_in, float* data_binned, con
 	}
 
 	//std::cout << "IPP status: " << st << "\tmsg:\t" << ippGetStatusString(st) << std::endl;
-	if(st !=0)
-		return 1
+	if (st != 0)
+		return 1;
 	//print_array_3D(data_in, shape_in[1], shape_in[2], shape_in[3]);
 	//print_array_3D(data_binned, shape_out[1], shape_out[2], shape_out[3]);
 

@@ -18,6 +18,23 @@ from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContain
 import numpy as np
 import weakref
 
+from cil.framework import cilacc
+import ctypes
+
+c_float_p = ctypes.POINTER(ctypes.c_float)
+c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
+
+cilacc.bin_2D.argtypes = [
+                        c_float_p,
+                        c_size_t_p,
+                        c_float_p,
+                        c_size_t_p,
+                        c_size_t_p,
+                        c_size_t_p,
+                        ctypes.c_bool]
+
+cilacc.bin_2D.restype = ctypes.c_int32
+
 class Binner(DataProcessor):
 
     """This creates a Binner processor.
@@ -75,9 +92,9 @@ class Binner(DataProcessor):
 
 
     def __init__(self,
-                 roi = None):
+                 roi = None,backend='python'):
 
-        kwargs = {'roi_input': roi, 'roi_ordered':None, 'data_array': False, 'geometry': None, 'processed_dims':None}
+        kwargs = {'roi_input': roi, 'roi_ordered':None, 'data_array': False, 'geometry': None, 'processed_dims':None, 'backend':backend}
 
         super(Binner, self).__init__(**kwargs)
     
@@ -268,13 +285,40 @@ class Binner(DataProcessor):
 
             count +=1
 
+
     def _bin_array_ipp(self, data, binned_array):
+        """
+        This bins the last 2 dimensions using IPP.
+        """
+        size_in = np.ones((4,),np.uintp)
+        size_out = np.ones((4,),np.uintp)
+        binning = np.ones((2,),np.uintp)
+        ind_start = np.zeros((2,),np.uintp)
 
+        offset = 4-len(data.shape)
+        size_in[offset::] =data.shape
 
-        #bin_array(binned_array,dimC,dimZ,dimY,dimX ,startC,startZ,startY,startX,stepC,stepZ,stepY,stepX, data, dim_in_C,dim_in_Z,dim_in_Y,dim_in_X)
+        offset = 4-len(binned_array.shape)
+        size_out[offset::] =binned_array.shape
 
+        data_p = data.array.ctypes.data_as(c_float_p)
+        data_out_p = binned_array.ctypes.data_as(c_float_p)
 
-        pass
+        binning[0] = self.roi_ordered[-2].step
+        binning[1] = self.roi_ordered[-1].step
+
+        ind_start[0] = self.roi_ordered[-2].start
+        ind_start[1] = self.roi_ordered[-1].start
+
+        size_in_p = size_in.ctypes.data_as(c_size_t_p)
+        size_out_p = size_out.ctypes.data_as(c_size_t_p)
+        binning_p = binning.ctypes.data_as(c_size_t_p)
+        ind_start_p = ind_start.ctypes.data_as(c_size_t_p)
+
+        res = cilacc.bin_2D(data_p, size_in_p, data_out_p, size_out_p, ind_start_p, binning_p, False)
+
+        if res == 1:
+            raise Exception("IPP call failed")
 
 
     def _construct_roi_object(self, ndim, dimension_labels, shape):
@@ -363,7 +407,10 @@ class Binner(DataProcessor):
             
                 binned_array = out.as_array()
 
-        self._bin_array(data, binned_array)
+        if self.backend == 'python':
+            self._bin_array(data, binned_array)
+        else:
+            self._bin_array_ipp(data, binned_array)
 
         if out is None:
             return data_out

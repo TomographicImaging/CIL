@@ -19,6 +19,7 @@ import time, functools
 from numbers import Integral, Number
 import logging
 import numpy as np
+from cil.framework import DataContainer
 
 class Algorithm(object):
     '''Base class for iterative algorithms
@@ -71,7 +72,7 @@ class Algorithm(object):
     def update(self):
         '''A single iteration of the algorithm'''
         raise NotImplementedError()
-    
+            
     def should_stop(self):
         '''default stopping cryterion: number of iterations
         
@@ -234,6 +235,8 @@ class Algorithm(object):
             raise ValueError('Update objective interval must be an integer >= 0')
     
     def run(self, iterations=None, verbose=1, callback=None, **kwargs):
+
+
         '''run n iterations and update the user with the callback if specified
         
         :param iterations: number of iterations to run. If not set the algorithm will
@@ -286,7 +289,8 @@ class Algorithm(object):
             if self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0: 
                 if callback is not None:
-                    callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+                    callback(self.x)
+                    # callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
                 if (print_interval != 0 and self.iteration % print_interval == 0) or \
                         ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):
@@ -306,6 +310,8 @@ class Algorithm(object):
             # Print to log file if desired
             if self.logger:
                 self.logger.info(out)
+
+                
         
 
     def verbose_output(self, verbose=False):
@@ -378,3 +384,5 @@ class Algorithm(object):
             self.logger.info(out)
 
         return out
+
+

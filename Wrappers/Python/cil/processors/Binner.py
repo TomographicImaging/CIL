@@ -404,7 +404,7 @@ class Binner(DataProcessor):
                 binned_array,
                 self.shape_out,
                 start_offset,
-                binning[2::]
+                binning
                 )
 
         else:

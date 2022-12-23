@@ -2,6 +2,7 @@ import unittest
 from utils import initialise_tests
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.functions import LeastSquares, ApproximateGradientSumFunction
+from cil.optimisation.utilities import RandomSampling
 from cil.framework import VectorData
 import numpy as np                  
                   
@@ -36,13 +37,14 @@ class TestApproximateGradientSumFunction(unittest.TestCase):
             self.fi_cil.append(LeastSquares(Ai_cil, bi_cil, c=1.0))
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=1.0)
-        generator = FunctionNumberGenerator(self.n_subsets)
+        generator = RandomSampling.uniform(self.n_subsets)
         self.f_subset_sum_function = ApproximateGradientSumFunction(self.fi_cil, generator) # default with replacement
         
-        generator = FunctionNumberGenerator(self.n_subsets, sampling_method="random_permutation")
+    
+        generator = RandomSampling(self.n_subsets, replace=True, shuffle=True)
         self.f_subset_sum_function_random_suffle = ApproximateGradientSumFunction(self.fi_cil, generator) 
 
-        generator = FunctionNumberGenerator(self.n_subsets, sampling_method="fixed_permutation")
+        generator = RandomSampling(self.n_subsets, replace=True, shuffle=False)
         self.f_subset_sum_function_single_suffle = ApproximateGradientSumFunction(self.fi_cil, generator)         
  
     def test_call_method(self):
@@ -71,7 +73,7 @@ class TestApproximateGradientSumFunction(unittest.TestCase):
         choices = []
         for i in range(epochs):
             for j in range(self.n_subsets):
-                self.f_subset_sum_function.next_function_num()
+                self.f_subset_sum_function.next_function()
                 choices.append(self.f_subset_sum_function.function_num)
         self.assertTrue( choices == self.f_subset_sum_function.functions_used)          
 
@@ -82,7 +84,7 @@ class TestApproximateGradientSumFunction(unittest.TestCase):
         choices = []
         for i in range(epochs):
             for j in range(self.n_subsets):
-                self.f_subset_sum_function_random_suffle.next_function_num()
+                self.f_subset_sum_function_random_suffle.next_function()
                 choices.append(self.f_subset_sum_function_random_suffle.function_num)
         self.assertTrue( choices == self.f_subset_sum_function_random_suffle.functions_used)  
 
@@ -93,6 +95,6 @@ class TestApproximateGradientSumFunction(unittest.TestCase):
         choices = []
         for i in range(epochs):
             for j in range(self.n_subsets):
-                self.f_subset_sum_function_single_suffle.next_function_num()
+                self.f_subset_sum_function_single_suffle.next_function()
                 choices.append(self.f_subset_sum_function_single_suffle.function_num)
         self.assertTrue( choices == self.f_subset_sum_function_single_suffle.functions_used)         

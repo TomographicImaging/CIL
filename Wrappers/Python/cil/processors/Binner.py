@@ -94,7 +94,17 @@ class Binner(DataProcessor):
     def __init__(self,
                  roi = None,backend='python'):
 
-        kwargs = {'roi_input': roi, 'roi_ordered':None, 'data_array': False, 'geometry': None, 'processed_dims':None, 'backend':backend}
+        kwargs = {
+            'roi_input': roi, 
+            'backend':backend,
+            'roi_ordered':None, 
+            'data_array': False, 
+            'geometry': None, 
+            'processed_dims':None, 
+            'shape_in':None, 
+            'shape_out':None, 
+            'labels_in':None, 
+            }
 
         super(Binner, self).__init__(**kwargs)
     
@@ -148,9 +158,84 @@ class Binner(DataProcessor):
         for key in self.roi_input.keys():
             if key not in data.dimension_labels:
                 raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
-        
+
+        #test on this?
+        self._parse_roi(data.ndim, data.shape, data.dimension_labels)
         
         return True 
+
+
+    def _parse_roi(self, ndim, shape, dimension_labels):
+        '''
+        This processes the roi input style
+        '''
+        offset = 4-ndim
+        labels_in = [None]*4
+        labels_in[offset::] = dimension_labels
+        shape_in = np.ones((4,),np.uintp)
+        shape_in[offset::] = shape
+
+        # defaults
+        shape_out = shape_in.copy()
+        processed_dim = np.zeros((4,),np.bool_)
+        binning = [1,1,1,1]
+        index_start =[0,0,0,0]
+        index_end = list(shape_in.copy())
+
+        for i in range(ndim):
+
+            roi = self.roi_input.get(dimension_labels[i],None)
+
+            if roi == None or roi == -1:
+                continue
+
+            start = index_start[offset + i]
+            stop = shape_out[offset + i]
+            step = binning[offset + i]
+
+            roi = list(roi)
+            length = len(roi)
+
+            if length == 1:
+                if roi[0] is not None:
+                    stop = roi[0]
+            elif length > 1:
+                if roi[0] is not None:
+                    start = roi[0]
+                if roi[1] is not None:
+                    stop = roi[1]
+            if length > 2:
+                if roi[2] is not None:
+                    step = roi[2]
+
+            # deal with negative indexing
+            if start < 0:
+                start += shape_in[offset + i]
+
+            if stop < 0:
+                stop += shape_in[offset + i]
+
+            #set values
+            binning[offset + i]  = int(step)
+            index_start[offset + i]  = int(start)
+            shape_out[offset + i]  = (stop - start)/ step
+
+            #end pixel based on binning
+            index_end[offset + i]  = int(index_start[offset + i] + shape_out[offset + i] * binning[offset + i])
+
+            if shape_out[offset + i] != shape_in[offset + i]:
+                processed_dim[offset + i] = 1
+
+        range_list = []
+        for i in range(4):
+            range_list.append(range(index_start[i], index_end[i],binning[i]))
+            
+        # set 
+        self.shape_in = shape_in
+        self.shape_out = shape_out
+        self.labels_in = labels_in
+        self.processed_dims = processed_dim
+        self.roi_ordered = range_list
 
 
     def _bin_acquisition_geometry(self):
@@ -162,8 +247,8 @@ class Binner(DataProcessor):
 
         #deal with vertical first as it may change the geometry type
         if 'vertical' in self.geometry.dimension_labels:
-            vert_ind = self.geometry.dimension_labels.index('vertical')
-            if self.processed_dims[vert_ind]:
+            vert_ind = self.labels_in.index('vertical')
+            if processed_dims[vert_ind]:
                 roi = self.roi_ordered[vert_ind]
                 n_elements = len(roi)
 
@@ -185,7 +270,7 @@ class Binner(DataProcessor):
                 processed_dims[vert_ind] = False #set to false locally
 
 
-        for i, axis  in enumerate(self.geometry.dimension_labels):
+        for i, axis  in enumerate(self.labels_in):
 
             if not processed_dims[i]:
                 continue
@@ -214,7 +299,8 @@ class Binner(DataProcessor):
     def _bin_image_geometry(self):
 
         geometry_new = self.geometry.copy()
-        for i, axis  in enumerate(self.geometry.dimension_labels):
+
+        for i, axis in enumerate(self.labels_in):
 
             if not self.processed_dims[i]:
                 continue
@@ -241,16 +327,7 @@ class Binner(DataProcessor):
         return geometry_new
 
 
-    def _binned_data_shape(self, shape_in):
-
-        shape_binned = []
-        for i in range(len(shape_in)):
-            shape_binned.append(len(self.roi_ordered[i]))
-        return shape_binned
-
-
     def _bin_array(self, data, binned_array):
-
         shape_object = []
         slice_object = []
         denom = self.roi_ordered[0].step
@@ -264,12 +341,14 @@ class Binner(DataProcessor):
         
         axes_sum = tuple(range(1,len(shape_object),2))
 
+        #reshape to include dimensions of 1.
+        array_in = data.array.reshape(self.shape_in)
         # needs a single 'outer dimension' (default channel) in memory at a time
         count = 0
         for l in self.roi_ordered[0]: 
 
             slice_proj = tuple([slice(l,l+1)]+slice_object)
-            slice_resized = data.as_array()[slice_proj].copy()
+            slice_resized = array_in[slice_proj].copy()
 
             for k in range(1,self.roi_ordered[0].step):
                 slice_proj = tuple([slice(l+k,l+k+1)]+slice_object)
@@ -286,91 +365,77 @@ class Binner(DataProcessor):
             count +=1
 
 
-    def _bin_array_ipp(self, data, binned_array):
+    def _bin_2D_ipp(self, arr_in, shape_in, arr_out, shape_out, ind_start, binning):
         """
-        This bins the last 2 dimensions using IPP.
+        This bins the last 2 dimensions (of up to 4D data) using IPP.
+
+        might as well make ipp end 3 dimensions, this doens't make much sense
         """
-        size_in = np.ones((4,),np.uintp)
-        size_out = np.ones((4,),np.uintp)
-        binning = np.ones((2,),np.uintp)
-        ind_start = np.zeros((2,),np.uintp)
 
-        offset = 4-len(data.shape)
-        size_in[offset::] =data.shape
+        data_p = arr_in.ctypes.data_as(c_float_p)
+        data_out_p = arr_out.ctypes.data_as(c_float_p)
 
-        offset = 4-len(binned_array.shape)
-        size_out[offset::] =binned_array.shape
-
-        data_p = data.array.ctypes.data_as(c_float_p)
-        data_out_p = binned_array.ctypes.data_as(c_float_p)
-
-        binning[0] = self.roi_ordered[-2].step
-        binning[1] = self.roi_ordered[-1].step
-
-        ind_start[0] = self.roi_ordered[-2].start
-        ind_start[1] = self.roi_ordered[-1].start
-
-        size_in_p = size_in.ctypes.data_as(c_size_t_p)
-        size_out_p = size_out.ctypes.data_as(c_size_t_p)
+        shape_in_p = shape_in.ctypes.data_as(c_size_t_p)
+        shape_out_p = shape_out.ctypes.data_as(c_size_t_p)
         binning_p = binning.ctypes.data_as(c_size_t_p)
         ind_start_p = ind_start.ctypes.data_as(c_size_t_p)
 
-        res = cilacc.bin_2D(data_p, size_in_p, data_out_p, size_out_p, ind_start_p, binning_p, False)
+        res = cilacc.bin_2D(data_p, shape_in_p, data_out_p, shape_out_p, ind_start_p, binning_p, False)
 
         if res == 1:
             raise Exception("IPP call failed")
 
 
-    def _construct_roi_object(self, ndim, dimension_labels, shape):
-        '''
-        This converts the slice style input to a range object for each dimension
-        '''
-        sl_list = []
-        sliced_dims= [False]*ndim
+    def _bin_array_ipp(self, data, binned_array):
+        """
+        This calls reorders and calls IPP until all requested dimensions are binned
 
-        for i in range(ndim):
-            roi = self.roi_input.get(dimension_labels[i],[None,None,None])
+        would it would be better for this to handle the allocating?
+        """
 
-            if roi == -1:
-                roi = [None,None,None]
-            else:
-                roi = list(roi)
-                length = len(roi)
-                if length == 1:
-                    roi.insert(0,None)
-                if length == 2:
-                    roi.append(None)
+        if not self.processed_dims[0] and not self.processed_dims[1]:
+
+            start_offset = np.array([self.roi_ordered[2].start,self.roi_ordered[3].start], np.uintp)
+            binning = np.array([self.roi_ordered[2].step,self.roi_ordered[3].step], np.uintp)
+
+            self._bin_2D_ipp(
+                data.array,
+                self.shape_in,
+                binned_array,
+                self.shape_out,
+                start_offset,
+                binning[2::]
+                )
+
+        else:
+            print("Work in progress")
+
+
+        #if 2D
+        # call binner and return
+
+        #else 3D or 4D
+
+            # if binning on 2 dimensions
+                #reorder
+
+                # if shape 0  changes
+                    #call binner with pointer to right start point
                 
-            if roi[0] == None:
-                roi[0] = 0
-            elif roi[0] < 0:
-                roi[0] += shape[i]
+                # else
+                    #call binner normal
 
-            if roi[1] == None:
-                roi[1] = shape[i]
-            elif roi[1] < 0:
-                roi[1] += shape[i]
+            # if binning on 3 dim or 4 dim
+                #bin
+                # reorder
+                #bin
+                #reorder
 
-            if roi[2] == None:
-                roi[2] = 1
-
-            roi[1]  = ((roi[1] - roi[0])// roi[2])*roi[2]+roi[0]
-
-            if roi[0] != 0 or roi[1] != shape[i] or roi[2] != 1:
-                sliced_dims[i] = True
-
-            sl_list.append(range(*roi))
-        
-        self.roi_ordered=sl_list
-        self.processed_dims = sliced_dims
-
+            
 
     def process(self, out=None):
 
         data = self.get_input()
-        num_dims = data.ndim
-
-        self._construct_roi_object(num_dims, data.dimension_labels, data.shape)
 
         if isinstance(self.geometry, ImageGeometry):
             binned_geometry = self._bin_image_geometry()
@@ -383,29 +448,26 @@ class Binner(DataProcessor):
         if not self.data_array:
             return binned_geometry
 
-        # calculate binned data shape
-        if binned_geometry is not None:
-            binned_shape = binned_geometry.shape
-        else:
-            binned_shape = self._binned_data_shape(data.shape)
-
         # create output array
         if out is None:
             if binned_geometry is not None:
                 data_out = binned_geometry.allocate(None)
                 binned_array = data_out.as_array()
             else:
-                binned_array = np.empty(binned_shape,dtype=np.float32)
+                binned_array = np.empty(self.shape_out,dtype=np.float32)
                 data_out = DataContainer(binned_array,False, data.dimension_labels)
 
         else:
-            if out.shape != binned_shape:
-                raise ValueError("Shape of `out` not as expected. Got {0}, expected {1}".format(out.shape, binned_shape))
+            try:
+                out.array = out.array.reshape(self.shape_out)
+            except:
+                raise ValueError("Shape of `out` not as expected. Got {0}, expected {1}".format(out.shape, self.shape_out))
+
             if binned_geometry is not None:
                 if out.geometry != binned_geometry:
                     raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, binned_geometry))
             
-                binned_array = out.as_array()
+            binned_array = out.array
 
         if self.backend == 'python':
             self._bin_array(data, binned_array)

@@ -19,7 +19,7 @@ import time, functools
 from numbers import Integral, Number
 import logging
 import numpy as np
-from cil.framework import DataContainer
+
 
 class Algorithm(object):
     '''Base class for iterative algorithms
@@ -288,9 +288,8 @@ class Algorithm(object):
                 break
             if self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0: 
-                if callback is not None:
-                    callback(self.x)
-                    # callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+                if callback!=None:
+                    callback()
             if verbose:
                 if (print_interval != 0 and self.iteration % print_interval == 0) or \
                         ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):

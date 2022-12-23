@@ -1085,8 +1085,17 @@ class PrintAlgo(Algorithm):
 
 class TestPrint(unittest.TestCase):
     def test_print(self):
-        def callback (iteration, objective, solution):
-            print("I am being called ", iteration)
+
+        class test_callback(object):
+
+            def __init__(self, iteration, objective, solution):
+                self.iteration = iteration
+                self.objective = objective
+                self.solution = solution
+
+            def __call__(self):
+                print("I am being called ", self.iteration)
+            
         algo = PrintAlgo(update_objective_interval = 10, max_iteration = 1000)
 
         algo.run(20, verbose=2, print_interval = 2)
@@ -1104,7 +1113,8 @@ class TestPrint(unittest.TestCase):
         # -- stop
         
         algo.run(20, verbose=1, very_verbose=False)
-        algo.run(20, verbose=2, print_interval=7, callback=callback)
+        ts = test_callback(1,2,3)
+        algo.run(20, verbose=2, print_interval=7, callback=ts)
         
         logging.info(algo._iteration)
         logging.info(algo.objective)

@@ -28,18 +28,21 @@ class SequentialSampling:
             
         # create partition for batch_size>1
         if self.batch_size>1: 
-            self.list_indices = [self.list_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
+            self.partition_list = [self.list_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
             
         self.index = 0
                 
                                          
     def __next__(self):
-                
-        tmp = self.list_indices[self.index]
+        
+        if self.batch_size>1:
+            tmp = self.partition_list[self.index]
+        else:
+            tmp = self.list_indices[self.index]
         self.indices_used.append(tmp)  
         self.index += 1
         
-        if self.index == len(self.list_indices):
+        if self.index == self.num_batches:
             self.index=0 
                     
         return tmp  

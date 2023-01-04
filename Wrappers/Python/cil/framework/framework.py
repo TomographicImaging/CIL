@@ -3356,6 +3356,41 @@ class AcquisitionData(DataContainer):
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
 
+
+    def split_to_chunks(self, method):
+
+        """ Returns a list of AcquisitionData. AcquisitionData is partitioned into smaller chunks
+        in the :code:`angle` axis, determined from the :code:`method`. 
+
+        Example
+        -------
+        method = RandomSampling(len(data.geometry.angles), batch_size=20, replace=False, seed=20)
+        list_ad = data.split_to_chunks(method)
+
+        """        
+
+        split_data = []
+
+        if not hasattr(method, 'partition_list'):
+            raise ValueError(" Use batch_size>1 for the selection process. ")
+
+        for i in method.partition_list:
+            
+            geom = self.geometry.copy()
+            geom.config.angles.angle_data = geom.angles[i]                
+            tmp_data = geom.allocate(0)
+            
+            # get angle axis
+            axis = self.dimension_labels.index('angle')
+            
+            # fill to datacontainer
+            tmp_data.fill(self.as_array().take(indices=i, axis=axis))
+            
+            # append to list
+            split_data.append(tmp_data) 
+
+        return split_data 
+
 class Processor(object):
 
     '''Defines a generic DataContainer processor

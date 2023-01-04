@@ -3377,14 +3377,14 @@ class AcquisitionData(DataContainer):
         for i in method.partition_list:
             
             geom = self.geometry.copy()
-            geom.config.angles.angle_data = geom.angles[i]                
+            geom.config.angles.angle_data = geom.angles[i]           
             tmp_data = geom.allocate(0)
             
             # get angle axis
             axis = self.dimension_labels.index('angle')
             
             # fill to datacontainer
-            tmp_data.fill(self.as_array().take(indices=i, axis=axis))
+            tmp_data.fill(self.as_array().take(indices=i, axis=axis).squeeze())
             
             # append to list
             split_data.append(tmp_data) 

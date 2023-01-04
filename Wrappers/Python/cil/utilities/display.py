@@ -126,7 +126,31 @@ class show1D(show_base):
     ----------
     figure : matplotlib.figure.Figure
 
+    Examples
+    --------
+
+    This example creates two 2D datasets (images), and uses the provided slicing
+    information to generate two plots on the same axis, corresponding to the two
+    datasets.
+
+    >>> from cil.utilities.display import show1D
+    >>> from cil.utilities.dataexample import PEPPERS
+    >>> data = PEPPERS.get()
+    >>> data_channel0 = data.get_slice(channel=0)
+    >>> data_channel1 = data.get_slice(channel=1)
+    >>> show1D([data_channel0, data_channel1], line_coords=[('horizontal_x', 256)],
+    ...        label=['Channel 0', 'Channel 1'])
+
+    The following example uses two sets of slicing information applied to a single
+    dataset, resulting in two separate plots.
+
+    >>> from cil.utilities.display import show1D
+    >>> from cil.utilities.dataexample import PEPPERS
+    >>> data = PEPPERS.get()
+    >>> slices = [[('channel', 0), ('horizontal_x', 256)], [('channel', 1), ('horizontal_y', 256)]]
+    >>> show1D(data, line_coords=slices, title=['Channel 0', 'Channel 1'])
     """
+
     def __init__(self, data, line_coords=None, label=None, title=None,
                  color=None, axis_labels=('Pixel', 'Pixel value'), num_cols=3,
                  size=(8,6), force=True):

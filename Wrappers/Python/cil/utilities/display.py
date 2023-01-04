@@ -96,7 +96,7 @@ class show_base(object):
 
 class show1D(show_base):
     """
-    This creates 1D plots of pixel values by slicing multi-dimensional
+    This creates and displays 1D plots of pixel values by slicing multi-dimensional
     data.
 
     Parameters
@@ -111,11 +111,14 @@ class show1D(show_base):
         A title for the plot
     color : str, list of str, default=None
         Color(s) for each line plot
-    size : tuple, default=(8,6)
-        The size of the figure
     axis_labels : tuple of str, list of str, default=('Pixel','Pixel
     value')
         Axis labels in the form (x_axis_label,y_axis_label)
+    num_cols : int, default=3
+        The number of columns in the grid of subplots produced in the case of
+        multiple plots
+    size : tuple, default=(8,6)
+        The size of the figure
     force : bool, default=True
         Passed to `get_slice`
 
@@ -125,13 +128,12 @@ class show1D(show_base):
 
     """
     def __init__(self, data, line_coords=None, label=None, title=None,
-                 color=None, axis_labels=('Pixel', 'Pixel value'),
+                 color=None, axis_labels=('Pixel', 'Pixel value'), num_cols=3,
                  size=(8,6), force=True):
 
-        self.figure = self._line_plot(data, line_coords=line_coords, label=label,
-                                      title=title, color=color,
-                                      axis_labels=axis_labels,
-                                      size=size, force=force)
+        self.figure = self._show1d(data, line_coords, labels=label, titles=title,
+                                   colors=color, axis_labels=axis_labels,
+                                   num_cols=num_cols, plot_size=size, force=force)
 
     def _extract_vector(self, data, coords, force=True):
         """
@@ -202,17 +204,17 @@ class show1D(show_base):
 
         return vector
 
-    def _line_plot(self, data, line_coords=None, label=None,
-                   title=None, color=None, size=(8,6),
+    def _line_plot(self, ax, data, line_coords=None, label=None,
+                   title=None, color=None,
                    axis_labels=('Pixel', 'Pixel value'), force=True):
         """
-        Creates and displays a 1D plot of pixel flux from multi-dimensional
-        data and slicing information.
+        Creates 1D plots pixel flux from multi-dimensional data and slicing information.
 
         Parameters
         ----------
-        data : DataContainer, list of DataContainer or tuple of
-        DataContainer
+        ax : matplotlib.axes.Axes
+            The axis to draw on
+        data : DataContainer, list of DataContainer or tuple of DataContainer
             The data to be sliced and plotted
         line_coords : list of tuples, optional
             (dimension, coordinate) pairs for slicing `data` (default is
@@ -223,18 +225,11 @@ class show1D(show_base):
             A title for the plot
         color : str, list of str, default=None
             Color(s) for each line plot
-        size : tuple, default=(8,6)
-            The size of the figure
         axis_labels : tuple of str, list of str, default=('Pixel','Pixel
         value')
             Axis labels in the form (x_axis_label,y_axis_label)
         force : bool, default=True
             Passed to `get_slice`
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-            The figure created to plot the 1D data
         """
 
         multi = False
@@ -267,7 +262,6 @@ class show1D(show_base):
                 raise TypeError(f'Expected list of tuples for slicing, ' \
                                 f'received {type(line_coords)}')
 
-        fig, ax = plt.subplots(1, 1, figsize=size)
         if multi:
             for i, el in enumerate(data):
                 ax.plot(self._extract_vector(el, dims, force),
@@ -280,15 +274,83 @@ class show1D(show_base):
         ax.set_xlabel(axis_labels[0]) # TODO determine axis labels from dimensions
         ax.set_ylabel(axis_labels[1])
 
-        fig2 = plt.gcf()
-
         valid_labels = 0
         if isinstance(label, list):
             valid_labels = len([l for l in label if l is not None])
 
-        if valid_labels: plt.legend()
-        plt.show()
+        if valid_labels: ax.legend()
 
+
+    def _show1d(self, data, line_coords=None, labels=None, titles=None, colors=None,
+                axis_labels=('Pixel', 'Pixel value'), num_cols=3, plot_size=(8,6),
+                force=True):
+        """
+        Displays 1D plots of pixel flux from multi-dimensional
+        data and slicing information.
+
+        Parameters
+        ----------
+        data : DataContainer, list of DataContainer or tuple of DataContainer
+            The data to be sliced and plotted
+        line_coords : list of tuples, optional
+            (dimension, coordinate) pairs for slicing `data` (default is
+            None, which is only valid when 1D data is passed)
+        labels : str, list of str, default=None
+            Label(s) to use in the plot's legend
+        titles : str, default=None
+            A title for the plot
+        colors : str, list of str, default=None
+            Color(s) for each line plot
+        axis_labels : tuple of str, list of str, default=('Pixel','Pixel
+        value')
+            Axis labels in the form (x_axis_label,y_axis_label)
+        num_cols : int, default=3
+            The number of columns in the grid of subplots produced in the case of
+            multiple plots
+        plot_size : tuple, default=(8,6)
+            The size of the figure
+        force : bool, default=True
+            Passed to `get_slice`
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The figure created to plot the 1D data
+        """
+
+        multi = False
+        if line_coords is None or isinstance(line_coords[0], tuple):
+            # num_plots = 1
+            fig = plt.figure(figsize=plot_size)
+        elif isinstance(line_coords[0], list):
+            multi = True
+            num_plots = len(line_coords)
+            if num_plots < num_cols:
+                num_cols = num_plots
+            num_rows = round(num_plots / num_cols + 0.5)
+            fig = plt.figure(
+                figsize=((num_cols)*plot_size[0], (num_rows)*plot_size[1]))
+
+            if labels is None:
+                labels = [None]*num_plots
+            if titles is None:
+                titles = [None]*num_plots
+            if colors is None:
+                colors = [None]*num_plots
+
+        if multi:
+            for i, sl in enumerate(line_coords):
+                ax = fig.add_subplot(num_rows, num_cols, i+1)
+                self._line_plot(ax, data, sl, label=labels[i], title=titles[i],
+                                color=colors[i], axis_labels=axis_labels,
+                                force=force)
+        else:
+            ax = fig.add_subplot(1, 1, 1)
+            self._line_plot(ax, data, line_coords, label=labels, title=titles,
+                            color=colors, axis_labels=axis_labels, force=force)
+
+        plt.tight_layout()
+        fig2 = plt.gcf()
         return fig2
 
 

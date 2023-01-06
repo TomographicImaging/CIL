@@ -372,9 +372,6 @@ class Binner(DataProcessor):
         """
         Bins the array using cilacc.bin_ipp
         """
-        #do this at the c++ level?
-        binned_array.fill(0)
-
 
         start_offset = np.array([self.roi_ordered[0].start,self.roi_ordered[1].start,self.roi_ordered[2].start,self.roi_ordered[3].start], np.uintp)
         binning = np.array([self.roi_ordered[0].step,self.roi_ordered[1].step,self.roi_ordered[2].step,self.roi_ordered[3].step], np.uintp)

@@ -32,12 +32,11 @@ class TestRandomSampling(unittest.TestCase):
 
     def test_random_sampling_uniform_with_replacement(self):
 
-        list_generated_seed_19 = [0, 7, 9, 7, 3, 5, 8, 3, 4, 9]
+        list_generated_seed_19 = [5, 4, 3, 9, 3, 2, 8, 0, 4, 3]
 
         # check static method
         sm_rs_uniform = RandomSampling.uniform(self.len_list, seed=self.seed)
         
-        tmp1 = []
         for _ in range(10):
             next(self.rs_uniform)
             next(sm_rs_uniform)
@@ -53,7 +52,6 @@ class TestRandomSampling(unittest.TestCase):
         # check static method
         sm_rs_uniform_without_replacement = RandomSampling.uniform_no_replacement(self.len_list, seed=self.seed)        
         
-        tmp1 = []
         for _ in range(10):
             next(self.rs_uniform_without_replacement)
             next(sm_rs_uniform_without_replacement)
@@ -65,7 +63,6 @@ class TestRandomSampling(unittest.TestCase):
 
         batches_generated_seed_19 = [[5, 4], [3, 9], [3, 2], [8, 0], [4, 3], [5, 4], [3, 9], [3, 2], [8, 0], [4, 3]]
         
-        tmp1 = []
         for _ in range(10):
             next(self.rs_uniform_batch)
 
@@ -76,7 +73,7 @@ class TestRandomSampling(unittest.TestCase):
 
         unequal_batches_generated_seed_19 = [[5, 4, 3], [9, 3, 2], [8, 0, 4], [3]]
         
-        print(int(self.len_list/3)+1)
+        
         for _ in range(int(self.len_list/self.batch_size)+1):
             next(self.rs_uniform_unequal_batch)
 
@@ -87,7 +84,7 @@ class TestRandomSampling(unittest.TestCase):
 
         batches_generated_seed_19 = [[7, 8], [9, 2], [1, 4], [6, 5], [0, 3]]
         
-        print(int(self.len_list/self.batch_size))
+        
         for _ in range(int(self.len_list/self.batch_size)):
             next(self.rs_uniform_without_replacement_batch)
 

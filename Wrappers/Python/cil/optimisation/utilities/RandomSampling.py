@@ -123,27 +123,27 @@ class RandomIndex(RandomSampling):
     
     def __next__(self):
 
-        # index_num = self.list_of_indices[self.index]
-        # self.index+=1   
+        index_num = self.list_of_indices[self.index]
+        self.index+=1   
 
-        # if self.index == self.num_indices:
-        #     self.index = 0                
-        #     if self.shuffle is True:                    
-        #         self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)         
+        if self.index == self.num_indices:
+            self.index = 0                
+            if self.shuffle is True:                    
+                self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace)         
 
         
-        if self.replace is False:
+        # if self.replace is False:
 
-            index_num = self.list_of_indices[self.index]
-            self.index+=1                
+        #     index_num = self.list_of_indices[self.index]
+        #     self.index+=1                
 
-            if self.index == self.num_indices:
-                self.index = 0                
-                if self.shuffle is True:                    
-                    self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)                                                                                         
-        else:
+        #     if self.index == self.num_indices:
+        #         self.index = 0                
+        #         if self.shuffle is True:                    
+        #             self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)                                                                                         
+        # else:
 
-            index_num = self.rng.choice(self.num_indices, size=1, p=self.prob, replace=True).item()
+        #     index_num = self.rng.choice(self.num_indices, size=1, p=self.prob, replace=True).item()
 
         self.indices_used.append(index_num)
 

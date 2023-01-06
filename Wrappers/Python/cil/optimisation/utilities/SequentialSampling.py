@@ -21,14 +21,14 @@ class SequentialSampling:
             self.num_batches = (self.num_indices//self.batch_size)+1        
         
         # create new list
-        self.list_indices = []
+        self.list_of_indices = []
         tmp_list_indices = list(np.arange(num_indices))
         for i in range(0,self.step_size):
-            self.list_indices += tmp_list_indices[i:self.num_indices:self.step_size] 
+            self.list_of_indices += tmp_list_indices[i:self.num_indices:self.step_size] 
             
         # create partition for batch_size>1
         if self.batch_size>1: 
-            self.partition_list = [self.list_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
+            self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
             
         self.index = 0
                 
@@ -38,7 +38,7 @@ class SequentialSampling:
         if self.batch_size>1:
             tmp = self.partition_list[self.index]
         else:
-            tmp = self.list_indices[self.index]
+            tmp = self.list_of_indices[self.index]
         self.indices_used.append(tmp)  
         self.index += 1
         

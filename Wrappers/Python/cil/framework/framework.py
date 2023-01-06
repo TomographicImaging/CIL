@@ -3370,11 +3370,13 @@ class AcquisitionData(DataContainer):
         """        
 
         split_data = []
+        
+        if method.batch_size>1:
+            tmp_list = method.partition_list
+        else:
+            tmp_list = method.list_of_indices
 
-        if not hasattr(method, 'partition_list'):
-            raise ValueError(" Use batch_size>1 for the selection process. ")
-
-        for i in method.partition_list:
+        for i in tmp_list:
             
             geom = self.geometry.copy()
             geom.config.angles.angle_data = geom.angles[i]           

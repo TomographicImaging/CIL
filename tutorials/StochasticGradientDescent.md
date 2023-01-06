@@ -81,7 +81,7 @@ fbp_recon = FBP(ig2D, ag2D)(data)
 show2D(fbp_recon, cmap="inferno", origin="upper", fix_range=(0,0.06))
 ```
 
-![](fdk_recon.png)
+![](imgs/fdk_recon.png)
 
 We compute an _optimal_ solution for the above problem using the FISTA algorithm with Total variation regularisation and large number of iterations.
 
@@ -102,7 +102,7 @@ optimal = fista.solution
 show2D(fista.solution, cmap="inferno", origin="upper")
 ```
 
-![](fista_recon.png)
+![](imgs/fista_recon.png)
 
 ### Stochastic setup
 
@@ -239,13 +239,13 @@ proxSGD2.run(verbose=1)
 
 ```
 
-![](diff_optimal_solution.png)
+![](imgs/diff_optimal_solution.png)
 
-![](diff_optimal_objective.png)
+![](imgs/diff_optimal_objective.png)
 
-![](recons.png)
+![](imgs/recons.png)
 
-![](diff_recons_optimal.png)
+![](imgs/diff_recons_optimal.png)
 
 
 

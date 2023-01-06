@@ -370,6 +370,45 @@ The block framework consists of:
 
 
 
+The block framework allows writing more advanced `optimisation problems`_. Consider the typical 
+`Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
+
+.. math:: 
+
+  \underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2
+
+where,
+
+* :math:`A` is the projection operator
+* :math:`b` is the acquired data
+* :math:`u` is the unknown image to be solved for
+* :math:`\alpha` is the regularisation parameter
+* :math:`L` is a regularisation operator
+
+The first term measures the fidelity of the solution to the data. The second term meausures the 
+fidelity to the prior knowledge we have imposed on the system, operator :math:`L`.  
+
+This can be re-written equivalently in the block matrix form:
+
+.. math::
+  \underset{u}{\mathrm{argmin}}\begin{Vmatrix}\binom{A}{\alpha L} u - \binom{b}{0}\end{Vmatrix}^2_2
+
+With the definitions:
+
+* :math:`\tilde{A} = \binom{A}{\alpha L}`
+* :math:`\tilde{b} = \binom{b}{0}`
+
+this can now be recognised as a least squares problem which can be solved by any algorithm in the :code:`cil.optimisation`
+which can solve least squares problem, e.g. CGLS.
+
+.. math:: 
+
+  \underset{u}{\mathrm{argmin}}\begin{Vmatrix}\tilde{A} u - \tilde{b}\end{Vmatrix}^2_2
+
+To be able to express our optimisation problems in the matrix form above, we developed the so-called, 
+Block Framework comprising 4 main actors: :code:`BlockGeometry`, :code:`BlockDataContainer`, 
+:code:`BlockFunction` and :code:`BlockOperator`.
+
 
 
 BlockDataContainer

@@ -60,8 +60,25 @@ Pre-processors
 These processors can be used with `AcquisitionData` objects
 
 
-Centre Of Rotation Correction
------------------------------
+Centre Of Rotation Corrector
+----------------------------
+
+In the ideal alignment of a CT instrument, the projection of the axis of rotation onto the 
+detector coincides with the vertical midline of the detector. In prtactise this is hard to acheive 
+due to misalignments and/or kinematic errors in positioning of CT instrument components. 
+A slight offset of the center of rotation with respect to the theoretical position will contribute 
+to the loss of resolution; in more severe cases, it will cause severe artifacts in the reconstructed 
+volume (double-borders).
+
+:code:`CentreOfRotationCorrector` can be used to estimate the offset of center of rotation from the data. 
+
+:code:`CentreOfRotationCorrector` supports both parallel and cone-beam geometry with 2 different algorithms:
+
+* Cross-correlation, is suitable for single slice parallel-beam geometry. It requires two projections 180 degree apart.
+
+* Image sharpness method, which maximising the sharpness of a reconstructed slice. It can be used on single 
+slice parallel-beam, and centre-slice of cone-beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.
+
 
 .. autoclass:: cil.processors.CentreOfRotationCorrector
    :exclude-members: check_input, get_input

@@ -24,16 +24,17 @@ import ctypes
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
 
-cilacc.bin_2D.argtypes = [
+cilacc.bin_ipp.argtypes = [
                         c_float_p,
                         c_size_t_p,
                         c_float_p,
                         c_size_t_p,
                         c_size_t_p,
-                        c_size_t_p,
-                        ctypes.c_bool]
+                        c_size_t_p]
 
-cilacc.bin_2D.restype = ctypes.c_int32
+
+cilacc.bin_ipp.restype = ctypes.c_int32
+
 
 class Binner(DataProcessor):
 
@@ -365,73 +366,27 @@ class Binner(DataProcessor):
             count +=1
 
 
-    def _bin_2D_ipp(self, arr_in, shape_in, arr_out, shape_out, ind_start, binning):
-        """
-        This bins the last 2 dimensions (of up to 4D data) using IPP.
-
-        might as well make ipp end 3 dimensions, this doens't make much sense
-        """
-
-        data_p = arr_in.ctypes.data_as(c_float_p)
-        data_out_p = arr_out.ctypes.data_as(c_float_p)
-
-        shape_in_p = shape_in.ctypes.data_as(c_size_t_p)
-        shape_out_p = shape_out.ctypes.data_as(c_size_t_p)
-        binning_p = binning.ctypes.data_as(c_size_t_p)
-        ind_start_p = ind_start.ctypes.data_as(c_size_t_p)
-
-        res = cilacc.bin_2D(data_p, shape_in_p, data_out_p, shape_out_p, ind_start_p, binning_p, False)
-
-        if res == 1:
-            raise Exception("IPP call failed")
-
-
     def _bin_array_ipp(self, data, binned_array):
         """
-        This calls reorders and calls IPP until all requested dimensions are binned
-
-        would it would be better for this to handle the allocating?
+        This calls the ipp binner
         """
+        start_offset = np.array([self.roi_ordered[0].start,self.roi_ordered[1].start,self.roi_ordered[2].start,self.roi_ordered[3].start], np.uintp)
+        binning = np.array([self.roi_ordered[0].step,self.roi_ordered[1].step,self.roi_ordered[2].step,self.roi_ordered[3].step], np.uintp)
 
-        if not self.processed_dims[0] and not self.processed_dims[1]:
+        data_p = data.array.ctypes.data_as(c_float_p)
+        data_out_p = binned_array.ctypes.data_as(c_float_p)
 
-            start_offset = np.array([self.roi_ordered[2].start,self.roi_ordered[3].start], np.uintp)
-            binning = np.array([self.roi_ordered[2].step,self.roi_ordered[3].step], np.uintp)
-
-            self._bin_2D_ipp(
-                data.array,
-                self.shape_in,
-                binned_array,
-                self.shape_out,
-                start_offset,
-                binning
-                )
-
-        else:
-            print("Work in progress")
+        shape_in_p = self.shape_in.ctypes.data_as(c_size_t_p)
+        shape_out_p = self.shape_out.ctypes.data_as(c_size_t_p)
+        binning_p = binning.ctypes.data_as(c_size_t_p)
+        ind_start_p = start_offset.ctypes.data_as(c_size_t_p)
 
 
-        #if 2D
-        # call binner and return
+        res = cilacc.bin_ipp(data_p, shape_in_p, data_out_p, shape_out_p, ind_start_p, binning_p)
 
-        #else 3D or 4D
+        if res != 0:
+            raise Exception("IPP call failed")
 
-            # if binning on 2 dimensions
-                #reorder
-
-                # if shape 0  changes
-                    #call binner with pointer to right start point
-                
-                # else
-                    #call binner normal
-
-            # if binning on 3 dim or 4 dim
-                #bin
-                # reorder
-                #bin
-                #reorder
-
-            
 
     def process(self, out=None):
 

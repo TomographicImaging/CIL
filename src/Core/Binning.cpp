@@ -18,8 +18,8 @@ void setup_binning_dimensions(const size_t* shape_in, const size_t* shape_out, c
 	*srcStep = (int)shape_in[3] * sizeof(float);
 	*dstStep = (int)shape_out[3] * sizeof(float);
 
-	srcSize->width = (int)(pixel_index_start[3] + shape_out[3] * binning_list[3] - pixel_index_start[3]);
-	srcSize->height = (int)(pixel_index_start[2] + shape_out[2] * binning_list[2] - pixel_index_start[2]);
+	srcSize->width = (int)(shape_out[3] * binning_list[3]);
+	srcSize->height = (int)(shape_out[2] * binning_list[2]);
 
 	dstSize->width = (int)shape_out[3];
 	dstSize->height = (int)shape_out[2];
@@ -31,7 +31,7 @@ void binning_ipp_init(IppiSize srcSize, IppiSize dstSize, int * bufSize, IppiRes
 
 	int specSize = 0, initSize = 0;
 
-	ippiResizeGetSize_32f(srcSize, dstSize, ippLinear, 0, &specSize, &initSize);
+	ippiResizeGetSize_32f(srcSize, dstSize, ippSuper, 0, &specSize, &initSize);
 
 	*pSpec = (IppiResizeSpec_32f*)ippsMalloc_8u(specSize);
 	ippiResizeSuperInit_32f(srcSize, dstSize, *pSpec);
@@ -107,6 +107,12 @@ void bin_4D(const float* data_in, const size_t* shape_in, float* data_binned, co
 
 	for (int l = 0; l < shape_out[0]; l++)
 	{
+#pragma omp parallel for
+		for (k = 0; k < shape_out[1]; k++)
+		{
+			ippiSet_32f_C1R(0, &data_binned[l * shape_out[3] * shape_out[2] * shape_out[1] + k * shape_out[2] * shape_out[1]], dstStep, dstSize);
+		}
+
 		for (int bl = 0; bl < binning_list[0]; bl++)
 		{
 			index_channel_in = (l * binning_list[0] + bl + pixel_index_start[0]) * shape_in[3] * shape_in[2] * shape_in[1];

@@ -1,19 +1,12 @@
-#include <iostream>
-#include <stdio.h>
-#include <ipp.h>
-#include <ipps.h>
-#include <omp.h>
+#ifndef _BINNER_H_
+#define _BINNER_H_
+
 #include "dll_export.h"
-#include "utilities.h"
 
-
-void bin_2D(const float* data_in, const size_t* shape_in, float* data_binned, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list);
-void bin_4D(const float* data_in, const size_t* shape_in, float* data_binned, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-	DLL_EXPORT int bin_ipp(const float* data_in, const size_t* shape_in, float* data_binned, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list);
-#ifdef __cplusplus
+extern "C"
+{
+    DLL_EXPORT void Binner_delete(void* binner);
+    DLL_EXPORT void* Binner_new(const size_t* shape_in, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list);
+    DLL_EXPORT int Binner_bin(void* binner, const float* data_in, float* data_binned);
 }
 #endif

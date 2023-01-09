@@ -14,26 +14,65 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
+
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
 import numpy as np
 import weakref
 
 from cil.framework import cilacc
 import ctypes
-
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
 
-cilacc.bin_ipp.argtypes = [
-                        c_float_p,
-                        c_size_t_p,
-                        c_float_p,
-                        c_size_t_p,
-                        c_size_t_p,
-                        c_size_t_p]
+# IppInit should be called once.
+
+# get slice geometry needs updating for off centre slices
+
+# have get_binned_geometry why not get_binned_data? allows binning without a geometry? Useful for calling from reader
+
+# Look at input paramaters.... maybe time to break backward compatibility 
 
 
-cilacc.bin_ipp.restype = ctypes.c_int32
+class Binner_IPP(object):
+    def __init__(self, shape_in, shape_out, start_index, binning):
+        """
+        Each input is a list with len 4
+        """
+
+        cilacc.Binner_new.argtypes = [c_size_t_p,c_size_t_p,c_size_t_p,c_size_t_p]
+        cilacc.Binner_new.restype = ctypes.c_void_p
+
+        cilacc.Binner_bin.argtypes =  [ ctypes.c_void_p, c_float_p,c_float_p]
+        cilacc.Binner_bin.restype = ctypes.c_int32
+
+        cilacc.Binner_delete.argtypes =  [ ctypes.c_void_p]
+        cilacc.Binner_delete.restype = ctypes.c_void_p
+
+        shape_in_arr = np.array(shape_in, np.uintp)
+        shape_out_arr = np.array(shape_out, np.uintp)
+        start_index_arr = np.array(start_index, np.uintp)
+        binning_arr = np.array(binning, np.uintp)
+
+        shape_in_p = shape_in_arr.ctypes.data_as(c_size_t_p)
+        shape_out_p = shape_out_arr.ctypes.data_as(c_size_t_p)
+        ind_start_p = start_index_arr.ctypes.data_as(c_size_t_p)
+        binning_p = binning_arr.ctypes.data_as(c_size_t_p)
+
+        self.obj = cilacc.Binner_new(shape_in_p, shape_out_p, ind_start_p, binning_p)
+
+
+    def bin(self, array_in, array_binned):
+        """
+        numpy array in and out
+        """
+        data_p = array_in.ctypes.data_as(c_float_p)
+        data_out_p = array_binned.ctypes.data_as(c_float_p)
+
+        return cilacc.Binner_bin(self.obj, data_p, data_out_p)
+
+    def __del__(self):
+        cilacc.Binner_delete(self.obj)
 
 
 class Binner(DataProcessor):
@@ -94,7 +133,6 @@ class Binner(DataProcessor):
 
     """
 
-
     def __init__(self,
                  roi = None,accelerated=True):
 
@@ -108,6 +146,8 @@ class Binner(DataProcessor):
             'shape_in':None, 
             'shape_out':None, 
             'labels_in':None, 
+            'binning':None, 
+            'index_start':None, 
             }
 
         super(Binner, self).__init__(**kwargs)
@@ -175,7 +215,7 @@ class Binner(DataProcessor):
         offset = 4-ndim
         labels_in = [None]*4
         labels_in[offset::] = dimension_labels
-        shape_in = np.ones((4,),np.uintp)
+        shape_in = [1]*4
         shape_in[offset::] = shape
 
         # defaults
@@ -239,7 +279,8 @@ class Binner(DataProcessor):
         self.labels_in = labels_in
         self.processed_dims = processed_dim
         self.roi_ordered = range_list
-
+        self.binning = binning 
+        self.index_start = index_start
 
     def _bin_acquisition_geometry(self):
         """
@@ -373,19 +414,12 @@ class Binner(DataProcessor):
         Bins the array using cilacc.bin_ipp
         """
 
-        start_offset = np.array([self.roi_ordered[0].start,self.roi_ordered[1].start,self.roi_ordered[2].start,self.roi_ordered[3].start], np.uintp)
-        binning = np.array([self.roi_ordered[0].step,self.roi_ordered[1].step,self.roi_ordered[2].step,self.roi_ordered[3].step], np.uintp)
+        start_offset = [self.roi_ordered[0].start,self.roi_ordered[1].start,self.roi_ordered[2].start,self.roi_ordered[3].start]
+        binning = [self.roi_ordered[0].step,self.roi_ordered[1].step,self.roi_ordered[2].step,self.roi_ordered[3].step]
 
-        data_p = data.array.ctypes.data_as(c_float_p)
-        data_out_p = binned_array.ctypes.data_as(c_float_p)
+        binner_ipp = Binner_IPP(self.shape_in, self.shape_out, self.index_start, self.binning)
 
-        shape_in_p = self.shape_in.ctypes.data_as(c_size_t_p)
-        shape_out_p = self.shape_out.ctypes.data_as(c_size_t_p)
-        binning_p = binning.ctypes.data_as(c_size_t_p)
-        ind_start_p = start_offset.ctypes.data_as(c_size_t_p)
-
-        res = cilacc.bin_ipp(data_p, shape_in_p, data_out_p, shape_out_p, ind_start_p, binning_p)
-
+        res = binner_ipp.bin(data, binned_array)
         if res != 0:
             raise Exception("IPP call failed")
 
@@ -427,7 +461,7 @@ class Binner(DataProcessor):
             binned_array = out.array
 
         if self.accelerated:
-            self._bin_array_acc(data, binned_array)
+            self._bin_array_acc(data.array, binned_array)
         else:
             self._bin_array(data, binned_array)
 

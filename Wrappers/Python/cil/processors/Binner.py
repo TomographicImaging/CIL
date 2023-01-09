@@ -261,7 +261,7 @@ class Binner(DataProcessor):
             #set values
             binning[offset + i]  = int(step)
             index_start[offset + i]  = int(start)
-            shape_out[offset + i]  = (stop - start)/ step
+            shape_out[offset + i]  = (stop - start)// step
 
             #end pixel based on binning
             index_end[offset + i]  = int(index_start[offset + i] + shape_out[offset + i] * binning[offset + i])
@@ -367,59 +367,38 @@ class Binner(DataProcessor):
         return geometry_new
 
 
-    def _bin_array(self, data, binned_array):
+    def _bin_array(self, array_in, array_binned):
         """
         Bins the array using numpy. This method is slower and less memory efficient than self._bin_array_acc
         """
         shape_object = []
         slice_object = []
-        denom = self.roi_ordered[0].step
 
-        for roi in self.roi_ordered[1::]:
-            shape_object.append(len(roi)) # reshape the data to add each 'bin' dimensions
-            shape_object.append(roi.step)
-            slice_object.append(slice(roi.start, roi.stop)) #crop data (i.e. no bin/step)
-            denom *=roi.step
-
+        for i in range(4):
+            # reshape the data to add each 'bin' dimensions
+            shape_object.append(self.shape_out[i]) 
+            shape_object.append(self.binning[i])
+            slice_object.append(slice(self.index_start[i], self.index_start[i] + self.shape_out[i] * self.binning[i])) #crop data (i.e. no bin/step)
         
-        axes_sum = tuple(range(1,len(shape_object),2))
+        shape_object = tuple(shape_object)
+        slice_object = tuple(slice_object)
 
-        #reshape to include dimensions of 1.
-        array_in = data.array.reshape(self.shape_in)
-        
-        # needs a single 'outer dimension' (default channel) in memory at a time
-        count = 0
-        for l in self.roi_ordered[0]: 
+        data_resized = array_in.reshape(self.shape_in)[slice_object].reshape(shape_object)
 
-            slice_proj = tuple([slice(l,l+1)]+slice_object)
-            slice_resized = array_in[slice_proj].copy()
-
-            for k in range(1,self.roi_ordered[0].step):
-                slice_proj = tuple([slice(l+k,l+k+1)]+slice_object)
-                slice_resized += data.as_array()[slice_proj]
-
-            slice_resized = np.squeeze(slice_resized.reshape(shape_object).sum(axis=axes_sum))
-            slice_resized /= denom
-
-            if len(self.roi_ordered[0]) > 1:
-                binned_array[count] = slice_resized
-            else:
-                binned_array[:] = slice_resized
-
-            count +=1
+        mean_order = (-1, 1, 2, 3)
+        for i in range(4):
+            data_resized = data_resized.mean(mean_order[i])
+            
+        np.copyto(array_binned, data_resized)
 
 
-    def _bin_array_acc(self, data, binned_array):
+    def _bin_array_acc(self, array_in, array_binned):
         """
         Bins the array using cilacc.bin_ipp
         """
-
-        start_offset = [self.roi_ordered[0].start,self.roi_ordered[1].start,self.roi_ordered[2].start,self.roi_ordered[3].start]
-        binning = [self.roi_ordered[0].step,self.roi_ordered[1].step,self.roi_ordered[2].step,self.roi_ordered[3].step]
-
         binner_ipp = Binner_IPP(self.shape_in, self.shape_out, self.index_start, self.binning)
 
-        res = binner_ipp.bin(data, binned_array)
+        res = binner_ipp.bin(array_in, array_binned)
         if res != 0:
             raise Exception("IPP call failed")
 
@@ -463,7 +442,7 @@ class Binner(DataProcessor):
         if self.accelerated:
             self._bin_array_acc(data.array, binned_array)
         else:
-            self._bin_array(data, binned_array)
+            self._bin_array(data.array, binned_array)
 
         if out is None:
             return data_out

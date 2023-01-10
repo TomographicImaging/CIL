@@ -15,64 +15,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
 import numpy as np
 import weakref
-
-from cil.framework import cilacc
-import ctypes
-c_float_p = ctypes.POINTER(ctypes.c_float)
-c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
+import logging
 
 # IppInit should be called once.
-
 # get slice geometry needs updating for off centre slices
-
-# have get_binned_geometry why not get_binned_data? allows binning without a geometry? Useful for calling from reader
-
 # Look at input paramaters.... maybe time to break backward compatibility 
 
-
-class Binner_IPP(object):
-    def __init__(self, shape_in, shape_out, start_index, binning):
-        """
-        Each input is a list with len 4
-        """
-
-        cilacc.Binner_new.argtypes = [c_size_t_p,c_size_t_p,c_size_t_p,c_size_t_p]
-        cilacc.Binner_new.restype = ctypes.c_void_p
-
-        cilacc.Binner_bin.argtypes =  [ ctypes.c_void_p, c_float_p,c_float_p]
-        cilacc.Binner_bin.restype = ctypes.c_int32
-
-        cilacc.Binner_delete.argtypes =  [ ctypes.c_void_p]
-        cilacc.Binner_delete.restype = ctypes.c_void_p
-
-        shape_in_arr = np.array(shape_in, np.uintp)
-        shape_out_arr = np.array(shape_out, np.uintp)
-        start_index_arr = np.array(start_index, np.uintp)
-        binning_arr = np.array(binning, np.uintp)
-
-        shape_in_p = shape_in_arr.ctypes.data_as(c_size_t_p)
-        shape_out_p = shape_out_arr.ctypes.data_as(c_size_t_p)
-        ind_start_p = start_index_arr.ctypes.data_as(c_size_t_p)
-        binning_p = binning_arr.ctypes.data_as(c_size_t_p)
-
-        self.obj = cilacc.Binner_new(shape_in_p, shape_out_p, ind_start_p, binning_p)
-
-
-    def bin(self, array_in, array_binned):
-        """
-        numpy array in and out
-        """
-        data_p = array_in.ctypes.data_as(c_float_p)
-        data_out_p = array_binned.ctypes.data_as(c_float_p)
-
-        return cilacc.Binner_bin(self.obj, data_p, data_out_p)
-
-    def __del__(self):
-        cilacc.Binner_delete(self.obj)
+try:
+    from cil.processors.cilacc_binner import Binner_IPP
+    has_ipp = True
+except:
+    has_ipp = False
 
 
 class Binner(DataProcessor):
@@ -136,18 +92,23 @@ class Binner(DataProcessor):
     def __init__(self,
                  roi = None,accelerated=True):
 
+
+        if accelerated and not has_ipp:
+            raise RuntimeError("Cannot run accelerated Binner without the IPP libraries.")
+
+
         kwargs = {
-            'roi_input': roi, 
-            'accelerated':accelerated,
-            'roi_ordered':None, 
-            'data_array': False, 
-            'geometry': None, 
-            'processed_dims':None, 
-            'shape_in':None, 
-            'shape_out':None, 
-            'labels_in':None, 
-            'binning':None, 
-            'index_start':None, 
+            '_roi_input': roi, 
+            '_accelerated':accelerated,
+            '_roi_ordered':None, 
+            '_data_array': False, 
+            '_geometry': None, 
+            '_processed_dims':None, 
+            '_shape_in':None, 
+            '_shape_out':None, 
+            '_labels_in':None, 
+            '_binning':None, 
+            '_index_start':None, 
             }
 
         super(Binner, self).__init__(**kwargs)
@@ -177,29 +138,29 @@ class Binner(DataProcessor):
     def check_input(self, data):
 
         if isinstance(data, (ImageData,AcquisitionData)):
-            self.data_array = True
-            self.geometry = data.geometry
+            self._data_array = True
+            self._geometry = data.geometry
 
         elif isinstance(data, DataContainer):
-            self.data_array = True
-            self.geometry = None
+            self._data_array = True
+            self._geometry = None
 
         elif isinstance(data, (ImageGeometry, AcquisitionGeometry)):
-            self.data_array = False
-            self.geometry = data
+            self._data_array = False
+            self._geometry = data
 
         else:
             raise TypeError('Processor supports following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
 
-        if self.data_array:
+        if self._data_array:
             if data.dtype != np.float32:
                 raise TypeError("Expected float32")
 
-        if (self.roi_input == None):
+        if (self._roi_input == None):
             raise ValueError('Please, specify roi')
 
-        for key in self.roi_input.keys():
+        for key in self._roi_input.keys():
             if key not in data.dimension_labels:
                 raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
 
@@ -227,7 +188,7 @@ class Binner(DataProcessor):
 
         for i in range(ndim):
 
-            roi = self.roi_input.get(dimension_labels[i],None)
+            roi = self._roi_input.get(dimension_labels[i],None)
 
             if roi == None or roi == -1:
                 continue
@@ -273,29 +234,29 @@ class Binner(DataProcessor):
         for i in range(4):
             range_list.append(range(index_start[i], index_end[i],binning[i]))
             
-        # set 
-        self.shape_in = shape_in
-        self.shape_out = shape_out
-        self.labels_in = labels_in
-        self.processed_dims = processed_dim
-        self.roi_ordered = range_list
-        self.binning = binning 
-        self.index_start = index_start
+        # set values
+        self._shape_in = shape_in
+        self._shape_out = shape_out
+        self._labels_in = labels_in
+        self._processed_dims = processed_dim
+        self._roi_ordered = range_list
+        self._binning = binning 
+        self._index_start = index_start
 
     def _bin_acquisition_geometry(self):
         """
         Creates the binned acquisition geometry
         """
-        geometry_new = self.geometry.copy()
+        geometry_new = self._geometry.copy()
         system_detector = geometry_new.config.system.detector
 
-        processed_dims = self.processed_dims.copy()
+        processed_dims = self._processed_dims.copy()
 
         # deal with vertical first as it may change the geometry type
-        if 'vertical' in self.geometry.dimension_labels:
-            vert_ind = self.labels_in.index('vertical')
+        if 'vertical' in self._geometry.dimension_labels:
+            vert_ind = self._labels_in.index('vertical')
             if processed_dims[vert_ind]:
-                roi = self.roi_ordered[vert_ind]
+                roi = self._roi_ordered[vert_ind]
                 n_elements = len(roi)
 
                 if n_elements > 1:
@@ -310,12 +271,12 @@ class Binner(DataProcessor):
                 processed_dims[vert_ind] = False
 
 
-        for i, axis  in enumerate(self.labels_in):
+        for i, axis  in enumerate(self._labels_in):
 
             if not processed_dims[i]:
                 continue
             
-            roi = self.roi_ordered[i]
+            roi = self._roi_ordered[i]
             n_elements = len(roi)
 
             if axis == 'channel':
@@ -323,7 +284,7 @@ class Binner(DataProcessor):
 
             elif axis == 'angle':
                 shape = (n_elements, roi.step)
-                geometry_new.config.angles.angle_data = self.geometry.angles[roi.start:roi.start+n_elements*roi.step].reshape(shape).mean(1)
+                geometry_new.config.angles.angle_data = self._geometry.angles[roi.start:roi.start+n_elements*roi.step].reshape(shape).mean(1)
                 
             elif axis == 'horizontal':
                 centre_offset = geometry_new.config.panel.pixel_size[0] * ( (n_elements * roi.step)*0.5 + roi.start - geometry_new.config.panel.num_pixels[0] * 0.5 )
@@ -338,14 +299,14 @@ class Binner(DataProcessor):
         """
         Creates the binned image geometry
         """
-        geometry_new = self.geometry.copy()
+        geometry_new = self._geometry.copy()
 
-        for i, axis in enumerate(self.labels_in):
+        for i, axis in enumerate(self._labels_in):
 
-            if not self.processed_dims[i]:
+            if not self._processed_dims[i]:
                 continue
 
-            roi = self.roi_ordered[i]
+            roi = self._roi_ordered[i]
             n_elements = len(roi)
 
             if axis == 'channel':
@@ -367,7 +328,7 @@ class Binner(DataProcessor):
         return geometry_new
 
 
-    def _bin_array(self, array_in, array_binned):
+    def _bin_array_numpy(self, array_in, array_binned):
         """
         Bins the array using numpy. This method is slower and less memory efficient than self._bin_array_acc
         """
@@ -376,14 +337,14 @@ class Binner(DataProcessor):
 
         for i in range(4):
             # reshape the data to add each 'bin' dimensions
-            shape_object.append(self.shape_out[i]) 
-            shape_object.append(self.binning[i])
-            slice_object.append(slice(self.index_start[i], self.index_start[i] + self.shape_out[i] * self.binning[i])) #crop data (i.e. no bin/step)
+            shape_object.append(self._shape_out[i]) 
+            shape_object.append(self._binning[i])
+            slice_object.append(slice(self._index_start[i], self._index_start[i] + self._shape_out[i] * self._binning[i])) #crop data (i.e. no bin/step)
         
         shape_object = tuple(shape_object)
         slice_object = tuple(slice_object)
 
-        data_resized = array_in.reshape(self.shape_in)[slice_object].reshape(shape_object)
+        data_resized = array_in.reshape(self._shape_in)[slice_object].reshape(shape_object)
 
         mean_order = (-1, 1, 2, 3)
         for i in range(4):
@@ -394,44 +355,43 @@ class Binner(DataProcessor):
 
     def _bin_array_acc(self, array_in, array_binned):
         """
-        Bins the array using cilacc.bin_ipp
+        Bins the array using the accelerated CIL backend
         """
-        binner_ipp = Binner_IPP(self.shape_in, self.shape_out, self.index_start, self.binning)
+        binner_ipp = Binner_IPP(self._shape_in, self._shape_out, self._index_start, self._binning)
 
         res = binner_ipp.bin(array_in, array_binned)
         if res != 0:
-            raise Exception("IPP call failed")
+            raise RuntimeError("Call failed")
 
 
     def process(self, out=None):
 
         data = self.get_input()
 
-        if isinstance(self.geometry, ImageGeometry):
+        if isinstance(self._geometry, ImageGeometry):
             binned_geometry = self._bin_image_geometry()
-        elif isinstance(self.geometry, AcquisitionGeometry):
+        elif isinstance(self._geometry, AcquisitionGeometry):
             binned_geometry = self._bin_acquisition_geometry()
         else:
             binned_geometry = None
 
         # return if just acting on geometry
-        if not self.data_array:
+        if not self._data_array:
             return binned_geometry
 
-        # create output array
+        # create output array or check size and shape of passed out
         if out is None:
             if binned_geometry is not None:
                 data_out = binned_geometry.allocate(None)
                 binned_array = data_out.as_array()
             else:
-                binned_array = np.empty(self.shape_out,dtype=np.float32)
+                binned_array = np.empty(self._shape_out,dtype=np.float32)
                 data_out = DataContainer(binned_array,False, data.dimension_labels)
-
         else:
             try:
-                out.array = out.array.reshape(self.shape_out)
+                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self._shape_out)
             except:
-                raise ValueError("Shape of `out` not as expected. Got {0}, expected {1}".format(out.shape, self.shape_out))
+                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
 
             if binned_geometry is not None:
                 if out.geometry != binned_geometry:
@@ -439,10 +399,11 @@ class Binner(DataProcessor):
             
             binned_array = out.array
 
-        if self.accelerated:
+        # bin data
+        if self._accelerated:
             self._bin_array_acc(data.array, binned_array)
         else:
-            self._bin_array(data.array, binned_array)
+            self._bin_array_numpy(data.array, binned_array)
 
         if out is None:
             return data_out

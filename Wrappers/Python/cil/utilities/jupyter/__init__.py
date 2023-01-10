@@ -159,13 +159,15 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
 
-    slider = widgets.IntSlider(
+    height_layout = widgets.Layout(height='20px')
+    slice_slider = widgets.IntSlider(
         min=0,
         max=data.shape[direction]-1,
         step=1,
         value=slice_number,
         continuous_update=False,
-        description=axis_labels[direction]
+        layout=height_layout,
+        # description=axis_labels[direction]
     )
     play_slices = widgets.Play(
         min=0,
@@ -175,7 +177,7 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         value=slice_number,
         disabled=False,
     )
-    widgets.jslink((play_slices, 'value'), (slider, 'value'))
+    widgets.jslink((play_slices, 'value'), (slice_slider, 'value'))
 
     amax = container.max()
     amin = container.min()
@@ -190,7 +192,6 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         default_ratio = 6./8.
         size = ( size , size * default_ratio )
 
-    height_layout = widgets.Layout(height='20px')
     min_max = widgets.FloatRangeSlider(
         value=[cmin, cmax],
         min=amin,
@@ -237,21 +238,27 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
 
     equal_aspect = widgets.Checkbox(
         value=True,
-        description='Pixel aspect ratio = 1 (unchecking this may ' +
-                    'cause the image to appear stretched)',
+        description='Pixel aspect ratio = 1',
         disabled=False,
         indent=False,
         layout=widgets.Layout(width='auto'),
     )
 
-    basic_widgets = widgets.HBox([play_slices, slider])
-    adv_widgets = widgets.Box([
-        widgets.Label('Min/max', layout=height_layout),
-        min_max,
+    box_layout = widgets.Layout(
+        display='flex',
+        flex_flow='column',
+        align_items='center',
+        justify_content='center',
+    )
+    sliders = widgets.Box([
+        widgets.Label(axis_labels[direction], layout=height_layout),
+        slice_slider,
         widgets.Label(f'roi_{axis_labels[h_dir]}', layout=height_layout),
         roi_select_hdir,
         widgets.Label(f'roi_{axis_labels[v_dir]}', layout=height_layout),
         roi_select_vdir,
+        widgets.Label('Min/max', layout=height_layout),
+        min_max,
         equal_aspect],
         layout=box_layout)
 
@@ -264,19 +271,13 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
             size=size,
             axis_labels=axis_labels,
             origin=origin),
-        {'x': slider,
+        {'x': slice_slider,
         'minmax': min_max,
         'roi_hdir': roi_select_hdir,
         'roi_vdir': roi_select_vdir,
         'equal_aspect': equal_aspect})
 
-    box_layout = widgets.Layout(
-        display='flex',
-        flex_flow='column',
-        align_items='center',
-        justify_content='center',
-    )
-    box = widgets.Box(children=[basic_widgets, out, adv_widgets], layout=box_layout)
+    box = widgets.Box(children=[play_slices, out, sliders], layout=box_layout)
 
     display(box)
 

@@ -190,17 +190,18 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         default_ratio = 6./8.
         size = ( size , size * default_ratio )
 
+    height_layout = widgets.Layout(height='20px')
     min_max = widgets.FloatRangeSlider(
         value=[cmin, cmax],
         min=amin,
         max=amax,
         step=(amax-amin)/100.,
-        description='Min/max',
         disabled=False,
         continuous_update=False,
         orientation='horizontal',
         readout=True,
         readout_format='.1f',
+        layout=height_layout,
     )
 
     dirs_remaining = [i for i in range(3) if i != direction]
@@ -213,12 +214,12 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         min=0,
         max=h_dir_size-1,
         step=1,
-        description=f'roi_{axis_labels[h_dir]}',
         disabled=False,
         continuous_update=False,
         orientation='horizontal',
         readout=True,
         readout_format='d',
+        layout=height_layout,
     )
 
     roi_select_vdir = widgets.IntRangeSlider(
@@ -226,12 +227,12 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         min=0,
         max=v_dir_size-1,
         step=1,
-        description=f'roi_{axis_labels[v_dir]}',
         disabled=False,
         continuous_update=False,
         orientation='horizontal',
         readout=True,
         readout_format='d',
+        layout=height_layout,
     )
 
     equal_aspect = widgets.Checkbox(
@@ -244,7 +245,15 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     )
 
     basic_widgets = widgets.HBox([play_slices, slider])
-    adv_widgets = widgets.VBox([min_max, roi_select_hdir, roi_select_vdir, equal_aspect])
+    adv_widgets = widgets.Box([
+        widgets.Label('Min/max', layout=height_layout),
+        min_max,
+        widgets.Label(f'roi_{axis_labels[h_dir]}', layout=height_layout),
+        roi_select_hdir,
+        widgets.Label(f'roi_{axis_labels[v_dir]}', layout=height_layout),
+        roi_select_vdir,
+        equal_aspect],
+        layout=box_layout)
 
     out = interactive_output(
         display_slice(

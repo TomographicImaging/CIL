@@ -96,27 +96,37 @@ class show_base(object):
 
 class show1D(show_base):
     """
-    This creates and displays 1D plots of pixel values by slicing multi-dimensional
-    data.
+    This creates and displays 1D plots of pixel values by slicing
+    multi-dimensional data.
+
+    When provided one or more datasets, alongside dimensions and
+    coordinates at which to slice, this function will generate graphs
+    plotting the resultant 1D data. If a single set of slicing information
+    is given via `line_coords` (see the first example below), this function
+    will generate a single graph with one line plot per dataset provided.
+    If multiple sets of slicing information are given (see the second
+    example below), this function will generate one graph per set (i.e. per
+    1D slice), each with one line plot per dataset.
 
     Parameters
     ----------
     data : DataContainer, list of DataContainer, tuple of DataContainer
         Multi-dimensional data to be reduced to 1D.
-    line_coords : list of tuples, default=None
-        (dimension, coordinate) pairs for slicing `data`
+    line_coords : list of tuple or list of list of tuple, default=None
+        A list, or nested list, of (dimension, coordinate) pairs for
+        slicing `data` (default is None, which is only valid when 1D
+        data is passed)
     label : str, list of str, default=None
         Label(s) to use in the plot's legend
     title : str, default None
         A title for the plot
     color : str, list of str, default=None
         Color(s) for each line plot
-    axis_labels : tuple of str, list of str, default=('Pixel','Pixel
-    value')
+    axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
         Axis labels in the form (x_axis_label,y_axis_label)
     num_cols : int, default=3
-        The number of columns in the grid of subplots produced in the case of
-        multiple plots
+        The number of columns in the grid of subplots produced in the case
+        of multiple plots
     size : tuple, default=(8,6)
         The size of the figure
     force : bool, default=True
@@ -129,9 +139,9 @@ class show1D(show_base):
     Examples
     --------
 
-    This example creates two 2D datasets (images), and uses the provided slicing
-    information to generate two plots on the same axis, corresponding to the two
-    datasets.
+    This example creates two 2D datasets (images), and uses the provided
+    slicing information to generate two plots on the same axis,
+    corresponding to the two datasets.
 
     >>> from cil.utilities.display import show1D
     >>> from cil.utilities.dataexample import PEPPERS
@@ -141,8 +151,8 @@ class show1D(show_base):
     >>> show1D([data_channel0, data_channel1], line_coords=[('horizontal_x', 256)],
     ...        label=['Channel 0', 'Channel 1'])
 
-    The following example uses two sets of slicing information applied to a single
-    dataset, resulting in two separate plots.
+    The following example uses two sets of slicing information applied to a
+    single dataset, resulting in two separate plots.
 
     >>> from cil.utilities.display import show1D
     >>> from cil.utilities.dataexample import PEPPERS
@@ -309,28 +319,29 @@ class show1D(show_base):
                 axis_labels=('Pixel', 'Pixel value'), num_cols=3, plot_size=(8,6),
                 force=True):
         """
-        Displays 1D plots of pixel flux from multi-dimensional
-        data and slicing information.
+        Displays 1D plots of pixel flux from multi-dimensional data and
+        slicing information.
 
         Parameters
         ----------
-        data : DataContainer, list of DataContainer or tuple of DataContainer
+        data : DataContainer, list of DataContainer or tuple of
+        DataContainer
             The data to be sliced and plotted
-        line_coords : list of tuples, optional
-            (dimension, coordinate) pairs for slicing `data` (default is
-            None, which is only valid when 1D data is passed)
+        line_coords : list of tuple or list of list of tuple, optional
+            A list, or nested list, of (dimension, coordinate) pairs for
+            slicing `data` (default is None, which is only valid when 1D
+            data is passed)
         labels : str, list of str, default=None
             Label(s) to use in the plot's legend
         titles : str, default=None
             A title for the plot
         colors : str, list of str, default=None
             Color(s) for each line plot
-        axis_labels : tuple of str, list of str, default=('Pixel','Pixel
-        value')
+        axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
             Axis labels in the form (x_axis_label,y_axis_label)
         num_cols : int, default=3
-            The number of columns in the grid of subplots produced in the case of
-            multiple plots
+            The number of columns in the grid of subplots produced in the
+            case of multiple plots
         plot_size : tuple, default=(8,6)
             The size of the figure
         force : bool, default=True

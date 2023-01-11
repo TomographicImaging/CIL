@@ -135,8 +135,8 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
 
     Returns
     -------
-    slider : ipywidgets.IntSlider
-        The slider whose value determines the slice on display.
+    box : ipywidgets.Box
+        The top-level widget container.
     """
 
     if axis_labels is None:
@@ -167,7 +167,6 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         value=slice_number,
         continuous_update=False,
         layout=height_layout,
-        # description=axis_labels[direction]
     )
     play_slices = widgets.Play(
         min=0,
@@ -250,7 +249,7 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         align_items='center',
         justify_content='center',
     )
-    sliders = widgets.Box([
+    selectors = widgets.Box([
         widgets.Label(axis_labels[direction], layout=height_layout),
         slice_slider,
         widgets.Label(f'roi_{axis_labels[h_dir]}', layout=height_layout),
@@ -277,19 +276,22 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         'roi_vdir': roi_select_vdir,
         'equal_aspect': equal_aspect})
 
-    box = widgets.Box(children=[play_slices, out, sliders], layout=box_layout)
+    box = widgets.Box(children=[play_slices, out, selectors], layout=box_layout)
 
-    display(box)
+    return box
 
 
 def link_islicer(*args):
-    '''links islicers IntSlider widgets
+    '''Links islicer's slice-selection widgets
 
     Parameters
     ----------
-    args: islicer objects to link
+    *args : tuple of ipywidgets.Box
+        The widget containers returned from `islicer`, from which the slice
+        selection sliders will be extracted and linked.
     '''
-    linked = [(widg, 'value') for widg in args]
+    slice_sliders = [arg.children[-1].children[1] for arg in args]
+    linked = [(widg, 'value') for widg in slice_sliders]
     # link pair-wise
     pairs = [(linked[i+1],linked[i]) for i in range(len(linked)-1)]
     for pair in pairs:

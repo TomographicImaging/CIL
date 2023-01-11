@@ -1,6 +1,7 @@
 #ifndef _BINNER_H_
 #define _BINNER_H_
 
+#include <cstddef>
 #include "dll_export.h"
 
 extern "C"

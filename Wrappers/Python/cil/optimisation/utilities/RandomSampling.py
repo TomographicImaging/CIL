@@ -22,7 +22,7 @@ class RandomSampling():
     
     r"""RandomSampling.
 
-    RandomSampling is a class tha generates randomly indices or batches from a list of integers.
+    RandomSampling is a class tha generates randomly indices or batches from a list of integers of length = `num_indices`.
     
     Parameters
     ----------

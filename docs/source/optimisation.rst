@@ -550,7 +550,19 @@ Which in Python would be like
 .. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
 
 
+Utilities
+==========
+
+RandomSampling
+--------------
+.. autoclass:: cil.optimisation.utilities.RandomSampling
+
+SequentialSampling
+--------------
+.. autoclass:: cil.optimisation.utilities.SequentialSampling
+
+
 References
-----------
+==========
 
 .. bibliography::    

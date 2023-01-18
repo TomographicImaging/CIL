@@ -1,9 +1,9 @@
 import unittest
-from utils import initialise_tests
+# from utils import initialise_tests
 from cil.optimisation.utilities import RandomSampling, RandomIndex, RandomBatch
 import numpy as np                  
                   
-initialise_tests()
+# initialise_tests()
 
 class TestRandomSampling(unittest.TestCase):
                     
@@ -11,6 +11,7 @@ class TestRandomSampling(unittest.TestCase):
             
         self.len_list = 10     
         self.seed = 19  
+        self.num_batches = 5
         self.batch_size = 2
         self.epochs = 3
 
@@ -21,13 +22,13 @@ class TestRandomSampling(unittest.TestCase):
         self.rs_uniform_without_replacement = RandomSampling(self.len_list, replace=False, seed=self.seed) 
 
         # uniform with replacement batch_size>1
-        self.rs_uniform_batch = RandomSampling(self.len_list, batch_size=self.batch_size, seed=self.seed) 
+        self.rs_uniform_batch = RandomSampling(self.len_list, num_batches=self.num_batches, seed=self.seed) 
 
         # uniform without replacement batch_size>1
-        self.rs_uniform_without_replacement_batch = RandomSampling(self.len_list, batch_size=self.batch_size, replace=False, seed=self.seed) 
+        self.rs_uniform_without_replacement_batch = RandomSampling(self.len_list, num_batches=self.num_batches, replace=False, seed=self.seed) 
 
         # uniform without replacement unequal batch_size
-        self.rs_uniform_unequal_batch = RandomSampling(self.len_list, batch_size=3, seed=self.seed) 
+        self.rs_uniform_unequal_batch = RandomSampling(self.len_list, num_batches=4, seed=self.seed) 
 
 
     def test_random_sampling_uniform_with_replacement(self):
@@ -50,7 +51,7 @@ class TestRandomSampling(unittest.TestCase):
         list_generated_seed_19 = [7, 8, 9, 2, 1, 4, 6, 5, 0, 3]
 
         # check static method
-        sm_rs_uniform_without_replacement = RandomSampling.uniform_no_replacement(self.len_list, seed=self.seed)        
+        sm_rs_uniform_without_replacement = RandomSampling.uniform(self.len_list, seed=self.seed, replace=False)        
         
         for _ in range(10):
             next(self.rs_uniform_without_replacement)

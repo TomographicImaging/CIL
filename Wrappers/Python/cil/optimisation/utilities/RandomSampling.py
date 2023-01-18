@@ -20,25 +20,60 @@ import logging
 
 class RandomSampling():
     
-    def __new__(cls, num_indices, batch_size=1, prob = None, replace = True, shuffle=False, seed = None):
+    r"""RandomSampling.
+
+    RandomSampling is a class tha generates randomly indices or batches from a list of integers.
+    
+    Parameters
+    ----------
+
+    num_indices : int 
+            Number of indices, default = int
+    num_batches : int
+            Number of batches, default = int 
+    prob : float in [0,1]
+            The probabilities associated with each entry in a. If not given, the sample assumes a uniform distribution over all entries in a.
+    replace : bool
+            Probability, default = True, uniform  
+    shuffle : bool
+            The list of integers is shuffled at the end of each epoch.
+    seed : int 
+            A seed to initialize the random generator.                                   
+
+    See also
+    --------
+    `np.random.choice <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.choice.html#numpy.random.Generator.choice>`_ 
+
+    """
+
+    
+    def __new__(cls, num_indices, num_batches=None, prob = None, replace = True, shuffle=False, seed = None):
         
-        cls.batch_size = batch_size
+        cls.num_batches = num_batches
+
+        if cls.num_batches is None:
+            cls.num_batches = num_indices
         
-        if cls.batch_size == 1:
+        if cls.num_batches == num_indices:
             return super(RandomSampling, cls).__new__(RandomIndex)
         else:
             return super(RandomSampling, cls).__new__(RandomBatch)
     
-    def __init__(self, num_indices, batch_size=1, prob = None, replace = True, shuffle=False, seed = None ):
+    def __init__(self, num_indices, num_batches=None, prob = None, replace = True, shuffle=False, seed = None ):
         
         self.num_indices = num_indices
-        self.batch_size = batch_size
-        self.equal_size_batches = self.num_indices%self.batch_size==0        
+        self.num_batches = num_batches
+
+        if self.num_batches is None:
+            self.num_batches = num_indices
+
+        self.equal_size_batches = self.num_indices%self.num_batches==0        
         if self.equal_size_batches:
-            self.num_batches = self.num_indices//self.batch_size
+            self.batch_size = self.num_indices//self.num_batches
         else:
             logging.warning("Batch size is not constant")
-            self.num_batches = (self.num_indices//self.batch_size)+1        
+            self.batch_size = (self.num_indices//self.num_batches)+1  
+
         self.prob = prob
         self.replace = replace
         self.shuffle = shuffle
@@ -48,13 +83,6 @@ class RandomSampling():
         self.rng = np.random.default_rng(self.seed)
         self.list_of_indices =  self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace) 
                     
-        # if self.replace is False: 
-        #     self.list_of_indices = self.rng.choice(num_indices, size=self.num_indices, p=prob, replace=False)                                        
-        # else:
-        #     if shuffle is True and self.batch_size==1:
-        #         raise ValueError("Shuffle is used only with replace=False")   
-        #     self.list_of_indices = self.rng.choice(num_indices, size=self.num_indices, p=prob, replace=True)         
-            
         if self.batch_size>1: 
             self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
             
@@ -78,28 +106,28 @@ class RandomSampling():
                 
             
     @staticmethod    
-    def uniform(num_indices, batch_size = 1, seed=None):
-        return RandomSampling(num_indices,  batch_size=batch_size, prob=None, replace = True, shuffle = False, seed = seed)
+    def uniform(num_indices, num_batches = None, replace = True, seed=None):
+        return RandomSampling(num_indices,  num_batches=num_batches, prob=None, replace = replace, shuffle = False, seed = seed)
     
     @staticmethod
-    def non_uniform(num_indices, prob, batch_size = 1, seed=None):
-        return RandomSampling(num_indices, batch_size=batch_size, replace = True, prob=prob, shuffle = False, seed = seed) 
+    def non_uniform(num_indices, prob, num_batches = None, replace = True, seed=None):
+        return RandomSampling(num_indices, num_batches=num_batches, replace = replace, prob=prob, shuffle = False, seed = seed) 
     
-    @staticmethod    
-    def uniform_no_replacement(num_indices, batch_size = 1, shuffle=True, seed=None):
-        return RandomSampling(num_indices, batch_size=batch_size, prob=None, replace = False, shuffle = shuffle, seed = seed) 
+    # @staticmethod    
+    # def uniform_no_replacement(num_indices, num_batches = None, shuffle=True, seed=None):
+    #     return RandomSampling(num_indices, num_batches=num_batches, prob=None, replace = False, shuffle = shuffle, seed = seed) 
     
-    @staticmethod    
-    def non_uniform_no_replacement(num_indices, prob, batch_size = 1, shuffle=False, seed=None):
-        return RandomSampling(num_indices, batch_size=batch_size, prob=prob, replace = False, shuffle = shuffle, seed = seed)     
+    # @staticmethod    
+    # def non_uniform_no_replacement(num_indices, prob, num_batches = None, shuffle=False, seed=None):
+    #     return RandomSampling(num_indices, num_batches=num_batches, prob=prob, replace = False, shuffle = shuffle, seed = seed)     
         
     @staticmethod
-    def single_shuffle(num_indices, batch_size = 1, seed=None):
-        return RandomSampling(num_indices, batch_size = batch_size, replace = False, shuffle = False, seed = seed)
+    def single_shuffle(num_indices, num_batches = None, prob=None, seed=None):
+        return RandomSampling(num_indices, num_batches = num_batches, prop=prob, replace = False, shuffle = False, seed = seed)
     
     @staticmethod
-    def random_shuffle(num_indices, batch_size = 1, seed=None):
-        return RandomSampling(num_indices, batch_size = batch_size, replace = False, shuffle = True, seed = seed)              
+    def random_shuffle(num_indices, num_batches = None, seed=None):
+        return RandomSampling(num_indices, num_batches = num_batches, replace = False, shuffle = True, seed = seed)              
             
 
 class RandomBatch(RandomSampling):
@@ -131,37 +159,7 @@ class RandomIndex(RandomSampling):
             if self.shuffle is True:                    
                 self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace)         
 
-        
-        # if self.replace is False:
-
-        #     index_num = self.list_of_indices[self.index]
-        #     self.index+=1                
-
-        #     if self.index == self.num_indices:
-        #         self.index = 0                
-        #         if self.shuffle is True:                    
-        #             self.list_of_indices = self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=False)                                                                                         
-        # else:
-
-        #     index_num = self.rng.choice(self.num_indices, size=1, p=self.prob, replace=True).item()
-
         self.indices_used.append(index_num)
 
         return index_num  
         
-if __name__ == "__main__":
-
-    rs1 = RandomSampling(10, batch_size=2, replace=False, seed=19)
-    rs2 = RandomIndex(10, seed=19)
-
-    tmp1 = []
-    for _ in range(10):
-        tmp1.append(next(rs1))
-
-    tmp2 = []
-    for _ in range(10):
-        tmp2.append(next(rs2))        
-
-
-    print(tmp1)
-    # print(tmp2)

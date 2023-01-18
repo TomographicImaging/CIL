@@ -66,8 +66,8 @@ class TestSequentialSampling(unittest.TestCase):
             next(sq1)
         self.assertListEqual(sq1.indices_used, tmp_list)    
 
-        sq1 = SequentialSampling(self.num_indices, num_batches=1, step_size = 5)
-        tmp_list = [[0, 5, 1, 6, 2], [7, 3, 8, 4, 9]]
+        sq1 = SequentialSampling(self.num_indices, num_batches=10, step_size = 5)
+        tmp_list = [0, 5, 1, 6, 2, 7, 3, 8, 4, 9]
         for _ in range(sq1.num_batches):
             next(sq1)
         self.assertListEqual(sq1.indices_used, tmp_list)                                                        

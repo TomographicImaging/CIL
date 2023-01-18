@@ -22,23 +22,27 @@ class RandomSampling():
     
     r"""RandomSampling.
 
-    RandomSampling is a class tha generates randomly indices or batches from a list of integers of length = `num_indices`.
+    RandomSampling is a class tha generates randomly indices or batches from a list of integers of length = `num_indices`, e.g., :code:`np.arange(num_indices)`.
     
     Parameters
     ----------
 
-    num_indices : int 
-            Number of indices, default = int
-    num_batches : int
-            Number of batches, default = int 
-    prob : float in [0,1]
-            The probabilities associated with each entry in a. If not given, the sample assumes a uniform distribution over all entries in a.
-    replace : bool
-            Probability, default = True, uniform  
-    shuffle : bool
-            The list of integers is shuffled at the end of each epoch.
-    seed : int 
-            A seed to initialize the random generator.                                   
+    num_indices : {int}
+            A list of length :code:`num_indices`, e.g., :code:`np.arange(num_indices)` is generated.
+    num_batches : {int}
+            The number of batches to split the generated list. Default = num_indices.
+            A warning is raised when :code:`num_batches` is not a divisor of :code:`num_indices`.
+    prob : 1-D array_like, optional
+            A list of probabilities of length :code:`num_indices`. Default = None.
+            If :code:`None`, a uniform distribution is assumed for all entries in the generated list.
+    replace : {bool}
+            Whether to use replacement or not when an item from the generated list is selected. Default = True.
+            If :code:`True`, an element from the list can be selected multiple times.  
+    shuffle : {bool}
+            Whether to shuffle the generated list at the end of each epoch. Default = True 
+    seed : {int} 
+            A seed to initialize the random generator.   
+                 
 
     See also
     --------
@@ -67,13 +71,6 @@ class RandomSampling():
         if self.num_batches is None:
             self.num_batches = num_indices
 
-        self.equal_size_batches = self.num_indices%self.num_batches==0        
-        if self.equal_size_batches:
-            self.batch_size = self.num_indices//self.num_batches
-        else:
-            logging.warning("Batch size is not constant")
-            self.batch_size = (self.num_indices//self.num_batches)+1  
-
         self.prob = prob
         self.replace = replace
         self.shuffle = shuffle
@@ -83,6 +80,13 @@ class RandomSampling():
         self.rng = np.random.default_rng(self.seed)
         self.list_of_indices =  self.rng.choice(self.num_indices, size=self.num_indices, p=self.prob, replace=self.replace) 
                     
+        self.equal_size_batches = self.num_indices%self.num_batches==0        
+        if self.equal_size_batches:
+            self.batch_size = self.num_indices//self.num_batches
+        else:
+            logging.warning("Batch size is not constant")
+            self.batch_size = (self.num_indices//self.num_batches)+1  
+
         if self.batch_size>1: 
             self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)]             
             
@@ -107,6 +111,7 @@ class RandomSampling():
             
     @staticmethod    
     def uniform(num_indices, num_batches = None, replace = True, seed=None):
+        
         return RandomSampling(num_indices,  num_batches=num_batches, prob=None, replace = replace, shuffle = False, seed = seed)
     
     @staticmethod
@@ -163,3 +168,7 @@ class RandomIndex(RandomSampling):
 
         return index_num  
         
+if __name__ == "__main__":
+
+    sq1 = RandomSampling([1,2,3,4,5,6,7],num_batches=10)
+    sq1.show_epochs(1)

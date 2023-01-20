@@ -22,32 +22,34 @@ class RandomSampling():
     
     r"""RandomSampling.
 
-    RandomSampling is a class tha generates randomly indices or batches from a list of integers of length = `num_indices`, e.g., :code:`np.arange(num_indices)`.
+    RandomSampling is an iterator that generates randomly indices or batches from a list of integers of length = `num_indices`, e.g., :code:`np.arange(num_indices)`.
     
     Parameters
     ----------
 
-    num_indices : {int}
+    num_indices : int
             A list of length :code:`num_indices`, e.g., :code:`np.arange(num_indices)` is generated.
-    num_batches : {int}
+    num_batches : int
             The number of batches to split the generated list. Default = num_indices.
             A warning is raised when :code:`num_batches` is not a divisor of :code:`num_indices`.
     prob : 1-D array_like, optional
             A list of probabilities of length :code:`num_indices`. Default = None.
             If :code:`None`, a uniform distribution is assumed for all entries in the generated list.
-    replace : {bool}
+    replace : bool, optional
             Whether to use replacement or not when an item from the generated list is selected. Default = True.
             If :code:`True`, an element from the list can be selected multiple times.  
-    shuffle : {bool}
+    shuffle : bool, optional
             Whether to shuffle the generated list at the end of each epoch. Default = True 
-    seed : {int} 
+    seed : int, optional
             A seed to initialize the random generator.   
-                 
 
     See also
     --------
+    :class:`.SequentialSampling`
+    
     `np.random.choice <https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.choice.html#numpy.random.Generator.choice>`_ 
 
+  
     """
 
     
@@ -110,29 +112,22 @@ class RandomSampling():
                 
             
     @staticmethod    
-    def uniform(num_indices, num_batches = None, replace = True, seed=None):
-        
-        return RandomSampling(num_indices,  num_batches=num_batches, prob=None, replace = replace, shuffle = False, seed = seed)
+    def uniform(num_indices, num_batches = None, replace = True, seed=None):        
+        return RandomSampling(num_indices,  num_batches=num_batches, prob=None, replace = replace, shuffle = True, seed = seed)
     
     @staticmethod
     def non_uniform(num_indices, prob, num_batches = None, replace = True, seed=None):
-        return RandomSampling(num_indices, num_batches=num_batches, replace = replace, prob=prob, shuffle = False, seed = seed) 
-    
-    # @staticmethod    
-    # def uniform_no_replacement(num_indices, num_batches = None, shuffle=True, seed=None):
-    #     return RandomSampling(num_indices, num_batches=num_batches, prob=None, replace = False, shuffle = shuffle, seed = seed) 
-    
-    # @staticmethod    
-    # def non_uniform_no_replacement(num_indices, prob, num_batches = None, shuffle=False, seed=None):
-    #     return RandomSampling(num_indices, num_batches=num_batches, prob=prob, replace = False, shuffle = shuffle, seed = seed)     
-        
+        if prob is None:
+            raise ValueError("List of probabilities is required for the non-uniform sampling. For uniform sampling use RandomSampling.uniform. ")
+        return RandomSampling(num_indices, num_batches=num_batches, replace = replace, prob=prob, shuffle = True, seed = seed) 
+     
     @staticmethod
     def single_shuffle(num_indices, num_batches = None, prob=None, seed=None):
         return RandomSampling(num_indices, num_batches = num_batches, prop=prob, replace = False, shuffle = False, seed = seed)
-    
+     
     @staticmethod
-    def random_shuffle(num_indices, num_batches = None, seed=None):
-        return RandomSampling(num_indices, num_batches = num_batches, replace = False, shuffle = True, seed = seed)              
+    def random_shuffle(num_indices, num_batches = None, prob=None, seed=None):
+        return RandomSampling(num_indices, num_batches = num_batches, prob = prob, replace = False, shuffle = True, seed = seed)              
             
 
 class RandomBatch(RandomSampling):
@@ -168,7 +163,4 @@ class RandomIndex(RandomSampling):
 
         return index_num  
         
-if __name__ == "__main__":
-
-    sq1 = RandomSampling([1,2,3,4,5,6,7],num_batches=10)
-    sq1.show_epochs(1)
+   

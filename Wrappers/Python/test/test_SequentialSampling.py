@@ -1,9 +1,9 @@
 import unittest
-from utils import initialise_tests
+# from utils import initialise_tests
 from cil.optimisation.utilities import SequentialSampling
 import numpy as np                  
                   
-initialise_tests()
+# initialise_tests()
 
 
 class TestSequentialSampling(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestSequentialSampling(unittest.TestCase):
         self.assertListEqual(sq1.indices_used, tmp_list) 
 
         sq1 = SequentialSampling(self.num_indices, num_batches=10)
-        tmp_list = [0,1,2,3,4,5,6,7,8,9]
+        tmp_list = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9]]
         for _ in range(sq1.num_batches):
             next(sq1)
         self.assertListEqual(sq1.indices_used, tmp_list)         
@@ -67,7 +67,7 @@ class TestSequentialSampling(unittest.TestCase):
         self.assertListEqual(sq1.indices_used, tmp_list)    
 
         sq1 = SequentialSampling(self.num_indices, num_batches=10, step_size = 5)
-        tmp_list = [0, 5, 1, 6, 2, 7, 3, 8, 4, 9]
+        tmp_list = [[0], [5], [1], [6], [2], [7], [3], [8], [4], [9]]
         for _ in range(sq1.num_batches):
             next(sq1)
         self.assertListEqual(sq1.indices_used, tmp_list)                                                        

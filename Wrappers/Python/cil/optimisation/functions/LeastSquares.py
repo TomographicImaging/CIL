@@ -35,16 +35,18 @@ class LeastSquares(Function):
     .. math:: F(x) = c\|Ax-b\|_{2,W}^{2}
     
     Parameters:
+    -----------
         
-        A : Operator
+        A : LinearOperator
+
+        b : Data, DataContainer
         
-        c : Scaling Constant
-        
-        b : Data
-        
+        c : Scaling Constant, float, default 1.0
+               
         weight: DataContainer with all positive elements of size of the range of operator A, default None
         
-    Members:        
+    Members:  
+    --------      
             
         L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c s1(A)^2`, or
         
@@ -58,8 +60,8 @@ class LeastSquares(Function):
     def __init__(self, A, b, c=1.0, weight = None):
         super(LeastSquares, self).__init__()
     
-        self.A = A  # Should be an operator, default identity
-        self.b = b  # Default zero DataSet?
+        self.A = A  # Should be a LinearOperator
+        self.b = b  
         self.c = c  # Default 1.
         
         # weight

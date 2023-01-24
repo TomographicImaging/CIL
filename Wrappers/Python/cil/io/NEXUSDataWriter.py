@@ -104,17 +104,6 @@ class NEXUSDataWriter(object):
 
         if self.compress is True:
             scale, offset = utilities.get_compression_scale_offset(self.data, self.compression)
-            # save_range = np.iinfo(self.dtype).max
-
-            # data_min = self.data.min()
-            # data_range = self.data.max() - data_min
-
-            # if data_range > 0:
-            #     scale = save_range / data_range
-            #     offset = - data_min * scale
-            # else:
-            #     scale = 1.0
-            #     offset = 0.0
                 
         # create the file
         with h5py.File(self.file_name, 'w') as f:

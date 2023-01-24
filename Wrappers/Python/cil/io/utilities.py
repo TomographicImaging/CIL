@@ -36,6 +36,10 @@ def get_compression_scale_offset(data, compression=0):
     '''Returns the scale and offset to be applied to the data to compress it'''
 
     compress, dtype = get_compression(data, compression)
+    if compression == 0:
+        # no compression
+        # return scale 1.0 and offset 0.0
+        return 1.0, 0.0
     save_range = np.iinfo(dtype).max
 
     data_min = data.min()

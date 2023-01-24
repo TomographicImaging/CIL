@@ -309,22 +309,36 @@ class Binner(DataProcessor):
             roi = self._roi_ordered[i]
             n_elements = len(roi)
 
+            offset = (roi.stop - roi.start) * 0.5 + roi.start
+
             if axis == 'channel':
                 geometry_new.channels = n_elements
                 geometry_new.channel_spacing *= roi.step
 
             elif axis == 'vertical':
+                # offset in unbinned voxels, multiplied by original voxel size
+                voxel_offset = geometry_new.voxel_num_z * 0.5 - offset
+                geometry_new.center_z = voxel_offset * geometry_new.voxel_size_z
+
                 geometry_new.voxel_num_z = n_elements
                 geometry_new.voxel_size_z *= roi.step
 
             elif axis == 'horizontal_x':
+                # offset in unbinned voxels, multiplied by original voxel size
+                voxel_offset = geometry_new.voxel_num_x * 0.5 - offset
+                geometry_new.center_x = voxel_offset * geometry_new.voxel_size_x
+
                 geometry_new.voxel_num_x = n_elements
                 geometry_new.voxel_size_x *= roi.step
 
             elif axis == 'horizontal_y':
+                # offset in unbinned voxels, multiplied by original voxel size
+                voxel_offset = geometry_new.voxel_num_y * 0.5 - offset
+                geometry_new.center_y = voxel_offset * geometry_new.voxel_size_y
+
                 geometry_new.voxel_num_y = n_elements
                 geometry_new.voxel_size_y *= roi.step
-             
+
         return geometry_new
 
 

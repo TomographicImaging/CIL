@@ -69,10 +69,11 @@ class TIFFWriter(object):
         ----------
         data : the DataContainer, AcquisitionData or ImageData to save to TIFF file(s)
         file_name : string defining the file name prefix
-        counter_offset : int indicating at which number the index starts. Default 0.
+        counter_offset : int indicating at which number the ordinal index should start. Default 0.
           For instance, if you have to save 10 files the index would by default go from 0 to 9.
           By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
-        compression : The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively, default 0.
+        compression : The lossy compression to apply, default 0 will not compress data. 
+          8 or 16 will compress to 8 and 16 bit dtypes respectively, default 0.
         '''
         
         self.data_container = kwargs.get('data', None)
@@ -348,10 +349,10 @@ class TIFFStackReader(object):
             dtype = np.float32
         elif mode == 'I':
             dtype = np.int32
-        elif mode in ['I;16', 'I;16L', 'I;16B', 'I;16N']:
+        elif mode in ['I;16']:
             dtype = np.uint16
         else:
-            raise ValueError("Unsupported type {}. Expected any of 1 L I I;16 I;16L I;16B I;16Nor F.".format(mode))
+            raise ValueError("Unsupported type {}. Expected any of 1 L I I;16 F.".format(mode))
         return dtype
 
     def read(self):

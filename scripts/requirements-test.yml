@@ -1,0 +1,34 @@
+name: cil_dev_test
+channels:
+  - conda-forge
+  - intel
+  - ccpi
+  - astra-toolbox
+  - defaults
+dependencies:
+  - python
+  - cil-data
+  - tigre=2.2
+  - ccpi-regulariser=21.0.0
+  - tomophantom=2.0.0
+  - astra-toolbox >=1.9.9.dev5,<2.1
+  - cvxpy
+  - python-wget
+  - scikit-image
+  - packaging
+  - cmake >=3.16
+  - setuptools 
+  - ipp-include 
+  - ipp-devel 
+  - ipp
+  - ipywidgets 
+  - scipy 
+  - matplotlib
+  - h5py 
+  - pillow
+  - libgcc-ng
+  - dxchange
+  - olefile
+  - pywavelets
+  - numba
+  - tqdm

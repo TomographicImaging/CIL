@@ -273,3 +273,34 @@ class TestTIFF(unittest.TestCase):
         except:
             assert True
 
+    def test_TIFF_compression(self):
+        self.TIFF_compression_test(8)
+        self.TIFF_compression_test(16)
+        with self.assertRaises(ValueError) as context:
+            self.TIFF_compression_test(12)
+
+    def TIFF_compression_test(self, compression):
+        ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
+        data = ig.allocate(0)
+        data.fill(np.arange(4*5*6).reshape(ig.shape))
+
+        from cil.io import utilities
+        compress , dtype= utilities.get_compression(data.array, compression=compression)
+        scale, offset = utilities.get_compression_scale_offset(data.array, compression)
+
+        fname = os.path.join(self.cwd, "unittest")
+        writer = TIFFWriter(data=data, file_name=fname, compression=compression)
+        writer.write()
+        # force the reader to use the native TIFF dtype by setting dtype=None
+        reader = TIFFStackReader(file_name=self.cwd, dtype=None)
+        read_array = reader.read()
+
+        
+        if compress:
+            tmp = data.array * scale + offset
+            tmp = np.asarray(tmp, dtype=dtype)
+        
+        assert tmp.dtype == read_array.dtype
+        
+        np.testing.assert_allclose(tmp, read_array)
+

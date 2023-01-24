@@ -29,10 +29,34 @@ import functools
 import glob
 import re
 import numpy as np
+from cil.io import utilities
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+def compress_data(data, scale, offset, dtype):
+    '''Compress data to dtype using scale and offset
+    
+    Parameters
+    ----------
+    data : numpy array
+    scale : float
+    offset : float
+    dtype : numpy dtype
+    
+    returns compressed casted data'''
+    if dtype == data.dtype:
+        return data
+    if data.ndim > 2:
+        # compress each slice
+        tmp = np.empty(data.shape, dtype=dtype)
+        for i in range(data.shape[0]):
+            tmp[i] = compress_data(data[i], scale, offset, dtype)
+    else:
+        tmp = data * scale + offset
+        tmp = tmp.astype(dtype)
+    return tmp
 
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
@@ -40,29 +64,33 @@ class TIFFWriter(object):
     def __init__(self,
                  **kwargs):
         '''
-        :param data: the data to save to TIFF file(s)
-        :type data: DataContainer, AcquisitionData or ImageData
-        :param file_name: string defining the file name prefix
-        :type file_name: string
-        :param counter_offset: int indicating at which number the index starts. 
+
+        Parameters
+        ----------
+        data : the DataContainer, AcquisitionData or ImageData to save to TIFF file(s)
+        file_name : string defining the file name prefix
+        counter_offset : int indicating at which number the index starts. Default 0.
           For instance, if you have to save 10 files the index would by default go from 0 to 9.
           By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
-        :type counter_offset: int, default 0
+        compression : The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively, default 0.
         '''
         
         self.data_container = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         counter_offset = kwargs.get('counter_offset', 0)
+        compression = kwargs.get('compression', 0)
         
         if ((self.data_container is not None) and (self.file_name is not None)):
             self.set_up(data = self.data_container,
                         file_name = self.file_name, 
-                        counter_offset=counter_offset)
+                        counter_offset=counter_offset,
+                        compression=compression)
         
     def set_up(self,
                data = None,
                file_name = None,
-               counter_offset = -1):
+               counter_offset = -1,
+               compression=0):
         
         self.data_container = data
         file_name = os.path.abspath(file_name)
@@ -81,6 +109,12 @@ class TIFFWriter(object):
                 (isinstance(self.data_container, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
+
+        # Deal with compression
+        self.compression = compression
+        self.compress, self.dtype,  = utilities.get_compression(data, compression)
+        self.scale, self.offset = utilities.get_compression_scale_offset(data, compression)
+
     
     def write(self):
         if not os.path.isdir(self.dir_name):
@@ -95,7 +129,9 @@ class TIFFWriter(object):
             else:
                 fname = "{}.tiff".format(os.path.join(self.dir_name, self.file_name))
             with open(fname, 'wb') as f:
-                Image.fromarray(self.data_container.as_array()).save(f, 'tiff')
+                Image.fromarray(
+                    compress_data(self.data_container.as_array() , self.scale, self.offset, self.dtype)
+                    ).save(f, 'tiff')
         elif ndim == 3:
             for sliceno in range(self.data_container.shape[0]):
                 # save single slice
@@ -105,7 +141,9 @@ class TIFFWriter(object):
                     os.path.join(self.dir_name, self.file_name),
                     sliceno + self.counter_offset)
                 with open(fname, 'wb') as f:
-                    Image.fromarray(self.data_container.as_array()[sliceno]).save(f, 'tiff')
+                    Image.fromarray(
+                            compress_data(self.data_container.as_array()[sliceno] , self.scale, self.offset, self.dtype)
+                        ).save(f, 'tiff')
         elif ndim == 4:
             # find how many decimal places self.data_container.shape[0] and shape[1] have
             zero_padding = self._zero_padding(self.data_container.shape[0])
@@ -121,7 +159,9 @@ class TIFFWriter(object):
                         self.data_container.shape[0], self.data_container.shape[1], self.data_container.shape[2],
                         self.data_container.shape[3] , sliceno1, sliceno2)
                     with open(fname, 'wb') as f:
-                        Image.fromarray(self.data_container.as_array()[sliceno1][sliceno2]).save(f, 'tiff')
+                        Image.fromarray(
+                            compress_data(self.data_container.as_array()[sliceno1][sliceno2] , self.scale, self.offset, self.dtype)
+                        ).save(f, 'tiff')
         else:
             raise ValueError('Cannot handle more than 4 dimensions')
     
@@ -187,16 +227,16 @@ class TIFFStackReader(object):
         '''
         
         self.file_name = kwargs.get('file_name', None)
-        self.roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
-        self.transpose = kwargs.get('transpose', False)
-        self.mode = kwargs.get('mode', 'bin')
-        self.dtype = kwargs.get('dtype', np.float32)
+        roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
+        transpose = kwargs.get('transpose', False)
+        mode = kwargs.get('mode', 'bin')
+        dtype = kwargs.get('dtype', np.float32)
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
-                        roi = self.roi,
-                        transpose = self.transpose,
-                        mode = self.mode, dtype=self.dtype)
+                        roi = roi,
+                        transpose = transpose,
+                        mode = mode, dtype=dtype)
             
     def set_up(self, 
                file_name = None,
@@ -242,6 +282,7 @@ class TIFFStackReader(object):
         self.roi = roi
         self.transpose = transpose
         self.mode = mode
+        self.dtype = dtype
         
         if file_name == None:
             raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
@@ -307,8 +348,10 @@ class TIFFStackReader(object):
             dtype = np.float32
         elif mode == 'I':
             dtype = np.int32
+        elif mode in ['I;16', 'I;16L', 'I;16B', 'I;16N']:
+            dtype = np.uint16
         else:
-            raise ValueError("Unsupported type {}. Expected 1 L I or F.".format(mode))
+            raise ValueError("Unsupported type {}. Expected any of 1 L I I;16 I;16L I;16B I;16Nor F.".format(mode))
         return dtype
 
     def read(self):

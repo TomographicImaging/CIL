@@ -76,12 +76,10 @@ class TestSequentialSampling(unittest.TestCase):
         # when the sum of each batch_size in the list does not sum to num_indices
         with self.assertRaises(ValueError) as err:            
             sq1 = SequentialSampling(self.num_indices, num_batches = 4, batch_size = [2,3,3,1])         
-            print(err)
 
         # when the len of the list batch_size < num_batches
         with self.assertRaises(ValueError) as err:            
-            sq1 = SequentialSampling(self.num_indices, num_batches = 4, batch_size = [2,3,5])         
-            print(err)            
+            sq1 = SequentialSampling(self.num_indices, num_batches = 4, batch_size = [2,3,5])                 
         
                  
 

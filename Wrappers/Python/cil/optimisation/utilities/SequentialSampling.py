@@ -23,11 +23,40 @@ class SequentialSampling:
     batch_size : list, optional
             The batch size for each `num_batches`. Default = None .
             If the `num_batches` is a divisor of `num_indices` then `batch_size` is `self.num_indices//self.num_batches`, by default.
-            If the `num_batches` is not a divisor of `num_indices`, then `batch_size` is `self.num_indices//self.num_batches + 1`, by default. Otherwise, a list can be passed for each size of the `num_batches`.
+            If the `num_batches` is not a divisor of `num_indices`, then `batch_size` is `self.num_indices//self.num_batches + 1`, by default. Otherwise, a list can be passed for each size of the `num_batches`.    
         
     See also
     --------
     :class:`.RandomSampling`
+
+    Examples
+    --------
+
+    Create a SequentialSampling iterator for a list of 10 indices, np.arange(10):
+    >>> sq1 = SequentialSampling(10)
+    >>> sq1.show_epochs(1)
+    Epoch : 0, indices used : [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]] 
+
+    Create a SequentialSampling iterator for a list of 10 indices, np.arange(10) with 2 batches:
+    >>> sq1 = SequentialSampling(10, num_batches = 2)
+    >>> sq1.show_epochs(1)
+    Epoch : 0, indices used : [[0, 2, 4, 6, 8], [1, 3, 5, 7, 9]]    
+
+    Create a SequentialSampling iterator for a list of 10 indices, np.arange(10) with 2 batches and step_size = 5:
+    >>> sq1 = SequentialSampling(10, num_batches = 2, step_size = 5)
+    >>> sq1.show_epochs(1)
+    Epoch : 0, indices used : [[0, 5, 1, 6, 2], [7, 3, 8, 4, 9]] 
+
+    Create a SequentialSampling iterator for a list of 10 indices, np.arange(10) with 3 batches:
+    >>> sq1 = SequentialSampling(10, num_batches = 3)
+    >>> sq1.show_epochs(1)
+    Epoch : 0, indices used : [[0, 3, 6, 9], [1, 4, 7, 2], [5, 8]]   
+
+    Create a SequentialSampling iterator for a list of 10 indices, np.arange(10) with 3 batches of batch_size = [1,3,6]:
+    >>> sq1 = SequentialSampling(10, num_batches = 3, batch_size = [1,3,6])
+    >>> sq1.show_epochs(1)
+    Epoch : 0, indices used : [[0], [3, 6, 9], [1, 4, 7, 2, 5, 8]]                
+
 
     """    
                 

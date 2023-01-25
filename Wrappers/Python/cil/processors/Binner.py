@@ -197,7 +197,12 @@ class Binner(DataProcessor):
             stop = shape_out[offset + i]
             step = binning[offset + i]
 
-            roi = list(roi)
+            # accepts a tuple, range or slice
+            try:
+                roi = [roi.start, roi.stop, roi.step]
+            except AttributeError:
+                roi = list(roi)
+                
             length = len(roi)
 
             if length == 1:

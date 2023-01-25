@@ -27,8 +27,9 @@ from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.processors import CentreOfRotationCorrector
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
+import gc
 
-from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests
+from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
 
 initialise_tests()
 
@@ -41,6 +42,8 @@ if has_astra:
 if has_tomophantom:
     from cil.plugins import TomoPhantom
 
+if has_ipp:
+    from cil.processors.cilacc_binner import Binner_IPP
 
 class TestPadder(unittest.TestCase):
     def setUp(self):
@@ -303,8 +306,337 @@ class TestPadder(unittest.TestCase):
 
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-    
+
+
+class TestBinner_cillacc(unittest.TestCase):
+
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
+    def test_binning_cpp(self):
+
+        shape_in = [4,12,16,32]
+        shape_out = [1,2,3,4]
+        start_index = [1,2,1,3]
+        binning = [3,4,5,6]
+
+        binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
+
+        # check clean up
+        del binner_cpp
+        gc.collect()
+
+        shape_in = [1,2,2,2]
+        shape_out = [1,1,1,1]
+        start_index = [0,0,0,0]
+        binning = [2,2,2,2]
+
+        with self.assertRaises(ValueError):
+            binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
+
+
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
+    def test_binning_cpp_2D_data(self):
+
+        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        shape_in = [1] + list(data.shape)
+        shape_out = [1,100,32,17]
+        start_index = [0,10,5,3]
+        binning = [1,1,3,4]
+
+        binned_arr = numpy.empty(shape_out,dtype=numpy.float32)
+        binned_by_hand = numpy.empty(shape_out,dtype=numpy.float32)
+
+
+        binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
+        binner_cpp.bin(data.array, binned_arr)
+
+        k_out=0
+        for k in range(start_index[1],start_index[1]+shape_out[1]):
+            j_out=0
+            for j in range(start_index[2],start_index[2]+shape_out[2]*binning[2], binning[2]):
+                i_out = 0
+                for i in range(start_index[3],start_index[3]+shape_out[3]*binning[3], binning[3]):
+                    binned_by_hand[0,k_out,j_out,i_out]  = data.array[k,j:j+binning[2],i:i+binning[3]].mean()
+                    i_out +=1
+                j_out +=1
+            k_out +=1
+
+        numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
+
+
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
+    def test_binning_cpp_4D(self):
+
+        shape_in = [9,21,40,92]
+        shape_out = [2,4,8,16]
+        start_index = [3,4,5,6]
+        binning = [2,3,4,5]
+
+        data = numpy.random.rand(*shape_in).astype(numpy.float32)
+
+        binned_arr =numpy.zeros(shape_out,dtype=numpy.float32)
+        binned_by_hand =numpy.empty(shape_out,dtype=numpy.float32)
+
+        binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
+        binner_cpp.bin(data, binned_arr)
+
+        l_out=0
+        for l in range(start_index[0],start_index[0]+shape_out[0]*binning[0], binning[0]):
+            k_out=0
+            for k in range(start_index[1],start_index[1]+shape_out[1]*binning[1], binning[1]):
+                j_out=0
+                for j in range(start_index[2],start_index[2]+shape_out[2]*binning[2], binning[2]):
+                    i_out = 0
+                    for i in range(start_index[3],start_index[3]+shape_out[3]*binning[3], binning[3]):
+                        binned_by_hand[l_out,k_out,j_out,i_out]  = data[l:l+binning[0],k:k+binning[1],j:j+binning[2],i:i+binning[3]].mean()
+                        i_out +=1
+                    j_out +=1
+                k_out +=1
+            l_out +=1
+
+        numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
+
+
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
+    def test_binning_cpp_2D(self):
+        
+        shape_in = [1,1,3,3]
+        shape_out = [1,1,1,1]
+        start_index = [0,0,0,0]
+        binning = [1,1,2,2]
+
+        data = numpy.random.rand(*shape_in).astype(numpy.float32)
+
+        binned_arr =numpy.zeros(shape_out,dtype=numpy.float32)
+        binned_by_hand =numpy.empty(shape_out,dtype=numpy.float32)
+
+        binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
+        binner_cpp.bin(data, binned_arr)
+
+        l_out=0
+        for l in range(start_index[0],start_index[0]+shape_out[0]*binning[0], binning[0]):
+            k_out=0
+            for k in range(start_index[1],start_index[1]+shape_out[1]*binning[1], binning[1]):
+                j_out=0
+                for j in range(start_index[2],start_index[2]+shape_out[2]*binning[2], binning[2]):
+                    i_out = 0
+                    for i in range(start_index[3],start_index[3]+shape_out[3]*binning[3], binning[3]):
+                        binned_by_hand[l_out,k_out,j_out,i_out]  = data[l:l+binning[0],k:k+binning[1],j:j+binning[2],i:i+binning[3]].mean()
+                        i_out +=1
+                    j_out +=1
+                k_out +=1
+            l_out +=1
+
+        numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
+
+
 class TestBinner(unittest.TestCase):
+
+    def test_parse_roi(self):
+
+        ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
+        data = ig.allocate('random')
+
+        channel = range(0,10,3)
+        vertical = range(0,8,2)
+        horizontal_y = range(0,22,1)
+        horizontal_x = range(0,4,4)
+
+        roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
+        proc = Binner(roi,accelerated=True)
+        proc._parse_roi(data.ndim, data.shape,data.dimension_labels)
+
+        # check set values
+        self.assertTrue(proc._shape_in == list(data.shape))
+
+        shape_out =[(channel.stop - channel.start)//channel.step,
+        (vertical.stop - vertical.start)//vertical.step,
+        (horizontal_y.stop - horizontal_y.start)//horizontal_y.step,
+        (horizontal_x.stop - horizontal_x.start)//horizontal_x.step
+        ]
+
+        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
+        numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
+
+        roi_ordered = [
+            range(channel.start, shape_out[0] * channel.step, channel.step),
+            range(vertical.start, shape_out[1] * vertical.step, vertical.step),
+            range(horizontal_y.start, shape_out[2] * horizontal_y.step, horizontal_y.step),
+            range(horizontal_x.start, shape_out[3] * horizontal_x.step, horizontal_x.step)
+        ]
+
+        self.assertTrue(proc._roi_ordered == roi_ordered)
+        self.assertTrue(proc._binning == [3,2,1,4] )
+        self.assertTrue(proc._index_start ==[0,0,0,0])
+
+
+    def test_bin_acquisition_geometry_parallel2D(self):
+
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=True)).set_panel(128,0.1).set_channels(4)
+
+
+    def test_bin_acquisition_geometry_parallel3D(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=True)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+
+    def test_bin_acquisition_geometry_cone2D(self):
+
+        ag = AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=True)).set_panel(128,0.1).set_channels(4)
+
+
+
+    def test_bin_acquisition_geometry_cone3D(self):
+
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+
+                # bin each dimension in turn
+                {'channel':(None,None,2),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+                {'channel':(None,None,None),'angle':(None,None,2),'vertical':(None,None,None),'horizontal':(None,None,None)},
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,2),'horizontal':(None,None,None)},
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,2)},
+        ]
+
+        ag_gold = [
+                # same as input
+                ag.copy(),
+                # bin each dimension in turn
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(2),
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4),
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,32],[0.1,0.4]).set_channels(4),
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([64,64],[0.2,0.2]).set_channels(4)
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Binner(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._bin_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
+
+
+    def test_bin_image_geometry(self):
+
+        ig_in = ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
+
+                # bin each dimension in turn
+                {'channel':(None,None,2),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
+                {'channel':(None,None,None),'vertical':(None,None,2),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
+                {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,2),'horizontal_y':(None,None,None)},
+                {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,2)},
+
+                # bin all
+                {'channel':(None,None,3),'vertical':(None,None,7),'horizontal_x':(None,None,4),'horizontal_y':(None,None,5)},
+
+                # crop and bin
+                {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
+                
+                # bin to single dimension
+                {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,8),'horizontal_y':(None,None,16)},
+        ]
+
+        ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
+                    ImageGeometry(8,16,28,0.1,0.2,0.3,channels=2),
+                    ImageGeometry(8,16,14,0.1,0.2,0.6,channels=4),
+                    ImageGeometry(4,16,28,0.2,0.2,0.3,channels=4),
+                    ImageGeometry(8,8,28,0.1,0.4,0.3,channels=4),
+                    ImageGeometry(2,3,4,0.4,1.0,2.1,center_y=-0.1,channels=1),
+                    ImageGeometry(3,2,4,0.2,0.4,1.2,center_y=-0.4, center_z=-0.6, channels=1),
+                    ImageGeometry(1,1,1,0.8,3.2,8.4,channels=1)
+        ]
+
+        #channel spacing isn't an initialisation argument
+        ig_gold[1].channel_spacing=2
+        ig_gold[5].channel_spacing=3
+        ig_gold[6].channel_spacing=2
+        ig_gold[7].channel_spacing=4
+
+
+        for i, roi in enumerate(rois):
+            proc = Binner(roi=roi)
+            proc.set_input(ig_in)
+            ig_out = proc._bin_image_geometry()
+            self.assertEqual(ig_gold[i], ig_out, msg="Binning image geometry with roi {}".format(i))
+
+        with self.assertRaises(ValueError):
+            roi = {'wrong label':(None,None,None)}
+            proc = Binner(roi=roi)
+            proc.set_input(ig_in)
+            ig_out = proc._bin_image_geometry(ig_in)
+
+
+    def test_bin_array_numpy(self):
+        pass
+
+
+    def test_bin_array_acc(self):
+        pass
+
+
+    def test_bin_image_data(self):
+        """
+        Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
+        """
+        ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
+        data = ig.allocate('random')
+
+        channel = range(0,10,2)
+        vertical = range(0,8,2)
+        horizontal_y = range(0,6,2)
+        horizontal_x = range(0,4,2)
+
+        roi = {'channel':channel,'vertical':vertical,'horizontal_x':horizontal_x,'horizontal_y':horizontal_y}
+        proc = Binner(roi,accelerated=True)
+        proc.set_input(data)
+        binned_data = proc.get_output()
+
+        ig_out = ImageGeometry(2,3,4,0.2,0.4,0.6,0.4,0.5,0.6,channels=5)
+        ig_out.channel_spacing = 2
+
+        binned_by_hand = ig_out.allocate(None)
+
+        l_out = 0
+        for l in channel:
+            k_out = 0
+            for k in vertical:
+                j_out = 0
+                for j in horizontal_y:
+                    i_out = 0
+                    for i in horizontal_x:
+                        binned_by_hand.array[l_out,k_out,j_out,i_out]  = data.array[l:l+channel.step,k:k+vertical.step,j:j+horizontal_y.step,i:i+horizontal_x.step].mean()
+                        i_out +=1
+                    j_out +=1
+                k_out +=1
+            l_out+=1
+
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
+
+
+        #test with `out`
+        binned_data.fill(0)
+        proc.get_output(out=binned_data)
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
+   
+
+
+    def test_bin_acquisition_data(self):
+        """
+        Results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
+        """
+        pass
+
+
     def test_Binner(self):
         #test parallel 2D case
         

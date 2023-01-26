@@ -473,18 +473,81 @@ class TestBinner(unittest.TestCase):
 
     def test_bin_acquisition_geometry_parallel2D(self):
 
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=True)).set_panel(128,0.1).set_channels(4)
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
 
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'horizontal':(None,None,None)},
+
+                # bin all
+                {'channel':(None,None,4),'angle':(None,None,2),'horizontal':(None,None,16)},
+        ]
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel(8,[1.6,0.1]).set_channels(1),
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Binner(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._bin_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
     def test_bin_acquisition_geometry_parallel3D(self):
 
-        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=True)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+
+                # bin all
+                {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
+                
+                # bin to single dimension
+                {'vertical':(31,33,2)},
+        ]
+
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
+                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Binner(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._bin_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
 
     def test_bin_acquisition_geometry_cone2D(self):
 
-        ag = AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=True)).set_panel(128,0.1).set_channels(4)
+        ag = AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
 
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'horizontal':(None,None,None)},
+
+                # bin all
+                {'channel':(None,None,4),'angle':(None,None,2),'horizontal':(None,None,16)},
+        ]
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel(8,[1.6,0.1]).set_channels(1),
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Binner(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._bin_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
 
     def test_bin_acquisition_geometry_cone3D(self):
@@ -495,21 +558,22 @@ class TestBinner(unittest.TestCase):
                 # same as input
                 {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
 
-                # bin each dimension in turn
-                {'channel':(None,None,2),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
-                {'channel':(None,None,None),'angle':(None,None,2),'vertical':(None,None,None),'horizontal':(None,None,None)},
-                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,2),'horizontal':(None,None,None)},
-                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,2)},
+                # bin all
+                {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
+
+                # shift detector with crop
+                {'vertical':(32,65,2)},
+                
+                # bin to single dimension
+                {'vertical':(31,33,2)},
+
         ]
 
         ag_gold = [
-                # same as input
                 ag.copy(),
-                # bin each dimension in turn
-                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(2),
-                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4),
-                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,32],[0.1,0.4]).set_channels(4),
-                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([64,64],[0.2,0.2]).set_channels(4)
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,32*0.2/2]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,16],[0.1,0.4]).set_channels(4),
+                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
         ]
 
         for i, roi in enumerate(rois):
@@ -528,12 +592,6 @@ class TestBinner(unittest.TestCase):
                 # same as input
                 {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
 
-                # bin each dimension in turn
-                {'channel':(None,None,2),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
-                {'channel':(None,None,None),'vertical':(None,None,2),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
-                {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,2),'horizontal_y':(None,None,None)},
-                {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,2)},
-
                 # bin all
                 {'channel':(None,None,3),'vertical':(None,None,7),'horizontal_x':(None,None,4),'horizontal_y':(None,None,5)},
 
@@ -545,27 +603,22 @@ class TestBinner(unittest.TestCase):
         ]
 
         ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
-                    ImageGeometry(8,16,28,0.1,0.2,0.3,channels=2),
-                    ImageGeometry(8,16,14,0.1,0.2,0.6,channels=4),
-                    ImageGeometry(4,16,28,0.2,0.2,0.3,channels=4),
-                    ImageGeometry(8,8,28,0.1,0.4,0.3,channels=4),
                     ImageGeometry(2,3,4,0.4,1.0,2.1,center_y=-0.1,channels=1),
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_y=-0.4, center_z=-0.6, channels=1),
                     ImageGeometry(1,1,1,0.8,3.2,8.4,channels=1)
         ]
 
         #channel spacing isn't an initialisation argument
-        ig_gold[1].channel_spacing=2
-        ig_gold[5].channel_spacing=3
-        ig_gold[6].channel_spacing=2
-        ig_gold[7].channel_spacing=4
+        ig_gold[1].channel_spacing=3
+        ig_gold[2].channel_spacing=2
+        ig_gold[3].channel_spacing=4
 
 
         for i, roi in enumerate(rois):
             proc = Binner(roi=roi)
             proc.set_input(ig_in)
             ig_out = proc._bin_image_geometry()
-            self.assertEqual(ig_gold[i], ig_out, msg="Binning image geometry with roi {}".format(i))
+            self.assertEqual(ig_gold[i], ig_out, msg="Binning image geometry with roi {} failed".format(i))
 
         with self.assertRaises(ValueError):
             roi = {'wrong label':(None,None,None)}
@@ -574,13 +627,54 @@ class TestBinner(unittest.TestCase):
             ig_out = proc._bin_image_geometry(ig_in)
 
 
-    def test_bin_array_numpy(self):
-        pass
+        # binning/cropping offsets geometry
+        ig_in = ImageGeometry(128,128,128,16,16,16,80,240,-160)
+        ig_gold = ImageGeometry(10,10,10,48,48,48,-192,-32,-432)
+
+        roi = {'vertical':(32,64,3),'horizontal_x':(32,64,3),'horizontal_y':(32,64,3)}
+        proc = Binner(roi,accelerated=True)
+        proc.set_input(ig_in)
+        ig_out = proc.get_output()
+
+        self.assertEqual(ig_gold, ig_out, msg="Binning image geometry with offset roi failed")
 
 
-    def test_bin_array_acc(self):
-        pass
+    def test_bin_array_consistency(self):
 
+        ig = ImageGeometry(64,32,16,channels=8)
+        data = ig.allocate('random')
+
+        roi = {'horizontal_x':(1,-1,16),'horizontal_y':(1,-1,8),'channel':(1,-1,2),'vertical':(1,-1,4)}
+
+        binner = Binner(roi)
+        binner.set_input(data)
+
+        shape_binned = binner._shape_out
+
+        binned_arr_acc = numpy.empty(shape_binned,dtype=numpy.float32)
+        binned_arr_numpy = numpy.empty(shape_binned,dtype=numpy.float32)
+        binned_by_hand = numpy.empty(shape_binned,dtype=numpy.float32)
+
+        binner._bin_array_numpy(data.array, binned_arr_numpy)
+        binner._bin_array_acc(data.array, binned_arr_acc)
+
+
+        l_out = 0
+        for l in range(1,shape_binned[0]*2, 2):
+            k_out = 0
+            for k in range(1,shape_binned[1]*4, 4):
+                j_out = 0
+                for j in range(1,shape_binned[2]*8, 8):
+                    i_out = 0
+                    for i in range(1, shape_binned[3]*16, 16):
+                        binned_by_hand[l_out,k_out,j_out,i_out]  = data.array[l:l+2,k:k+4,j:j+8,i:i+16].mean()
+                        i_out +=1
+                    j_out +=1
+                k_out +=1
+            l_out +=1
+
+        numpy.testing.assert_allclose(binned_by_hand,binned_arr_numpy,atol=1e-6)
+        numpy.testing.assert_allclose(binned_by_hand,binned_arr_acc,atol=1e-6)
 
     def test_bin_image_data(self):
         """
@@ -632,189 +726,48 @@ class TestBinner(unittest.TestCase):
 
     def test_bin_acquisition_data(self):
         """
-        Results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
+        Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
-        pass
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
+        data = ag.allocate('random')
+
+        channel = range(0,10,2)
+        angle = range(0,8,2)
+        vertical = range(0,6,2)
+        horizontal = range(0,4,2)
+
+        roi = {'channel':channel,'vertical':vertical,'horizontal':horizontal,'angle':angle}
+        proc = Binner(roi,accelerated=True)
+        proc.set_input(data)
+        binned_data = proc.get_output()
+
+        ag_out = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(22.5,360+22.5,4,endpoint=False)).set_panel([2,3],[0.2,0.4]).set_channels(5)
+        binned_by_hand = ag_out.allocate(None)
+
+        l_out = 0
+        for l in channel:
+            k_out = 0
+            for k in angle:
+                j_out = 0
+                for j in vertical:
+                    i_out = 0
+                    for i in horizontal:
+                        binned_by_hand.array[l_out,k_out,j_out,i_out]  = data.array[l:l+channel.step,k:k+vertical.step,j:j+vertical.step,i:i+horizontal.step].mean()
+                        i_out +=1
+                    j_out +=1
+                k_out +=1
+            l_out+=1
+
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
 
 
-    def test_Binner(self):
-        #test parallel 2D case
-        
-        ray_direction = [0.1, 3.0]
-        detector_position = [-1.3, 1000.0]
-        detector_direction_row = [1.0, 0.2]
-        rotation_axis_position = [0.1, 2.0]
-        
-        AG = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    rotation_axis_position=rotation_axis_position)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel(5, pixel_size=0.1)
-        
-        data = AG.allocate('random')
-        
-        b = Binner(roi={'channel': (1, -2, 3),
-                        'angle': (2, 9, 2),
-                        'horizontal': (2, -1)})
-        
-        b.set_input(data)
-        data_binned = b.process()
-        
-        AG_binned = AG.clone()
-        AG_binned.set_channels(num_channels=2)
-        AG_binned.set_panel(2, pixel_size=0.1)
-        angles_new = (angles[2:8:2] + angles[3:9:2])/2
-        AG_binned.set_angles(angles_new, initial_angle=10, angle_unit='radian')
-        
-        data_new = (data.as_array()[1:6:3, :, :] + data.as_array()[2:7:3, :, :] + data.as_array()[3:8:3, :, :]) / 3
-        data_new = (data_new[:, 2:8:2, :] + data_new[:, 3:9:2, :]) / 2
-        data_new = data_new[:, :, 2:-1]
-        
-        #self.assertTrue(data_binned.geometry == AG_binned)
-        numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
-        
-        #%%
-        #test parallel 3D case
-        
-        ray_direction = [0.1, 3.0, 0.4]
-        detector_position = [-1.3, 1000.0, 2]
-        detector_direction_row = [1.0, 0.2, 0.0]
-        detector_direction_col = [0.0 ,0.0, 1.0]
-        rotation_axis_position = [0.1, 2.0, 0.5]
-        rotation_axis_direction = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    detector_direction_y=detector_direction_col,
-                                                    rotation_axis_position=rotation_axis_position,
-                                                    rotation_axis_direction=rotation_axis_direction)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
-        
-        data = AG.allocate('random')
-        
-        b = Binner(roi={'channel': (None, 1),
-                        'angle': -1,
-                        'horizontal': (1, None, 2),
-                        'vertical': (0 , 4, 1)})
-        b.set_input(data)
-        data_binned = b.process()
-        
-        dimension_labels_binned = list(data.geometry.dimension_labels)
-        dimension_labels_binned.remove('channel')
-        
-        AG_binned = AG.clone()
-        AG_binned.dimension_labels = dimension_labels_binned
-        AG_binned.set_channels(num_channels=1)
-        AG_binned.set_panel([4, 4], pixel_size=(0.2, 0.2))
-        
-        data_new = data.as_array()[:4, :, :, 0]
-        data_new = (data_new[:, 1:9:2, :] + data_new[:, 2:10:2, :]) / 2
-        
-        #self.assertTrue(data_binned.geometry == AG_binned)
-        numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
-        
-        #%%
-        #test cone 3D case
-        
-        source_position = [0.1, 3.0, 0.4]
-        detector_position = [-1.3, 1000.0, 2]
-        rotation_axis_position = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Cone3D(source_position=source_position, 
-                                                detector_position=detector_position,
-                                                rotation_axis_position=rotation_axis_position)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel((100, 50), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
-        
-        data = AG.allocate('random')
-        
-        b = Binner(roi={'channel': (None, 1),
-                        'angle': -1,
-                        'horizontal': (10, None, 2),
-                        'vertical': (24, 26, 2)})
-        b.set_input(data)
-        data_binned = b.process()
-        
-        dimension_labels_binned = list(data.geometry.dimension_labels)
-        dimension_labels_binned.remove('channel')
-        dimension_labels_binned.remove('vertical')
-        
-        AG_binned = AG.get_slice(vertical='centre')
-        AG_binned = AG_binned.get_slice(channel=0)
-        AG_binned.config.panel.num_pixels[0] = 45
-        AG_binned.config.panel.pixel_size[0] = 0.2
-        AG_binned.config.panel.pixel_size[1] = 0.4
-        
-        data_new = data.as_array()[:,:,:,0]
-        data_new = (data_new[:, 10:99:2, :] + data_new[:, 11:100:2, :]) / 2
-        data_new = (data_new[24, :, :] + data_new[25, :, :]) / 2
-        
-        #self.assertTrue(data_binned.geometry == AG_binned)
-        numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
-        
-        
-        #%% test ImageData
-        IG = ImageGeometry(voxel_num_x=20,
-                            voxel_num_y=30,
-                            voxel_num_z=12,
-                            voxel_size_x=0.1,
-                            voxel_size_y=0.2,
-                            voxel_size_z=0.3,
-                            channels=10,
-                            center_x=0.2,
-                            center_y=0.4,
-                            center_z=0.6,
-                            dimension_labels = ['vertical',\
-                                                'channel',\
-                                                'horizontal_y',\
-                                                'horizontal_x'])
-        
-        data = IG.allocate('random')
-        
-        b = Binner(roi={'channel': (None, None, 2),
-                        'horizontal_x': -1,
-                        'horizontal_y': (10, None, 2),
-                        'vertical': (5, None, 3)})
-        b.set_input(data)
-        data_binned = b.process()
-        
-        IG_binned = IG.copy()
-        IG_binned.voxel_num_y = 10
-        IG_binned.voxel_size_y = 0.2 * 2
-        IG_binned.voxel_num_z = 2
-        IG_binned.voxel_size_z = 0.3 * 3
-        IG_binned.channels = 5
-        IG_binned.channel_spacing = 1 * 2.0
-        
-        data_new = (data.as_array()[:, :-1:2, :, :] + data.as_array()[:, 1::2, :, :]) / 2
-        data_new = (data_new[5:-2:3, :, :, :] + data_new[6:-1:3, :, :, :] + data_new[7::3, :, :, :]) / 3
-        data_new = (data_new[:, :, 10:-1:2, :] + data_new[:, :, 11::2, :]) / 2
-        
-        #self.assertTrue(data_binned.geometry == IG_binned)
-        numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
+        #test with `out`
+        binned_data.fill(0)
+        proc.get_output(out=binned_data)
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
+   
 
 class TestSlicer(unittest.TestCase):      
     def test_Slicer(self):

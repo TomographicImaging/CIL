@@ -2377,7 +2377,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
         
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))

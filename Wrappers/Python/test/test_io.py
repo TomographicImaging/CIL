@@ -273,34 +273,66 @@ class TestTIFF(unittest.TestCase):
         except:
             assert True
 
-    def test_TIFF_compression(self):
+    def test_TIFF_compression3D_0(self):
+        self.TIFF_compression_test(0)
+    
+    def test_TIFF_compression3D_1(self):
         self.TIFF_compression_test(8)
+
+    def test_TIFF_compression3D_2(self):
         self.TIFF_compression_test(16)
+
+    def test_TIFF_compression3D_3(self):
         with self.assertRaises(ValueError) as context:
             self.TIFF_compression_test(12)
+            
+    def test_TIFF_compression4D_0(self):
+        self.TIFF_compression_test(0,2)
+        
+    def test_TIFF_compression4D_1(self):
+        self.TIFF_compression_test(8,2)
 
-    def TIFF_compression_test(self, compression):
-        ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
+    def test_TIFF_compression4D_2(self):
+        self.TIFF_compression_test(16,2)
+    
+    def test_TIFF_compression4D_3(self):
+        with self.assertRaises(ValueError) as context:
+            self.TIFF_compression_test(12,2)
+
+    def TIFF_compression_test(self, compression, channels=1):
+        X=4
+        Y=5
+        Z=6
+        C=channels
+        if C == 1:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
+        else:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6, channels=C)
         data = ig.allocate(0)
-        data.fill(np.arange(4*5*6).reshape(ig.shape))
+        data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
 
         from cil.io import utilities
         compress , dtype= utilities.get_compression(data.array, compression=compression)
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
-
+        if C > 1:
+            assert data.ndim == 4
         fname = os.path.join(self.cwd, "unittest")
         writer = TIFFWriter(data=data, file_name=fname, compression=compression)
         writer.write()
         # force the reader to use the native TIFF dtype by setting dtype=None
         reader = TIFFStackReader(file_name=self.cwd, dtype=None)
         read_array = reader.read()
+        if C > 1:
+            read_array = reader.read_as_ImageData(ig).array
 
         
         if compress:
             tmp = data.array * scale + offset
             tmp = np.asarray(tmp, dtype=dtype)
+        else:
+            tmp = data.array
         
         assert tmp.dtype == read_array.dtype
         
-        np.testing.assert_allclose(tmp, read_array)
+        np.testing.assert_array_equal(tmp, read_array)
 

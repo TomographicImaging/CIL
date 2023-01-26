@@ -58,6 +58,20 @@ def compress_data(data, scale, offset, dtype):
         tmp = tmp.astype(dtype)
     return tmp
 
+def save_scale_offset(fname, scale, offset):
+    '''Save scale and offset to file
+    
+    Parameters
+    ----------
+    fname : string
+    scale : float
+    offset : float
+    '''
+    dirname = os.path.dirname(fname)
+    txt = os.path.join(dirname, 'scaleoffset.json')
+    d = {'scale': scale, 'offset': offset}
+    utilities.save_dict_to_file(txt, d)
+
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
     
@@ -166,6 +180,8 @@ class TIFFWriter(object):
                         ).save(f, 'tiff')
         else:
             raise ValueError('Cannot handle more than 4 dimensions')
+        if self.compress:
+            save_scale_offset(fname, self.scale, self.offset)
     
     def _zero_padding(self, number):
         i = 0

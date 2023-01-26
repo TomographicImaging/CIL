@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+import json
 
 def get_compress(compression=0):
     '''Returns whether the data needs to be compressed and to which numpy type
@@ -96,3 +97,16 @@ def get_compression_scale_offset(data, compression=0):
         scale = 1.0
         offset = 0.0
     return scale, offset
+
+def save_dict_to_file(fname, dictionary):
+    '''Save scale and offset to file
+    
+    Parameters
+    ----------
+    fname : string
+    dictionary : dictionary to write to file
+    '''
+
+    with open(fname, 'w') as configfile:
+        json.dump(dictionary, configfile)
+

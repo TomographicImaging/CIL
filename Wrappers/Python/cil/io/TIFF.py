@@ -90,7 +90,7 @@ class TIFFWriter(object):
     def set_up(self,
                data = None,
                file_name = None,
-               counter_offset = -1,
+               counter_offset = 0,
                compression=0):
         
         self.data_container = data

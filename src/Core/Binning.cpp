@@ -48,50 +48,26 @@ public:
 
 Binner::Binner(const size_t* shape_in, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list)
 {
-
-	//std::cout << "Initialising binner" << std::endl;
-
-
 	memcpy(this->shape_in, shape_in, 4 * sizeof(size_t));
 	memcpy(this->shape_out, shape_out, 4 * sizeof(size_t));
 	memcpy(this->pixel_index_start, pixel_index_start, 4 * sizeof(size_t));
 	memcpy(this->binning_list, binning_list, 4 * sizeof(size_t));
 
-	//std::cout << "shape_in\t" << this->shape_in[0] << '\t' << this->shape_in[1] << '\t' << this->shape_in[2] << '\t' << this->shape_in[3] << std::endl;
-	//std::cout << "shape_out\t" << this->shape_out[0] << '\t' << this->shape_out[1] << '\t' << this->shape_out[2] << '\t' << this->shape_out[3] << std::endl;
-	//std::cout << "pixel_index_start\t" << this->pixel_index_start[0] << '\t' << this->pixel_index_start[1] << '\t' << this->pixel_index_start[2] << '\t' << this->pixel_index_start[3] << std::endl;
-	//std::cout << "binning_list\t" << this->binning_list[0] << '\t' << this->binning_list[1] << '\t' << this->binning_list[2] << '\t' << this->binning_list[3] << std::endl;
-
-
 	srcStep = (int)shape_in[3] * sizeof(float);
 	dstStep = (int)shape_out[3] * sizeof(float);
-
-	//std::cout << "srcStep\t" << srcStep << std::endl;
-	//std::cout << "dstStep\t" << dstStep << std::endl;
 
 	srcSize.width = (int)(shape_out[3] * binning_list[3]);
 	srcSize.height = (int)(shape_out[2] * binning_list[2]);
 
-	//std::cout << "srcSize\t" << srcSize.width << '\t' << srcSize.height << std::endl;
-
 	dstSize.width = (int)shape_out[3];
 	dstSize.height = (int)shape_out[2];
 
-	//std::cout << "dstSize:\t" << dstSize.width << '\t' << dstSize.height << std::endl;
-
 	ippiResizeGetSize_32f(srcSize, dstSize, ippSuper, 0, &specSize, &initSize);
-
-	//std::cout << "specSize\t" << specSize << std::endl;
-	//std::cout << "initSize\t" << initSize << std::endl;
-
 
 	pSpec = (IppiResizeSpec_32f*)ippsMalloc_8u(specSize);
 	ippiResizeSuperInit_32f(srcSize, dstSize, pSpec);
 
 	ippiResizeGetBufferSize_8u(pSpec, dstSize, 1, &bufSize);
-
-	//std::cout << "bufSize\t" << bufSize << std::endl;
-
 }
 
 int Binner::bin(const float* data_in, float* data_binned)
@@ -110,7 +86,6 @@ int Binner::bin(const float* data_in, float* data_binned)
 void Binner::bin_2D(const float* data_in, float* data_binned)
 {
 	/*bin last 2 dimensions in dataset*/
-
 
 	size_t index_channel_in;
 	long long k;

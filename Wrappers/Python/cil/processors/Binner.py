@@ -18,11 +18,6 @@
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
 import numpy as np
 import weakref
-import logging
-
-# IppInit should be called once.
-# get slice geometry needs updating for off centre slices
-# Look at input paramaters.... maybe time to break backward compatibility 
 
 try:
     from cil.processors.cilacc_binner import Binner_IPP

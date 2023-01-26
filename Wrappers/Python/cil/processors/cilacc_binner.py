@@ -9,9 +9,9 @@ c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
 class Binner_IPP(object):
 
    def __init__(self, shape_in, shape_out, start_index, binning):
-      """This constructs a configured cilacc Binner object.
+      """This constructs a configured cilacc Binner object used by cil.processors.Binner. This class should not be used directly.
         
-      This  perfoms no checks on the inputs. Expects input for 4 dimensions.
+      This performs no checks on the inputs. Expects input for 4 dimensions.
 
       Parameters
       ----------
@@ -59,7 +59,7 @@ class Binner_IPP(object):
    def bin(self, array_in, array_binned):
       """This bins the input array and writes the result in array_binned.
       
-      This  perfoms no checks on the inputs.
+      This  performs no checks on the inputs.
 
       Parameters
       ----------

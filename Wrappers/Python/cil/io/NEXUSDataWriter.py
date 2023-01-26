@@ -73,8 +73,10 @@ class NEXUSDataWriter(object):
         if not self.file_name.endswith('nxs') and not self.file_name.endswith('nex'):
             self.file_name+='.nxs'
         
-        self.compression = compression
-        self.compress, self.dtype = utilities.get_compression(data, compression)
+        # Deal with compression
+        self.compress           = utilities.get_compress(compression)
+        self.dtype              = utilities.get_compressed_dtype(data, compression)
+        self.compression        = compression
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):

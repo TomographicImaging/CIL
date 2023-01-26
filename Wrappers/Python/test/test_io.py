@@ -312,7 +312,8 @@ class TestTIFF(unittest.TestCase):
         data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
 
         from cil.io import utilities
-        compress , dtype= utilities.get_compression(data.array, compression=compression)
+        compress = utilities.get_compress(compression)
+        dtype = utilities.get_compressed_dtype(data.array, compression)
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
         if C > 1:
             assert data.ndim == 4

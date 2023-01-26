@@ -112,9 +112,10 @@ class TIFFWriter(object):
                             ' - ImageData\n - AcquisitionData')
 
         # Deal with compression
-        self.compression = compression
-        self.compress, self.dtype,  = utilities.get_compression(data, compression)
+        self.compress           = utilities.get_compress(compression)
+        self.dtype              = utilities.get_compressed_dtype(data, compression)
         self.scale, self.offset = utilities.get_compression_scale_offset(data, compression)
+        self.compression        = compression
 
     
     def write(self):

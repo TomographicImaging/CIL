@@ -3,6 +3,9 @@
     - `get_centre_of_rotation()` calculates the centre of rotation of the system
     - `set_centre_of_rotation()` sets the system centre of rotation with an offset and angle
     - `set_centre_of_rotation_by_slice()` sets the system centre of rotation with offsets from two slices
+  - Binner processor reworked
+    - Significant speed increase available via the C++ backend
+    - Returned geometry is correctly offset where binning/cropping moves the origin
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

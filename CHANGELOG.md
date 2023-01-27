@@ -8,6 +8,7 @@
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
+  - Implemented the analytical norm for GradientOperator
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

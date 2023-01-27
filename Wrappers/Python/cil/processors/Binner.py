@@ -46,7 +46,7 @@ class Binner(DataProcessor):
         Step: Number of pixels to average together. Must be an integer or `None` defaults to 1.
 
     accelerated : boolean, default=True
-        Used the CIL accelerated backend if `True`, numpy if `False`.
+        Uses the CIL accelerated backend if `True`, numpy if `False`.
 
 
     Example

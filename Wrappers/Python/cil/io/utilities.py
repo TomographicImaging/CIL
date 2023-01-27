@@ -25,8 +25,8 @@ def get_compress(compression=None):
     
     Parameters:
     -----------
-    compression : int, string. Default is 0, no compression.
-        It specifies the number of bits to use for compression, allowed values are 0, 8, 16. 
+    compression : string, int. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16. 
     
     Returns:
     --------
@@ -52,7 +52,7 @@ def get_compress(compression=None):
 
     return compress
 
-def get_compressed_dtype(data, compression=0):
+def get_compressed_dtype(data, compression=None):
     '''Returns whether the data needs to be compressed and to which numpy type
     
     Given the data and the compression level, returns the numpy type to be used for compression.
@@ -61,8 +61,8 @@ def get_compressed_dtype(data, compression=0):
     -----------
     data : DataContainer, numpy array
         the data to be compressed
-    compression : int, Default is 0, no compression.
-        Specifies the number of bits to use for compression, allowed values are 0, 8, 16. 
+    compression : string, int. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16. 
 
     Returns:
     --------
@@ -88,8 +88,8 @@ def get_compression_scale_offset(data, compression=0):
     -----------
     data : DataContainer, numpy array
         The data to be compressed
-    compression : int, Default is 0, no compression.
-        Specifies the number of bits to use for compression, allowed values are 0, 8, 16. 
+    compression : string, int. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16. 
 
     Returns:
     --------

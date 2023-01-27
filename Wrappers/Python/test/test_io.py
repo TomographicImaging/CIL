@@ -64,6 +64,8 @@ has_file = os.path.isfile(filename)
 has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia and has_file \
     and has_wget
 
+# Change the level of the logger to WARNING (or whichever you want) to see more information
+# logging.basicConfig(level=logging.WARNING)
 
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
@@ -167,7 +169,6 @@ class TestTIFF(unittest.TestCase):
         # self.logger.setLevel(logging.DEBUG)
         self.cwd = os.path.join(os.getcwd(), 'tifftest')
         os.mkdir(self.cwd)
-
 
     def tearDown(self) -> None:
         shutil.rmtree(self.cwd)
@@ -275,30 +276,30 @@ class TestTIFF(unittest.TestCase):
             assert True
 
     def test_TIFF_compression3D_0(self):
-        self.TIFF_compression_test(0)
+        self.TIFF_compression_test(None)
     
     def test_TIFF_compression3D_1(self):
-        self.TIFF_compression_test(8)
+        self.TIFF_compression_test('uint8')
 
     def test_TIFF_compression3D_2(self):
-        self.TIFF_compression_test(16)
+        self.TIFF_compression_test('uint16')
 
     def test_TIFF_compression3D_3(self):
         with self.assertRaises(ValueError) as context:
-            self.TIFF_compression_test(12)
+            self.TIFF_compression_test('whatever_compression')
             
     def test_TIFF_compression4D_0(self):
-        self.TIFF_compression_test(0,2)
+        self.TIFF_compression_test(None,2)
         
     def test_TIFF_compression4D_1(self):
-        self.TIFF_compression_test(8,2)
+        self.TIFF_compression_test('uint8',2)
 
     def test_TIFF_compression4D_2(self):
-        self.TIFF_compression_test(16,2)
+        self.TIFF_compression_test('uint16',2)
     
     def test_TIFF_compression4D_3(self):
         with self.assertRaises(ValueError) as context:
-            self.TIFF_compression_test(12,2)
+            self.TIFF_compression_test('whatever_compression',2)
 
     def TIFF_compression_test(self, compression, channels=1):
         X=4

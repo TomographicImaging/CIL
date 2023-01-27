@@ -90,15 +90,15 @@ class TIFFWriter(object):
             counter_offset indicates at which number the ordinal index should start.
             For instance, if you have to save 10 files the index would by default go from 0 to 9.
             By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
-        compression : int, default 0. Accepted values 0, 8, 16.
-            The lossy compression to apply. The default 0 will not compress data. 
-            8 or 16 will compress to unsigned int 8 and 16 bit respectively.
+        compression : str, default None. Accepted values None, 'uint8', 'uint16'
+            The lossy compression to apply. The default None will not compress data. 
+            'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
 
 
         Note:
         -----
 
-        If compression 8 or 16 are used, the scale and offset used to compress the data are saved 
+        If compression 'uint8' or 'unit16' are used, the scale and offset used to compress the data are saved 
         in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
 
         The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
@@ -107,7 +107,7 @@ class TIFFWriter(object):
         self.data_container = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         counter_offset = kwargs.get('counter_offset', 0)
-        compression = kwargs.get('compression', 0)
+        compression = kwargs.get('compression', None)
         
         if ((self.data_container is not None) and (self.file_name is not None)):
             self.set_up(data = self.data_container,

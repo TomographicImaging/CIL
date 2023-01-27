@@ -22,7 +22,8 @@ def get_compress(compression=0):
     
     Parameters:
     -----------
-    compression : int, specifies the number of bits to use for compression, allowed values are 0, 8, 16. Default is 0, no compression.
+    compression : int, Default is 0, no compression.
+        It specifies the number of bits to use for compression, allowed values are 0, 8, 16. 
     
     Returns:
     --------
@@ -47,8 +48,10 @@ def get_compressed_dtype(data, compression=0):
 
     Parameters:
     -----------
-    data : DataContainer, numpy array, the data to be compressed
-    compression : int, specifies the number of bits to use for compression, allowed values are 0, 8, 16. Default is 0, no compression.
+    data : DataContainer, numpy array
+        the data to be compressed
+    compression : int, Default is 0, no compression.
+        Specifies the number of bits to use for compression, allowed values are 0, 8, 16. 
 
     Returns:
     --------
@@ -70,8 +73,10 @@ def get_compression_scale_offset(data, compression=0):
     
     Parameters:
     -----------
-    data : DataContainer, numpy array, the data to be compressed
-    compression : int, specifies the number of bits to use for compression, allowed values are 0, 8, 16. Default is 0, no compression.
+    data : DataContainer, numpy array
+        The data to be compressed
+    compression : int, Default is 0, no compression.
+        Specifies the number of bits to use for compression, allowed values are 0, 8, 16. 
 
     Returns:
     --------
@@ -104,7 +109,8 @@ def save_dict_to_file(fname, dictionary):
     Parameters
     ----------
     fname : string
-    dictionary : dictionary to write to file
+    dictionary : dictionary
+        dictionary to write to file
     '''
 
     with open(fname, 'w') as configfile:

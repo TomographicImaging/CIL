@@ -92,6 +92,15 @@ class TIFFWriter(object):
         compression : int, default 0. Accepted values 0, 8, 16.
             The lossy compression to apply. The default 0 will not compress data. 
             8 or 16 will compress to unsigned int 8 and 16 bit respectively.
+
+
+        Note:
+        -----
+
+        If compression 8 or 16 are used, the scale and offset used to compress the data are saved 
+        in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
+
+        The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
         '''
         
         self.data_container = kwargs.get('data', None)

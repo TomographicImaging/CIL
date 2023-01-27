@@ -506,70 +506,13 @@ Start and end also can be negative using numpy indexing.</p>
 <dd><dl class="py method">
 <dt id="cil.io.TIFFStackReader.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Basic TIFF redaer which loops through all riff files in a specific
+<dd><p>Basic TIFF redaer which loops through all tiff files in a specific
 folder and load them in alphabetic order</p>
-<p>:param :
-:type : param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
-:param :
-:type : type file_name: str, abspath to folder, list
-:param :</p>
-<blockquote>
-<div><dl class="simple">
-<dt>{‘axis_0’: (start, end, step),</dt><dd><p>‘axis_1’: (start, end, step),
-‘axis_2’: (start, end, step)}</p>
-</dd>
-</dl>
-<p>Files are stacked along axis_0. axis_1 and axis_2 correspond
-to row and column dimensions, respectively.
-Files are stacked in alphabetic order.
-To skip files or to change number of files to load,
-adjust axis_0. For instance, ‘axis_0’: (100, 300)
-will skip first 100 files and will load 200 files.
-‘axis_0’: -1 is a shortcut to load all elements along axis.
-Start and end can be specified as None which is equivalent
-to start = 0 and end = load everything to the end, respectively.
-Start and end also can be negative.
-Notes: roi is specified for axes before transpose.</p>
-</div></blockquote>
-<p>:type : param roi: dictionary with roi to load
-:param :
-:type : type roi: dictionary, default None
-:param :
-:type : param transpose: transpose loaded images
-:param :
-:type : type transpose: bool, default False
-:param : of pixels is binned together, values of resulting binned</p>
-<blockquote>
-<div><p>pixels are calculated as average.
-In ‘slice’ mode ‘step’ defines standard numpy slicing.
-Note: in general output array size in bin mode != output array size
-in slice mode</p>
-</div></blockquote>
-<p>:type : param mode: str, ‘bin’ (default) or ‘slice’. In bin mode, ‘step’ number
-:param :
-:type : type mode: str, default ‘bin’
-:param : the type of the saved file.
-:type : param dtype: Requested type of the read image. If set to None it defaults to
-:param :
-:type : type dtype: numpy type, string, default np.float32</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>numpy array with stack of images</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.io.TIFFStackReader.set_up">
-<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_name=None</span></em>, <em class="sig-param"><span class="pre">roi={'axis_0':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_1':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_2':</span> <span class="pre">-1}</span></em>, <em class="sig-param"><span class="pre">transpose=False</span></em>, <em class="sig-param"><span class="pre">mode='bin'</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.set_up" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
-<li><p><strong>roi</strong> (<em>dictionary</em><em>, </em><em>default None</em>) – <p>dictionary with roi to load
+<li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – Path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
+<li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – <p>dictionary with roi to load
 {‘axis_0’: (start, end, step),</p>
 <blockquote>
 <div><p>’axis_1’: (start, end, step),
@@ -587,15 +530,62 @@ to start = 0 and end = load everything to the end, respectively.
 Start and end also can be negative.
 Notes: roi is specified for axes before transpose.</p>
 </p></li>
-<li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – transpose loaded images</p></li>
-<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>default 'bin'</em>) – str, ‘bin’ (default) or ‘slice’. In bin mode, ‘step’ number
-of pixels is binned together, values of resulting binned
-pixels are calculated as average.
+<li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – Whether to transpose loaded images</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>default 'bin'. Accepted values 'bin'</em><em>, </em><em>'slice'</em>) – Referring to the ‘step’ defined in the roi parameter, in bin mode, ‘step’ number of pixels
+are binned together, values of resulting binned pixels are calculated as average.
 In ‘slice’ mode ‘step’ defines standard numpy slicing.
-Note: in general output array size in bin mode != output array size
-in slice mode</p></li>
-<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to
-the type of the saved file.</p></li>
+Note: in general output array size in bin mode != output array size in slice mode</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to the type of the saved file.</p></li>
+</ul>
+</dd>
+</dl>
+<p>You can rescale the read data as <cite>rescaled_data = (read_data - offset)/scale</cite> with the following code:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rescaled_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
+read data to approximately the original data with the following code:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">TIFFWriter</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">original_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">about_original_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.io.TIFFStackReader.set_up">
+<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_name=None</span></em>, <em class="sig-param"><span class="pre">roi={'axis_0':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_1':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_2':</span> <span class="pre">-1}</span></em>, <em class="sig-param"><span class="pre">transpose=False</span></em>, <em class="sig-param"><span class="pre">mode='bin'</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.set_up" title="Permalink to this definition">#</a></dt>
+<dd><p>Set up method for the TIFFStackReader class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – Path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
+<li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – <p>dictionary with roi to load
+{‘axis_0’: (start, end, step),</p>
+<blockquote>
+<div><p>’axis_1’: (start, end, step),
+‘axis_2’: (start, end, step)}</p>
+</div></blockquote>
+<p>Files are stacked along axis_0. axis_1 and axis_2 correspond
+to row and column dimensions, respectively.
+Files are stacked in alphabetic order.
+To skip files or to change number of files to load,
+adjust axis_0. For instance, ‘axis_0’: (100, 300)
+will skip first 100 files and will load 200 files.
+‘axis_0’: -1 is a shortcut to load all elements along axis.
+Start and end can be specified as None which is equivalent
+to start = 0 and end = load everything to the end, respectively.
+Start and end also can be negative.
+Notes: roi is specified for axes before transpose.</p>
+</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – Whether to transpose loaded images</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>default 'bin'. Accepted values 'bin'</em><em>, </em><em>'slice'</em>) – Referring to the ‘step’ defined in the roi parameter, in bin mode, ‘step’ number of pixels
+are binned together, values of resulting binned pixels are calculated as average.
+In ‘slice’ mode ‘step’ defines standard numpy slicing.
+Note: in general output array size in bin mode != output array size in slice mode</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to the type of the saved file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -633,6 +623,28 @@ In facts you can reshape a (2,3,4) array as (3,4,2), however we do not check if 
 leads to sensible data.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="cil.io.TIFFStackReader.read_scale_offset">
+<code class="sig-name descname"><span class="pre">read_scale_offset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read_scale_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_scale_offset" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the scale and offset from a json file in the same folder as the tiff stack</p>
+<p>This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter</p>
+<p>tuple: (scale, offset)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.io.TIFFStackReader.read_rescaled">
+<code class="sig-name descname"><span class="pre">read_rescaled</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read_rescaled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_rescaled" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the TIFF stack and rescales it with the provided scale and offset, or with the ones in the json file if not provided</p>
+<p>This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter</p>
+<dl class="simple">
+<dt>scale: float, default None</dt><dd><p>scale to apply to the data. If None, the scale will be read from the json file saved by TIFFWriter.</p>
+</dd>
+<dt>offset: float, default None</dt><dd><p>offset to apply to the data. If None, the offset will be read from the json file saved by TIFFWriter.</p>
+</dd>
+</dl>
+<p>numpy.ndarray in float32</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -645,14 +657,19 @@ leads to sensible data.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – the data to save to TIFF file(s)</p></li>
-<li><p><strong>file_name</strong> (<em>string</em>) – string defining the file name prefix</p></li>
-<li><p><strong>counter_offset</strong> (<em>int</em><em>, </em><em>default 0</em>) – int indicating at which number the index starts.
+<li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – This represents the data to save to TIFF file(s)</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – This defines the file name prefix, i.e. the file name without the extension.</p></li>
+<li><p><strong>counter_offset</strong> (<em>int</em><em>, </em><em>default 0.</em>) – counter_offset indicates at which number the ordinal index should start.
 For instance, if you have to save 10 files the index would by default go from 0 to 9.
 By counter_offset you can offset the index: from <cite>counter_offset</cite> to <cite>9+counter_offset</cite></p></li>
+<li><p><strong>compression</strong> (<em>str</em><em>, </em><em>default None. Accepted values None</em><em>, </em><em>'uint8'</em><em>, </em><em>'uint16'</em>) – The lossy compression to apply. The default None will not compress data.
+‘uint8’ or ‘unit16’ will compress to unsigned int 8 and 16 bit respectively.</p></li>
 </ul>
 </dd>
 </dl>
+<p>If compression ‘uint8’ or ‘unit16’ are used, the scale and offset used to compress the data are saved
+in a file called <cite>scaleoffset.json</cite> in the same directory as the TIFF file(s).</p>
+<p>The original data can be obtained by: <cite>original_data = (compressed_data - offset) / scale</cite></p>
 </dd></dl>
 
 <dl class="py attribute">

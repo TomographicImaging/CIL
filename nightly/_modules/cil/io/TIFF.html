@@ -223,10 +223,49 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">utilities</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compress_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Compress data to dtype using scale and offset</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : numpy array</span>
+<span class="sd">    scale : float</span>
+<span class="sd">    offset : float</span>
+<span class="sd">    dtype : numpy dtype</span>
+<span class="sd">    </span>
+<span class="sd">    returns compressed casted data&#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># compress each slice</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">compress_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tmp</span>
+
+<span class="k">def</span> <span class="nf">save_scale_offset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Save scale and offset to file</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : string</span>
+<span class="sd">    scale : float</span>
+<span class="sd">    offset : float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="n">txt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="s1">&#39;scaleoffset.json&#39;</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="n">offset</span><span class="p">}</span>
+    <span class="n">utilities</span><span class="o">.</span><span class="n">save_dict_to_file</span><span class="p">(</span><span class="n">txt</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TIFFWriter"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFWriter">[docs]</a><span class="k">class</span> <span class="nc">TIFFWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Write a DataSet to disk as a TIFF file or stack&#39;&#39;&#39;</span>
@@ -234,29 +273,47 @@
 <div class="viewcode-block" id="TIFFWriter.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFWriter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        :param data: the data to save to TIFF file(s)</span>
-<span class="sd">        :type data: DataContainer, AcquisitionData or ImageData</span>
-<span class="sd">        :param file_name: string defining the file name prefix</span>
-<span class="sd">        :type file_name: string</span>
-<span class="sd">        :param counter_offset: int indicating at which number the index starts. </span>
-<span class="sd">          For instance, if you have to save 10 files the index would by default go from 0 to 9.</span>
-<span class="sd">          By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`</span>
-<span class="sd">        :type counter_offset: int, default 0</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : DataContainer, AcquisitionData or ImageData</span>
+<span class="sd">            This represents the data to save to TIFF file(s)</span>
+<span class="sd">        file_name : string</span>
+<span class="sd">            This defines the file name prefix, i.e. the file name without the extension.</span>
+<span class="sd">        counter_offset : int, default 0.</span>
+<span class="sd">            counter_offset indicates at which number the ordinal index should start.</span>
+<span class="sd">            For instance, if you have to save 10 files the index would by default go from 0 to 9.</span>
+<span class="sd">            By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`</span>
+<span class="sd">        compression : str, default None. Accepted values None, &#39;uint8&#39;, &#39;uint16&#39;</span>
+<span class="sd">            The lossy compression to apply. The default None will not compress data. </span>
+<span class="sd">            &#39;uint8&#39; or &#39;unit16&#39; will compress to unsigned int 8 and 16 bit respectively.</span>
+
+
+<span class="sd">        Note:</span>
+<span class="sd">        -----</span>
+
+<span class="sd">        If compression &#39;uint8&#39; or &#39;unit16&#39; are used, the scale and offset used to compress the data are saved </span>
+<span class="sd">        in a file called `scaleoffset.json` in the same directory as the TIFF file(s).</span>
+
+<span class="sd">        The original data can be obtained by: `original_data = (compressed_data - offset) / scale`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">counter_offset</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;counter_offset&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;compression&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="p">,</span>
                         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> 
-                        <span class="n">counter_offset</span><span class="o">=</span><span class="n">counter_offset</span><span class="p">)</span></div>
+                        <span class="n">counter_offset</span><span class="o">=</span><span class="n">counter_offset</span><span class="p">,</span>
+                        <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span></div>
         
     <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="n">counter_offset</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+               <span class="n">counter_offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+               <span class="n">compression</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="o">=</span> <span class="n">data</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -275,6 +332,13 @@
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Writer supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Deal with compression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compress</span>           <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span>              <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compressed_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compression_scale_offset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span>        <span class="o">=</span> <span class="n">compression</span>
+
     
     <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">):</span>
@@ -289,7 +353,9 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.tiff&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">))</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tiff&#39;</span><span class="p">)</span>
+                <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span>
+                    <span class="n">compress_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tiff&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">sliceno</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="c1"># save single slice</span>
@@ -299,7 +365,9 @@
                     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">),</span>
                     <span class="n">sliceno</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter_offset</span><span class="p">)</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">sliceno</span><span class="p">])</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tiff&#39;</span><span class="p">)</span>
+                    <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span>
+                            <span class="n">compress_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">sliceno</span><span class="p">]</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tiff&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="c1"># find how many decimal places self.data_container.shape[0] and shape[1] have</span>
             <span class="n">zero_padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_padding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -315,9 +383,13 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">,</span> <span class="n">sliceno1</span><span class="p">,</span> <span class="n">sliceno2</span><span class="p">)</span>
                     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">sliceno1</span><span class="p">][</span><span class="n">sliceno2</span><span class="p">])</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tiff&#39;</span><span class="p">)</span>
+                        <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span>
+                            <span class="n">compress_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">sliceno1</span><span class="p">][</span><span class="n">sliceno2</span><span class="p">]</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tiff&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot handle more than 4 dimensions&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">:</span>
+            <span class="n">save_scale_offset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">_zero_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -333,64 +405,73 @@
 <div class="viewcode-block" id="TIFFStackReader.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">        Basic TIFF redaer which loops through all riff files in a specific </span>
+<span class="sd">        Basic TIFF redaer which loops through all tiff files in a specific </span>
 <span class="sd">        folder and load them in alphabetic order</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">            </span>
-<span class="sd">        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file</span>
-<span class="sd">        :type file_name: str, abspath to folder, list</span>
+<span class="sd">        file_name : str, abspath to folder, list</span>
+<span class="sd">            Path to folder with tiff files, list of paths of tiffs, or single tiff file</span>
+<span class="sd">                   </span>
+<span class="sd">        roi : dictionary, default `None`</span>
+<span class="sd">            dictionary with roi to load </span>
+<span class="sd">            {&#39;axis_0&#39;: (start, end, step), </span>
+<span class="sd">                &#39;axis_1&#39;: (start, end, step), </span>
+<span class="sd">                &#39;axis_2&#39;: (start, end, step)}</span>
+<span class="sd">            Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
+<span class="sd">            to row and column dimensions, respectively.</span>
+<span class="sd">            Files are stacked in alphabetic order. </span>
+<span class="sd">            To skip files or to change number of files to load, </span>
+<span class="sd">            adjust axis_0. For instance, &#39;axis_0&#39;: (100, 300)</span>
+<span class="sd">            will skip first 100 files and will load 200 files.</span>
+<span class="sd">            &#39;axis_0&#39;: -1 is a shortcut to load all elements along axis.</span>
+<span class="sd">            Start and end can be specified as None which is equivalent </span>
+<span class="sd">            to start = 0 and end = load everything to the end, respectively.</span>
+<span class="sd">            Start and end also can be negative.</span>
+<span class="sd">            Notes: roi is specified for axes before transpose.</span>
 <span class="sd">            </span>
-<span class="sd">        :param roi: dictionary with roi to load </span>
-<span class="sd">                {&#39;axis_0&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_1&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_2&#39;: (start, end, step)}</span>
-<span class="sd">                Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
-<span class="sd">                to row and column dimensions, respectively.</span>
-<span class="sd">                Files are stacked in alphabetic order. </span>
-<span class="sd">                To skip files or to change number of files to load, </span>
-<span class="sd">                adjust axis_0. For instance, &#39;axis_0&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 files and will load 200 files.</span>
-<span class="sd">                &#39;axis_0&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative.</span>
-<span class="sd">                Notes: roi is specified for axes before transpose.</span>
-<span class="sd">        :type roi: dictionary, default None</span>
-<span class="sd">            </span>
-<span class="sd">        :param transpose: transpose loaded images</span>
-<span class="sd">        :type transpose: bool, default False</span>
-<span class="sd">            </span>
-<span class="sd">        :param mode: str, &#39;bin&#39; (default) or &#39;slice&#39;. In bin mode, &#39;step&#39; number</span>
-<span class="sd">                of pixels is binned together, values of resulting binned</span>
-<span class="sd">                pixels are calculated as average. </span>
-<span class="sd">                In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
-<span class="sd">                Note: in general output array size in bin mode != output array size</span>
-<span class="sd">                in slice mode</span>
-<span class="sd">        :type mode: str, default &#39;bin&#39;</span>
-<span class="sd">        :param dtype: Requested type of the read image. If set to None it defaults to</span>
-<span class="sd">                      the type of the saved file.</span>
-<span class="sd">        :type dtype: numpy type, string, default np.float32</span>
+<span class="sd">        transpose : bool, default False</span>
+<span class="sd">            Whether to transpose loaded images</span>
+<span class="sd">                    </span>
+<span class="sd">        mode : str, default &#39;bin&#39;. Accepted values &#39;bin&#39;, &#39;slice&#39;</span>
+<span class="sd">            Referring to the &#39;step&#39; defined in the roi parameter, in bin mode, &#39;step&#39; number of pixels </span>
+<span class="sd">            are binned together, values of resulting binned pixels are calculated as average. </span>
+<span class="sd">            In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing. </span>
+<span class="sd">            Note: in general output array size in bin mode != output array size in slice mode</span>
 <span class="sd">        </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            </span>
-<span class="sd">            numpy array with stack of images</span>
-<span class="sd">            </span>
+<span class="sd">        dtype : numpy type, string, default np.float32</span>
+<span class="sd">            Requested type of the read image. If set to None it defaults to the type of the saved file.</span>
+<span class="sd">                    </span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        --------</span>
+<span class="sd">        You can rescale the read data as `rescaled_data = (read_data - offset)/scale` with the following code:</span>
+
+<span class="sd">        &gt;&gt;&gt; reader = TIFFStackReader(file_name = &#39;/path/to/folder&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; rescaled_data = reader.read_rescaled(scale, offset)</span>
+<span class="sd">        </span>
+
+<span class="sd">        Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the</span>
+<span class="sd">        read data to approximately the original data with the following code:</span>
+
+<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, compression=8)</span>
+<span class="sd">        &gt;&gt;&gt; writer.write(original_data)</span>
+<span class="sd">        &gt;&gt;&gt; reader = TIFFStackReader(file_name = &#39;/path/to/folder&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; about_original_data = reader.read_rescaled()</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;roi&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;axis_0&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transpose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transpose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;roi&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;axis_0&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+        <span class="n">transpose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transpose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
-                        <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">,</span>
-                        <span class="n">transpose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transpose</span><span class="p">,</span>
-                        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+                        <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">,</span>
+                        <span class="n">transpose</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">,</span>
+                        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="TIFFStackReader.set_up"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -398,44 +479,49 @@
                <span class="n">transpose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> 
                <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file</span>
-<span class="sd">        :type file_name: str, abspath to folder, list</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">        Set up method for the TIFFStackReader class</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
 <span class="sd">            </span>
-<span class="sd">        :param roi: dictionary with roi to load </span>
-<span class="sd">                {&#39;axis_0&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_1&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_2&#39;: (start, end, step)}</span>
-<span class="sd">                Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
-<span class="sd">                to row and column dimensions, respectively.</span>
-<span class="sd">                Files are stacked in alphabetic order. </span>
-<span class="sd">                To skip files or to change number of files to load, </span>
-<span class="sd">                adjust axis_0. For instance, &#39;axis_0&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 files and will load 200 files.</span>
-<span class="sd">                &#39;axis_0&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative.</span>
-<span class="sd">                Notes: roi is specified for axes before transpose.</span>
-<span class="sd">        :type roi: dictionary, default None</span>
+<span class="sd">        file_name : str, abspath to folder, list</span>
+<span class="sd">            Path to folder with tiff files, list of paths of tiffs, or single tiff file</span>
+<span class="sd">                   </span>
+<span class="sd">        roi : dictionary, default `None`</span>
+<span class="sd">            dictionary with roi to load </span>
+<span class="sd">            {&#39;axis_0&#39;: (start, end, step), </span>
+<span class="sd">                &#39;axis_1&#39;: (start, end, step), </span>
+<span class="sd">                &#39;axis_2&#39;: (start, end, step)}</span>
+<span class="sd">            Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
+<span class="sd">            to row and column dimensions, respectively.</span>
+<span class="sd">            Files are stacked in alphabetic order. </span>
+<span class="sd">            To skip files or to change number of files to load, </span>
+<span class="sd">            adjust axis_0. For instance, &#39;axis_0&#39;: (100, 300)</span>
+<span class="sd">            will skip first 100 files and will load 200 files.</span>
+<span class="sd">            &#39;axis_0&#39;: -1 is a shortcut to load all elements along axis.</span>
+<span class="sd">            Start and end can be specified as None which is equivalent </span>
+<span class="sd">            to start = 0 and end = load everything to the end, respectively.</span>
+<span class="sd">            Start and end also can be negative.</span>
+<span class="sd">            Notes: roi is specified for axes before transpose.</span>
 <span class="sd">            </span>
-<span class="sd">        :param transpose: transpose loaded images</span>
-<span class="sd">        :type transpose: bool, default False</span>
-<span class="sd">            </span>
-<span class="sd">        :param mode: str, &#39;bin&#39; (default) or &#39;slice&#39;. In bin mode, &#39;step&#39; number</span>
-<span class="sd">                of pixels is binned together, values of resulting binned</span>
-<span class="sd">                pixels are calculated as average. </span>
-<span class="sd">                In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
-<span class="sd">                Note: in general output array size in bin mode != output array size</span>
-<span class="sd">                in slice mode</span>
-<span class="sd">        :type mode: str, default &#39;bin&#39;</span>
-<span class="sd">        :param dtype: Requested type of the read image. If set to None it defaults to</span>
-<span class="sd">                      the type of the saved file.</span>
-<span class="sd">        :type dtype: numpy type, string, default np.float32</span>
+<span class="sd">        transpose : bool, default False</span>
+<span class="sd">            Whether to transpose loaded images</span>
+<span class="sd">                    </span>
+<span class="sd">        mode : str, default &#39;bin&#39;. Accepted values &#39;bin&#39;, &#39;slice&#39;</span>
+<span class="sd">            Referring to the &#39;step&#39; defined in the roi parameter, in bin mode, &#39;step&#39; number of pixels </span>
+<span class="sd">            are binned together, values of resulting binned pixels are calculated as average. </span>
+<span class="sd">            In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing. </span>
+<span class="sd">            Note: in general output array size in bin mode != output array size in slice mode</span>
+<span class="sd">        </span>
+<span class="sd">        dtype : numpy type, string, default np.float32</span>
+<span class="sd">            Requested type of the read image. If set to None it defaults to the type of the saved file.</span>
+<span class="sd">                    </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transpose</span> <span class="o">=</span> <span class="n">transpose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
         
         <span class="k">if</span> <span class="n">file_name</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs&#39;</span><span class="p">)</span>
@@ -501,8 +587,10 @@
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;I;16&#39;</span><span class="p">]:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported type </span><span class="si">{}</span><span class="s2">. Expected 1 L I or F.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported type </span><span class="si">{}</span><span class="s2">. Expected any of 1 L I I;16 F.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dtype</span>
 
 <div class="viewcode-block" id="TIFFStackReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -672,9 +760,51 @@
 <span class="sd">        In facts you can reshape a (2,3,4) array as (3,4,2), however we do not check if the reshape</span>
 <span class="sd">        leads to sensible data.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_as</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">)</span></div></div>
-<span class="w">    </span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_as</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TIFFStackReader.read_scale_offset"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.read_scale_offset">[docs]</a>    <span class="k">def</span> <span class="nf">read_scale_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reads the scale and offset from a json file in the same folder as the tiff stack</span>
+<span class="sd">        </span>
+<span class="sd">        This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter</span>
 
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        tuple: (scale, offset)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># load first image to find out dimensions and type</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;scaleoffset.json&quot;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TIFFStackReader.read_rescaled"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.read_rescaled">[docs]</a>    <span class="k">def</span> <span class="nf">read_rescaled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reads the TIFF stack and rescales it with the provided scale and offset, or with the ones in the json file if not provided</span>
+<span class="sd">        </span>
+<span class="sd">        This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+
+<span class="sd">        scale: float, default None</span>
+<span class="sd">            scale to apply to the data. If None, the scale will be read from the json file saved by TIFFWriter.</span>
+<span class="sd">        offset: float, default None</span>
+<span class="sd">            offset to apply to the data. If None, the offset will be read from the json file saved by TIFFWriter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        numpy.ndarray in float32</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_scale_offset</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">-=</span> <span class="n">offset</span>
+        <span class="n">data</span> <span class="o">/=</span> <span class="n">scale</span>
+        <span class="k">return</span> <span class="n">data</span></div></div>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">import matplotlib.pyplot as plt</span>

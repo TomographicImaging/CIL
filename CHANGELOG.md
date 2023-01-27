@@ -1,5 +1,6 @@
 * Next
-  - Added convenience centre of rotation methods to `AcquisitionGeometry` class:
+  - Add compression to 8bit and 16bit to TIFFWriter
+  - Added convenience centre of rotation methods to `AcquisitionGeometry` class.
     - `get_centre_of_rotation()` calculates the centre of rotation of the system
     - `set_centre_of_rotation()` sets the system centre of rotation with an offset and angle
     - `set_centre_of_rotation_by_slice()` sets the system centre of rotation with offsets from two slices

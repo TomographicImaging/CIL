@@ -81,13 +81,17 @@ class TIFFWriter(object):
 
         Parameters
         ----------
-        data : the DataContainer, AcquisitionData or ImageData to save to TIFF file(s)
-        file_name : string defining the file name prefix
-        counter_offset : int indicating at which number the ordinal index should start. Default 0.
-          For instance, if you have to save 10 files the index would by default go from 0 to 9.
-          By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
-        compression : The lossy compression to apply, default 0 will not compress data. 
-          8 or 16 will compress to 8 and 16 bit dtypes respectively, default 0.
+        data : DataContainer, AcquisitionData or ImageData
+            This represents the data to save to TIFF file(s)
+        file_name : string
+            This defines the file name prefix, i.e. the file name without the extension.
+        counter_offset : int, default 0.
+            counter_offset indicates at which number the ordinal index should start.
+            For instance, if you have to save 10 files the index would by default go from 0 to 9.
+            By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
+        compression : int, default 0. Accepted values 0, 8, 16.
+            The lossy compression to apply. The default 0 will not compress data. 
+            8 or 16 will compress to unsigned int 8 and 16 bit respectively.
         '''
         
         self.data_container = kwargs.get('data', None)
@@ -197,51 +201,44 @@ class TIFFStackReader(object):
     def __init__(self, 
                  **kwargs):
         ''' 
-        Basic TIFF redaer which loops through all riff files in a specific 
+        Basic TIFF redaer which loops through all tiff files in a specific 
         folder and load them in alphabetic order
         
         Parameters
         ----------
             
-        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
-        :type file_name: str, abspath to folder, list
+        file_name : str, abspath to folder, list
+            Path to folder with tiff files, list of paths of tiffs, or single tiff file
+                   
+        roi : dictionary, default `None`
+            dictionary with roi to load 
+            {'axis_0': (start, end, step), 
+                'axis_1': (start, end, step), 
+                'axis_2': (start, end, step)}
+            Files are stacked along axis_0. axis_1 and axis_2 correspond
+            to row and column dimensions, respectively.
+            Files are stacked in alphabetic order. 
+            To skip files or to change number of files to load, 
+            adjust axis_0. For instance, 'axis_0': (100, 300)
+            will skip first 100 files and will load 200 files.
+            'axis_0': -1 is a shortcut to load all elements along axis.
+            Start and end can be specified as None which is equivalent 
+            to start = 0 and end = load everything to the end, respectively.
+            Start and end also can be negative.
+            Notes: roi is specified for axes before transpose.
             
-        :param roi: dictionary with roi to load 
-                {'axis_0': (start, end, step), 
-                 'axis_1': (start, end, step), 
-                 'axis_2': (start, end, step)}
-                Files are stacked along axis_0. axis_1 and axis_2 correspond
-                to row and column dimensions, respectively.
-                Files are stacked in alphabetic order. 
-                To skip files or to change number of files to load, 
-                adjust axis_0. For instance, 'axis_0': (100, 300)
-                will skip first 100 files and will load 200 files.
-                'axis_0': -1 is a shortcut to load all elements along axis.
-                Start and end can be specified as None which is equivalent 
-                to start = 0 and end = load everything to the end, respectively.
-                Start and end also can be negative.
-                Notes: roi is specified for axes before transpose.
-        :type roi: dictionary, default None
-            
-        :param transpose: transpose loaded images
-        :type transpose: bool, default False
-            
-        :param mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
-                of pixels is binned together, values of resulting binned
-                pixels are calculated as average. 
-                In 'slice' mode 'step' defines standard numpy slicing.
-                Note: in general output array size in bin mode != output array size
-                in slice mode
-        :type mode: str, default 'bin'
-        :param dtype: Requested type of the read image. If set to None it defaults to
-                      the type of the saved file.
-        :type dtype: numpy type, string, default np.float32
+        transpose : bool, default False
+            Whether to transpose loaded images
+                    
+        mode : str, default 'bin'. Accepted values 'bin', 'slice'
+            Referring to the 'step' defined in the roi parameter, in bin mode, 'step' number of pixels 
+            are binned together, values of resulting binned pixels are calculated as average. 
+            In 'slice' mode 'step' defines standard numpy slicing. 
+            Note: in general output array size in bin mode != output array size in slice mode
         
-        Returns
-        -------
-            
-            numpy array with stack of images
-            
+        dtype : numpy type, string, default np.float32
+            Requested type of the read image. If set to None it defaults to the type of the saved file.
+                    
         '''
         
         self.file_name = kwargs.get('file_name', None)
@@ -262,40 +259,44 @@ class TIFFStackReader(object):
                transpose = False,
                mode = 'bin', 
                dtype = np.float32):
-        '''
-        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
-        :type file_name: str, abspath to folder, list
+        ''' 
+        Set up method for the TIFFStackReader class
+        
+        Parameters
+        ----------
             
-        :param roi: dictionary with roi to load 
-                {'axis_0': (start, end, step), 
-                 'axis_1': (start, end, step), 
-                 'axis_2': (start, end, step)}
-                Files are stacked along axis_0. axis_1 and axis_2 correspond
-                to row and column dimensions, respectively.
-                Files are stacked in alphabetic order. 
-                To skip files or to change number of files to load, 
-                adjust axis_0. For instance, 'axis_0': (100, 300)
-                will skip first 100 files and will load 200 files.
-                'axis_0': -1 is a shortcut to load all elements along axis.
-                Start and end can be specified as None which is equivalent 
-                to start = 0 and end = load everything to the end, respectively.
-                Start and end also can be negative.
-                Notes: roi is specified for axes before transpose.
-        :type roi: dictionary, default None
+        file_name : str, abspath to folder, list
+            Path to folder with tiff files, list of paths of tiffs, or single tiff file
+                   
+        roi : dictionary, default `None`
+            dictionary with roi to load 
+            {'axis_0': (start, end, step), 
+                'axis_1': (start, end, step), 
+                'axis_2': (start, end, step)}
+            Files are stacked along axis_0. axis_1 and axis_2 correspond
+            to row and column dimensions, respectively.
+            Files are stacked in alphabetic order. 
+            To skip files or to change number of files to load, 
+            adjust axis_0. For instance, 'axis_0': (100, 300)
+            will skip first 100 files and will load 200 files.
+            'axis_0': -1 is a shortcut to load all elements along axis.
+            Start and end can be specified as None which is equivalent 
+            to start = 0 and end = load everything to the end, respectively.
+            Start and end also can be negative.
+            Notes: roi is specified for axes before transpose.
             
-        :param transpose: transpose loaded images
-        :type transpose: bool, default False
-            
-        :param mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
-                of pixels is binned together, values of resulting binned
-                pixels are calculated as average. 
-                In 'slice' mode 'step' defines standard numpy slicing.
-                Note: in general output array size in bin mode != output array size
-                in slice mode
-        :type mode: str, default 'bin'
-        :param dtype: Requested type of the read image. If set to None it defaults to
-                      the type of the saved file.
-        :type dtype: numpy type, string, default np.float32
+        transpose : bool, default False
+            Whether to transpose loaded images
+                    
+        mode : str, default 'bin'. Accepted values 'bin', 'slice'
+            Referring to the 'step' defined in the roi parameter, in bin mode, 'step' number of pixels 
+            are binned together, values of resulting binned pixels are calculated as average. 
+            In 'slice' mode 'step' defines standard numpy slicing. 
+            Note: in general output array size in bin mode != output array size in slice mode
+        
+        dtype : numpy type, string, default np.float32
+            Requested type of the read image. If set to None it defaults to the type of the saved file.
+                    
         '''
         self.roi = roi
         self.transpose = transpose

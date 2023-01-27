@@ -25,11 +25,12 @@ from cil.io import TIFFWriter, TIFFStackReader
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
 from cil.utilities.dataexample import data_dir
-from cil.utilities.quality_measures import mae, mse, psnr
+from cil.utilities.quality_measures import mse
 from cil.utilities import dataexample
 import shutil
 import logging
 import glob
+import json
 
 initialise_tests()
 
@@ -330,10 +331,14 @@ class TestTIFF(unittest.TestCase):
         if compress:
             tmp = data.array * scale + offset
             tmp = np.asarray(tmp, dtype=dtype)
+            # test if the scale and offset are written to the json file
+            with open(os.path.join(self.cwd, "scaleoffset.json"), 'r') as f:
+                d = json.load(f)
+            assert d['scale'] == scale
+            assert d['offset'] == offset
         else:
             tmp = data.array
         
         assert tmp.dtype == read_array.dtype
         
         np.testing.assert_array_equal(tmp, read_array)
-

@@ -79,7 +79,7 @@ class GradientOperator(LinearOperator):
         backend = kwargs.get('backend',C)
 
         # Default correlation for the gradient coupling
-        correlation = kwargs.get('correlation',CORRELATION_SPACE)
+        self.correlation = kwargs.get('correlation',CORRELATION_SPACE)
 
         # Add assumed attributes if there is no CIL geometry (i.e. SIRF objects)
         if not hasattr(domain_geometry, 'channels'):
@@ -89,7 +89,7 @@ class GradientOperator(LinearOperator):
             domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)       
 
         if backend == C:
-            if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
+            if self.correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
                 backend = NUMPY
                 logging.warning("C backend cannot use correlation='Space' on multi-channel dataset - defaulting to `numpy` backend")
             elif domain_geometry.dtype != np.float32:
@@ -132,6 +132,23 @@ class GradientOperator(LinearOperator):
         """            
         return self.operator.adjoint(x, out=out)
 
+
+    def calculate_norm(self):
+        
+        r""" Returns the analytical norm of the GradientOperator.
+                
+        """
+
+        if self.correlation==CORRELATION_SPACE and self._domain_geometry.channels > 1:
+            norm = np.array(self.operator.voxel_size_order[1::])
+        else:
+            norm = np.array(self.operator.voxel_size_order)
+            
+        norm = 4 / (norm * norm)
+
+        return np.sqrt(norm.sum())
+
+
 class Gradient_numpy(LinearOperator):
     
     def __init__(self, domain_geometry, method = 'forward', bnd_cond = 'Neumann', **kwargs):
@@ -148,8 +165,8 @@ class Gradient_numpy(LinearOperator):
         # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
         domain_shape = []
         self.ind = []
-        for i, size in enumerate(list(domain_geometry.shape) ):
-            if size!=1:
+        for i, size in enumerate(list(domain_geometry.shape)):
+            if size > 1:
                 domain_shape.append(size)
                 self.ind.append(i)
      
@@ -286,7 +303,6 @@ class Gradient_C(LinearOperator):
         self.split = kwargs.get('split',False)
         
         # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
-        self.is2D = False
         self.domain_shape = []
         self.ind = []
         self.voxel_size_order = []
@@ -295,7 +311,6 @@ class Gradient_C(LinearOperator):
                 self.domain_shape.append(size)
                 self.ind.append(i)
                 self.voxel_size_order.append(domain_geometry.spacing[i])
-                self.is2D = True
         
         # Dimension of domain geometry
         self.ndim = len(self.domain_shape)

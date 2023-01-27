@@ -115,7 +115,7 @@ class Binner(DataProcessor):
 
         Parameters
         ----------
-        input : DataContainer, Geometry
+        dataset : DataContainer, Geometry
             The input DataContainer
         """
 

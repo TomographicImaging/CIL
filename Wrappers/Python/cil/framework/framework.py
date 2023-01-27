@@ -98,11 +98,15 @@ class ImageGeometry(object):
         return len(self.dimension_labels)
 
     @property
+    def ndim(self):
+        return len(self.dimension_labels)
+
+    @property
     def dimension_labels(self):
         
         labels_default = DataOrder.CIL_IG_LABELS
 
-        shape_default = [   self.channels - 1, #channels default is 1
+        shape_default = [   self.channels,
                             self.voxel_num_z,
                             self.voxel_num_y,
                             self.voxel_num_x]
@@ -113,7 +117,7 @@ class ImageGeometry(object):
             labels = labels_default.copy()
 
         for i, x in enumerate(shape_default):
-            if x == 0:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1928,7 +1932,6 @@ class AcquisitionGeometry(object):
 
         return tuple(shape)
 
-
     @property
     def dimension_labels(self):
         labels_default = DataOrder.CIL_AG_LABELS
@@ -1947,7 +1950,7 @@ class AcquisitionGeometry(object):
         #remove from list labels where len == 1
         #
         for i, x in enumerate(shape_default):
-            if x == 1:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1968,6 +1971,9 @@ class AcquisitionGeometry(object):
                     
             self._dimension_labels = tuple(val)
 
+    @property
+    def ndim(self):
+        return len(self.dimension_labels)
 
     @property
     def system_description(self):
@@ -2371,7 +2377,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
         
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
@@ -2480,9 +2486,7 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the dtype of the data array. 
-           If geometry exists, the dtype of the geometry = dtype of the array'''                          
-        self.geometry.dtype = self.array.dtype       
+        '''Returns the dtype of the data array.'''
         return self.array.dtype
 
     @property

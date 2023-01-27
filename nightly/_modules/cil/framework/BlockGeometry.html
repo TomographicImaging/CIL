@@ -220,11 +220,11 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">)</span>
-          
-    <span class="sd">&#39;&#39;&#39;Class to hold Geometry as column vector&#39;&#39;&#39;</span>
+<span class="w">          </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to hold Geometry as column vector&#39;&#39;&#39;</span>
     <span class="c1">#__array_priority__ = 1</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
@@ -237,12 +237,12 @@
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
             
 <div class="viewcode-block" id="BlockGeometry.get_item"><a class="viewcode-back" href="../../../framework.html#cil.framework.BlockGeometry.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns the Geometry in the BlockGeometry located at position index&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the Geometry in the BlockGeometry located at position index&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>            </div>
 
 <div class="viewcode-block" id="BlockGeometry.allocate"><a class="viewcode-back" href="../../../framework.html#cil.framework.BlockGeometry.allocate">[docs]</a>    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;Allocates a BlockDataContainer according to geometries contained in the BlockGeometry&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Allocates a BlockDataContainer according to geometries contained in the BlockGeometry&#39;&#39;&#39;</span>
         
         <span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>        
         <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">]</span>

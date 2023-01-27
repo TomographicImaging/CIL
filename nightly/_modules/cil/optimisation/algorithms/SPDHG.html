@@ -214,7 +214,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <div class="viewcode-block" id="SPDHG"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SPDHG">[docs]</a><span class="k">class</span> <span class="nc">SPDHG</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Stochastic Primal Dual Hybrid Gradient</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Stochastic Primal Dual Hybrid Gradient</span>
 
 <span class="sd">    Problem: </span>
 <span class="sd">    </span>
@@ -303,8 +303,8 @@
 
 <div class="viewcode-block" id="SPDHG.set_up"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SPDHG.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
                <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">norms</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;set-up of the algorithm</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;set-up of the algorithm</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        f : BlockFunction</span>
@@ -425,7 +425,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-         <span class="sd">&#39;&#39;&#39;alias of loss&#39;&#39;&#39;</span>
+<span class="w">         </span><span class="sd">&#39;&#39;&#39;alias of loss&#39;&#39;&#39;</span>
          <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">]</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dual_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

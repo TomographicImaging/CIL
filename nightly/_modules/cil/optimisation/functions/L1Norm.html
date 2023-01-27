@@ -215,8 +215,8 @@
 
  
 <span class="k">def</span> <span class="nf">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the soft-shrinkage operator at x.</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the soft-shrinkage operator at x.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
@@ -233,8 +233,8 @@
         <span class="k">return</span> <span class="n">out</span>        
     
 <div class="viewcode-block" id="L1Norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L1Norm">[docs]</a><span class="k">class</span> <span class="nc">L1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-    
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Norm function</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Norm function</span>
 <span class="sd">            </span>
 <span class="sd">        Consider the following cases:           </span>
 <span class="sd">            a) .. math:: F(x) = ||x||_{1}</span>
@@ -243,7 +243,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>   
            
 <div class="viewcode-block" id="L1Norm.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L1Norm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;creator</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
 <span class="sd">        Cases considered (with/without data):            </span>
 <span class="sd">        a) :math:`f(x) = ||x||_{1}`</span>
@@ -256,8 +256,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="L1Norm.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L1Norm.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the L1Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the L1Norm function at x.</span>
 <span class="sd">        </span>
 <span class="sd">        Consider the following cases:           </span>
 <span class="sd">            a) .. math:: F(x) = ||x||_{1}</span>
@@ -271,8 +271,8 @@
         <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  </div>
           
 <div class="viewcode-block" id="L1Norm.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L1Norm.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the L1Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the L1Norm function at x.</span>
 <span class="sd">        Here, we need to use the convex conjugate of L1Norm, which is the Indicator of the unit </span>
 <span class="sd">        :math:`L^{\infty}` norm</span>
 <span class="sd">        </span>
@@ -300,8 +300,8 @@
 
                     
 <div class="viewcode-block" id="L1Norm.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L1Norm.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the L1Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the L1Norm function at x.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Consider the following cases:</span>
@@ -332,7 +332,7 @@
 
 <div class="viewcode-block" id="MixedL11Norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL11Norm">[docs]</a><span class="k">class</span> <span class="nc">MixedL11Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;MixedL11Norm function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MixedL11Norm function</span>
 <span class="sd">                     </span>
 <span class="sd">    .. math:: F(x) = ||x||_{1,1} = \sum |x_{1}| + |x_{2}| + \cdots + |x_{n}|</span>
 
@@ -353,7 +353,7 @@
 
 <div class="viewcode-block" id="MixedL11Norm.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL11Norm.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL11Norm function at x. </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL11Norm function at x. </span>
 
 <span class="sd">        :param x: :code:`BlockDataContainer`                                           </span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -364,7 +364,7 @@
         
 <div class="viewcode-block" id="MixedL11Norm.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL11Norm.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL11Norm function at x.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL11Norm function at x.</span>
 <span class="sd">                </span>
 <span class="sd">        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)</span>
 <span class="sd">    </span>

@@ -370,19 +370,61 @@ Step: Determines the increment between each index for slicing</p>
 <h3>Data Binner<a class="headerlink" href="#data-binner" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.processors.Binner">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Binner</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner" title="Permalink to this definition">#</a></dt>
-<dd><p>Binner processor rebins (downsample) array and returns new geometry.</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Binner</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner" title="Permalink to this definition">#</a></dt>
+<dd><p>This creates a Binner processor.</p>
+<p>The processor will crop the data, and then average together n input pixels along a dimension from the starting index.</p>
+<p>The output will be a data container with the data, and geometry updated to reflect the operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>roi</strong> (<em>dict</em>) – region-of-interest to bin, specified as a dictionary containing tuple (Start, Stop, Step)</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns an AcquisitionData or ImageData object with an updated AcquisitionGeometry or ImageGeometry</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a> or <a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>roi</strong> (<em>dict</em>) – <p>The region-of-interest to bin {‘axis_name1’:(start,stop,step), ‘axis_name2’:(start,stop,step)}
+The <cite>key</cite> being the axis name to apply the processor to, the <cite>value</cite> holding a tuple containing the ROI description</p>
+<p>Start: Starting index of input data. Must be an integer, or <cite>None</cite> defaults to index 0.
+Stop: Stopping index of input data. Must be an integer, or <cite>None</cite> defaults to index N.
+Step: Number of pixels to average together. Must be an integer or <cite>None</cite> defaults to 1.</p>
+</p></li>
+<li><p><strong>accelerated</strong> (<em>boolean</em><em>, </em><em>default=True</em>) – Uses the CIL accelerated backend if <cite>True</cite>, numpy if <cite>False</cite>.</p></li>
+</ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Binner</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Binner</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_binned</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Binner</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Binner</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geometry_binned</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The indices provided are start inclusive, stop exclusive.</p>
+<p>All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {‘axis_name’,-1}</p>
+<p>If only one number is provided, then it is interpreted as Stop. i.e. {‘axis_name1’:(stop)}
+If two numbers are provided, then they are interpreted as Start and Stop  i.e. {‘axis_name1’:(start, stop)}</p>
+<p>Negative indexing can be used to specify the index. i.e. {‘axis_name1’:(10, -10)} will crop the dimension symmetrically</p>
+<p>If Stop - Start is not multiple of Step, then
+the resulted dimension will have (Stop - Start) // Step
+elements, i.e. (Stop - Start) % Step elements will be ignored</p>
+</div>
+<dl class="py method">
+<dt id="cil.processors.Binner.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>Geometry</em>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="cil.processors.Binner.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.get_output" title="Permalink to this definition">#</a></dt>
@@ -396,17 +438,6 @@ Step: Determines the increment between each index for slicing</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Binner.set_input">
-<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.set_input" title="Permalink to this definition">#</a></dt>
-<dd><p>Set the input data to the processor</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
 </dd></dl>

@@ -227,7 +227,7 @@
 <div class="viewcode-block" id="GradientOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.GradientOperator">[docs]</a><span class="k">class</span> <span class="nc">GradientOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 
 
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Gradient Operator: Computes first-order forward/backward differences on </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Gradient Operator: Computes first-order forward/backward differences on </span>
 <span class="sd">        2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions</span>
 <span class="sd">    </span>
 <span class="sd">    :param gm_domain: Set up the domain of the function</span>
@@ -266,7 +266,7 @@
     <span class="n">CORRELATION_SPACECHANNEL</span> <span class="o">=</span> <span class="n">CORRELATION_SPACECHANNEL</span>
 
 <div class="viewcode-block" id="GradientOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.GradientOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;forward&#39;</span><span class="p">,</span> <span class="n">bnd_cond</span> <span class="o">=</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor method</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
         <span class="c1"># Default backend = C</span>
@@ -302,7 +302,7 @@
                                        <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span> </div>
 
 <div class="viewcode-block" id="GradientOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.GradientOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes the first-order forward differences</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the first-order forward differences</span>
 
 <span class="sd">        :param x: Image data</span>
 <span class="sd">        :type x: `ImageData`</span>
@@ -315,7 +315,7 @@
         
         
 <div class="viewcode-block" id="GradientOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.GradientOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes the first-order backward differences</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the first-order backward differences</span>
 
 <span class="sd">        :param x: Gradient images for each dimension in ImageGeometry domain</span>
 <span class="sd">        :type x: `BlockDataContainer`</span>
@@ -329,7 +329,7 @@
 <span class="k">class</span> <span class="nc">Gradient_numpy</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;forward&#39;</span><span class="p">,</span> <span class="n">bnd_cond</span> <span class="o">=</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;creator</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 <span class="sd">        </span>
 <span class="sd">        :param gm_domain: domain of the operator</span>
 <span class="sd">        :type gm_domain: :code:`AcquisitionGeometry` or :code:`ImageGeometry`</span>
@@ -464,8 +464,8 @@
 
 
 <span class="k">class</span> <span class="nc">Gradient_C</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
-    
-    <span class="sd">&#39;&#39;&#39;Finite Difference Operator:</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Finite Difference Operator:</span>
 <span class="sd">            </span>
 <span class="sd">            Computes first-order forward/backward differences </span>
 <span class="sd">                     on 2D, 3D, 4D ImageData</span>

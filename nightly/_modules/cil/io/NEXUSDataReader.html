@@ -223,8 +223,8 @@
     
 <div class="viewcode-block" id="NEXUSDataReader.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Constructor</span>
 <span class="sd">        </span>
 <span class="sd">        Input:</span>
@@ -270,8 +270,8 @@
         <span class="k">return</span> <span class="n">dimension_labels</span>
 
 <div class="viewcode-block" id="NEXUSDataReader.get_geometry"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.get_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parse NEXUS file and returns either ImageData or Acquisition Data </span>
 <span class="sd">        depending on file content</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -406,7 +406,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span></div>
     
 <div class="viewcode-block" id="NEXUSDataReader.get_data_scale"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.get_data_scale">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Parse NEXUS file and returns the scale factor applied to compress the dataset&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Parse NEXUS file and returns the scale factor applied to compress the dataset&#39;&#39;&#39;</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
             <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span> 
@@ -418,7 +418,7 @@
         <span class="k">return</span> <span class="n">scale</span></div>
 
 <div class="viewcode-block" id="NEXUSDataReader.get_data_offset"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.get_data_offset">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Parse NEXUS file and returns the offset factor applied to compress the dataset&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Parse NEXUS file and returns the offset factor applied to compress the dataset&#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
             <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span> 
             <span class="k">try</span><span class="p">:</span>
@@ -429,7 +429,7 @@
         <span class="k">return</span> <span class="n">offset</span></div>
 
     <span class="k">def</span> <span class="nf">__read_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parse NEXUS file and returns either ImageData or Acquisition Data </span>
 <span class="sd">        depending on file content</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -447,7 +447,7 @@
         <span class="k">return</span> <span class="n">output</span>
         
 <div class="viewcode-block" id="NEXUSDataReader.read_as_original"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.read_as_original">[docs]</a>    <span class="k">def</span> <span class="nf">read_as_original</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns either an ImageData or AcquisitionData containing the compressed data</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
@@ -458,7 +458,7 @@
 
 
 <div class="viewcode-block" id="NEXUSDataReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns either an ImageData or Acquisition Data containing the uncompressed data as numpy.float32</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_as</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
@@ -474,7 +474,7 @@
     
           
 <div class="viewcode-block" id="NEXUSDataReader.load_data"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;alias of read&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of read&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
     <span class="k">def</span> <span class="nf">is_old_file_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1">#return ds_data.attrs.__contains__(&#39;geom_type&#39;)</span>

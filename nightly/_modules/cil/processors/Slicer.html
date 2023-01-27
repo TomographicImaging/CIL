@@ -215,7 +215,7 @@
 
 <div class="viewcode-block" id="Slicer"><a class="viewcode-back" href="../../../processors.html#cil.processors.Slicer">[docs]</a><span class="k">class</span> <span class="nc">Slicer</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor slices an array and returns new geometry.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor slices an array and returns new geometry.</span>
 <span class="sd">        </span>
 <span class="sd">    :param roi: region-of-interest to slice, specified as a dictionary containing tuple (Start, Stop, Step)</span>
 <span class="sd">    :type roi: dict</span>
@@ -347,7 +347,7 @@
                 <span class="k">return</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slice_object</span><span class="p">)]),</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="o">=</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_construct_slice_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">n_elements</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        parse roi input</span>
 <span class="sd">        here we construct slice() object to slice the actual array</span>
 <span class="sd">        &#39;&#39;&#39;</span>

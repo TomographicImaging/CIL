@@ -269,7 +269,7 @@
 <div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SYNCHROTRON_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA.get"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A DLS dataset</span>
 
 <span class="sd">        Parameters</span>
@@ -290,7 +290,7 @@
 <div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SIMULATED_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA.get"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME </span>
 
 <span class="sd">        Parameters</span>
@@ -311,7 +311,7 @@
 <div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SIMULATED_CONE_BEAM_DATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA.get"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME </span>
 
 <span class="sd">        Parameters</span>
@@ -332,7 +332,7 @@
 <span class="k">class</span> <span class="nc">SIMULATED_SPHERE_VOLUME</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A simulated volume of spheres</span>
 
 <span class="sd">        Parameters</span>
@@ -352,7 +352,7 @@
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
 <div class="viewcode-block" id="TestData"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.TestData">[docs]</a><span class="k">class</span> <span class="nc">TestData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Class to return test data</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to return test data</span>
 <span class="sd">    </span>
 <span class="sd">    provides 6 dataset:</span>
 <span class="sd">    BOAT = &#39;boat.tiff&#39;</span>
@@ -375,7 +375,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
         
 <div class="viewcode-block" id="TestData.load"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.TestData.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return a test data of the requested image</span>
 
 <span class="sd">        Parameters</span>
@@ -470,7 +470,7 @@
 
 <div class="viewcode-block" id="TestData.random_noise"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.TestData.random_noise">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Function to add noise to input image</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Function to add noise to input image</span>
 
 <span class="sd">        :param image: input dataset, DataContainer of numpy.ndarray</span>
 <span class="sd">        :param mode: type of noise</span>
@@ -491,7 +491,7 @@
 
 <div class="viewcode-block" id="TestData.scikit_random_noise"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.dataexample.TestData.scikit_random_noise">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to add random noise of various types to a floating-point image.</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

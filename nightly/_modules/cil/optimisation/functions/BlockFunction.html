@@ -214,8 +214,8 @@
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 
 <div class="viewcode-block" id="BlockFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction">[docs]</a><span class="k">class</span> <span class="nc">BlockFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-    
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; BlockFunction represents a *separable sum* function :math:`F` defined as</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; BlockFunction represents a *separable sum* function :math:`F` defined as</span>
 <span class="sd">    </span>
 <span class="sd">    .. math:: F:X_{1}\times X_{2}\cdots\times X_{m} \rightarrow (-\infty, \infty]</span>
 <span class="sd">    </span>
@@ -253,8 +253,8 @@
         <span class="k">return</span> <span class="n">tmp_L</span>     
                                 
 <div class="viewcode-block" id="BlockFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the value of the BlockFunction :math:`F`</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the value of the BlockFunction :math:`F`</span>
 <span class="sd">        </span>
 <span class="sd">        .. math:: F(x) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ where } x = (x_{1}, x_{2}, \cdots, x_{m}), \quad i = 1,2,\dots,m</span>
 <span class="sd">                </span>
@@ -274,8 +274,8 @@
         <span class="k">return</span> <span class="n">t</span></div>
     
 <div class="viewcode-block" id="BlockFunction.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the BlockFunction at :math:`x^{*}`.       </span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the BlockFunction at :math:`x^{*}`.       </span>
 <span class="sd">        </span>
 <span class="sd">            .. math:: F^{*}(x^{*}) = \overset{m}{\underset{i=1}{\sum}}f_{i}^{*}(x^{*}_{i})</span>
 <span class="sd">            </span>
@@ -293,8 +293,8 @@
         <span class="k">return</span> <span class="n">t</span>  </div>
     
 <div class="viewcode-block" id="BlockFunction.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Proximal operator of the BlockFunction at x:</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Proximal operator of the BlockFunction at x:</span>
 <span class="sd">        </span>
 <span class="sd">            .. math:: \mathrm{prox}_{\tau F}(x) =  (\mathrm{prox}_{\tau f_{i}}(x_{i}))_{i=1}^{m}</span>
 <span class="sd">            </span>
@@ -329,8 +329,8 @@
             
     
 <div class="viewcode-block" id="BlockFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the BlockFunction function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the BlockFunction function at x.</span>
 <span class="sd">        </span>
 <span class="sd">        .. math:: F&#39;(x) = [f_{1}&#39;(x_{1}), ... , f_{m}&#39;(x_{m})]        </span>
 <span class="sd">        </span>
@@ -350,8 +350,8 @@
         <span class="k">return</span>  <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="p">)</span>     </div>
 
 <div class="viewcode-block" id="BlockFunction.proximal_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction.proximal_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Proximal operator of the convex conjugate of BlockFunction at x:</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Proximal operator of the convex conjugate of BlockFunction at x:</span>
 <span class="sd">        </span>
 <span class="sd">            .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}</span>
 <span class="sd">            </span>
@@ -387,7 +387,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
         
 <div class="viewcode-block" id="BlockFunction.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.BlockFunction.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Define multiplication with a scalar</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Define multiplication with a scalar</span>
 <span class="sd">        </span>
 <span class="sd">        :param other: number</span>
 <span class="sd">        Returns a new `BlockFunction`_ containing the product of the scalar with all the functions in the block</span>

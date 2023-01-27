@@ -217,7 +217,7 @@
 
 <div class="viewcode-block" id="SIRT"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT">[docs]</a><span class="k">class</span> <span class="nc">SIRT</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>    
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.</span>
 
 <span class="sd">    Simultaneous Iterative Reconstruction Technique (SIRT) solves</span>
 <span class="sd">    the following problem</span>
@@ -289,7 +289,7 @@
 
 <div class="viewcode-block" id="SIRT.set_up"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialisation of the algorithm    </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -321,7 +321,7 @@
 
 <div class="viewcode-block" id="SIRT.fix_weights"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.fix_weights">[docs]</a>    <span class="k">def</span> <span class="nf">fix_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; In case of division error when the preconditioning arrays :code:`M` and :code:`D`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; In case of division error when the preconditioning arrays :code:`M` and :code:`D`</span>
 <span class="sd">        are defined, the :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values are replaced with one.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
@@ -335,7 +335,7 @@
 
 <div class="viewcode-block" id="SIRT.update"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Performs a single iteration of the SIRT algorithm</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Performs a single iteration of the SIRT algorithm</span>
 
 <span class="sd">        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) )</span>
 
@@ -349,7 +349,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SIRT.update_objective"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the objective </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the objective </span>
 
 <span class="sd">        .. math:: \|A x - b\|^{2}</span>
 

@@ -213,9 +213,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <div class="viewcode-block" id="IndicatorBox"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox">[docs]</a><span class="k">class</span> <span class="nc">IndicatorBox</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-    
-    
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Indicator function for box constraint</span>
+<span class="w">    </span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Indicator function for box constraint</span>
 <span class="sd">            </span>
 <span class="sd">      .. math:: </span>
 <span class="sd">         </span>
@@ -227,7 +227,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
     
 <div class="viewcode-block" id="IndicatorBox.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">lower</span><span class="o">=-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;creator</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
 <span class="sd">        :param lower: lower bound</span>
 <span class="sd">        :type lower: float, default = :code:`-numpy.inf`</span>
@@ -239,8 +239,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">upper</span> <span class="o">=</span> <span class="n">upper</span></div>
 
 <div class="viewcode-block" id="IndicatorBox.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;Evaluates IndicatorBox at x&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates IndicatorBox at x&#39;&#39;&#39;</span>
                 
         <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span> <span class="ow">and</span> 
             <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">)</span> <span class="p">):</span>
@@ -253,14 +253,14 @@
         <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not Differentiable&#39;</span><span class="p">)</span> </div>
     
 <div class="viewcode-block" id="IndicatorBox.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;Convex conjugate of IndicatorBox at x&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convex conjugate of IndicatorBox at x&#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div>
          
 <div class="viewcode-block" id="IndicatorBox.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of IndicatorBox at x</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of IndicatorBox at x</span>
 
 <span class="sd">            .. math:: prox_{\tau * f}(x)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -272,8 +272,8 @@
             <span class="n">out</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span> </div>
             
 <div class="viewcode-block" id="IndicatorBox.proximal_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.proximal_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of the convex conjugate of IndicatorBox at x:</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of the convex conjugate of IndicatorBox at x:</span>
 
 <span class="sd">          ..math:: prox_{\tau * f^{*}}(x)</span>
 <span class="sd">        &#39;&#39;&#39;</span>

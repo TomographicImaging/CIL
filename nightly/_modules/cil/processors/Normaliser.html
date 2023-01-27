@@ -214,7 +214,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <div class="viewcode-block" id="Normaliser"><a class="viewcode-back" href="../../../processors.html#cil.processors.Normaliser">[docs]</a><span class="k">class</span> <span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Normalisation based on flat and dark</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Normalisation based on flat and dark</span>
 <span class="sd">    </span>
 <span class="sd">    This processor read in a AcquisitionData and normalises it based on </span>
 <span class="sd">    the instrument reading with and without incident photons or neutrons.</span>
@@ -277,7 +277,7 @@
     
 <div class="viewcode-block" id="Normaliser.estimate_normalised_error"><a class="viewcode-back" href="../../../processors.html#cil.processors.Normaliser.estimate_normalised_error">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">estimate_normalised_error</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">delta_flat</span><span class="p">,</span> <span class="n">delta_dark</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns the estimated relative error of the normalised projection</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the estimated relative error of the normalised projection</span>
 <span class="sd">        </span>
 <span class="sd">        n = (projection - dark) / (flat - dark)</span>
 <span class="sd">        Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)</span>

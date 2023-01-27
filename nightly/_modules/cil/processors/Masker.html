@@ -215,13 +215,13 @@
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
 
 <div class="viewcode-block" id="Masker"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker">[docs]</a><span class="k">class</span> <span class="nc">Masker</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Processor to fill missing values provided by mask. Please use the desiried method to configure a processor for your needs.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Masker.value"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker.value">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the requested value.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the requested value.</span>
 
 <span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
 <span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
@@ -235,7 +235,7 @@
     
 <div class="viewcode-block" id="Masker.mean"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker.mean">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the mean of the unmasked values across the array or axis.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the mean of the unmasked values across the array or axis.</span>
 
 <span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.  </span>
 <span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
@@ -249,7 +249,7 @@
     
 <div class="viewcode-block" id="Masker.median"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker.median">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the median of the unmasked values across the array or axis.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the median of the unmasked values across the array or axis.</span>
 
 <span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.  </span>
 <span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
@@ -263,7 +263,7 @@
     
 <div class="viewcode-block" id="Masker.interpolate"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker.interpolate">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.</span>
 
 <span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.  </span>
 <span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
@@ -283,8 +283,8 @@
                  <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="n">axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to fill missing values provided by mask.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to fill missing values provided by mask.</span>
 
 <span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
 <span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>

@@ -225,8 +225,8 @@
 
 <span class="k">class</span> <span class="nc">RegulariserFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
- 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Generic proximal method for a RegulariserFunction</span>
+<span class="w"> </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Generic proximal method for a RegulariserFunction</span>
 
 <span class="sd">        .. math:: \mathrm{prox}_{\tau f}(x) := \argmin_{z} f(x) + \frac{1}{2}\|z - x \|^{2}</span>
 <span class="sd">        </span>
@@ -283,7 +283,7 @@
 
 <span class="k">class</span> <span class="nc">TV_Base</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total Variation regulariser</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total Variation regulariser</span>
 
 <span class="sd">    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1}</span>
 
@@ -322,7 +322,7 @@
 
 <div class="viewcode-block" id="FGP_TV"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.FGP_TV">[docs]</a><span class="k">class</span> <span class="nc">FGP_TV</span><span class="p">(</span><span class="n">TV_Base</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Fast Gradient Projection Total Variation (FGP_TV)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Fast Gradient Projection Total Variation (FGP_TV)</span>
 
 <span class="sd">        The :class:`FGP_TV` computes the proximal operator of the Total variation regulariser</span>
 
@@ -416,8 +416,8 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">FGP_TV</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">strong_convexity_constant</span><span class="o">=</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Implements the Fast Gradient Projection algorithm on the dual problem </span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Implements the Fast Gradient Projection algorithm on the dual problem </span>
 <span class="sd">        of the Total Variation Denoising problem (ROF).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>    
@@ -450,7 +450,7 @@
         <span class="k">return</span> <span class="n">solution</span>
                 
     <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 <span class="sd">        </span>
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -465,7 +465,7 @@
 <div class="viewcode-block" id="TGV"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TGV">[docs]</a><span class="k">class</span> <span class="nc">TGV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TGV.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TGV.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span> <span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Creator of Total Generalised Variation Function </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Creator of Total Generalised Variation Function </span>
 
 <span class="sd">        :param alpha: regularisation parameter</span>
 <span class="sd">        :type alpha: number, default 1</span>
@@ -527,7 +527,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
         
 <div class="viewcode-block" id="TGV.__rmul__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TGV.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 <span class="sd">        </span>
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -549,7 +549,7 @@
         
 
 <div class="viewcode-block" id="FGP_dTV"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.FGP_dTV">[docs]</a><span class="k">class</span> <span class="nc">FGP_dTV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Creator of FGP_dTV Function</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Creator of FGP_dTV Function</span>
 
 <span class="sd">        :param reference: reference image</span>
 <span class="sd">        :type reference: ImageData</span>
@@ -610,7 +610,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
     
 <div class="viewcode-block" id="FGP_dTV.__rmul__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 <span class="sd">        </span>
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -626,7 +626,7 @@
 <div class="viewcode-block" id="TNV"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TNV">[docs]</a><span class="k">class</span> <span class="nc">TNV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
     
 <div class="viewcode-block" id="TNV.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TNV.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Creator of TNV Function</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Creator of TNV Function</span>
 
 <span class="sd">        :param alpha: regularisation parameter</span>
 <span class="sd">        :type alpha: number, default 1</span>
@@ -659,7 +659,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
 <div class="viewcode-block" id="TNV.__rmul__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TNV.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 <span class="sd">        </span>
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -669,7 +669,7 @@
             <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="TNV.check_input"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.ccpi_regularisation.functions.TNV.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;TNV requires 2D+channel data with the first dimension as the channel dimension&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;TNV requires 2D+channel data with the first dimension as the channel dimension&#39;&#39;&#39;</span>
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="ow">not</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;TNV requires 2D+channel data. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span></div></div>

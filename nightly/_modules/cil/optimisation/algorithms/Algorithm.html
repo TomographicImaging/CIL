@@ -215,7 +215,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <div class="viewcode-block" id="Algorithm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm">[docs]</a><span class="k">class</span> <span class="nc">Algorithm</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Base class for iterative algorithms</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Base class for iterative algorithms</span>
 
 <span class="sd">      provides the minimal infrastructure.</span>
 
@@ -231,7 +231,7 @@
 <span class="sd">   &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Algorithm.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Constructor</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Constructor</span>
 <span class="sd">        </span>
 <span class="sd">        Set the minimal number of parameters:</span>
 <span class="sd">        </span>
@@ -260,20 +260,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_up_logger</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_file&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div>
         
 <div class="viewcode-block" id="Algorithm.set_up"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Set up the algorithm&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set up the algorithm&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 <div class="viewcode-block" id="Algorithm.update"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;A single iteration of the algorithm&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;A single iteration of the algorithm&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
     
 <div class="viewcode-block" id="Algorithm.should_stop"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;default stopping cryterion: number of iterations</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stopping cryterion: number of iterations</span>
 <span class="sd">        </span>
 <span class="sd">        The user can change this in concrete implementatition of iterative algorithms.&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_cryterion</span><span class="p">()</span></div>
     
     <span class="k">def</span> <span class="nf">__set_up_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set up the logger if desired&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the logger if desired&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">fname</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Will output results to: &quot;</span> <span class="o">+</span>  <span class="n">fname</span><span class="p">)</span>
             <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -282,18 +282,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
     
 <div class="viewcode-block" id="Algorithm.max_iteration_stop_cryterion"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.max_iteration_stop_cryterion">[docs]</a>    <span class="k">def</span> <span class="nf">max_iteration_stop_cryterion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;default stop cryterion for iterative algorithm: max_iteration reached&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stop cryterion for iterative algorithm: max_iteration reached&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span></div>
 <div class="viewcode-block" id="Algorithm.__iter__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algorithm is an iterable&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 <div class="viewcode-block" id="Algorithm.next"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algorithm is an iterable</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable</span>
 <span class="sd">        </span>
 <span class="sd">        python2 backwards compatibility&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span></div>
 <div class="viewcode-block" id="Algorithm.__next__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.__next__">[docs]</a>    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algorithm is an iterable</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable</span>
 <span class="sd">        </span>
 <span class="sd">        calling this method triggers update and update_objective</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -322,7 +322,7 @@
             
 
 <div class="viewcode-block" id="Algorithm._update_previous_solution"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm._update_previous_solution">[docs]</a>    <span class="k">def</span> <span class="nf">_update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Update the previous solution with the current one</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Update the previous solution with the current one</span>
 <span class="sd">        </span>
 <span class="sd">        The concrete algorithm calls update_previous_solution. Normally this would </span>
 <span class="sd">        entail the swapping of pointers:</span>
@@ -347,7 +347,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot; Convergence criterion is not implemented for this algorithm. &quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Algorithm.is_provably_convergent"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.is_provably_convergent">[docs]</a>    <span class="k">def</span> <span class="nf">is_provably_convergent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check if the algorithm is convergent based on the provable convergence criterion.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if the algorithm is convergent based on the provable convergence criterion.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provable_convergence_condition</span><span class="p">()</span></div>
     
@@ -356,7 +356,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
     
 <div class="viewcode-block" id="Algorithm.get_last_loss"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.get_last_loss">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns the last stored value of the loss function</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the last stored value of the loss function</span>
 <span class="sd">        </span>
 <span class="sd">        if update_objective_interval is 1 it is the value of the objective at the current</span>
 <span class="sd">        iteration. If update_objective_interval &gt; 1 it is the last stored value. </span>
@@ -377,20 +377,20 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">objective</span></div>
 <div class="viewcode-block" id="Algorithm.get_last_objective"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.get_last_objective">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;alias to get_last_loss&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias to get_last_loss&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_loss</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="Algorithm.update_objective"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;calculates the objective with the current solution&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;calculates the objective with the current solution&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns the iterations at which the objective has been evaluated&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the iterations at which the objective has been evaluated&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns the list of the values of the objective during the iteration</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the list of the values of the objective during the iteration</span>
 <span class="sd">        </span>
 <span class="sd">        The length of this list may be shorter than the number of iterations run when </span>
 <span class="sd">        the update_objective_interval &gt; 1</span>
@@ -399,17 +399,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;alias of loss&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of loss&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;gets the maximum number of iterations&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;gets the maximum number of iterations&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span>
 
     <span class="nd">@max_iteration</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">max_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;sets the maximum number of iterations&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;sets the maximum number of iterations&#39;&#39;&#39;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -428,7 +428,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Update objective interval must be an integer &gt;= 0&#39;</span><span class="p">)</span>
     
 <div class="viewcode-block" id="Algorithm.run"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;run n iterations and update the user with the callback if specified</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;run n iterations and update the user with the callback if specified</span>
 <span class="sd">        </span>
 <span class="sd">        :param iterations: number of iterations to run. If not set the algorithm will</span>
 <span class="sd">          run until max_iteration or until stop criterion is reached</span>
@@ -503,7 +503,7 @@
         
 
 <div class="viewcode-block" id="Algorithm.verbose_output"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.verbose_output">[docs]</a>    <span class="k">def</span> <span class="nf">verbose_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Creates a nice tabulated output&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Creates a nice tabulated output&#39;&#39;&#39;</span>
         <span class="n">timing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timing</span>
         <span class="k">if</span> <span class="nb">len</span> <span class="p">(</span><span class="n">timing</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>

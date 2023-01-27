@@ -229,11 +229,11 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TIFFWriter"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFWriter">[docs]</a><span class="k">class</span> <span class="nc">TIFFWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Write a DataSet to disk as a TIFF file or stack&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Write a DataSet to disk as a TIFF file or stack&#39;&#39;&#39;</span>
     
 <div class="viewcode-block" id="TIFFWriter.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFWriter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :param data: the data to save to TIFF file(s)</span>
 <span class="sd">        :type data: DataContainer, AcquisitionData or ImageData</span>
 <span class="sd">        :param file_name: string defining the file name prefix</span>
@@ -332,7 +332,7 @@
     
 <div class="viewcode-block" id="TIFFStackReader.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
 <span class="sd">        Basic TIFF redaer which loops through all riff files in a specific </span>
 <span class="sd">        folder and load them in alphabetic order</span>
 <span class="sd">        </span>
@@ -398,7 +398,7 @@
                <span class="n">transpose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> 
                <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file</span>
 <span class="sd">        :type file_name: str, abspath to folder, list</span>
 <span class="sd">            </span>
@@ -506,8 +506,8 @@
         <span class="k">return</span> <span class="n">dtype</span>
 
 <div class="viewcode-block" id="TIFFStackReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reads images and return numpy array</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># load first image to find out dimensions and type</span>
@@ -610,7 +610,7 @@
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">else</span> <span class="n">text</span>
     
     <span class="k">def</span> <span class="nf">__natural_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        https://stackoverflow.com/questions/5967500/how-to-correctly-sort-a-string-with-a-number-inside</span>
 <span class="sd">        alist.sort(key=natural_keys) sorts in human order</span>
 <span class="sd">        http://nedbatchelder.com/blog/200712/human_sorting.html</span>
@@ -619,7 +619,7 @@
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__atoi</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d+)&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_read_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;reads the TIFF stack as an ImageData with the provided geometry&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;reads the TIFF stack as an ImageData with the provided geometry&#39;&#39;&#39;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="n">gsize</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -656,7 +656,7 @@
                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">geometry</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="TIFFStackReader.read_as_ImageData"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.read_as_ImageData">[docs]</a>    <span class="k">def</span> <span class="nf">read_as_ImageData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;reads the TIFF stack as an ImageData with the provided geometry</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;reads the TIFF stack as an ImageData with the provided geometry</span>
 <span class="sd">        </span>
 <span class="sd">        Notice that the data will be reshaped to what requested in the geometry but there is </span>
 <span class="sd">        no warranty that the data will be read in the right order! </span>
@@ -665,7 +665,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_as</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">)</span></div>
 <div class="viewcode-block" id="TIFFStackReader.read_as_AcquisitionData"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader.read_as_AcquisitionData">[docs]</a>    <span class="k">def</span> <span class="nf">read_as_AcquisitionData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;reads the TIFF stack as an AcquisitionData with the provided geometry</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;reads the TIFF stack as an AcquisitionData with the provided geometry</span>
 <span class="sd">        </span>
 <span class="sd">        Notice that the data will be reshaped to what requested in the geometry but there is </span>
 <span class="sd">        no warranty that the data will be read in the right order! </span>
@@ -673,7 +673,7 @@
 <span class="sd">        leads to sensible data.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_as</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">)</span></div></div>
-    
+<span class="w">    </span>
 
 
 <span class="sd">&#39;&#39;&#39;</span>

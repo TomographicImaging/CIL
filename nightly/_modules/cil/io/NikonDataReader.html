@@ -219,7 +219,7 @@
     
 <div class="viewcode-block" id="NikonDataReader.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Basic reader for xtekct files</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Basic reader for xtekct files</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -514,14 +514,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="NikonDataReader.get_geometry"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.get_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return AcquisitionGeometry object</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span></div>
 <div class="viewcode-block" id="NikonDataReader.get_roi"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.get_roi">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;returns the roi&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the roi&#39;&#39;&#39;</span>
         <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[:]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
             <span class="n">roi</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -533,8 +533,8 @@
         <span class="k">return</span> <span class="n">roidict</span></div>
 
 <div class="viewcode-block" id="NikonDataReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reads projections and return AcquisitionData container</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
@@ -560,7 +560,7 @@
         <span class="k">return</span> <span class="n">ad</span></div>
 
 <div class="viewcode-block" id="NikonDataReader.load_projections"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.load_projections">[docs]</a>    <span class="k">def</span> <span class="nf">load_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;alias of read for backward compatibility&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of read for backward compatibility&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div></div>
 </pre></div>
 

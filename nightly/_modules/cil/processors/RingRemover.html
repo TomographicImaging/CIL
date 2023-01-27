@@ -215,16 +215,16 @@
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">AcquisitionData</span>
 
 <div class="viewcode-block" id="RingRemover"><a class="viewcode-back" href="../../../processors.html#cil.processors.RingRemover">[docs]</a><span class="k">class</span> <span class="nc">RingRemover</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-    
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) </span>
 <span class="sd">        the algorithm in https://doi.org/10.1364/OE.17.008567</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
         
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -328,8 +328,8 @@
 
           
 <div class="viewcode-block" id="RingRemover.xRemoveStripesVertical"><a class="viewcode-back" href="../../../processors.html#cil.processors.RingRemover.xRemoveStripesVertical">[docs]</a>    <span class="k">def</span> <span class="nf">xRemoveStripesVertical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ima</span><span class="p">,</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39; Code from https://doi.org/10.1364/OE.17.008567 </span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Code from https://doi.org/10.1364/OE.17.008567 </span>
 <span class="sd">            translated in Python</span>
 <span class="sd">                            </span>
 <span class="sd">        Returns</span>

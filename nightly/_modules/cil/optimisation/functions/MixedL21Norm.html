@@ -218,7 +218,7 @@
     <span class="kn">import</span> <span class="nn">numba</span>
     <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_proximal_step_numba</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">abstau</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Numba implementation of a step in the calculation of the proximal of MixedL21Norm</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Numba implementation of a step in the calculation of the proximal of MixedL21Norm</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters:</span>
 <span class="sd">        -----------</span>
@@ -250,7 +250,7 @@
 
 
 <span class="k">def</span> <span class="nf">_proximal_step_numpy</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Numpy implementation of a step in the calculation of the proximal of MixedL21Norm</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Numpy implementation of a step in the calculation of the proximal of MixedL21Norm</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
@@ -275,9 +275,9 @@
     <span class="k">return</span> <span class="n">res</span>
 
 <div class="viewcode-block" id="MixedL21Norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL21Norm">[docs]</a><span class="k">class</span> <span class="nc">MixedL21Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-    
-    
-    <span class="sd">&quot;&quot;&quot; MixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}`                  </span>
+<span class="w">    </span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; MixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}`                  </span>
 <span class="sd">    </span>
 <span class="sd">        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`</span>
 <span class="sd">    </span>
@@ -289,8 +289,8 @@
                     
         
 <div class="viewcode-block" id="MixedL21Norm.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL21Norm.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL21Norm function at x. </span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL21Norm function at x. </span>
 
 <span class="sd">        :param x: :code:`BlockDataContainer`                                           </span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -301,8 +301,8 @@
             
                             
 <div class="viewcode-block" id="MixedL21Norm.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL21Norm.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the MixedL21Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the MixedL21Norm function at x.</span>
 <span class="sd">        </span>
 <span class="sd">        This is the Indicator function of :math:`\mathbb{I}_{\{\|\cdot\|_{2,\infty}\leq1\}}(x^{*})`,</span>
 <span class="sd">        </span>
@@ -329,8 +329,8 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span></div>
                     
 <div class="viewcode-block" id="MixedL21Norm.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL21Norm.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL21Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL21Norm function at x.</span>
 <span class="sd">        </span>
 <span class="sd">        .. math :: \mathrm{prox}_{\tau F}(x) = \frac{x}{\|x\|_{2}}\max\{ \|x\|_{2} - \tau, 0 \}</span>
 <span class="sd">        </span>
@@ -364,8 +364,8 @@
             <span class="k">return</span> <span class="n">res</span></div></div>
 
 <div class="viewcode-block" id="SmoothMixedL21Norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SmoothMixedL21Norm">[docs]</a><span class="k">class</span> <span class="nc">SmoothMixedL21Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-    
-    <span class="sd">&quot;&quot;&quot; SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  </span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  </span>
 <span class="sd">    </span>
 <span class="sd">        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`</span>
 <span class="sd">        </span>
@@ -375,8 +375,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>    
         
 <div class="viewcode-block" id="SmoothMixedL21Norm.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SmoothMixedL21Norm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
-                
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">                </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :param epsilon: smoothing parameter making MixedL21Norm differentiable </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -387,8 +387,8 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;We need epsilon&gt;0. Otherwise, call &quot;MixedL21Norm&quot; &#39;</span><span class="p">)</span></div>
                             
 <div class="viewcode-block" id="SmoothMixedL21Norm.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SmoothMixedL21Norm.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the SmoothMixedL21Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the SmoothMixedL21Norm function at x.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> 
@@ -398,8 +398,8 @@
          
 
 <div class="viewcode-block" id="SmoothMixedL21Norm.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SmoothMixedL21Norm.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the SmoothMixedL21Norm function at x.</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the SmoothMixedL21Norm function at x.</span>
 <span class="sd">        </span>
 <span class="sd">        \frac{x}{|x|}</span>
 <span class="sd">                </span>

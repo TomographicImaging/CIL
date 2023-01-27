@@ -217,7 +217,7 @@
 
 <div class="viewcode-block" id="ISTA"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.ISTA">[docs]</a><span class="k">class</span> <span class="nc">ISTA</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
 
 <span class="sd">    Iterative Shrinkage-Thresholding Algorithm (ISTA)</span>
 
@@ -286,7 +286,7 @@
 
     <span class="c1"># Set default step size</span>
 <div class="viewcode-block" id="ISTA.set_step_size"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.ISTA.set_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">set_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set default step size.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set default step size.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">step_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -303,7 +303,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ISTA.set_up"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.ISTA.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set up of the algorithm</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set up of the algorithm</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> setting up&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span>        
@@ -325,7 +325,7 @@
 
 <div class="viewcode-block" id="ISTA.update"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.ISTA.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single iteration of ISTA</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single iteration of ISTA</span>
 
 <span class="sd">        .. math:: x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))</span>
 
@@ -339,7 +339,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
-        <span class="sd">&quot;&quot;&quot; Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
@@ -350,7 +350,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span></div>
         
 <div class="viewcode-block" id="ISTA.update_objective"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.ISTA.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Updates the objective</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Updates the objective</span>
 
 <span class="sd">        .. math:: f(x) + g(x)</span>
 
@@ -360,7 +360,7 @@
 
 <div class="viewcode-block" id="FISTA"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.FISTA">[docs]</a><span class="k">class</span> <span class="nc">FISTA</span><span class="p">(</span><span class="n">ISTA</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fast Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fast Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
 
 <span class="sd">    Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</span>
 
@@ -418,7 +418,7 @@
 
 <div class="viewcode-block" id="FISTA.set_step_size"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.FISTA.set_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">set_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
 
-        <span class="sd">&quot;&quot;&quot;Set the default step size</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the default step size</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">step_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -438,8 +438,8 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">FISTA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
               
 <div class="viewcode-block" id="FISTA.update"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.FISTA.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single iteration of FISTA</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single iteration of FISTA</span>
 
 <span class="sd">        .. math::</span>
 

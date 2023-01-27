@@ -252,7 +252,7 @@
 
 <span class="k">class</span> <span class="nc">show_base</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Saves the image as a `.png` using matplotlib.figure.savefig()</span>
 
 <span class="sd">        matplotlib kwargs can be passed, refer to documentation</span>
@@ -287,7 +287,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unable to save image&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="show2D"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.display.show2D">[docs]</a><span class="k">class</span> <span class="nc">show2D</span><span class="p">(</span><span class="n">show_base</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;This plots 2D slices from cil DataContainer types.</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;This plots 2D slices from cil DataContainer types.</span>
 
 <span class="sd">    Plots 1 or more 2D plots in an (n x num_cols) matrix.</span>
 <span class="sd">    Can plot multiple slices from one 3D dataset, or compare multiple datasets</span>
@@ -585,7 +585,7 @@
         <span class="k">return</span> <span class="n">fig2</span></div>
 
 <span class="k">def</span> <span class="nf">plotter2D</span><span class="p">(</span><span class="n">datacontainers</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)):</span>
-    <span class="sd">&#39;&#39;&#39;Alias of show2D&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Alias of show2D&#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">show2D</span><span class="p">(</span><span class="n">datacontainers</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="n">slice_list</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="n">fix_range</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="n">axis_labels</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">_Arrow3D</span><span class="p">(</span><span class="n">FancyArrowPatch</span><span class="p">):</span>
@@ -926,7 +926,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h0</span><span class="o">.</span><span class="n">get_label</span><span class="p">())</span>
 
 <div class="viewcode-block" id="show_geometry"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.display.show_geometry">[docs]</a><span class="k">class</span> <span class="nc">show_geometry</span><span class="p">(</span><span class="n">show_base</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Displays a schematic of the acquisition geometry</span>
 <span class="sd">    for 2D geometries elevation and azimuthal cannot be changed</span>
 

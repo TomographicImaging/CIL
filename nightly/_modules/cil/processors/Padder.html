@@ -216,14 +216,14 @@
 
 
 <div class="viewcode-block" id="Padder"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder">[docs]</a><span class="k">class</span> <span class="nc">Padder</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Processor to pad an array, wrapping numpy.pad</span>
 <span class="sd">    See https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Padder.constant"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.constant">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Padder processor wrapping numpy.pad with mode `constant` </span>
 <span class="sd">        Pads with a constant value.</span>
 
@@ -246,7 +246,7 @@
 
 <div class="viewcode-block" id="Padder.edge"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.edge">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `edge` </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `edge` </span>
 <span class="sd">        Pads with the edge values of array.</span>
 
 <span class="sd">        Parameters</span>
@@ -267,7 +267,7 @@
     
 <div class="viewcode-block" id="Padder.linear_ramp"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.linear_ramp">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">linear_ramp</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
 <span class="sd">        Pads with the linear ramp between end_value and the array edge value.</span>
 
 <span class="sd">        Parameters</span>
@@ -289,7 +289,7 @@
     
 <div class="viewcode-block" id="Padder.reflect"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.reflect">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `reflect` </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `reflect` </span>
 <span class="sd">        Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -309,7 +309,7 @@
     
 <div class="viewcode-block" id="Padder.symmetric"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.symmetric">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">symmetric</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `symmetric`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `symmetric`</span>
 <span class="sd">        Pads with the reflection of the vector mirrored along the edge of the array.</span>
 
 <span class="sd">        Parameters</span>
@@ -329,7 +329,7 @@
     
 <div class="viewcode-block" id="Padder.wrap"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.wrap">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `wrap`</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `wrap`</span>
 <span class="sd">        Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.</span>
 
 <span class="sd">        Parameters</span>

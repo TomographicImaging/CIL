@@ -215,7 +215,7 @@
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 
 <div class="viewcode-block" id="BlockDataContainer"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer">[docs]</a><span class="k">class</span> <span class="nc">BlockDataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Class to hold DataContainers as column vector</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to hold DataContainers as column vector</span>
 <span class="sd">    </span>
 <span class="sd">    Provides basic algebra between BlockDataContainer&#39;s, DataContainer&#39;s and</span>
 <span class="sd">    subclasses and Numbers</span>
@@ -257,7 +257,7 @@
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">)</span>    
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">containers</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="kc">None</span>
@@ -278,10 +278,10 @@
 
         
 <div class="viewcode-block" id="BlockDataContainer.__iter__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;BlockDataContainer is Iterable&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockDataContainer is Iterable&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 <div class="viewcode-block" id="BlockDataContainer.next"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;python2 backwards compatibility&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;python2 backwards compatibility&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span></div>
     <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -292,7 +292,7 @@
         <span class="k">return</span> <span class="n">out</span>
     
 <div class="viewcode-block" id="BlockDataContainer.is_compatible"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.is_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;basic check if the size of the 2 objects fit&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;basic check if the size of the 2 objects fit&#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>   
@@ -326,7 +326,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
                 
 <div class="viewcode-block" id="BlockDataContainer.add"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -337,7 +337,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="BlockDataContainer.subtract"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.subtract">[docs]</a>    <span class="k">def</span> <span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -348,7 +348,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SUBTRACT</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="BlockDataContainer.multiply"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.multiply">[docs]</a>    <span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -359,7 +359,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MULTIPLY</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="BlockDataContainer.divide"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.divide">[docs]</a>    <span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -370,7 +370,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">DIVIDE</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="BlockDataContainer.power"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.power">[docs]</a>    <span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -381,7 +381,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">POWER</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="BlockDataContainer.maximum"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.maximum">[docs]</a>    <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -392,7 +392,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MAXIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 <div class="viewcode-block" id="BlockDataContainer.minimum"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.minimum">[docs]</a>    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
@@ -404,7 +404,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.sapyb"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.sapyb">[docs]</a>    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;performs axpby element-wise on the BlockDataContainer containers</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;performs axpby element-wise on the BlockDataContainer containers</span>
 <span class="sd">        </span>
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
 
@@ -433,13 +433,13 @@
 
 
 <div class="viewcode-block" id="BlockDataContainer.axpby"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Deprecated method. Alias of sapyb&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Deprecated method. Alias of sapyb&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">out</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="BlockDataContainer.binary_operations"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.binary_operations">[docs]</a>    <span class="k">def</span> <span class="nf">binary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        Provides commutativity with DataContainer and subclasses, i.e. this </span>
 <span class="sd">        class&#39;s reverse algebric methods take precedence w.r.t. direct algebric</span>
@@ -592,7 +592,7 @@
     <span class="c1">## unary operations</span>
 
 <div class="viewcode-block" id="BlockDataContainer.unary_operations"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.unary_operations">[docs]</a>    <span class="k">def</span> <span class="nf">unary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Unary operation on BlockDataContainer: </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Unary operation on BlockDataContainer: </span>
 <span class="sd">        </span>
 <span class="sd">        generic method of unary operation with BlockDataContainer: abs, sign, sqrt and conjugate</span>
 <span class="sd">        </span>
@@ -668,7 +668,7 @@
             <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
                 
 <div class="viewcode-block" id="BlockDataContainer.copy"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>    
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>    
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
     <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -703,7 +703,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="c1"># reverse operand</span>
 <div class="viewcode-block" id="BlockDataContainer.__radd__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__radd__">[docs]</a>    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Reverse addition</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse addition</span>
 <span class="sd">        </span>
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
@@ -713,7 +713,7 @@
     <span class="c1"># __radd__</span>
     
 <div class="viewcode-block" id="BlockDataContainer.__rsub__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__rsub__">[docs]</a>    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Reverse subtraction</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse subtraction</span>
 <span class="sd">        </span>
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
@@ -723,7 +723,7 @@
     <span class="c1"># __rsub__</span>
     
 <div class="viewcode-block" id="BlockDataContainer.__rmul__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Reverse multiplication</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse multiplication</span>
 <span class="sd">        </span>
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
@@ -733,7 +733,7 @@
     <span class="c1"># __rmul__</span>
     
 <div class="viewcode-block" id="BlockDataContainer.__rdiv__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__rdiv__">[docs]</a>    <span class="k">def</span> <span class="nf">__rdiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Reverse division</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse division</span>
 <span class="sd">        </span>
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
@@ -742,7 +742,7 @@
         <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
     <span class="c1"># __rdiv__</span>
 <div class="viewcode-block" id="BlockDataContainer.__rtruediv__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__rtruediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Reverse truedivision</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse truedivision</span>
 <span class="sd">        </span>
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
@@ -751,7 +751,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rdiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="BlockDataContainer.__rpow__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__rpow__">[docs]</a>    <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Reverse power</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse power</span>
 <span class="sd">        </span>
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
@@ -760,7 +760,7 @@
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="BlockDataContainer.__iadd__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__iadd__">[docs]</a>    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Inline addition&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline addition&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">+=</span> <span class="n">ot</span>
@@ -776,7 +776,7 @@
     <span class="c1"># __iadd__</span>
     
 <div class="viewcode-block" id="BlockDataContainer.__isub__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__isub__">[docs]</a>    <span class="k">def</span> <span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Inline subtraction&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline subtraction&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">-=</span> <span class="n">ot</span>
@@ -792,7 +792,7 @@
     <span class="c1"># __isub__</span>
     
 <div class="viewcode-block" id="BlockDataContainer.__imul__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__imul__">[docs]</a>    <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Inline multiplication&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline multiplication&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">*=</span> <span class="n">ot</span>
@@ -808,7 +808,7 @@
     <span class="c1"># __imul__</span>
     
 <div class="viewcode-block" id="BlockDataContainer.__idiv__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__idiv__">[docs]</a>    <span class="k">def</span> <span class="nf">__idiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Inline division&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline division&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">/=</span> <span class="n">ot</span>
@@ -823,11 +823,11 @@
         <span class="k">return</span> <span class="bp">self</span></div>
     <span class="c1"># __rdiv__</span>
 <div class="viewcode-block" id="BlockDataContainer.__itruediv__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__itruediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Inline truedivision&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline truedivision&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__idiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="BlockDataContainer.__neg__"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.__neg__">[docs]</a>    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return - self &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return - self &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span>     </div>
     
     <span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>

@@ -51,20 +51,21 @@ class Binner(DataProcessor):
 
     Example
     -------
-    from cil.processors import Binner
-    roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
-    processor = Binner(roi)
-    processor.set_input(data)
-    data_binned = processor.get_output()
+    
+    >>> from cil.processors import Binner
+    >>> roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
+    >>> processor = Binner(roi)
+    >>> processor.set_input(data)
+    >>> data_binned = processor.get_output()
 
 
     Example
     -------
-    from cil.processors import Binner
-    roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
-    processor = Binner(roi)
-    processor.set_input(data.geometry)
-    geometry_binned = processor.get_output()
+    >>> from cil.processors import Binner
+    >>> roi = {'horizontal':(None,None,2),'vertical':(None,None,2)}
+    >>> processor = Binner(roi)
+    >>> processor.set_input(data.geometry)
+    >>> geometry_binned = processor.get_output()
 
 
     Note

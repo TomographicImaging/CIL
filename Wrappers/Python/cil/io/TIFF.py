@@ -30,6 +30,7 @@ import glob
 import re
 import numpy as np
 from cil.io import utilities
+import json
 
 import logging
 
@@ -248,6 +249,16 @@ class TIFFStackReader(object):
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
                     
+
+        Example:
+        --------
+        If TIFFWriter has been used to save data with lossy compression, then you can rescale the 
+        read data to approximately the original data with the following code:
+
+        >>> reader = TIFFStackReader(file_name = '/path/to/folder')
+        >>> compressed_data = reader.read()
+        >>> scale, offset = reader.reader_scale_offset()
+        >>> about_original_data = (compressed_data - offset)/scale
         '''
         
         self.file_name = kwargs.get('file_name', None)
@@ -551,6 +562,23 @@ class TIFFStackReader(object):
         '''
         return self._read_as(acquisition_geometry)
     
+    def read_scale_offset(self):
+        '''Reads the scale and offset from a json file in the same folder as the tiff stack
+        
+        This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter
+
+        Returns:
+        --------
+
+        tuple: (scale, offset)
+        '''
+        # load first image to find out dimensions and type
+        path = os.path.dirname(self._tiff_files[0])
+        with open(os.path.join(path, "scaleoffset.json"), 'r') as f:
+            d = json.load(f)
+
+        return (d['scale'], d['offset'])
+
 
 
 '''

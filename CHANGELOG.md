@@ -5,6 +5,9 @@
     - `get_centre_of_rotation()` calculates the centre of rotation of the system
     - `set_centre_of_rotation()` sets the system centre of rotation with an offset and angle
     - `set_centre_of_rotation_by_slice()` sets the system centre of rotation with offsets from two slices
+  - Binner processor reworked:
+    - Significant speed increase available via the C++ backend
+    - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1

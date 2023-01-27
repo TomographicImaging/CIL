@@ -47,12 +47,16 @@ endif()
 if (UNIX)
   find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
   find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
+  find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
+  find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
 elseif(WIN32)
   find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
   find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
+  find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
+  find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
 endif()
 
-if(IPP_CORE AND IPP_S)
+if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
   set(USE_IPP TRUE)
   message("IPP libraries found")
 else()
@@ -64,9 +68,11 @@ if(USE_IPP)
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
 
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S})
+
+  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
   include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 else()
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp

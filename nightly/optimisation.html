@@ -4196,20 +4196,15 @@ see <em>TranslateFunction</em>.</p>
 <dd><p>(Weighted) Least Squares function</p>
 <div class="math notranslate nohighlight">
 \[F(x) = c\|Ax-b\|_2^2\]</div>
-<p>or</p>
+<p>or if weighted</p>
 <div class="math notranslate nohighlight">
 \[F(x) = c\|Ax-b\|_{2,W}^{2}\]</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> – Operator</p></li>
-<li><p><strong>c</strong> – Scaling Constant</p></li>
-<li><p><strong>b</strong> – Data</p></li>
-<li><p><strong>weight</strong> – 1.0 (Default) or DataContainer</p></li>
-</ul>
-</dd>
-</dl>
-<p>Members:</p>
+<blockquote>
+<div><p>A : LinearOperator</p>
+<p>b : Data, DataContainer</p>
+<p>c : Scaling Constant, float, default 1.0</p>
+<p>weight: DataContainer with all positive elements of size of the range of operator A, default None</p>
+</div></blockquote>
 <blockquote>
 <div><p>L : Lipshitz Constant of the gradient of <span class="math notranslate nohighlight">\(F\)</span> which is <span class="math notranslate nohighlight">\(2 c ||A||_2^2 = 2 c s1(A)^2\)</span>, or</p>
 <p>L : Lipshitz Constant of the gradient of <span class="math notranslate nohighlight">\(F\)</span> which is <span class="math notranslate nohighlight">\(2 c ||weight|| ||A||_2^2 = 2s1(A)^2\)</span>,</p>

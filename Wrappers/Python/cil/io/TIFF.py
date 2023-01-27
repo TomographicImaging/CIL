@@ -252,13 +252,19 @@ class TIFFStackReader(object):
 
         Example:
         --------
-        If TIFFWriter has been used to save data with lossy compression, then you can rescale the 
-        read data to approximately the original data with the following code:
+        You can rescale the read data as `rescaled_data = (read_data - offset)/scale` with the following code:
 
         >>> reader = TIFFStackReader(file_name = '/path/to/folder')
-        >>> compressed_data = reader.read()
-        >>> scale, offset = reader.reader_scale_offset()
-        >>> about_original_data = (compressed_data - offset)/scale
+        >>> rescaled_data = reader.read_rescaled(scale, offset)
+        
+
+        Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
+        read data to approximately the original data with the following code:
+
+        >>> writer = TIFFWriter(file_name = '/path/to/folder', compression=8)
+        >>> writer.write(original_data)
+        >>> reader = TIFFStackReader(file_name = '/path/to/folder')
+        >>> about_original_data = reader.read_rescaled()
         '''
         
         self.file_name = kwargs.get('file_name', None)
@@ -579,7 +585,32 @@ class TIFFStackReader(object):
 
         return (d['scale'], d['offset'])
 
+    def read_rescaled(self, scale=None, offset=None):
+        '''Reads the TIFF stack and rescales it with the provided scale and offset, or with the ones in the json file if not provided
+        
+        This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter
 
+        Parameters:
+        -----------
+
+        scale: float, default None
+            scale to apply to the data. If None, the scale will be read from the json file saved by TIFFWriter.
+        offset: float, default None
+            offset to apply to the data. If None, the offset will be read from the json file saved by TIFFWriter.
+
+        Returns:
+        --------
+
+        numpy.ndarray in float32
+        '''
+        data = self.read()
+        if scale is None or offset is None:
+            scale, offset = self.read_scale_offset()
+        if self.dtype != np.float32:
+            data = data.astype(np.float32)
+        data -= offset
+        data /= scale
+        return data
 
 '''
 import matplotlib.pyplot as plt

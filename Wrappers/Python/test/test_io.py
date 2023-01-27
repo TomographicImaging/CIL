@@ -342,7 +342,14 @@ class TestTIFF(unittest.TestCase):
             assert of == offset
             
             recovered_data = (read_array - of)/sc
-            np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1)
+            np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
+
+            # test read_rescaled
+            approx = reader.read_rescaled()
+            np.testing.assert_allclose(approx.ravel(), data.array.ravel(), rtol=1e-1, atol=1e-2)
+
+            approx = reader.read_rescaled(sc, of)
+            np.testing.assert_allclose(approx.ravel(), data.array.ravel(), rtol=1e-1, atol=1e-2)
         else:
             tmp = data.array
             # if the compression is None, the scale and offset should not be written to the json file

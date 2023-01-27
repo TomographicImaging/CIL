@@ -336,9 +336,19 @@ class TestTIFF(unittest.TestCase):
                 d = json.load(f)
             assert d['scale'] == scale
             assert d['offset'] == offset
+            # test if the scale and offset are read from the json file
+            sc, of = reader.read_scale_offset()
+            assert sc == scale
+            assert of == offset
         else:
             tmp = data.array
+            # if the compression is None, the scale and offset should not be written to the json file
+            with self.assertRaises(OSError) as context:
+                sc, of = reader.read_scale_offset()
         
         assert tmp.dtype == read_array.dtype
         
         np.testing.assert_array_equal(tmp, read_array)
+
+        
+

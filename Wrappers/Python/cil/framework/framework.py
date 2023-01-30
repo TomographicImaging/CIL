@@ -3305,7 +3305,7 @@ class ImageData(DataContainer):
         Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
         
         # use centre from geometry in units distance to account for aspect ratio of pixels
-        dist_from_center = numpy.sqrt((X*ig.voxel_size_x- ig.center_x)**2 + (Y*ig.voxel_size_y-ig.center_y)**2)
+        dist_from_center = numpy.sqrt((X*ig.voxel_size_x+ ig.center_x)**2 + (Y*ig.voxel_size_y+ig.center_y)**2)
 
         size_x = ig.voxel_num_x * ig.voxel_size_x
         size_y = ig.voxel_num_y * ig.voxel_size_y

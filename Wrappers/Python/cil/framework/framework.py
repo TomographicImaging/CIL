@@ -3304,25 +3304,29 @@ class ImageData(DataContainer):
 
         Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
         
-        # use centre from geometry in voxels
-        dist_from_center = numpy.sqrt((X- ig.center_x/ig.voxel_size_x)**2 + (Y - ig.center_y/ig.voxel_size_y)**2)
+        # use centre from geometry in units distance to account for aspect ratio of pixels
+        dist_from_center = numpy.sqrt((X*ig.voxel_size_x- ig.center_x)**2 + (Y*ig.voxel_size_y-ig.center_y)**2)
 
-        if ig.voxel_num_x > ig.voxel_num_y:
-            radius_applied = radius * ig.voxel_num_x/2
+        size_x = ig.voxel_num_x * ig.voxel_size_x
+        size_y = ig.voxel_num_y * ig.voxel_size_y
+
+        if size_x > size_y:
+            radius_applied =radius * size_x/2
         else:
-            radius_applied = radius * ig.voxel_num_y/2
+            radius_applied =radius * size_y/2
 
-        #voxel area = 1, sphere of area=1 has r = 0.56
-        #outside this r clip data and scale to -1->+1
-        r=(1/numpy.pi)**(1/2)
+        # voxel area = 1, sphere of area=1 has r = 0.56
+        # outside this r clip data and scale to -1->+1
+        r=((ig.voxel_size_x * ig.voxel_size_y )/numpy.pi)**(1/2)
+
         mask =(radius_applied-dist_from_center).clip(-r,r)
         mask /= r
 
-        #anti-aliasing approximation
+        # apply anti-aliasing approximation
         mask *= (0.5*numpy.pi)
         mask = 0.5+0.5*numpy.sin(mask)
 
-        #reorder and apply mask to horizontal_y and horizontal_x
+        # reorder and apply mask to horizontal_y and horizontal_x
         labels_orig = self.dimension_labels
         labels = list(labels_orig)
 

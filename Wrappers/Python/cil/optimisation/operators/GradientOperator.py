@@ -136,7 +136,18 @@ class GradientOperator(LinearOperator):
     def calculate_norm(self):
         
         r""" Returns the analytical norm of the GradientOperator.
-                
+            
+            For
+            .. math:: $\nabla = (\partial_{z}, \partial_{y}, \partial_{x})$
+
+            we have,
+
+            ..math:: \|\|\nabla\|\| = \sqrt{  \|\|\partial_{z}\|\|^{2} + \|\|\partial_{z}\|\|^{2} +  \|\|\partial_{z}\|\|^{2} } =  \sqrt{ \frac{4}{h_{z}^{2}} + \frac{4}{h_{y}^{2}} + \frac{4}{h_{x}^{2}}}
+        
+            Where voxel size in each dimension are equal this simplifies to:
+            - 2D geometries math:: $\sqrt{8}$
+            - 3D geometries math:: $\sqrt{12}$
+        
         """
 
         if self.correlation==CORRELATION_SPACE and self._domain_geometry.channels > 1:

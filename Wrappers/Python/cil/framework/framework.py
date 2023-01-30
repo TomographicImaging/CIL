@@ -3273,6 +3273,79 @@ class ImageData(DataContainer):
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)                            
 
+
+    def apply_circular_mask(self, radius=0.99, in_place=True):
+        """
+
+        Apply a circular mask to the horizontal_x and horizontal_y slices. Values outside this mask will be set to zero.
+
+        This will most commonly used to mask edge artefacts from standard CT reconstructions with FBP.
+
+        Parameters
+        ----------
+        radius : float, default 0.99
+            radius of mask by percentage of size of horizontal_x or horizontal_y, whichever is greater
+
+        in_place : boolean, default True
+            If `True` masks the current data, if `False` returns a new `ImageData` object.
+            
+
+        Returns
+        -------
+        ImageData
+            If `in_place = False` returns a new ImageData object with the masked data
+
+        """
+        ig = self.geometry
+
+        # grid
+        y_range = (ig.voxel_num_y-1)/2
+        x_range = (ig.voxel_num_x-1)/2
+
+        Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
+        
+        # use centre from geometry in voxels
+        dist_from_center = numpy.sqrt((X- ig.center_x/ig.voxel_size_x)**2 + (Y - ig.center_y/ig.voxel_size_y)**2)
+
+        if ig.voxel_num_x > ig.voxel_num_y:
+            radius_applied = radius * ig.voxel_num_x/2
+        else:
+            radius_applied = radius * ig.voxel_num_y/2
+
+        #voxel area = 1, sphere of area=1 has r = 0.56
+        #outside this r clip data and scale to -1->+1
+        r=(1/numpy.pi)**(1/2)
+        mask =(radius_applied-dist_from_center).clip(-r,r)
+        mask /= r
+
+        #anti-aliasing approximation
+        mask *= (0.5*numpy.pi)
+        mask = 0.5+0.5*numpy.sin(mask)
+
+        #reorder and apply mask to horizontal_y and horizontal_x
+        labels_orig = self.dimension_labels
+        labels = list(labels_orig)
+
+        labels.remove('horizontal_y')
+        labels.remove('horizontal_x')
+        labels.append('horizontal_y')
+        labels.append('horizontal_x')
+
+
+        if in_place == True:
+            self.reorder(labels)
+            numpy.multiply(self.array, mask, out=self.array)
+            self.reorder(labels_orig)
+
+        else:
+            image_data_out = self.copy()
+            image_data_out.reorder(labels)
+            numpy.multiply(image_data_out.array, mask, out=image_data_out.array)
+            image_data_out.reorder(labels_orig)
+
+            return image_data_out
+
+
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1

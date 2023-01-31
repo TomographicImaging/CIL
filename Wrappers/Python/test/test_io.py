@@ -396,26 +396,39 @@ class Test_HDF5_utilities(unittest.TestCase):
         # subset of input
         subset = np.s_[44:45,70:90:2,80]
         data_read_subset = HDF5_utilities.read(self.path, self.dset_path, subset)
+        self.assertTrue(data_read_subset.dtype == np.float32)
         np.testing.assert_allclose(data_full.array[subset],data_read_subset)
+
+        # read as dtype
+        subset = np.s_[44:45,70:90:2,80]
+        data_read_dtype = HDF5_utilities.read(self.path, self.dset_path, subset, dtype=np.float64)
+        self.assertTrue(data_read_dtype.dtype == np.float64)
+        np.testing.assert_allclose(data_full.array[subset],data_read_dtype)
 
 
     def test_read_to(self):
         data_full = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
         # full dataset
-        data_full_out = np.empty_like(data_full.array)
+        data_full_out = np.empty_like(data_full.array, dtype=np.float32)
         HDF5_utilities.read_to(self.path, self.dset_path, data_full_out)
         np.testing.assert_allclose(data_full.array,data_full_out)
 
         # subset of input, continuous output
         subset = np.s_[44:45,70:90:2,80]
-        data_subset_out = np.empty((1,10))
+        data_subset_out = np.empty((1,10), dtype=np.float32)
+        HDF5_utilities.read_to(self.path, self.dset_path, data_subset_out, source_sel=subset)
+        np.testing.assert_allclose(data_full.array[subset],data_subset_out)
+
+        # subset of input, continuous output, change of dtype
+        subset = np.s_[44:45,70:90:2,80]
+        data_subset_out = np.empty((1,10), dtype=np.float64)
         HDF5_utilities.read_to(self.path, self.dset_path, data_subset_out, source_sel=subset)
         np.testing.assert_allclose(data_full.array[subset],data_subset_out)
 
         # subset of input written to subset of  output
-        data_partial_by_hand = np.zeros_like(data_full.array)
-        data_partial = np.zeros_like(data_full.array)
+        data_partial_by_hand = np.zeros_like(data_full.array, dtype=np.float32)
+        data_partial = np.zeros_like(data_full.array, dtype=np.float32)
 
         data_partial_by_hand[subset] = data_full.array[subset]
 

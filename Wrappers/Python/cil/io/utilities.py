@@ -152,7 +152,7 @@ class HDF5_utilities(object):
             The initial group to print the metadata for
         sep: str, default '\t'
             The separator to use for the output
-        depth : int
+        depth: int
             depth to print from starting object. Values 1-N, if -1 will print all
         """
         if depth != 0:
@@ -184,32 +184,9 @@ class HDF5_utilities(object):
 
 
     @staticmethod
-    def print_dataset_metadata(filename, dset_path):
-        """
-        Prints the dataset metadata
-        
-        Parameters
-        ----------
-        filename: str
-            The full path to the HDF5 file
-        dset_path: str
-            The internal path to the requested dataset
-        """
-        with h5py.File(filename, 'r') as f:
-                dset = f.get(dset_path)
-                print('ndim\t\t', dset.ndim)
-                print('shape\t\t', dset.shape)    
-                print('size\t\t', dset.size)
-                print('dtype\t\t', dset.dtype)
-                print('nbytes\t\t', dset.nbytes)
-                print('compression\t', dset.compression)
-                print('chunks\t\t', dset.chunks)
-
-
-    @staticmethod
     def get_dataset_metadata(filename, dset_path):
         """
-        Returns the dataset metadata
+        Returns the dataset metadata as a dictionary
 
         Parameters
         ----------
@@ -220,13 +197,22 @@ class HDF5_utilities(object):
 
         Returns
         -------
-        Tuple containing:
-        (ndim, shape, size, dtype, nbytes, compression, chunks)
+        A dictionary containing keys:
+            ndim, shape, size, dtype, nbytes, compression, chunks
         """
         with h5py.File(filename, 'r') as f:
                 dset = f.get(dset_path)
 
-                return [dset.ndim, dset.shape, dset.size, dset.dtype, dset.nbytes, dset.compression, dset.chunks]
+                return {
+                    'ndim':dset.ndim, 
+                    'shape':dset.shape,
+                    'size':dset.size,
+                    'dtype':np.dtype(dset.dtype),
+                    'nbytes':dset.nbytes, 
+                    'compression':dset.compression, 
+                    'chunks':dset.chunks, 
+                    'is_virtual':dset.is_virtual
+                    }
 
 
     @staticmethod
@@ -240,9 +226,9 @@ class HDF5_utilities(object):
             The full path to the HDF5 file
         dset_path: str
             The internal path to the requested dataset
-        source_sel: tuple of slice objects
+        source_sel: tuple of slice objects, optional
             The selection of slices in each source dimension to return
-        dtype:  numpy type
+        dtype: numpy type, default np.float32
             the numpy data type for the returned array
     
             
@@ -285,9 +271,9 @@ class HDF5_utilities(object):
             The full path to the HDF5 file
         dset_path: str
             The internal path to the requested dataset
-        source_sel: tuple of slice objects
+        source_sel: tuple of slice objects, optional
             The selection of slices in each source dimension to return
-        dest_sel: tuple of slice objects
+        dest_sel: tuple of slice objects, optional
             The selection of slices in each destination dimension to fill
 
 

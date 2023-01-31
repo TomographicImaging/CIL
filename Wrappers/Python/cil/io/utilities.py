@@ -17,6 +17,7 @@
 import numpy as np
 import json
 import logging
+import struct
 
 logger = logging.getLogger(__name__)
 

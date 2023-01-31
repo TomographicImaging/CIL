@@ -31,6 +31,10 @@ import shutil
 import logging
 import glob
 import json
+from cil.io import utilities
+from cil.io import RAWFileWriter
+import configparser
+        
 
 initialise_tests()
 
@@ -65,7 +69,7 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
     and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
-# logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.WARNING)
 
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
@@ -313,7 +317,6 @@ class TestTIFF(unittest.TestCase):
         data = ig.allocate(0)
         data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
 
-        from cil.io import utilities
         compress = utilities.get_compress(compression)
         dtype = utilities.get_compressed_dtype(data.array, compression)
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
@@ -371,6 +374,7 @@ class TestRAW(unittest.TestCase):
 
     def tearDown(self) -> None:
         shutil.rmtree(self.cwd)
+        # pass
 
     def test_raw_nocompression_0(self):
         self.RAW_compression_test(None,1)
@@ -400,18 +404,27 @@ class TestRAW(unittest.TestCase):
         data = ig.allocate(0)
         data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
 
-        from cil.io import utilities
         compress = utilities.get_compress(compression)
         dtype = utilities.get_compressed_dtype(data.array, compression)
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
         if C > 1:
             assert data.ndim == 4
         fname = os.path.join(self.cwd, "unittest.raw")
-        from cil.io import RAWFileWriter
+        
         writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
         writer.write()
+
+        config = configparser.ConfigParser()
+        inifname = os.path.join(self.cwd, "unittest.ini")
+        config.read(inifname)
+
+        read_dtype = config['MINIMAL INFO']['data_type']
         
-        read_array = np.fromfile(fname, dtype=dtype)
+        read_array = np.fromfile(fname, dtype=read_dtype)
+
+        logging.warning("read_array shape {}".format(read_array.shape))
+        logging.warning("read_array dtype {}".format(read_array.dtype))
+
         read_array = read_array.reshape(ig.shape)
 
         if compress:

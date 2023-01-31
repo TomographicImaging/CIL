@@ -24,6 +24,7 @@ from cil.io import utilities
 import configparser
 
 import logging
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
     Parameters
     ----------
     data : numpy array
+    compress : bool
     scale : float
     offset : float
     dtype : numpy dtype
@@ -42,8 +44,39 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
         d = utilities.compress_data(data, scale, offset, dtype)
     else:
         d = data
-    # Data is always written in ‘C’ order, independent of the order of d. 
-    d.tofile(fname)    
+    
+    # This is slightly silly, but tofile will only export float (i.e. 64 bit)
+    # which is not what we want.
+    # So, we write a npy file with the correct type, then 
+    # we copy only the binary part and dispose of the npy file.
+    np.save(fname+'.npy', d)
+    
+    buffer_size = 1024*1024
+    with open(fname+'.npy', 'rb') as f:
+        
+        vM, vm = np.lib.format.read_magic(f)
+        if vM == 1:
+            header = np.lib.format.read_array_header_1_0(f)
+        elif vM == 2:
+            header = np.lib.format.read_array_header_2_0(f)
+
+        if header[0] != data.shape:
+            raise ValueError('Shape mismatch')
+        if header[2] != d.dtype:
+            raise ValueError('dtype mismatch')
+
+        with open(fname, 'wb') as f2:
+            buffer = f.read(buffer_size)
+            while buffer:
+                f2.write(buffer)
+                buffer = f.read(buffer_size)
+    
+    # finally remove the npy file.
+    os.remove(fname+'.npy')
+    return header
+        
+
+
 
 class RAWFileWriter(object):
     '''
@@ -70,49 +103,31 @@ class RAWFileWriter(object):
         in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
 
         The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
+
+        
     '''
     
-    def __init__(self,
-                 **kwargs):
+    def __init__(self, data, file_name, compression=None):
         
-        
-        self.data_container = kwargs.get('data', None)
-        self.file_name = kwargs.get('file_name', None)
-        compression = kwargs.get('compression', None)
-        
-        if ((self.data_container is not None) and (self.file_name is not None)):
-            self.set_up(data = self.data_container,
-                        file_name = self.file_name, 
-                        compression=compression)
-        
-    def set_up(self,
-               data = None,
-               file_name = None,
-               compression=0):
-        
+        if not isinstance(data, (ImageData, AcquisitionData) ):
+            raise Exception('Writer supports only following data types:\n' +
+                            ' - ImageData\n - AcquisitionData')
+
         self.data_container = data
         file_name = os.path.abspath(file_name)
         self.file_name = os.path.splitext(
-            os.path.basename(
-                file_name
-                )
+            os.path.basename( file_name )
             )[0]
         
         self.dir_name = os.path.dirname(file_name)
         logger.info ("dir_name {}".format(self.dir_name))
         logger.info ("file_name {}".format(self.file_name))
         
-        if not ((isinstance(self.data_container, ImageData)) or 
-                (isinstance(self.data_container, AcquisitionData))):
-            raise Exception('Writer supports only following data types:\n' +
-                            ' - ImageData\n - AcquisitionData')
-
         # Deal with compression
         self.compress           = utilities.get_compress(compression)
         self.dtype              = utilities.get_compressed_dtype(data, compression)
         self.scale, self.offset = utilities.get_compression_scale_offset(data, compression)
         self.compression        = compression
-
     
     def write(self):
         if not os.path.isdir(self.dir_name):
@@ -121,7 +136,14 @@ class RAWFileWriter(object):
         fname = os.path.join(self.dir_name, self.file_name + '.raw')
 
         # write to disk
-        compress_and_save(self.data_container.as_array(), self.compress, self.scale, self.offset, self.dtype, fname)
+        header = \
+            compress_and_save(self.data_container.as_array(), self.compress, self.scale, self.offset, self.dtype, fname)
+
+        shape = header[0]
+        fortran_order = header[1]
+        read_dtype = header[2]
+        if len(header) > 3:
+            max_header_length = header[3]
 
         # save information about the file we just saved
         config = configparser.ConfigParser()
@@ -130,7 +152,7 @@ class RAWFileWriter(object):
             'data_type': str(self.dtype),
             'shape': self.data_container.shape,
             # Data is always written in ‘C’ order, independent of the order of d. 
-            'isFortran': False
+            'isFortran': fortran_order
         }
         
         if self.compress:

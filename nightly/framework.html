@@ -1085,6 +1085,27 @@ returns [1,0]</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.framework.ImageData.apply_circular_mask">
+<code class="sig-name descname"><span class="pre">apply_circular_mask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#ImageData.apply_circular_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageData.apply_circular_mask" title="Permalink to this definition">#</a></dt>
+<dd><p>Apply a circular mask to the horizontal_x and horizontal_y slices. Values outside this mask will be set to zero.</p>
+<p>This will most commonly be used to mask edge artefacts from standard CT reconstructions with FBP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em><em>, </em><em>default 0.99</em>) – radius of mask by percentage of size of horizontal_x or horizontal_y, whichever is greater</p></li>
+<li><p><strong>in_place</strong> (<em>boolean</em><em>, </em><em>default True</em>) – If <cite>True</cite> masks the current data, if <cite>False</cite> returns a new <cite>ImageData</cite> object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If <cite>in_place = False</cite> returns a new ImageData object with the masked data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.framework.ImageData.as_array">
 <code class="sig-name descname"><span class="pre">as_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.as_array" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the pointer to the array.</p>

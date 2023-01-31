@@ -376,10 +376,10 @@ class TestRAW(unittest.TestCase):
         self.RAW_compression_test(None,1)
     
     def test_raw_compression_0(self):
-        self.RAW_compression_test(8,1)
+        self.RAW_compression_test('uint8',1)
 
     def test_raw_compression_1(self):
-        self.RAW_compression_test(16,1)
+        self.RAW_compression_test('uint16',1)
 
     def test_raw_nocompression_1(self):
         self.RAW_compression_test(None,1)

@@ -46,12 +46,12 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
     d.tofile(fname)    
 
 class RAWFileWriter(object):
-    '''Write a DataSet to disk as a binary blob'''
-    
-    def __init__(self,
-                 **kwargs):
-        '''
+    '''
+        Writer to write DataSet to disk as a binary blob
 
+        This writer will write a text file with the minimal information necessary to 
+        read the data back in.
+        
         Parameters
         ----------
         data : DataContainer, AcquisitionData or ImageData
@@ -70,7 +70,11 @@ class RAWFileWriter(object):
         in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
 
         The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
-        '''
+    '''
+    
+    def __init__(self,
+                 **kwargs):
+        
         
         self.data_container = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)

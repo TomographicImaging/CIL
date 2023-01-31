@@ -468,7 +468,7 @@
         <span class="ne">NotImplementedError</span>
 
 
-<div class="viewcode-block" id="FDK"><a class="viewcode-back" href="../../../recon.html#cil.recon.FDK">[docs]</a><span class="k">class</span> <span class="nc">FDK</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
+<div class="viewcode-block" id="FDK"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.FDK">[docs]</a><span class="k">class</span> <span class="nc">FDK</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.</span>
@@ -517,7 +517,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">scaling</span> <span class="o">*</span> <span class="n">principal_ray_length</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">principal_ray_length</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">xx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="FDK.run"><a class="viewcode-back" href="../../../recon.html#cil.recon.FDK.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="FDK.run"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.FDK.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs the configured FDK recon and returns the reconstruction.</span>
 
@@ -565,7 +565,7 @@
 
         <span class="k">return</span> <span class="n">repres</span>   </div>
 
-<div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
+<div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates an FBP reconstructor based on your parallel-beam acquisition data.</span>
@@ -613,7 +613,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for parallel-beam data only.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="FBP.set_split_processing"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.set_split_processing">[docs]</a>    <span class="k">def</span> <span class="nf">set_split_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slices_per_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="FBP.set_split_processing"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.FBP.set_split_processing">[docs]</a>    <span class="k">def</span> <span class="nf">set_split_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slices_per_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Splits the processing in to chunks. Default, 0 will process the data in a single call.</span>
 
@@ -671,7 +671,7 @@
         <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">step</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="p">)</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span>
 
 
-<div class="viewcode-block" id="FBP.run"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="FBP.run"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.FBP.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
 
@@ -754,7 +754,7 @@
                 <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="FBP.reset"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FBP.reset"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.FBP.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Resets all optional configuration parameters to their default values</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -57,14 +57,14 @@ class GradientOperator(LinearOperator):
     Returns
     -------
     BlockDataContainer
-        returns a BlockDataContainer containing images of the derivatives order given by `dimension_labels`
+        a BlockDataContainer containing images of the derivatives order given by `dimension_labels`
         i.e. ['horizontal_y','horizontal_x'] will return [d('horizontal_y'), d('horizontal_x')]
 
 
     Example
     -------
 
-    2D example maths
+    2D example
 
     .. math::
        :nowrap:
@@ -160,7 +160,7 @@ class GradientOperator(LinearOperator):
             
         .. math::
 
-            (\partial_{z}, \partial_{y}, \partial_{x}) &= \sqrt{\|\partial_{z}\|^{2} + \|\partial_{z}\|^{2} + \|\partial_{z}\|^{2} } \\
+            (\partial_{z}, \partial_{y}, \partial_{x}) &= \sqrt{\|\partial_{z}\|^{2} + \|\partial_{y}\|^{2} + \|\partial_{x}\|^{2} } \\
             &=  \sqrt{ \frac{4}{h_{z}^{2}} + \frac{4}{h_{y}^{2}} + \frac{4}{h_{x}^{2}}}
 
 

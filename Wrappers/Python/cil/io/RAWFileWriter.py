@@ -139,11 +139,3 @@ class RAWFileWriter(object):
         # write the configuration to an ini file
         with open(os.path.join(self.dir_name, self.file_name + '.ini'), 'w') as configfile:
             config.write(configfile)
-
-    def _zero_padding(self, number):
-        i = 0
-        while 10**i < number:
-            i+=1
-        i+=1 
-        zero_padding_string = '{:0'+str(i)+'d}'
-        return zero_padding_string

@@ -65,7 +65,7 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
     and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
-logging.basicConfig(level=logging.ERROR)
+# logging.basicConfig(level=logging.WARNING)
 
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
@@ -411,9 +411,6 @@ class TestRAW(unittest.TestCase):
         writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
         writer.write()
         
-        # import time
-        # time.sleep(1)
-        # # force the reader to use the native TIFF dtype by setting dtype=None        
         read_array = np.fromfile(fname, dtype=dtype)
         read_array = read_array.reshape(ig.shape)
 

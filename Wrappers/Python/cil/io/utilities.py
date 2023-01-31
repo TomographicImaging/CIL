@@ -235,8 +235,7 @@ class HDF5_utilities(object):
         Returns
         -------
         numpy.ndarray
-
-        The requested dataset
+            The requested data
 
         Note
         ----

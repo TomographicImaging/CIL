@@ -14,12 +14,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.import numpy as np
-from cil.io import *
+
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData
 import os, re
-import sys
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-import datetime
+
 pilAvailable = True
 try:    
     from PIL import Image
@@ -36,29 +35,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def compress_data(data, scale, offset, dtype):
-    '''Compress data to dtype using scale and offset
-    
-    Parameters
-    ----------
-    data : numpy array
-    scale : float
-    offset : float
-    dtype : numpy dtype
-    
-    returns compressed casted data'''
-    if dtype == data.dtype:
-        return data
-    if data.ndim > 2:
-        # compress each slice
-        tmp = np.empty(data.shape, dtype=dtype)
-        for i in range(data.shape[0]):
-            tmp[i] = compress_data(data[i], scale, offset, dtype)
-    else:
-        tmp = data * scale + offset
-        tmp = tmp.astype(dtype)
-    return tmp
-
 def save_scale_offset(fname, scale, offset):
     '''Save scale and offset to file
     
@@ -74,7 +50,7 @@ def save_scale_offset(fname, scale, offset):
     utilities.save_dict_to_file(txt, d)
 
 class TIFFWriter(object):
-    '''Write a DataSet to disk as a TIFF file or stack'''
+    '''Write a DataSet to disk as a TIFF file or stack of TIFF files'''
     
     def __init__(self,
                  **kwargs):
@@ -102,6 +78,11 @@ class TIFFWriter(object):
         in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
 
         The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
+        
+        Note:
+        -----
+        In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
+        not as a single multi-page TIFF file.
         '''
         
         self.data_container = kwargs.get('data', None)
@@ -160,7 +141,7 @@ class TIFFWriter(object):
                 fname = "{}.tiff".format(os.path.join(self.dir_name, self.file_name))
             with open(fname, 'wb') as f:
                 Image.fromarray(
-                    compress_data(self.data_container.as_array() , self.scale, self.offset, self.dtype)
+                    utilities.compress_data(self.data_container.as_array() , self.scale, self.offset, self.dtype)
                     ).save(f, 'tiff')
         elif ndim == 3:
             for sliceno in range(self.data_container.shape[0]):
@@ -172,7 +153,7 @@ class TIFFWriter(object):
                     sliceno + self.counter_offset)
                 with open(fname, 'wb') as f:
                     Image.fromarray(
-                            compress_data(self.data_container.as_array()[sliceno] , self.scale, self.offset, self.dtype)
+                            utilities.compress_data(self.data_container.as_array()[sliceno] , self.scale, self.offset, self.dtype)
                         ).save(f, 'tiff')
         elif ndim == 4:
             # find how many decimal places self.data_container.shape[0] and shape[1] have
@@ -190,7 +171,7 @@ class TIFFWriter(object):
                         self.data_container.shape[3] , sliceno1, sliceno2)
                     with open(fname, 'wb') as f:
                         Image.fromarray(
-                            compress_data(self.data_container.as_array()[sliceno1][sliceno2] , self.scale, self.offset, self.dtype)
+                            utilities.compress_data(self.data_container.as_array()[sliceno1][sliceno2] , self.scale, self.offset, self.dtype)
                         ).save(f, 'tiff')
         else:
             raise ValueError('Cannot handle more than 4 dimensions')

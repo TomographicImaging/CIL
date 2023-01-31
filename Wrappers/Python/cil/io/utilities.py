@@ -198,7 +198,7 @@ class HDF5_utilities(object):
         Returns
         -------
         A dictionary containing keys:
-            ndim, shape, size, dtype, nbytes, compression, chunks
+            ndim, shape, size, dtype, nbytes, compression, chunks, is_virtual
         """
         with h5py.File(filename, 'r') as f:
                 dset = f.get(dset_path)
@@ -271,6 +271,8 @@ class HDF5_utilities(object):
             The full path to the HDF5 file
         dset_path: str
             The internal path to the requested dataset
+        out: numpy.ndarray
+            The output array to be filled
         source_sel: tuple of slice objects, optional
             The selection of slices in each source dimension to return
         dest_sel: tuple of slice objects, optional

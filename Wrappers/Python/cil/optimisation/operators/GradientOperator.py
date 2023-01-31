@@ -52,7 +52,7 @@ class GradientOperator(LinearOperator):
         num_threads: int
             If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
         split: boolean
-            If 'True', and backend 'C' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
+            If 'True', and backend 'c' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
 
     Returns
     -------

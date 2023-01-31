@@ -132,3 +132,25 @@ def save_dict_to_file(fname, dictionary):
     with open(fname, 'w') as configfile:
         json.dump(dictionary, configfile)
 
+def compress_data(data, scale, offset, dtype):
+    '''Compress data to dtype using scale and offset
+    
+    Parameters
+    ----------
+    data : numpy array
+    scale : float
+    offset : float
+    dtype : numpy dtype
+    
+    returns compressed casted data'''
+    if dtype == data.dtype:
+        return data
+    if data.ndim > 2:
+        # compress each slice
+        tmp = np.empty(data.shape, dtype=dtype)
+        for i in range(data.shape[0]):
+            tmp[i] = compress_data(data[i], scale, offset, dtype)
+    else:
+        tmp = data * scale + offset
+        tmp = tmp.astype(dtype)
+    return tmp

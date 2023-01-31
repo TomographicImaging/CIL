@@ -65,7 +65,7 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
     and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
-# logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.ERROR)
 
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
@@ -362,4 +362,73 @@ class TestTIFF(unittest.TestCase):
         np.testing.assert_array_equal(tmp, read_array)
 
         
+class TestRAW(unittest.TestCase):
+    def setUp(self) -> None:
+        # self.logger = logging.getLogger('cil.io')
+        # self.logger.setLevel(logging.DEBUG)
+        self.cwd = os.path.join(os.getcwd(), 'rawtest')
+        os.mkdir(self.cwd)
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.cwd)
+
+    def test_raw_nocompression_0(self):
+        self.RAW_compression_test(None,1)
+    
+    def test_raw_compression_0(self):
+        self.RAW_compression_test(8,1)
+
+    def test_raw_compression_1(self):
+        self.RAW_compression_test(16,1)
+
+    def test_raw_nocompression_1(self):
+        self.RAW_compression_test(None,1)
+    
+    def test_raw_compression_3(self):
+        with self.assertRaises(ValueError) as context:
+            self.RAW_compression_test(12,1)
+
+    def RAW_compression_test(self, compression, channels=1):
+        X=4
+        Y=5
+        Z=6
+        C=channels
+        if C == 1:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
+        else:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6, channels=C)
+        data = ig.allocate(0)
+        data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
+
+        from cil.io import utilities
+        compress = utilities.get_compress(compression)
+        dtype = utilities.get_compressed_dtype(data.array, compression)
+        scale, offset = utilities.get_compression_scale_offset(data.array, compression)
+        if C > 1:
+            assert data.ndim == 4
+        fname = os.path.join(self.cwd, "unittest.raw")
+        from cil.io import RAWFileWriter
+        writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
+        writer.write()
+        
+        # import time
+        # time.sleep(1)
+        # # force the reader to use the native TIFF dtype by setting dtype=None        
+        read_array = np.fromfile(fname, dtype=dtype)
+        read_array = read_array.reshape(ig.shape)
+
+        if compress:
+            tmp = data.array * scale + offset
+            tmp = np.asarray(tmp, dtype=dtype)
+            
+            
+            recovered_data = (read_array - offset)/scale
+            np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
+
+        else:
+            tmp = data.array
+            
+        assert tmp.dtype == read_array.dtype
+        
+        np.testing.assert_array_equal(tmp, read_array)
 

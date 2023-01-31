@@ -31,10 +31,10 @@ CORRELATION_SPACE = "Space"
 CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class GradientOperator(LinearOperator):
-    """
+
+    r"""
     Gradient Operator: Computes first-order forward/backward differences on
     2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
-
 
     Parameters
     ----------
@@ -64,15 +64,18 @@ class GradientOperator(LinearOperator):
     Example
     -------
 
-    2D example
+    2D example maths
 
     .. math::
+       :nowrap:
 
-        \\nabla : X \\arrow Y
+        \begin{eqnarray}
+        \nabla : X \rightarrow Y\\
+        u \in X, \nabla(u) &=& [\partial_{y} u, \partial_{x} u]\\
+        u^{*} \in Y, \nabla^{*}(u^{*}) &=& \partial_{y} v1 + \partial_{x} v2
+        \end{eqnarray}
 
-        u\in X, \\nabla(u) &= [\partial_{y} u, \partial_{x} u]
 
-        u^{*}\in Y, \\nabla^{*}(u^{*}) &= \partial_{y} v1 + \partial_{x} v2
     """
 
     #kept here for backwards compatbility
@@ -162,6 +165,7 @@ class GradientOperator(LinearOperator):
 
 
         Where the voxel sizes in each dimension are equal to 1 this simplifies to:
+
           - 2D geometries :math:`norm = \sqrt{8}`
           - 3D geometries :math:`norm = \sqrt{12}`
         

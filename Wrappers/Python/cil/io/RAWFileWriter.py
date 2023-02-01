@@ -79,7 +79,7 @@ class RAWFileWriter(object):
             offset = -0.0
         
         The data_type describes the data layout when packing and unpacking data. 
-        See [struct](https://docs.python.org/3/library/struct.html#format-strings) for more information.
+        See ``struct`` for more information. https://docs.python.org/3/library/struct.html#format-strings
         
         Parameters
         ----------
@@ -92,15 +92,18 @@ class RAWFileWriter(object):
             'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
 
 
-        Example:
-        --------
+
+        Example of using the writer with compression to `uint8`:
+
+        Example
+        -------
         
         >>> from cil.io import RAWFileWriter
         >>> writer = RAWFileWriter(data=data, file_name=fname, compression='uint8')
         >>> writer.write()
 
-        Example:
-        --------
+        Example
+        -------
 
         Example of reading the data from the ini file:
         
@@ -113,19 +116,20 @@ class RAWFileWriter(object):
         >>> scale = float(config['COMPRESSION']['scale'])
         >>> offset = float(config['COMPRESSION']['offset'])
 
-        Note:
-        -----
+        Note
+        ----
 
-        If compression 'uint8' or 'unit16' are used, the scale and offset used to compress the data are saved 
-        in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
+          If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved 
+          in a file called ``scaleoffset.json`` in the same directory as the TIFF file(s).
 
-        The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
+          The original data can be obtained by: ``original_data = (compressed_data - offset) / scale``
 
-        Note:
-        -----
+        Note
+        ----
 
-        Data is always written in [‘C’ order](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile), 
-        independent of the order of the original data.
+          Data is always written in ‘C’ order independent of the order of the original data, 
+          https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile, 
+          
                 
     '''
     

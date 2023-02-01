@@ -39,27 +39,22 @@ class IndicatorBox(Function):
 
         Parameters:
         -----------
-        lower : float, DataContainer or numpy array, default -np.inf
+        lower : float, DataContainer or numpy array, default ``-np.inf``
           Lower bound
-        upper : float, DataContainer or numpy array, default -np.inf
+        upper : float, DataContainer or numpy array, default ``np.inf``
           upper bound
         
         If passed a DataContainer or numpy array, the bounds can be set to different values for each element.
         '''
         super(IndicatorBox, self).__init__()
         
-        self.pixelwise_lower = False
-        self.pixelwise_upper = False
-
         # We set lower and upper to either a float or a numpy array        
         self.lower = lower
         self.upper = upper
         if isinstance(lower, (np.ndarray, DataContainer, AcquisitionData, ImageData)):
-            self.pixelwise_lower = True
             if not isinstance(lower, np.ndarray):
                 self.lower = lower.as_array()
         if isinstance(upper, (np.ndarray, DataContainer, AcquisitionData, ImageData)):
-            self.pixelwise_lower = True
             if not isinstance(upper, np.ndarray):
                 self.upper = upper.as_array()
 

@@ -18,7 +18,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: conda-build
-      uses: paskino/conda-package-publish-action@channel-priority
+      uses: paskino/conda-package-publish-action@v2.0.0
       with:
         subDir: 'recipe'
         channels: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi  --override-channels'

@@ -488,6 +488,74 @@ class TestFunction(CCPiTestClass):
         a = ib(im)
         numpy.testing.assert_equal(a, numpy.inf)
         
+    def create_circular_mask(self, ig):
+        mask = ig.allocate(1)
+        # create circular mask
+        pix_x, pix_y = ig.shape
+        center = [int(pix_x/2.), int(pix_y/2.)]
+
+        Y, X = np.ogrid[:pix_y, :pix_x]
+        dist_from_center = np.sqrt((X - center[0])**2 + (Y-center[1])**2)
+
+        radius = 4
+        mask_arr = dist_from_center <= radius
+
+        np.multiply(mask.array, mask_arr, out=mask.array)
+        return mask
+
+    def test_IndicatorBox_pixelwise_call(self):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask)
+        for val, res in zip([2, -3], [0, np.inf]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask)
+        for val, res in zip([-1, 3], [0, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask)
+        for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im.fill(1)
+        im.array *= mask.as_array()
+        np.testing.assert_equal(ib(im), 0)
+
+    def test_IndicatorBox_pixelwise_proximal(self):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask)
+        for val, res in zip([2, -3], [ig.allocate(2), -2*mask]):
+            # logging.info("test1", val, res)
+            im.fill(val)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask)
+        for val, res in zip([-1, 3], [ig.allocate(-1), 2*mask]):
+            # logging.info("test1", val, res)
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask)
+        for val, res in zip([-1, -3, 1], [-1*mask, -2*mask, 1*mask]):
+            print("test3", val, res)
+            im.fill(val)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
 
     def tests_for_L2NormSq_and_weighted(self):
         numpy.random.seed(1)

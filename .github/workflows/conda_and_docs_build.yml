@@ -14,7 +14,9 @@ jobs:
   conda_build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3.1.0
+      with:
+        fetch-depth: 0
     - name: conda-build
       uses: paskino/conda-package-publish-action@channel-priority
       with:
@@ -24,7 +26,7 @@ jobs:
         convert_osx: false
         additional_apt_packages: 'libegl1-mesa libegl1-mesa-dev'
     - name: Upload artifact of the conda package.
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3.1.1
       with:
         name: cil-package
         path: recipe/linux-64/cil*
@@ -32,21 +34,21 @@ jobs:
     needs: conda_build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
       with:
         fetch-depth: 0
     - name: change directory
       run: |
         ls
     - name: Download artifact of the conda package.
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3.0.1
       with:
         name: 'cil-package'
         path: 'conda_package'
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.7
-    - uses: lauramurgatroyd/build-sphinx-action@v0.1.1
+    - uses: lauramurgatroyd/build-sphinx-action@v0.1.3
       with:
         DOCS_PATH: 'docs'
         CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'
@@ -61,7 +63,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact of the html output.
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3.0.1
       with:
         name: DocumentationHTML
         path: docs/build

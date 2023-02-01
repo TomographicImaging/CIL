@@ -29,10 +29,49 @@ import functools
 import glob
 import re
 import numpy as np
+from cil.io import utilities
+import json
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+def compress_data(data, scale, offset, dtype):
+    '''Compress data to dtype using scale and offset
+    
+    Parameters
+    ----------
+    data : numpy array
+    scale : float
+    offset : float
+    dtype : numpy dtype
+    
+    returns compressed casted data'''
+    if dtype == data.dtype:
+        return data
+    if data.ndim > 2:
+        # compress each slice
+        tmp = np.empty(data.shape, dtype=dtype)
+        for i in range(data.shape[0]):
+            tmp[i] = compress_data(data[i], scale, offset, dtype)
+    else:
+        tmp = data * scale + offset
+        tmp = tmp.astype(dtype)
+    return tmp
+
+def save_scale_offset(fname, scale, offset):
+    '''Save scale and offset to file
+    
+    Parameters
+    ----------
+    fname : string
+    scale : float
+    offset : float
+    '''
+    dirname = os.path.dirname(fname)
+    txt = os.path.join(dirname, 'scaleoffset.json')
+    d = {'scale': scale, 'offset': offset}
+    utilities.save_dict_to_file(txt, d)
 
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
@@ -40,29 +79,47 @@ class TIFFWriter(object):
     def __init__(self,
                  **kwargs):
         '''
-        :param data: the data to save to TIFF file(s)
-        :type data: DataContainer, AcquisitionData or ImageData
-        :param file_name: string defining the file name prefix
-        :type file_name: string
-        :param counter_offset: int indicating at which number the index starts. 
-          For instance, if you have to save 10 files the index would by default go from 0 to 9.
-          By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
-        :type counter_offset: int, default 0
+
+        Parameters
+        ----------
+        data : DataContainer, AcquisitionData or ImageData
+            This represents the data to save to TIFF file(s)
+        file_name : string
+            This defines the file name prefix, i.e. the file name without the extension.
+        counter_offset : int, default 0.
+            counter_offset indicates at which number the ordinal index should start.
+            For instance, if you have to save 10 files the index would by default go from 0 to 9.
+            By counter_offset you can offset the index: from `counter_offset` to `9+counter_offset`
+        compression : str, default None. Accepted values None, 'uint8', 'uint16'
+            The lossy compression to apply. The default None will not compress data. 
+            'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
+
+
+        Note:
+        -----
+
+        If compression 'uint8' or 'unit16' are used, the scale and offset used to compress the data are saved 
+        in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
+
+        The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
         '''
         
         self.data_container = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         counter_offset = kwargs.get('counter_offset', 0)
+        compression = kwargs.get('compression', None)
         
         if ((self.data_container is not None) and (self.file_name is not None)):
             self.set_up(data = self.data_container,
                         file_name = self.file_name, 
-                        counter_offset=counter_offset)
+                        counter_offset=counter_offset,
+                        compression=compression)
         
     def set_up(self,
                data = None,
                file_name = None,
-               counter_offset = -1):
+               counter_offset = 0,
+               compression=0):
         
         self.data_container = data
         file_name = os.path.abspath(file_name)
@@ -81,6 +138,13 @@ class TIFFWriter(object):
                 (isinstance(self.data_container, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
+
+        # Deal with compression
+        self.compress           = utilities.get_compress(compression)
+        self.dtype              = utilities.get_compressed_dtype(data, compression)
+        self.scale, self.offset = utilities.get_compression_scale_offset(data, compression)
+        self.compression        = compression
+
     
     def write(self):
         if not os.path.isdir(self.dir_name):
@@ -95,7 +159,9 @@ class TIFFWriter(object):
             else:
                 fname = "{}.tiff".format(os.path.join(self.dir_name, self.file_name))
             with open(fname, 'wb') as f:
-                Image.fromarray(self.data_container.as_array()).save(f, 'tiff')
+                Image.fromarray(
+                    compress_data(self.data_container.as_array() , self.scale, self.offset, self.dtype)
+                    ).save(f, 'tiff')
         elif ndim == 3:
             for sliceno in range(self.data_container.shape[0]):
                 # save single slice
@@ -105,7 +171,9 @@ class TIFFWriter(object):
                     os.path.join(self.dir_name, self.file_name),
                     sliceno + self.counter_offset)
                 with open(fname, 'wb') as f:
-                    Image.fromarray(self.data_container.as_array()[sliceno]).save(f, 'tiff')
+                    Image.fromarray(
+                            compress_data(self.data_container.as_array()[sliceno] , self.scale, self.offset, self.dtype)
+                        ).save(f, 'tiff')
         elif ndim == 4:
             # find how many decimal places self.data_container.shape[0] and shape[1] have
             zero_padding = self._zero_padding(self.data_container.shape[0])
@@ -121,9 +189,13 @@ class TIFFWriter(object):
                         self.data_container.shape[0], self.data_container.shape[1], self.data_container.shape[2],
                         self.data_container.shape[3] , sliceno1, sliceno2)
                     with open(fname, 'wb') as f:
-                        Image.fromarray(self.data_container.as_array()[sliceno1][sliceno2]).save(f, 'tiff')
+                        Image.fromarray(
+                            compress_data(self.data_container.as_array()[sliceno1][sliceno2] , self.scale, self.offset, self.dtype)
+                        ).save(f, 'tiff')
         else:
             raise ValueError('Cannot handle more than 4 dimensions')
+        if self.compress:
+            save_scale_offset(fname, self.scale, self.offset)
     
     def _zero_padding(self, number):
         i = 0
@@ -139,64 +211,73 @@ class TIFFStackReader(object):
     def __init__(self, 
                  **kwargs):
         ''' 
-        Basic TIFF redaer which loops through all riff files in a specific 
+        Basic TIFF redaer which loops through all tiff files in a specific 
         folder and load them in alphabetic order
         
         Parameters
         ----------
             
-        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
-        :type file_name: str, abspath to folder, list
+        file_name : str, abspath to folder, list
+            Path to folder with tiff files, list of paths of tiffs, or single tiff file
+                   
+        roi : dictionary, default `None`
+            dictionary with roi to load 
+            {'axis_0': (start, end, step), 
+                'axis_1': (start, end, step), 
+                'axis_2': (start, end, step)}
+            Files are stacked along axis_0. axis_1 and axis_2 correspond
+            to row and column dimensions, respectively.
+            Files are stacked in alphabetic order. 
+            To skip files or to change number of files to load, 
+            adjust axis_0. For instance, 'axis_0': (100, 300)
+            will skip first 100 files and will load 200 files.
+            'axis_0': -1 is a shortcut to load all elements along axis.
+            Start and end can be specified as None which is equivalent 
+            to start = 0 and end = load everything to the end, respectively.
+            Start and end also can be negative.
+            Notes: roi is specified for axes before transpose.
             
-        :param roi: dictionary with roi to load 
-                {'axis_0': (start, end, step), 
-                 'axis_1': (start, end, step), 
-                 'axis_2': (start, end, step)}
-                Files are stacked along axis_0. axis_1 and axis_2 correspond
-                to row and column dimensions, respectively.
-                Files are stacked in alphabetic order. 
-                To skip files or to change number of files to load, 
-                adjust axis_0. For instance, 'axis_0': (100, 300)
-                will skip first 100 files and will load 200 files.
-                'axis_0': -1 is a shortcut to load all elements along axis.
-                Start and end can be specified as None which is equivalent 
-                to start = 0 and end = load everything to the end, respectively.
-                Start and end also can be negative.
-                Notes: roi is specified for axes before transpose.
-        :type roi: dictionary, default None
-            
-        :param transpose: transpose loaded images
-        :type transpose: bool, default False
-            
-        :param mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
-                of pixels is binned together, values of resulting binned
-                pixels are calculated as average. 
-                In 'slice' mode 'step' defines standard numpy slicing.
-                Note: in general output array size in bin mode != output array size
-                in slice mode
-        :type mode: str, default 'bin'
-        :param dtype: Requested type of the read image. If set to None it defaults to
-                      the type of the saved file.
-        :type dtype: numpy type, string, default np.float32
+        transpose : bool, default False
+            Whether to transpose loaded images
+                    
+        mode : str, default 'bin'. Accepted values 'bin', 'slice'
+            Referring to the 'step' defined in the roi parameter, in bin mode, 'step' number of pixels 
+            are binned together, values of resulting binned pixels are calculated as average. 
+            In 'slice' mode 'step' defines standard numpy slicing. 
+            Note: in general output array size in bin mode != output array size in slice mode
         
-        Returns
-        -------
-            
-            numpy array with stack of images
-            
+        dtype : numpy type, string, default np.float32
+            Requested type of the read image. If set to None it defaults to the type of the saved file.
+                    
+
+        Example:
+        --------
+        You can rescale the read data as `rescaled_data = (read_data - offset)/scale` with the following code:
+
+        >>> reader = TIFFStackReader(file_name = '/path/to/folder')
+        >>> rescaled_data = reader.read_rescaled(scale, offset)
+        
+
+        Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
+        read data to approximately the original data with the following code:
+
+        >>> writer = TIFFWriter(file_name = '/path/to/folder', compression=8)
+        >>> writer.write(original_data)
+        >>> reader = TIFFStackReader(file_name = '/path/to/folder')
+        >>> about_original_data = reader.read_rescaled()
         '''
         
         self.file_name = kwargs.get('file_name', None)
-        self.roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
-        self.transpose = kwargs.get('transpose', False)
-        self.mode = kwargs.get('mode', 'bin')
-        self.dtype = kwargs.get('dtype', np.float32)
+        roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
+        transpose = kwargs.get('transpose', False)
+        mode = kwargs.get('mode', 'bin')
+        dtype = kwargs.get('dtype', np.float32)
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
-                        roi = self.roi,
-                        transpose = self.transpose,
-                        mode = self.mode, dtype=self.dtype)
+                        roi = roi,
+                        transpose = transpose,
+                        mode = mode, dtype=dtype)
             
     def set_up(self, 
                file_name = None,
@@ -204,44 +285,49 @@ class TIFFStackReader(object):
                transpose = False,
                mode = 'bin', 
                dtype = np.float32):
-        '''
-        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
-        :type file_name: str, abspath to folder, list
+        ''' 
+        Set up method for the TIFFStackReader class
+        
+        Parameters
+        ----------
             
-        :param roi: dictionary with roi to load 
-                {'axis_0': (start, end, step), 
-                 'axis_1': (start, end, step), 
-                 'axis_2': (start, end, step)}
-                Files are stacked along axis_0. axis_1 and axis_2 correspond
-                to row and column dimensions, respectively.
-                Files are stacked in alphabetic order. 
-                To skip files or to change number of files to load, 
-                adjust axis_0. For instance, 'axis_0': (100, 300)
-                will skip first 100 files and will load 200 files.
-                'axis_0': -1 is a shortcut to load all elements along axis.
-                Start and end can be specified as None which is equivalent 
-                to start = 0 and end = load everything to the end, respectively.
-                Start and end also can be negative.
-                Notes: roi is specified for axes before transpose.
-        :type roi: dictionary, default None
+        file_name : str, abspath to folder, list
+            Path to folder with tiff files, list of paths of tiffs, or single tiff file
+                   
+        roi : dictionary, default `None`
+            dictionary with roi to load 
+            {'axis_0': (start, end, step), 
+                'axis_1': (start, end, step), 
+                'axis_2': (start, end, step)}
+            Files are stacked along axis_0. axis_1 and axis_2 correspond
+            to row and column dimensions, respectively.
+            Files are stacked in alphabetic order. 
+            To skip files or to change number of files to load, 
+            adjust axis_0. For instance, 'axis_0': (100, 300)
+            will skip first 100 files and will load 200 files.
+            'axis_0': -1 is a shortcut to load all elements along axis.
+            Start and end can be specified as None which is equivalent 
+            to start = 0 and end = load everything to the end, respectively.
+            Start and end also can be negative.
+            Notes: roi is specified for axes before transpose.
             
-        :param transpose: transpose loaded images
-        :type transpose: bool, default False
-            
-        :param mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
-                of pixels is binned together, values of resulting binned
-                pixels are calculated as average. 
-                In 'slice' mode 'step' defines standard numpy slicing.
-                Note: in general output array size in bin mode != output array size
-                in slice mode
-        :type mode: str, default 'bin'
-        :param dtype: Requested type of the read image. If set to None it defaults to
-                      the type of the saved file.
-        :type dtype: numpy type, string, default np.float32
+        transpose : bool, default False
+            Whether to transpose loaded images
+                    
+        mode : str, default 'bin'. Accepted values 'bin', 'slice'
+            Referring to the 'step' defined in the roi parameter, in bin mode, 'step' number of pixels 
+            are binned together, values of resulting binned pixels are calculated as average. 
+            In 'slice' mode 'step' defines standard numpy slicing. 
+            Note: in general output array size in bin mode != output array size in slice mode
+        
+        dtype : numpy type, string, default np.float32
+            Requested type of the read image. If set to None it defaults to the type of the saved file.
+                    
         '''
         self.roi = roi
         self.transpose = transpose
         self.mode = mode
+        self.dtype = dtype
         
         if file_name == None:
             raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
@@ -307,8 +393,10 @@ class TIFFStackReader(object):
             dtype = np.float32
         elif mode == 'I':
             dtype = np.int32
+        elif mode in ['I;16']:
+            dtype = np.uint16
         else:
-            raise ValueError("Unsupported type {}. Expected 1 L I or F.".format(mode))
+            raise ValueError("Unsupported type {}. Expected any of 1 L I I;16 F.".format(mode))
         return dtype
 
     def read(self):
@@ -480,7 +568,49 @@ class TIFFStackReader(object):
         '''
         return self._read_as(acquisition_geometry)
     
+    def read_scale_offset(self):
+        '''Reads the scale and offset from a json file in the same folder as the tiff stack
+        
+        This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter
 
+        Returns:
+        --------
+
+        tuple: (scale, offset)
+        '''
+        # load first image to find out dimensions and type
+        path = os.path.dirname(self._tiff_files[0])
+        with open(os.path.join(path, "scaleoffset.json"), 'r') as f:
+            d = json.load(f)
+
+        return (d['scale'], d['offset'])
+
+    def read_rescaled(self, scale=None, offset=None):
+        '''Reads the TIFF stack and rescales it with the provided scale and offset, or with the ones in the json file if not provided
+        
+        This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter
+
+        Parameters:
+        -----------
+
+        scale: float, default None
+            scale to apply to the data. If None, the scale will be read from the json file saved by TIFFWriter.
+        offset: float, default None
+            offset to apply to the data. If None, the offset will be read from the json file saved by TIFFWriter.
+
+        Returns:
+        --------
+
+        numpy.ndarray in float32
+        '''
+        data = self.read()
+        if scale is None or offset is None:
+            scale, offset = self.read_scale_offset()
+        if self.dtype != np.float32:
+            data = data.astype(np.float32)
+        data -= offset
+        data /= scale
+        return data
 
 '''
 import matplotlib.pyplot as plt

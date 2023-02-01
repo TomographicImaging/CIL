@@ -87,7 +87,7 @@ git submodule update --init
 ```
 
 ## Build dependencies
-To create a conda environment with all the dependencies for building CIL run:
+To create a conda environment with all the dependencies for building CIL run the following `bash` script:
 
 ```bash
 sh scripts/create_local_env_for_cil_development.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
@@ -98,7 +98,14 @@ Or with the CIL build and test dependencies:
 sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
 ```
 
-And then install CIL in to this environment using CMAKE.
+And then install CIL in to this environment using CMake.
+
+Alternatively, one can use the `scripts/requirements-test.yml` to create a conda environment with all the 
+appropriate dependencies on any OS, using the following command:
+
+```
+conda env create -f scripts/requirements-test.yml
+```
 
 
 ## Build with CMake

@@ -388,7 +388,7 @@ class TestRAW(unittest.TestCase):
     def test_raw_nocompression_1(self):
         self.RAW_compression_test(None,1)
     
-    def test_raw_compression_3(self):
+    def test_raw_compression_2(self):
         with self.assertRaises(ValueError) as context:
             self.RAW_compression_test(12,1)
 

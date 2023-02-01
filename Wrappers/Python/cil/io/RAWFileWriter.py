@@ -39,41 +39,22 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
     offset : float
     dtype : numpy dtype
     fname : string
+
+    Note:
+    -----
+    Data is always written in ‘C’ order, independent of the order of d.
     '''
     if compress:
         d = utilities.compress_data(data, scale, offset, dtype)
     else:
         d = data
-    
-    # This is slightly silly, but tofile will only export float (i.e. 64 bit)
-    # which is not what we want.
-    # So, we write a npy file with the correct type, then 
-    # we copy only the binary part and dispose of the npy file.
-    np.save(fname+'.npy', d)
-    
-    buffer_size = 1024*1024
-    with open(fname+'.npy', 'rb') as f:
         
-        vM, vm = np.lib.format.read_magic(f)
-        if vM == 1:
-            header = np.lib.format.read_array_header_1_0(f)
-        elif vM == 2:
-            header = np.lib.format.read_array_header_2_0(f)
+    # Data is always written in ‘C’ order, independent of the order of d.
+    logging.info("Data is always written in ‘C’ order, independent of the order of d.")
+    d.tofile(fname)
 
-        if header[0] != data.shape:
-            raise ValueError('Shape mismatch')
-        if header[2] != d.dtype:
-            raise ValueError('dtype mismatch')
-
-        with open(fname, 'wb') as f2:
-            buffer = f.read(buffer_size)
-            while buffer:
-                f2.write(buffer)
-                buffer = f.read(buffer_size)
-    
-    # finally remove the npy file.
-    os.remove(fname+'.npy')
-    return header
+    # return shape, fortran order, dtype
+    return d.shape, False, d.dtype.str
         
 
 
@@ -82,8 +63,23 @@ class RAWFileWriter(object):
     '''
         Writer to write DataSet to disk as a binary blob
 
-        This writer will write a text file with the minimal information necessary to 
+        This writer will also write a text file with the minimal information necessary to 
         read the data back in.
+
+        The text file will look something like this::
+        
+            [MINIMAL INFO]
+            file_name = /path/to/file/filename.raw
+            data_type = <u2
+            shape = (6, 5, 4)
+            isfortran = False
+
+            [COMPRESSION]
+            scale = 550.7142857142857
+            offset = -0.0
+        
+        The data_type describes the data layout when packing and unpacking data. 
+        See [struct](https://docs.python.org/3/library/struct.html#format-strings) for more information.
         
         Parameters
         ----------
@@ -96,6 +92,13 @@ class RAWFileWriter(object):
             'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
 
 
+        Example:
+        --------
+        
+        >>> from cil.io import RAWFileWriter
+        >>> writer = RAWFileWriter(data=data, file_name=fname, compression='uint8')
+        >>> writer.write()
+
         Note:
         -----
 
@@ -104,7 +107,12 @@ class RAWFileWriter(object):
 
         The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
 
-        
+        Note:
+        -----
+
+        Data is always written in [‘C’ order](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile), 
+        independent of the order of the original data.
+                
     '''
     
     def __init__(self, data, file_name, compression=None):
@@ -142,15 +150,13 @@ class RAWFileWriter(object):
         shape = header[0]
         fortran_order = header[1]
         read_dtype = header[2]
-        if len(header) > 3:
-            max_header_length = header[3]
-
+        
         # save information about the file we just saved
         config = configparser.ConfigParser()
         config['MINIMAL INFO'] = {
-            'file_name': self.file_name,
-            'data_type': str(self.dtype),
-            'shape': self.data_container.shape,
+            'file_name': fname,
+            'data_type': read_dtype,
+            'shape': shape,
             # Data is always written in ‘C’ order, independent of the order of d. 
             'isFortran': fortran_order
         }

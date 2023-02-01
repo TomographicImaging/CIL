@@ -18,6 +18,7 @@ import unittest
 from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 from scipy.fft  import fft, ifft
+from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
 from utils import has_tigre, has_ipp, has_astra, has_nvidia, initialise_tests
 
@@ -236,47 +237,30 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
         reconstructor = GenericFilteredBackProjection(self.ad3D)
 
-        reconstructor.set_filter('ram-lak', 1.0)
+        #filters constructed in different domains but at higher orders this bias is negligible
+        order = 20
+        reconstructor.set_fft_order(order)
+
+        reconstructor.set_filter(filter='ram-lak', cutoff=1.0)
         arr = reconstructor.get_filter_array()
+        response = skimage_get_fourier_filter(2**order, 'ramp')
+        np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter 'ram-lak'")
 
-        arr_hand = 2*np.arange(2**reconstructor.fft_order//2+1) / 2**reconstructor.fft_order
-        ramp = np.concatenate((arr_hand, arr_hand[1:-1][::-1]))
-
-        np.testing.assert_almost_equal(ramp, arr)
-
-        reconstructor.set_filter('ram-lak', 0.5)
+        reconstructor.set_filter(filter='ram-lak', cutoff=1.0)
         arr = reconstructor.get_filter_array()
-        filter_gold = ramp.copy()
-        filter_gold[filter_gold>0.5]=0
-        np.testing.assert_almost_equal(filter_gold, arr)
+        response = skimage_get_fourier_filter(2**order, 'ramp')
+        response[response>1.0]=0
+        np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter 'ram-lak' and cut-off frequency")
 
-        reconstructor.set_filter('shepp-logan', 0.5)
-        arr = reconstructor.get_filter_array()
-        filter_gold = ramp.copy()
-        filter_gold[filter_gold>0.5]=0
-        filter_gold *= np.sinc(filter_gold/2)
-        np.testing.assert_almost_equal(filter_gold, arr)
+        filters = ['shepp-logan', 'cosine', 'hamming', 'hann']
 
-        reconstructor.set_filter('cosine', 0.5)
-        arr = reconstructor.get_filter_array()
-        filter_gold = ramp.copy()
-        filter_gold[filter_gold>0.5]=0
-        filter_gold *= np.cos(filter_gold*np.pi/2)
-        np.testing.assert_almost_equal(filter_gold, arr)
+        for filter in filters:
+            reconstructor.set_fft_order(order)
+            reconstructor.set_filter(filter=filter, cutoff=1.0)
+            arr = reconstructor.get_filter_array()
 
-        reconstructor.set_filter('hamming', 0.5)
-        arr = reconstructor.get_filter_array()
-        filter_gold = ramp.copy()
-        filter_gold[filter_gold>0.5]=0
-        filter_gold *= (0.54 + 0.46 * np.cos(filter_gold*np.pi))
-        np.testing.assert_almost_equal(filter_gold, arr)
-
-        reconstructor.set_filter('hann', 0.5)
-        arr = reconstructor.get_filter_array()
-        filter_gold = ramp.copy()
-        filter_gold[filter_gold>0.5]=0
-        filter_gold *= (0.5 + 0.5 * np.cos(filter_gold*np.pi))
-        np.testing.assert_almost_equal(filter_gold, arr)
+            response = skimage_get_fourier_filter(2**order, filter)
+            np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter {}".format(filter))
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")

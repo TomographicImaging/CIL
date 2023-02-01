@@ -214,27 +214,37 @@ class GenericFilteredBackProjection(Reconstructor):
         - [N/2:N-1] negative frequencies
 
         The array can be modified and passed back using set_filter()
+
+
+        Notes
+        -----
+
+        Filter reference in frequency domain:
+        Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.
+
+        Plantagie, L. Algebraic filters for filtered backprojection, 2017
+        https://scholarlypublications.universiteitleiden.nl/handle/1887/48289
         """
 
         if self._filter == 'custom':
             return self._filter_array
 
         filter_length = 2**self.fft_order         
-        freq = fftfreq(filter_length,0.5)
+        freq = fftfreq(filter_length)
 
-        ramp = abs(freq)
+        ramp = abs(freq*2)
         ramp[ramp>self._filter_cutoff]=0
 
         if self._filter == 'ram-lak':
             filter_array = ramp
         if self._filter == 'shepp-logan':
-            filter_array = ramp * np.sinc(ramp/2)
+            filter_array = ramp * np.sinc(freq)
         elif self._filter == 'cosine':
-            filter_array = ramp * np.cos(ramp*np.pi/2)
+            filter_array = ramp * np.cos(freq*np.pi)
         elif self._filter == 'hamming':
-            filter_array = ramp * (0.54 + 0.46 * np.cos(ramp*np.pi))
+            filter_array = ramp * (0.54 + 0.46 * np.cos(2*freq*np.pi))
         elif self._filter == 'hann':
-            filter_array = ramp * (0.5 + 0.5 * np.cos(ramp*np.pi))
+            filter_array = ramp * (0.5 + 0.5 * np.cos(2*freq*np.pi))
 
         return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order) 
         

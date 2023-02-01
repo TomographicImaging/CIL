@@ -71,18 +71,19 @@ class TIFFWriter(object):
             'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
 
 
-        Note:
-        -----
+        Note
+        ----
 
-        If compression 'uint8' or 'unit16' are used, the scale and offset used to compress the data are saved 
-        in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
+          If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved 
+          in a file called ``scaleoffset.json`` in the same directory as the TIFF file(s).
 
-        The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
+          The original data can be obtained by: ``original_data = (compressed_data - offset) / scale``
         
-        Note:
-        -----
-        In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
-        not as a single multi-page TIFF file.
+        Note
+        ----
+        
+          In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
+          not as a single multi-page TIFF file.
         '''
         
         self.data_container = kwargs.get('data', None)

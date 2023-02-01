@@ -15,6 +15,7 @@
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
+  - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

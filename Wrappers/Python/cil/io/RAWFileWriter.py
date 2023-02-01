@@ -99,6 +99,20 @@ class RAWFileWriter(object):
         >>> writer = RAWFileWriter(data=data, file_name=fname, compression='uint8')
         >>> writer.write()
 
+        Example:
+        --------
+
+        Example of reading the data from the ini file:
+        
+        >>> config = configparser.ConfigParser()
+        >>> inifname = "file_name.ini"
+        >>> config.read(inifname)
+        >>> read_dtype = config['MINIMAL INFO']['data_type']
+        >>> read_array = np.fromfile(fname, dtype=read_dtype)
+        >>> read_shape = eval(config['MINIMAL INFO']['shape'])
+        >>> scale = float(config['COMPRESSION']['scale'])
+        >>> offset = float(config['COMPRESSION']['offset'])
+
         Note:
         -----
 

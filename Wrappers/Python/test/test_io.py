@@ -414,27 +414,34 @@ class TestRAW(unittest.TestCase):
         writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
         writer.write()
 
+        # read the data from the ini file
         config = configparser.ConfigParser()
         inifname = os.path.join(self.cwd, "unittest.ini")
         config.read(inifname)
 
+        # read how to read the data from the ini file
         read_dtype = config['MINIMAL INFO']['data_type']
-        
         read_array = np.fromfile(fname, dtype=read_dtype)
-
+        read_shape = eval(config['MINIMAL INFO']['shape'])
         logging.warning("read_array shape {}".format(read_array.shape))
         logging.warning("read_array dtype {}".format(read_array.dtype))
 
-        read_array = read_array.reshape(ig.shape)
+        # reshape read in array
+        read_array = read_array.reshape(read_shape)
 
         if compress:
-            tmp = data.array * scale + offset
-            tmp = np.asarray(tmp, dtype=dtype)
-            
-            
-            recovered_data = (read_array - offset)/scale
+            # rescale the dataset to the original data
+            sc = float(config['COMPRESSION']['scale'])
+            of = float(config['COMPRESSION']['offset'])
+            assert sc == scale
+            assert of == offset
+
+            recovered_data = (read_array - of)/sc
             np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
 
+            # rescale the original data with scale and offset and compare with what saved
+            tmp = data.array * scale + offset
+            tmp = np.asarray(tmp, dtype=dtype)
         else:
             tmp = data.array
             

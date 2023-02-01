@@ -223,7 +223,7 @@ class GenericFilteredBackProjection(Reconstructor):
         Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.
 
         Plantagie, L. Algebraic filters for filtered backprojection, 2017
-        https://scholarlypublications.universiteitleiden.nl/handle/1887/48289
+        https://hdl.handle.net/1887/48289
         """
 
         if self._filter == 'custom':
@@ -232,7 +232,7 @@ class GenericFilteredBackProjection(Reconstructor):
         filter_length = 2**self.fft_order         
         freq = fftfreq(filter_length)
 
-        ramp = abs(freq*2)
+        ramp = abs(freq)*2
         ramp[ramp>self._filter_cutoff]=0
 
         if self._filter == 'ram-lak':

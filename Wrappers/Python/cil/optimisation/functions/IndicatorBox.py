@@ -16,7 +16,9 @@
 #   limitations under the License.
 
 from cil.optimisation.functions import Function
-import numpy
+from cil.framework import AcquisitionData, ImageData, DataContainer
+import numpy as np
+
 
 class IndicatorBox(Function):
     
@@ -32,36 +34,52 @@ class IndicatorBox(Function):
     
     '''
     
-    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
+    def __init__(self,lower=-np.inf,upper=np.inf):
         '''creator
 
-        :param lower: lower bound
-        :type lower: float, default = :code:`-numpy.inf`
-        :param upper: upper bound
-        :type upper: float, optional, default = :code:`numpy.inf`
+        Parameters:
+        -----------
+        lower : float, DataContainer or numpy array, default -np.inf
+          Lower bound
+        upper : float, DataContainer or numpy array, default -np.inf
+          upper bound
+        
+        If passed a DataContainer or numpy array, the bounds can be set to different values for each element.
         '''
         super(IndicatorBox, self).__init__()
+        
+        self.pixelwise_lower = False
+        self.pixelwise_upper = False
+
+        # We set lower and upper to either a float or a numpy array        
         self.lower = lower
         self.upper = upper
+        if isinstance(lower, (np.ndarray, DataContainer, AcquisitionData, ImageData)):
+            self.pixelwise_lower = True
+            if not isinstance(lower, np.ndarray):
+                self.lower = lower.as_array()
+        if isinstance(upper, (np.ndarray, DataContainer, AcquisitionData, ImageData)):
+            self.pixelwise_lower = True
+            if not isinstance(upper, np.ndarray):
+                self.upper = upper.as_array()
 
     def __call__(self,x):
         
         '''Evaluates IndicatorBox at x'''
                 
-        if (numpy.all(x.as_array() >= self.lower) and 
-            numpy.all(x.as_array() <= self.upper) ):
+        if (np.all(x.as_array() >= self.lower) and 
+            np.all(x.as_array() <= self.upper) ):
             val = 0
         else:
-            val = numpy.inf
+            val = np.inf
         return val
     
     def gradient(self,x):
+        '''IndicatorBox is not differentiable, so calling gradient will raise a ValueError'''
         return ValueError('Not Differentiable') 
     
     def convex_conjugate(self,x):
-        
         '''Convex conjugate of IndicatorBox at x'''
-
         return x.maximum(0).sum()
          
     def proximal(self, x, tau, out=None):
@@ -72,7 +90,9 @@ class IndicatorBox(Function):
         '''
         
         if out is None:
-            return (x.maximum(self.lower)).minimum(self.upper)        
+            out = x.maximum(self.lower)
+            out.minimum(self.upper, out=out)
+            return out
         else:               
             x.maximum(self.lower, out=out)
             out.minimum(self.upper, out=out) 
@@ -85,11 +105,17 @@ class IndicatorBox(Function):
         '''
 
         if out is None:
-            
-            return x - tau * self.proximal(x/tau, tau)
+            # x - tau * self.proximal(x/tau, tau):
+            # use x as temporary storage variable
+            x/=tau
+            out = self.proximal(x, tau)
+            out *= -1*tau
+            # restore the values of x
+            x*=tau
+            tmp += x
+            return tmp
         
         else:
-            
             self.proximal(x/tau, tau, out=out)
             out *= -1*tau
             out += x

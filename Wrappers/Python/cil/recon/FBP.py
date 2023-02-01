@@ -156,7 +156,7 @@ class GenericFilteredBackProjection(Reconstructor):
         """
         Set the filter used by the reconstruction.
 
-        Pre-set filters are defined in the frequency domain.        
+        Pre-set filters are constructed in the frequency domain.        
         Pre-set filters are: 'ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'
         
         Parameters
@@ -164,7 +164,7 @@ class GenericFilteredBackProjection(Reconstructor):
         filter : string, numpy.ndarray, default='ram-lak'
             Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.
         cutoff : float, default=1
-            The cut-off frequency of the filter between -1 and 1. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)
+            The cut-off frequency of the filter between 0 - 1. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)
 
         Notes
         -----
@@ -196,7 +196,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
     def get_filter_array(self):
         """
-        Returns the filter in used in the frequency domain. 
+        Returns the filter array in the frequency domain. 
         
         Returns
         -------

@@ -16,47 +16,9 @@
 #   limitations under the License.
 
 from cil.optimisation.functions import Function
-from cil.framework import AcquisitionData, ImageData, DataContainer
 import numpy as np
 import numba
 
-@numba.jit(nopython=True)
-def _array_within_limits_ff(x, lower, upper):
-    '''Returns 0 if all elements of x are within [lower, upper]'''
-
-    for i in numba.prange(x.size):
-        if x.flat[i] < lower or x.flat[i] > upper:
-            return np.inf
-    return 0
-@numba.jit(nopython=True)
-def _array_within_limits_af(x, lower, upper):
-    '''Returns 0 if all elements of x are within [lower, upper]'''
-    if x.size != lower.size:
-        raise ValueError('x and lower must have the same size')
-    for i in numba.prange(x.size):
-        if x.flat[i] < lower.flat[i] or x.flat[i] > upper:
-            return np.inf
-    return 0
-
-@numba.jit(nopython=True)
-def _array_within_limits_aa(x, lower, upper):
-    '''Returns 0 if all elements of x are within [lower, upper]'''
-    if x.size != lower.size or x.size != upper.size:
-        raise ValueError('x, lower and upper must have the same size')
-    for i in numba.prange(x.size):
-        if x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]:
-            return np.inf
-    return 0
-
-@numba.jit(nopython=True)
-def _array_within_limits_fa(x, lower, upper):
-    '''Returns 0 if all elements of x are within [lower, upper]'''
-    if x.size != upper.size:
-        raise ValueError('x and upper must have the same size')
-    for i in numba.prange(x.size):
-        if x.flat[i] < lower or x.flat[i] > upper.flat[i]:
-            return np.inf
-    return 0
 
 class IndicatorBox(Function):
     
@@ -120,15 +82,25 @@ class IndicatorBox(Function):
 
             .. math:: prox_{\tau * f}(x)
         '''
-        
+        should_return = False
         if out is None:
-            out = x.maximum(self.lower)
-            # numpy clip 
-            out.minimum(self.upper, out=out)
+            should_return = True
+            out = x * 0 
+        outarr = out.as_array()
+
+        if isinstance(self.lower, np.ndarray):
+            if isinstance(self.upper, np.ndarray):
+                _proximal_aa(x.as_array(), self.lower, self.upper, outarr)
+            else:
+                _proximal_af(x.as_array(), self.lower, self.upper, outarr)
+        else:
+            if isinstance(self.upper, np.ndarray):
+                _proximal_fa(x.as_array(), self.lower, self.upper, outarr)
+            else:
+                np.clip(x.as_array(), self.lower, self.upper, out=outarr)
+
+        if should_return:
             return out
-        else:               
-            x.maximum(self.lower, out=out)
-            out.minimum(self.upper, out=out) 
             
     def proximal_conjugate(self, x, tau, out=None):
         
@@ -153,12 +125,94 @@ class IndicatorBox(Function):
             out *= -1*tau
             out += x
 
+## Utilities
 def _get_as_nparray_or_number(x):
     '''Returns x as a numpy array or a number'''
     try:
         return x.as_array()
     except AttributeError:
-        # we trust that it will be either a numpy ndarray or a number
-        # as described in the docstring
+        # In this case we trust that it will be either a numpy ndarray 
+        # or a number as described in the docstring
         return x
-        
+
+@numba.jit(nopython=True)
+def _array_within_limits_ff(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+
+    for i in range(x.size):
+        if x.flat[i] < lower or x.flat[i] > upper:
+            return np.inf
+    return 0
+@numba.jit(nopython=True)
+def _array_within_limits_af(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+    if x.size != lower.size:
+        raise ValueError('x and lower must have the same size')
+    for i in range(x.size):
+        if x.flat[i] < lower.flat[i] or x.flat[i] > upper:
+            return np.inf
+    return 0
+
+@numba.jit(nopython=True)
+def _array_within_limits_aa(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+    if x.size != lower.size or x.size != upper.size:
+        raise ValueError('x, lower and upper must have the same size')
+    for i in range(x.size):
+        if x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]:
+            return np.inf
+    return 0
+
+@numba.jit(nopython=True)
+def _array_within_limits_fa(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+    if x.size != upper.size:
+        raise ValueError('x and upper must have the same size')
+    for i in range(x.size):
+        if x.flat[i] < lower or x.flat[i] > upper.flat[i]:
+            return np.inf
+    return 0
+
+##########################################################################
+@numba.jit(nopython=True)
+def _proximal_aa(x, lower, upper, out):
+    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    if x.size != lower.size or x.size != upper.size:
+        raise ValueError('x, lower and upper must have the same size')
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower.flat[i]:
+            out.flat[i] = lower.flat[i]
+        else:
+            out.flat[i] = x.flat[i]
+
+        if out.flat[i] > upper.flat[i]:
+            out.flat[i] = upper.flat[i]
+            
+@numba.jit(nopython=True)
+def _proximal_af(x, lower, upper, out):
+    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    if x.size != lower.size :
+        raise ValueError('x, lower and upper must have the same size')
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower.flat[i]:
+            out.flat[i] = lower.flat[i]
+        else:
+            out.flat[i] = x.flat[i]
+
+        if out.flat[i] > upper:
+            out.flat[i] = upper
+
+
+@numba.jit(nopython=True)
+def _proximal_fa(x, lower, upper, out):
+    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    if x.size != upper.size:
+        raise ValueError('x, lower and upper must have the same size')
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower:
+            out.flat[i] = lower
+        else:
+            out.flat[i] = x.flat[i]
+
+        if out.flat[i] > upper.flat[i]:
+            out.flat[i] = upper.flat[i]

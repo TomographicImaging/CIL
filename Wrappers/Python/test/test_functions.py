@@ -557,6 +557,13 @@ class TestFunction(CCPiTestClass):
             print("test3", val, res)
             im.fill(val)
             np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+            # check against old implementation of proximal:
+            out = im.maximum(ib.lower)
+            # numpy clip 
+            out.minimum(ib.upper, out=out)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), out.as_array())
+            
+
 
     def test_IndicatorBox_input0(self):
         exc = numba.core.errors.TypingError

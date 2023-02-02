@@ -31,8 +31,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from itertools import cycle
 
 CB_PALETTE = ['#377eb8', '#ff7f00', '#4daf4a',
-                        '#f781bf', '#a65628', '#984ea3',
-                        '#999999', '#e41a1c', '#dede00']
+              '#f781bf', '#a65628', '#984ea3',
+              '#999999', '#e41a1c', '#dede00']
 
 class _PlotData(object):
     def __init__(self, data, title, axis_labels, origin):
@@ -127,6 +127,8 @@ class show1D(show_base):
         A title for the plot
     color : str, list of str, default=None
         Color(s) for each line plot
+    ls : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
+        Linestyle(s) for each line plot
     axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
         Axis labels in the form (x_axis_label,y_axis_label)
     num_cols : int, default=3

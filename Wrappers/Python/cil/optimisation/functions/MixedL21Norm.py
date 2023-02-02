@@ -22,7 +22,7 @@ from numbers import Number
 has_numba = True
 try:
     import numba
-    @numba.jit(nopython=True)
+    @numba.jit(parallel=True, nopython=True)
     def _proximal_step_numba(arr, abstau):
         '''Numba implementation of a step in the calculation of the proximal of MixedL21Norm
         

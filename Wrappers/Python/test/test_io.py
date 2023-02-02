@@ -34,6 +34,7 @@ import json
 from cil.io import utilities
 from cil.io import RAWFileWriter
 import configparser
+import tempfile
         
 
 initialise_tests()
@@ -169,15 +170,12 @@ class TestTXRMDataReader(unittest.TestCase):
 
 class TestTIFF(unittest.TestCase):
     def setUp(self) -> None:
-        # self.logger = logging.getLogger('cil.io')
-        # self.logger.setLevel(logging.DEBUG)
-        self.cwd = os.path.join(os.getcwd(), 'tifftest')
-        os.mkdir(self.cwd)
+        self.TMP = tempfile.TemporaryDirectory()
+        self.cwd = os.path.join(self.TMP.name, 'rawtest')
 
     def tearDown(self) -> None:
-        shutil.rmtree(self.cwd)
+        self.TMP.cleanup()
         
-
     def get_slice_imagedata(self, data):
         '''Returns only 2 slices of data'''
         # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -364,16 +362,13 @@ class TestTIFF(unittest.TestCase):
         
         np.testing.assert_array_equal(tmp, read_array)
 
-        
 class TestRAW(unittest.TestCase):
     def setUp(self) -> None:
-        # self.logger = logging.getLogger('cil.io')
-        # self.logger.setLevel(logging.DEBUG)
-        self.cwd = os.path.join(os.getcwd(), 'rawtest')
-        os.mkdir(self.cwd)
+        self.TMP = tempfile.TemporaryDirectory()
+        self.cwd = os.path.join(self.TMP.name, 'rawtest')
 
     def tearDown(self) -> None:
-        shutil.rmtree(self.cwd)
+        self.TMP.cleanup()
         # pass
 
     def test_raw_nocompression_0(self):
@@ -423,9 +418,7 @@ class TestRAW(unittest.TestCase):
         read_dtype = config['MINIMAL INFO']['data_type']
         read_array = np.fromfile(fname, dtype=read_dtype)
         read_shape = eval(config['MINIMAL INFO']['shape'])
-        logging.warning("read_array shape {}".format(read_array.shape))
-        logging.warning("read_array dtype {}".format(read_array.dtype))
-
+        
         # reshape read in array
         read_array = read_array.reshape(read_shape)
 

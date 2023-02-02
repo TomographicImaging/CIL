@@ -37,7 +37,7 @@ import random
 from cil.utilities.display import set_origin
 
 
-def display_slice(container, clim, direction, title, cmap, size, axis_labels, origin):
+def display_slice(container, direction, title, cmap, size, axis_labels, origin):
 
 
     def get_slice_3D(x, minmax, roi_hdir, roi_vdir, equal_aspect):
@@ -71,25 +71,20 @@ def display_slice(container, clim, direction, title, cmap, size, axis_labels, or
         gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=(1,.05), height_ratios=(1,))
         # image
         ax = fig.add_subplot(gs[0, 0])
+
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+
         img, data_origin, _ = set_origin(img, origin)
 
         aspect = 'equal'
         if not equal_aspect:
             aspect = (roi_hdir[1] - roi_hdir[0]) / (roi_vdir[1] - roi_vdir[0])
 
-        if 'right' in origin:
-            roi_hdir = roi_hdir[1], roi_hdir[0]
-        if 'upper' in origin:
-            roi_vdir = roi_vdir[1], roi_vdir[0]
-
         aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect=aspect)
-        cmin = clim[0] + minmax[0]*(clim[1]-clim[0])
-        cmax = clim[0] + minmax[1]*(clim[1]-clim[0])
-        aximg.set_clim((cmin, cmax))
+        aximg.set_clim(minmax)
         ax.set_xlim(*roi_hdir)
         ax.set_ylim(*roi_vdir)
-        ax.set_xlabel(x_label)
-        ax.set_ylabel(y_label)
         ax.set_title(f'{dtitle} {x}')
         # colorbar
         ax = fig.add_subplot(gs[0, 1])
@@ -164,7 +159,6 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
 
-    style = {'description_width': '130px'}
     height_layout = widgets.Layout(height='20px')
     slice_slider = widgets.IntSlider(
         min=0,
@@ -173,8 +167,6 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         value=slice_number,
         continuous_update=False,
         layout=height_layout,
-        description=axis_labels[direction],
-        style=style,
     )
     play_slices = widgets.Play(
         min=0,
@@ -189,25 +181,27 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     amax = container.max()
     amin = container.min()
     if minmax is None:
-        minmax = (amin, amax)
+        cmax = amax
+        cmin = amin
+    else:
+        cmin = min(minmax)
+        cmax = max(minmax)
 
     if isinstance (size, (int, float)):
         default_ratio = 6./8.
         size = ( size , size * default_ratio )
 
     min_max = widgets.FloatRangeSlider(
-        value=[0., 1.],
-        min=0.,
-        max=1.,
-        step=.05,
+        value=[cmin, cmax],
+        min=amin,
+        max=amax,
+        step=(amax-amin)/100.,
         disabled=False,
         continuous_update=False,
         orientation='horizontal',
         readout=True,
-        readout_format='.2f',
+        readout_format='.1f',
         layout=height_layout,
-        description='Min/max',
-        style=style,
     )
 
     dirs_remaining = [i for i in range(3) if i != direction]
@@ -226,8 +220,6 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         readout=True,
         readout_format='d',
         layout=height_layout,
-        description=f'Range: {axis_labels[h_dir]}',
-        style=style,
     )
 
     roi_select_vdir = widgets.IntRangeSlider(
@@ -241,8 +233,6 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         readout=True,
         readout_format='d',
         layout=height_layout,
-        description=f'Range: {axis_labels[v_dir]}',
-        style=style,
     )
 
     equal_aspect = widgets.Checkbox(
@@ -260,18 +250,20 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         justify_content='center',
     )
     selectors = widgets.Box([
-        play_slices,
+        widgets.Label(axis_labels[direction], layout=height_layout),
         slice_slider,
-        min_max,
+        widgets.Label(f'roi_{axis_labels[h_dir]}', layout=height_layout),
         roi_select_hdir,
+        widgets.Label(f'roi_{axis_labels[v_dir]}', layout=height_layout),
         roi_select_vdir,
+        widgets.Label('Min/max', layout=height_layout),
+        min_max,
         equal_aspect],
         layout=box_layout)
 
     out = interactive_output(
         display_slice(
             container,
-            minmax,
             direction,
             title=title,
             cmap=cmap,
@@ -284,10 +276,7 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         'roi_vdir': roi_select_vdir,
         'equal_aspect': equal_aspect})
 
-    box = widgets.HBox(children=[out, selectors],
-                       layout=widgets.Layout(
-                            display='flex',
-                            justify_content='center'))
+    box = widgets.Box(children=[play_slices, out, selectors], layout=box_layout)
 
     return box
 
@@ -302,9 +291,6 @@ def link_islicer(*args):
         selection sliders will be extracted and linked.
     '''
     slice_sliders = [arg.children[-1].children[1] for arg in args]
-    play_widgets = [arg.children[-1].children[0] for arg in args][1:]
-    for p in play_widgets:
-        p.layout.visibility = 'hidden'
     linked = [(widg, 'value') for widg in slice_sliders]
     # link pair-wise
     pairs = [(linked[i+1],linked[i]) for i in range(len(linked)-1)]

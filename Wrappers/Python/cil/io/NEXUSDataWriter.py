@@ -19,7 +19,6 @@ import os
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 from cil.version import version
 import datetime
-from cil.io import utilities
 
 h5pyAvailable = True
 try:
@@ -73,18 +72,25 @@ class NEXUSDataWriter(object):
         if not self.file_name.endswith('nxs') and not self.file_name.endswith('nex'):
             self.file_name+='.nxs'
         
-        # Deal with compression
-        self.compress           = utilities.get_compress(compression)
-        self.dtype              = utilities.get_compressed_dtype(data, compression)
-        self.compression        = compression
+        self.compression = compression
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
 
-        
-        
+        if self.compression == 0:
+            self.dtype = data.dtype
+            self.compress = False
+        elif self.compression == 8:
+            self.dtype = np.uint8
+            self.compress = True
+        elif self.compression == 16:
+            self.dtype = np.uint16
+            self.compress = True
+        else:
+            raise Exception('Compression bits not valid. Got {0} expected value in {1}'.format(self.compression, [0,8,16]))
+
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot write NEXUS files.')
@@ -105,7 +111,17 @@ class NEXUSDataWriter(object):
             os.mkdir(os.path.dirname(self.file_name))
 
         if self.compress is True:
-            scale, offset = utilities.get_compression_scale_offset(self.data, self.compression)
+            save_range = np.iinfo(self.dtype).max
+
+            data_min = self.data.min()
+            data_range = self.data.max() - data_min
+
+            if data_range > 0:
+                scale = save_range / data_range
+                offset = - data_min * scale
+            else:
+                scale = 1.0
+                offset = 0.0
                 
         # create the file
         with h5py.File(self.file_name, 'w') as f:

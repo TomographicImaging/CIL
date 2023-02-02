@@ -14,411 +14,218 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
-import numpy as np
-import weakref
-
-try:
-    from cil.processors.cilacc_binner import Binner_IPP
-    has_ipp = True
-except:
-    has_ipp = False
+import numpy
+import warnings
 
 
 class Binner(DataProcessor):
-
-    """This creates a Binner processor.
+    r'''Binner processor rebins (downsample) array and returns new geometry.
+        
+    :param roi: region-of-interest to bin, specified as a dictionary containing tuple (Start, Stop, Step)
+    :type roi: dict
+    :return: returns an AcquisitionData or ImageData object with an updated AcquisitionGeometry or ImageGeometry
+    :rtype: AcquisitionData or ImageData
+    '''
     
-    The processor will crop the data, and then average together n input pixels along a dimension from the starting index.
-
-    The output will be a data container with the data, and geometry updated to reflect the operation.
-
-    Parameters
-    ----------
-
-    roi : dict
-        The region-of-interest to bin {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
-        The `key` being the axis name to apply the processor to, the `value` holding a tuple containing the ROI description
-
-        Start: Starting index of input data. Must be an integer, or `None` defaults to index 0.
-        Stop: Stopping index of input data. Must be an integer, or `None` defaults to index N.
-        Step: Number of pixels to average together. Must be an integer or `None` defaults to 1.
-
-    accelerated : boolean, default=True
-        Uses the CIL accelerated backend if `True`, numpy if `False`.
-
-
-    Example
-    -------
+    '''
+    Start inclusive, Stop exclusive
     
-    >>> from cil.processors import Binner
-    >>> roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
-    >>> processor = Binner(roi)
-    >>> processor.set_input(data)
-    >>> data_binned = processor.get_output()
-
-
-    Example
-    -------
-    >>> from cil.processors import Binner
-    >>> roi = {'horizontal':(None,None,2),'vertical':(None,None,2)}
-    >>> processor = Binner(roi)
-    >>> processor.set_input(data.geometry)
-    >>> geometry_binned = processor.get_output()
-
-
-    Note
-    ----
-    The indices provided are start inclusive, stop exclusive.
-
-    All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {'axis_name',-1}
+    -1 is a shortcut to include all elements along the specified dimension
     
-    If only one number is provided, then it is interpreted as Stop. i.e. {'axis_name1':(stop)}
-    If two numbers are provided, then they are interpreted as Start and Stop  i.e. {'axis_name1':(start, stop)}
-
-    Negative indexing can be used to specify the index. i.e. {'axis_name1':(10, -10)} will crop the dimension symmetrically
+    if only one number is provided, then it is interpreted as Stop
+    
+    if two numbers are provided, then they are interpreted as Start and Stop
+    
+    Start = None is equivalent to Start = 0
+    Stop = None is equivalent to Stop = number of elements
+    Step = None is equivalent to Step = 1
+    
+    You can specify negative Start and Stop.
     
     If Stop - Start is not multiple of Step, then 
     the resulted dimension will have (Stop - Start) // Step 
     elements, i.e. (Stop - Start) % Step elements will be ignored
-
-    """
+    '''
 
     def __init__(self,
-                 roi = None,accelerated=True):
+                 roi = None):
 
-
-        if accelerated and not has_ipp:
-            raise RuntimeError("Cannot run accelerated Binner without the IPP libraries.")
-
-
-        kwargs = {
-            '_roi_input': roi, 
-            '_accelerated':accelerated,
-            '_roi_ordered':None, 
-            '_data_array': False, 
-            '_geometry': None, 
-            '_processed_dims':None, 
-            '_shape_in':None, 
-            '_shape_out':None, 
-            '_labels_in':None, 
-            '_binning':None, 
-            '_index_start':None, 
-            }
+        kwargs = {'roi': roi}
 
         super(Binner, self).__init__(**kwargs)
     
 
-    def set_input(self, dataset):
-        """
-        Set the input data to the processor
-
-        Parameters
-        ----------
-        dataset : DataContainer, Geometry
-            The input DataContainer
-        """
-
-        if issubclass(type(dataset), DataContainer) or isinstance(dataset,(AcquisitionGeometry,ImageGeometry)):
-            if self.check_input(dataset):
-                self.__dict__['input'] = weakref.ref(dataset)
-                self.__dict__['shouldRun'] = True
-            else:
-                raise ValueError('Input data not compatible')
-        else:
-            raise TypeError("Input type mismatch: got {0} expecting {1}"\
-                            .format(type(dataset), DataContainer))
-
-
     def check_input(self, data):
-
-        if isinstance(data, (ImageData,AcquisitionData)):
-            self._data_array = True
-            self._geometry = data.geometry
-
-        elif isinstance(data, DataContainer):
-            self._data_array = True
-            self._geometry = None
-
-        elif isinstance(data, (ImageGeometry, AcquisitionGeometry)):
-            self._data_array = False
-            self._geometry = data
-
+        
+        if not ((isinstance(data, ImageData)) or 
+                (isinstance(data, AcquisitionData))):
+            raise TypeError('Processor supports only following data types:\n' +
+                            ' - ImageData\n - AcquisitionData')
+        elif (data.geometry == None):
+            raise ValueError('Geometry is not defined.')
+        elif (self.roi == None):
+            raise ValueError('Prease, specify roi')
         else:
-            raise TypeError('Processor supports following data types:\n' +
-                            ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
-
-        if self._data_array:
-            if data.dtype != np.float32:
-                raise TypeError("Expected float32")
-
-        if (self._roi_input == None):
-            raise ValueError('Please, specify roi')
-
-        for key in self._roi_input.keys():
-            if key not in data.dimension_labels:
-                raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
-
-        self._parse_roi(data.ndim, data.shape, data.dimension_labels)
-        
-        return True 
-
-
-    def _parse_roi(self, ndim, shape, dimension_labels):
-        '''
-        This processes the roi input style
-        '''
-        offset = 4-ndim
-        labels_in = [None]*4
-        labels_in[offset::] = dimension_labels
-        shape_in = [1]*4
-        shape_in[offset::] = shape
-
-        # defaults
-        shape_out = shape_in.copy()
-        processed_dim = np.zeros((4,),np.bool_)
-        binning = [1,1,1,1]
-        index_start =[0,0,0,0]
-        index_end = list(shape_in.copy())
-
-        for i in range(ndim):
-
-            roi = self._roi_input.get(dimension_labels[i],None)
-
-            if roi == None or roi == -1:
-                continue
-
-            start = index_start[offset + i]
-            stop = shape_out[offset + i]
-            step = binning[offset + i]
-
-            # accepts a tuple, range or slice
-            try:
-                roi = [roi.start, roi.stop, roi.step]
-            except AttributeError:
-                roi = list(roi)
-                
-            length = len(roi)
-
-            if length == 1:
-                if roi[0] is not None:
-                    stop = roi[0]
-            elif length > 1:
-                if roi[0] is not None:
-                    start = roi[0]
-                if roi[1] is not None:
-                    stop = roi[1]
-            if length > 2:
-                if roi[2] is not None:
-                    step = roi[2]
-
-            # deal with negative indexing
-            if start < 0:
-                start += shape_in[offset + i]
-
-            if stop < 0:
-                stop += shape_in[offset + i]
-
-            #set values
-            binning[offset + i]  = int(step)
-            index_start[offset + i]  = int(start)
-            shape_out[offset + i]  = (stop - start)// step
-
-            #end pixel based on binning
-            index_end[offset + i]  = int(index_start[offset + i] + shape_out[offset + i] * binning[offset + i])
-
-            if shape_out[offset + i] != shape_in[offset + i]:
-                processed_dim[offset + i] = 1
-
-        range_list = []
-        for i in range(4):
-            range_list.append(range(index_start[i], index_end[i],binning[i]))
-            
-        # set values
-        self._shape_in = shape_in
-        self._shape_out = shape_out
-        self._labels_in = labels_in
-        self._processed_dims = processed_dim
-        self._roi_ordered = range_list
-        self._binning = binning 
-        self._index_start = index_start
-
-    def _bin_acquisition_geometry(self):
-        """
-        Creates the binned acquisition geometry
-        """
-        geometry_new = self._geometry.copy()
-        system_detector = geometry_new.config.system.detector
-
-        processed_dims = self._processed_dims.copy()
-
-        # deal with vertical first as it may change the geometry type
-        if 'vertical' in self._geometry.dimension_labels:
-            vert_ind = self._labels_in.index('vertical')
-            if processed_dims[vert_ind]:
-                roi = self._roi_ordered[vert_ind]
-                n_elements = len(roi)
-
-                if n_elements > 1:
-                    centre_offset = geometry_new.config.panel.pixel_size[1] * ((n_elements * roi.step)*0.5 + roi.start - geometry_new.config.panel.num_pixels[1] * 0.5 )
-
-                    geometry_new.config.panel.num_pixels[1] = n_elements
-                    system_detector.position = system_detector.position + centre_offset * system_detector.direction_y
-                else:
-                    geometry_new = geometry_new.get_slice(vertical = (roi.start + roi.step/2))
-
-                geometry_new.config.panel.pixel_size[1] *= roi.step
-                processed_dims[vert_ind] = False
-
-
-        for i, axis  in enumerate(self._labels_in):
-
-            if not processed_dims[i]:
-                continue
-            
-            roi = self._roi_ordered[i]
-            n_elements = len(roi)
-
-            if axis == 'channel':
-                geometry_new.set_channels(num_channels=n_elements)
-
-            elif axis == 'angle':
-                shape = (n_elements, roi.step)
-                geometry_new.config.angles.angle_data = self._geometry.angles[roi.start:roi.start+n_elements*roi.step].reshape(shape).mean(1)
-                
-            elif axis == 'horizontal':
-                centre_offset = geometry_new.config.panel.pixel_size[0] * ( (n_elements * roi.step)*0.5 + roi.start - geometry_new.config.panel.num_pixels[0] * 0.5 )
-                geometry_new.config.panel.num_pixels[0] = n_elements
-                geometry_new.config.panel.pixel_size[0] *= roi.step
-                system_detector.position = system_detector.position + centre_offset * system_detector.direction_x
-
-        return geometry_new
-
-
-    def _bin_image_geometry(self):
-        """
-        Creates the binned image geometry
-        """
-        geometry_new = self._geometry.copy()
-
-        for i, axis in enumerate(self._labels_in):
-
-            if not self._processed_dims[i]:
-                continue
-
-            roi = self._roi_ordered[i]
-            n_elements = len(roi)
-
-            offset = (roi.stop - roi.start) * 0.5 + roi.start
-
-            if axis == 'channel':
-                geometry_new.channels = n_elements
-                geometry_new.channel_spacing *= roi.step
-
-            elif axis == 'vertical':
-                # offset in unbinned voxels, multiplied by original voxel size
-                voxel_offset = geometry_new.voxel_num_z * 0.5 - offset
-                geometry_new.center_z -= voxel_offset * geometry_new.voxel_size_z
-
-                geometry_new.voxel_num_z = n_elements
-                geometry_new.voxel_size_z *= roi.step
-
-            elif axis == 'horizontal_x':
-                # offset in unbinned voxels, multiplied by original voxel size
-                voxel_offset = geometry_new.voxel_num_x * 0.5 - offset
-                geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
-
-                geometry_new.voxel_num_x = n_elements
-                geometry_new.voxel_size_x *= roi.step
-
-            elif axis == 'horizontal_y':
-                # offset in unbinned voxels, multiplied by original voxel size
-                voxel_offset = geometry_new.voxel_num_y * 0.5 - offset
-                geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
-
-                geometry_new.voxel_num_y = n_elements
-                geometry_new.voxel_size_y *= roi.step
-
-        return geometry_new
-
-
-    def _bin_array_numpy(self, array_in, array_binned):
-        """
-        Bins the array using numpy. This method is slower and less memory efficient than self._bin_array_acc
-        """
-        shape_object = []
-        slice_object = []
-
-        for i in range(4):
-            # reshape the data to add each 'bin' dimensions
-            shape_object.append(self._shape_out[i]) 
-            shape_object.append(self._binning[i])
-            slice_object.append(slice(self._index_start[i], self._index_start[i] + self._shape_out[i] * self._binning[i])) #crop data (i.e. no bin/step)
-        
-        shape_object = tuple(shape_object)
-        slice_object = tuple(slice_object)
-
-        data_resized = array_in.reshape(self._shape_in)[slice_object].reshape(shape_object)
-
-        mean_order = (-1, 1, 2, 3)
-        for i in range(4):
-            data_resized = data_resized.mean(mean_order[i])
-            
-        np.copyto(array_binned, data_resized)
-
-
-    def _bin_array_acc(self, array_in, array_binned):
-        """
-        Bins the array using the accelerated CIL backend
-        """
-        binner_ipp = Binner_IPP(self._shape_in, self._shape_out, self._index_start, self._binning)
-
-        res = binner_ipp.bin(array_in, array_binned)
-        if res != 0:
-            raise RuntimeError("Call failed")
-
+            return True 
+    
 
     def process(self, out=None):
 
         data = self.get_input()
+        ndim = data.number_of_dimensions
 
-        if isinstance(self._geometry, ImageGeometry):
-            binned_geometry = self._bin_image_geometry()
-        elif isinstance(self._geometry, AcquisitionGeometry):
-            binned_geometry = self._bin_acquisition_geometry()
-        else:
-            binned_geometry = None
+        geometry_0 = data.geometry
+        geometry = geometry_0.copy()
 
-        # return if just acting on geometry
-        if not self._data_array:
-            return binned_geometry
+        dimension_labels = list(geometry_0.dimension_labels)
+        
+        if self.roi != None:
+            for key in self.roi.keys():
+                if key not in data.dimension_labels:
+                    raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels))
+        
+        roi_object = self._construct_roi_object(self.roi, data.shape, dimension_labels)
 
-        # create output array or check size and shape of passed out
-        if out is None:
-            if binned_geometry is not None:
-                data_out = binned_geometry.allocate(None)
-                binned_array = data_out.as_array()
-            else:
-                binned_array = np.empty(self._shape_out,dtype=np.float32)
-                data_out = DataContainer(binned_array,False, data.dimension_labels)
-        else:
-            try:
-                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self._shape_out)
-            except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
-
-            if binned_geometry is not None:
-                if out.geometry != binned_geometry:
-                    raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, binned_geometry))
+        
+        for key in self.roi.keys():
+            idx = data.dimension_labels.index(key)
+            n_elements = (roi_object[idx][1] - roi_object[idx][0]) // roi_object[idx][2]
             
-            binned_array = out.array
+            if (isinstance(data, ImageData)):
 
-        # bin data
-        if self._accelerated:
-            self._bin_array_acc(data.array, binned_array)
+                if key == 'channel':
+                    geometry.channels = n_elements
+                    geometry.channel_spacing *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('channel')
+                elif key == 'vertical':
+                    geometry.voxel_num_z = n_elements
+                    geometry.voxel_size_z *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('vertical')
+                elif key == 'horizontal_x':
+                    geometry.voxel_num_x = n_elements
+                    geometry.voxel_size_x *= roi_object[idx][2]
+                    if n_elements <= 1:
+                       dimension_labels.remove('horizontal_x')
+                elif key == 'horizontal_y':
+                    geometry.voxel_num_y = n_elements
+                    geometry.voxel_size_y *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('horizontal_y')
+            
+            # if AcquisitionData
+            else:
+                if key == 'channel':
+                    geometry.set_channels(num_channels=n_elements)
+                    if n_elements <= 1:
+                        dimension_labels.remove('channel')
+                elif key == 'angle':
+                    shape = (n_elements, roi_object[idx][2])
+                    geometry.config.angles.angle_data = geometry_0.config.angles.angle_data[roi_object[idx][0]:(roi_object[idx][0] + n_elements * roi_object[idx][2])].reshape(shape).mean(1)
+                    if n_elements <= 1:
+                        dimension_labels.remove('angle')
+                elif key == 'vertical':
+                    if n_elements > 1:
+                        geometry.config.panel.num_pixels[1] = n_elements
+                    else:
+                        geometry = geometry.get_slice(vertical = (roi_object[idx][1] + roi_object[idx][0]) // 2)
+                    geometry.config.panel.pixel_size[1] *= roi_object[idx][2]
+                elif key == 'horizontal':
+                    geometry.config.panel.num_pixels[0] = n_elements
+                    geometry.config.panel.pixel_size[0] *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('horizontal')
+        
+        geometry.dimension_labels = dimension_labels
+        
+        shape_object = []
+        slice_object = []
+        for i in range(ndim):
+            n_pix = (roi_object[i][1] - roi_object[i][0]) // roi_object[i][2]
+            shape_object.append(n_pix)
+            shape_object.append(roi_object[i][2])
+            slice_object.append(slice(roi_object[i][0], roi_object[i][0] + n_pix * roi_object[i][2]))
+        
+        shape_object = tuple(shape_object)
+        slice_object = tuple(slice_object)
+
+        data_resized = data.as_array()[slice_object].reshape(shape_object)
+
+        mean_order = [-1, 1, 2, 3]
+
+        for i in range(ndim):
+            data_resized = data_resized.mean(mean_order[i])
+            
+        data_binned = geometry.allocate()
+        data_binned.fill(numpy.squeeze(data_resized))
+        if out == None:
+            return data_binned
         else:
-            self._bin_array_numpy(data.array, binned_array)
+            out = data_binned
+        
 
-        if out is None:
-            return data_out
+    def _construct_roi_object(self, roi, n_elements, dimension_labels):
+
+        '''
+        parse roi input
+        here we parse input and calculate requested roi
+        '''
+        ndim = len(n_elements)
+        roi_object = []
+        # loop through dimensions
+        for i in range(ndim):
+            # given dimension number, get corresponding label
+            label = dimension_labels[i]
+            # '-1' shortcut = include all elements
+            if (label in roi.keys()) and (roi[label] != -1):
+                # start and step are optional
+                if len(roi[label]) == 1:
+                    start = 0
+                    step = 1
+                    if roi[label][0] != None:
+                        if roi[label][0] < 0:
+                            stop =  n_elements[i]+roi[label][0]
+                        else:
+                            stop = roi[label][0]
+                    else:
+                        stop =  n_elements[i]
+
+                elif len(roi[label]) == 2 or len(roi[label]) == 3:
+                    
+                    if roi[label][0] != None:
+                        if roi[label][0] < 0:
+                            start = n_elements[i]+roi[label][0]
+                        else:
+                            start = roi[label][0]
+                    else:
+                        start = 0
+
+                    if roi[label][1] != None:
+                        if roi[label][1] < 0:
+                            stop = n_elements[i]+roi[label][1]
+                        else:
+                            stop = roi[label][1]
+                    else: 
+                        stop = n_elements[i]
+                    
+                    if len(roi[label]) == 2:
+                        step = 1
+
+                    if len(roi[label]) == 3:
+                        if roi[label][2] != None:
+                            if roi[label][2] <= 0:
+                                raise ValueError('Binning parameter has to be > 0')
+                            else:
+                                step = roi[label][2]
+                        else:
+                            step = 1
+                else:
+                    raise ValueError('roi is exected to have 1, 2 or 3 elements')
+            else:
+                step = 1
+                start = 0
+                stop = n_elements[i]
+            roi_object.append((start, stop, step))
+        return roi_object

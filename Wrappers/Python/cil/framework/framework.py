@@ -98,15 +98,11 @@ class ImageGeometry(object):
         return len(self.dimension_labels)
 
     @property
-    def ndim(self):
-        return len(self.dimension_labels)
-
-    @property
     def dimension_labels(self):
         
         labels_default = DataOrder.CIL_IG_LABELS
 
-        shape_default = [   self.channels,
+        shape_default = [   self.channels - 1, #channels default is 1
                             self.voxel_num_z,
                             self.voxel_num_y,
                             self.voxel_num_x]
@@ -117,7 +113,7 @@ class ImageGeometry(object):
             labels = labels_default.copy()
 
         for i, x in enumerate(shape_default):
-            if x == 0 or x==1:
+            if x == 0:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1932,6 +1928,7 @@ class AcquisitionGeometry(object):
 
         return tuple(shape)
 
+
     @property
     def dimension_labels(self):
         labels_default = DataOrder.CIL_AG_LABELS
@@ -1950,7 +1947,7 @@ class AcquisitionGeometry(object):
         #remove from list labels where len == 1
         #
         for i, x in enumerate(shape_default):
-            if x == 0 or x==1:
+            if x == 1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1971,9 +1968,6 @@ class AcquisitionGeometry(object):
                     
             self._dimension_labels = tuple(val)
 
-    @property
-    def ndim(self):
-        return len(self.dimension_labels)
 
     @property
     def system_description(self):
@@ -2377,7 +2371,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
         
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
@@ -2486,7 +2480,9 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the dtype of the data array.'''
+        '''Returns the dtype of the data array. 
+           If geometry exists, the dtype of the geometry = dtype of the array'''                          
+        self.geometry.dtype = self.array.dtype       
         return self.array.dtype
 
     @property
@@ -3272,89 +3268,6 @@ class ImageData(DataContainer):
             return out
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)                            
-
-
-    def apply_circular_mask(self, radius=0.99, in_place=True):
-        """
-
-        Apply a circular mask to the horizontal_x and horizontal_y slices. Values outside this mask will be set to zero.
-
-        This will most commonly be used to mask edge artefacts from standard CT reconstructions with FBP.
-
-        Parameters
-        ----------
-        radius : float, default 0.99
-            radius of mask by percentage of size of horizontal_x or horizontal_y, whichever is greater
-
-        in_place : boolean, default True
-            If `True` masks the current data, if `False` returns a new `ImageData` object.
-            
-
-        Returns
-        -------
-        ImageData
-            If `in_place = False` returns a new ImageData object with the masked data
-
-        """
-        ig = self.geometry
-
-        # grid
-        y_range = (ig.voxel_num_y-1)/2
-        x_range = (ig.voxel_num_x-1)/2
-
-        Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
-        
-        # use centre from geometry in units distance to account for aspect ratio of pixels
-        dist_from_center = numpy.sqrt((X*ig.voxel_size_x+ ig.center_x)**2 + (Y*ig.voxel_size_y+ig.center_y)**2)
-
-        size_x = ig.voxel_num_x * ig.voxel_size_x
-        size_y = ig.voxel_num_y * ig.voxel_size_y
-
-        if size_x > size_y:
-            radius_applied =radius * size_x/2
-        else:
-            radius_applied =radius * size_y/2
-
-        # approximate the voxel as a circle and get the radius
-        # ie voxel area = 1, circle of area=1 has r = 0.56
-        r=((ig.voxel_size_x * ig.voxel_size_y )/numpy.pi)**(1/2)
-
-        # we have the voxel centre distance to mask. voxels with distance greater than |r| are fully inside or outside.
-        # values on the border region between -r and r are preserved
-        mask =(radius_applied-dist_from_center).clip(-r,r)
-
-        #  rescale to -pi/2->+pi/2
-        mask *= (0.5*numpy.pi)/r
-
-        # the sin of the linear distance gives us an approximation of area of the circle to include in the mask
-        numpy.sin(mask, out = mask)
-
-        # rescale the data 0 - 1
-        mask = 0.5 + mask * 0.5
-
-        # reorder dataset so 'horizontal_y' and 'horizontal_x' are the final dimensions
-        labels_orig = self.dimension_labels
-        labels = list(labels_orig)
-
-        labels.remove('horizontal_y')
-        labels.remove('horizontal_x')
-        labels.append('horizontal_y')
-        labels.append('horizontal_x')
-
-
-        if in_place == True:
-            self.reorder(labels)
-            numpy.multiply(self.array, mask, out=self.array)
-            self.reorder(labels_orig)
-
-        else:
-            image_data_out = self.copy()
-            image_data_out.reorder(labels)
-            numpy.multiply(image_data_out.array, mask, out=image_data_out.array)
-            image_data_out.reorder(labels_orig)
-
-            return image_data_out
-
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''

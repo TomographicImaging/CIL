@@ -25,12 +25,11 @@ from cil.io import TIFFWriter, TIFFStackReader
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
 from cil.utilities.dataexample import data_dir
-from cil.utilities.quality_measures import mse
+from cil.utilities.quality_measures import mae, mse, psnr
 from cil.utilities import dataexample
 import shutil
 import logging
 import glob
-import json
 
 initialise_tests()
 
@@ -64,8 +63,6 @@ has_file = os.path.isfile(filename)
 has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia and has_file \
     and has_wget
 
-# Change the level of the logger to WARNING (or whichever you want) to see more information
-# logging.basicConfig(level=logging.WARNING)
 
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
@@ -169,6 +166,7 @@ class TestTIFF(unittest.TestCase):
         # self.logger.setLevel(logging.DEBUG)
         self.cwd = os.path.join(os.getcwd(), 'tifftest')
         os.mkdir(self.cwd)
+
 
     def tearDown(self) -> None:
         shutil.rmtree(self.cwd)
@@ -274,92 +272,4 @@ class TestTIFF(unittest.TestCase):
             assert False
         except:
             assert True
-
-    def test_TIFF_compression3D_0(self):
-        self.TIFF_compression_test(None)
-    
-    def test_TIFF_compression3D_1(self):
-        self.TIFF_compression_test('uint8')
-
-    def test_TIFF_compression3D_2(self):
-        self.TIFF_compression_test('uint16')
-
-    def test_TIFF_compression3D_3(self):
-        with self.assertRaises(ValueError) as context:
-            self.TIFF_compression_test('whatever_compression')
-            
-    def test_TIFF_compression4D_0(self):
-        self.TIFF_compression_test(None,2)
-        
-    def test_TIFF_compression4D_1(self):
-        self.TIFF_compression_test('uint8',2)
-
-    def test_TIFF_compression4D_2(self):
-        self.TIFF_compression_test('uint16',2)
-    
-    def test_TIFF_compression4D_3(self):
-        with self.assertRaises(ValueError) as context:
-            self.TIFF_compression_test('whatever_compression',2)
-
-    def TIFF_compression_test(self, compression, channels=1):
-        X=4
-        Y=5
-        Z=6
-        C=channels
-        if C == 1:
-            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
-        else:
-            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6, channels=C)
-        data = ig.allocate(0)
-        data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
-
-        from cil.io import utilities
-        compress = utilities.get_compress(compression)
-        dtype = utilities.get_compressed_dtype(data.array, compression)
-        scale, offset = utilities.get_compression_scale_offset(data.array, compression)
-        if C > 1:
-            assert data.ndim == 4
-        fname = os.path.join(self.cwd, "unittest")
-        writer = TIFFWriter(data=data, file_name=fname, compression=compression)
-        writer.write()
-        # force the reader to use the native TIFF dtype by setting dtype=None
-        reader = TIFFStackReader(file_name=self.cwd, dtype=None)
-        read_array = reader.read()
-        if C > 1:
-            read_array = reader.read_as_ImageData(ig).array
-
-        
-        if compress:
-            tmp = data.array * scale + offset
-            tmp = np.asarray(tmp, dtype=dtype)
-            # test if the scale and offset are written to the json file
-            with open(os.path.join(self.cwd, "scaleoffset.json"), 'r') as f:
-                d = json.load(f)
-            assert d['scale'] == scale
-            assert d['offset'] == offset
-            # test if the scale and offset are read from the json file
-            sc, of = reader.read_scale_offset()
-            assert sc == scale
-            assert of == offset
-            
-            recovered_data = (read_array - of)/sc
-            np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
-
-            # test read_rescaled
-            approx = reader.read_rescaled()
-            np.testing.assert_allclose(approx.ravel(), data.array.ravel(), rtol=1e-1, atol=1e-2)
-
-            approx = reader.read_rescaled(sc, of)
-            np.testing.assert_allclose(approx.ravel(), data.array.ravel(), rtol=1e-1, atol=1e-2)
-        else:
-            tmp = data.array
-            # if the compression is None, the scale and offset should not be written to the json file
-            with self.assertRaises(OSError) as context:
-                sc, of = reader.read_scale_offset()
-        
-        assert tmp.dtype == read_array.dtype
-        
-        np.testing.assert_array_equal(tmp, read_array)
-
-        
 

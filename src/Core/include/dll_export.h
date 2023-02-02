@@ -7,7 +7,7 @@
 #define  DLL_EXPORT __declspec(dllexport)
 #define EXPIMP_TEMPLATE
 #else
-#define  DLL_EXPORT __declspec(dllexport)
+#define  DLL_EXPORT __declspec(dllimport)
 #define EXPIMP_TEMPLATE extern
 #endif 
 #elif defined(linux) || defined(__linux) || defined(__APPLE__)

@@ -31,7 +31,7 @@ as NeXuS files.
 
 .. autoclass:: cil.io.NEXUSDataReader
    :members:
-   :inherited-members:
+   :special-members:
 .. autoclass:: cil.io.NEXUSDataWriter
    :members:
    :special-members:

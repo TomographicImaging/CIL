@@ -27,17 +27,16 @@ except:
 
 class NEXUSDataReader(object):
     
-    """
-    Create a reader for NeXus files.
-
-    Parameters
-    ----------
-    **kwargs : dict, optional
-        Arguments to the constructor. One of these should be `file_name`.
-    """
-
     def __init__(self,
                  **kwargs):
+        
+        '''
+        Constructor
+        
+        Input:
+            
+            file_name      full path to NEXUS file
+        '''
         
         self.file_name = kwargs.get('file_name', None)
         
@@ -46,15 +45,7 @@ class NEXUSDataReader(object):
             
     def set_up(self, 
                file_name = None):
-        """
-        Initialise reader.
-
-        Parameters
-        ----------
-        file_name : str
-            Full path to NeXus file
-        """
-
+        
         self.file_name = os.path.abspath(file_name)
 
         # check that h5py library is installed
@@ -85,16 +76,11 @@ class NEXUSDataReader(object):
         return dimension_labels
 
     def get_geometry(self):
-        """
-        Parse NEXUS file and return acquisition or reconstructed volume
-        parameters, depending on file type.
-
-        Returns
-        -------
-        AcquisitionGeometry or ImageGeometry
-            Acquisition or reconstructed volume parameters. Exact type
-            depends on file content.
-        """
+        
+        '''
+        Parse NEXUS file and returns either ImageData or Acquisition Data 
+        depending on file content
+        '''
         
         with h5py.File(self.file_name,'r') as dfile:
             
@@ -226,15 +212,7 @@ class NEXUSDataReader(object):
         return self._geometry
     
     def get_data_scale(self):
-        """
-        Parse NEXUS file and return the scale factor applied to compress
-        the dataset.
-        
-        Returns
-        -------
-        scale : float
-            The scale factor applied to compress the dataset
-        """
+        '''Parse NEXUS file and returns the scale factor applied to compress the dataset'''
 
         with h5py.File(self.file_name,'r') as dfile:
             ds_data = dfile['entry1/tomo_entry/data/data'] 
@@ -246,16 +224,7 @@ class NEXUSDataReader(object):
         return scale
 
     def get_data_offset(self):
-        """
-        Parse NEXUS file and return the offset factor applied to compress
-        the dataset.
-        
-        Returns
-        -------
-        offset : float
-            The offset factor applied to compress the dataset
-        """
-        
+        '''Parse NEXUS file and returns the offset factor applied to compress the dataset'''
         with h5py.File(self.file_name,'r') as dfile:
             ds_data = dfile['entry1/tomo_entry/data/data'] 
             try:
@@ -266,20 +235,10 @@ class NEXUSDataReader(object):
         return offset
 
     def __read_as(self, dtype=np.float32):
-        """
-        Parse NEXUS file and return raw file content.
-        
-        Parameters
-        ----------
-        dtype : data-type
-            The data type used for storing the parsed data.
-
-        Returns
-        -------
-        output : ImageData or AcquisitionData
-            The parsed raw data. Exact type depends on file content.
-        """
-
+        '''
+        Parse NEXUS file and returns either ImageData or Acquisition Data 
+        depending on file content
+        '''
         if self._geometry is None:
             self.get_geometry()
 
@@ -294,15 +253,9 @@ class NEXUSDataReader(object):
         return output
         
     def read_as_original(self):
-        """
-        Returns the compressed data from the file.
-
-        Returns
-        -------
-        output : ImageData or AcquisitionData
-            The raw, compressed data. Exact type depends on file content.
-        """
-        
+        '''
+        Returns either an ImageData or AcquisitionData containing the compressed data
+        '''
         with h5py.File(self.file_name,'r') as dfile:
             ds_data = dfile['entry1/tomo_entry/data/data']
             dtype = ds_data.dtype
@@ -311,15 +264,9 @@ class NEXUSDataReader(object):
 
 
     def read(self):
-        """
-        Returns the uncompressed data as numpy.float32.
-
-        Returns
-        -------
-        output : ImageData or AcquisitionData
-            The uncompressed data. Exact type depends on file content.
-        """
-        
+        '''
+        Returns either an ImageData or Acquisition Data containing the uncompressed data as numpy.float32
+        '''
         output = self.__read_as(np.float32)
         scale = self.get_data_scale()
         offset = self.get_data_offset()
@@ -333,16 +280,8 @@ class NEXUSDataReader(object):
     
           
     def load_data(self):
-        """
-        Alias of `read`.
-
-        See Also
-        --------
-        read
-        """
-        
+        '''alias of read'''
         return self.read()
-
     def is_old_file_version(self):
         #return ds_data.attrs.__contains__('geom_type')
         with h5py.File(self.file_name,'r') as dfile:

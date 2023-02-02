@@ -1,13 +1,20 @@
 * Next
+  - added yml file to create test environment
+  - LeastSquares fixed docstring and unified gradient code when out is passed or not.
+  - Add compression to 8bit and 16bit to TIFFWriter
   - Added convenience centre of rotation methods to `AcquisitionGeometry` class.
     - `get_centre_of_rotation()` calculates the centre of rotation of the system
     - `set_centre_of_rotation()` sets the system centre of rotation with an offset and angle
     - `set_centre_of_rotation_by_slice()` sets the system centre of rotation with offsets from two slices
+  - Binner processor reworked:
+    - Significant speed increase available via the C++ backend
+    - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
+  - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
   - ROI selection, aspect ratio toggle and Play widget added to islicer
 
 * 22.1.0

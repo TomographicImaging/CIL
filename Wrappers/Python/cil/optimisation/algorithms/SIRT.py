@@ -74,7 +74,7 @@ class SIRT(Algorithm):
 
     .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
 
-    In case of division errors above, :meth:`._fix_weights` can be used, where :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values
+    In case of division errors above, :meth:`.fix_weights` can be used, where :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values
     are replaced with 1.0.
 
 

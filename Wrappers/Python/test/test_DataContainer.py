@@ -463,6 +463,32 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
 
 
+    def test_ImageData_apply_circular_mask(self):
+        ig = ImageGeometry(voxel_num_x=6, voxel_num_y=3, voxel_size_x=0.5, voxel_size_y = 1)
+        data_orig = ig.allocate(1)
+
+        data_masked1 = data_orig.copy()
+        data_masked1.apply_circular_mask(0.8)
+
+        self.assertEqual(data_orig.geometry, data_masked1.geometry)
+        self.assertEqual(numpy.count_nonzero(data_masked1.array), 14)
+
+        data_masked1 = data_orig.copy()
+        data_masked1.apply_circular_mask(0.5)
+
+        self.assertEqual(data_orig.geometry, data_masked1.geometry)
+        self.assertEqual(numpy.count_nonzero(data_masked1.array), 8)
+
+        data2 = data_orig.copy()
+        data_masked2 = data2.apply_circular_mask(0.5, False)
+
+        numpy.testing.assert_allclose(data_orig.array, data2.array)
+        self.assertEqual(numpy.count_nonzero(data_masked2.array), 8)
+
+
+
+
+
     def test_AcquisitionData(self):
         sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
 

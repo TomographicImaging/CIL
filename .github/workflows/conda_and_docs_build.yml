@@ -12,7 +12,7 @@ on:
 
 jobs:
   conda_build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:
@@ -31,7 +31,7 @@ jobs:
         path: recipe/linux-64/cil*
   docs_build:
     needs: conda_build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:

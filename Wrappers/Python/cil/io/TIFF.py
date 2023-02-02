@@ -129,6 +129,7 @@ class TIFFWriter(object):
 
     
     def write(self):
+        '''Write data to disk'''
         if not os.path.isdir(self.dir_name):
             os.mkdir(self.dir_name)
 
@@ -593,22 +594,3 @@ class TIFFStackReader(object):
         data -= offset
         data /= scale
         return data
-
-'''
-import matplotlib.pyplot as plt
-from cil.io import TIFFStackReader
-
-path = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/'
-
-reader = TIFFStackReader()
-reader.set_up(path = path,
-              n_images = 100,
-              binning = {'axis_0': 5, 'axis_1': 6},
-              roi = {'axis_0': (100,900), 'axis_1': (200,700)},
-              skip = 100)
-
-data = reader.load_images()
-
-plt.imshow(data[1, :, :])
-plt.show()
-'''

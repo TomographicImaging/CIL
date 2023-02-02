@@ -28,6 +28,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from itertools import cycle
+
+CB_PALETTE = ['#377eb8', '#ff7f00', '#4daf4a',
+                        '#f781bf', '#a65628', '#984ea3',
+                        '#999999', '#e41a1c', '#dede00']
 
 class _PlotData(object):
     def __init__(self, data, title, axis_labels, origin):
@@ -162,12 +167,12 @@ class show1D(show_base):
     """
 
     def __init__(self, data, line_coords=None, label=None, title=None,
-                 color=None, axis_labels=('Pixel', 'Pixel value'), num_cols=3,
+                 color=None, ls=None, axis_labels=('Pixel', 'Pixel value'),
                  size=(8,6), force=True):
 
-        self.figure = self._show1d(data, line_coords, labels=label, titles=title,
-                                   colors=color, axis_labels=axis_labels,
-                                   num_cols=num_cols, plot_size=size, force=force)
+        self.figure = self._show1d(data, line_coords, labels=label, title=title,
+                                   colors=color, ls=ls, axis_labels=axis_labels,
+                                   plot_size=size, force=force)
 
     def _extract_vector(self, data, coords, force=True):
         """
@@ -239,7 +244,7 @@ class show1D(show_base):
         return vector
 
     def _line_plot(self, ax, data, line_coords=None, label=None,
-                   title=None, color=None,
+                   title=None, color=None, ls=None,
                    axis_labels=('Pixel', 'Pixel value'), force=True):
         """
         Creates 1D plots pixel flux from multi-dimensional data and slicing information.
@@ -281,6 +286,8 @@ class show1D(show_base):
 
             if color is None:
                 color = [None for _ in data]
+            if ls is None:
+                ls = [None for _ in data]
             if label is None:
                 label = [None for _ in data]
         else:
@@ -299,24 +306,18 @@ class show1D(show_base):
         if multi:
             for i, el in enumerate(data):
                 ax.plot(self._extract_vector(el, dims, force),
-                        color=color[i], label=label[i])
+                        color=color[i], ls=ls[i], label=label[i])
         else:
             ax.plot(self._extract_vector(data, dims, force),
-                    color=color, label=label)
+                    color=color, ls=ls, label=label)
 
         ax.set_title(title)
         ax.set_xlabel(axis_labels[0]) # TODO determine axis labels from dimensions
         ax.set_ylabel(axis_labels[1])
 
-        valid_labels = 0
-        if isinstance(label, list):
-            valid_labels = len([l for l in label if l is not None])
 
-        if valid_labels: ax.legend()
-
-
-    def _show1d(self, data, line_coords=None, labels=None, titles=None, colors=None,
-                axis_labels=('Pixel', 'Pixel value'), num_cols=3, plot_size=(8,6),
+    def _show1d(self, data, line_coords=None, labels=None, title=None, colors=None, ls=None,
+                axis_labels=('Pixel', 'Pixel value'), plot_size=(8,6),
                 force=True):
         """
         Displays 1D plots of pixel flux from multi-dimensional data and
@@ -353,37 +354,56 @@ class show1D(show_base):
             The figure created to plot the 1D data
         """
 
-        multi = False
+        fig = plt.figure(figsize=plot_size)
+        ax = fig.add_subplot(1, 1, 1)
+
+        num_data = 1 if isinstance(data, DataContainer) else len(data)
+        color_cyc = cycle(CB_PALETTE)
+        ls_cyc = cycle(["-","--","-.",":"])
+        _lbls = labels
         if line_coords is None or isinstance(line_coords[0], tuple):
-            # num_plots = 1
-            fig = plt.figure(figsize=plot_size)
+
+            if labels is None and num_data > 1:
+                _lbls = [None]*num_data
+            elif labels == 'default' and num_data > 1:
+                _lbls = [f'Dataset {i}' for i in range(num_data)]
+            elif labels == 'default' and num_data == 1:
+                _lbls = 'Dataset 0'
+
+            _cl = [next(color_cyc) for _ in range(num_data)] if colors is None else colors
+            _ls = [next(ls_cyc) for _ in range(num_data)] if ls is None else ls
+
+            if len(_cl) == 1: _cl = _cl[0]
+            if len(_ls) == 1: _ls = _ls[0]
+            self._line_plot(ax, data, line_coords, label=_lbls, title=title,
+                            color=colors, ls=_ls, axis_labels=axis_labels, force=force)
+
         elif isinstance(line_coords[0], list):
-            multi = True
-            num_plots = len(line_coords)
-            if num_plots < num_cols:
-                num_cols = num_plots
-            num_rows = round(num_plots / num_cols + 0.5)
-            fig = plt.figure(
-                figsize=((num_cols)*plot_size[0], (num_rows)*plot_size[1]))
+            if labels == 'default' or labels is None:
+                _lbls =  [None]*(len(line_coords)*num_data)
 
-            if labels is None:
-                labels = [None]*num_plots
-            if titles is None:
-                titles = [None]*num_plots
-            if colors is None:
-                colors = [None]*num_plots
+            if num_data == 1:
+                for i, sl in enumerate(line_coords):
+                    _cl = next(color_cyc) if colors is None else colors[i]
+                    _ls = next(ls_cyc) if ls is None else ls[i]
+                    if labels == 'default':
+                        _lbls[i] = ', '.join(f'{c[0]}={c[1]}' for c in sl)
+                    self._line_plot(ax, data, sl, label=_lbls[i], title=title,
+                                   color=_cl, ls=_ls, axis_labels=axis_labels,
+                                   force=force)
+            else:
+                for i, sl in enumerate(line_coords):
+                    _cl = next(color_cyc) if colors is None else colors[i]
+                    _ls = next(ls_cyc) if ls is None else ls[i]
+                    if labels == 'default':
+                        _lbls[i] = f'Dataset {i}, ' + ', '.join(f'{c[0]}={c[1]}' for c in sl)
 
-        if multi:
-            for i, sl in enumerate(line_coords):
-                ax = fig.add_subplot(num_rows, num_cols, i+1)
-                self._line_plot(ax, data, sl, label=labels[i], title=titles[i],
-                                color=colors[i], axis_labels=axis_labels,
-                                force=force)
-        else:
-            ax = fig.add_subplot(1, 1, 1)
-            self._line_plot(ax, data, line_coords, label=labels, title=titles,
-                            color=colors, axis_labels=axis_labels, force=force)
+                    self._line_plot(ax, data[i], sl, label=_lbls[i], title=title,
+                                    color=_cl, ls=_ls, axis_labels=axis_labels,
+                                    force=force)
 
+        if labels is not None:
+            fig.legend(loc='upper left', bbox_to_anchor=(1., 0., 1., 1.))
         plt.tight_layout()
         fig2 = plt.gcf()
         return fig2

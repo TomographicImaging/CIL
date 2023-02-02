@@ -49,7 +49,6 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
     else:
         d = data
         
-    # Data is always written in ‘C’ order, independent of the order of d.
     logging.info("Data is always written in ‘C’ order, independent of the order of d.")
     d.tofile(fname)
 
@@ -72,7 +71,7 @@ class RAWFileWriter(object):
             file_name = /path/to/file/filename.raw
             data_type = <u2
             shape = (6, 5, 4)
-            isfortran = False
+            is_fortran = False
 
             [COMPRESSION]
             scale = 550.7142857142857
@@ -93,11 +92,13 @@ class RAWFileWriter(object):
 
 
 
-        Example of using the writer with compression to `uint8`:
+        
 
         Example
         -------
         
+        Example of using the writer with compression to `uint8`:
+
         >>> from cil.io import RAWFileWriter
         >>> writer = RAWFileWriter(data=data, file_name=fname, compression='uint8')
         >>> writer.write()
@@ -111,6 +112,7 @@ class RAWFileWriter(object):
         >>> inifname = "file_name.ini"
         >>> config.read(inifname)
         >>> read_dtype = config['MINIMAL INFO']['data_type']
+        >>> fname = config['MINIMAL INFO']['file_name']
         >>> read_array = np.fromfile(fname, dtype=read_dtype)
         >>> read_shape = eval(config['MINIMAL INFO']['shape'])
         >>> scale = float(config['COMPRESSION']['scale'])
@@ -120,7 +122,7 @@ class RAWFileWriter(object):
         ----
 
           If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved 
-          in a file called ``scaleoffset.json`` in the same directory as the TIFF file(s).
+          in the ``ini`` file in the same directory as the raw file, in the "COMPRESSION" section .
 
           The original data can be obtained by: ``original_data = (compressed_data - offset) / scale``
 
@@ -156,6 +158,7 @@ class RAWFileWriter(object):
         self.compression        = compression
     
     def write(self):
+        '''Write data to disk'''
         if not os.path.isdir(self.dir_name):
             os.mkdir(self.dir_name)
         
@@ -176,7 +179,7 @@ class RAWFileWriter(object):
             'data_type': read_dtype,
             'shape': shape,
             # Data is always written in ‘C’ order, independent of the order of d. 
-            'isFortran': fortran_order
+            'is_fortran': fortran_order
         }
         
         if self.compress:

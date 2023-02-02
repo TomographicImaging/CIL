@@ -30,21 +30,23 @@ class LeastSquares(Function):
     
     .. math:: F(x) = c\|Ax-b\|_2^2 
     
-    or
+    or if weighted
     
     .. math:: F(x) = c\|Ax-b\|_{2,W}^{2}
     
     Parameters:
+    -----------
         
-        A : Operator
+        A : LinearOperator
+
+        b : Data, DataContainer
         
-        c : Scaling Constant
+        c : Scaling Constant, float, default 1.0
+               
+        weight: DataContainer with all positive elements of size of the range of operator A, default None
         
-        b : Data
-        
-        weight: 1.0 (Default) or DataContainer
-        
-    Members:        
+    Members:  
+    --------      
             
         L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c s1(A)^2`, or
         
@@ -58,8 +60,8 @@ class LeastSquares(Function):
     def __init__(self, A, b, c=1.0, weight = None):
         super(LeastSquares, self).__init__()
     
-        self.A = A  # Should be an operator, default identity
-        self.b = b  # Default zero DataSet?
+        self.A = A  # Should be a LinearOperator
+        self.b = b  
         self.c = c  # Default 1.
         
         # weight
@@ -95,20 +97,22 @@ class LeastSquares(Function):
              .. math:: F'(x) = 2cA^T(weight(Ax-b))
 
         """
-        
+        should_return = True
         if out is not None:
-            tmp = self.A.direct(x)
-            tmp.subtract(self.b , out=tmp)
-            if self.weight is not None:
-                tmp.multiply(self.weight, out=tmp)
-            self.A.adjoint(tmp, out = out)
-            out.multiply(self.c * 2.0, out=out)
+            should_return = False
         else:
-            if self.weight is None:
-                return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
-            else:
-                return (2.0*self.c)*self.A.adjoint(self.weight * (self.A.direct(x) - self.b))
+            out = x * 0.0
+
+        tmp = self.A.direct(x)
+        tmp.subtract(self.b , out=tmp)
+        if self.weight is not None:
+            tmp.multiply(self.weight, out=tmp)
+        self.A.adjoint(tmp, out = out)
+        out.multiply(self.c * 2.0, out=out)
         
+        if should_return:
+            return out
+
     @property
     def L(self):
         if self._L is None:

@@ -3070,70 +3070,61 @@ Y : gm_range ( Default: Y = X )</p>
 </div>
 <div class="section" id="gradientoperator">
 <h3>GradientOperator<a class="headerlink" href="#gradientoperator" title="Permalink to this headline">#</a></h3>
-<p>In the following the required classes for the implementation of the <code class="code docutils literal notranslate"><span class="pre">GradientOperator</span></code> operator.</p>
 <dl class="py class">
 <dt id="cil.optimisation.operators.GradientOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">GradientOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'forward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/GradientOperator.html#GradientOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.GradientOperator" title="Permalink to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>Gradient Operator: Computes first-order forward/backward differences on</dt><dd><p>2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions</p>
-</dd>
-</dl>
-<dl class="field-list">
+<dd><p>Gradient Operator: Computes first-order forward/backward differences on
+2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gm_domain</strong> (<cite>ImageGeometry</cite>) – Set up the domain of the function</p></li>
-<li><p><strong>bnd_cond</strong> (<em>str</em><em>, </em><em>optional</em>) – Set the boundary conditions to use ‘Neumann’ or ‘Periodic’, defaults to ‘Neumann’</p></li>
-<li><p><strong>**kwargs</strong> – See below</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – Set up the domain of the function</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>default 'forward'</em>) – Accepts: ‘forward’, ‘backward’, ‘centered’, note C++ optimised routine only works with ‘forward’</p></li>
+<li><p><strong>bnd_cond</strong> (<em>str</em><em>, </em><em>default</em><em>,  </em><em>'Neumann'</em>) – Set the boundary conditions to use ‘Neumann’ or ‘Periodic’</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt>correlation: str, default ‘Space’</dt><dd><p>’Space’ will compute the gradient on only the spatial dimensions, ‘SpaceChannels’ will include the channel dimension direction</p>
+</dd>
+<dt>backend: str, default ‘c’</dt><dd><p>’c’ or ‘numpy’, defaults to ‘c’ if correlation is ‘SpaceChannels’ or channels = 1</p>
+</dd>
+<dt>num_threads: int</dt><dd><p>If backend is ‘c’ specify the number of threads to use. Default is number of cpus/2</p>
+</dd>
+<dt>split: boolean</dt><dd><p>If ‘True’, and backend ‘c’ will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns a BlockDataContainer containing images of the derivatives order given by <cite>dimension_labels</cite>i.e. [‘horizontal_y’,’horizontal_x’] will return [d(‘horizontal_y’), d(‘horizontal_x’)]</p>
+<dd class="field-even"><p>a BlockDataContainer containing images of the derivatives order given by <cite>dimension_labels</cite>
+i.e. [‘horizontal_y’,’horizontal_x’] will return [d(‘horizontal_y’), d(‘horizontal_x’)]</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer">BlockDataContainer</a></p>
 </dd>
-<dt class="field-even">Keyword Arguments</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><em>correlation</em> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) –
-‘Space’ or ‘SpaceChannels’, defaults to ‘Space’</p></li>
-<li><p><em>backend</em> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) –
-‘c’ or ‘numpy’, defaults to ‘c’ if correlation is ‘SpaceChannels’ or channels = 1</p></li>
-<li><p><em>num_threads</em> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) –
-If backend is ‘c’ specify the number of threads to use. Default is number of cpus/2</p></li>
-<li><p><em>split</em> (<code class="docutils literal notranslate"><span class="pre">boolean</span></code>) –
-If ‘True’, and backend ‘C’ will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]</p></li>
-</ul>
-<p>Example (2D):
-.. math:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>\<span class="n">nabla</span> <span class="p">:</span> <span class="n">X</span> <span class="o">-&gt;</span> <span class="n">Y</span> \\
-<span class="n">u</span>\<span class="ow">in</span> <span class="n">X</span><span class="p">,</span> \<span class="n">nabla</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">partial_</span><span class="p">{</span><span class="n">y</span><span class="p">}</span> <span class="n">u</span><span class="p">,</span> \<span class="n">partial_</span><span class="p">{</span><span class="n">x</span><span class="p">}</span> <span class="n">u</span><span class="p">]</span> \\
-<span class="n">u</span><span class="o">^</span><span class="p">{</span><span class="o">*</span><span class="p">}</span>\<span class="ow">in</span> <span class="n">Y</span><span class="p">,</span> \<span class="n">nabla</span><span class="o">^</span><span class="p">{</span><span class="o">*</span><span class="p">}(</span><span class="n">u</span><span class="o">^</span><span class="p">{</span><span class="o">*</span><span class="p">})</span> <span class="o">=</span> \<span class="n">partial_</span><span class="p">{</span><span class="n">y</span><span class="p">}</span> <span class="n">v1</span> <span class="o">+</span> \<span class="n">partial_</span><span class="p">{</span><span class="n">x</span><span class="p">}</span> <span class="n">v2</span>
-</pre></div>
-</div>
-</dd>
 </dl>
-<dl class="py method">
-<dt id="cil.optimisation.operators.GradientOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'forward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/GradientOperator.html#GradientOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.GradientOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Constructor method</p>
-</dd></dl>
-
-<dl class="py method">
+<p class="rubric">Example</p>
+<p>2D example</p>
+<div class="math notranslate nohighlight">
+ \begin{eqnarray}
+ \nabla : X \rightarrow Y\\
+ u \in X, \nabla(u) &amp;=&amp; [\partial_{y} u, \partial_{x} u]\\
+ u^{*} \in Y, \nabla^{*}(u^{*}) &amp;=&amp; \partial_{y} v1 + \partial_{x} v2
+ \end{eqnarray}</div><dl class="py method">
 <dt id="cil.optimisation.operators.GradientOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/GradientOperator.html#GradientOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.GradientOperator.direct" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the first-order forward differences</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<cite>ImageData</cite>) – Image data</p></li>
-<li><p><strong>out</strong> (<cite>BlockDataContainer</cite>, optional) – pre-allocated output memory to store result</p></li>
+<li><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – </p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – pre-allocated output memory to store result</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>result data if not passed as parameter</p>
+<dd class="field-even"><p>result data if <cite>out</cite> not specified</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>BlockDataContainer</cite></p>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer">BlockDataContainer</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3145,17 +3136,33 @@ If ‘True’, and backend ‘C’ will return a BlockDataContainer with grouped
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<cite>BlockDataContainer</cite>) – Gradient images for each dimension in ImageGeometry domain</p></li>
-<li><p><strong>out</strong> (<cite>ImageData</cite>, optional) – pre-allocated output memory to store result</p></li>
+<li><p><strong>x</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Gradient images for each dimension in ImageGeometry domain</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><em>optional</em>) – pre-allocated output memory to store result</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>result data if not passed as parameter</p>
+<dd class="field-even"><p>result data if <cite>out</cite> not specified</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>ImageData</cite></p>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.operators.GradientOperator.calculate_norm">
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/GradientOperator.html#GradientOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.GradientOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the analytical norm of the GradientOperator.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}(\partial_{z}, \partial_{y}, \partial_{x}) &amp;= \sqrt{\|\partial_{z}\|^{2} + \|\partial_{y}\|^{2} + \|\partial_{x}\|^{2} } \\
+&amp;=  \sqrt{ \frac{4}{h_{z}^{2}} + \frac{4}{h_{y}^{2}} + \frac{4}{h_{x}^{2}}}\end{split}\]</div>
+<p>Where the voxel sizes in each dimension are equal to 1 this simplifies to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>2D geometries <span class="math notranslate nohighlight">\(norm = \sqrt{8}\)</span></p></li>
+<li><p>3D geometries <span class="math notranslate nohighlight">\(norm = \sqrt{12}\)</span></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -3176,12 +3183,6 @@ under Neumann/Periodic boundary conditions</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="cil.optimisation.operators.FiniteDifferenceOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'forward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/FiniteDifferenceOperator.html#FiniteDifferenceOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.FiniteDifferenceOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.operators.FiniteDifferenceOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/FiniteDifferenceOperator.html#FiniteDifferenceOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.FiniteDifferenceOperator.direct" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the application of the Operator on x</p>
@@ -3200,12 +3201,6 @@ under Neumann/Periodic boundary conditions</p>
 <dt id="cil.optimisation.operators.SparseFiniteDifferenceOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">SparseFiniteDifferenceOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SparseFiniteDifferenceOperator.html#SparseFiniteDifferenceOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SparseFiniteDifferenceOperator" title="Permalink to this definition">#</a></dt>
 <dd><p>Create Sparse Matrices for the Finite Difference Operator</p>
-<dl class="py method">
-<dt id="cil.optimisation.operators.SparseFiniteDifferenceOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SparseFiniteDifferenceOperator.html#SparseFiniteDifferenceOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SparseFiniteDifferenceOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.operators.SparseFiniteDifferenceOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SparseFiniteDifferenceOperator.html#SparseFiniteDifferenceOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SparseFiniteDifferenceOperator.direct" title="Permalink to this definition">#</a></dt>
@@ -3226,21 +3221,6 @@ W : range of the Symmetrized Gradient</p>
     \partial_{y} v1 &amp; 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
     0.5 * (\partial_{x} v1 + \partial_{y} v2) &amp; \partial_{x} v2
 \end{matrix}\end{split}\end{aligned}\end{align} \]</div>
-<dl class="py method">
-<dt id="cil.optimisation.operators.SymmetrisedGradientOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SymmetrisedGradientOperator.html#SymmetrisedGradientOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SymmetrisedGradientOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
-<li><p><strong>bnd_cond</strong> (str, optional, default <code class="code docutils literal notranslate"><span class="pre">Neumann</span></code>) – boundary condition, either <code class="code docutils literal notranslate"><span class="pre">Neumann</span></code> or <code class="code docutils literal notranslate"><span class="pre">Periodic</span></code>.</p></li>
-<li><p><strong>correlation</strong> (str, optional, default <code class="code docutils literal notranslate"><span class="pre">Channel</span></code>) – <code class="code docutils literal notranslate"><span class="pre">SpaceChannel</span></code> or <code class="code docutils literal notranslate"><span class="pre">Channel</span></code></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.operators.SymmetrisedGradientOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SymmetrisedGradientOperator.html#SymmetrisedGradientOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SymmetrisedGradientOperator.direct" title="Permalink to this definition">#</a></dt>

@@ -587,6 +587,16 @@ class TestFunction(CCPiTestClass):
         with self.assertRaises(exception):
             ib(x)
 
+    def test_IndicatorBox_convex_conjugate(self):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask)
+
+        ib.convex_conjugate(im)
+        np.testing.assert_equal(im.maximum(0).sum(), ib.convex_conjugate(im))
+
     def tests_for_L2NormSq_and_weighted(self):
         numpy.random.seed(1)
         M, N, K = 2,3,1

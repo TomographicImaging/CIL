@@ -74,7 +74,7 @@ class IndicatorBox(Function):
     
     def convex_conjugate(self,x):
         '''Convex conjugate of IndicatorBox at x'''
-        return x.maximum(0).sum()
+        return _convex_conjugate(x.as_array())
          
     def proximal(self, x, tau, out=None):
         
@@ -216,3 +216,12 @@ def _proximal_fa(x, lower, upper, out):
 
         if out.flat[i] > upper.flat[i]:
             out.flat[i] = upper.flat[i]
+
+@numba.jit(nopython=True)
+def _convex_conjugate(x):
+    '''Convex conjugate of IndicatorBox'''
+    acc = 0.
+    for i in range(x.size):
+        if x.flat[i] >= 0:
+            acc += x.flat[i]
+    return acc

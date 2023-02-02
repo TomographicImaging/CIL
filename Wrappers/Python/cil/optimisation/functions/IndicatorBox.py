@@ -56,10 +56,13 @@ class IndicatorBox(Function):
         
         '''Evaluates IndicatorBox at x'''
                 
-        
+        numba.set_num_threads(4)
+        breaking = np.zeros(numba.get_num_threads(), dtype=np.int8)
+                
         if isinstance(self.lower, np.ndarray):
             if isinstance(self.upper, np.ndarray):
-                return _array_within_limits_aa(x.as_array(), self.lower, self.upper)
+                _array_within_limits_aa(x.as_array(), self.lower, self.upper, breaking)
+                return np.inf if breaking.sum() > 0 else 0
             else:
                 return _array_within_limits_af(x.as_array(), self.lower, self.upper)
         else:
@@ -135,7 +138,7 @@ def _get_as_nparray_or_number(x):
         # or a number as described in the docstring
         return x
 
-@numba.jit(nopython=True)
+@numba.jit(nopython=True, parallel=True)
 def _array_within_limits_ff(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     go_ahead = True
@@ -145,7 +148,7 @@ def _array_within_limits_ff(x, lower, upper):
             break
     return 0 if go_ahead else np.inf
 
-@numba.jit(nopython=True)
+@numba.jit(nopython=True, parallel=True)
 def _array_within_limits_af(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != lower.size:
@@ -157,19 +160,19 @@ def _array_within_limits_af(x, lower, upper):
             break
     return 0 if go_ahead else np.inf
 
-@numba.jit(nopython=True)
-def _array_within_limits_aa(x, lower, upper):
+@numba.jit(parallel=True, nopython=True)
+def _array_within_limits_aa(x, lower, upper, breaking):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != lower.size or x.size != upper.size:
         raise ValueError('x, lower and upper must have the same size')
-    go_ahead = True
+    
     for i in numba.prange(x.size):
-        if go_ahead and (x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]):
-            go_ahead = False
-            break
-    return 0 if go_ahead else np.inf
+        j = numba.np.ufunc.parallel._get_thread_id()
+        
+        if breaking[j] == 1 and (x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]):
+            breaking[j] = 1
 
-@numba.jit(nopython=True)
+@numba.jit(nopython=True, parallel=True)
 def _array_within_limits_fa(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != upper.size:
@@ -181,7 +184,7 @@ def _array_within_limits_fa(x, lower, upper):
             break
     return 0 if go_ahead else np.inf
 ##########################################################################
-@numba.jit(nopython=True)
+@numba.jit(nopython=True, parallel=True)
 def _proximal_aa(x, lower, upper, out):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
     if x.size != lower.size or x.size != upper.size:
@@ -195,7 +198,7 @@ def _proximal_aa(x, lower, upper, out):
         if out.flat[i] > upper.flat[i]:
             out.flat[i] = upper.flat[i]
             
-@numba.jit(nopython=True)
+@numba.jit(nopython=True, parallel=True)
 def _proximal_af(x, lower, upper, out):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
     if x.size != lower.size :
@@ -210,7 +213,7 @@ def _proximal_af(x, lower, upper, out):
             out.flat[i] = upper
 
 
-@numba.jit(nopython=True)
+@numba.jit(nopython=True, parallel=True)
 def _proximal_fa(x, lower, upper, out):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
     if x.size != upper.size:

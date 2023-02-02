@@ -1,5 +1,6 @@
 * Next
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
+  - Implemented IndicatorBox in numba
   - added yml file to create test environment
   - LeastSquares fixed docstring and unified gradient code when out is passed or not.
   - Add compression to 8bit and 16bit to TIFFWriter

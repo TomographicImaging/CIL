@@ -138,41 +138,48 @@ def _get_as_nparray_or_number(x):
 @numba.jit(nopython=True)
 def _array_within_limits_ff(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
+    go_ahead = True
+    for i in numba.prange(x.size):
+        if go_ahead and (x.flat[i] < lower or x.flat[i] > upper):
+            go_ahead = False
+            break
+    return 0 if go_ahead else np.inf
 
-    for i in range(x.size):
-        if x.flat[i] < lower or x.flat[i] > upper:
-            return np.inf
-    return 0
 @numba.jit(nopython=True)
 def _array_within_limits_af(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != lower.size:
         raise ValueError('x and lower must have the same size')
-    for i in range(x.size):
-        if x.flat[i] < lower.flat[i] or x.flat[i] > upper:
-            return np.inf
-    return 0
+    go_ahead = True
+    for i in numba.prange(x.size):
+        if go_ahead and (x.flat[i] < lower.flat[i] or x.flat[i] > upper):
+            go_ahead = False
+            break
+    return 0 if go_ahead else np.inf
 
 @numba.jit(nopython=True)
 def _array_within_limits_aa(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != lower.size or x.size != upper.size:
         raise ValueError('x, lower and upper must have the same size')
-    for i in range(x.size):
-        if x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]:
-            return np.inf
-    return 0
+    go_ahead = True
+    for i in numba.prange(x.size):
+        if go_ahead and (x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]):
+            go_ahead = False
+            break
+    return 0 if go_ahead else np.inf
 
 @numba.jit(nopython=True)
 def _array_within_limits_fa(x, lower, upper):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != upper.size:
         raise ValueError('x and upper must have the same size')
-    for i in range(x.size):
-        if x.flat[i] < lower or x.flat[i] > upper.flat[i]:
-            return np.inf
-    return 0
-
+    go_ahead = True
+    for i in numba.prange(x.size):
+        if go_ahead and (x.flat[i] < lower or x.flat[i] > upper.flat[i]):
+            go_ahead = False
+            break
+    return 0 if go_ahead else np.inf
 ##########################################################################
 @numba.jit(nopython=True)
 def _proximal_aa(x, lower, upper, out):

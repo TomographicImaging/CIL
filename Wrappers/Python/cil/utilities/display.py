@@ -243,9 +243,8 @@ class show1D(show_base):
 
         return vector
 
-    def _line_plot(self, ax, data, line_coords=None, label=None,
-                   title=None, color=None, ls=None,
-                   axis_labels=('Pixel', 'Pixel value'), force=True):
+    def _plot_slice(self, ax, data, line_coords=None,
+                   label=None, color=None, ls=None, force=True):
         """
         Creates 1D plots pixel flux from multi-dimensional data and slicing information.
 
@@ -253,46 +252,24 @@ class show1D(show_base):
         ----------
         ax : matplotlib.axes.Axes
             The axis to draw on
-        data : DataContainer, list of DataContainer or tuple of DataContainer
+        data : DataContainer
             The data to be sliced and plotted
         line_coords : list of tuples, optional
             (dimension, coordinate) pairs for slicing `data` (default is
             None, which is only valid when 1D data is passed)
-        label : str, list of str, default=None
-            Label(s) to use in the plot's legend
-        title : str, default=None
-            A title for the plot
-        color : str, list of str, default=None
-            Color(s) for each line plot
-        axis_labels : tuple of str, list of str, default=('Pixel','Pixel
-        value')
-            Axis labels in the form (x_axis_label,y_axis_label)
+        label : str, default=None
+            Label to use in the plot's legend
+        color : str, default=None
+            Color of the line plot
+        ls : {"-","--","-.",":"}, default=None
+            Linestyle to pass to `matplotlib.axes.Axes.plot`
         force : bool, default=True
             Passed to `get_slice`
         """
 
-        multi = False
         is_1d = False
-        if issubclass(data.__class__, (list, tuple)): # TODO: support BlockDataContainers
-            multi = True
-
-            dimensions = len(data[0].shape)
-            if len(data[0].shape) == 1:
-                is_1d = True
-
-            for ds in data:
-                if len(ds.shape) != dimensions:
-                    raise ValueError('Datasets have inconsistent dimensions')
-
-            if color is None:
-                color = [None for _ in data]
-            if ls is None:
-                ls = [None for _ in data]
-            if label is None:
-                label = [None for _ in data]
-        else:
-            if len(data.shape) == 1:
-                is_1d = True
+        if len(data.shape) == 1:
+            is_1d = True
 
         dims = {}
         if not is_1d:
@@ -303,21 +280,12 @@ class show1D(show_base):
                 raise TypeError(f'Expected list of tuples for slicing, ' \
                                 f'received {type(line_coords)}')
 
-        if multi:
-            for i, el in enumerate(data):
-                ax.plot(self._extract_vector(el, dims, force),
-                        color=color[i], ls=ls[i], label=label[i])
-        else:
-            ax.plot(self._extract_vector(data, dims, force),
-                    color=color, ls=ls, label=label)
-
-        ax.set_title(title)
-        ax.set_xlabel(axis_labels[0]) # TODO determine axis labels from dimensions
-        ax.set_ylabel(axis_labels[1])
+        ax.plot(self._extract_vector(data, dims, force),
+                color=color, ls=ls, label=label)
 
 
-    def _show1d(self, data, line_coords=None, labels=None, title=None, colors=None, ls=None,
-                axis_labels=('Pixel', 'Pixel value'), plot_size=(8,6),
+    def _show1d(self, data, line_coords=None, labels=None, title=None, colors=None,
+                ls=None, axis_labels=('Pixel', 'Pixel value'), plot_size=(8,6),
                 force=True):
         """
         Displays 1D plots of pixel flux from multi-dimensional data and
@@ -338,6 +306,8 @@ class show1D(show_base):
             A title for the plot
         colors : str, list of str, default=None
             Color(s) for each line plot
+        ls : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
+            Linestyle(s) for each line plot
         axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
             Axis labels in the form (x_axis_label,y_axis_label)
         num_cols : int, default=3
@@ -363,22 +333,21 @@ class show1D(show_base):
         _lbls = labels
         if line_coords is None or isinstance(line_coords[0], tuple):
 
-            if labels is None and num_data > 1:
-                _lbls = [None]*num_data
-            elif labels == 'default' and num_data > 1:
-                _lbls = [f'Dataset {i}' for i in range(num_data)]
-            elif labels == 'default' and num_data == 1:
-                _lbls = 'Dataset 0'
-
-            _cl = [next(color_cyc) for _ in range(num_data)] if colors is None else colors
-            _ls = [next(ls_cyc) for _ in range(num_data)] if ls is None else ls
-
-            if len(_cl) == 1: _cl = _cl[0]
-            if len(_ls) == 1: _ls = _ls[0]
-            self._line_plot(ax, data, line_coords, label=_lbls, title=title,
-                            color=colors, ls=_ls, axis_labels=axis_labels, force=force)
+            for i in range(num_data):
+                _data = data if isinstance(data, DataContainer) else data[i]
+                _cl = next(color_cyc) if colors is None else colors[i]
+                _ls = next(ls_cyc) if ls is None else ls[i]
+                if labels is None:
+                    _lbl = None
+                elif labels == 'default':
+                    _lbl = f'Dataset {i}'
+                else:
+                    _lbl = labels[i]
+                self._plot_slice(ax, _data, line_coords, label=_lbl,
+                                color=_cl, ls=_ls, force=force)
 
         elif isinstance(line_coords[0], list):
+
             if labels == 'default' or labels is None:
                 _lbls =  [None]*(len(line_coords)*num_data)
 
@@ -388,20 +357,21 @@ class show1D(show_base):
                     _ls = next(ls_cyc) if ls is None else ls[i]
                     if labels == 'default':
                         _lbls[i] = ', '.join(f'{c[0]}={c[1]}' for c in sl)
-                    self._line_plot(ax, data, sl, label=_lbls[i], title=title,
-                                   color=_cl, ls=_ls, axis_labels=axis_labels,
-                                   force=force)
+                    self._plot_slice(ax, data, sl, label=_lbls[i], color=_cl,
+                                     ls=_ls, force=force)
             else:
                 for i, sl in enumerate(line_coords):
                     _cl = next(color_cyc) if colors is None else colors[i]
                     _ls = next(ls_cyc) if ls is None else ls[i]
                     if labels == 'default':
-                        _lbls[i] = f'Dataset {i}, ' + ', '.join(f'{c[0]}={c[1]}' for c in sl)
+                        _lbls[i] = f'Dataset {i}, ' + \
+                                   ', '.join(f'{c[0]}={c[1]}' for c in sl)
+                    self._plot_slice(ax, data[i], sl, label=_lbls[i], color=_cl,
+                                     ls=_ls, force=force)
 
-                    self._line_plot(ax, data[i], sl, label=_lbls[i], title=title,
-                                    color=_cl, ls=_ls, axis_labels=axis_labels,
-                                    force=force)
-
+        ax.set_title(title)
+        ax.set_xlabel(axis_labels[0])
+        ax.set_ylabel(axis_labels[1])
         if labels is not None:
             fig.legend(loc='upper left', bbox_to_anchor=(1., 0., 1., 1.))
         plt.tight_layout()

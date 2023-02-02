@@ -18,6 +18,7 @@
 from cil.optimisation.functions import Function
 import numpy as np
 import numba
+from cil.utilities.multiprocessing import NUM_THREADS
 
 
 class IndicatorBox(Function):
@@ -55,21 +56,31 @@ class IndicatorBox(Function):
     def __call__(self,x):
         
         '''Evaluates IndicatorBox at x'''
-                
-        numba.set_num_threads(4)
-        breaking = np.zeros(numba.get_num_threads(), dtype=np.int8)
+        
+        num_threads = numba.get_num_threads()
+        numba.set_num_threads(NUM_THREADS)
+        breaking = np.zeros(numba.get_num_threads(), dtype=np.uint8)
                 
         if isinstance(self.lower, np.ndarray):
             if isinstance(self.upper, np.ndarray):
+
                 _array_within_limits_aa(x.as_array(), self.lower, self.upper, breaking)
-                return np.inf if breaking.sum() > 0 else 0
+
             else:
-                return _array_within_limits_af(x.as_array(), self.lower, self.upper)
+
+                _array_within_limits_af(x.as_array(), self.lower, self.upper, breaking)
+
         else:
             if isinstance(self.upper, np.ndarray):
-                return _array_within_limits_fa(x.as_array(), self.lower, self.upper)
+
+                _array_within_limits_fa(x.as_array(), self.lower, self.upper, breaking)
+
             else:
-                return _array_within_limits_ff(x.as_array(), self.lower, self.upper)
+
+                _array_within_limits_ff(x.as_array(), self.lower, self.upper, breaking)
+
+        numba.set_num_threads(num_threads)
+        return np.inf if breaking.sum() > 0 else 0
     
     def gradient(self,x):
         '''IndicatorBox is not differentiable, so calling gradient will raise a ValueError'''
@@ -139,26 +150,24 @@ def _get_as_nparray_or_number(x):
         return x
 
 @numba.jit(nopython=True, parallel=True)
-def _array_within_limits_ff(x, lower, upper):
+def _array_within_limits_ff(x, lower, upper, breaking):
     '''Returns 0 if all elements of x are within [lower, upper]'''
-    go_ahead = True
     for i in numba.prange(x.size):
-        if go_ahead and (x.flat[i] < lower or x.flat[i] > upper):
-            go_ahead = False
-            break
-    return 0 if go_ahead else np.inf
+        j = numba.np.ufunc.parallel._get_thread_id()
+        
+        if breaking[j] == 1 and (x.flat[i] < lower or x.flat[i] > upper):
+            breaking[j] = 1
 
 @numba.jit(nopython=True, parallel=True)
-def _array_within_limits_af(x, lower, upper):
+def _array_within_limits_af(x, lower, upper, breaking):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != lower.size:
         raise ValueError('x and lower must have the same size')
-    go_ahead = True
     for i in numba.prange(x.size):
-        if go_ahead and (x.flat[i] < lower.flat[i] or x.flat[i] > upper):
-            go_ahead = False
-            break
-    return 0 if go_ahead else np.inf
+        j = numba.np.ufunc.parallel._get_thread_id()
+        
+        if breaking[j] == 1 and (x.flat[i] < lower.flat[i] or x.flat[i] > upper):
+            breaking[j] = 1
 
 @numba.jit(parallel=True, nopython=True)
 def _array_within_limits_aa(x, lower, upper, breaking):
@@ -173,16 +182,15 @@ def _array_within_limits_aa(x, lower, upper, breaking):
             breaking[j] = 1
 
 @numba.jit(nopython=True, parallel=True)
-def _array_within_limits_fa(x, lower, upper):
+def _array_within_limits_fa(x, lower, upper, breaking):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     if x.size != upper.size:
         raise ValueError('x and upper must have the same size')
-    go_ahead = True
     for i in numba.prange(x.size):
-        if go_ahead and (x.flat[i] < lower or x.flat[i] > upper.flat[i]):
-            go_ahead = False
-            break
-    return 0 if go_ahead else np.inf
+        j = numba.np.ufunc.parallel._get_thread_id()
+        
+        if breaking[j] == 1 and (x.flat[i] < lower or x.flat[i] > upper.flat[i]):
+            breaking[j] = 1
 ##########################################################################
 @numba.jit(nopython=True, parallel=True)
 def _proximal_aa(x, lower, upper, out):
@@ -230,8 +238,9 @@ def _proximal_fa(x, lower, upper, out):
 @numba.jit(nopython=True)
 def _convex_conjugate(x):
     '''Convex conjugate of IndicatorBox'''
-    acc = 0.
-    for i in range(x.size):
+    acc = np.empty((numba.get_num_threads()), dtype=np.uint8)
+    for i in numba.prange(x.size):
+        j = numba.np.ufunc.parallel._get_thread_id()
         if x.flat[i] >= 0:
-            acc += x.flat[i]
-    return acc
+            acc[j] += x.flat[i]
+    return np.sum(acc)

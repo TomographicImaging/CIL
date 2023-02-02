@@ -18,7 +18,45 @@
 from cil.optimisation.functions import Function
 from cil.framework import AcquisitionData, ImageData, DataContainer
 import numpy as np
+import numba
 
+@numba.jit(nopython=True)
+def _array_within_limits_ff(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower or x.flat[i] > upper:
+            return np.inf
+    return 0
+@numba.jit(nopython=True)
+def _array_within_limits_af(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+    if x.size != lower.size:
+        raise ValueError('x and lower must have the same size')
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower.flat[i] or x.flat[i] > upper:
+            return np.inf
+    return 0
+
+@numba.jit(nopython=True)
+def _array_within_limits_aa(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+    if x.size != lower.size or x.size != upper.size:
+        raise ValueError('x, lower and upper must have the same size')
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]:
+            return np.inf
+    return 0
+
+@numba.jit(nopython=True)
+def _array_within_limits_fa(x, lower, upper):
+    '''Returns 0 if all elements of x are within [lower, upper]'''
+    if x.size != upper.size:
+        raise ValueError('x and upper must have the same size')
+    for i in numba.prange(x.size):
+        if x.flat[i] < lower or x.flat[i] > upper.flat[i]:
+            return np.inf
+    return 0
 
 class IndicatorBox(Function):
     
@@ -49,25 +87,24 @@ class IndicatorBox(Function):
         super(IndicatorBox, self).__init__()
         
         # We set lower and upper to either a float or a numpy array        
-        self.lower = lower
-        self.upper = upper
-        if isinstance(lower, (np.ndarray, DataContainer, AcquisitionData, ImageData)):
-            if not isinstance(lower, np.ndarray):
-                self.lower = lower.as_array()
-        if isinstance(upper, (np.ndarray, DataContainer, AcquisitionData, ImageData)):
-            if not isinstance(upper, np.ndarray):
-                self.upper = upper.as_array()
-
+        self.lower = _get_as_nparray_or_number(lower)
+        self.upper = _get_as_nparray_or_number(upper)
+        
     def __call__(self,x):
         
         '''Evaluates IndicatorBox at x'''
                 
-        if (np.all(x.as_array() >= self.lower) and 
-            np.all(x.as_array() <= self.upper) ):
-            val = 0
+        
+        if isinstance(self.lower, np.ndarray):
+            if isinstance(self.upper, np.ndarray):
+                return _array_within_limits_aa(x.as_array(), self.lower, self.upper)
+            else:
+                return _array_within_limits_af(x.as_array(), self.lower, self.upper)
         else:
-            val = np.inf
-        return val
+            if isinstance(self.upper, np.ndarray):
+                return _array_within_limits_fa(x.as_array(), self.lower, self.upper)
+            else:
+                return _array_within_limits_ff(x.as_array(), self.lower, self.upper)
     
     def gradient(self,x):
         '''IndicatorBox is not differentiable, so calling gradient will raise a ValueError'''
@@ -86,6 +123,7 @@ class IndicatorBox(Function):
         
         if out is None:
             out = x.maximum(self.lower)
+            # numpy clip 
             out.minimum(self.upper, out=out)
             return out
         else:               
@@ -107,10 +145,20 @@ class IndicatorBox(Function):
             out *= -1*tau
             # restore the values of x
             x*=tau
-            tmp += x
-            return tmp
+            out += x
+            return out
         
         else:
             self.proximal(x/tau, tau, out=out)
             out *= -1*tau
             out += x
+
+def _get_as_nparray_or_number(x):
+    '''Returns x as a numpy array or a number'''
+    try:
+        return x.as_array()
+    except AttributeError:
+        # we trust that it will be either a numpy ndarray or a number
+        # as described in the docstring
+        return x
+        

@@ -46,6 +46,7 @@ from testclass import CCPiTestClass
 from cil.utilities.quality_measures import mae
 
 from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
+import numba
 
 initialise_tests()
 
@@ -556,6 +557,28 @@ class TestFunction(CCPiTestClass):
             print("test3", val, res)
             im.fill(val)
             np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+
+    def test_IndicatorBox_input0(self):
+        exc = numba.core.errors.TypingError
+        self.input_IndicatorBox(lower='string', upper=[1,1], exception=exc)
+        self.input_IndicatorBox(lower=[0,0], upper=[1,1], exception=exc)
+        self.input_IndicatorBox(lower=[0,0], upper=1, exception=exc)
+        self.input_IndicatorBox(lower=[0,0], upper=VectorData(numpy.asarray([0.5,0.5])), exception=exc)
+        self.input_IndicatorBox(upper='string', lower=[1,1], exception=exc)
+        self.input_IndicatorBox(upper=[0,0], lower=[1,1], exception=exc)
+        self.input_IndicatorBox(upper=[0,0], lower=1, exception=exc)
+        self.input_IndicatorBox(upper=[0,0], lower=VectorData(numpy.asarray([0.5,0.5])), exception=exc)
+
+    def test_IndicatorBox_input1(self):
+        exc = ValueError
+        self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,])), lower=VectorData(numpy.asarray([0.5,])), exception=exc)
+        self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,0.5])), lower=VectorData(numpy.asarray([0.5,0.5,0.5])), exception=exc)
+        
+    def input_IndicatorBox(self, lower, upper, exception):
+        ib = IndicatorBox(lower=lower, upper=upper)
+        x = VectorData(numpy.asarray([0.5,0.5]))
+        with self.assertRaises(exception):
+            ib(x)
 
     def tests_for_L2NormSq_and_weighted(self):
         numpy.random.seed(1)

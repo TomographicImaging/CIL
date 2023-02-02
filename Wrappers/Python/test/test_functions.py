@@ -591,10 +591,13 @@ class TestFunction(CCPiTestClass):
         ig = ImageGeometry(10,10)
         mask = self.create_circular_mask(ig)
     
-        im = ig.allocate(2)
+        im = ig.allocate(-2) * mask
         ib = IndicatorBox(lower=-2*mask)
 
         ib.convex_conjugate(im)
+        np.testing.assert_equal(im.maximum(0).sum(), ib.convex_conjugate(im))
+
+        im = ig.allocate(2) * mask
         np.testing.assert_equal(im.maximum(0).sum(), ib.convex_conjugate(im))
 
     def tests_for_L2NormSq_and_weighted(self):

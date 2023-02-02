@@ -369,23 +369,24 @@ class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:
         self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
 
+        
         self.dset_path ='/entry1/tomo_entry/data/data'
 
-
-    def test_print_metadata(self):
+    def test_everything(self):
+    #def test_print_metadata(self):
         devnull = open(os.devnull, 'w') #suppress stdout
         with patch('sys.stdout', devnull):
             HDF5_utilities.print_metadata(self.path)    
 
 
-    def test_get_dataset_metadata(self):
+    #def test_get_dataset_metadata(self):
         dset_dict = HDF5_utilities.get_dataset_metadata(self.path, self.dset_path)
 
         dict_by_hand  ={'ndim': 3, 'shape': (91, 135, 160), 'size': 1965600, 'dtype': np.float32, 'nbytes': 7862400, 'compression': None, 'chunks': None, 'is_virtual': False}
         self.assertDictContainsSubset(dict_by_hand,dset_dict)
 
 
-    def test_read(self):
+    #def test_read(self):
 
         data_full = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
@@ -406,7 +407,7 @@ class Test_HDF5_utilities(unittest.TestCase):
         np.testing.assert_allclose(data_full.array[subset],data_read_dtype)
 
 
-    def test_read_to(self):
+    #def test_read_to(self):
         data_full = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
         # full dataset

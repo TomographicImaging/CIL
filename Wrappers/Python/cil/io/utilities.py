@@ -254,7 +254,7 @@ class HDF5_utilities(object):
             if source_sel == None:
                 source_sel = tuple([slice(None)]*dset.ndim)
 
-            arr = dset.astype(dtype)[source_sel]
+            arr = np.asarray(dset[source_sel],dtype=dtype, order='C')
 
         return arr 
 

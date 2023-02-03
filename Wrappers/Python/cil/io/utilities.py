@@ -197,22 +197,30 @@ class HDF5_utilities(object):
 
         Returns
         -------
-        A dictionary containing keys:
+        A dictionary containing keys, values are `None` if attribute can't be read.:
             ndim, shape, size, dtype, nbytes, compression, chunks, is_virtual
         """
         with h5py.File(filename, 'r') as f:
-                dset = f.get(dset_path)
+                dset = f.get(dset_path, )
 
-                return {
-                    'ndim':dset.ndim, 
-                    'shape':dset.shape,
-                    'size':dset.size,
-                    'dtype':np.dtype(dset.dtype),
-                    'nbytes':dset.nbytes, 
-                    'compression':dset.compression, 
-                    'chunks':dset.chunks, 
-                    'is_virtual':dset.is_virtual
-                    }
+                attribs = {
+                    'ndim':None, 
+                    'shape':None,
+                    'size':None,
+                    'dtype':None,
+                    'nbytes':None, 
+                    'compression':None, 
+                    'chunks':None, 
+                    'is_virtual':None}
+                
+                for x in attribs.keys():
+                    try:
+                        attribs[x] = getattr(dset, x)
+                    except AttributeError:
+                        pass
+
+                return attribs
+
 
 
     @staticmethod

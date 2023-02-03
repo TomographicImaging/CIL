@@ -1,19 +1,22 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+# Copyright 2022 United Kingdom Research and Innovation
+# Copyright 2022 The University of Manchester
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Author(s): 
+# Evangelos Papoutsellis (UKRI)
+# Edoardo Pasca (UKRI)
+# Gemma Fardell (UKRI)
 
-#   http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from cil.optimisation.functions import Function
 import numpy as np
@@ -52,8 +55,28 @@ class IndicatorBox(Function):
         # We set lower and upper to either a float or a numpy array        
         self.lower = _get_as_nparray_or_number(lower)
         self.upper = _get_as_nparray_or_number(upper)
-        
+
+        self._suppress_evaluation = False
+
+    @property
+    def suppress_evaluation(self):
+        return self._suppress_evaluation
+
+    def set_suppress_evaluation(self, value):
+        '''Suppresses the evaluation of the function'''
+        self._suppress_evaluation = value
+
     def __call__(self,x):
+        '''Evaluates IndicatorBox at x
+        
+        Evaluates the IndicatorBox at x. If suppress_evaluation is True, returns 0. 
+        This 
+        '''
+        if not self.suppress_evaluation:
+            return self.evaluate(x)    
+        return 0
+
+    def evaluate(self,x):
         
         '''Evaluates IndicatorBox at x'''
         
@@ -95,6 +118,11 @@ class IndicatorBox(Function):
         r'''Proximal operator of IndicatorBox at x
 
             .. math:: prox_{\tau * f}(x)
+
+            Note:
+            -----
+
+              ``tau`` is ignored but it is in the signature of the generic Function class
         '''
         should_return = False
         if out is None:
@@ -123,22 +151,30 @@ class IndicatorBox(Function):
           ..math:: prox_{\tau * f^{*}}(x)
         '''
 
+        # x - tau * self.proximal(x/tau, tau)
+        should_return = False
+        
         if out is None:
-            # x - tau * self.proximal(x/tau, tau):
-            # use x as temporary storage variable
-            x/=tau
             out = self.proximal(x, tau)
-            out *= -1*tau
-            # restore the values of x
-            x*=tau
-            out += x
+            should_return = True
+        else:
+            self.proximal(x, tau, out=out)
+        
+        # finish up calculation
+        # out *= -1*tau
+        # if tau != 1:
+        #     # restore the values of x
+        #     x*=tau
+        # out += x
+        outarr = out.as_array()
+        xarr = x.as_array()
+        _proximal_conjugate_final_calculation(x, outarr)
+        out.fill(outarr)
+        x.fill(xarr)
+
+        if should_return:
             return out
         
-        else:
-            self.proximal(x/tau, tau, out=out)
-            out *= -1*tau
-            out += x
-
 ## Utilities
 def _get_as_nparray_or_number(x):
     '''Returns x as a numpy array or a number'''
@@ -150,12 +186,25 @@ def _get_as_nparray_or_number(x):
         return x
 
 @numba.jit(nopython=True, parallel=True)
+def _proximal_conjugate_final_calculation(x, out):
+    '''
+    # finish up calculation, tau is ignored
+    out *= -1*tau
+    if tau != 1:
+        # restore the values of x
+        x*=tau
+    out += x
+    '''
+    for i in numba.prange(x.size):
+        out.flat[i] = -1 * out.flat[i] + x.flat[i]
+
+@numba.jit(nopython=True, parallel=True)
 def _array_within_limits_ff(x, lower, upper, breaking):
     '''Returns 0 if all elements of x are within [lower, upper]'''
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
         
-        if breaking[j] == 1 and (x.flat[i] < lower or x.flat[i] > upper):
+        if breaking[j] == 0 and (x.flat[i] < lower or x.flat[i] > upper):
             breaking[j] = 1
 
 @numba.jit(nopython=True, parallel=True)
@@ -166,7 +215,7 @@ def _array_within_limits_af(x, lower, upper, breaking):
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
         
-        if breaking[j] == 1 and (x.flat[i] < lower.flat[i] or x.flat[i] > upper):
+        if breaking[j] == 0 and (x.flat[i] < lower.flat[i] or x.flat[i] > upper):
             breaking[j] = 1
 
 @numba.jit(parallel=True, nopython=True)
@@ -178,7 +227,7 @@ def _array_within_limits_aa(x, lower, upper, breaking):
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
         
-        if breaking[j] == 1 and (x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]):
+        if breaking[j] == 0 and (x.flat[i] < lower.flat[i] or x.flat[i] > upper.flat[i]):
             breaking[j] = 1
 
 @numba.jit(nopython=True, parallel=True)
@@ -189,9 +238,11 @@ def _array_within_limits_fa(x, lower, upper, breaking):
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
         
-        if breaking[j] == 1 and (x.flat[i] < lower or x.flat[i] > upper.flat[i]):
+        if breaking[j] == 0 and (x.flat[i] < lower or x.flat[i] > upper.flat[i]):
             breaking[j] = 1
+
 ##########################################################################
+
 @numba.jit(nopython=True, parallel=True)
 def _proximal_aa(x, lower, upper, out):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
@@ -219,7 +270,6 @@ def _proximal_af(x, lower, upper, out):
 
         if out.flat[i] > upper:
             out.flat[i] = upper
-
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_fa(x, lower, upper, out):

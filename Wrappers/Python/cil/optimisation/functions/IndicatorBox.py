@@ -38,16 +38,16 @@ class IndicatorBox(Function):
     
     '''
     
-    def __init__(self,lower=-np.inf,upper=np.inf):
+    def __init__(self, lower=None, upper=None):
         '''creator
 
         Parameters
         ----------
         
-            lower : float, DataContainer or numpy array, default ``-np.inf``
-                Lower bound
-            upper : float, DataContainer or numpy array, default ``np.inf``
-                upper bound
+            lower : float, DataContainer or numpy array, default None
+                Lower bound. If set to None, it is equivalent to ``-np.inf``.
+            upper : float, DataContainer or numpy array, default None
+                Upper bound. If set to None, it is equivalent to ``np.inf``.
         
         If passed a ``DataContainer`` or ``numpy array``, the bounds can be set to different values for each element.
 
@@ -65,9 +65,11 @@ class IndicatorBox(Function):
         super(IndicatorBox, self).__init__()
         
         # We set lower and upper to either a float or a numpy array        
-        self.lower = _get_as_nparray_or_number(lower)
-        self.upper = _get_as_nparray_or_number(upper)
+        self.lower = -np.inf if lower is None else _get_as_nparray_or_number(lower)
+        self.upper =  np.inf if upper is None else _get_as_nparray_or_number(upper)
 
+        self.orig_lower = lower
+        self.orig_upper = upper
         # default is to evaluate the function
         self._suppress_evaluation = False
 
@@ -163,20 +165,39 @@ class IndicatorBox(Function):
         should_return = False
         if out is None:
             should_return = True
-            out = x * 0 
+            out = x.copy()
         outarr = out.as_array()
 
-        if isinstance(self.lower, np.ndarray):
-            if isinstance(self.upper, np.ndarray):
-                _proximal_aa(x.as_array(), self.lower, self.upper, outarr)
-            else:
-                _proximal_af(x.as_array(), self.lower, self.upper, outarr)
-        else:
-            if isinstance(self.upper, np.ndarray):
-                _proximal_fa(x.as_array(), self.lower, self.upper, outarr)
-            else:
-                np.clip(x.as_array(), self.lower, self.upper, out=outarr)
+        if self.orig_lower is None and self.orig_upper is None:
+            # nothing to do
+            pass
 
+        elif self.orig_lower is None:
+            if isinstance(self.upper, np.ndarray):
+                _proximal_na(outarr, self.upper)
+            else:
+                np.clip(outarr, None, self.upper, out=outarr)
+        
+        elif self.orig_upper is None:
+            if isinstance(self.lower, np.ndarray):
+                _proximal_an(outarr, self.lower)
+            else:
+                np.clip(outarr, self.lower, None,out=outarr)
+        
+        else:
+            if isinstance(self.lower, np.ndarray):
+                if isinstance(self.upper, np.ndarray):
+                    _proximal_aa(outarr, self.lower, self.upper)
+                else:
+                    _proximal_af(outarr, self.lower, self.upper)
+            
+            else:
+                if isinstance(self.upper, np.ndarray):
+                    _proximal_fa(outarr, self.lower, self.upper)
+                else:
+                    np.clip(outarr, self.lower, self.upper, out=outarr)
+
+        out.fill(outarr)
         if should_return:
             return out
             
@@ -275,45 +296,69 @@ def _array_within_limits_fa(x, lower, upper, breaking):
 ##########################################################################
 
 @numba.jit(nopython=True, parallel=True)
-def _proximal_aa(x, lower, upper, out):
+def _proximal_aa(x, lower, upper):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
     if x.size != lower.size or x.size != upper.size:
         raise ValueError('x, lower and upper must have the same size')
+    arr = x.ravel()
+    loarr = lower.ravel()
+    uparr = upper.ravel()
     for i in numba.prange(x.size):
-        if x.flat[i] < lower.flat[i]:
-            out.flat[i] = lower.flat[i]
-        elif out.flat[i] > upper.flat[i]:
-            out.flat[i] = upper.flat[i]
-        else:
-            out.flat[i] = x.flat[i]
+        if arr[i] < loarr[i]:
+            arr[i] = loarr[i]
+        elif arr[i] > uparr[i]:
+            arr[i] = uparr[i]
 
         
             
 @numba.jit(nopython=True, parallel=True)
-def _proximal_af(x, lower, upper, out):
+def _proximal_af(x, lower, upper):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
     if x.size != lower.size :
         raise ValueError('x, lower and upper must have the same size')
+    arr = x.ravel()
+    loarr = lower.ravel()
     for i in numba.prange(x.size):
-        if x.flat[i] < lower.flat[i]:
-            out.flat[i] = lower.flat[i]
-        elif out.flat[i] > upper:
-            out.flat[i] = upper
-        else:
-            out.flat[i] = x.flat[i]
+        if arr[i] < loarr[i]:
+            arr[i] = loarr[i]
+        elif arr[i] > upper:
+            arr[i] = upper
+    
 
 @numba.jit(nopython=True, parallel=True)
-def _proximal_fa(x, lower, upper, out):
+def _proximal_fa(x, lower, upper):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
     if x.size != upper.size:
         raise ValueError('x, lower and upper must have the same size')
+    arr = x.ravel()
+    uparr = upper.ravel()
     for i in numba.prange(x.size):
-        if x.flat[i] < lower:
-            out.flat[i] = lower
-        elif out.flat[i] > upper.flat[i]:
-            out.flat[i] = upper.flat[i]
-        else:
-            out.flat[i] = x.flat[i]
+        if arr[i] < lower:
+            arr[i] = lower
+        elif arr[i] > uparr[i]:
+            arr[i] = uparr[i]
+
+@numba.jit(nopython=True, parallel=True)
+def _proximal_na(x, upper):
+    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    if x.size != upper.size:
+        raise ValueError('x and upper must have the same size')
+    arr = x.ravel()
+    uparr = upper.ravel()
+    for i in numba.prange(x.size):
+        if arr[i] > uparr[i]:
+            arr[i] = uparr[i]
+
+@numba.jit(nopython=True, parallel=True)
+def _proximal_an(x, lower):
+    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    if x.size != lower.size:
+        raise ValueError('x and lower must have the same size')
+    arr = x.ravel()
+    loarr = lower.ravel()
+    for i in numba.prange(x.size):
+        if arr[i] < loarr[i]:
+            arr[i] = loarr[i]
 
 @numba.jit(nopython=True)
 def _convex_conjugate(x):

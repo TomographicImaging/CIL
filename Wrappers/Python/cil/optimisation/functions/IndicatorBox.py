@@ -197,6 +197,10 @@ class IndicatorBox(Function):
                 else:
                     np.clip(outarr, self.lower, self.upper, out=outarr)
 
+        # this could be achieved by the following, but it is slower
+        # np.clip(outarr, None if self.orig_lower is None else self.lower, 
+        #                 None if self.orig_upper is None else self.upper, out=outarr)
+
         out.fill(outarr)
         if should_return:
             return out

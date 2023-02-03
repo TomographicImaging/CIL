@@ -170,23 +170,10 @@ class IndicatorBox(Function):
             out.fill(x)
         outarr = out.as_array()
 
-        if self.orig_lower is None and self.orig_upper is None:
-            # nothing to do
-            pass
-
-        elif self.orig_lower is None:
-            if isinstance(self.upper, np.ndarray):
-                _proximal_na(outarr, self.upper)
-            else:
-                np.clip(outarr, None, self.upper, out=outarr)
-        
-        elif self.orig_upper is None:
-            if isinstance(self.lower, np.ndarray):
-                _proximal_an(outarr, self.lower)
-            else:
-                np.clip(outarr, self.lower, None,out=outarr)
-        
-        else:
+        # the following could be achieved by the following, but it is 2x slower
+        # np.clip(outarr, None if self.orig_lower is None else self.lower, 
+        #                 None if self.orig_upper is None else self.upper, out=outarr)
+        if self.orig_lower is not None and self.orig_upper is not None:
             if isinstance(self.lower, np.ndarray):
                 if isinstance(self.upper, np.ndarray):
                     _proximal_aa(outarr, self.lower, self.upper)
@@ -199,9 +186,17 @@ class IndicatorBox(Function):
                 else:
                     np.clip(outarr, self.lower, self.upper, out=outarr)
 
-        # this could be achieved by the following, but it is slower
-        # np.clip(outarr, None if self.orig_lower is None else self.lower, 
-        #                 None if self.orig_upper is None else self.upper, out=outarr)
+        elif self.orig_lower is None:
+            if isinstance(self.upper, np.ndarray):
+                _proximal_na(outarr, self.upper)
+            else:
+                np.clip(outarr, None, self.upper, out=outarr)
+        
+        elif self.orig_upper is None:
+            if isinstance(self.lower, np.ndarray):
+                _proximal_an(outarr, self.lower)
+            else:
+                np.clip(outarr, self.lower, None,out=outarr)
 
         out.fill(outarr)
         if should_return:

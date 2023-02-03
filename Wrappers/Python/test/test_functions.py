@@ -516,7 +516,19 @@ class TestFunction(CCPiTestClass):
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask, upper=None)
+        for val, res in zip([2, -3], [0, np.inf]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
         ib = IndicatorBox(upper=2*mask)
+        for val, res in zip([-1, 3], [0, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+        ib = IndicatorBox(upper=2*mask, lower=None)
         for val, res in zip([-1, 3], [0, np.inf]):
             print("test2", val, res)
             im.fill(val)
@@ -524,6 +536,52 @@ class TestFunction(CCPiTestClass):
 
         ib = IndicatorBox(upper=2*mask, lower=-2*mask)
         for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im.fill(1)
+        im.array *= mask.as_array()
+        np.testing.assert_equal(ib(im), 0)
+
+    def test_IndicatorBox_pixelwise_call_suppress(self):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([2, -3], [0, 0]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([-1, 3], [0, 0]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        ib = IndicatorBox(lower=-2*mask, upper=None)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([2, -3], [0, 0]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, lower=None)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([-1, 3], [0, 0]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([-1, 1, 3], [0,0,0]):
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
@@ -570,10 +628,12 @@ class TestFunction(CCPiTestClass):
         self.input_IndicatorBox(lower='string', upper=[1,1], exception=exc)
         self.input_IndicatorBox(lower=[0,0], upper=[1,1], exception=exc)
         self.input_IndicatorBox(lower=[0,0], upper=1, exception=exc)
+        self.input_IndicatorBox(lower=[0,0], upper=None, exception=exc)
         self.input_IndicatorBox(lower=[0,0], upper=VectorData(numpy.asarray([0.5,0.5])), exception=exc)
         self.input_IndicatorBox(upper='string', lower=[1,1], exception=exc)
         self.input_IndicatorBox(upper=[0,0], lower=[1,1], exception=exc)
         self.input_IndicatorBox(upper=[0,0], lower=1, exception=exc)
+        self.input_IndicatorBox(upper=[0,0], lower=None, exception=exc)
         self.input_IndicatorBox(upper=[0,0], lower=VectorData(numpy.asarray([0.5,0.5])), exception=exc)
 
     def test_IndicatorBox_input1(self):

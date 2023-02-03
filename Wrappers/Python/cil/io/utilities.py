@@ -208,7 +208,6 @@ class HDF5_utilities(object):
                     'shape':None,
                     'size':None,
                     'dtype':None,
-                    'nbytes':None, 
                     'compression':None, 
                     'chunks':None, 
                     'is_virtual':None}

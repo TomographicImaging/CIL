@@ -600,6 +600,32 @@ class TestFunction(CCPiTestClass):
         im = ig.allocate(2) * mask
         np.testing.assert_equal(im.maximum(0).sum(), ib.convex_conjugate(im))
 
+    def test_IndicatorBox_suppress_(self):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=mask)
+
+        assert ib.suppress_evaluation == False
+
+        v = ib(im)
+
+        ib.set_suppress_evaluation(True)
+
+        assert ib.suppress_evaluation == True
+        v2 = ib(im)
+        assert v2 == 0
+
+        assert v != ib(im)
+
+        with self.assertRaises(ValueError):
+            ib.set_suppress_evaluation('string')
+
+
+
+
+
     def tests_for_L2NormSq_and_weighted(self):
         numpy.random.seed(1)
         M, N, K = 2,3,1

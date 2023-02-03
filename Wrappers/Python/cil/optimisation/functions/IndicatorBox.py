@@ -1,11 +1,6 @@
 # Copyright 2022 United Kingdom Research and Innovation
 # Copyright 2022 The University of Manchester
 
-# Author(s): 
-# Evangelos Papoutsellis (UKRI)
-# Edoardo Pasca (UKRI)
-# Gemma Fardell (UKRI)
-
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,6 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Author(s): 
+# Evangelos Papoutsellis (UKRI)
+# Edoardo Pasca (UKRI)
+# Gemma Fardell (UKRI)
 
 from cil.optimisation.functions import Function
 import numpy as np
@@ -287,10 +287,13 @@ def _proximal_fa(x, lower, upper, out):
 
 @numba.jit(nopython=True)
 def _convex_conjugate(x):
-    '''Convex conjugate of IndicatorBox'''
-    acc = np.empty((numba.get_num_threads()), dtype=np.uint8)
+    '''Convex conjugate of IndicatorBox
+    
+    im.maximum(0).sum()
+    '''
+    acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-        if x.flat[i] >= 0:
+        if x.flat[i] > 0:
             acc[j] += x.flat[i]
     return np.sum(acc)

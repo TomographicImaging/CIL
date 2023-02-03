@@ -242,7 +242,7 @@ def _array_within_limits_af(x, lower, upper, breaking):
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
         
-        if breaking[j] == 0 and (arr[i] < loarr[i] or xarr[i] > upper):
+        if breaking[j] == 0 and (arr[i] < loarr[i] or arr[i] > upper):
             breaking[j] = 1
 
 @numba.jit(parallel=True, nopython=True)

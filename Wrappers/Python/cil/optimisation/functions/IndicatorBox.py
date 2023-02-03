@@ -166,6 +166,8 @@ class IndicatorBox(Function):
         if out is None:
             should_return = True
             out = x.copy()
+        else:
+            out.fill(x)
         outarr = out.as_array()
 
         if self.orig_lower is None and self.orig_upper is None:
@@ -310,11 +312,9 @@ def _proximal_aa(x, lower, upper):
     for i in numba.prange(x.size):
         if arr[i] < loarr[i]:
             arr[i] = loarr[i]
-        elif arr[i] > uparr[i]:
+        if arr[i] > uparr[i]:
             arr[i] = uparr[i]
 
-        
-            
 @numba.jit(nopython=True, parallel=True)
 def _proximal_af(x, lower, upper):
     '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
@@ -325,7 +325,7 @@ def _proximal_af(x, lower, upper):
     for i in numba.prange(x.size):
         if arr[i] < loarr[i]:
             arr[i] = loarr[i]
-        elif arr[i] > upper:
+        if arr[i] > upper:
             arr[i] = upper
     
 
@@ -339,7 +339,7 @@ def _proximal_fa(x, lower, upper):
     for i in numba.prange(x.size):
         if arr[i] < lower:
             arr[i] = lower
-        elif arr[i] > uparr[i]:
+        if arr[i] > uparr[i]:
             arr[i] = uparr[i]
 
 @numba.jit(nopython=True, parallel=True)

@@ -41,14 +41,26 @@ class IndicatorBox(Function):
     def __init__(self,lower=-np.inf,upper=np.inf):
         '''creator
 
-        Parameters:
-        -----------
-        lower : float, DataContainer or numpy array, default ``-np.inf``
-          Lower bound
-        upper : float, DataContainer or numpy array, default ``np.inf``
-          upper bound
+        Parameters
+        ----------
         
-        If passed a DataContainer or numpy array, the bounds can be set to different values for each element.
+            lower : float, DataContainer or numpy array, default ``-np.inf``
+                Lower bound
+            upper : float, DataContainer or numpy array, default ``np.inf``
+                upper bound
+        
+        If passed a ``DataContainer`` or ``numpy array``, the bounds can be set to different values for each element.
+
+        To suppress the evaluation of the function, set ``suppress_evaluation`` to ``True``. This will return 0 for any input.
+
+        Example:
+        --------
+
+        .. code-block:: python
+
+          ib = IndicatorBox(lower=0, upper=1)
+          ib.set_suppress_evaluation(True)
+          ib.evaluate(x) # returns 0
         '''
         super(IndicatorBox, self).__init__()
         
@@ -56,6 +68,7 @@ class IndicatorBox(Function):
         self.lower = _get_as_nparray_or_number(lower)
         self.upper = _get_as_nparray_or_number(upper)
 
+        # default is to evaluate the function
         self._suppress_evaluation = False
 
     @property
@@ -63,14 +76,27 @@ class IndicatorBox(Function):
         return self._suppress_evaluation
 
     def set_suppress_evaluation(self, value):
-        '''Suppresses the evaluation of the function'''
+        '''Suppresses the evaluation of the function
+        
+        Parameters
+        ----------
+
+            value : bool
+                If True, the function evaluation on any input will return 0, without calculation.
+        '''
+        if not isinstance(value, bool):
+            raise ValueError('Value must be boolean')
         self._suppress_evaluation = value
 
     def __call__(self,x):
         '''Evaluates IndicatorBox at x
         
-        Evaluates the IndicatorBox at x. If suppress_evaluation is True, returns 0. 
-        This 
+        Parameters
+        ----------
+        
+            x : DataContainer
+            
+        Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.  
         '''
         if not self.suppress_evaluation:
             return self.evaluate(x)    
@@ -106,7 +132,7 @@ class IndicatorBox(Function):
         return np.inf if breaking.sum() > 0 else 0
     
     def gradient(self,x):
-        '''IndicatorBox is not differentiable, so calling gradient will raise a ValueError'''
+        '''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''
         return ValueError('Not Differentiable') 
     
     def convex_conjugate(self,x):
@@ -117,12 +143,22 @@ class IndicatorBox(Function):
         
         r'''Proximal operator of IndicatorBox at x
 
-            .. math:: prox_{\tau * f}(x)
+        .. math:: prox_{\tau * f}(x)
 
-            Note:
-            -----
+        Parameters
+        ----------
 
-              ``tau`` is ignored but it is in the signature of the generic Function class
+        x : DataContainer
+            Input to the proximal operator
+        tau : float
+            Step size. Notice it is ignored in IndicatorBox
+        out : DataContainer, optional
+            Output of the proximal operator. If not provided, a new DataContainer is created.
+
+        Note
+        ----
+
+            ``tau`` is ignored but it is in the signature of the generic Function class
         '''
         should_return = False
         if out is None:
@@ -148,7 +184,18 @@ class IndicatorBox(Function):
         
         r'''Proximal operator of the convex conjugate of IndicatorBox at x:
 
-          ..math:: prox_{\tau * f^{*}}(x)
+          .. math:: prox_{\tau * f^{*}}(x)
+
+          Parameters
+          ----------
+
+            x : DataContainer
+                Input to the proximal operator
+            tau : float
+                Step size. Notice it is ignored in IndicatorBox, see ``proximal`` for details
+            out : DataContainer, optional
+                Output of the proximal operator. If not provided, a new DataContainer is created.
+
         '''
 
         # x - tau * self.proximal(x/tau, tau)
@@ -161,11 +208,6 @@ class IndicatorBox(Function):
             self.proximal(x, tau, out=out)
         
         # finish up calculation
-        # out *= -1*tau
-        # if tau != 1:
-        #     # restore the values of x
-        #     x*=tau
-        # out += x
         outarr = out.as_array()
         xarr = x.as_array()
         _proximal_conjugate_final_calculation(x, outarr)
@@ -188,12 +230,7 @@ def _get_as_nparray_or_number(x):
 @numba.jit(nopython=True, parallel=True)
 def _proximal_conjugate_final_calculation(x, out):
     '''
-    # finish up calculation, tau is ignored
-    out *= -1*tau
-    if tau != 1:
-        # restore the values of x
-        x*=tau
-    out += x
+    The final calculation for the proximal conjugate of IndicatorBox
     '''
     for i in numba.prange(x.size):
         out.flat[i] = -1 * out.flat[i] + x.flat[i]

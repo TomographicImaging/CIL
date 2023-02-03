@@ -126,7 +126,7 @@ class show1D(show_base):
         A title for the plot
     color : str, list of str, default=None
         Color(s) for each line plot
-    ls : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
+    ls : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
         Linestyle(s) for each line plot
     axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
         Axis labels in the form (x_axis_label,y_axis_label)
@@ -155,7 +155,7 @@ class show1D(show_base):
     >>> data_channel0 = data.get_slice(channel=0)
     >>> data_channel1 = data.get_slice(channel=1)
     >>> show1D([data_channel0, data_channel1], line_coords=[('horizontal_x', 256)],
-    ...        label=['Channel 0', 'Channel 1'])
+    ...        label=['Channel 0', 'Channel 1'], ls=["--", "-"])
 
     The following example uses two sets of slicing information applied to a
     single dataset, resulting in two separate plots.
@@ -307,7 +307,7 @@ class show1D(show_base):
             A title for the plot
         colors : str, list of str, default=None
             Color(s) for each line plot
-        ls : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
+        ls : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
             Linestyle(s) for each line plot
         axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
             Axis labels in the form (x_axis_label,y_axis_label)

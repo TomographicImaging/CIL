@@ -104,14 +104,13 @@ class show1D(show_base):
     This creates and displays 1D plots of pixel values by slicing
     multi-dimensional data.
 
-    When provided one or more datasets, alongside dimensions and
-    coordinates at which to slice, this function will generate graphs
-    plotting the resultant 1D data. If a single set of slicing information
-    is given via `line_coords` (see the first example below), this function
-    will generate a single graph with one line plot per dataset provided.
-    If multiple sets of slicing information are given (see the second
-    example below), this function will generate one graph per set (i.e. per
-    1D slice), each with one line plot per dataset.
+    The behaviour is as follows: if provided multiple datasets and a single
+    slice set (see first example below), one line plot will be generated
+    per dataset; if provided a single dataset and multiple sets of slices
+    (see second example below), one line plot will be generated per slice
+    set;  if provided multiple datasets and multiple slice sets, the
+    :math:`i`-th set of slices will apply to the :math:`i`-th dataset, with
+    a line plot generated in each case.
 
     Parameters
     ----------
@@ -248,7 +247,7 @@ class show1D(show_base):
     def _plot_slice(self, ax, data, line_coords=None,
                    label=None, color=None, ls=None, force=True):
         """
-        Creates 1D plots pixel flux from multi-dimensional data and slicing information.
+        Creates 1D plots of pixel flux from multi-dimensional data and slicing information.
 
         Parameters
         ----------

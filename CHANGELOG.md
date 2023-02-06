@@ -1,4 +1,5 @@
 * Next
+  
   - added yml file to create test environment
   - LeastSquares fixed docstring and unified gradient code when out is passed or not.
   - Add compression to 8bit and 16bit to TIFFWriter
@@ -10,6 +11,8 @@
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
+    - Update conda build action to v2.0.0
+    - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0

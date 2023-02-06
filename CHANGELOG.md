@@ -15,6 +15,7 @@
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
   - `io.utilities.HDF5_utilities` Added utility functions to browse hdf5 files and read datasets into numpy array
+  - Implemented the analytical norm for GradientOperator
   - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
 
 * 22.1.0

@@ -139,8 +139,16 @@ class IndicatorBox(Function):
     
     def convex_conjugate(self,x):
         '''Convex conjugate of IndicatorBox at x'''
+        # set the number of threads to the number of threads used in the CIL multiprocessing module
+        num_threads = numba.get_num_threads()
+        numba.set_num_threads(cil_mp.NUM_THREADS)
+
         acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
         _convex_conjugate(x.as_array(), acc)
+        
+        # reset the number of threads to the original value
+        numba.set_num_threads(num_threads)
+        
         return np.sum(acc)
          
     def proximal(self, x, tau, out=None):
@@ -368,8 +376,9 @@ def _convex_conjugate(x, acc):
     im.maximum(0).sum()
     '''
     arr = x.ravel()
+    j = 0
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
     
-    if arr[i] > 0:
-        acc[j] += arr[i]
+        if arr[i] > 0:
+            acc[j] += arr[i]

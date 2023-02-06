@@ -655,10 +655,10 @@ class TestFunction(CCPiTestClass):
         ib = IndicatorBox(lower=-2*mask)
 
         ib.convex_conjugate(im)
-        np.testing.assert_equal(im.maximum(0).sum(), ib.convex_conjugate(im))
+        np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
 
         im = ig.allocate(2) * mask
-        np.testing.assert_equal(im.maximum(0).sum(), ib.convex_conjugate(im))
+        np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
 
     def test_IndicatorBox_suppress_(self):
         ig = ImageGeometry(10,10)

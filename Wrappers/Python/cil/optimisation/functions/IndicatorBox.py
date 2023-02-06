@@ -139,7 +139,9 @@ class IndicatorBox(Function):
     
     def convex_conjugate(self,x):
         '''Convex conjugate of IndicatorBox at x'''
-        return _convex_conjugate(x.as_array())
+        acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
+        _convex_conjugate(x.as_array(), acc)
+        return np.sum(acc)
          
     def proximal(self, x, tau, out=None):
         
@@ -359,15 +361,15 @@ def _proximal_an(x, lower):
         if arr[i] < loarr[i]:
             arr[i] = loarr[i]
 
-@numba.jit(nopython=True)
-def _convex_conjugate(x):
+@numba.jit(nopython=True, parallel=True)
+def _convex_conjugate(x, acc):
     '''Convex conjugate of IndicatorBox
     
     im.maximum(0).sum()
     '''
-    acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
+    arr = x.ravel()
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-        if x.flat[i] > 0:
-            acc[j] += x.flat[i]
-    return np.sum(acc)
+    
+    if arr[i] > 0:
+        acc[j] += arr[i]

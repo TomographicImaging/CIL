@@ -12,7 +12,7 @@ on:
 
 jobs:
   conda_build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:
@@ -49,7 +49,7 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.9
-    - uses: lauramurgatroyd/build-sphinx-action@v0.1.3
+    - uses: paskino/build-sphinx-action@master
       with:
         DOCS_PATH: 'docs'
         CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'
@@ -58,6 +58,7 @@ jobs:
         PACKAGE_NAME: 'cil'
         PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
         BUILD_SUBDIR_NAME: 'nightly'
+        # python_version: 3.9 # default is 3.9
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest

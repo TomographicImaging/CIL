@@ -12,16 +12,16 @@ on:
 
 jobs:
   conda_build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:
         fetch-depth: 0
     - name: conda-build
-      uses: paskino/conda-package-publish-action@v1.4.3
+      uses: paskino/conda-package-publish-action@v2.0.0
       with:
         subDir: 'recipe'
-        channels: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
+        channels: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi  --override-channels'
         convert_win: false
         convert_osx: false
     - name: Upload artifact of the conda package.
@@ -31,7 +31,7 @@ jobs:
         path: recipe/linux-64/cil*
   docs_build:
     needs: conda_build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:

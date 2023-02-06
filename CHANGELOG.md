@@ -12,10 +12,14 @@
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
+    - Update conda build action to v2.0.0
+    - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
+  - `io.utilities.HDF5_utilities` Added utility functions to browse hdf5 files and read datasets into numpy array
+  - Implemented the analytical norm for GradientOperator
   - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
 
 * 22.1.0

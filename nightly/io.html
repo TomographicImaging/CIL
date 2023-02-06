@@ -157,6 +157,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#nikon">Nikon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#zeiss">ZEISS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tiff-reader-writer">TIFF Reader/Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hdf5-utilities">HDF5 Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
@@ -222,6 +223,11 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#tiff-reader-writer">
    TIFF Reader/Writer
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hdf5-utilities">
+   HDF5 Utilities
   </a>
  </li>
 </ul>
@@ -724,6 +730,113 @@ in a file called <cite>scaleoffset.json</cite> in the same directory as the TIFF
 <dt id="cil.io.TIFFWriter.__weakref__">
 <code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFWriter.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hdf5-utilities">
+<h2>HDF5 Utilities<a class="headerlink" href="#hdf5-utilities" title="Permalink to this headline">#</a></h2>
+<p>Utility functions to browse HDF5 files. These allow you to browse groups and read in datasets as numpy.ndarrays.</p>
+<p>A CIL geometry and dataset must be constructed manually from the array and metadata.</p>
+<dl class="py class">
+<dt id="cil.io.utilities.HDF5_utilities">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.utilities.</span></code><code class="sig-name descname"><span class="pre">HDF5_utilities</span></code><a class="reference internal" href="_modules/cil/io/utilities.html#HDF5_utilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities" title="Permalink to this definition">#</a></dt>
+<dd><p>Utility methods to read in from a generic HDF5 file and extract the relevant data</p>
+<dl class="py method">
+<dt id="cil.io.utilities.HDF5_utilities.print_metadata">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">print_metadata</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/utilities.html#HDF5_utilities.print_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.print_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Prints the file metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>group</strong> (<em>(</em><em>str</em><em>)</em><em>, </em><em>default: '/'</em>) – a specific group to print the metadata for, this defaults to the root group</p></li>
+<li><p><strong>depth</strong> (<em>int</em><em>, </em><em>default -1</em>) – depth of group to output the metadata for, -1 is fully recursive</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.io.utilities.HDF5_utilities.get_dataset_metadata">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_dataset_metadata</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dset_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/utilities.html#HDF5_utilities.get_dataset_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.get_dataset_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the dataset metadata as a dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>dset_path</strong> (<em>str</em>) – The internal path to the requested dataset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ndim, shape, size, dtype, nbytes, compression, chunks, is_virtual</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A dictionary containing keys, values are <cite>None</cite> if attribute can’t be read.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.io.utilities.HDF5_utilities.read">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filename</span></em>, <em class="sig-param"><span class="pre">dset_path</span></em>, <em class="sig-param"><span class="pre">source_sel=None</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/utilities.html#HDF5_utilities.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a dataset entry and returns a numpy array with the requested data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>dset_path</strong> (<em>str</em>) – The internal path to the requested dataset</p></li>
+<li><p><strong>source_sel</strong> (<em>tuple of slice objects</em><em>, </em><em>optional</em>) – The selection of slices in each source dimension to return</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default np.float32</em>) – the numpy data type for the returned array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The requested data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>source_sel takes a tuple of slice objects to defining crop and slicing behaviour</p>
+<p>This can be constructed using numpy indexing, i.e. the following lines are equivalent.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">s_</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.io.utilities.HDF5_utilities.read_to">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">read_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/utilities.html#HDF5_utilities.read_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.read_to" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a dataset entry and directly fills a numpy array with the requested data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>dset_path</strong> (<em>str</em>) – The internal path to the requested dataset</p></li>
+<li><p><strong>out</strong> (<em>numpy.ndarray</em>) – The output array to be filled</p></li>
+<li><p><strong>source_sel</strong> (<em>tuple of slice objects</em><em>, </em><em>optional</em>) – The selection of slices in each source dimension to return</p></li>
+<li><p><strong>dest_sel</strong> (<em>tuple of slice objects</em><em>, </em><em>optional</em>) – The selection of slices in each destination dimension to fill</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>source_sel and dest_sel take a tuple of slice objects to defining crop and slicing behaviour</p>
+<p>This can be constructed using numpy indexing, i.e. the following lines are equivalent.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">s_</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
 </dd></dl>
 
 </dd></dl>

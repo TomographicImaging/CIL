@@ -49,7 +49,7 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.9
-    - uses: paskino/build-sphinx-action@master
+    - uses: paskino/build-sphinx-action@main
       with:
         DOCS_PATH: 'docs'
         CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'

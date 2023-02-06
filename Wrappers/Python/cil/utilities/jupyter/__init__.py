@@ -164,8 +164,8 @@ def islicer(data, direction=0, title=None, slice_number=None, cmap='gray',
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
 
-    if title==None:
-        title = "Direction {}: Slice ".format(axis_labels[direction])
+    if title is None:
+        title = "Direction {}: Slice".format(axis_labels[direction])
 
     style = {'slider_width': '80%'}
     layout = widgets.Layout(width='200px')

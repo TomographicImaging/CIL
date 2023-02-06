@@ -49,7 +49,8 @@ class IndicatorBox(Function):
         If passed a ``DataContainer`` (or derived class such as ``ImageData`` or ``AcquisitionData``) 
         or ``numpy array``, the bounds can be set to different values for each element.
 
-        To suppress the evaluation of the function, set ``suppress_evaluation`` to ``True``. This will return 0 for any input.
+        In order to save computing time it is possible to suppress the evaluation of the function. This is 
+        achieved by setting ``suppress_evaluation`` to ``True``. ``IndicatorBox`` evaluated on any input will then return 0.
 
         Example:
         --------

@@ -24,6 +24,8 @@ jobs:
         channels: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi  --override-channels'
         convert_win: false
         convert_osx: false
+        test_pyver: 3.9
+        test_npver: 1.22
     - name: Upload artifact of the conda package.
       uses: actions/upload-artifact@v3.1.1
       with:

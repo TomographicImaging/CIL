@@ -2,7 +2,7 @@
   - Dropped Python 3.6 and NumPy 1.15 support as not required by DLS
   - Updated version of python and numpy tested by GHA to 3.9 and 1.21 and Jenkins to 3.8 and 1.20
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
-  - Implemented IndicatorBox in numba
+  - Implemented IndicatorBox in numba and numpy
   - added yml file to create test environment
   - LeastSquares fixed docstring and unified gradient code when out is passed or not.
   - Add compression to 8bit and 16bit to TIFFWriter
@@ -14,6 +14,8 @@
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
+    - Updated version of python and numpy tested by GHA to 3.9 and 1.21
+    - Updated python version for docs build to 3.9
     - Update conda build action to v2.0.0
     - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1

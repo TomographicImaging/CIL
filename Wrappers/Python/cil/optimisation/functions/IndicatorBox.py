@@ -22,7 +22,7 @@ from cil.optimisation.functions import Function
 import numpy as np
 import numba
 from cil.utilities import multiprocessing as cil_mp
-
+import logging
 
 class IndicatorBox(Function):
     
@@ -37,8 +37,17 @@ class IndicatorBox(Function):
                                      \end{cases}
     
     '''
+
+    def __new__(cls, lower=None, upper=None, backend='numba'):
+        if backend == 'numba':
+
+            logging.info("Numba backend is used.")      
+            return super(IndicatorBox, cls).__new__(IndicatorBox_numba)
+        else:
+            logging.info("Numpy backend is used.") 
+            return super(IndicatorBox, cls).__new__(IndicatorBox_numpy)
     
-    def __init__(self, lower=None, upper=None):
+    def __init__(self, lower=None, upper=None, backend='numba'):
         '''creator
 
         Parameters
@@ -48,6 +57,8 @@ class IndicatorBox(Function):
                 Lower bound. If set to None, it is equivalent to ``-np.inf``.
             upper : float, DataContainer or numpy array, default None
                 Upper bound. If set to None, it is equivalent to ``np.inf``.
+            backend : string, default 'numba'
+                Backend to use. Allowed values are 'numba' and 'numpy'.
         
         If passed a ``DataContainer`` or ``numpy array``, the bounds can be set to different values for each element.
 
@@ -103,115 +114,7 @@ class IndicatorBox(Function):
         if not self.suppress_evaluation:
             return self.evaluate(x)    
         return 0.0
-
-    def evaluate(self,x):
-        
-        '''Evaluates IndicatorBox at x'''
-        
-        num_threads = numba.get_num_threads()
-        numba.set_num_threads(cil_mp.NUM_THREADS)
-        breaking = np.zeros(numba.get_num_threads(), dtype=np.uint8)
-                
-        if isinstance(self.lower, np.ndarray):
-            if isinstance(self.upper, np.ndarray):
-
-                _array_within_limits_aa(x.as_array(), self.lower, self.upper, breaking)
-
-            else:
-
-                _array_within_limits_af(x.as_array(), self.lower, self.upper, breaking)
-
-        else:
-            if isinstance(self.upper, np.ndarray):
-
-                _array_within_limits_fa(x.as_array(), self.lower, self.upper, breaking)
-
-            else:
-
-                _array_within_limits_ff(x.as_array(), self.lower, self.upper, breaking)
-
-        numba.set_num_threads(num_threads)
-        return np.inf if breaking.sum() > 0 else 0.0
     
-    def gradient(self,x):
-        '''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''
-        return ValueError('Not Differentiable') 
-    
-    def convex_conjugate(self,x):
-        '''Convex conjugate of IndicatorBox at x'''
-        # set the number of threads to the number of threads used in the CIL multiprocessing module
-        num_threads = numba.get_num_threads()
-        numba.set_num_threads(cil_mp.NUM_THREADS)
-
-        acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
-        _convex_conjugate(x.as_array(), acc)
-        
-        # reset the number of threads to the original value
-        numba.set_num_threads(num_threads)
-        
-        return np.sum(acc)
-         
-    def proximal(self, x, tau, out=None):
-        
-        r'''Proximal operator of IndicatorBox at x
-
-        .. math:: prox_{\tau * f}(x)
-
-        Parameters
-        ----------
-
-        x : DataContainer
-            Input to the proximal operator
-        tau : float
-            Step size. Notice it is ignored in IndicatorBox
-        out : DataContainer, optional
-            Output of the proximal operator. If not provided, a new DataContainer is created.
-
-        Note
-        ----
-
-            ``tau`` is ignored but it is in the signature of the generic Function class
-        '''
-        should_return = False
-        if out is None:
-            should_return = True
-            out = x.copy()
-        else:
-            out.fill(x)
-        outarr = out.as_array()
-
-        # the following could be achieved by the following, but it is 2x slower
-        # np.clip(outarr, None if self.orig_lower is None else self.lower, 
-        #                 None if self.orig_upper is None else self.upper, out=outarr)
-        if self.orig_lower is not None and self.orig_upper is not None:
-            if isinstance(self.lower, np.ndarray):
-                if isinstance(self.upper, np.ndarray):
-                    _proximal_aa(outarr, self.lower, self.upper)
-                else:
-                    _proximal_af(outarr, self.lower, self.upper)
-            
-            else:
-                if isinstance(self.upper, np.ndarray):
-                    _proximal_fa(outarr, self.lower, self.upper)
-                else:
-                    np.clip(outarr, self.lower, self.upper, out=outarr)
-
-        elif self.orig_lower is None:
-            if isinstance(self.upper, np.ndarray):
-                _proximal_na(outarr, self.upper)
-            else:
-                np.clip(outarr, None, self.upper, out=outarr)
-        
-        elif self.orig_upper is None:
-            if isinstance(self.lower, np.ndarray):
-                _proximal_an(outarr, self.lower)
-            else:
-                np.clip(outarr, self.lower, None,out=outarr)
-
-        out.fill(outarr)
-        if should_return:
-            return out
-            
     def proximal_conjugate(self, x, tau, out=None):
         
         r'''Proximal operator of the convex conjugate of IndicatorBox at x:
@@ -243,7 +146,153 @@ class IndicatorBox(Function):
 
         if should_return:
             return out
+
+    def proximal(self, x, tau, out=None):
         
+        r'''Proximal operator of IndicatorBox at x
+
+        .. math:: prox_{\tau * f}(x)
+
+        Parameters
+        ----------
+
+        x : DataContainer
+            Input to the proximal operator
+        tau : float
+            Step size. Notice it is ignored in IndicatorBox
+        out : DataContainer, optional
+            Output of the proximal operator. If not provided, a new DataContainer is created.
+
+        Note
+        ----
+
+            ``tau`` is ignored but it is in the signature of the generic Function class
+        '''
+        should_return = False
+        if out is None:
+            should_return = True
+            out = x.copy()
+        else:
+            out.fill(x)
+        outarr = out.as_array()
+
+        # calculate the proximal
+        self._proximal(outarr)
+        
+        out.fill(outarr)
+        if should_return:
+            return out
+
+    def gradient(self,x):
+        '''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''
+        return ValueError('Not Differentiable') 
+
+    def _proximal(self, outarr):
+        raise NotImplementedError('Implement this in the derived class')
+
+class IndicatorBox_numba(IndicatorBox):
+
+    def evaluate(self,x):
+        
+        '''Evaluates IndicatorBox at x'''
+        
+        num_threads = numba.get_num_threads()
+        numba.set_num_threads(cil_mp.NUM_THREADS)
+        breaking = np.zeros(numba.get_num_threads(), dtype=np.uint8)
+                
+        if isinstance(self.lower, np.ndarray):
+            if isinstance(self.upper, np.ndarray):
+
+                _array_within_limits_aa(x.as_array(), self.lower, self.upper, breaking)
+
+            else:
+
+                _array_within_limits_af(x.as_array(), self.lower, self.upper, breaking)
+
+        else:
+            if isinstance(self.upper, np.ndarray):
+
+                _array_within_limits_fa(x.as_array(), self.lower, self.upper, breaking)
+
+            else:
+
+                _array_within_limits_ff(x.as_array(), self.lower, self.upper, breaking)
+
+        numba.set_num_threads(num_threads)
+        return np.inf if breaking.sum() > 0 else 0.0
+    
+    def convex_conjugate(self,x):
+        '''Convex conjugate of IndicatorBox at x'''
+        # set the number of threads to the number of threads used in the CIL multiprocessing module
+        num_threads = numba.get_num_threads()
+        numba.set_num_threads(cil_mp.NUM_THREADS)
+
+        acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
+        _convex_conjugate(x.as_array(), acc)
+        
+        # reset the number of threads to the original value
+        numba.set_num_threads(num_threads)
+        
+        return np.sum(acc)
+            
+    def _proximal(self, outarr):
+        if self.orig_lower is not None and self.orig_upper is not None:
+            if isinstance(self.lower, np.ndarray):
+                if isinstance(self.upper, np.ndarray):
+                    _proximal_aa(outarr, self.lower, self.upper)
+                else:
+                    _proximal_af(outarr, self.lower, self.upper)
+            
+            else:
+                if isinstance(self.upper, np.ndarray):
+                    _proximal_fa(outarr, self.lower, self.upper)
+                else:
+                    np.clip(outarr, self.lower, self.upper, out=outarr)
+
+        elif self.orig_lower is None:
+            if isinstance(self.upper, np.ndarray):
+                _proximal_na(outarr, self.upper)
+            else:
+                np.clip(outarr, None, self.upper, out=outarr)
+        
+        elif self.orig_upper is None:
+            if isinstance(self.lower, np.ndarray):
+                _proximal_an(outarr, self.lower)
+            else:
+                np.clip(outarr, self.lower, None,out=outarr)
+
+class IndicatorBox_numpy(IndicatorBox):
+
+    def evaluate(self,x):
+        
+        '''Evaluates IndicatorBox at x'''
+        
+        if (np.all(x.as_array() >= self.lower) and 
+            np.all(x.as_array() <= self.upper) ):
+            val = 0
+        else:
+            val = np.inf
+        return val
+    
+    def convex_conjugate(self,x):
+        '''Convex conjugate of IndicatorBox at x'''
+        # set the number of threads to the number of threads used in the CIL multiprocessing module
+        num_threads = numba.get_num_threads()
+        numba.set_num_threads(cil_mp.NUM_THREADS)
+
+        acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
+        _convex_conjugate(x.as_array(), acc)
+        
+        # reset the number of threads to the original value
+        numba.set_num_threads(num_threads)
+        
+        return np.sum(acc)
+            
+    def _proximal(self, outarr):
+        np.clip(outarr, None if self.orig_lower is None else self.lower, 
+                        None if self.orig_upper is None else self.upper, out=outarr)
+
+
 ## Utilities
 def _get_as_nparray_or_number(x):
     '''Returns x as a numpy array or a number'''

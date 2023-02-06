@@ -476,216 +476,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
 
 
-    def test_IndicatorBox(self):
-        ig = ImageGeometry(10,10)
-        im = ig.allocate(-1)
-        ib = IndicatorBox(lower=0)
-        a = ib(im)
-        numpy.testing.assert_equal(a, numpy.inf)
-        ib = IndicatorBox(lower=-2)
-        a = ib(im)
-        numpy.testing.assert_array_equal(0, a)
-        ib = IndicatorBox(lower=-5, upper=-2)
-        a = ib(im)
-        numpy.testing.assert_equal(a, numpy.inf)
-        
-    def create_circular_mask(self, ig):
-        mask = ig.allocate(1)
-        # create circular mask
-        pix_x, pix_y = ig.shape
-        center = [int(pix_x/2.), int(pix_y/2.)]
-
-        Y, X = np.ogrid[:pix_y, :pix_x]
-        dist_from_center = np.sqrt((X - center[0])**2 + (Y-center[1])**2)
-
-        radius = 4
-        mask_arr = dist_from_center <= radius
-
-        np.multiply(mask.array, mask_arr, out=mask.array)
-        return mask
-
-    def test_IndicatorBox_pixelwise_call(self):
-        ig = ImageGeometry(10,10)
-        mask = self.create_circular_mask(ig)
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask)
-        for val, res in zip([2, -3], [0, np.inf]):
-            print("test1", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask, upper=None)
-        for val, res in zip([2, -3], [0, np.inf]):
-            print("test1", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask)
-        for val, res in zip([-1, 3], [0, np.inf]):
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-        ib = IndicatorBox(upper=2*mask, lower=None)
-        for val, res in zip([-1, 3], [0, np.inf]):
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        ib = IndicatorBox(upper=2*mask, lower=-2*mask)
-        for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        im.fill(1)
-        im.array *= mask.as_array()
-        np.testing.assert_equal(ib(im), 0)
-
-    def test_IndicatorBox_pixelwise_call_suppress(self):
-        ig = ImageGeometry(10,10)
-        mask = self.create_circular_mask(ig)
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask)
-        ib.set_suppress_evaluation(True)
-        for val, res in zip([2, -3], [0, 0]):
-            print("test1", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask)
-        ib.set_suppress_evaluation(True)
-        for val, res in zip([-1, 3], [0, 0]):
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        ib = IndicatorBox(lower=-2*mask, upper=None)
-        ib.set_suppress_evaluation(True)
-        for val, res in zip([2, -3], [0, 0]):
-            print("test1", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, lower=None)
-        ib.set_suppress_evaluation(True)
-        for val, res in zip([-1, 3], [0, 0]):
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        ib = IndicatorBox(upper=2*mask, lower=-2*mask)
-        ib.set_suppress_evaluation(True)
-        for val, res in zip([-1, 1, 3], [0,0,0]):
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_equal(ib(im), res)
-
-        im.fill(1)
-        im.array *= mask.as_array()
-        np.testing.assert_equal(ib(im), 0)
-
-    def test_IndicatorBox_pixelwise_proximal(self):
-        ig = ImageGeometry(10,10)
-        mask = self.create_circular_mask(ig)
     
-        im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask)
-        for val, res in zip([2, -3], [ig.allocate(2), -2*mask]):
-            # logging.info("test1", val, res)
-            im.fill(val)
-            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask)
-        for val, res in zip([-1, 3], [ig.allocate(-1), 2*mask]):
-            # logging.info("test1", val, res)
-            print("test2", val, res)
-            im.fill(val)
-            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
-
-        im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, lower=-2*mask)
-        for val, res in zip([-1, -3, 1], [-1*mask, -2*mask, 1*mask]):
-            print("test3", val, res)
-            im.fill(val)
-            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
-            # check against old implementation of proximal:
-            out = im.maximum(ib.lower)
-            # numpy clip 
-            out.minimum(ib.upper, out=out)
-            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), out.as_array())
-            
-
-
-    def test_IndicatorBox_input0(self):
-        exc = numba.core.errors.TypingError
-        self.input_IndicatorBox(lower='string', upper=[1,1], exception=exc)
-        self.input_IndicatorBox(lower=[0,0], upper=[1,1], exception=exc)
-        self.input_IndicatorBox(lower=[0,0], upper=1, exception=exc)
-        self.input_IndicatorBox(lower=[0,0], upper=None, exception=exc)
-        self.input_IndicatorBox(lower=[0,0], upper=VectorData(numpy.asarray([0.5,0.5])), exception=exc)
-        self.input_IndicatorBox(upper='string', lower=[1,1], exception=exc)
-        self.input_IndicatorBox(upper=[0,0], lower=[1,1], exception=exc)
-        self.input_IndicatorBox(upper=[0,0], lower=1, exception=exc)
-        self.input_IndicatorBox(upper=[0,0], lower=None, exception=exc)
-        self.input_IndicatorBox(upper=[0,0], lower=VectorData(numpy.asarray([0.5,0.5])), exception=exc)
-
-    def test_IndicatorBox_input1(self):
-        exc = ValueError
-        self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,])), lower=VectorData(numpy.asarray([0.5,])), exception=exc)
-        self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,0.5])), lower=VectorData(numpy.asarray([0.5,0.5,0.5])), exception=exc)
-        
-    def input_IndicatorBox(self, lower, upper, exception):
-        ib = IndicatorBox(lower=lower, upper=upper)
-        x = VectorData(numpy.asarray([0.5,0.5]))
-        with self.assertRaises(exception):
-            ib(x)
-
-    def test_IndicatorBox_convex_conjugate(self):
-        ig = ImageGeometry(10,10)
-        mask = self.create_circular_mask(ig)
-    
-        im = ig.allocate(-2) * mask
-        ib = IndicatorBox(lower=-2*mask)
-
-        ib.convex_conjugate(im)
-        np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
-
-        im = ig.allocate(2) * mask
-        np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
-
-    def test_IndicatorBox_suppress_(self):
-        ig = ImageGeometry(10,10)
-        mask = self.create_circular_mask(ig)
-    
-        im = ig.allocate(2)
-        ib = IndicatorBox(upper=mask)
-
-        assert ib.suppress_evaluation == False
-
-        v = ib(im)
-
-        ib.set_suppress_evaluation(True)
-
-        assert ib.suppress_evaluation == True
-        v2 = ib(im)
-        assert v2 == 0
-
-        assert v != ib(im)
-
-        with self.assertRaises(ValueError):
-            ib.set_suppress_evaluation('string')
-
-
-
-
-
     def tests_for_L2NormSq_and_weighted(self):
         numpy.random.seed(1)
         M, N, K = 2,3,1
@@ -1493,3 +1284,250 @@ class TestBlockFunction(unittest.TestCase):
         bf0 = BlockFunction(L1Norm())
         bf = 2*bf0
         assert isinstance(bf[0], ScaledFunction)
+
+class TestIndicatorBox(unittest.TestCase):
+    def _test_IndicatorBox(self, backend):
+        ig = ImageGeometry(10,10)
+        im = ig.allocate(-1)
+        ib = IndicatorBox(lower=0, backend=backend)
+        a = ib(im)
+        numpy.testing.assert_equal(a, numpy.inf)
+        ib = IndicatorBox(lower=-2, backend=backend)
+        a = ib(im)
+        numpy.testing.assert_array_equal(0, a)
+        ib = IndicatorBox(lower=-5, upper=-2, backend=backend)
+        a = ib(im)
+        numpy.testing.assert_equal(a, numpy.inf)
+
+    def test_basic(self):
+        self._test_IndicatorBox('numpy')
+        self._test_IndicatorBox('numba')
+        
+    def create_circular_mask(self, ig):
+        mask = ig.allocate(1)
+        # create circular mask
+        pix_x, pix_y = ig.shape
+        center = [int(pix_x/2.), int(pix_y/2.)]
+
+        Y, X = np.ogrid[:pix_y, :pix_x]
+        dist_from_center = np.sqrt((X - center[0])**2 + (Y-center[1])**2)
+
+        radius = 4
+        mask_arr = dist_from_center <= radius
+
+        np.multiply(mask.array, mask_arr, out=mask.array)
+        return mask
+
+    def test_pixelwise_call(self):
+        self._test_IndicatorBox_pixelwise_call('numpy')
+        self._test_IndicatorBox_pixelwise_call('numba')
+
+    def _test_IndicatorBox_pixelwise_call(self, backend):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        for val, res in zip([2, -3], [0, np.inf]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask, upper=None, backend=backend)
+        for val, res in zip([2, -3], [0, np.inf]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, backend=backend)
+        for val, res in zip([-1, 3], [0, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+        ib = IndicatorBox(upper=2*mask, lower=None, backend=backend)
+        for val, res in zip([-1, 3], [0, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask, backend=backend)
+        for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im.fill(1)
+        im.array *= mask.as_array()
+        np.testing.assert_equal(ib(im), 0)
+
+    def test_pixelwise_call_suppress(self):
+        self._test_IndicatorBox_pixelwise_call_suppress('numpy')
+        self._test_IndicatorBox_pixelwise_call_suppress('numba')
+
+    def _test_IndicatorBox_pixelwise_call_suppress(self, backend):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([2, -3], [0, 0]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, backend=backend)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([-1, 3], [0, 0]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        ib = IndicatorBox(lower=-2*mask, upper=None, backend=backend)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([2, -3], [0, 0]):
+            print("test1", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, lower=None, backend=backend)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([-1, 3], [0, 0]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask, backend=backend)
+        ib.set_suppress_evaluation(True)
+        for val, res in zip([-1, 1, 3], [0,0,0]):
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_equal(ib(im), res)
+
+        im.fill(1)
+        im.array *= mask.as_array()
+        np.testing.assert_equal(ib(im), 0)
+
+    def test_pixelwise_proximal(self):
+        self._test_IndicatorBox_pixelwise_proximal('numpy')
+        self._test_IndicatorBox_pixelwise_proximal('numba')
+
+    def _test_IndicatorBox_pixelwise_proximal(self, backend):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        im = ig.allocate(2)
+        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        for val, res in zip([2, -3], [ig.allocate(2), -2*mask]):
+            # logging.info("test1", val, res)
+            im.fill(val)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, backend=backend)
+        for val, res in zip([-1, 3], [ig.allocate(-1), 2*mask]):
+            # logging.info("test1", val, res)
+            print("test2", val, res)
+            im.fill(val)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask, backend=backend)
+        for val, res in zip([-1, -3, 1], [-1*mask, -2*mask, 1*mask]):
+            print("test3", val, res)
+            im.fill(val)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
+            # check against old implementation of proximal:
+            out = im.maximum(ib.lower)
+            # numpy clip 
+            out.minimum(ib.upper, out=out)
+            np.testing.assert_allclose(ib.proximal(im, 1).as_array(), out.as_array())
+            
+
+
+    def test_input0(self):
+        self._test_IndicatorBox_input0('numpy')
+        self._test_IndicatorBox_input0('numba')
+
+    def _test_IndicatorBox_input0(self, backend):
+        if backend == 'numpy':
+            return
+
+        exc = numba.core.errors.TypingError
+            
+        self.input_IndicatorBox(lower='string', upper=[1,1], exception=exc, backend=backend)
+        self.input_IndicatorBox(upper='string', lower=[1,1], exception=exc, backend=backend)
+        self.input_IndicatorBox(lower=[0,0], upper=[1,1], exception=exc, backend=backend)
+        self.input_IndicatorBox(lower=[0,0], upper=1, exception=exc, backend=backend)
+        self.input_IndicatorBox(lower=[0,0], upper=None, exception=exc, backend=backend)
+        self.input_IndicatorBox(lower=[0,0], upper=VectorData(numpy.asarray([0.5,0.5])), exception=exc, backend=backend)
+        self.input_IndicatorBox(upper=[0,0], lower=[1,1], exception=exc, backend=backend)
+        self.input_IndicatorBox(upper=[0,0], lower=1, exception=exc, backend=backend)
+        self.input_IndicatorBox(upper=[0,0], lower=None, exception=exc, backend=backend)
+        self.input_IndicatorBox(upper=[0,0], lower=VectorData(numpy.asarray([0.5,0.5])), exception=exc, backend=backend)
+
+    def test_input1(self):
+        self._test_IndicatorBox_input1('numpy')
+        self._test_IndicatorBox_input1('numba')
+
+    def _test_IndicatorBox_input1(self, backend):
+        if backend == 'numba':
+            exc = ValueError
+            self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,])), lower=VectorData(numpy.asarray([0.5,])), exception=exc, backend=backend)
+            self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,0.5])), lower=VectorData(numpy.asarray([0.5,0.5,0.5])), exception=exc, backend=backend)
+        
+        elif backend == 'numpy':
+            pass
+        
+    def input_IndicatorBox(self, lower, upper, exception, backend):
+        ib = IndicatorBox(lower=lower, upper=upper, backend=backend)
+        x = VectorData(numpy.asarray([0.5,0.5]))
+        with self.assertRaises(exception):
+            ib(x)
+
+    def test_convex_conjugate(self):
+        self._test_IndicatorBox_convex_conjugate('numpy')
+        self._test_IndicatorBox_convex_conjugate('numba')
+        
+    def _test_IndicatorBox_convex_conjugate(self, backend):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        im = ig.allocate(-2) * mask
+        ib = IndicatorBox(lower=-2*mask, backend=backend)
+
+        ib.convex_conjugate(im)
+        np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
+
+        im = ig.allocate(2) * mask
+        np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
+
+    def test_suppress_evaluation(self):
+        self._test_IndicatorBox_suppress_evaluation('numpy')
+        self._test_IndicatorBox_suppress_evaluation('numba')
+
+    def _test_IndicatorBox_suppress_evaluation(self, backend):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        im = ig.allocate(2)
+        ib = IndicatorBox(upper=mask, backend=backend)
+
+        assert ib.suppress_evaluation == False
+
+        v = ib(im)
+
+        ib.set_suppress_evaluation(True)
+
+        assert ib.suppress_evaluation == True
+        v2 = ib(im)
+        assert v2 == 0
+
+        assert v != ib(im)
+
+        with self.assertRaises(ValueError):
+            ib.set_suppress_evaluation('string')

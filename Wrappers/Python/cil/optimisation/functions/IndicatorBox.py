@@ -35,7 +35,30 @@ class IndicatorBox(Function):
                                             0, \text{ if } x \in [a, b] \\
                                             \infty, \text{otherwise}
                                      \end{cases}
-    
+        
+        Parameters
+        ----------
+        
+            lower : float, DataContainer or numpy array, default None
+                Lower bound. If set to None, it is equivalent to ``-np.inf``.
+            upper : float, DataContainer or numpy array, default None
+                Upper bound. If set to None, it is equivalent to ``np.inf``.
+            backend : string, default 'numba'
+                Backend to use. Allowed values are 'numba' and 'numpy'.
+        
+        If passed a ``DataContainer`` (or derived class such as ``ImageData`` or ``AcquisitionData``) 
+        or ``numpy array``, the bounds can be set to different values for each element.
+
+        To suppress the evaluation of the function, set ``suppress_evaluation`` to ``True``. This will return 0 for any input.
+
+        Example:
+        --------
+
+        .. code-block:: python
+
+          ib = IndicatorBox(lower=0, upper=1)
+          ib.set_suppress_evaluation(True)
+          ib.evaluate(x) # returns 0
     '''
 
     def __new__(cls, lower=None, upper=None, backend='numba'):
@@ -48,31 +71,7 @@ class IndicatorBox(Function):
             return super(IndicatorBox, cls).__new__(IndicatorBox_numpy)
     
     def __init__(self, lower=None, upper=None, backend='numba'):
-        '''creator
-
-        Parameters
-        ----------
-        
-            lower : float, DataContainer or numpy array, default None
-                Lower bound. If set to None, it is equivalent to ``-np.inf``.
-            upper : float, DataContainer or numpy array, default None
-                Upper bound. If set to None, it is equivalent to ``np.inf``.
-            backend : string, default 'numba'
-                Backend to use. Allowed values are 'numba' and 'numpy'.
-        
-        If passed a ``DataContainer`` or ``numpy array``, the bounds can be set to different values for each element.
-
-        To suppress the evaluation of the function, set ``suppress_evaluation`` to ``True``. This will return 0 for any input.
-
-        Example:
-        --------
-
-        .. code-block:: python
-
-          ib = IndicatorBox(lower=0, upper=1)
-          ib.set_suppress_evaluation(True)
-          ib.evaluate(x) # returns 0
-        '''
+        '''__init__'''
         super(IndicatorBox, self).__init__()
         
         # We set lower and upper to either a float or a numpy array        
@@ -276,17 +275,7 @@ class IndicatorBox_numpy(IndicatorBox):
     
     def convex_conjugate(self,x):
         '''Convex conjugate of IndicatorBox at x'''
-        # set the number of threads to the number of threads used in the CIL multiprocessing module
-        num_threads = numba.get_num_threads()
-        numba.set_num_threads(cil_mp.NUM_THREADS)
-
-        acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
-        _convex_conjugate(x.as_array(), acc)
-        
-        # reset the number of threads to the original value
-        numba.set_num_threads(num_threads)
-        
-        return np.sum(acc)
+        return x.maximum(0).sum()   
             
     def _proximal(self, outarr):
         np.clip(outarr, None if self.orig_lower is None else self.lower, 

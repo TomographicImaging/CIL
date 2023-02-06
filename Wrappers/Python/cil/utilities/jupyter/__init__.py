@@ -100,7 +100,7 @@ def display_slice(container, clim, direction, title, cmap, size, axis_labels, or
     return get_slice_3D
 
 
-def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
+def islicer(data, direction=0, title=None, slice_number=None, cmap='gray',
             minmax=None, size=None, axis_labels=None, origin='lower-left',
             play_interval=500):
     """
@@ -164,18 +164,24 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
 
-    style = {'description_width': '130px'}
-    height_layout = widgets.Layout(height='20px')
+    if title is None:
+        title = "Direction {}: Slice".format(axis_labels[direction])
+
+    style = {'slider_width': '80%'}
+    layout = widgets.Layout(width='200px')
+
     slice_slider = widgets.IntSlider(
         min=0,
         max=data.shape[direction]-1,
         step=1,
         value=slice_number,
-        continuous_update=False,
-        layout=height_layout,
-        description=axis_labels[direction],
+        continuous_update=True,
+        layout=layout,
         style=style,
     )
+    slice_selector_full = widgets.VBox([widgets.Label('Slice index (direction {})'.format(axis_labels[direction])), slice_slider])
+
+
     play_slices = widgets.Play(
         min=0,
         max=data.shape[direction]-1,
@@ -201,14 +207,14 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         max=1.,
         step=.05,
         disabled=False,
-        continuous_update=False,
+        continuous_update=True,
         orientation='horizontal',
         readout=True,
         readout_format='.2f',
-        layout=height_layout,
-        description='Min/max',
+        layout=layout,
         style=style,
     )
+    min_max_full = widgets.VBox([widgets.Label('Display window percent (0-1)'), min_max])
 
     dirs_remaining = [i for i in range(3) if i != direction]
     h_dir, v_dir = dirs_remaining[1], dirs_remaining[0]
@@ -225,10 +231,11 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         orientation='horizontal',
         readout=True,
         readout_format='d',
-        layout=height_layout,
-        description=f'Range: {axis_labels[h_dir]}',
+        layout=layout,
         style=style,
     )
+    roi_select_hdir_full = widgets.VBox([widgets.Label(f'Range: {axis_labels[h_dir]}'), roi_select_hdir])
+
 
     roi_select_vdir = widgets.IntRangeSlider(
         value=[0, v_dir_size-1],
@@ -240,10 +247,10 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
         orientation='horizontal',
         readout=True,
         readout_format='d',
-        layout=height_layout,
-        description=f'Range: {axis_labels[v_dir]}',
+        layout=layout,
         style=style,
     )
+    roi_select_vdir_full = widgets.VBox([widgets.Label(f'Range: {axis_labels[v_dir]}'), roi_select_vdir])
 
     equal_aspect = widgets.Checkbox(
         value=True,
@@ -256,15 +263,15 @@ def islicer(data, direction=0, title="", slice_number=None, cmap='gray',
     box_layout = widgets.Layout(
         display='flex',
         flex_flow='column',
-        align_items='center',
+        align_items='flex-start',
         justify_content='center',
     )
     selectors = widgets.Box([
         play_slices,
-        slice_slider,
-        min_max,
-        roi_select_hdir,
-        roi_select_vdir,
+        slice_selector_full,
+        min_max_full,
+        roi_select_hdir_full,
+        roi_select_vdir_full,
         equal_aspect],
         layout=box_layout)
 
@@ -301,7 +308,7 @@ def link_islicer(*args):
         The widget containers returned from `islicer`, from which the slice
         selection sliders will be extracted and linked.
     '''
-    slice_sliders = [arg.children[-1].children[1] for arg in args]
+    slice_sliders = [arg.children[-1].children[1].children[1] for arg in args]
     play_widgets = [arg.children[-1].children[0] for arg in args][1:]
     for p in play_widgets:
         p.layout.visibility = 'hidden'
@@ -311,6 +318,7 @@ def link_islicer(*args):
     for pair in pairs:
         widgets.link(*pair)
 
+    display(*args)
 
 # https://stackoverflow.com/questions/31517194/how-to-hide-one-specific-cell-input-or-output-in-ipython-notebook/52664156
 

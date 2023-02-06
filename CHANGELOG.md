@@ -1,4 +1,6 @@
 * Next
+  - Dropped Python 3.6 and NumPy 1.15 support as not required by DLS
+  - Updated version of python and numpy tested by GHA to 3.9 and 1.21 and Jenkins to 3.8 and 1.20
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
   - Implemented IndicatorBox in numba
   - added yml file to create test environment

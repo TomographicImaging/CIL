@@ -48,7 +48,7 @@ jobs:
         path: 'conda_package'
     - uses: conda-incubator/setup-miniconda@v2
       with:
-        python-version: 3.7
+        python-version: 3.9
     - uses: lauramurgatroyd/build-sphinx-action@v0.1.3
       with:
         DOCS_PATH: 'docs'

@@ -119,15 +119,14 @@ class TestGradientOperator(unittest.TestCase):
                                         norm = numpy.sqrt(
                                             (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-
+                                        norm = numpy.sqrt((2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                 else:
 
                                     if geom.length ==3:
                                         norm = numpy.sqrt(
-                                            4 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                            (2/geom.channel_spacing)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                        norm = numpy.sqrt((2/geom.channel_spacing)**2 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
 
 
                             Grad = GradientOperator(geom,
@@ -135,7 +134,7 @@ class TestGradientOperator(unittest.TestCase):
                                                     backend = backend,
                                                     correlation= corr, method=method)
                             try:
-                                numpy.testing.assert_approx_equal(Grad.norm(), norm, significant = 1)
+                                self.assertAlmostEqual(Grad.norm(), norm, 6)
                             except AssertionError:
                                 self.print_assertion_info(geom, bnd,backend,corr,method,None) 
                                 raise

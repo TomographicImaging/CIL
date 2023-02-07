@@ -58,7 +58,7 @@ jobs:
         PACKAGE_NAME: 'cil'
         PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
         BUILD_SUBDIR_NAME: 'nightly'
-        # python_version: 3.9 # default is 3.9
+        python_version: 3. # default is 3.7
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest

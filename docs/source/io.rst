@@ -61,4 +61,16 @@ TIFF Reader/Writer
    :members:
    :special-members:
 
+
+HDF5 Utilities
+==================
+
+Utility functions to browse HDF5 files. These allow you to browse groups and read in datasets as numpy.ndarrays.
+
+A CIL geometry and dataset must be constructed manually from the array and metadata.
+
+.. autoclass:: cil.io.utilities.HDF5_utilities
+   :members:
+
+
 :ref:`Return Home <mastertoc>`

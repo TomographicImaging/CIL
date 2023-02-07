@@ -21,7 +21,7 @@ jobs:
       uses: paskino/conda-package-publish-action@v2.0.0
       with:
         subDir: 'recipe'
-        channels: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi  --override-channels'
+        channels: '-c conda-forge -c intel -c astra-toolbox -c cvxgrp -c ccpi'
         convert_win: false
         convert_osx: false
         test_pyver: 3.9

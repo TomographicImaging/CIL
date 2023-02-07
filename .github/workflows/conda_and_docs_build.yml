@@ -18,7 +18,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: conda-build
-      uses: paskino/conda-package-publish-action@v2.0.0
+      uses: paskino/conda-package-publish-action@v1.4.4
       with:
         subDir: 'recipe'
         channels: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi  --override-channels'
@@ -58,7 +58,7 @@ jobs:
         PACKAGE_NAME: 'cil'
         PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
         BUILD_SUBDIR_NAME: 'nightly'
-        python_version: 3. # default is 3.7
+        python_version: 3.9 # default is 3.7
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest

@@ -26,8 +26,6 @@ import configparser
 import logging
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 def compress_and_save(data, compress, scale, offset, dtype, fname):
     '''Compress and save numpy array to file
     
@@ -148,8 +146,8 @@ class RAWFileWriter(object):
             )[0]
         
         self.dir_name = os.path.dirname(file_name)
-        logger.info ("dir_name {}".format(self.dir_name))
-        logger.info ("file_name {}".format(self.file_name))
+        logging.info ("dir_name {}".format(self.dir_name))
+        logging.info ("file_name {}".format(self.file_name))
         
         # Deal with compression
         self.compress           = utilities.get_compress(compression)

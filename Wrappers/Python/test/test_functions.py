@@ -44,6 +44,7 @@ from cil.utilities import dataexample
 from cil.utilities import noise
 from testclass import CCPiTestClass
 from cil.utilities.quality_measures import mae
+import cil.utilities.multiprocessing as cilmp
 
 from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
 import numba
@@ -1286,16 +1287,16 @@ class TestBlockFunction(unittest.TestCase):
         assert isinstance(bf[0], ScaledFunction)
 
 class TestIndicatorBox(unittest.TestCase):
-    def _test_IndicatorBox(self, backend):
+    def _test_IndicatorBox(self, accelerated):
         ig = ImageGeometry(10,10)
         im = ig.allocate(-1)
-        ib = IndicatorBox(lower=0, backend=backend)
+        ib = IndicatorBox(lower=0, accelerated=accelerated)
         a = ib(im)
         numpy.testing.assert_equal(a, numpy.inf)
-        ib = IndicatorBox(lower=-2, backend=backend)
+        ib = IndicatorBox(lower=-2, accelerated=accelerated)
         a = ib(im)
         numpy.testing.assert_array_equal(0, a)
-        ib = IndicatorBox(lower=-5, upper=-2, backend=backend)
+        ib = IndicatorBox(lower=-5, upper=-2, accelerated=accelerated)
         a = ib(im)
         numpy.testing.assert_equal(a, numpy.inf)
 
@@ -1322,37 +1323,37 @@ class TestIndicatorBox(unittest.TestCase):
         self._test_IndicatorBox_pixelwise_call('numpy')
         self._test_IndicatorBox_pixelwise_call('numba')
 
-    def _test_IndicatorBox_pixelwise_call(self, backend):
+    def _test_IndicatorBox_pixelwise_call(self, accelerated):
         ig = ImageGeometry(10,10)
         mask = self.create_circular_mask(ig)
 
         im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        ib = IndicatorBox(lower=-2*mask, accelerated=accelerated)
         for val, res in zip([2, -3], [0, np.inf]):
             print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask, upper=None, backend=backend)
+        ib = IndicatorBox(lower=-2*mask, upper=None, accelerated=accelerated)
         for val, res in zip([2, -3], [0, np.inf]):
             print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, backend=backend)
+        ib = IndicatorBox(upper=2*mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [0, np.inf]):
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
-        ib = IndicatorBox(upper=2*mask, lower=None, backend=backend)
+        ib = IndicatorBox(upper=2*mask, lower=None, accelerated=accelerated)
         for val, res in zip([-1, 3], [0, np.inf]):
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
-        ib = IndicatorBox(upper=2*mask, lower=-2*mask, backend=backend)
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask, accelerated=accelerated)
         for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
             print("test2", val, res)
             im.fill(val)
@@ -1366,12 +1367,12 @@ class TestIndicatorBox(unittest.TestCase):
         self._test_IndicatorBox_pixelwise_call_suppress('numpy')
         self._test_IndicatorBox_pixelwise_call_suppress('numba')
 
-    def _test_IndicatorBox_pixelwise_call_suppress(self, backend):
+    def _test_IndicatorBox_pixelwise_call_suppress(self, accelerated):
         ig = ImageGeometry(10,10)
         mask = self.create_circular_mask(ig)
 
         im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        ib = IndicatorBox(lower=-2*mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([2, -3], [0, 0]):
             print("test1", val, res)
@@ -1379,14 +1380,14 @@ class TestIndicatorBox(unittest.TestCase):
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, backend=backend)
+        ib = IndicatorBox(upper=2*mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 3], [0, 0]):
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
-        ib = IndicatorBox(lower=-2*mask, upper=None, backend=backend)
+        ib = IndicatorBox(lower=-2*mask, upper=None, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([2, -3], [0, 0]):
             print("test1", val, res)
@@ -1394,14 +1395,14 @@ class TestIndicatorBox(unittest.TestCase):
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, lower=None, backend=backend)
+        ib = IndicatorBox(upper=2*mask, lower=None, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 3], [0, 0]):
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
-        ib = IndicatorBox(upper=2*mask, lower=-2*mask, backend=backend)
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 1, 3], [0,0,0]):
             print("test2", val, res)
@@ -1416,19 +1417,19 @@ class TestIndicatorBox(unittest.TestCase):
         self._test_IndicatorBox_pixelwise_proximal('numpy')
         self._test_IndicatorBox_pixelwise_proximal('numba')
 
-    def _test_IndicatorBox_pixelwise_proximal(self, backend):
+    def _test_IndicatorBox_pixelwise_proximal(self, accelerated):
         ig = ImageGeometry(10,10)
         mask = self.create_circular_mask(ig)
     
         im = ig.allocate(2)
-        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        ib = IndicatorBox(lower=-2*mask, accelerated=accelerated)
         for val, res in zip([2, -3], [ig.allocate(2), -2*mask]):
             # logging.info("test1", val, res)
             im.fill(val)
             np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
 
         im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, backend=backend)
+        ib = IndicatorBox(upper=2*mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2*mask]):
             # logging.info("test1", val, res)
             print("test2", val, res)
@@ -1436,7 +1437,7 @@ class TestIndicatorBox(unittest.TestCase):
             np.testing.assert_allclose(ib.proximal(im, 1).as_array(), res.as_array())
 
         im = ig.allocate(2)
-        ib = IndicatorBox(upper=2*mask, lower=-2*mask, backend=backend)
+        ib = IndicatorBox(upper=2*mask, lower=-2*mask, accelerated=accelerated)
         for val, res in zip([-1, -3, 1], [-1*mask, -2*mask, 1*mask]):
             print("test3", val, res)
             im.fill(val)
@@ -1453,38 +1454,38 @@ class TestIndicatorBox(unittest.TestCase):
         self._test_IndicatorBox_input0('numpy')
         self._test_IndicatorBox_input0('numba')
 
-    def _test_IndicatorBox_input0(self, backend):
-        if backend == 'numpy':
+    def _test_IndicatorBox_input0(self, accelerated):
+        if not accelerated:
             return
 
         exc = numba.core.errors.TypingError
             
-        self.input_IndicatorBox(lower='string', upper=[1,1], exception=exc, backend=backend)
-        self.input_IndicatorBox(upper='string', lower=[1,1], exception=exc, backend=backend)
-        self.input_IndicatorBox(lower=[0,0], upper=[1,1], exception=exc, backend=backend)
-        self.input_IndicatorBox(lower=[0,0], upper=1, exception=exc, backend=backend)
-        self.input_IndicatorBox(lower=[0,0], upper=None, exception=exc, backend=backend)
-        self.input_IndicatorBox(lower=[0,0], upper=VectorData(numpy.asarray([0.5,0.5])), exception=exc, backend=backend)
-        self.input_IndicatorBox(upper=[0,0], lower=[1,1], exception=exc, backend=backend)
-        self.input_IndicatorBox(upper=[0,0], lower=1, exception=exc, backend=backend)
-        self.input_IndicatorBox(upper=[0,0], lower=None, exception=exc, backend=backend)
-        self.input_IndicatorBox(upper=[0,0], lower=VectorData(numpy.asarray([0.5,0.5])), exception=exc, backend=backend)
+        self.input_IndicatorBox(lower='string', upper=[1,1], exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(upper='string', lower=[1,1], exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(lower=[0,0], upper=[1,1], exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(lower=[0,0], upper=1, exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(lower=[0,0], upper=None, exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(lower=[0,0], upper=VectorData(numpy.asarray([0.5,0.5])), exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(upper=[0,0], lower=[1,1], exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(upper=[0,0], lower=1, exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(upper=[0,0], lower=None, exception=exc, accelerated=accelerated)
+        self.input_IndicatorBox(upper=[0,0], lower=VectorData(numpy.asarray([0.5,0.5])), exception=exc, accelerated=accelerated)
 
     def test_input1(self):
         self._test_IndicatorBox_input1('numpy')
         self._test_IndicatorBox_input1('numba')
 
-    def _test_IndicatorBox_input1(self, backend):
-        if backend == 'numba':
+    def _test_IndicatorBox_input1(self, accelerated):
+        if accelerated:
             exc = ValueError
-            self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,])), lower=VectorData(numpy.asarray([0.5,])), exception=exc, backend=backend)
-            self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,0.5])), lower=VectorData(numpy.asarray([0.5,0.5,0.5])), exception=exc, backend=backend)
+            self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,])), lower=VectorData(numpy.asarray([0.5,])), exception=exc, accelerated=accelerated)
+            self.input_IndicatorBox(upper=VectorData(numpy.asarray([0.5,0.5])), lower=VectorData(numpy.asarray([0.5,0.5,0.5])), exception=exc, accelerated=accelerated)
         
-        elif backend == 'numpy':
+        else:
             pass
         
-    def input_IndicatorBox(self, lower, upper, exception, backend):
-        ib = IndicatorBox(lower=lower, upper=upper, backend=backend)
+    def input_IndicatorBox(self, lower, upper, exception, accelerated):
+        ib = IndicatorBox(lower=lower, upper=upper, accelerated=accelerated)
         x = VectorData(numpy.asarray([0.5,0.5]))
         with self.assertRaises(exception):
             ib(x)
@@ -1493,12 +1494,12 @@ class TestIndicatorBox(unittest.TestCase):
         self._test_IndicatorBox_convex_conjugate('numpy')
         self._test_IndicatorBox_convex_conjugate('numba')
         
-    def _test_IndicatorBox_convex_conjugate(self, backend):
+    def _test_IndicatorBox_convex_conjugate(self, accelerated):
         ig = ImageGeometry(10,10)
         mask = self.create_circular_mask(ig)
     
         im = ig.allocate(-2) * mask
-        ib = IndicatorBox(lower=-2*mask, backend=backend)
+        ib = IndicatorBox(lower=-2*mask, accelerated=accelerated)
 
         ib.convex_conjugate(im)
         np.testing.assert_equal(ib.convex_conjugate(im), im.maximum(0).sum())
@@ -1510,12 +1511,12 @@ class TestIndicatorBox(unittest.TestCase):
         self._test_IndicatorBox_suppress_evaluation('numpy')
         self._test_IndicatorBox_suppress_evaluation('numba')
 
-    def _test_IndicatorBox_suppress_evaluation(self, backend):
+    def _test_IndicatorBox_suppress_evaluation(self, accelerated):
         ig = ImageGeometry(10,10)
         mask = self.create_circular_mask(ig)
     
         im = ig.allocate(2)
-        ib = IndicatorBox(upper=mask, backend=backend)
+        ib = IndicatorBox(upper=mask, accelerated=accelerated)
 
         assert ib.suppress_evaluation == False
 
@@ -1531,3 +1532,18 @@ class TestIndicatorBox(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             ib.set_suppress_evaluation('string')
+
+    def test_set_num_threads(self):
+        ig = ImageGeometry(10,10)
+        mask = self.create_circular_mask(ig)
+    
+        for acc in [True, False]:
+            im = ig.allocate(2)
+            ib = IndicatorBox(upper=mask, accelerated=acc)
+
+            assert ib.num_threads == cilmp.NUM_THREADS
+
+
+            N = 10
+            ib.set_num_threads(N)
+            assert ib.num_threads == N

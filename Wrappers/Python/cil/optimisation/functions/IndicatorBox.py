@@ -38,13 +38,12 @@ class IndicatorBox(Function):
         
         Parameters
         ----------
-        
-            lower : float, DataContainer or numpy array, default None
-                Lower bound. If set to None, it is equivalent to ``-np.inf``.
-            upper : float, DataContainer or numpy array, default None
-                Upper bound. If set to None, it is equivalent to ``np.inf``.
-            backend : string, default 'numba'
-                Backend to use. Allowed values are 'numba' and 'numpy'.
+        lower : float, DataContainer or numpy array, default None
+            Lower bound. If set to None, it is equivalent to ``-np.inf``.
+        upper : float, DataContainer or numpy array, default None
+            Upper bound. If set to None, it is equivalent to ``np.inf``.
+        backend : string, default 'numba'
+            Backend to use. Allowed values are 'numba' and 'numpy'.
         
         If passed a ``DataContainer`` (or derived class such as ``ImageData`` or ``AcquisitionData``) 
         or ``numpy array``, the bounds can be set to different values for each element.
@@ -52,26 +51,46 @@ class IndicatorBox(Function):
         In order to save computing time it is possible to suppress the evaluation of the function. This is 
         achieved by setting ``suppress_evaluation`` to ``True``. ``IndicatorBox`` evaluated on any input will then return 0.
 
+        If ``accelerated`` is set to ``True``, the Numba backend is used. Otherwise, the Numpy backend is used.
+        An optional parameter to set the number of threads used by Numba can be set with ``set_num_threads``.
+        The default number of threads is defined in the ``cil.utilities.multiprocessing`` module, and
+        it is equivalent to half of the CPU cores available.
+
         Example:
         --------
-
+        
+        In order to save computing time it is possible to suppress the evaluation of the function.
+        
         .. code-block:: python
 
           ib = IndicatorBox(lower=0, upper=1)
           ib.set_suppress_evaluation(True)
           ib.evaluate(x) # returns 0
+
+
+        Example:
+        --------
+        
+        Set the number of threads used in accelerated mode.
+        
+        .. code-block:: python
+
+        
+          num_threads = 4
+          ib = IndicatorBox(lower=0, upper=1)
+          ib.set_num_threads(num_threads)
+          ib.evaluate(x) # returns 0
     '''
 
-    def __new__(cls, lower=None, upper=None, backend='numba'):
-        if backend == 'numba':
-
+    def __new__(cls, lower=None, upper=None, accelerated=True):
+        if accelerated:
             logging.info("Numba backend is used.")      
             return super(IndicatorBox, cls).__new__(IndicatorBox_numba)
         else:
             logging.info("Numpy backend is used.") 
             return super(IndicatorBox, cls).__new__(IndicatorBox_numpy)
     
-    def __init__(self, lower=None, upper=None, backend='numba'):
+    def __init__(self, lower=None, upper=None, accelerated=True):
         '''__init__'''
         super(IndicatorBox, self).__init__()
         
@@ -84,6 +103,9 @@ class IndicatorBox(Function):
         # default is to evaluate the function
         self._suppress_evaluation = False
 
+        # optional parameter to track the number of threads used by numba
+        self._num_threads = None
+
     @property
     def suppress_evaluation(self):
         return self._suppress_evaluation
@@ -93,9 +115,8 @@ class IndicatorBox(Function):
         
         Parameters
         ----------
-
-            value : bool
-                If True, the function evaluation on any input will return 0, without calculation.
+        value : bool
+            If True, the function evaluation on any input will return 0, without calculation.
         '''
         if not isinstance(value, bool):
             raise ValueError('Value must be boolean')
@@ -123,13 +144,12 @@ class IndicatorBox(Function):
 
           Parameters
           ----------
-
-            x : DataContainer
-                Input to the proximal operator
-            tau : float
-                Step size. Notice it is ignored in IndicatorBox, see ``proximal`` for details
-            out : DataContainer, optional
-                Output of the proximal operator. If not provided, a new DataContainer is created.
+          x : DataContainer
+              Input to the proximal operator
+          tau : float
+              Step size. Notice it is ignored in IndicatorBox, see ``proximal`` for details
+          out : DataContainer, optional
+              Output of the proximal operator. If not provided, a new DataContainer is created.
 
         '''
 
@@ -155,7 +175,6 @@ class IndicatorBox(Function):
 
         Parameters
         ----------
-
         x : DataContainer
             Input to the proximal operator
         tau : float
@@ -190,14 +209,28 @@ class IndicatorBox(Function):
     def _proximal(self, outarr):
         raise NotImplementedError('Implement this in the derived class')
 
+    @property
+    def num_threads(self):
+        '''Get the optional number of threads parameter to use for the accelerated version.
+        
+        Defaults to the value set in the CIL multiprocessing module.'''
+        return cil_mp.NUM_THREADS if self._num_threads is None else self._num_threads
+
+    def set_num_threads(self, value):
+        '''Set the optional number of threads parameter to use for the accelerated version.
+        
+        This is discarded if ``accelerated=False``.'''
+        self._num_threads = value
+
 class IndicatorBox_numba(IndicatorBox):
 
     def evaluate(self,x):
         
         '''Evaluates IndicatorBox at x'''
-        
+        # set the number of threads to the number of threads defined by the user
+        # or default to what set in the CIL multiprocessing module
         num_threads = numba.get_num_threads()
-        numba.set_num_threads(cil_mp.NUM_THREADS)
+        numba.set_num_threads(self.num_threads)
         breaking = np.zeros(numba.get_num_threads(), dtype=np.uint8)
                 
         if isinstance(self.lower, np.ndarray):
@@ -218,14 +251,16 @@ class IndicatorBox_numba(IndicatorBox):
 
                 _array_within_limits_ff(x.as_array(), self.lower, self.upper, breaking)
 
+        # reset the number of threads to the original value
         numba.set_num_threads(num_threads)
         return np.inf if breaking.sum() > 0 else 0.0
     
     def convex_conjugate(self,x):
         '''Convex conjugate of IndicatorBox at x'''
-        # set the number of threads to the number of threads used in the CIL multiprocessing module
+        # set the number of threads to the number of threads defined by the user
+        # or default to what set in the CIL multiprocessing module
         num_threads = numba.get_num_threads()
-        numba.set_num_threads(cil_mp.NUM_THREADS)
+        numba.set_num_threads(self.num_threads)
 
         acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
         _convex_conjugate(x.as_array(), acc)
@@ -347,7 +382,7 @@ def _array_within_limits_fa(x, lower, upper, breaking):
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_aa(x, lower, upper):
-    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    '''Slightly faster than using np.clip'''
     if x.size != lower.size or x.size != upper.size:
         raise ValueError('x, lower and upper must have the same size')
     arr = x.ravel()
@@ -361,7 +396,7 @@ def _proximal_aa(x, lower, upper):
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_af(x, lower, upper):
-    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    '''Slightly faster than using np.clip'''
     if x.size != lower.size :
         raise ValueError('x, lower and upper must have the same size')
     arr = x.ravel()
@@ -375,7 +410,7 @@ def _proximal_af(x, lower, upper):
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_fa(x, lower, upper):
-    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    '''Slightly faster than using np.clip'''
     if x.size != upper.size:
         raise ValueError('x, lower and upper must have the same size')
     arr = x.ravel()
@@ -388,7 +423,7 @@ def _proximal_fa(x, lower, upper):
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_na(x, upper):
-    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    '''Slightly faster than using np.clip'''
     if x.size != upper.size:
         raise ValueError('x and upper must have the same size')
     arr = x.ravel()
@@ -399,7 +434,7 @@ def _proximal_na(x, upper):
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_an(x, lower):
-    '''Similar to np.clip except that the clipping range can be defined by ndarrays'''
+    '''Slightly faster than using np.clip'''
     if x.size != lower.size:
         raise ValueError('x and lower must have the same size')
     arr = x.ravel()

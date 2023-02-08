@@ -15,6 +15,7 @@
 #  limitations under the License.
 
 import unittest
+from unittest.mock import patch
 from utils import initialise_tests
 from cil.framework import AcquisitionGeometry
 import numpy as np
@@ -22,6 +23,7 @@ import os
 from cil.framework import ImageGeometry
 from cil.io import TXRMDataReader, NEXUSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
+from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
 from cil.utilities.dataexample import data_dir
@@ -442,3 +444,73 @@ class TestRAW(unittest.TestCase):
         
         np.testing.assert_array_equal(tmp, read_array)
 
+class Test_HDF5_utilities(unittest.TestCase):
+    def setUp(self) -> None:
+        self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
+
+        
+        self.dset_path ='/entry1/tomo_entry/data/data'
+
+
+    def test_print_metadata(self):
+        devnull = open(os.devnull, 'w') #suppress stdout
+        with patch('sys.stdout', devnull):
+            HDF5_utilities.print_metadata(self.path)    
+
+
+    def test_get_dataset_metadata(self):
+        dset_dict = HDF5_utilities.get_dataset_metadata(self.path, self.dset_path)
+
+        dict_by_hand  ={'ndim': 3, 'shape': (91, 135, 160), 'size': 1965600, 'dtype': np.float32, 'compression': None, 'chunks': None, 'is_virtual': False}
+        self.assertDictContainsSubset(dict_by_hand,dset_dict)
+
+
+    def test_read(self):
+
+        data_full = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+
+        # full dataset
+        data_read_full = HDF5_utilities.read(self.path, self.dset_path)
+        np.testing.assert_allclose(data_full.array,data_read_full)
+
+        # subset of input
+        subset = np.s_[44:45,70:90:2,80]
+        data_read_subset = HDF5_utilities.read(self.path, self.dset_path, subset)
+        self.assertTrue(data_read_subset.dtype == np.float32)
+        np.testing.assert_allclose(data_full.array[subset],data_read_subset)
+
+        # read as dtype
+        subset = np.s_[44:45,70:90:2,80]
+        data_read_dtype = HDF5_utilities.read(self.path, self.dset_path, subset, dtype=np.float64)
+        self.assertTrue(data_read_dtype.dtype == np.float64)
+        np.testing.assert_allclose(data_full.array[subset],data_read_dtype)
+
+
+    def test_read_to(self):
+        data_full = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+
+        # full dataset
+        data_full_out = np.empty_like(data_full.array, dtype=np.float32)
+        HDF5_utilities.read_to(self.path, self.dset_path, data_full_out)
+        np.testing.assert_allclose(data_full.array,data_full_out)
+
+        # subset of input, continuous output
+        subset = np.s_[44:45,70:90:2,80]
+        data_subset_out = np.empty((1,10), dtype=np.float32)
+        HDF5_utilities.read_to(self.path, self.dset_path, data_subset_out, source_sel=subset)
+        np.testing.assert_allclose(data_full.array[subset],data_subset_out)
+
+        # subset of input, continuous output, change of dtype
+        subset = np.s_[44:45,70:90:2,80]
+        data_subset_out = np.empty((1,10), dtype=np.float64)
+        HDF5_utilities.read_to(self.path, self.dset_path, data_subset_out, source_sel=subset)
+        np.testing.assert_allclose(data_full.array[subset],data_subset_out)
+
+        # subset of input written to subset of  output
+        data_partial_by_hand = np.zeros_like(data_full.array, dtype=np.float32)
+        data_partial = np.zeros_like(data_full.array, dtype=np.float32)
+
+        data_partial_by_hand[subset] = data_full.array[subset]
+
+        HDF5_utilities.read_to(self.path, self.dset_path, data_partial, source_sel=subset, dest_sel=subset)
+        np.testing.assert_allclose(data_partial_by_hand,data_partial)

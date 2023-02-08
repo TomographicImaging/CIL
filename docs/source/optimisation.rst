@@ -176,23 +176,18 @@ Trivial operators are the following.
 GradientOperator 
 -----------------
 
-In the following the required classes for the implementation of the :code:`GradientOperator` operator.
-
 .. autoclass:: cil.optimisation.operators.GradientOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.FiniteDifferenceOperator
    :members:
-   :special-members:
 
 .. autoclass:: cil.optimisation.operators.SparseFiniteDifferenceOperator
    :members:
-   :special-members:
 
 .. autoclass:: cil.optimisation.operators.SymmetrisedGradientOperator
    :members:
-   :special-members:
 
 
 

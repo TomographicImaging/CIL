@@ -329,19 +329,19 @@ class TestOperator(CCPiTestClass):
         self.assertIsNone(G._norm)
         
         #calculates norm
-        self.assertAlmostEqual(G.norm(), 2.754, 2)
+        self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
 
         #sets_norm
         G.set_norm(4)
         self.assertEqual(G._norm, 4)
 
-        #gets chached norm
+        #gets cached norm
         self.assertEqual(G.norm(), 4)
 
         #sets cache to None
         G.set_norm(None)
         #recalculates norm
-        self.assertAlmostEqual(G.norm(), 2.754, 2)
+        self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
 
 
     def test_ProjectionMap(self):

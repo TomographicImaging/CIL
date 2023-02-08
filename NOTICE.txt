@@ -14,6 +14,7 @@ Jakob Jorgensen (DTU)
 Laura Murgatroyd (STFC)
 Evangelos Papoutsellis (STFC)
 Edoardo Pasca (STFC)
+Kyle Pidgeon (STFC)
 
 Other contributors:
 Claire Delplancke (UoB)

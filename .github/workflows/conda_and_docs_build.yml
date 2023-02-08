@@ -21,7 +21,7 @@ jobs:
       uses: paskino/conda-package-publish-action@v1.4.4
       with:
         subDir: 'recipe'
-        channels: '-c conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi  --override-channels'
+        channels: '-c conda-forge -c intel -c astra-toolbox -c ccpi'
         convert_win: false
         convert_osx: false
         test_pyver: 3.9
@@ -49,16 +49,16 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.9
-    - uses: paskino/build-sphinx-action@main
+    - uses: lauramurgatroyd/build-sphinx-action@v0.1.4
       with:
         DOCS_PATH: 'docs'
         CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'
         ARTIFACT_NAME: 'DocumentationHTML'
         PACKAGE_FOLDER_PATH: 'conda_package'
         PACKAGE_NAME: 'cil'
-        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
+        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox -c ccpi'
         BUILD_SUBDIR_NAME: 'nightly'
-        python_version: 3.9 # default is 3.7
+        python_version: 3.9
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest

@@ -18,6 +18,7 @@
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
 import numpy as np
 import weakref
+import logging 
 
 try:
     from cil.processors.cilacc_binner import Binner_IPP
@@ -217,8 +218,19 @@ class Binner(DataProcessor):
             if start < 0:
                 start += shape_in[offset + i]
 
-            if stop < 0:
+            if stop <= 0:
                 stop += shape_in[offset + i]
+
+
+            if stop > shape_in[offset+i]:
+                logging.warning("ROI for axis {0} has 'stop' out of bounds. Using axis length as stop value. Got stop index: {1}, using {2}".format(dimension_labels[i],stop, shape_in[offset+i]))
+                stop = shape_in[offset+i]
+
+            if start > shape_in[offset+i]:
+                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1} for axis length {2}".format(dimension_labels[i]),start, shape_in[offset+i])
+
+            if start >= stop:
+                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1}, stop index {2}".format(dimension_labels[i]),start, stop)
 
             #set values
             binning[offset + i]  = int(step)

@@ -23,6 +23,7 @@ from cil.utilities import dataexample
 from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
+from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
@@ -33,11 +34,11 @@ from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_
 
 initialise_tests()
 
-if has_tigre:
-    from cil.plugins.tigre import ProjectionOperator
-
 if has_astra:
     from cil.plugins.astra import ProjectionOperator as AstraProjectionOperator
+
+if has_tigre:
+    from cil.plugins.tigre import ProjectionOperator as TigreProjectionOperator
 
 if has_tomophantom:
     from cil.plugins import TomoPhantom
@@ -769,220 +770,442 @@ class TestBinner(unittest.TestCase):
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
    
 
-class TestSlicer(unittest.TestCase):      
-    def test_Slicer(self):
-        
-        #test parallel 2D case
+class TestSlicer(unittest.TestCase):
 
-        ray_direction = [0.1, 3.0]
-        detector_position = [-1.3, 1000.0]
-        detector_direction_row = [1.0, 0.2]
-        rotation_axis_position = [0.1, 2.0]
-        
-        AG = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    rotation_axis_position=rotation_axis_position)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel(100, pixel_size=0.1)
-        
-        data = AG.allocate('random')
-        
-        s = Slicer(roi={'channel': (1, -2, 3),
-                        'angle': (2, 9, 2),
-                        'horizontal': (10, -11, 7)})
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        AG_sliced = AG.clone()
-        AG_sliced.set_channels(num_channels=numpy.arange(1, 10-2, 3).shape[0])
-        AG_sliced.set_panel([numpy.arange(10, 100-11, 7).shape[0], 1], pixel_size=0.1)
-        AG_sliced.set_angles(angles[2:9:2], initial_angle=10, angle_unit='radian')
-        
-        self.assertTrue(data_sliced.geometry == AG_sliced)
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1:-2:3, 2:9:2, 10:-11:7]), rtol=1E-6)
-        
-        #%%
-        #test parallel 3D case
-        
-        ray_direction = [0.1, 3.0, 0.4]
-        detector_position = [-1.3, 1000.0, 2]
-        detector_direction_row = [1.0, 0.2, 0.0]
-        detector_direction_col = [0.0 ,0.0, 1.0]
-        rotation_axis_position = [0.1, 2.0, 0.5]
-        rotation_axis_direction = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    detector_direction_y=detector_direction_col,
-                                                    rotation_axis_position=rotation_axis_position,
-                                                    rotation_axis_direction=rotation_axis_direction)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel((100, 50), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
-        
-        data = AG.allocate('random')
-        
-        s = Slicer(roi={'channel': (None, 1),
-                        'angle': -1,
-                        'horizontal': (10, None, 2),
-                        'vertical': (10, 12, 1)})
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        dimension_labels_sliced = list(data.geometry.dimension_labels)
-        dimension_labels_sliced.remove('channel')
-        dimension_labels_sliced.remove('vertical')
-        
-        AG_sliced = AG.clone()
-        AG_sliced.dimension_labels = dimension_labels_sliced
-        AG_sliced.set_channels(num_channels=1)
-        AG_sliced.set_panel([numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 12, 1).shape[0]], pixel_size=(0.1, 0.2))
-        
-        self.assertTrue(data_sliced.geometry == AG_sliced)
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:12:1, 10::2, :, :1]), rtol=1E-6)
-        
-        #%%
-        #test cone 2D case
-        
-        source_position = [0.1, 3.0]
-        detector_position = [-1.3, 1000.0]
-        detector_direction_row = [1.0, 0.2]
-        rotation_axis_position = [0.1, 2.0]
-        
-        AG = AcquisitionGeometry.create_Cone2D(source_position=source_position, 
-                                                detector_position=detector_position, 
-                                                detector_direction_x=detector_direction_row, 
-                                                rotation_axis_position=rotation_axis_position)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='degree')
-        AG.set_panel(100, pixel_size=0.1)
-        
-        data = AG.allocate('random')
-        
-        s = Slicer(roi={'channel': (1, None, 4),
-                        'angle': (2, 9, 2),
-                        'horizontal': (10, -10, 5)})
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        AG_sliced = AG.clone()
-        AG_sliced.set_channels(num_channels=numpy.arange(1,10,4).shape[0])
-        AG_sliced.set_angles(AG.config.angles.angle_data[2:9:2], angle_unit='degree', initial_angle=10)
-        AG_sliced.set_panel(numpy.arange(10,90,5).shape[0], pixel_size=0.1)
-        
-        self.assertTrue(data_sliced.geometry == AG_sliced)
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1::4, 2:9:2, 10:-10:5]), rtol=1E-6)
-        
-        #%%
-        #test cone 3D case
-        
-        source_position = [0.1, 3.0, 0.4]
-        detector_position = [-1.3, 1000.0, 2]
-        rotation_axis_position = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Cone3D(source_position=source_position, 
-                                                detector_position=detector_position,
-                                                rotation_axis_position=rotation_axis_position)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel((100, 50), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
-        
-        data = AG.allocate('random')
-        
-        s = Slicer(roi={'channel': (None, 1),
-                        'angle': -1,
-                        'horizontal': (10, None, 2),
-                        'vertical': (10, -10, 2)})
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        dimension_labels_sliced = list(data.geometry.dimension_labels)
-        dimension_labels_sliced.remove('channel')
-        
-        AG_sliced = AG.clone()
-        AG_sliced.dimension_labels = dimension_labels_sliced
-        AG_sliced.set_channels(num_channels=1)
-        AG_sliced.set_panel([numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 50-10, 2).shape[0]], pixel_size=(0.1, 0.2))
-        self.assertTrue(data_sliced.geometry == AG_sliced)
-        
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:-10:2, 10::2, :, :1]), rtol=1E-6)
-        
-        #%% test cone 3D - central slice
-        s = Slicer(roi={'channel': (None, 1),
-                        'angle': -1,
-                        'horizontal': (10, None, 2),
-                        'vertical': (25, 26)})
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        dimension_labels_sliced = list(data.geometry.dimension_labels)
-        dimension_labels_sliced.remove('channel')
-        dimension_labels_sliced.remove('vertical')
-        
-        AG_sliced = AG.get_slice(vertical='centre')
-        AG_sliced = AG_sliced.get_slice(channel=1)
-        AG_sliced.config.panel.num_pixels[0] = numpy.arange(10,100,2).shape[0]
-        
-        self.assertTrue(data_sliced.geometry == AG_sliced)
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[25:26, 10::2, :, :1]), rtol=1E-6)
-        
-        
-        #%% test ImageData
-        IG = ImageGeometry(voxel_num_x=20,
-                            voxel_num_y=30,
-                            voxel_num_z=12,
-                            voxel_size_x=0.1,
-                            voxel_size_y=0.2,
-                            voxel_size_z=0.3,
-                            channels=10,
-                            center_x=0.2,
-                            center_y=0.4,
-                            center_z=0.6,
-                            dimension_labels = ['vertical',\
-                                                'channel',\
-                                                'horizontal_y',\
-                                                'horizontal_x'])
-        
-        data = IG.allocate('random')
-        
-        s = Slicer(roi={'channel': (None, None, 2),
-                        'horizontal_x': -1,
-                        'horizontal_y': (10, None, 2),
-                        'vertical': (5, None, 3)})
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        IG_sliced = IG.copy()
-        IG_sliced.voxel_num_y = numpy.arange(10, 30, 2).shape[0]
-        IG_sliced.voxel_num_z = numpy.arange(5, 12, 3).shape[0]
-        IG_sliced.channels = numpy.arange(0, 10, 2).shape[0]
-        
-        self.assertTrue(data_sliced.geometry == IG_sliced)
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
+    def test_parse_roi(self):
 
+        ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
+        data = ig.allocate('random')
+
+        channel = range(0,10,3)
+        vertical = range(0,8,2)
+        horizontal_y = range(0,22,1)
+        horizontal_x = range(0,4,4)
+
+        roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
+        proc = Slicer(roi)
+        proc._parse_roi(data.ndim, data.shape,data.dimension_labels)
+
+        # check set values
+        self.assertTrue(proc._shape_in == list(data.shape))
+
+        shape_out =[
+            len(channel),
+            len(vertical),
+            len(horizontal_y),
+            len(horizontal_x),
+        ]
+
+        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
+        numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
+
+        roi_ordered = [
+            range(channel.start, shape_out[0] * channel.step, channel.step),
+            range(vertical.start, shape_out[1] * vertical.step, vertical.step),
+            range(horizontal_y.start, shape_out[2] * horizontal_y.step, horizontal_y.step),
+            range(horizontal_x.start, shape_out[3] * horizontal_x.step, horizontal_x.step)
+        ]
+
+        self.assertTrue(proc._roi_ordered == roi_ordered)
+
+
+    def test_slice_acquisition_geometry_parallel2D(self):
+
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'horizontal':(None,None,None)},
+
+                # slice all
+                {'channel':(None,None,4),'angle':(None,None,2),'horizontal':(None,None,16)},
+        ]
+
+        pix_end1 = ag.pixel_num_h -1
+        pix_start2 = 0
+        pix_end2 = 7 * 16 # last pixel index sliced multiplied by step size
+        offset = ag.pixel_size_h*((pix_start2)-(pix_end1 - pix_end2 ))/2
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Parallel2D(detector_position=[offset, 0.  ]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel(8,[1.6,0.1]).set_channels(1),
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Slicer(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._slice_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
+
+    def test_slice_acquisition_geometry_parallel3D(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+
+                # slice all
+                {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
+                
+                # slice to single dimension
+                {'vertical':(31,33,2)},
+        ]
+
+        pix_end_h1 = ag.pixel_num_h -1
+        pix_start_h2 = 0
+        pix_end_h2 = 7 * 16 # last pixel index sliced multiplied by step size
+        offset_h = ag.pixel_size_h*((pix_start_h2)-(pix_end_h1-pix_end_h2))/2
+
+        pix_end_v1 = ag.pixel_num_v -1
+        pix_start_v2 = 0
+        pix_end_v2 = 7 * 8 # last pixel index sliced multiplied by step size
+        offset_v = ag.pixel_size_v*((pix_start_v2)-(pix_end_v1- pix_end_v2))/2
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Parallel3D(detector_position=[offset_h, 0, offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
+                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Slicer(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._slice_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
+
+
+    def test_slice_acquisition_geometry_cone2D(self):
+
+        ag = AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'horizontal':(None,None,None)},
+
+                # slice all
+                {'channel':(None,None,4),'angle':(None,None,2),'horizontal':(None,None,16)},
+        ]
+
+        pix_end1 = ag.pixel_num_h -1
+        pix_start2 = 0
+        pix_end2 = 7 * 16 # last pixel index sliced multiplied by step size
+        offset = ag.pixel_size_h*((pix_start2)-(pix_end1-pix_end2) )/2
+        
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Cone2D([0,-50],[offset,50]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel(8,[1.6,0.1]).set_channels(1),
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Slicer(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._slice_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
+
+
+    def test_slice_acquisition_geometry_cone3D(self):
+
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+
+                # slice all
+                {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
+
+                # shift detector with crop
+                {'vertical':(32,65,2)},
+                
+                # slice to single dimension
+                {'vertical':(32,34,2)},
+
+        ]
+
+        # roi1
+        pix_end_h1 = ag.pixel_num_h -1
+        pix_start_h2 = 0
+        pix_end_h2 = 7 * 16 # last pixel index sliced multiplied by step size
+        offset_h = ag.pixel_size_h*((pix_start_h2)-(pix_end_h1-pix_end_h2))/2
+
+        pix_end_v1 = ag.pixel_num_v -1
+        pix_start_v2 = 0
+        pix_end_v2 = 7 * 8 # last pixel index sliced multiplied by step size
+        offset_v = ag.pixel_size_v*((pix_start_v2)-(pix_end_v1-pix_end_v2) )/2
+
+        #roi2
+        vert_range = range(32,min(65,ag.pixel_num_v),2)
+        pix_end_v1 = ag.pixel_num_v -1
+        pix_start_v2 = 32
+        pix_end_v2 = 15 * 2 +  pix_start_v2 # last pixel index sliced multiplied by step size
+        offset_v2 = ag.pixel_size_v*((pix_start_v2)-(pix_end_v1-pix_end_v2))/2
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[offset_h,50,offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
+                AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,offset_v2]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,16],[0.1,0.4]).set_channels(4),
+                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Slicer(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._slice_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
+
+
+    def test_slice_image_geometry(self):
+
+        ig_in = ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'vertical':(None,None,None),'horizontal_x':(None,None,None),'horizontal_y':(None,None,None)},
+
+                # slice all
+                {'channel':(None,None,3),'vertical':(None,None,7),'horizontal_x':(None,None,4),'horizontal_y':(None,None,5)},
+
+                # crop and slice
+                {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
+                
+                # slice to single dimension
+                {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(4,5,8),'horizontal_y':(None,None,16)},
+        ]
+
+        offset_x =0.1*(8-1-1*4)/2
+        offset_y =0.2*(16-1-3 * 5)/2
+        offset_z =0.3*(28-1-3 * 7)/2
+
+        ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
+                    ImageGeometry(2,4,4,0.4,1.0,2.1,center_x=-offset_x,center_y=-offset_y,center_z=-offset_z,channels=2),
+                    ImageGeometry(3,2,4,0.2,0.4,1.2,center_x=-0.05,center_y=-0.5,center_z=-1.05,channels=2),
+                    ImageGeometry(1,1,1,0.8,3.2,8.4,center_x=0.05,center_y=-1.5,center_z=-4.05, channels=1),
+        ]
+
+        #channel spacing isn't an initialisation argument
+        ig_gold[1].channel_spacing=3
+        ig_gold[2].channel_spacing=2
+        ig_gold[3].channel_spacing=4
+
+
+        for i, roi in enumerate(rois):
+            proc = Slicer(roi=roi)
+            proc.set_input(ig_in)
+            ig_out = proc._slice_image_geometry()
+            self.assertEqual(ig_gold[i], ig_out, msg="Slicer image geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ig_gold[i], ig_out))
+
+        with self.assertRaises(ValueError):
+            roi = {'wrong label':(None,None,None)}
+            proc = Slicer(roi=roi)
+            proc.set_input(ig_in)
+            ig_out = proc._slice_image_geometry(ig_in)
+
+
+        # slicing/cropping offsets geometry
+        ig_in = ImageGeometry(128,128,128,16,16,16,80,240,-160)
+        ig_gold = ImageGeometry(11,11,11,48,48,48,-184,-24,-424)
+
+        roi = {'vertical':(32,64,3),'horizontal_x':(32,64,3),'horizontal_y':(32,64,3)}
+        proc = Slicer(roi)
+        proc.set_input(ig_in)
+        ig_out = proc.get_output()
+
+        self.assertEqual(ig_gold, ig_out, msg="Slicing image geometry with offset roi failed. \nExpected:\n{0}\nGot\n{1}".format(ig_gold, ig_out))
+
+
+    def test_slice_image_data(self):
+
+        ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
+        data = ig.allocate('random')
+
+        channel = range(0,10,2)
+        vertical = range(0,8,2)
+        horizontal_y = range(0,6,2)
+        horizontal_x = range(0,4,2)
+
+        roi = {'channel':channel,'vertical':vertical,'horizontal_x':horizontal_x,'horizontal_y':horizontal_y}
+        proc = Slicer(roi)
+        proc.set_input(data)
+        sliced_data = proc.get_output()
+
+        ig_out = ImageGeometry(2,3,4,0.2,0.4,0.6,0.4-0.5*0.1,0.5-0.5*0.2,0.6-0.5*0.3,channels=5)
+        ig_out.channel_spacing = 2
+
+        sliced_by_hand = ig_out.allocate(None)
+
+
+        sliced_by_hand.fill( data.array[(
+            slice(channel.start,channel.stop,channel.step),
+            slice(vertical.start,vertical.stop,vertical.step),
+            slice(horizontal_y.start,horizontal_y.stop,horizontal_y.step),
+            slice(horizontal_x.start,horizontal_x.stop,horizontal_x.step))]
+            )
+
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry)
+
+
+        #test with `out`
+        sliced_data.fill(0)
+        proc.get_output(out=sliced_data)
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry)
+   
+
+
+    def test_slice_acquisition_data(self):
+
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
+        data = ag.allocate('random')
+
+        channel = range(0,10,2)
+        angle = range(0,8,2)
+        vertical = range(0,6,2)
+        horizontal = range(0,4,2)
+
+        roi = {'channel':channel,'vertical':vertical,'horizontal':horizontal,'angle':angle}
+        proc = Slicer(roi)
+        proc.set_input(data)
+        sliced_data = proc.get_output()
+
+        pix_end_h1 = ag.pixel_num_h -1
+        pix_start_h2 = 0
+        pix_end_h2 = 1 * 2 # last pixel index sliced multiplied by step size
+        offset_h = ag.pixel_size_h*((pix_start_h2)-(pix_end_h1-pix_end_h2))/2
+
+        pix_end_v1 = ag.pixel_num_v -1
+        pix_start_v2 = 0
+        pix_end_v2 = 2 * 2 # last pixel index sliced multiplied by step size
+        offset_v = ag.pixel_size_v*((pix_start_v2)-(pix_end_v1-pix_end_v2))/2
+
+        ag_out = AcquisitionGeometry.create_Cone3D([0,-50,0],[offset_h,50,offset_v]).set_angles(numpy.linspace(0,360,4,endpoint=False)).set_panel([2,3],[0.2,0.4]).set_channels(5)
+        sliced_by_hand = ag_out.allocate(None)
+
+        sliced_by_hand.fill( data.array[(
+            slice(channel.start,channel.stop,channel.step),
+            slice(angle.start,angle.stop,angle.step),
+            slice(vertical.start,vertical.stop,vertical.step),
+            slice(horizontal.start,horizontal.stop,horizontal.step))]
+            )
+
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry,msg="Expected:\n{0}\nGot\n{1}".format(sliced_by_hand.geometry, sliced_data.geometry))
+
+
+        #test with `out`
+        sliced_data.fill(0)
+        proc.get_output(out=sliced_data)
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry,msg="Expected:\n{0}\nGot\n{1}".format(sliced_by_hand.geometry, sliced_data.geometry))
+
+
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_imagedata_full(self):
+        """
+        This test slices a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data.log(out=data)
+        data*=-1
+
+        recon =FBP(data).run(verbose=0)
+
+        roi = {'vertical':(20,40,5),'horizontal_y':(70,100,3),'horizontal_x':(-80,-40,2)}
+        slicer = Slicer(roi)
+
+        slicer.set_input(recon.geometry)
+        ig_roi = slicer.get_output()
+
+        slicer.set_input(recon)
+        recon_sliced = slicer.get_output()
+
+        self.assertEqual(ig_roi, recon_sliced.geometry, msg="Sliced geometries not equal")
+
+        recon_roi =FBP(data, ig_roi).run(verbose=0)
+
+        numpy.testing.assert_allclose(recon_roi.array, recon_sliced.array, atol=5e-6)
+
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_aqdata_full(self):
+        """
+        This test slices a sinogram. It then uses that geometry for the forward projection.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+        ag.set_labels(['vertical','angle','horizontal'])
+
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = AstraProjectionOperator(phantom.geometry, ag)
+        fp_full = PO.direct(phantom)
+
+
+        roi = {'angle':(25,30,2),'vertical':(5,50,2),'horizontal':(-50,0,2)}
+        slicer = Slicer(roi)
+
+        slicer.set_input(ag)
+        ag_roi = slicer.get_output()
+
+        slicer.set_input(fp_full)
+        fp_sliced = slicer.get_output()
+
+        numpy.testing.assert_allclose(fp_sliced.array, fp_full.array[5:50:2,25:30:2,-50::2])
+
+        self.assertEqual(ag_roi, fp_sliced.geometry, msg="Sliced geometries not equal")
+
+        PO = AstraProjectionOperator(phantom.geometry, ag_roi)
+        fp_roi = PO.direct(phantom)
+
+        numpy.testing.assert_allclose(fp_roi.array, fp_sliced.array, 1e-4)
+
+    @unittest.skip
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_aqdata_full_tigre(self):
+        """
+        This test slices a sinogram. It then uses that geometry for the forward projection.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+
+        Tigre geometry bug means this does not pass.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = TigreProjectionOperator(phantom.geometry, ag)
+        fp_full = PO.direct(phantom)
+
+
+        roi = {'angle':(25,30,2),'vertical':(5,50,2),'horizontal':(-50,0,2)}
+        slicer = Slicer(roi)
+
+        slicer.set_input(ag)
+        ag_roi = slicer.get_output()
+
+        slicer.set_input(fp_full)
+        fp_sliced = slicer.get_output()
+
+        numpy.testing.assert_allclose(fp_sliced.array, fp_full.array[25:30:2,5:50:2,-50::2])
+
+        self.assertEqual(ag_roi, fp_sliced.geometry, msg="Sliced geometries not equal")
+
+        PO = TigreProjectionOperator(phantom.geometry, ag_roi)
+        fp_roi = PO.direct(phantom)
+
+        numpy.testing.assert_allclose(fp_roi.array, fp_sliced.array, 1e-4)
 
 class TestCentreOfRotation_parallel(unittest.TestCase):
     

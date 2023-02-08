@@ -56,7 +56,7 @@ jobs:
         ARTIFACT_NAME: 'DocumentationHTML'
         PACKAGE_FOLDER_PATH: 'conda_package'
         PACKAGE_NAME: 'cil'
-        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox -c cvxgrp -c ccpi'
+        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox -c ccpi'
         BUILD_SUBDIR_NAME: 'nightly'
         python_version: 3.9
   docs_publish:

@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.import numpy as np
 
-from cil.framework import AcquisitionData, ImageData
+from cil.framework import AcquisitionData, ImageData, DataContainer
 import os, re
 import sys
 from cil.framework import AcquisitionData, ImageData
@@ -58,7 +58,7 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
 
 class RAWFileWriter(object):
     '''
-        Writer to write DataSet to disk as a binary blob
+        Writer to write DataContainer (or subclass AcquisitionData, ImageData) to disk as a binary blob
 
         This writer will also write a text file with the minimal information necessary to 
         read the data back in.
@@ -135,9 +135,9 @@ class RAWFileWriter(object):
     
     def __init__(self, data, file_name, compression=None):
         
-        if not isinstance(data, (ImageData, AcquisitionData) ):
+        if not isinstance(data, (DataContainer, ImageData, AcquisitionData) ):
             raise Exception('Writer supports only following data types:\n' +
-                            ' - ImageData\n - AcquisitionData')
+                            'DataContainer - ImageData\n - AcquisitionData')
 
         self.data_container = data
         file_name = os.path.abspath(file_name)

@@ -1,5 +1,7 @@
 * Next
   
+  - Dropped support for Python 3.6 and NumPy 1.15
+  - Jenkins PR tests on Python 3.8 and NumPy 1.20
   - added yml file to create test environment
   - LeastSquares fixed docstring and unified gradient code when out is passed or not.
   - Add compression to 8bit and 16bit to TIFFWriter
@@ -11,7 +13,7 @@
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
-    - Update conda build action to v2.0.0
+    - update test python and numpy versions to 3.9 and 1.22
     - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1

@@ -1,6 +1,5 @@
 #creates pairs of versions using zip_keys, lists must be the same length
 python:
-  - 3.6 # [ linux ]
   - 3.8
   - 3.8
   - 3.8
@@ -10,7 +9,6 @@ python:
   - 3.10 
   - 3.10
 numpy:
-  - 1.15 # [ linux ]
   - 1.20
   - 1.21
   - 1.22

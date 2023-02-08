@@ -1,7 +1,7 @@
 # Copyright 2022 United Kingdom Research and Innovation
 # Copyright 2022 The University of Manchester
 
-# Author(s): 
+# Author(s):
 #   Evangelos Papoutsellis (UKRI)
 #   Edoardo Pasca (UKRI)
 #   Gemma Fardell (UKRI)
@@ -24,9 +24,8 @@ import numba
 from cil.utilities import multiprocessing as cil_mp
 import logging
 
+
 class IndicatorBox(Function):
-    
-    
     r'''Indicator function for box constraint
             
       .. math:: 
@@ -42,24 +41,30 @@ class IndicatorBox(Function):
             Lower bound. If set to None, it is equivalent to ``-np.inf``.
         upper : float, DataContainer or numpy array, default None
             Upper bound. If set to None, it is equivalent to ``np.inf``.
-        backend : string, default 'numba'
-            Backend to use. Allowed values are 'numba' and 'numpy'.
+        accelerated : bool, default True
+            Specifies whether to use the accelerated version or not, using numba or
+            numpy backends respectively.
         
-        If passed a ``DataContainer`` (or derived class such as ``ImageData`` or ``AcquisitionData``) 
-        or ``numpy array``, the bounds can be set to different values for each element.
+        If passed a ``DataContainer`` (or derived class such as ``ImageData`` or 
+        ``AcquisitionData``) or ``numpy array``, the bounds can be set to different 
+        values for each element.
 
-        In order to save computing time it is possible to suppress the evaluation of the function. This is 
-        achieved by setting ``suppress_evaluation`` to ``True``. ``IndicatorBox`` evaluated on any input will then return 0.
+        In order to save computing time it is possible to suppress the evaluation of 
+        the function. This is achieved by setting ``suppress_evaluation`` to ``True``. 
+        ``IndicatorBox`` evaluated on any input will then return 0.
 
-        If ``accelerated`` is set to ``True``, the Numba backend is used. Otherwise, the Numpy backend is used.
-        An optional parameter to set the number of threads used by Numba can be set with ``set_num_threads``.
-        The default number of threads is defined in the ``cil.utilities.multiprocessing`` module, and
-        it is equivalent to half of the CPU cores available.
+        If ``accelerated`` is set to ``True`` (default), the Numba backend is used. 
+        Otherwise, the Numpy backend is used. An optional parameter to set the number of 
+        threads used by Numba can be set with ``set_num_threads``. Setting the number of
+        threads when ``accelerate`` is set to ``False`` will not have any effect.
+        The default number of threads is defined in the ``cil.utilities.multiprocessing`` 
+        module, and it is equivalent to half of the CPU cores available.
 
         Example:
         --------
         
-        In order to save computing time it is possible to suppress the evaluation of the function.
+        In order to save computing time it is possible to suppress the evaluation of the 
+        function.
         
         .. code-block:: python
 
@@ -84,19 +89,21 @@ class IndicatorBox(Function):
 
     def __new__(cls, lower=None, upper=None, accelerated=True):
         if accelerated:
-            logging.info("Numba backend is used.")      
+            logging.info("Numba backend is used.")
             return super(IndicatorBox, cls).__new__(IndicatorBox_numba)
         else:
-            logging.info("Numpy backend is used.") 
+            logging.info("Numpy backend is used.")
             return super(IndicatorBox, cls).__new__(IndicatorBox_numpy)
-    
+
     def __init__(self, lower=None, upper=None, accelerated=True):
         '''__init__'''
         super(IndicatorBox, self).__init__()
-        
-        # We set lower and upper to either a float or a numpy array        
-        self.lower = -np.inf if lower is None else _get_as_nparray_or_number(lower)
-        self.upper =  np.inf if upper is None else _get_as_nparray_or_number(upper)
+
+        # We set lower and upper to either a float or a numpy array
+        self.lower = -np.inf if lower is None else _get_as_nparray_or_number(
+            lower)
+        self.upper = np.inf if upper is None else _get_as_nparray_or_number(
+            upper)
 
         self.orig_lower = lower
         self.orig_upper = upper
@@ -122,7 +129,7 @@ class IndicatorBox(Function):
             raise ValueError('Value must be boolean')
         self._suppress_evaluation = value
 
-    def __call__(self,x):
+    def __call__(self, x):
         '''Evaluates IndicatorBox at x
         
         Parameters
@@ -133,11 +140,10 @@ class IndicatorBox(Function):
         Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.  
         '''
         if not self.suppress_evaluation:
-            return self.evaluate(x)    
+            return self.evaluate(x)
         return 0.0
-    
+
     def proximal_conjugate(self, x, tau, out=None):
-        
         r'''Proximal operator of the convex conjugate of IndicatorBox at x:
 
           .. math:: prox_{\tau * f^{*}}(x)
@@ -155,20 +161,19 @@ class IndicatorBox(Function):
 
         # x - tau * self.proximal(x/tau, tau)
         should_return = False
-        
+
         if out is None:
             out = self.proximal(x, tau)
             should_return = True
         else:
             self.proximal(x, tau, out=out)
-        
+
         out.sapyb(-1., x, 1., out=out)
 
         if should_return:
             return out
 
     def proximal(self, x, tau, out=None):
-        
         r'''Proximal operator of IndicatorBox at x
 
         .. math:: prox_{\tau * f}(x)
@@ -197,14 +202,14 @@ class IndicatorBox(Function):
 
         # calculate the proximal
         self._proximal(outarr)
-        
+
         out.fill(outarr)
         if should_return:
             return out
 
-    def gradient(self,x):
+    def gradient(self, x):
         '''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''
-        return ValueError('Not Differentiable') 
+        return ValueError('Not Differentiable')
 
     def _proximal(self, outarr):
         raise NotImplementedError('Implement this in the derived class')
@@ -222,40 +227,44 @@ class IndicatorBox(Function):
         This is discarded if ``accelerated=False``.'''
         self._num_threads = value
 
+
 class IndicatorBox_numba(IndicatorBox):
 
-    def evaluate(self,x):
-        
+    def evaluate(self, x):
         '''Evaluates IndicatorBox at x'''
         # set the number of threads to the number of threads defined by the user
         # or default to what set in the CIL multiprocessing module
         num_threads = numba.get_num_threads()
         numba.set_num_threads(self.num_threads)
         breaking = np.zeros(numba.get_num_threads(), dtype=np.uint8)
-                
+
         if isinstance(self.lower, np.ndarray):
             if isinstance(self.upper, np.ndarray):
 
-                _array_within_limits_aa(x.as_array(), self.lower, self.upper, breaking)
+                _array_within_limits_aa(x.as_array(), self.lower, self.upper,
+                                        breaking)
 
             else:
 
-                _array_within_limits_af(x.as_array(), self.lower, self.upper, breaking)
+                _array_within_limits_af(x.as_array(), self.lower, self.upper,
+                                        breaking)
 
         else:
             if isinstance(self.upper, np.ndarray):
 
-                _array_within_limits_fa(x.as_array(), self.lower, self.upper, breaking)
+                _array_within_limits_fa(x.as_array(), self.lower, self.upper,
+                                        breaking)
 
             else:
 
-                _array_within_limits_ff(x.as_array(), self.lower, self.upper, breaking)
+                _array_within_limits_ff(x.as_array(), self.lower, self.upper,
+                                        breaking)
 
         # reset the number of threads to the original value
         numba.set_num_threads(num_threads)
         return np.inf if breaking.sum() > 0 else 0.0
-    
-    def convex_conjugate(self,x):
+
+    def convex_conjugate(self, x):
         '''Convex conjugate of IndicatorBox at x'''
         # set the number of threads to the number of threads defined by the user
         # or default to what set in the CIL multiprocessing module
@@ -264,12 +273,12 @@ class IndicatorBox_numba(IndicatorBox):
 
         acc = np.zeros((numba.get_num_threads()), dtype=np.uint32)
         _convex_conjugate(x.as_array(), acc)
-        
+
         # reset the number of threads to the original value
         numba.set_num_threads(num_threads)
-        
+
         return np.sum(acc)
-            
+
     def _proximal(self, outarr):
         if self.orig_lower is not None and self.orig_upper is not None:
             if isinstance(self.lower, np.ndarray):
@@ -277,7 +286,7 @@ class IndicatorBox_numba(IndicatorBox):
                     _proximal_aa(outarr, self.lower, self.upper)
                 else:
                     _proximal_af(outarr, self.lower, self.upper)
-            
+
             else:
                 if isinstance(self.upper, np.ndarray):
                     _proximal_fa(outarr, self.lower, self.upper)
@@ -289,33 +298,35 @@ class IndicatorBox_numba(IndicatorBox):
                 _proximal_na(outarr, self.upper)
             else:
                 np.clip(outarr, None, self.upper, out=outarr)
-        
+
         elif self.orig_upper is None:
             if isinstance(self.lower, np.ndarray):
                 _proximal_an(outarr, self.lower)
             else:
-                np.clip(outarr, self.lower, None,out=outarr)
+                np.clip(outarr, self.lower, None, out=outarr)
+
 
 class IndicatorBox_numpy(IndicatorBox):
 
-    def evaluate(self,x):
-        
+    def evaluate(self, x):
         '''Evaluates IndicatorBox at x'''
-        
-        if (np.all(x.as_array() >= self.lower) and 
-            np.all(x.as_array() <= self.upper) ):
+
+        if (np.all(x.as_array() >= self.lower)
+                and np.all(x.as_array() <= self.upper)):
             val = 0
         else:
             val = np.inf
         return val
-    
-    def convex_conjugate(self,x):
+
+    def convex_conjugate(self, x):
         '''Convex conjugate of IndicatorBox at x'''
-        return x.maximum(0).sum()   
-            
+        return x.maximum(0).sum()
+
     def _proximal(self, outarr):
-        np.clip(outarr, None if self.orig_lower is None else self.lower, 
-                        None if self.orig_upper is None else self.upper, out=outarr)
+        np.clip(outarr,
+                None if self.orig_lower is None else self.lower,
+                None if self.orig_upper is None else self.upper,
+                out=outarr)
 
 
 ## Utilities
@@ -324,9 +335,10 @@ def _get_as_nparray_or_number(x):
     try:
         return x.as_array()
     except AttributeError:
-        # In this case we trust that it will be either a numpy ndarray 
+        # In this case we trust that it will be either a numpy ndarray
         # or a number as described in the docstring
         return x
+
 
 @numba.jit(nopython=True, parallel=True)
 def _array_within_limits_ff(x, lower, upper, breaking):
@@ -334,9 +346,10 @@ def _array_within_limits_ff(x, lower, upper, breaking):
     arr = x.ravel()
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-        
+
         if breaking[j] == 0 and (arr[i] < lower or arr[i] > upper):
             breaking[j] = 1
+
 
 @numba.jit(nopython=True, parallel=True)
 def _array_within_limits_af(x, lower, upper, breaking):
@@ -347,9 +360,10 @@ def _array_within_limits_af(x, lower, upper, breaking):
     loarr = lower.ravel()
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-        
+
         if breaking[j] == 0 and (arr[i] < loarr[i] or arr[i] > upper):
             breaking[j] = 1
+
 
 @numba.jit(parallel=True, nopython=True)
 def _array_within_limits_aa(x, lower, upper, breaking):
@@ -361,9 +375,10 @@ def _array_within_limits_aa(x, lower, upper, breaking):
     loarr = lower.ravel()
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-        
+
         if breaking[j] == 0 and (arr[i] < loarr[i] or arr[i] > uparr[i]):
             breaking[j] = 1
+
 
 @numba.jit(nopython=True, parallel=True)
 def _array_within_limits_fa(x, lower, upper, breaking):
@@ -374,11 +389,13 @@ def _array_within_limits_fa(x, lower, upper, breaking):
     uparr = upper.ravel()
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-        
+
         if breaking[j] == 0 and (arr[i] < lower or arr[i] > uparr[i]):
             breaking[j] = 1
 
+
 ##########################################################################
+
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_aa(x, lower, upper):
@@ -394,10 +411,11 @@ def _proximal_aa(x, lower, upper):
         if arr[i] > uparr[i]:
             arr[i] = uparr[i]
 
+
 @numba.jit(nopython=True, parallel=True)
 def _proximal_af(x, lower, upper):
     '''Slightly faster than using np.clip'''
-    if x.size != lower.size :
+    if x.size != lower.size:
         raise ValueError('x, lower and upper must have the same size')
     arr = x.ravel()
     loarr = lower.ravel()
@@ -406,7 +424,7 @@ def _proximal_af(x, lower, upper):
             arr[i] = loarr[i]
         if arr[i] > upper:
             arr[i] = upper
-    
+
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_fa(x, lower, upper):
@@ -421,6 +439,7 @@ def _proximal_fa(x, lower, upper):
         if arr[i] > uparr[i]:
             arr[i] = uparr[i]
 
+
 @numba.jit(nopython=True, parallel=True)
 def _proximal_na(x, upper):
     '''Slightly faster than using np.clip'''
@@ -431,6 +450,7 @@ def _proximal_na(x, upper):
     for i in numba.prange(x.size):
         if arr[i] > uparr[i]:
             arr[i] = uparr[i]
+
 
 @numba.jit(nopython=True, parallel=True)
 def _proximal_an(x, lower):
@@ -443,6 +463,7 @@ def _proximal_an(x, lower):
         if arr[i] < loarr[i]:
             arr[i] = loarr[i]
 
+
 @numba.jit(nopython=True, parallel=True)
 def _convex_conjugate(x, acc):
     '''Convex conjugate of IndicatorBox
@@ -453,6 +474,6 @@ def _convex_conjugate(x, acc):
     j = 0
     for i in numba.prange(x.size):
         j = numba.np.ufunc.parallel._get_thread_id()
-    
+
         if arr[i] > 0:
             acc[j] += arr[i]

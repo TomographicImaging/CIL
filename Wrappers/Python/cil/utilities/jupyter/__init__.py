@@ -83,8 +83,8 @@ def display_slice(container, clim, direction, title, cmap, size, axis_labels, or
             roi_vdir = roi_vdir[1], roi_vdir[0]
 
         aximg = ax.imshow(img, cmap=cmap, origin=data_origin, aspect=aspect)
-        cmin = clim[0] + minmax[0]*(clim[1]-clim[0])
-        cmax = clim[0] + minmax[1]*(clim[1]-clim[0])
+        cmin = clim[0] + (minmax[0] / 100)*(clim[1]-clim[0])
+        cmax = clim[0] + (minmax[1] / 100)*(clim[1]-clim[0])
         aximg.set_clim((cmin, cmax))
         ax.set_xlim(*roi_hdir)
         ax.set_ylim(*roi_vdir)
@@ -201,20 +201,19 @@ def islicer(data, direction=0, title=None, slice_number=None, cmap='gray',
         default_ratio = 6./8.
         size = ( size , size * default_ratio )
 
-    min_max = widgets.FloatRangeSlider(
-        value=[0., 1.],
-        min=0.,
-        max=1.,
-        step=.05,
+    min_max = widgets.IntRangeSlider(
+        value=[0, 100],
+        min=0,
+        max=100,
+        step=5,
         disabled=False,
         continuous_update=True,
         orientation='horizontal',
         readout=True,
-        readout_format='.2f',
         layout=layout,
         style=style,
     )
-    min_max_full = widgets.VBox([widgets.Label('Display window percent (0-1)'), min_max])
+    min_max_full = widgets.VBox([widgets.Label('Display window percent'), min_max])
 
     dirs_remaining = [i for i in range(3) if i != direction]
     h_dir, v_dir = dirs_remaining[1], dirs_remaining[0]

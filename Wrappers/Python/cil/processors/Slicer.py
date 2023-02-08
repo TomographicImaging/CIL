@@ -79,15 +79,13 @@ class Slicer(DataProcessor):
 
     """
 
-
-    #ToDo offsets not quite the same as binning 
     def __init__(self,
                  roi = None, force=False):
 
 
         kwargs = {
             '_roi_input': roi,
-            'force':None, 
+            'force':force, 
             '_roi_ordered':None, 
             '_data_array': False, 
             '_geometry': None, 
@@ -261,7 +259,13 @@ class Slicer(DataProcessor):
                     system_detector.position = system_detector.position - pixel_offset * system_detector.direction_y * geometry_new.config.panel.pixel_size[1]
                     geometry_new.config.panel.num_pixels[1] = n_elements
                 else:
-                    geometry_new = geometry_new.get_slice(vertical = roi.start)
+                    try:
+                        geometry_new = geometry_new.get_slice(vertical = roi.start)
+                    except ValueError as ve:
+                        if self.force == True:
+                            return None
+                        raise ValueError(ve)
+
 
                 geometry_new.config.panel.pixel_size[1] *= roi.step
                 processed_dims[vert_ind] = False

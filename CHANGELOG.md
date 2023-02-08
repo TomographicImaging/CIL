@@ -14,7 +14,6 @@
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
     - update test python and numpy versions to 3.9 and 1.22
-    - Update conda build action to v2.0.0
     - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1

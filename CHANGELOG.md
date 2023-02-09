@@ -23,6 +23,7 @@
   - Implemented the analytical norm for GradientOperator
   - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
   - ROI selection, aspect ratio toggle and Play widget added to islicer
+  - Add show1D display utility
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

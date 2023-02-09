@@ -216,7 +216,7 @@
 <span class="n">has_numba</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numba</span>
-    <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_proximal_step_numba</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">abstau</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Numba implementation of a step in the calculation of the proximal of MixedL21Norm</span>
 <span class="sd">        </span>

@@ -3786,23 +3786,68 @@ proximal and proximal_conjugate</p>
 <h3>Indicator box<a class="headerlink" href="#indicator-box" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.optimisation.functions.IndicatorBox">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">IndicatorBox</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">IndicatorBox</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox" title="Permalink to this definition">#</a></dt>
 <dd><p>Indicator function for box constraint</p>
-<div class="math notranslate nohighlight">
+<blockquote>
+<div><div class="math notranslate nohighlight">
 \[\begin{split}f(x) = \mathbb{I}_{[a, b]} = \begin{cases}
                                    0, \text{ if } x \in [a, b] \\
                                    \infty, \text{otherwise}
                             \end{cases}\end{split}\]</div>
-<dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>creator</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lower</strong> (float, default = <code class="code docutils literal notranslate"><span class="pre">-numpy.inf</span></code>) – lower bound</p></li>
-<li><p><strong>upper</strong> (float, optional, default = <code class="code docutils literal notranslate"><span class="pre">numpy.inf</span></code>) – upper bound</p></li>
+<li><p><strong>lower</strong> (<em>float</em><em>, </em><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>numpy array</em><em>, </em><em>default None</em>) – Lower bound. If set to None, it is equivalent to <code class="docutils literal notranslate"><span class="pre">-np.inf</span></code>.</p></li>
+<li><p><strong>upper</strong> (<em>float</em><em>, </em><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>numpy array</em><em>, </em><em>default None</em>) – Upper bound. If set to None, it is equivalent to <code class="docutils literal notranslate"><span class="pre">np.inf</span></code>.</p></li>
+<li><p><strong>accelerated</strong> (<em>bool</em><em>, </em><em>default True</em>) – Specifies whether to use the accelerated version or not, using numba or
+numpy backends respectively.</p></li>
 </ul>
+</dd>
+</dl>
+<p>If <code class="docutils literal notranslate"><span class="pre">lower</span></code> or <code class="docutils literal notranslate"><span class="pre">upper</span></code> are passed a <code class="docutils literal notranslate"><span class="pre">DataContainer</span></code> (or derived class
+such as <code class="docutils literal notranslate"><span class="pre">ImageData</span></code> or <code class="docutils literal notranslate"><span class="pre">AcquisitionData</span></code>) or a <code class="docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">array</span></code>, the bounds
+can be set to different values for each element.</p>
+<p>In order to save computing time it is possible to suppress the evaluation of
+the function. This is achieved by setting <code class="docutils literal notranslate"><span class="pre">suppress_evaluation</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+<code class="docutils literal notranslate"><span class="pre">IndicatorBox</span></code> evaluated on any input will then return 0.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">accelerated</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), the Numba backend is used.
+Otherwise, the Numpy backend is used. An optional parameter to set the number of
+threads used by Numba can be set with <code class="docutils literal notranslate"><span class="pre">set_num_threads</span></code>. Setting the number of
+threads when <code class="docutils literal notranslate"><span class="pre">accelerate</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code> will not have any effect.
+The default number of threads is defined in the <code class="docutils literal notranslate"><span class="pre">cil.utilities.multiprocessing</span></code>
+module, and it is equivalent to half of the CPU cores available.</p>
+<p>In order to save computing time it is possible to suppress the evaluation of the
+function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ib</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ib</span><span class="o">.</span><span class="n">set_suppress_evaluation</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ib</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="c1"># returns 0</span>
+</pre></div>
+</div>
+<p>Set the number of threads used in accelerated mode.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">num_threads</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">ib</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ib</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.__new__">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">__new__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__new__" title="Permalink to this definition">#</a></dt>
+<dd><p>Create and return a new object.  See help(type) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__init__" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">
+<code class="sig-name descname"><span class="pre">set_suppress_evaluation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.set_suppress_evaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation" title="Permalink to this definition">#</a></dt>
+<dd><p>Suppresses the evaluation of the function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>bool</em>) – If True, the function evaluation on any input will return 0, without calculation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3811,20 +3856,29 @@ proximal and proximal_conjugate</p>
 <dt id="cil.optimisation.functions.IndicatorBox.__call__">
 <code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__call__" title="Permalink to this definition">#</a></dt>
 <dd><p>Evaluates IndicatorBox at x</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p>
+</dd>
+</dl>
+<p>Evaluates the IndicatorBox at x. If <code class="docutils literal notranslate"><span class="pre">suppress_evaluation</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, returns 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.gradient">
-<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the gradient of function F at x, if it is differentiable</p>
+<dt id="cil.optimisation.functions.IndicatorBox.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Proximal operator of the convex conjugate of IndicatorBox at x:</p>
 <div class="math notranslate nohighlight">
-\[F'(x)\]</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.convex_conjugate">
-<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.convex_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Convex conjugate of IndicatorBox at x</p>
+\[prox_{\tau * f^{*}}(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Input to the proximal operator</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Step size. Notice it is ignored in IndicatorBox, see <code class="docutils literal notranslate"><span class="pre">proximal</span></code> for details</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Output of the proximal operator. If not provided, a new DataContainer is created.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -3833,13 +3887,39 @@ proximal and proximal_conjugate</p>
 <dd><p>Proximal operator of IndicatorBox at x</p>
 <div class="math notranslate nohighlight">
 \[prox_{\tau * f}(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Input to the proximal operator</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Step size. Notice it is ignored in IndicatorBox</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Output of the proximal operator. If not provided, a new DataContainer is created.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">tau</span></code> is ignored but it is in the signature of the generic Function class</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.proximal_conjugate">
-<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.proximal_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Proximal operator of the convex conjugate of IndicatorBox at x:</p>
-<p>..math:: prox_{tau * f^{*}}(x)</p>
+<dt id="cil.optimisation.functions.IndicatorBox.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>IndicatorBox is not differentiable, so calling gradient will raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.num_threads">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">num_threads</span></code><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.num_threads" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the optional number of threads parameter to use for the accelerated version.</p>
+<p>Defaults to the value set in the CIL multiprocessing module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.set_num_threads">
+<code class="sig-name descname"><span class="pre">set_num_threads</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.set_num_threads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.set_num_threads" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the optional number of threads parameter to use for the accelerated version.</p>
+<p>This is discarded if <code class="docutils literal notranslate"><span class="pre">accelerated=False</span></code>.</p>
 </dd></dl>
 
 </dd></dl>

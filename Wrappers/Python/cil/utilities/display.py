@@ -126,7 +126,7 @@ class show1D(show_base):
         A title for the plot
     line_colours : str, list of str, default=None
         Colour(s) for each line plot
-    line_styles : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
+    line_styles : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
         Linestyle(s) for each line plot
     axis_labels : tuple of str, list of str, default=('Index','Value')
         Axis labels in the form (x_axis_label,y_axis_label)
@@ -301,7 +301,7 @@ class show1D(show_base):
             A title for the plot
         line_colours : str, list of str, default=None
             Colour(s) for each line plot
-        line_styles : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
+        line_styles : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
             Linestyle(s) for each line plot
         axis_labels : tuple of str, list of str, default=('Index','Value')
             Axis labels in the form (x_axis_label,y_axis_label)

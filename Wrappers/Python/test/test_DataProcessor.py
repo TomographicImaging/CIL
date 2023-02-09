@@ -795,8 +795,6 @@ class TestBinner(unittest.TestCase):
 
         recon_roi =FBP(data, ig_roi).run(verbose=0)
 
-        show2D([recon_roi,recon_binned,recon_roi-recon_binned])
-
         # not a very tight tolerance as binning and fbp at lower res are not identical operations.
         numpy.testing.assert_allclose(recon_roi.array, recon_binned.array, atol=5e-3)
 

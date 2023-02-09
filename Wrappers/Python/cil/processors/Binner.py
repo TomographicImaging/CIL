@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .DownsampleBase import DownsampleBase
+from cil.processors import Slicer
 import numpy as np
 
 try:
@@ -24,7 +24,11 @@ try:
 except:
     has_ipp = False
 
-class Binner(DownsampleBase):
+# Note to developers: Binner and Slicer share a lot of common code
+# so Binner has been implemented as a child of Slicer this makes use
+# of commonality and redefine only the methods that differ. These methods
+# dictate the style of slicer
+class Binner(Slicer):
 
     """This creates a Binner processor.
     
@@ -87,23 +91,18 @@ class Binner(DownsampleBase):
     """
 
     def __init__(self,
-                 roi = None, force=True, accelerated=True):
+                 roi = None, force=False, accelerated=True):
 
         if accelerated and not has_ipp:
             raise RuntimeError("Cannot run accelerated Binner without the IPP libraries.")
 
-        kwargs = {
-            '_roi_input': roi,
-            '_force':force, 
-            '_accelerated': accelerated
-        }
-
-        super(Binner,self).__init__(**kwargs)
+        super(Binner,self).__init__(roi = roi, force=force)
+        self._accelerated = True
 
 
     def _configure(self):
         """
-        Configure the input specifically for use with Binner        
+        Once the ROI has been parsed this configure the input specifically for use with Binner        
         """
 
         #as binning we only include bins that are inside boundaries
@@ -124,13 +123,20 @@ class Binner(DownsampleBase):
             self._pixel_indices.append((start, stop-1))
 
 
-    def _process_acquisition_geometry(self):
+    def _get_slice_position(self, roi):
         """
-        Creates the binned acquisition geometry
+        Return the vertical position to extract a single slice
         """
-        
-        geometry_new = super(Binner,self)._process_acquisition_geometry(type='Bin')
-        return geometry_new
+        return roi.start + roi.step/2
+
+
+    def _get_angles(self, roi):
+        """
+        Returns the sliced angles according to the roi
+        """
+        n_elements = len(roi)
+        shape = (n_elements, roi.step)
+        return self._geometry.angles[roi.start:roi.start+n_elements*roi.step].reshape(shape).mean(1)
 
 
     def _bin_array_numpy(self, array_in, array_binned):
@@ -172,6 +178,9 @@ class Binner(DownsampleBase):
 
 
     def _process_data(self, dc_in, dc_out):
+        """
+        Processes the dataset
+        """
         if self._accelerated:
             self._bin_array_acc(dc_in.array, dc_out.array)
         else:

@@ -1,5 +1,7 @@
 * Next
-  - added RAWFileWriter to export data containers to raw files
+  - Added RAWFileWriter to export data containers to raw files
+  - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
+  - Implemented IndicatorBox in numba and numpy
   - Dropped support for Python 3.6 and NumPy 1.15
   - Jenkins PR tests on Python 3.8 and NumPy 1.20
   - added yml file to create test environment
@@ -24,6 +26,7 @@
   - Implemented the analytical norm for GradientOperator
   - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
   - ROI selection, aspect ratio toggle and Play widget added to islicer
+  - Add show1D display utility
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

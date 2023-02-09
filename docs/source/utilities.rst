@@ -54,6 +54,12 @@ show2D - Display 2D slices
    :members:
    :inherited-members:
 
+show1D - Display 1D slices
+--------------------------
+
+.. autoclass:: cil.utilities.display.show1D
+   :members:
+   :inherited-members:
 
 show_geometry - Display system geometry
 ---------------------------------------

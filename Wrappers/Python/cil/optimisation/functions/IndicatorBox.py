@@ -35,56 +35,56 @@ class IndicatorBox(Function):
                                             \infty, \text{otherwise}
                                      \end{cases}
         
-        Parameters
-        ----------
-        lower : float, DataContainer or numpy array, default None
-            Lower bound. If set to None, it is equivalent to ``-np.inf``.
-        upper : float, DataContainer or numpy array, default None
-            Upper bound. If set to None, it is equivalent to ``np.inf``.
-        accelerated : bool, default True
-            Specifies whether to use the accelerated version or not, using numba or
-            numpy backends respectively.
-        
-        If passed a ``DataContainer`` (or derived class such as ``ImageData`` or 
-        ``AcquisitionData``) or ``numpy array``, the bounds can be set to different 
-        values for each element.
+    Parameters
+    ----------
+    lower : float, DataContainer or numpy array, default None
+        Lower bound. If set to None, it is equivalent to ``-np.inf``.
+    upper : float, DataContainer or numpy array, default None
+        Upper bound. If set to None, it is equivalent to ``np.inf``.
+    accelerated : bool, default True
+        Specifies whether to use the accelerated version or not, using numba or
+        numpy backends respectively.
+    
+    
+    If ``lower`` or ``upper`` are passed a ``DataContainer`` (or derived class 
+    such as ``ImageData`` or ``AcquisitionData``) or a ``numpy array``, the bounds 
+    can be set to different values for each element.
 
-        In order to save computing time it is possible to suppress the evaluation of 
-        the function. This is achieved by setting ``suppress_evaluation`` to ``True``. 
-        ``IndicatorBox`` evaluated on any input will then return 0.
+    In order to save computing time it is possible to suppress the evaluation of 
+    the function. This is achieved by setting ``suppress_evaluation`` to ``True``. 
+    ``IndicatorBox`` evaluated on any input will then return 0.
 
-        If ``accelerated`` is set to ``True`` (default), the Numba backend is used. 
-        Otherwise, the Numpy backend is used. An optional parameter to set the number of 
-        threads used by Numba can be set with ``set_num_threads``. Setting the number of
-        threads when ``accelerate`` is set to ``False`` will not have any effect.
-        The default number of threads is defined in the ``cil.utilities.multiprocessing`` 
-        module, and it is equivalent to half of the CPU cores available.
+    If ``accelerated`` is set to ``True`` (default), the Numba backend is used. 
+    Otherwise, the Numpy backend is used. An optional parameter to set the number of 
+    threads used by Numba can be set with ``set_num_threads``. Setting the number of
+    threads when ``accelerate`` is set to ``False`` will not have any effect.
+    The default number of threads is defined in the ``cil.utilities.multiprocessing`` 
+    module, and it is equivalent to half of the CPU cores available.
 
-        Example:
-        --------
-        
-        In order to save computing time it is possible to suppress the evaluation of the 
-        function.
-        
-        .. code-block:: python
+    Example:
+    --------
+    
+    In order to save computing time it is possible to suppress the evaluation of the 
+    function.
+    
+    .. code-block:: python
 
-          ib = IndicatorBox(lower=0, upper=1)
-          ib.set_suppress_evaluation(True)
-          ib.evaluate(x) # returns 0
+        ib = IndicatorBox(lower=0, upper=1)
+        ib.set_suppress_evaluation(True)
+        ib.evaluate(x) # returns 0
 
 
-        Example:
-        --------
-        
-        Set the number of threads used in accelerated mode.
-        
-        .. code-block:: python
+    Example:
+    --------
+    
+    Set the number of threads used in accelerated mode.
+    
+    .. code-block:: python
 
-        
-          num_threads = 4
-          ib = IndicatorBox(lower=0, upper=1)
-          ib.set_num_threads(num_threads)
-          ib.evaluate(x) # returns 0
+    
+        num_threads = 4
+        ib = IndicatorBox(lower=0, upper=1)
+        ib.set_num_threads(num_threads)
     '''
 
     def __new__(cls, lower=None, upper=None, accelerated=True):
@@ -337,6 +337,7 @@ def _get_as_nparray_or_number(x):
     except AttributeError:
         # In this case we trust that it will be either a numpy ndarray
         # or a number as described in the docstring
+        logging.info('Assuming that x is a numpy array or a number')
         return x
 
 

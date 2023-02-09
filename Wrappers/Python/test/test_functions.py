@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2023 United Kingdom Research and Innovation
+#  Copyright 2023 The University of Manchester
 #
 # Author(s):
 #   Evangelos Papoutsellis (UKRI)

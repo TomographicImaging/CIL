@@ -66,7 +66,6 @@ RAW File Writer
 
 .. autoclass:: cil.io.RAWFileWriter
    :members:
-   :special-members:
 
 :ref:`Return Home <mastertoc>`
 

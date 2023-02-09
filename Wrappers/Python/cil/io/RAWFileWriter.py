@@ -57,6 +57,17 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
 class RAWFileWriter(object):
     '''
         Writer to write DataContainer (or subclass AcquisitionData, ImageData) to disk as a binary blob
+        
+        Parameters
+        ----------
+        data : DataContainer, AcquisitionData or ImageData
+            This represents the data to save to TIFF file(s)
+        file_name : string
+            This defines the file name prefix, i.e. the file name without the extension.
+        compression : str, default None. Accepted values None, 'uint8', 'uint16'
+            The lossy compression to apply. The default None will not compress data. 
+            'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
+
 
         This writer will also write a text file with the minimal information necessary to 
         read the data back in.
@@ -75,21 +86,8 @@ class RAWFileWriter(object):
         
         The data_type describes the data layout when packing and unpacking data. 
         See ``struct`` for more information. https://docs.python.org/3/library/struct.html#format-strings
-        
-        Parameters
-        ----------
-        data : DataContainer, AcquisitionData or ImageData
-            This represents the data to save to TIFF file(s)
-        file_name : string
-            This defines the file name prefix, i.e. the file name without the extension.
-        compression : str, default None. Accepted values None, 'uint8', 'uint16'
-            The lossy compression to apply. The default None will not compress data. 
-            'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
-
-
 
         
-
         Example
         -------
         

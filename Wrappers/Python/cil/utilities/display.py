@@ -116,27 +116,25 @@ class show1D(show_base):
     ----------
     data : DataContainer, list of DataContainer, tuple of DataContainer
         Multi-dimensional data to be reduced to 1D.
-    line_coords : list of tuple or list of list of tuple, default=None
+    slice_list : list of tuple or list of list of tuple, default=None
         A list, or nested list, of (dimension, coordinate) pairs for
         slicing `data` (default is None, which is only valid when 1D
         data is passed)
-    label : str, list of str, default=None
-        Label(s) to use in the plot's legend
+    label : 'default', str, list of str, None, default='default'
+        Label(s) to use in the plot's legend. Use `None` to suppress legend.
     title : str, default None
         A title for the plot
-    color : str, list of str, default=None
-        Color(s) for each line plot
-    ls : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
+    line_colours : str, list of str, default=None
+        Colour(s) for each line plot
+    line_styles : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
         Linestyle(s) for each line plot
-    axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
+    axis_labels : tuple of str, list of str, default=('Index','Value')
         Axis labels in the form (x_axis_label,y_axis_label)
     num_cols : int, default=3
         The number of columns in the grid of subplots produced in the case
         of multiple plots
     size : tuple, default=(8,6)
         The size of the figure
-    force : bool, default=True
-        Passed to `get_slice`
 
     Attributes
     ----------
@@ -154,8 +152,8 @@ class show1D(show_base):
     >>> data = PEPPERS.get()
     >>> data_channel0 = data.get_slice(channel=0)
     >>> data_channel1 = data.get_slice(channel=1)
-    >>> show1D([data_channel0, data_channel1], line_coords=[('horizontal_x', 256)],
-    ...        label=['Channel 0', 'Channel 1'], ls=["--", "-"])
+    >>> show1D([data_channel0, data_channel1], slice_list=[('horizontal_x', 256)],
+    ...        label=['Channel 0', 'Channel 1'])
 
     The following example uses two sets of slicing information applied to a
     single dataset, resulting in two separate plots.
@@ -164,18 +162,18 @@ class show1D(show_base):
     >>> from cil.utilities.dataexample import PEPPERS
     >>> data = PEPPERS.get()
     >>> slices = [[('channel', 0), ('horizontal_x', 256)], [('channel', 1), ('horizontal_y', 256)]]
-    >>> show1D(data, line_coords=slices, title=['Channel 0', 'Channel 1'])
+    >>> show1D(data, slice_list=slices, title=['Channel 0', 'Channel 1'])
     """
 
-    def __init__(self, data, line_coords=None, label=None, title=None,
-                 color=None, ls=None, axis_labels=('Pixel', 'Pixel value'),
-                 size=(8,6), force=True):
+    def __init__(self, data, slice_list=None, label='default', title=None,
+                 line_colours=None, line_styles=None, axis_labels=('Index', 'Value'),
+                 size=(8,6)):
 
-        self.figure = self._show1d(data, line_coords, labels=label, title=title,
-                                   colors=color, ls=ls, axis_labels=axis_labels,
-                                   plot_size=size, force=force)
+        self.figure = self._show1d(data, slice_list, labels=label, title=title,
+                                   line_colours=line_colours, line_styles=line_styles,
+                                   axis_labels=axis_labels, plot_size=size)
 
-    def _extract_vector(self, data, coords, force=True):
+    def _extract_vector(self, data, coords):
         """
         Extracts a 1D vector by slicing multi-dimensional data using the
         coordinates provided.
@@ -189,8 +187,6 @@ class show1D(show_base):
             DataContainer, this should comprise dimensions from
             `data.dimension_labels`. If `data` is a numpy.ndarray, integers
             representing the axes should be used instead.
-        force : bool, default=True
-            Passed to `get_slice`
 
         Returns
         -------
@@ -238,14 +234,14 @@ class show1D(show_base):
                     sliceme[k] = v
 
             if isinstance(data, AcquisitionData) or isinstance(data, ImageData):
-                sliceme['force'] = force
+                sliceme['force'] = True
 
             vector = data.get_slice(**sliceme).as_array()
 
         return vector
 
-    def _plot_slice(self, ax, data, line_coords=None,
-                   label=None, color=None, ls=None, force=True):
+    def _plot_slice(self, ax, data, slice_list=None,
+                   label=None, line_colour=None, line_style=None):
         """
         Creates 1D plots of pixel flux from multi-dimensional data and slicing information.
 
@@ -255,39 +251,37 @@ class show1D(show_base):
             The axis to draw on
         data : DataContainer
             The data to be sliced and plotted
-        line_coords : list of tuples, optional
+        slice_list : list of tuples, optional
             (dimension, coordinate) pairs for slicing `data` (default is
             None, which is only valid when 1D data is passed)
         label : str, default=None
             Label to use in the plot's legend
-        color : str, default=None
-            Color of the line plot
-        ls : {"-","--","-.",":"}, default=None
+        line_colour : str, default=None
+            Colour of the line plot
+        line_style : {"-","--","-.",":"}, default=None
             Linestyle to pass to `matplotlib.axes.Axes.plot`
-        force : bool, default=True
-            Passed to `get_slice`
         """
 
         is_1d = False
         if len(data.shape) == 1:
             is_1d = True
 
+
         dims = {}
         if not is_1d:
             try:
-                for el in line_coords:
+                for el in slice_list:
                     dims[el[0]] = el[1]
             except TypeError:
                 raise TypeError(f'Expected list of tuples for slicing, ' \
-                                f'received {type(line_coords)}')
+                                f'received {type(slice_list)}')
 
-        ax.plot(self._extract_vector(data, dims, force),
-                color=color, ls=ls, label=label)
+        arr = self._extract_vector(data, dims)
+        ax.plot(arr, color=line_colour, ls=line_style, label=label)
 
 
-    def _show1d(self, data, line_coords=None, labels=None, title=None, colors=None,
-                ls=None, axis_labels=('Pixel', 'Pixel value'), plot_size=(8,6),
-                force=True):
+    def _show1d(self, data, slice_list=None, labels='default', title=None, line_colours=None,
+                line_styles=None, axis_labels=('Pixel', 'Pixel value'), plot_size=(8,6)):
         """
         Displays 1D plots of pixel flux from multi-dimensional data and
         slicing information.
@@ -297,27 +291,25 @@ class show1D(show_base):
         data : DataContainer, list of DataContainer or tuple of
         DataContainer
             The data to be sliced and plotted
-        line_coords : list of tuple or list of list of tuple, optional
+        slice_list : list of tuple or list of list of tuple, optional
             A list, or nested list, of (dimension, coordinate) pairs for
             slicing `data` (default is None, which is only valid when 1D
             data is passed)
-        labels : str, list of str, default=None
-            Label(s) to use in the plot's legend
+        labels : 'default', str, list of str, None, default='default'
+            Label(s) to use in the plot's legend. Use `None` to suppress legend.
         titles : str, default=None
             A title for the plot
-        colors : str, list of str, default=None
-            Color(s) for each line plot
-        ls : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
+        line_colours : str, list of str, default=None
+            Colour(s) for each line plot
+        line_styles : {"-","--","-.",":"}, dict of {"-","--","-.",":"}, default=None
             Linestyle(s) for each line plot
-        axis_labels : tuple of str, list of str, default=('Pixel','Pixel value')
+        axis_labels : tuple of str, list of str, default=('Index','Value')
             Axis labels in the form (x_axis_label,y_axis_label)
         num_cols : int, default=3
             The number of columns in the grid of subplots produced in the
             case of multiple plots
         plot_size : tuple, default=(8,6)
             The size of the figure
-        force : bool, default=True
-            Passed to `get_slice`
 
         Returns
         -------
@@ -329,46 +321,46 @@ class show1D(show_base):
         ax = fig.add_subplot(1, 1, 1)
 
         num_data = 1 if isinstance(data, DataContainer) else len(data)
-        color_cyc = cycle(CB_PALETTE)
+        colour_cyc = cycle(CB_PALETTE)
         ls_cyc = cycle(["-","--","-.",":"])
         _lbls = labels
-        if line_coords is None or isinstance(line_coords[0], tuple):
+        if slice_list is None or isinstance(slice_list[0], tuple):
 
             for i in range(num_data):
                 _data = data if isinstance(data, DataContainer) else data[i]
-                _cl = next(color_cyc) if colors is None else colors[i]
-                _ls = next(ls_cyc) if ls is None else ls[i]
+                _cl = next(colour_cyc) if line_colours is None else line_colours[i]
+                _ls = next(ls_cyc) if line_styles is None else line_styles[i]
                 if labels is None:
                     _lbl = None
                 elif labels == 'default':
                     _lbl = f'Dataset {i}'
                 else:
                     _lbl = labels[i]
-                self._plot_slice(ax, _data, line_coords, label=_lbl,
-                                color=_cl, ls=_ls, force=force)
+                self._plot_slice(ax, _data, slice_list, label=_lbl,
+                                line_colour=_cl, line_style=_ls)
 
-        elif isinstance(line_coords[0], list):
+        elif isinstance(slice_list[0], list):
 
             if labels == 'default' or labels is None:
-                _lbls =  [None]*(len(line_coords)*num_data)
+                _lbls =  [None]*(len(slice_list)*num_data)
 
             if num_data == 1:
-                for i, sl in enumerate(line_coords):
-                    _cl = next(color_cyc) if colors is None else colors[i]
-                    _ls = next(ls_cyc) if ls is None else ls[i]
+                for i, sl in enumerate(slice_list):
+                    _cl = next(colour_cyc) if line_colours is None else line_colours[i]
+                    _ls = next(ls_cyc) if line_styles is None else line_styles[i]
                     if labels == 'default':
                         _lbls[i] = ', '.join(f'{c[0]}={c[1]}' for c in sl)
-                    self._plot_slice(ax, data, sl, label=_lbls[i], color=_cl,
-                                     ls=_ls, force=force)
+                    self._plot_slice(ax, data, sl, label=_lbls[i], line_colour=_cl,
+                                     line_style=_ls)
             else:
-                for i, sl in enumerate(line_coords):
-                    _cl = next(color_cyc) if colors is None else colors[i]
-                    _ls = next(ls_cyc) if ls is None else ls[i]
+                for i, sl in enumerate(slice_list):
+                    _cl = next(colour_cyc) if line_colours is None else line_colours[i]
+                    _ls = next(ls_cyc) if line_styles is None else line_styles[i]
                     if labels == 'default':
                         _lbls[i] = f'Dataset {i}, ' + \
                                    ', '.join(f'{c[0]}={c[1]}' for c in sl)
-                    self._plot_slice(ax, data[i], sl, label=_lbls[i], color=_cl,
-                                     ls=_ls, force=force)
+                    self._plot_slice(ax, data[i], sl, label=_lbls[i], line_colour=_cl,
+                                     line_style=_ls)
 
         ax.set_title(title)
         ax.set_xlabel(axis_labels[0])

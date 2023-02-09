@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2022 United Kingdom Research and Innovation
-# Copyright 2022 The University of Manchester
+# Copyright 2023 United Kingdom Research and Innovation
+# Copyright 2023 The University of Manchester
 
 # Author(s): Edoardo Pasca (UKRI)
 
@@ -24,6 +24,7 @@ import configparser
 
 import logging
 
+
 def compress_and_save(data, compress, scale, offset, dtype, fname):
     '''Compress and save numpy array to file
     
@@ -44,14 +45,13 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
         d = utilities.compress_data(data, scale, offset, dtype)
     else:
         d = data
-        
-    logging.info("Data is always written in ‘C’ order, independent of the order of d.")
+
+    logging.info(
+        "Data is always written in ‘C’ order, independent of the order of d.")
     d.tofile(fname)
 
     # return shape, fortran order, dtype
     return d.shape, False, d.dtype.str
-        
-
 
 
 class RAWFileWriter(object):
@@ -130,34 +130,33 @@ class RAWFileWriter(object):
           
                 
     '''
-    
+
     def __init__(self, data, file_name, compression=None):
-        
-        if not isinstance(data, (DataContainer, ImageData, AcquisitionData) ):
+
+        if not isinstance(data, (DataContainer, ImageData, AcquisitionData)):
             raise Exception('Writer supports only following data types:\n' +
                             'DataContainer - ImageData\n - AcquisitionData')
 
         self.data_container = data
         file_name = os.path.abspath(file_name)
-        self.file_name = os.path.splitext(
-            os.path.basename( file_name )
-            )[0]
-        
+        self.file_name = os.path.splitext(os.path.basename(file_name))[0]
+
         self.dir_name = os.path.dirname(file_name)
-        logging.info ("dir_name {}".format(self.dir_name))
-        logging.info ("file_name {}".format(self.file_name))
-        
+        logging.info("dir_name {}".format(self.dir_name))
+        logging.info("file_name {}".format(self.file_name))
+
         # Deal with compression
-        self.compress           = utilities.get_compress(compression)
-        self.dtype              = utilities.get_compressed_dtype(data, compression)
-        self.scale, self.offset = utilities.get_compression_scale_offset(data, compression)
-        self.compression        = compression
-    
+        self.compress = utilities.get_compress(compression)
+        self.dtype = utilities.get_compressed_dtype(data, compression)
+        self.scale, self.offset = utilities.get_compression_scale_offset(
+            data, compression)
+        self.compression = compression
+
     def write(self):
         '''Write data to disk'''
         if not os.path.isdir(self.dir_name):
             os.mkdir(self.dir_name)
-        
+
         fname = os.path.join(self.dir_name, self.file_name + '.raw')
 
         # write to disk
@@ -167,17 +166,17 @@ class RAWFileWriter(object):
         shape = header[0]
         fortran_order = header[1]
         read_dtype = header[2]
-        
+
         # save information about the file we just saved
         config = configparser.ConfigParser()
         config['MINIMAL INFO'] = {
             'file_name': fname,
             'data_type': read_dtype,
             'shape': shape,
-            # Data is always written in ‘C’ order, independent of the order of d. 
+            # Data is always written in ‘C’ order, independent of the order of d.
             'is_fortran': fortran_order
         }
-        
+
         if self.compress:
             config['COMPRESSION'] = {
                 'scale': self.scale,
@@ -186,5 +185,6 @@ class RAWFileWriter(object):
         logging.info("Saving to {}".format(self.file_name))
         logging.info(str(config))
         # write the configuration to an ini file
-        with open(os.path.join(self.dir_name, self.file_name + '.ini'), 'w') as configfile:
+        with open(os.path.join(self.dir_name, self.file_name + '.ini'),
+                  'w') as configfile:
             config.write(configfile)

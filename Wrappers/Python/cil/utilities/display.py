@@ -153,7 +153,7 @@ class show1D(show_base):
     >>> data_channel0 = data.get_slice(channel=0)
     >>> data_channel1 = data.get_slice(channel=1)
     >>> show1D([data_channel0, data_channel1], slice_list=[('horizontal_x', 256)],
-    ...        label=['Channel 0', 'Channel 1'])
+    ...        label=['Channel 0', 'Channel 1'], line_styles=["--", "-"])
 
     The following example uses two sets of slicing information applied to a
     single dataset, resulting in two separate plots.

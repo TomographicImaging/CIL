@@ -433,7 +433,7 @@ class TestBinner_cillacc(unittest.TestCase):
 
 class TestBinner(unittest.TestCase):
 
-    def test_parse_roi(self):
+    def test_set_up_processor(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
@@ -445,7 +445,7 @@ class TestBinner(unittest.TestCase):
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
         proc = Binner(roi,accelerated=True)
-        proc._parse_roi(data.ndim, data.shape,data.dimension_labels)
+        proc._set_up_processor(data)
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -468,11 +468,9 @@ class TestBinner(unittest.TestCase):
         ]
 
         self.assertTrue(proc._roi_ordered == roi_ordered)
-        self.assertTrue(proc._binning == [3,2,1,4] )
-        self.assertTrue(proc._index_start ==[0,0,0,0])
 
 
-    def test_bin_acquisition_geometry_parallel2D(self):
+    def test_process_acquisition_geometry_parallel2D(self):
 
         ag = AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
 
@@ -492,11 +490,11 @@ class TestBinner(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Binner(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._bin_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
-    def test_bin_acquisition_geometry_parallel3D(self):
+    def test_process_acquisition_geometry_parallel3D(self):
 
         ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
@@ -521,12 +519,12 @@ class TestBinner(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Binner(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._bin_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
 
-    def test_bin_acquisition_geometry_cone2D(self):
+    def test_process_acquisition_geometry_cone2D(self):
 
         ag = AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
 
@@ -546,12 +544,12 @@ class TestBinner(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Binner(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._bin_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
 
-    def test_bin_acquisition_geometry_cone3D(self):
+    def test_process_acquisition_geometry_cone3D(self):
 
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
@@ -580,12 +578,12 @@ class TestBinner(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Binner(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._bin_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
 
-    def test_bin_image_geometry(self):
+    def test_process_image_geometry(self):
 
         ig_in = ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4)
 
@@ -618,14 +616,14 @@ class TestBinner(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Binner(roi=roi)
             proc.set_input(ig_in)
-            ig_out = proc._bin_image_geometry()
+            ig_out = proc._process_image_geometry()
             self.assertEqual(ig_gold[i], ig_out, msg="Binning image geometry with roi {} failed".format(i))
 
         with self.assertRaises(ValueError):
             roi = {'wrong label':(None,None,None)}
             proc = Binner(roi=roi)
             proc.set_input(ig_in)
-            ig_out = proc._bin_image_geometry(ig_in)
+            ig_out = proc._process_image_geometry(ig_in)
 
 
         # binning/cropping offsets geometry
@@ -770,10 +768,113 @@ class TestBinner(unittest.TestCase):
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
    
 
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_imagedata_full(self):
+        """
+        This test bins a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data.log(out=data)
+        data*=-1
+
+        recon =FBP(data).run(verbose=0)
+
+        roi = {'vertical':(20,40,5),'horizontal_y':(70,100,3),'horizontal_x':(-80,-40,2)}
+        binner = Binner(roi)
+
+        binner.set_input(recon.geometry)
+        ig_roi = binner.get_output()
+
+        binner.set_input(recon)
+        recon_binned = binner.get_output()
+
+        self.assertEqual(ig_roi, recon_binned.geometry, msg="Binned geometries not equal")
+
+        recon_roi =FBP(data, ig_roi).run(verbose=0)
+
+        show2D([recon_roi,recon_binned,recon_roi-recon_binned])
+
+        # not a very tight tolerance as binning and fbp at lower res are not identical operations.
+        numpy.testing.assert_allclose(recon_roi.array, recon_binned.array, atol=5e-3)
+
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_aqdata_full(self):
+        """
+        This test bins a sinogram. It then uses that geometry for the forward projection.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+        ag.set_labels(['vertical','angle','horizontal'])
+
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = AstraProjectionOperator(phantom.geometry, ag)
+        fp_full = PO.direct(phantom)
+
+
+        roi = {'angle':(25,26),'vertical':(5,62,2),'horizontal':(-75,0,2)}
+        binner = Binner(roi)
+
+        binner.set_input(ag)
+        ag_roi = binner.get_output()
+
+        binner.set_input(fp_full)
+        fp_binned = binner.get_output()
+
+        self.assertEqual(ag_roi, fp_binned.geometry, msg="Binned geometries not equal")
+
+        PO = AstraProjectionOperator(phantom.geometry, ag_roi)
+        fp_roi = PO.direct(phantom)
+
+        # not a very tight tolerance as binning and fp at lower res are not identical operations.
+        numpy.testing.assert_allclose(fp_roi.array, fp_binned.array, atol=0.06)
+
+    @unittest.skip
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_aqdata_full_tigre(self):
+        """
+        This test slices a sinogram. It then uses that geometry for the forward projection.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+
+        Tigre geometry bug means this does not pass.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = TigreProjectionOperator(phantom.geometry, ag)
+        fp_full = PO.direct(phantom)
+
+
+        roi = {'angle':(25,26),'vertical':(5,62,2),'horizontal':(-75,0,2)}
+        binner = Binner(roi)
+
+        binner.set_input(ag)
+        ag_roi = binner.get_output()
+
+        binner.set_input(fp_full)
+        fp_binned = binner.get_output()
+
+        self.assertEqual(ag_roi, fp_binned.geometry, msg="Binned geometries not equal")
+
+        PO = TigreProjectionOperator(phantom.geometry, ag_roi)
+        fp_roi = PO.direct(phantom)
+
+        show2D([fp_roi,fp_binned,fp_roi-fp_binned])
+        numpy.testing.assert_allclose(fp_roi.array, fp_binned.array, atol=0.06)
+
+
 class TestSlicer(unittest.TestCase):
 
-    def test_parse_roi(self):
-
+    def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
 
@@ -784,7 +885,7 @@ class TestSlicer(unittest.TestCase):
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
         proc = Slicer(roi)
-        proc._parse_roi(data.ndim, data.shape,data.dimension_labels)
+        proc._set_up_processor(data)
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -810,7 +911,7 @@ class TestSlicer(unittest.TestCase):
         self.assertTrue(proc._roi_ordered == roi_ordered)
 
 
-    def test_slice_acquisition_geometry_parallel2D(self):
+    def test_process_acquisition_geometry_parallel2D(self):
 
         ag = AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
 
@@ -835,11 +936,11 @@ class TestSlicer(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Slicer(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._slice_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
-    def test_slice_acquisition_geometry_parallel3D(self):
+    def test_process_acquisition_geometry_parallel3D(self):
 
         ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
@@ -873,12 +974,12 @@ class TestSlicer(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Slicer(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._slice_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
 
-    def test_slice_acquisition_geometry_cone2D(self):
+    def test_process_acquisition_geometry_cone2D(self):
 
         ag = AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,0.1).set_channels(4)
 
@@ -903,12 +1004,12 @@ class TestSlicer(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Slicer(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._slice_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
 
-    def test_slice_acquisition_geometry_cone3D(self):
+    def test_process_acquisition_geometry_cone3D(self):
 
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
@@ -955,12 +1056,12 @@ class TestSlicer(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Slicer(roi=roi)
             proc.set_input(ag)
-            ag_out = proc._slice_acquisition_geometry()
+            ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
 
-    def test_slice_image_geometry(self):
+    def test_process_image_geometry(self):
 
         ig_in = ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4)
 
@@ -997,14 +1098,14 @@ class TestSlicer(unittest.TestCase):
         for i, roi in enumerate(rois):
             proc = Slicer(roi=roi)
             proc.set_input(ig_in)
-            ig_out = proc._slice_image_geometry()
+            ig_out = proc._process_image_geometry()
             self.assertEqual(ig_gold[i], ig_out, msg="Slicer image geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ig_gold[i], ig_out))
 
         with self.assertRaises(ValueError):
             roi = {'wrong label':(None,None,None)}
             proc = Slicer(roi=roi)
             proc.set_input(ig_in)
-            ig_out = proc._slice_image_geometry(ig_in)
+            ig_out = proc._process_image_geometry(ig_in)
 
 
         # slicing/cropping offsets geometry

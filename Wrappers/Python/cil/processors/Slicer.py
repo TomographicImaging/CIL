@@ -14,13 +14,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
-import numpy
-import numpy as np
-import weakref
-import logging
 
-class Slicer(DataProcessor):
+from .DownsampleBase import DownsampleBase
+import numpy as np
+
+class Slicer(DownsampleBase):
 
     """This creates a Slicer processor.
     
@@ -82,297 +80,32 @@ class Slicer(DataProcessor):
     def __init__(self,
                  roi = None, force=False):
 
-
         kwargs = {
             '_roi_input': roi,
-            'force':force, 
-            '_roi_ordered':None, 
-            '_data_array': False, 
-            '_geometry': None, 
-            '_processed_dims':None, 
-            '_shape_in':None, 
-            '_shape_out':None, 
-            '_labels_in':None
-            }
+            '_force':force, 
+        }
 
-        super(Slicer, self).__init__(**kwargs)
+        super(Slicer,self).__init__(**kwargs)
     
 
-    def set_input(self, dataset):
+    def _configure(self):
         """
-        Set the input data to the processor
-
-        Parameters
-        ----------
-        dataset : DataContainer, Geometry
-            The input DataContainer
+        Configure the input specifically for use with Slicer        
         """
-
-        if issubclass(type(dataset), DataContainer) or isinstance(dataset,(AcquisitionGeometry,ImageGeometry)):
-            if self.check_input(dataset):
-                self.__dict__['input'] = weakref.ref(dataset)
-                self.__dict__['shouldRun'] = True
-            else:
-                raise ValueError('Input data not compatible')
-        else:
-            raise TypeError("Input type mismatch: got {0} expecting {1}"\
-                            .format(type(dataset), DataContainer))
+        self._shape_out = [len(x) for x in self._roi_ordered]
+        self._pixel_indices = [(x[0],x[-1]) for x in self._roi_ordered]
 
 
-    def check_input(self, data):
-
-        if isinstance(data, (ImageData,AcquisitionData)):
-            self._data_array = True
-            self._geometry = data.geometry
-
-        elif isinstance(data, DataContainer):
-            self._data_array = True
-            self._geometry = None
-
-        elif isinstance(data, (ImageGeometry, AcquisitionGeometry)):
-            self._data_array = False
-            self._geometry = data
-
-        else:
-            raise TypeError('Processor supports following data types:\n' +
-                            ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
-
-        if self._data_array:
-            if data.dtype != np.float32:
-                raise TypeError("Expected float32")
-
-        if (self._roi_input == None):
-            raise ValueError('Please, specify roi')
-
-        for key in self._roi_input.keys():
-            if key not in data.dimension_labels:
-                raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
-
-        self._parse_roi(data.ndim, data.shape, data.dimension_labels)
-        
-        return True 
-
-
-    def _parse_roi(self, ndim, shape, dimension_labels):
-        '''
-        This processes the roi input style
-        '''
-        offset = 4-ndim
-        labels_in = [None]*4
-        labels_in[offset::] = dimension_labels
-        shape_in = [1]*4
-        shape_in[offset::] = shape
-
-        # defaults
-        shape_out = shape_in.copy()
-        processed_dim = np.zeros((4,),np.bool_)
-        range_list = [range(0,x, 1) for x in shape_in]
-
-        for i in range(ndim):
-
-            roi = self._roi_input.get(dimension_labels[i],None)
-            
-            if roi == None or roi == -1:
-                continue
-
-            start = range_list[offset + i].start
-            stop = range_list[offset + i].stop
-            step = range_list[offset + i].step
-
-            # accepts a tuple, range or slice
-            try:
-                roi = [roi.start, roi.stop, roi.step]
-            except AttributeError:
-                roi = list(roi)
-                
-            length = len(roi)
-
-            if length == 1:
-                if roi[0] is not None:
-                    stop = roi[0]
-            elif length > 1:
-                if roi[0] is not None:
-                    start = roi[0]
-                if roi[1] is not None:
-                    stop = roi[1]
-
-            if length > 2:
-                if roi[2] is not None:
-                    step = roi[2]
-
-            # deal with negative indexing
-            if start < 0:
-                start += shape_in[offset + i]
-
-            if stop <= 0:
-                stop += shape_in[offset + i]
-
-
-            if stop > shape_in[offset+i]:
-                logging.warning("ROI for axis {0} has 'stop' out of bounds. Using axis length as stop value. Got stop index: {1}, using {2}".format(dimension_labels[i],stop, shape_in[offset+i]))
-                stop = shape_in[offset+i]
-
-            if start > shape_in[offset+i]:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1} for axis length {2}".format(dimension_labels[i]),start, shape_in[offset+i])
-
-            if start >= stop:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1}, stop index {2}".format(dimension_labels[i]),start, stop)
-
-
-            # set values
-            range_temp = range(int(start), int(stop), int(step))
-            shape_out[offset + i]  = len(range_temp)
-
-            # trim the excess pixels from the range but getting the final iterate
-            # this may not ne necessary but it's nice to keep the list consistent
-            stop_new =  range_temp[-1]+1
-            range_list[offset+ i] = range(int(start), int(stop_new), int(step))
-
-            if shape_out[offset + i] != shape_in[offset + i]:
-                processed_dim[offset + i] = 1
-
-        # set values
-        self._shape_in = shape_in
-        self._shape_out = shape_out
-        self._labels_in = labels_in
-        self._processed_dims = processed_dim
-        self._roi_ordered = range_list
-
-    def _slice_acquisition_geometry(self):
+    def _process_acquisition_geometry(self):
         """
-        Creates the binned acquisition geometry
+        Creates the sliced acquisition geometry
         """
-        geometry_new = self._geometry.copy()
-        system_detector = geometry_new.config.system.detector
-
-        processed_dims = self._processed_dims.copy()
-
-        # deal with vertical first as it may change the geometry type
-        if 'vertical' in self._geometry.dimension_labels:
-            vert_ind = self._labels_in.index('vertical')
-            if processed_dims[vert_ind]:
-                roi = self._roi_ordered[vert_ind]
-                n_elements = len(roi)
-
-                if n_elements > 1:
-                    pixel_offset = (self._shape_in[vert_ind] -1 - roi[-1] - roi[0]) * 0.5
-                    system_detector.position = system_detector.position - pixel_offset * system_detector.direction_y * geometry_new.config.panel.pixel_size[1]
-                    geometry_new.config.panel.num_pixels[1] = n_elements
-                else:
-                    try:
-                        geometry_new = geometry_new.get_slice(vertical = roi.start)
-                    except ValueError as ve:
-                        if self.force == True:
-                            return None
-                        raise ValueError(ve)
-
-
-                geometry_new.config.panel.pixel_size[1] *= roi.step
-                processed_dims[vert_ind] = False
-
-
-        for i, axis  in enumerate(self._labels_in):
-
-            if not processed_dims[i]:
-                continue
-            
-            roi = self._roi_ordered[i]
-            n_elements = len(roi)
-
-            if axis == 'channel':
-                geometry_new.set_channels(num_channels=n_elements)
-
-            elif axis == 'angle':
-                geometry_new.config.angles.angle_data = self._geometry.angles[roi.start:roi.stop:roi.step]
-                
-            elif axis == 'horizontal':
-                pixel_offset = (self._shape_in[i] -1 - roi[-1] - roi[0]) * 0.5
-                system_detector.position = system_detector.position - pixel_offset * system_detector.direction_x * geometry_new.config.panel.pixel_size[0]
-                geometry_new.config.panel.num_pixels[0] = n_elements
-                geometry_new.config.panel.pixel_size[0] *= roi.step
-
+        geometry_new = super(Slicer,self)._process_acquisition_geometry(type='Slice')
         return geometry_new
 
 
-    def _slice_image_geometry(self):
-        """
-        Creates the binned image geometry
-        """
-        geometry_new = self._geometry.copy()
-
-        for i, axis in enumerate(self._labels_in):
-
-            if not self._processed_dims[i]:
-                continue
-
-            roi = self._roi_ordered[i]
-            n_elements = len(roi)
-
-            voxel_offset = (self._shape_in[i] -1 - roi[-1] - roi[0]) * 0.5
-
-            if axis == 'channel':
-                geometry_new.channels = n_elements
-                geometry_new.channel_spacing *= roi.step
-
-            elif axis == 'vertical':
-                geometry_new.center_z -= voxel_offset * geometry_new.voxel_size_z
-
-                geometry_new.voxel_num_z = n_elements
-                geometry_new.voxel_size_z *= roi.step
-
-            elif axis == 'horizontal_x':
-                geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
-
-                geometry_new.voxel_num_x = n_elements
-                geometry_new.voxel_size_x *= roi.step
-
-            elif axis == 'horizontal_y':
-                geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
-
-                geometry_new.voxel_num_y = n_elements
-                geometry_new.voxel_size_y *= roi.step
-
-        return geometry_new
-
-
-    def process(self, out=None):
-
-        data = self.get_input()
-
-        if isinstance(self._geometry, ImageGeometry):
-            sliced_geometry = self._slice_image_geometry()
-        elif isinstance(self._geometry, AcquisitionGeometry):
-            sliced_geometry = self._slice_acquisition_geometry()
-        else:
-            sliced_geometry = None
-
-        # return if just acting on geometry
-        if not self._data_array:
-            return sliced_geometry
-
-        # create output array or check size and shape of passed out
-        if out is None:
-            if sliced_geometry is not None:
-                data_out = sliced_geometry.allocate(None)
-            else:
-                sliced_array = np.empty(self._shape_out,dtype=np.float32)
-                data_out = DataContainer(sliced_array,False, data.dimension_labels)
-        else:
-            try:
-                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self._shape_out)
-            except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
-
-            if sliced_geometry is not None:
-                if out.geometry != sliced_geometry:
-                    raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, sliced_geometry))
-            
-            data_out = out
-
-        # slice data
+    def _process_data(self, dc_in, dc_out):
         slice_obj = tuple([slice(x.start, x.stop, x.step) for x in self._roi_ordered])
-        arr_in = data.array.reshape(self._shape_in)
-        data_out.fill(numpy.squeeze(arr_in[slice_obj]))
+        arr_in = dc_in.array.reshape(self._shape_in)
+        dc_out.fill(np.squeeze(arr_in[slice_obj]))
 
-        if out is None:
-            return data_out

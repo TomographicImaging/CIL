@@ -125,14 +125,14 @@ class Binner(Slicer):
 
     def _get_slice_position(self, roi):
         """
-        Return the vertical position to extract a single slice
+        Return the vertical position to extract a single slice for binned geometry
         """
         return roi.start + roi.step/2
 
 
     def _get_angles(self, roi):
         """
-        Returns the sliced angles according to the roi
+        Returns the binned angles according to the roi
         """
         n_elements = len(roi)
         shape = (n_elements, roi.step)
@@ -179,7 +179,7 @@ class Binner(Slicer):
 
     def _process_data(self, dc_in, dc_out):
         """
-        Processes the dataset
+        Bin the data array
         """
         if self._accelerated:
             self._bin_array_acc(dc_in.array, dc_out.array)

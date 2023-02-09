@@ -14,7 +14,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer,
+from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
 import weakref
@@ -160,7 +160,7 @@ class Slicer(DataProcessor):
 
     def _set_up_processor(self, data):
         """
-        This parses the input roi generically and then configures the processor according to it's class.
+        This parses the input roi generically and then configures the processor according to its class.
         """
         #read input
         self._parse_roi(data.ndim, data.shape, data.dimension_labels)
@@ -251,7 +251,7 @@ class Slicer(DataProcessor):
 
     def _process_data(self, dc_in, dc_out):
         """
-        Process the dataset
+        Slice the data array
         """
         slice_obj = tuple([slice(x.start, x.stop, x.step) for x in self._roi_ordered])
         arr_in = dc_in.array.reshape(self._shape_in)
@@ -260,7 +260,7 @@ class Slicer(DataProcessor):
 
     def _get_slice_position(self, roi):
         """
-        Return the vertical position to extract a single slice
+        Return the vertical position to extract a single slice for sliced geometry
         """
         return roi.start
 

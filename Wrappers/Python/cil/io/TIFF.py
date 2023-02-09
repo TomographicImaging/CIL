@@ -50,11 +50,8 @@ def save_scale_offset(fname, scale, offset):
     utilities.save_dict_to_file(txt, d)
 
 class TIFFWriter(object):
-    '''Write a DataSet to disk as a TIFF file or stack of TIFF files'''
-    
-    def __init__(self,
-                 **kwargs):
-        '''
+    '''Write a DataSet to disk as a TIFF file or stack of TIFF files
+
 
         Parameters
         ----------
@@ -85,7 +82,11 @@ class TIFFWriter(object):
           In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
           not as a single multi-page TIFF file.
         '''
-        
+
+    
+    def __init__(self, **kwargs):
+
+
         self.data_container = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         counter_offset = kwargs.get('counter_offset', 0)
@@ -191,9 +192,7 @@ class TIFFWriter(object):
 
 class TIFFStackReader(object):
     
-    def __init__(self, 
-                 **kwargs):
-        ''' 
+    ''' 
         Basic TIFF redaer which loops through all tiff files in a specific 
         folder and load them in alphabetic order
         
@@ -248,8 +247,9 @@ class TIFFStackReader(object):
         >>> writer.write(original_data)
         >>> reader = TIFFStackReader(file_name = '/path/to/folder')
         >>> about_original_data = reader.read_rescaled()
-        '''
-        
+    '''
+
+    def __init__(self, **kwargs):    
         self.file_name = kwargs.get('file_name', None)
         roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
         transpose = kwargs.get('transpose', False)

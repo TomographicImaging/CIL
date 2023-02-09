@@ -1,5 +1,6 @@
 * Next
-  
+  - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
+  - Implemented IndicatorBox in numba and numpy
   - Dropped support for Python 3.6 and NumPy 1.15
   - Jenkins PR tests on Python 3.8 and NumPy 1.20
   - added yml file to create test environment
@@ -14,6 +15,7 @@
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
     - update test python and numpy versions to 3.9 and 1.22
+    - Update conda build action to v2.0.0
     - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1

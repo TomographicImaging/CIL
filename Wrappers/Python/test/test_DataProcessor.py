@@ -1367,7 +1367,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         phantom = TomoPhantom.get_ImageData(12, ig)
 
         if has_tigre:
-            Op = ProjectionOperator(ig, ag_orig, direct_method='Siddon')
+            Op = TigreProjectionOperator(ig, ag_orig, direct_method='Siddon')
         else:
             Op = AstraProjectionOperator(ig, ag_orig)
 
@@ -1379,7 +1379,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
             .set_labels(['angle', 'horizontal'])
 
         if has_tigre:
-            Op = ProjectionOperator(ig, ag_offset, direct_method='Siddon')
+            Op = TigreProjectionOperator(ig, ag_offset, direct_method='Siddon')
         else:
             Op = AstraProjectionOperator(ig, ag_offset)        
             

@@ -157,6 +157,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#nikon">Nikon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#zeiss">ZEISS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tiff-reader-writer">TIFF Reader/Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#raw-file-writer">RAW File Writer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#hdf5-utilities">HDF5 Utilities</a></li>
 </ul>
 </li>
@@ -223,6 +224,11 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#tiff-reader-writer">
    TIFF Reader/Writer
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#raw-file-writer">
+   RAW File Writer
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -557,9 +563,6 @@ Start and end also can be negative using numpy indexing.</p>
 <dl class="py class">
 <dt id="cil.io.TIFFStackReader">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TIFFStackReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Permalink to this definition">#</a></dt>
-<dd><dl class="py method">
-<dt id="cil.io.TIFFStackReader.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Basic TIFF redaer which loops through all tiff files in a specific
 folder and load them in alphabetic order</p>
 <dl class="field-list simple">
@@ -567,10 +570,10 @@ folder and load them in alphabetic order</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – Path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
 <li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – <p>dictionary with roi to load
-{‘axis_0’: (start, end, step),</p>
+<a href="#id1"><span class="problematic" id="id2">``</span></a>{‘axis_0’: (start, end, step),</p>
 <blockquote>
 <div><p>’axis_1’: (start, end, step),
-‘axis_2’: (start, end, step)}</p>
+‘axis_2’: (start, end, step)}``</p>
 </div></blockquote>
 <p>Files are stacked along axis_0. axis_1 and axis_2 correspond
 to row and column dimensions, respectively.
@@ -606,55 +609,10 @@ read data to approximately the original data with the following code:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">about_original_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">()</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.io.TIFFStackReader.set_up">
-<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_name=None</span></em>, <em class="sig-param"><span class="pre">roi={'axis_0':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_1':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_2':</span> <span class="pre">-1}</span></em>, <em class="sig-param"><span class="pre">transpose=False</span></em>, <em class="sig-param"><span class="pre">mode='bin'</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.set_up" title="Permalink to this definition">#</a></dt>
-<dd><p>Set up method for the TIFFStackReader class</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – Path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
-<li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – <p>dictionary with roi to load
-{‘axis_0’: (start, end, step),</p>
-<blockquote>
-<div><p>’axis_1’: (start, end, step),
-‘axis_2’: (start, end, step)}</p>
-</div></blockquote>
-<p>Files are stacked along axis_0. axis_1 and axis_2 correspond
-to row and column dimensions, respectively.
-Files are stacked in alphabetic order.
-To skip files or to change number of files to load,
-adjust axis_0. For instance, ‘axis_0’: (100, 300)
-will skip first 100 files and will load 200 files.
-‘axis_0’: -1 is a shortcut to load all elements along axis.
-Start and end can be specified as None which is equivalent
-to start = 0 and end = load everything to the end, respectively.
-Start and end also can be negative.
-Notes: roi is specified for axes before transpose.</p>
-</p></li>
-<li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – Whether to transpose loaded images</p></li>
-<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>default 'bin'. Accepted values 'bin'</em><em>, </em><em>'slice'</em>) – Referring to the ‘step’ defined in the roi parameter, in bin mode, ‘step’ number of pixels
-are binned together, values of resulting binned pixels are calculated as average.
-In ‘slice’ mode ‘step’ defines standard numpy slicing.
-Note: in general output array size in bin mode != output array size in slice mode</p></li>
-<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to the type of the saved file.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.io.TIFFStackReader.read">
 <code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read" title="Permalink to this definition">#</a></dt>
 <dd><p>Reads images and return numpy array</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cil.io.TIFFStackReader.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFStackReader.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="py method">
@@ -704,11 +662,8 @@ leads to sensible data.</p>
 <dl class="py class">
 <dt id="cil.io.TIFFWriter">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TIFFWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter" title="Permalink to this definition">#</a></dt>
-<dd><p>Write a DataSet to disk as a TIFF file or stack</p>
-<dl class="py method">
-<dt id="cil.io.TIFFWriter.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Write a DataSet to disk as a TIFF file or stack of TIFF files</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – This represents the data to save to TIFF file(s)</p></li>
@@ -721,19 +676,99 @@ By counter_offset you can offset the index: from <cite>counter_offset</cite> to 
 </ul>
 </dd>
 </dl>
-<p>If compression ‘uint8’ or ‘unit16’ are used, the scale and offset used to compress the data are saved
-in a file called <cite>scaleoffset.json</cite> in the same directory as the TIFF file(s).</p>
-<p>The original data can be obtained by: <cite>original_data = (compressed_data - offset) / scale</cite></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If compression <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">unit16</span></code> are used, the scale and offset used to compress the data are saved
+in a file called <code class="docutils literal notranslate"><span class="pre">scaleoffset.json</span></code> in the same directory as the TIFF file(s).</p>
+<p>The original data can be obtained by: <code class="docutils literal notranslate"><span class="pre">original_data</span> <span class="pre">=</span> <span class="pre">(compressed_data</span> <span class="pre">-</span> <span class="pre">offset)</span> <span class="pre">/</span> <span class="pre">scale</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
+not as a single multi-page TIFF file.</p>
+</div>
+<dl class="py method">
+<dt id="cil.io.TIFFWriter.write">
+<code class="sig-name descname"><span class="pre">write</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Write data to disk</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt id="cil.io.TIFFWriter.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFWriter.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="raw-file-writer">
+<h2>RAW File Writer<a class="headerlink" href="#raw-file-writer" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt id="cil.io.RAWFileWriter">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">RAWFileWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/RAWFileWriter.html#RAWFileWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.RAWFileWriter" title="Permalink to this definition">#</a></dt>
+<dd><p>Writer to write DataContainer (or subclass AcquisitionData, ImageData) to disk as a binary blob</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em> or </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – This represents the data to save to TIFF file(s)</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – This defines the file name prefix, i.e. the file name without the extension.</p></li>
+<li><p><strong>compression</strong> (<em>str</em><em>, </em><em>default None. Accepted values None</em><em>, </em><em>'uint8'</em><em>, </em><em>'uint16'</em>) – The lossy compression to apply. The default None will not compress data.
+‘uint8’ or ‘unit16’ will compress to unsigned int 8 and 16 bit respectively.</p></li>
+</ul>
+</dd>
+</dl>
+<p>This writer will also write a text file with the minimal information necessary to
+read the data back in. This text file will need to reside in the same directory as the raw file.</p>
+<p>The text file will look something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">MINIMAL</span> <span class="n">INFO</span><span class="p">]</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">raw</span>
+<span class="n">data_type</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">u2</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">is_fortran</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="p">[</span><span class="n">COMPRESSION</span><span class="p">]</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="mf">550.7142857142857</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">data_type</span></code> describes the data layout when packing and unpacking data. This can be
+read as numpy dtype with <code class="docutils literal notranslate"><span class="pre">np.dtype('&lt;u2')</span></code>.</p>
+<p class="rubric">Example</p>
+<p>Example of using the writer with compression to <code class="docutils literal notranslate"><span class="pre">uint8</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">RAWFileWriter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<p>Example of reading the data from the ini file:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inifname</span> <span class="o">=</span> <span class="s2">&quot;file_name.ini&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">inifname</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_dtype</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">read_dtype</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fname</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">read_dtype</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_shape</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">][</span><span class="s1">&#39;scale&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">][</span><span class="s1">&#39;offset&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If compression <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">unit16</span></code> are used, the scale and offset used to compress the data are saved
+in the <code class="docutils literal notranslate"><span class="pre">ini</span></code> file in the same directory as the raw file, in the “COMPRESSION” section .</p>
+<p>The original data can be obtained by: <code class="docutils literal notranslate"><span class="pre">original_data</span> <span class="pre">=</span> <span class="pre">(compressed_data</span> <span class="pre">-</span> <span class="pre">offset)</span> <span class="pre">/</span> <span class="pre">scale</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Data is always written in ‘C’ order independent of the order of the original data,
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile">https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile</a>,</p>
+</div>
+<dl class="py method">
+<dt id="cil.io.RAWFileWriter.write">
+<code class="sig-name descname"><span class="pre">write</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/RAWFileWriter.html#RAWFileWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.RAWFileWriter.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Write data to disk</p>
 </dd></dl>
 
 </dd></dl>
 
+<p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 </div>
 <div class="section" id="hdf5-utilities">
 <h2>HDF5 Utilities<a class="headerlink" href="#hdf5-utilities" title="Permalink to this headline">#</a></h2>

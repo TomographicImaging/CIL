@@ -33,6 +33,11 @@ import shutil
 import logging
 import glob
 import json
+from cil.io import utilities
+from cil.io import RAWFileWriter
+import configparser
+import tempfile
+        
 
 initialise_tests()
 
@@ -67,7 +72,7 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
     and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
-# logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.WARNING)
 
 logging.info ("has_astra {}".format(has_astra))
 logging.info ("has_wget {}".format(has_wget))
@@ -167,15 +172,12 @@ class TestTXRMDataReader(unittest.TestCase):
 
 class TestTIFF(unittest.TestCase):
     def setUp(self) -> None:
-        # self.logger = logging.getLogger('cil.io')
-        # self.logger.setLevel(logging.DEBUG)
-        self.cwd = os.path.join(os.getcwd(), 'tifftest')
-        os.mkdir(self.cwd)
+        self.TMP = tempfile.TemporaryDirectory()
+        self.cwd = os.path.join(self.TMP.name, 'rawtest')
 
     def tearDown(self) -> None:
-        shutil.rmtree(self.cwd)
+        self.TMP.cleanup()
         
-
     def get_slice_imagedata(self, data):
         '''Returns only 2 slices of data'''
         # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -315,7 +317,6 @@ class TestTIFF(unittest.TestCase):
         data = ig.allocate(0)
         data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
 
-        from cil.io import utilities
         compress = utilities.get_compress(compression)
         dtype = utilities.get_compressed_dtype(data.array, compression)
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
@@ -363,7 +364,90 @@ class TestTIFF(unittest.TestCase):
         
         np.testing.assert_array_equal(tmp, read_array)
 
+class TestRAW(unittest.TestCase):
+    def setUp(self) -> None:
+        self.TMP = tempfile.TemporaryDirectory()
+        self.cwd = os.path.join(self.TMP.name, 'rawtest')
+
+    def tearDown(self) -> None:
+        self.TMP.cleanup()
+        # pass
+
+    def test_raw_nocompression_0(self):
+        self.RAW_compression_test(None,1)
+    
+    def test_raw_compression_0(self):
+        self.RAW_compression_test('uint8',1)
+
+    def test_raw_compression_1(self):
+        self.RAW_compression_test('uint16',1)
+
+    def test_raw_nocompression_1(self):
+        self.RAW_compression_test(None,1)
+    
+    def test_raw_compression_2(self):
+        with self.assertRaises(ValueError) as context:
+            self.RAW_compression_test(12,1)
+
+    def RAW_compression_test(self, compression, channels=1):
+        X=4
+        Y=5
+        Z=6
+        C=channels
+        if C == 1:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
+        else:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6, channels=C)
+        data = ig.allocate(0)
+        data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
+
+        compress = utilities.get_compress(compression)
+        dtype = utilities.get_compressed_dtype(data.array, compression)
+        scale, offset = utilities.get_compression_scale_offset(data.array, compression)
+        if C > 1:
+            assert data.ndim == 4
+        raw = "unittest.raw"
+        fname = os.path.join(self.cwd, raw)
         
+        writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
+        writer.write()
+
+        # read the data from the ini file
+        ini = "unittest.ini"
+        config = configparser.ConfigParser()
+        inifname = os.path.join(self.cwd, ini)
+        config.read(inifname)
+        
+
+        assert raw == config['MINIMAL INFO']['file_name']
+
+        # read how to read the data from the ini file
+        read_dtype = config['MINIMAL INFO']['data_type']
+        read_array = np.fromfile(fname, dtype=read_dtype)
+        read_shape = eval(config['MINIMAL INFO']['shape'])
+        
+        # reshape read in array
+        read_array = read_array.reshape(read_shape)
+
+        if compress:
+            # rescale the dataset to the original data
+            sc = float(config['COMPRESSION']['scale'])
+            of = float(config['COMPRESSION']['offset'])
+            assert sc == scale
+            assert of == offset
+
+            recovered_data = (read_array - of)/sc
+            np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
+
+            # rescale the original data with scale and offset and compare with what saved
+            tmp = data.array * scale + offset
+            tmp = np.asarray(tmp, dtype=dtype)
+        else:
+            tmp = data.array
+            
+        assert tmp.dtype == read_array.dtype
+        
+        np.testing.assert_array_equal(tmp, read_array)
 
 class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:

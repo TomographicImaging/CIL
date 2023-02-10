@@ -1,4 +1,5 @@
 * Next
+  - Added RAWFileWriter to export data containers to raw files
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
   - Implemented IndicatorBox in numba and numpy
   - Dropped support for Python 3.6 and NumPy 1.15
@@ -15,7 +16,7 @@
     - Returned geometry is correctly offset where binning/cropping moves the origin
   - Github Actions:
     - update test python and numpy versions to 3.9 and 1.22
-    - Update conda build action to v2.0.0
+    - Update conda build action to v1.4.4
     - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1

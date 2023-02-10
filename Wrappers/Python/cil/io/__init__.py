@@ -22,3 +22,4 @@ from .TIFF import TIFFStackReader
 # from .TIFFStackReader import TIFFStackReader
 from .ZEISSDataReader import ZEISSDataReader
 from .ZEISSDataReader import TXRMDataReader
+from .RAWFileWriter import RAWFileWriter

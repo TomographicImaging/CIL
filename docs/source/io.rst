@@ -55,12 +55,19 @@ TIFF Reader/Writer
 
 .. autoclass:: cil.io.TIFFStackReader
    :members:
-   :special-members:
+   :exclude-members: set_up
 
 .. autoclass:: cil.io.TIFFWriter
    :members:
-   :special-members:
+   :exclude-members: set_up
 
+RAW File Writer
+===============
+
+.. autoclass:: cil.io.RAWFileWriter
+   :members:
+
+:ref:`Return Home <mastertoc>`
 
 HDF5 Utilities
 ==================

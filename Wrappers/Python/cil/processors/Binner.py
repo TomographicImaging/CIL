@@ -47,9 +47,6 @@ class Binner(Slicer):
         Stop: Stopping index of input data. Must be an integer, or `None` defaults to index N.
         Step: Number of pixels to average together. Must be an integer or `None` defaults to 1.
 
-    force: boolean, default=False
-        enforce binning even if the returned geometry is not meaningful, will return a DataContainer and not a geometry
-
     accelerated : boolean, default=True
         Uses the CIL accelerated backend if `True`, numpy if `False`.
 
@@ -91,12 +88,12 @@ class Binner(Slicer):
     """
 
     def __init__(self,
-                 roi = None, force=False, accelerated=True):
+                 roi = None, accelerated=True):
 
         if accelerated and not has_ipp:
             raise RuntimeError("Cannot run accelerated Binner without the IPP libraries.")
 
-        super(Binner,self).__init__(roi = roi, force=force)
+        super(Binner,self).__init__(roi = roi)
         self._accelerated = True
 
 

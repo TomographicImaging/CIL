@@ -43,9 +43,6 @@ class Slicer(DataProcessor):
         Stop: Stopping index of input data. Must be an integer, or `None` defaults to index N.
         Step: Number of pixels to average together. Must be an integer or `None` defaults to 1.
 
-    force: boolean, default=False
-        enforce slicing even if the returned geometry is not meaningful, will return a DataContainer and not a geometry
-
 
     Example
     -------
@@ -84,11 +81,10 @@ class Slicer(DataProcessor):
     """
 
     def __init__(self,
-                 roi = None, force=False):
+                 roi = None):
 
         kwargs = {
             '_roi_input': roi,
-            '_force':force, 
             '_roi_ordered':None, 
             '_data_array': False, 
             '_geometry': None, 
@@ -296,10 +292,9 @@ class Slicer(DataProcessor):
                     try:
                         position = self._get_slice_position(roi)
                         geometry_new = geometry_new.get_slice(vertical = position)
-                    except ValueError as ve:
-                        if self._force == True:
-                            return None
-                        raise ValueError(ve)
+                    except ValueError:
+                        logging.warn("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
+                        return None
 
                 geometry_new.config.panel.pixel_size[1] *= roi.step
                 processed_dims[vert_ind] = False

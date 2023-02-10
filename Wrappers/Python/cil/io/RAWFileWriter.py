@@ -70,7 +70,7 @@ class RAWFileWriter(object):
 
 
         This writer will also write a text file with the minimal information necessary to 
-        read the data back in.
+        read the data back in. This text file will need to reside in the same directory as the raw file.
 
         The text file will look something like this::
         

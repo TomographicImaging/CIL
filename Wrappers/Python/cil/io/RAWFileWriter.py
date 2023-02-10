@@ -75,7 +75,7 @@ class RAWFileWriter(object):
         The text file will look something like this::
         
             [MINIMAL INFO]
-            file_name = /path/to/file/filename.raw
+            file_name = filename.raw
             data_type = <u2
             shape = (6, 5, 4)
             is_fortran = False
@@ -84,14 +84,14 @@ class RAWFileWriter(object):
             scale = 550.7142857142857
             offset = -0.0
         
-        The data_type describes the data layout when packing and unpacking data. 
-        See ``struct`` for more information. https://docs.python.org/3/library/struct.html#format-strings
+        The ``data_type`` describes the data layout when packing and unpacking data. This can be
+        read as numpy dtype with ``np.dtype('<u2')``.
 
         
         Example
         -------
         
-        Example of using the writer with compression to `uint8`:
+        Example of using the writer with compression to ``uint8``:
 
         >>> from cil.io import RAWFileWriter
         >>> writer = RAWFileWriter(data=data, file_name=fname, compression='uint8')
@@ -106,6 +106,7 @@ class RAWFileWriter(object):
         >>> inifname = "file_name.ini"
         >>> config.read(inifname)
         >>> read_dtype = config['MINIMAL INFO']['data_type']
+        >>> dtype = np.dtype(read_dtype)
         >>> fname = config['MINIMAL INFO']['file_name']
         >>> read_array = np.fromfile(fname, dtype=read_dtype)
         >>> read_shape = eval(config['MINIMAL INFO']['shape'])
@@ -168,7 +169,7 @@ class RAWFileWriter(object):
         # save information about the file we just saved
         config = configparser.ConfigParser()
         config['MINIMAL INFO'] = {
-            'file_name': fname,
+            'file_name': os.path.basename(fname),
             'data_type': read_dtype,
             'shape': shape,
             # Data is always written in ‘C’ order, independent of the order of d.

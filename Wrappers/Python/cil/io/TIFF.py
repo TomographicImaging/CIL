@@ -204,9 +204,9 @@ class TIFFStackReader(object):
                    
         roi : dictionary, default `None`
             dictionary with roi to load 
-            {'axis_0': (start, end, step), 
-                'axis_1': (start, end, step), 
-                'axis_2': (start, end, step)}
+            ``{'axis_0': (start, end, step), 
+               'axis_1': (start, end, step), 
+               'axis_2': (start, end, step)}``
             Files are stacked along axis_0. axis_1 and axis_2 correspond
             to row and column dimensions, respectively.
             Files are stacked in alphabetic order. 
@@ -279,9 +279,7 @@ class TIFFStackReader(object):
                    
         roi : dictionary, default `None`
             dictionary with roi to load 
-            {'axis_0': (start, end, step), 
-                'axis_1': (start, end, step), 
-                'axis_2': (start, end, step)}
+            ``{'axis_0': (start, end, step), 'axis_1': (start, end, step), 'axis_2': (start, end, step)}``
             Files are stacked along axis_0. axis_1 and axis_2 correspond
             to row and column dimensions, respectively.
             Files are stacked in alphabetic order. 

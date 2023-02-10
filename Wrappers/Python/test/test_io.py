@@ -406,15 +406,20 @@ class TestRAW(unittest.TestCase):
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
         if C > 1:
             assert data.ndim == 4
-        fname = os.path.join(self.cwd, "unittest.raw")
+        raw = "unittest.raw"
+        fname = os.path.join(self.cwd, raw)
         
         writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
         writer.write()
 
         # read the data from the ini file
+        ini = "unittest.ini"
         config = configparser.ConfigParser()
-        inifname = os.path.join(self.cwd, "unittest.ini")
+        inifname = os.path.join(self.cwd, ini)
         config.read(inifname)
+        
+
+        assert raw == config['MINIMAL INFO']['file_name']
 
         # read how to read the data from the ini file
         read_dtype = config['MINIMAL INFO']['data_type']

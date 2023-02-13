@@ -19,7 +19,7 @@ from utils import initialise_tests
 import numpy
 from cil.framework import ImageGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
-from cil.framework import BlockDataContainer, DataContainer
+from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
 from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
@@ -845,3 +845,15 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+
+class TestBlockGeometry(unittest.TestCase):
+    def setUp(self):
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(0,360, 9))
+
+        self.ig = BlockGeometry( *[ AG.copy() for i in range(9) ] )
+
+    def test_block_geometry(self):
+        for ig in self.ig:
+            assert type(ig) == AcquisitionGeometry

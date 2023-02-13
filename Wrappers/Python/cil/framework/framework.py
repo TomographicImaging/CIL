@@ -104,7 +104,7 @@ class Partitioner(object):
             ag.set_angles(self.angles[boolbatch])
             ags.append(ag)
         
-        return BlockGeometry.BlockGeometry(*boolbatches)
+        return BlockGeometry.BlockGeometry(*ags)
 
     def _convert_indices_to_masks(self, batches, num_indices):
         boolbatches = []

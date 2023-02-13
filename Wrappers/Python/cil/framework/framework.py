@@ -40,6 +40,122 @@ else:
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
+from cil.framework import BlockGeometry
+
+class Partitioner(object):
+    '''Base class for partitioners'''
+    # modes of partitioning
+    SEQUENTIAL = 'sequential'
+    STAGGERED = 'staggered'
+    RANDOM_PERMUTATION = 'random_permutation'
+
+    def __init__(self, **kwargs):
+        pass
+    def _partition_indices(self, num_batches, indices, stagger=False):
+        """Partition a list of indices into num_batches of indices.
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the indices into.
+        indices : list of int, int
+            The indices to partition. If passed a list, this list will be partitioned in ``num_batches``
+            partitions. If passed an int the indices will be generated automatically using ``range(indices)``.
+        stagger : bool, default False
+            If True, the indices will be staggered across the batches.
+
+        -------
+        list of list of int
+            A list of batches of indices.
+        """
+
+        # Partition the indices into batches.
+        if isinstance(indices, int):
+            indices = list(range(indices))
+            
+        num_indices = len(indices)
+        # sanity check
+        if num_indices < num_batches:
+            raise ValueError('The number of batches must be less than or equal to the number of indices.')
+            
+        if stagger:
+            batches = [ indices[i::num_batches] for i in range(num_batches) ]
+
+        else:    
+            batch_size = num_indices // num_batches
+            # normally the last batch will be the same size or larger than the others
+            if num_indices/num_batches - batch_size > 0.5:
+                # makes the last batch smaller if the number of indices is not divisible by the number of batches
+                batch_size += 1
+                
+            batches = [indices[i * batch_size : (i + 1) * batch_size : 1] for i in range(num_batches-1)]
+            
+            # Add any remaining indices to the last batch.
+            # the last batch may be of different size than the others
+            batches.append(indices[(num_batches-1) * batch_size:])
+
+        return batches
+    
+    def _convert_indices_to_BlockGeometry(self, batches, num_indices):
+        boolbatches = self._convert_indices_to_masks(batches, num_indices)
+
+        ags = []
+        for boolbatch in boolbatches:
+            ag = self.copy()
+            ag.set_angles(self.angles[boolbatch])
+            ags.append(ag)
+        
+        return BlockGeometry(*boolbatches)
+
+    def _convert_indices_to_masks(self, batches, num_indices):
+        boolbatches = []
+        for batch in batches:
+            boolbatch = numpy.zeros(num_indices, dtype=numpy.bool)
+            for j in batch:
+                boolbatch[j] = True
+            boolbatches.append(boolbatch)
+        
+        return boolbatches
+
+    def partition(self, num_batches, mode):
+        if mode == Partitioner.SEQUENTIAL:
+            return self._partition_sequential(num_batches)
+        elif mode == Partitioner.STAGGERED:
+            return self._partition_staggered(num_batches)
+        elif mode == Partitioner.RANDOM_PERMUTATION:
+            return self._partition_random_permutation(num_batches)
+        else:
+            raise ValueError('Unknown partition mode {}'.format(mode))
+
+    def _partition_sequential(self, num_batches):
+        indices = len(self.angles)
+        batches = self._partition_indices(num_batches, indices, False)
+        geometry = self
+        angles = geometry.angles
+        
+        return self._convert_indices_to_BlockGeometry(batches, indices)
+        
+    def _partition_staggered(self, num_batches):
+        indices = len(self.angles)
+        batches = self._partition_indices(num_batches, indices, True)
+        geometry = self
+        angles = geometry.angles
+        
+        return self._convert_indices_to_BlockGeometry(batches, indices)
+
+    def _partition_random_permutation(self, num_batches, seed=None):
+        if seed is not None:
+            numpy.random.seed(seed)
+        
+        indices = numpy.arange(len(self.angles))
+        numpy.random.shuffle(indices)
+
+        indices = list(indices)            
+        batches = self._partition_indices(num_batches, indices, False)
+        geometry = self
+        angles = geometry.angles
+        
+        return self._convert_indices_to_BlockGeometry(batches, indices)
+
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
@@ -1822,7 +1938,7 @@ class Configuration(object):
         return False
 
 
-class AcquisitionGeometry(object, Partitioner):
+class AcquisitionGeometry(Partitioner, object):
     """This class holds the AcquisitionGeometry of the system.
     
     Please initialise the AcquisitionGeometry using the using the static methods:
@@ -3905,119 +4021,5 @@ class DataOrder():
                  .format(order_requested, list(geometry.dimension_labels), engine))
 
 
-from cil.framework import BlockGeometry
 
-class Partitioner(object):
-    '''Base class for partitioners'''
-    # modes of partitioning
-    SEQUENTIAL = 'sequential'
-    STAGGERED = 'staggered'
-    RANDOM_PERMUTATION = 'random_permutation'
-
-    def __init__(self, **kwargs):
-        pass
-    def _partition_indices(self, num_batches, indices, stagger=False):
-        """Partition a list of indices into num_batches of indices.
-        Parameters
-        ----------
-        num_batches : int
-            The number of batches to partition the indices into.
-        indices : list of int, int
-            The indices to partition. If passed a list, this list will be partitioned in ``num_batches``
-            partitions. If passed an int the indices will be generated automatically using ``range(indices)``.
-        stagger : bool, default False
-            If True, the indices will be staggered across the batches.
-
-        -------
-        list of list of int
-            A list of batches of indices.
-        """
-
-        # Partition the indices into batches.
-        if isinstance(indices, int):
-            indices = list(range(indices))
-            
-        num_indices = len(indices)
-        # sanity check
-        if num_indices < num_batches:
-            raise ValueError('The number of batches must be less than or equal to the number of indices.')
-            
-        if stagger:
-            batches = [ indices[i::num_batches] for i in range(num_batches) ]
-
-        else:    
-            batch_size = num_indices // num_batches
-            # normally the last batch will be the same size or larger than the others
-            if num_indices/num_batches - batch_size > 0.5:
-                # makes the last batch smaller if the number of indices is not divisible by the number of batches
-                batch_size += 1
-                
-            batches = [indices[i * batch_size : (i + 1) * batch_size : 1] for i in range(num_batches-1)]
-            
-            # Add any remaining indices to the last batch.
-            # the last batch may be of different size than the others
-            batches.append(indices[(num_batches-1) * batch_size:])
-
-        return batches
-    
-    def _convert_indices_to_BlockGeometry(self, batches, num_indices):
-        boolbatches = self._convert_indices_to_masks(batches, num_indices)
-
-        ags = []
-        for boolbatch in boolbatches:
-            ag = self.copy()
-            ag.set_angles(self.angles[boolbatch])
-            ags.append(ag)
-        
-        return BlockGeometry(*boolbatches)
-
-    def _convert_indices_to_masks(self, batches, num_indices):
-        boolbatches = []
-        for batch in batches:
-            boolbatch = numpy.zeros(num_indices, dtype=numpy.bool)
-            for j in batch:
-                boolbatch[j] = True
-            boolbatches.append(boolbatch)
-        
-        return boolbatches
-
-    def partition(self, num_batches, mode):
-        if mode == Partitioner.SEQUENTIAL:
-            return self._partition_sequential(num_batches)
-        elif mode == Partitioner.STAGGERED:
-            return self._partition_staggered(num_batches)
-        elif mode == Partitioner.RANDOM_PERMUTATION:
-            return self._partition_random_permutation(num_batches)
-        else:
-            raise ValueError('Unknown partition mode {}'.format(mode))
-
-    def _partition_sequential(self, num_batches):
-        indices = len(self.angles)
-        batches = self._partition_indices(num_batches, indices, False)
-        geometry = self
-        angles = geometry.angles
-        
-        return self._convert_indices_to_BlockGeometry(batches, indices)
-        
-    def _partition_staggered(self, num_batches):
-        indices = len(self.angles)
-        batches = self._partition_indices(num_batches, indices, True)
-        geometry = self
-        angles = geometry.angles
-        
-        return self._convert_indices_to_BlockGeometry(batches, indices)
-
-    def _partition_random_permutation(self, num_batches, seed=None):
-        if seed is not None:
-            numpy.random.seed(seed)
-        
-        indices = numpy.arange(len(self.angles))
-        numpy.random.shuffle(indices)
-
-        indices = list(indices)            
-        batches = self._partition_indices(num_batches, indices, False)
-        geometry = self
-        angles = geometry.angles
-        
-        return self._convert_indices_to_BlockGeometry(batches, indices)
         

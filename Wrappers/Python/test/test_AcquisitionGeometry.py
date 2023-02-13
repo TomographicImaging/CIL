@@ -1433,7 +1433,7 @@ class TestSubset(unittest.TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
-    def test_partition_indices(self):
+    def test_partition_indices_int(self):
         from cil.framework import Partitioner
 
         par = Partitioner()
@@ -1443,4 +1443,27 @@ class TestSubset(unittest.TestCase):
         ret = par._partition_indices(num_batches, indices, stagger=False)
         gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
 
-        np.testing.assert_array_equal(np.asarray(ret), np.asarray(gold))
+        self.assertListEqual(ret, gold)
+
+        ret = par._partition_indices(num_batches, indices, stagger=True)
+        gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+
+        self.assertListEqual(ret, gold)
+
+    def test_partition_indices_list(self):
+        from cil.framework import Partitioner
+
+        par = Partitioner()
+
+        num_batches = 4
+        num_indices = 9
+        indices = list(range(num_indices))
+        ret = par._partition_indices(num_batches, indices, stagger=False)
+        gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
+
+        self.assertListEqual(ret, gold)
+
+        ret = par._partition_indices(num_batches, indices, stagger=True)
+        gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+
+        self.assertListEqual(ret, gold)

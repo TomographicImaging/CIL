@@ -260,92 +260,92 @@ class Padder(DataProcessor):
     
         return True 
 
+    def _create_tuple(self, value):
+        try:
+            out = (int(value),int(value))
+        except TypeError:
+            try:
+                out = (int(value[0]),int(value[1]))
+            except:
+                raise TypeError()
+
+        return out
 
     def _parse_input(self, data):
 
         offset = 4-data.ndim
-        labels_in = [None]*4
-        labels_in[offset::] = data.dimension_labels
-        shape_in = [1]*4
-        shape_in[offset::] = data.shape
-        process_axis = [0,0,0,0]
-        pad_param = [(0,0)]*4
-        pad_values_param = [(0,0)]*4
 
+        self._labels_in = [None]*4
+        self._labels_in[offset::] = data.dimension_labels
+
+        self._shape_in = [1]*4
+        self._shape_in[offset::] = data.shape
+
+        self._shape_out = self._shape_in.copy()
+
+        self._processed_dims = [0,0,0,0]
+
+        self._pad_width_param = [(0,0)]*4
+        self._pad_values_param = [(0,0)]*4
+
+
+        # apply to spatial dimensions only by default
+        # dimensions to process
+        spatial_dimensions =[
+            'vertical',
+            'horizontal',
+            'horizontal_y',
+            'horizontal_x',
+            'channel'
+        ]
+        
         if isinstance(self.pad_width, dict):
             for k, v in self.pad_width.items():
                 if k == 'angle':            
                     raise NotImplementedError('Cannot use Padder to pad the angle dimension')
 
                 try:
-                    i = labels_in.index(k)
+                    i = self._labels_in.index(k)
                 except:
                     raise ValueError('Dimension label not found in data. Expected labels from {0}. Got {1}'.format(data.dimension_labels, k))
 
-                process_axis[i] = 1
-
                 try:
-                    pad_param[i] = (int(v),int(v))
+                    self._pad_width_param[i] = self._create_tuple(v)
                 except TypeError:
-                    try:
-                        pad_param[i] = (int(v[0]),int(v[1]))
-                    except:
-                        raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0} for axis {1}".format(v, k))    
+                    raise TypeError("`pad_width` for axis {0} should be a integer or a tuple of integers. Got {1}".format(k, v))    
 
         else:
-
             try:
-                pad = (int(self.pad_width),int(self.pad_width))
+                pad = self._create_tuple(self.pad_width)
             except TypeError:
+                raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0}".format(v))    
+
+            for i, dim in enumerate(self._labels_in):
+                if dim in spatial_dimensions:
+                    self._pad_width_param[i] = pad
+
+        # create list of processed axes and new_shape
+        for i in range(4):
+           if self._pad_width_param[i] != (0,0):
+                self._processed_dims[i] = 1 
+                self._shape_out[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
+
+
+        for i, dim in enumerate(self._labels_in):
+            # only get values for axes we're processing
+            if self._processed_dims[i]:
                 try:
-                    pad = (int(self.pad_width[0]),int(self.pad_width[1]))
-                except:
-                    raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0} for axis {1}".format(v, k))    
-
-            # apply to spatial dimensions only by default
-            # dimensions to process
-            spatial_dimensions =[
-                'vertical',
-                'horizontal',
-                'horizontal_y',
-                'horizontal_x',
-                #'angle',
-                'channel'
-            ]
-
-            for i, dim in enumerate(labels_in):
-                if dim not in spatial_dimensions:
-                    continue
-                
-                process_axis[i] = 1
-                pad_param[i] = pad
-
-
-        for i, dim in enumerate(labels_in):
-            if process_axis[i]:
-                try:
-                    values = self.pad_values['dim']
+                    # if passed a dictionary must have values for each padded axis
+                    values = self.pad_values[dim]
                 except KeyError:
-                    raise KeyError("Corresponding value not found for padded axis")
+                    raise KeyError("Corresponding value not found for padded axis {0}".format(dim))
                 except TypeError:
                     values = self.pad_values
 
                 try:
-                    pad_values_param[i] = (int(values),int(values))
+                    self._pad_values_param[i] = self._create_tuple(values)
                 except TypeError:
-                    try:
-                        pad_values_param[i] = (int(values[0]),int(values[1]))
-                    except:
-                        raise TypeError("`pad_values` not readable")   
-             
-
-        self._shape_out = [shape_in[i] + pad_param[i][0] + pad_param[i][1] for i in range(4)]
-        self._pad_width_param = pad_param
-        self._shape_in = shape_in
-        self._labels_in = labels_in
-        self._processed_dims = process_axis
-        self._pad_values_param = pad_values_param
-
+                    raise TypeError("`pad_values` should be a integer or a tuple of integers. Got {0} for axis {1}".format(v, dim))    
 
 
     def _process_acquisition_geometry(self):
@@ -366,16 +366,15 @@ class Padder(DataProcessor):
                 geometry.set_channels(num_channels= geometry.config.channels.num_channels + \
                 self._pad_width_param[i][0] + self._pad_width_param[i][1])
             elif dim == 'angle':
-                # pad angles vector
-                self._pad_width_param[i] = (0,0)
+                raise NotImplementedError('Cannot use Padder to pad in the angle dimension')
             elif dim == 'vertical':
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][0] 
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][1]
-                system_detector.position =  system_detector.position - offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
+                system_detector.position = system_detector.position - offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
             elif dim == 'horizontal':
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][0]
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][1]
-                system_detector.position =  system_detector.position - offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
+                system_detector.position = system_detector.position - offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
         
         return geometry
 
@@ -407,8 +406,8 @@ class Padder(DataProcessor):
                 geometry.voxel_num_y += self._pad_width_param[i][1]
                 geometry.center_y += offset * geometry.voxel_size_y
 
-
         return geometry
+
 
     def _process_data(self, dc_in):
         arr_in = dc_in.array.reshape(self._shape_in)

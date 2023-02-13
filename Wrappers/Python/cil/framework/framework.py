@@ -104,12 +104,12 @@ class Partitioner(object):
             ag.set_angles(self.angles[boolbatch])
             ags.append(ag)
         
-        return BlockGeometry(*boolbatches)
+        return BlockGeometry.BlockGeometry(*boolbatches)
 
     def _convert_indices_to_masks(self, batches, num_indices):
         boolbatches = []
         for batch in batches:
-            boolbatch = numpy.zeros(num_indices, dtype=numpy.bool)
+            boolbatch = numpy.zeros(num_indices, dtype=bool)
             for j in batch:
                 boolbatch[j] = True
             boolbatches.append(boolbatch)

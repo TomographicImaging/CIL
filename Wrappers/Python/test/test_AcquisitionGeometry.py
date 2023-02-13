@@ -18,8 +18,9 @@ import unittest
 from utils import initialise_tests
 import numpy as np
 import math
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry
 from cil.framework.framework import SystemConfiguration
+from cil.framework import Partitioner
 
 initialise_tests()
 
@@ -1434,8 +1435,6 @@ class TestSubset(unittest.TestCase):
         return super().tearDown()
 
     def test_partition_indices_int(self):
-        from cil.framework import Partitioner
-
         par = Partitioner()
 
         num_batches = 4
@@ -1451,8 +1450,6 @@ class TestSubset(unittest.TestCase):
         self.assertListEqual(ret, gold)
 
     def test_partition_indices_list(self):
-        from cil.framework import Partitioner
-
         par = Partitioner()
 
         num_batches = 4
@@ -1467,3 +1464,82 @@ class TestSubset(unittest.TestCase):
         gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
 
         self.assertListEqual(ret, gold)
+
+    def test_convert_to_mask(self):
+        par = Partitioner()
+
+        num_batches = 4
+        num_indices = 9
+        indices = list(range(num_indices))
+        ret = par._partition_indices(num_batches, indices, stagger=False)
+        ret = par._convert_indices_to_masks(ret, num_indices)
+        # gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
+        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
+        gold[0][0] = True
+        gold[0][1] = True
+
+        gold[1][2] = True
+        gold[1][3] = True
+
+        gold[2][4] = True
+        gold[2][5] = True
+
+        gold[3][6] = True
+        gold[3][7] = True
+        gold[3][8] = True
+        
+        for i,r in enumerate(ret):
+            np.testing.assert_array_equal(np.asarray(r, dtype=bool), gold[i])
+
+        ret = par._partition_indices(num_batches, indices, stagger=True)
+        ret = par._convert_indices_to_masks(ret, num_indices)
+        # gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
+        gold[0][0] = True
+        gold[0][4] = True
+        gold[0][8] = True
+
+        gold[1][1] = True
+        gold[1][5] = True
+
+        gold[2][2] = True
+        gold[2][6] = True
+
+        gold[3][3] = True
+        gold[3][7] = True
+
+        for i,r in enumerate(ret):
+            np.testing.assert_array_equal(np.asarray(r, dtype=bool), gold[i])
+
+    def test_AcquisitionGeometry_split_to_BlockGeometry(self):
+        AG = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 9, dtype=np.float32)
+
+        #default
+        AG.set_angles(angles)
+        self.AcquisitionGeometry_split_to_BlockGeometry(AG, 'sequential', 1)
+
+
+    def AcquisitionGeometry_split_to_BlockGeometry(self, ag, method, seed):
+        num_batches = 4
+        np.random.seed(seed)
+        bg = ag.partition(num_batches, method)
+        num_indices = len(ag.angles)
+
+        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
+        gold[0][0] = True
+        gold[0][1] = True
+
+        gold[1][2] = True
+        gold[1][3] = True
+
+        gold[2][4] = True
+        gold[2][5] = True
+
+        gold[3][6] = True
+        gold[3][7] = True
+        gold[3][8] = True
+
+        for i, geo in enumerate(bg):
+            print (type(geo), type(ag ))
+            np.testing.assert_allclose(geo.angles, ag.angles[gold[i]])

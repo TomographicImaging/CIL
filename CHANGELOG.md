@@ -14,6 +14,8 @@
   - Binner processor reworked:
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
+  - Slicer refactoring
+    - Returned geometry is correctly offset where slicing/cropping moves the origin
   - Github Actions:
     - update test python and numpy versions to 3.9 and 1.22
     - Update conda build action to v1.4.4

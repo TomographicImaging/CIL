@@ -1426,3 +1426,21 @@ class Test_Cone3D(unittest.TestCase):
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
         numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
+
+class TestSubset(unittest.TestCase):
+    def setUp(self) -> None:
+        return super().setUp()
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def test_partition_indices(self):
+        from cil.framework import Partitioner
+
+        par = Partitioner()
+
+        num_batches = 4
+        indices = 9
+        ret = par._partition_indices(num_batches, indices, stagger=False)
+        gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
+
+        numpy.testing.assert_array_equal(np.asarray(ret), np.asarray(gold))

@@ -1514,9 +1514,10 @@ class TestSubset(unittest.TestCase):
     def test_AcquisitionGeometry_split_to_BlockGeometry(self):
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
             .set_panel(num_pixels=10)\
-            .set_angles(angles=range(0,360, 9))
+            .set_angles(angles=range(9))
 
         self.AcquisitionGeometry_split_to_BlockGeometry(AG, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(AG, 'staggered', 1)
 
 
     def AcquisitionGeometry_split_to_BlockGeometry(self, ag, method, seed):
@@ -1526,21 +1527,33 @@ class TestSubset(unittest.TestCase):
         num_indices = len(ag.angles)
 
         gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
-        gold[0][0] = True
-        gold[0][1] = True
+        if method == Partitioner.SEQUENTIAL:
+            gold[0][0] = True
+            gold[0][1] = True
 
-        gold[1][2] = True
-        gold[1][3] = True
+            gold[1][2] = True
+            gold[1][3] = True
 
-        gold[2][4] = True
-        gold[2][5] = True
+            gold[2][4] = True
+            gold[2][5] = True
 
-        gold[3][6] = True
-        gold[3][7] = True
-        gold[3][8] = True
+            gold[3][6] = True
+            gold[3][7] = True
+            gold[3][8] = True
+        elif method == Partitioner.STAGGERED:
+            # gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+            gold[0][0] = True
+            gold[0][4] = True
+            gold[0][8] = True
 
-        print ("type of bg", type(bg))
-        # for i, geo in enumerate(bg):
-        for geo in bg:
-            print ("type of geo -------------> ", type(geo))
-            # np.testing.assert_allclose(geo.angles, ag.angles[gold[i]])
+            gold[1][1] = True
+            gold[1][5] = True
+
+            gold[2][2] = True
+            gold[2][6] = True
+
+            gold[3][3] = True
+            gold[3][7] = True
+
+        for i, geo in enumerate(bg):
+            np.testing.assert_allclose(geo.angles, ag.angles[gold[i]])

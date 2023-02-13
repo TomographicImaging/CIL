@@ -21,8 +21,8 @@ import weakref
 import logging
 
 # Note to developers: Binner and Slicer share a lot of common code
-# so Binner has been implemented as a child of Slicer this makes use
-# of commonality and redefine only the methods that differ. These methods
+# so Binner has been implemented as a child of Slicer.  This makes use
+# of commonality and redefines only the methods that differ. These methods
 # dictate the style of slicer
 class Slicer(DataProcessor):
 
@@ -51,7 +51,7 @@ class Slicer(DataProcessor):
     >>> roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
     >>> processor = Slicer(roi)
     >>> processor.set_input(data)
-    >>> data_binned = processor.get_output()
+    >>> data_sliced= processor.get_output()
 
 
     Example
@@ -60,7 +60,7 @@ class Slicer(DataProcessor):
     >>> roi = {'horizontal':(None,None,2),'vertical':(None,None,2)}
     >>> processor = Slicer(roi)
     >>> processor.set_input(data.geometry)
-    >>> geometry_binned = processor.get_output()
+    >>> geometry_sliced = processor.get_output()
 
 
     Note
@@ -101,12 +101,12 @@ class Slicer(DataProcessor):
 
     def set_input(self, dataset):
         """
-        Set the input data to the processor
+        Set the input data or geometry to the processor
 
         Parameters
         ----------
         dataset : DataContainer, Geometry
-            The input DataContainer
+            The input DataContainer or Geometry
         """
 
         if issubclass(type(dataset), DataContainer) or isinstance(dataset,(AcquisitionGeometry,ImageGeometry)):
@@ -377,7 +377,7 @@ class Slicer(DataProcessor):
         Returns
         -------
         DataContainer
-            The downsampled output is returned depending on the input type is may be:
+            The downsampled output is returned. Depending on the input type this may be:
             ImageData, AcquisitionData, DataContainer, ImageGeometry, AcquisitionGeometry
         """
         data = self.get_input()

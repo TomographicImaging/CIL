@@ -25,8 +25,8 @@ except:
     has_ipp = False
 
 # Note to developers: Binner and Slicer share a lot of common code
-# so Binner has been implemented as a child of Slicer this makes use
-# of commonality and redefine only the methods that differ. These methods
+# so Binner has been implemented as a child of Slicer. This makes use
+# of commonality and redefines only the methods that differ. These methods
 # dictate the style of slicer
 class Binner(Slicer):
 
@@ -99,7 +99,7 @@ class Binner(Slicer):
 
     def _configure(self):
         """
-        Once the ROI has been parsed this configure the input specifically for use with Binner        
+        Once the ROI has been parsed this configures the input specifically for use with Binner        
         """
 
         #as binning we only include bins that are inside boundaries

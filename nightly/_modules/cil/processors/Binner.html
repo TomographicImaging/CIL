@@ -209,9 +209,8 @@
 <span class="c1">#   See the License for the specific language governing permissions and</span>
 <span class="c1">#   limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Slicer</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">weakref</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">cil.processors.cilacc_binner</span> <span class="kn">import</span> <span class="n">Binner_IPP</span>
@@ -219,8 +218,11 @@
 <span class="k">except</span><span class="p">:</span>
     <span class="n">has_ipp</span> <span class="o">=</span> <span class="kc">False</span>
 
-
-<div class="viewcode-block" id="Binner"><a class="viewcode-back" href="../../../processors.html#cil.processors.Binner">[docs]</a><span class="k">class</span> <span class="nc">Binner</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
+<span class="c1"># Note to developers: Binner and Slicer share a lot of common code</span>
+<span class="c1"># so Binner has been implemented as a child of Slicer. This makes use</span>
+<span class="c1"># of commonality and redefines only the methods that differ. These methods</span>
+<span class="c1"># dictate the style of slicer</span>
+<div class="viewcode-block" id="Binner"><a class="viewcode-back" href="../../../processors.html#cil.processors.Binner">[docs]</a><span class="k">class</span> <span class="nc">Binner</span><span class="p">(</span><span class="n">Slicer</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This creates a Binner processor.</span>
 <span class="sd">    </span>
@@ -280,261 +282,52 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">accelerated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-
+                 <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">accelerated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">accelerated</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_ipp</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot run accelerated Binner without the IPP libraries.&quot;</span><span class="p">)</span>
 
+        <span class="nb">super</span><span class="p">(</span><span class="n">Binner</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accelerated</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;_roi_input&#39;</span><span class="p">:</span> <span class="n">roi</span><span class="p">,</span> 
-            <span class="s1">&#39;_accelerated&#39;</span><span class="p">:</span><span class="n">accelerated</span><span class="p">,</span>
-            <span class="s1">&#39;_roi_ordered&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_data_array&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> 
-            <span class="s1">&#39;_geometry&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_processed_dims&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_shape_in&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_shape_out&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_labels_in&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_binning&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;_index_start&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="p">}</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">Binner</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
-
-<div class="viewcode-block" id="Binner.set_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.Binner.set_input">[docs]</a>    <span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set the input data to the processor</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        dataset : DataContainer, Geometry</span>
-<span class="sd">            The input DataContainer</span>
+<span class="sd">        Once the ROI has been parsed this configures the input specifically for use with Binner        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,(</span><span class="n">AcquisitionGeometry</span><span class="p">,</span><span class="n">ImageGeometry</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data not compatible&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
-                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">))</span></div>
+        <span class="c1">#as binning we only include bins that are inside boundaries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">)</span><span class="o">//</span><span class="n">x</span><span class="o">.</span><span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_indices</span> <span class="o">=</span> <span class="p">[]</span>
 
-
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ImageData</span><span class="p">,</span><span class="n">AcquisitionData</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
-
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="n">data</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                            <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1"> - DataContainer</span><span class="se">\n</span><span class="s1"> - ImageGeometry</span><span class="se">\n</span><span class="s1"> - AcquisitionGeometry&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected float32&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_input</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, specify roi&#39;</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Wrong label is specified for roi, expected one of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_roi</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="kc">True</span> 
-
-
-    <span class="k">def</span> <span class="nf">_parse_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This processes the roi input style</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">offset</span> <span class="o">=</span> <span class="mi">4</span><span class="o">-</span><span class="n">ndim</span>
-        <span class="n">labels_in</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span>
-        <span class="n">labels_in</span><span class="p">[</span><span class="n">offset</span><span class="p">::]</span> <span class="o">=</span> <span class="n">dimension_labels</span>
-        <span class="n">shape_in</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span>
-        <span class="n">shape_in</span><span class="p">[</span><span class="n">offset</span><span class="p">::]</span> <span class="o">=</span> <span class="n">shape</span>
-
-        <span class="c1"># defaults</span>
-        <span class="n">shape_out</span> <span class="o">=</span> <span class="n">shape_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">processed_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,),</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
-        <span class="n">binning</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">index_start</span> <span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">index_end</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shape_in</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
-
-            <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dimension_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="kc">None</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">roi</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">roi</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="k">continue</span>
-
-            <span class="n">start</span> <span class="o">=</span> <span class="n">index_start</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
-            <span class="n">stop</span> <span class="o">=</span> <span class="n">shape_out</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="n">binning</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
-
-            <span class="c1"># accepts a tuple, range or slice</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">roi</span> <span class="o">=</span> <span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="n">roi</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
-                
-            <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">stop</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">start</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">stop</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">step</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-
-            <span class="c1"># deal with negative indexing</span>
-            <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">start</span> <span class="o">+=</span> <span class="n">shape_in</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="n">stop</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">stop</span> <span class="o">+=</span> <span class="n">shape_in</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
-
-            <span class="c1">#set values</span>
-            <span class="n">binning</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-            <span class="n">index_start</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
-            <span class="n">shape_out</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">//</span> <span class="n">step</span>
-
-            <span class="c1">#end pixel based on binning</span>
-            <span class="n">index_end</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">index_start</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">shape_out</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">binning</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">])</span>
-
-            <span class="k">if</span> <span class="n">shape_out</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape_in</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]:</span>
-                <span class="n">processed_dim</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-
-        <span class="n">range_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># fix roi_ordered for binner based on shape out</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-            <span class="n">range_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">index_start</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">index_end</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">binning</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-            
-        <span class="c1"># set values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span> <span class="o">=</span> <span class="n">shape_in</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">=</span> <span class="n">shape_out</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span> <span class="o">=</span> <span class="n">labels_in</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span> <span class="o">=</span> <span class="n">processed_dim</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span> <span class="o">=</span> <span class="n">range_list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_binning</span> <span class="o">=</span> <span class="n">binning</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_index_start</span> <span class="o">=</span> <span class="n">index_start</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">start</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
 
-    <span class="k">def</span> <span class="nf">_bin_acquisition_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="n">start</span><span class="p">,</span>
+                <span class="n">stop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_indices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">_get_slice_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates the binned acquisition geometry</span>
+<span class="sd">        Return the vertical position to extract a single slice for binned geometry</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">system_detector</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span>
-
-        <span class="n">processed_dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-        <span class="c1"># deal with vertical first as it may change the geometry type</span>
-        <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-            <span class="n">vert_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">processed_dims</span><span class="p">[</span><span class="n">vert_ind</span><span class="p">]:</span>
-                <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">vert_ind</span><span class="p">]</span>
-                <span class="n">n_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">n_elements</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">centre_offset</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">((</span><span class="n">n_elements</span> <span class="o">*</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="p">)</span>
-
-                    <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_elements</span>
-                    <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">centre_offset</span> <span class="o">*</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">direction_y</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">geometry_new</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span> <span class="o">=</span> <span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
-
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span>
-                <span class="n">processed_dims</span><span class="p">[</span><span class="n">vert_ind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="o">/</span><span class="mi">2</span>
 
 
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span>  <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">):</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                <span class="k">continue</span>
-            
-            <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">n_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;channel&#39;</span><span class="p">:</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">num_channels</span><span class="o">=</span><span class="n">n_elements</span><span class="p">)</span>
-
-            <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
-                <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="o">+</span><span class="n">n_elements</span><span class="o">*</span><span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                
-            <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span>
-                <span class="n">centre_offset</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span> <span class="p">(</span><span class="n">n_elements</span> <span class="o">*</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="p">)</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_elements</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span>
-                <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">centre_offset</span> <span class="o">*</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">direction_x</span>
-
-        <span class="k">return</span> <span class="n">geometry_new</span>
-
-
-    <span class="k">def</span> <span class="nf">_bin_image_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates the binned image geometry</span>
+<span class="sd">        Returns the binned angles according to the roi</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">):</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                <span class="k">continue</span>
-
-            <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">n_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
-
-            <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span>
-
-            <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;channel&#39;</span><span class="p">:</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">n_elements</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">channel_spacing</span> <span class="o">*=</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span>
-
-            <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
-                <span class="c1"># offset in unbinned voxels, multiplied by original voxel size</span>
-                <span class="n">voxel_offset</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">offset</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">center_z</span> <span class="o">-=</span> <span class="n">voxel_offset</span> <span class="o">*</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_size_z</span>
-
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">=</span> <span class="n">n_elements</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_size_z</span> <span class="o">*=</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span>
-
-            <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;horizontal_x&#39;</span><span class="p">:</span>
-                <span class="c1"># offset in unbinned voxels, multiplied by original voxel size</span>
-                <span class="n">voxel_offset</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">offset</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">center_x</span> <span class="o">-=</span> <span class="n">voxel_offset</span> <span class="o">*</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_size_x</span>
-
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="n">n_elements</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_size_x</span> <span class="o">*=</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span>
-
-            <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="s1">&#39;horizontal_y&#39;</span><span class="p">:</span>
-                <span class="c1"># offset in unbinned voxels, multiplied by original voxel size</span>
-                <span class="n">voxel_offset</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">offset</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">center_y</span> <span class="o">-=</span> <span class="n">voxel_offset</span> <span class="o">*</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_size_y</span>
-
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">=</span> <span class="n">n_elements</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_size_y</span> <span class="o">*=</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span>
-
-        <span class="k">return</span> <span class="n">geometry_new</span>
+        <span class="n">n_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="o">+</span><span class="n">n_elements</span><span class="o">*</span><span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">_bin_array_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_in</span><span class="p">,</span> <span class="n">array_binned</span><span class="p">):</span>
@@ -547,12 +340,11 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
             <span class="c1"># reshape the data to add each &#39;bin&#39; dimensions</span>
             <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
-            <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_binning</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="n">slice_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index_start</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_start</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binning</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="c1">#crop data (i.e. no bin/step)</span>
-        
-        <span class="n">shape_object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape_object</span><span class="p">)</span>
-        <span class="n">slice_object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">slice_object</span><span class="p">)</span>
+            <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
 
+        <span class="n">shape_object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape_object</span><span class="p">)</span>
+        <span class="n">slice_object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">])</span>
+      
         <span class="n">data_resized</span> <span class="o">=</span> <span class="n">array_in</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="p">)[</span><span class="n">slice_object</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape_object</span><span class="p">)</span>
 
         <span class="n">mean_order</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -566,56 +358,25 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Bins the array using the accelerated CIL backend</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">binner_ipp</span> <span class="o">=</span> <span class="n">Binner_IPP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binning</span><span class="p">)</span>
+        <span class="n">indices_start</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">step</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
+
+        <span class="n">binner_ipp</span> <span class="o">=</span> <span class="n">Binner_IPP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">,</span> <span class="n">indices_start</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">binner_ipp</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">array_in</span><span class="p">,</span> <span class="n">array_binned</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call failed&quot;</span><span class="p">)</span>
 
 
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
-            <span class="n">binned_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_image_geometry</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">):</span>
-            <span class="n">binned_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_acquisition_geometry</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">binned_geometry</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># return if just acting on geometry</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">binned_geometry</span>
-
-        <span class="c1"># create output array or check size and shape of passed out</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">binned_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">data_out</span> <span class="o">=</span> <span class="n">binned_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-                <span class="n">binned_array</span> <span class="o">=</span> <span class="n">data_out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">binned_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-                <span class="n">data_out</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">binned_array</span><span class="p">,</span><span class="kc">False</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Array of `out` not compatible. Expected shape: </span><span class="si">{0}</span><span class="s2">, data type: </span><span class="si">{1}</span><span class="s2"> Got shape: </span><span class="si">{2}</span><span class="s2">, data type: </span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-            <span class="k">if</span> <span class="n">binned_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="n">binned_geometry</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry of `out` not as expected. Got </span><span class="si">{0}</span><span class="s2">, expected </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">binned_geometry</span><span class="p">))</span>
-            
-            <span class="n">binned_array</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span>
-
-        <span class="c1"># bin data</span>
+    <span class="k">def</span> <span class="nf">_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dc_in</span><span class="p">,</span> <span class="n">dc_out</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Bin the data array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_accelerated</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_acc</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">binned_array</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_acc</span><span class="p">(</span><span class="n">dc_in</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dc_out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_numpy</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">binned_array</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_numpy</span><span class="p">(</span><span class="n">dc_in</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dc_out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span></div>
 
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data_out</span></div>
 </pre></div>
 
               </div>

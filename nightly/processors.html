@@ -311,30 +311,76 @@
 <h3>Data Slicer<a class="headerlink" href="#data-slicer" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.processors.Slicer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Slicer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer" title="Permalink to this definition">#</a></dt>
-<dd><p>Processor slices an array and returns new geometry.</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Slicer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer" title="Permalink to this definition">#</a></dt>
+<dd><p>This creates a Slicer processor.</p>
+<p>The processor will crop the data, and then return every n input pixels along a dimension from the starting index.</p>
+<p>The output will be a data container with the data, and geometry updated to reflect the operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>roi</strong> (<em>dict</em>) – region-of-interest to slice, specified as a dictionary containing tuple (Start, Stop, Step)</p></li>
-<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>default=False</em>) – enforce slicing even if the returned geometry is not meaningful</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns a DataContainer (AcquisitionData or ImageData) object with an updated AcquisitionGeometry or ImageGeometry where applicable</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a> or <a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a>)</p>
+<dd class="field-odd"><p><strong>roi</strong> (<em>dict</em>) – <p>The region-of-interest to bin {‘axis_name1’:(start,stop,step), ‘axis_name2’:(start,stop,step)}
+The <cite>key</cite> being the axis name to apply the processor to, the <cite>value</cite> holding a tuple containing the ROI description</p>
+<p>Start: Starting index of input data. Must be an integer, or <cite>None</cite> defaults to index 0.
+Stop: Stopping index of input data. Must be an integer, or <cite>None</cite> defaults to index N.
+Step: Number of pixels to average together. Must be an integer or <cite>None</cite> defaults to 1.</p>
+</p>
 </dd>
 </dl>
-<p>Start inclusive, Stop exclusive</p>
-<p>-1 is a shortcut to include all elements along the specified axis</p>
-<p>Input is used to contruct Python slice object using slice() function</p>
-<p>Start: Starting index where the slicing of object starts
-Stop: Ending index where the slicing of object stops.
-Step: Determines the increment between each index for slicing</p>
-<p>Both Start and Step are optional</p>
-<p>Supports negative indexing</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Slicer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_sliced</span><span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Slicer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geometry_sliced</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The indices provided are start inclusive, stop exclusive.</p>
+<p>All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {‘axis_name’,-1}</p>
+<p>If only one number is provided, then it is interpreted as Stop. i.e. {‘axis_name1’:(stop)}
+If two numbers are provided, then they are interpreted as Start and Stop  i.e. {‘axis_name1’:(start, stop)}</p>
+<p>Negative indexing can be used to specify the index. i.e. {‘axis_name1’:(10, -10)} will crop the dimension symmetrically</p>
+<p>If Stop - Start is not multiple of Step, then
+the resulted dimension will have (Stop - Start) // Step
+elements, i.e. (Stop - Start) % Step elements will be ignored</p>
+</div>
+<dl class="py method">
+<dt id="cil.processors.Slicer.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the input data or geometry to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>Geometry</em>) – The input DataContainer or Geometry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Slicer.process">
+<code class="sig-name descname"><span class="pre">process</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer.process" title="Permalink to this definition">#</a></dt>
+<dd><p>Processes the input data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed output and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The downsampled output is returned. Depending on the input type this may be:
+ImageData, AcquisitionData, DataContainer, ImageGeometry, AcquisitionGeometry</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="cil.processors.Slicer.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Slicer.get_output" title="Permalink to this definition">#</a></dt>
@@ -348,17 +394,6 @@ Step: Determines the increment between each index for slicing</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Slicer.set_input">
-<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Slicer.set_input" title="Permalink to this definition">#</a></dt>
-<dd><p>Set the input data to the processor</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
 </dd></dl>
@@ -415,17 +450,6 @@ the resulted dimension will have (Stop - Start) // Step
 elements, i.e. (Stop - Start) % Step elements will be ignored</p>
 </div>
 <dl class="py method">
-<dt id="cil.processors.Binner.set_input">
-<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner.set_input" title="Permalink to this definition">#</a></dt>
-<dd><p>Set the input data to the processor</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dataset</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>Geometry</em>) – The input DataContainer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.processors.Binner.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.get_output" title="Permalink to this definition">#</a></dt>
 <dd><p>Runs the configured processor and returns the processed data</p>
@@ -438,6 +462,35 @@ elements, i.e. (Stop - Start) % Step elements will be ignored</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Binner.process">
+<code class="sig-name descname"><span class="pre">process</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.process" title="Permalink to this definition">#</a></dt>
+<dd><p>Processes the input data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed output and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The downsampled output is returned. Depending on the input type this may be:
+ImageData, AcquisitionData, DataContainer, ImageGeometry, AcquisitionGeometry</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Binner.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the input data or geometry to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>Geometry</em>) – The input DataContainer or Geometry</p>
 </dd>
 </dl>
 </dd></dl>

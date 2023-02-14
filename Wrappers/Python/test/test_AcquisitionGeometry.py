@@ -1440,7 +1440,7 @@ class TestSubset(unittest.TestCase):
         num_batches = 4
         indices = 9
         ret = par._partition_indices(num_batches, indices, stagger=False)
-        gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
+        gold = [[0, 1, 2], [3, 4] ,[5, 6], [7, 8]]
 
         self.assertListEqual(ret, gold)
 
@@ -1456,7 +1456,7 @@ class TestSubset(unittest.TestCase):
         num_indices = 9
         indices = list(range(num_indices))
         ret = par._partition_indices(num_batches, indices, stagger=False)
-        gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
+        gold = [[0, 1, 2], [3, 4] ,[5, 6], [7, 8]]
 
         self.assertListEqual(ret, gold)
 
@@ -1473,18 +1473,18 @@ class TestSubset(unittest.TestCase):
         indices = list(range(num_indices))
         ret = par._partition_indices(num_batches, indices, stagger=False)
         ret = par._convert_indices_to_masks(ret, num_indices)
-        # gold = [[0, 1], [2, 3], [4, 5], [6, 7, 8]]
+        # gold = [[0, 1, 2], [3, 4] ,[5, 6], [7, 8]]
         gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
         gold[0][0] = True
         gold[0][1] = True
+        gold[0][2] = True
 
-        gold[1][2] = True
         gold[1][3] = True
+        gold[1][4] = True
 
-        gold[2][4] = True
         gold[2][5] = True
+        gold[2][6] = True
 
-        gold[3][6] = True
         gold[3][7] = True
         gold[3][8] = True
         
@@ -1530,14 +1530,14 @@ class TestSubset(unittest.TestCase):
         if method == Partitioner.SEQUENTIAL:
             gold[0][0] = True
             gold[0][1] = True
+            gold[0][2] = True
 
-            gold[1][2] = True
             gold[1][3] = True
+            gold[1][4] = True
 
-            gold[2][4] = True
             gold[2][5] = True
+            gold[2][6] = True
 
-            gold[3][6] = True
             gold[3][7] = True
             gold[3][8] = True
         elif method == Partitioner.STAGGERED:

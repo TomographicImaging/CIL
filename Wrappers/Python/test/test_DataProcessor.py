@@ -17,7 +17,7 @@
 import unittest
 import numpy
 from cil.framework import DataContainer
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, ImageData
 from cil.framework import AcquisitionGeometry
 from cil.utilities import dataexample
 from timeit import default_timer as timer
@@ -45,269 +45,6 @@ if has_tomophantom:
 
 if has_ipp:
     from cil.processors.cilacc_binner import Binner_IPP
-
-
-class TestPadder_old(unittest.TestCase):
-    def setUp(self):
-        ray_direction = [0.1, 3.0]
-        detector_position = [-1.3, 1000.0]
-        detector_direction_row = [1.0, 0.2]
-        rotation_axis_position = [0.1, 2.0]
-
-        AG = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    rotation_axis_position=rotation_axis_position)
-
-        # test int shortcut
-        self.num_angles = 10
-        angles = numpy.linspace(0, 360, self.num_angles, dtype=numpy.float32)
-
-        self.num_channels = 10
-        self.num_pixels = 5
-        AG.set_channels(num_channels=self.num_channels)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel(self.num_pixels, pixel_size=0.1)
-
-        data = AG.allocate('random')
-        
-        self.data = data
-        self.AG = AG
-
-    def test_constant_with_int(self):
-        data = self.data
-        AG = self.AG
-        num_pad = 5
-        b = Padder.constant(pad_width=num_pad)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = numpy.zeros((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
-        data_new[5:15,:,5:10] = data.as_array()
-        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
-        # new_angles[5:15] = angles
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=20)
-        geometry_padded.set_panel(15, pixel_size=0.1)
-        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
-                
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-    
-    def test_constant_with_tuple(self):
-        data = self.data
-        AG = self.AG
-        # test tuple
-        pad_tuple = (5,2)
-        b = Padder.constant(pad_width=pad_tuple)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = numpy.zeros((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
-                     dtype=numpy.float32)
-        data_new[pad_tuple[0]:-pad_tuple[1],\
-            :,\
-                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
-        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
-        # new_angles[5:15] = angles
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
-        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
-        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
-                
-        #self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
-    def test_constant_with_dictionary1(self):
-        data = self.data
-        AG = self.AG
-        # test dictionary + constant values
-        pad_tuple = (5,2)
-        const = 5.0
-        b = Padder.constant(pad_width={'channel':pad_tuple}, constant_values=const)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = const * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
-                     dtype=numpy.float32)
-
-        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
-        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=17)
-
-        #self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-    
-    def test_constant_with_dictionary2(self):
-        data = self.data
-        AG = self.AG
-        # test dictionary + constant values
-        pad_tuple1 = (5,2)
-        pad_tuple2 = (2,5)
-        const = 5.0
-        b = Padder.constant(pad_width={'channel':pad_tuple1, 'horizontal':pad_tuple2}, constant_values=const)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = const * numpy.ones((self.num_channels + sum(pad_tuple1), self.num_angles, \
-            self.num_pixels + sum(pad_tuple2)),\
-                     dtype=numpy.float32)
-
-        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
-        data_new[pad_tuple1[0]:-pad_tuple1[1],:,pad_tuple2[0]:-pad_tuple2[1]] = data.as_array()
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=17)
-        geometry_padded.set_panel(self.num_pixels + sum(pad_tuple2),pixel_size=0.1)
-        
-        #self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-    
-    def test_edge_with_int(self):
-        AG = self.AG
-        value = -11.
-        data = self.AG.allocate(value)
-        
-        num_pad = 5
-        b = Padder.edge(pad_width=num_pad)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = value * numpy.ones((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
-        data_new[5:15,:,5:10] = data.as_array()
-
-        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
-        # new_angles[5:15] = angles
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=20)
-        geometry_padded.set_panel(15, pixel_size=0.1)
-        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
-                
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-    
-    def test_edge_with_tuple(self):
-        AG = self.AG
-        value = -11.
-        data = self.AG.allocate(value)
-        # test tuple
-        pad_tuple = (5,2)
-        b = Padder.edge(pad_width=pad_tuple)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
-                     dtype=numpy.float32)
-        data_new[pad_tuple[0]:-pad_tuple[1],\
-            :,\
-                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
-        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
-        # new_angles[5:15] = angles
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
-        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
-        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
-                
-        #self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
-    def test_edge_with_dictionary(self):
-        AG = self.AG
-        value = -11.
-        data = self.AG.allocate(value)
-        # test dictionary + constant values
-        pad_tuple = (5,2)
-        b = Padder.edge(pad_width={'channel':pad_tuple})
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
-                     dtype=numpy.float32)
-
-        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
-        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=17)
-
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
-    def test_linear_ramp_with_int(self):
-        AG = self.AG
-        value = -11.
-        data = self.AG.allocate(value)
-        
-        num_pad = 5
-        b = Padder.linear_ramp(pad_width=num_pad)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = 0 * numpy.ones((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
-        data_new[5:15,:,5:10] = data.as_array()
-
-        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
-        # new_angles[5:15] = angles
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=20)
-        geometry_padded.set_panel(15, pixel_size=0.1)
-        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
-                
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        # numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-        self.assertAlmostEqual(data_padded.as_array().ravel()[0] , 0.)
-        self.assertAlmostEqual(data_padded.as_array().ravel()[-1] , 0.)
-    
-    def test_linear_ramp_with_tuple(self):
-        AG = self.AG
-        value = -11.
-        data = self.AG.allocate(value)
-        # test tuple
-        pad_tuple = (5,2)
-        b = Padder.edge(pad_width=pad_tuple)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
-                     dtype=numpy.float32)
-        data_new[pad_tuple[0]:-pad_tuple[1],\
-            :,\
-                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
-        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
-        # new_angles[5:15] = angles
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
-        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
-        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
-                
-        #self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
-    def test_linear_ramp_with_dictionary(self):
-        AG = self.AG
-        value = -11.
-        data = self.AG.allocate(value)
-        # test dictionary + constant values
-        pad_tuple = (5,2)
-        b = Padder.edge(pad_width={'channel':pad_tuple})
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
-                     dtype=numpy.float32)
-
-        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
-        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=17)
-
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
 
 
 class TestBinner_cillacc(unittest.TestCase):
@@ -1405,6 +1142,440 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         corr = CentreOfRotationCorrector.image_sharpness(backend='tigre')
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+
+class TestPaddder(unittest.TestCase):
+    
+    def setUp(self):
+
+        self.ag = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,360]).set_panel([16,16],[0.1,0.1]).set_channels(4)
+        self.ag_pad_width = {'channel':(1,2),'vertical':(3,4),'horizontal':(5,6)}
+        self.ag_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.05, 0., -0.15]).set_angles([0,90,180,360]).set_panel([27,23],[0.1,0.1]).set_channels(7)
+
+        self.ig = ImageGeometry(5,4,3,center_x=0.5,center_y=1,center_z=-0.5,channels=2)
+        self.ig_pad_width = {'channel':(1,2),'vertical':(3,2),'horizontal_x':(2,1), 'horizontal_y':(2,3)}
+        self.ig_padded = ImageGeometry(8,9,8,center_x=1,center_y=0.5,center_z=0, channels=5)
+
+
+        arr_in = numpy.arange(9, dtype=numpy.float32).reshape(3,3)
+        ig = ImageGeometry(3,3)
+        self.data_test = ImageData(arr_in, True, ig)
+
+
+    def test_parse_input(self):
+
+        ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
+        data = ig.allocate('random')
+        dim_order = ['channel','vertical','horizontal_y','horizontal_x']
+
+        pad_width = {'horizontal_x':(3,4),'vertical':(5,6),'channel':(7,8)}
+        pad_values= {'horizontal_x':(0.3,0.4),'vertical':(0.5,0.6),'channel':(0.7,0.8)}
+
+
+        # check inputs
+        proc = Padder('constant', pad_width=2, pad_values=0.1)
+        proc._parse_input(data)
+        self.assertListEqual(list(data.dimension_labels), proc._labels_in)
+        self.assertListEqual(list(data.shape), proc._shape_in)
+
+        #expected outputs
+        gold_width_default = [(0,0),(2,2),(2,2),(2,2)]
+        gold_value_default = [(0,0),(0.1,0.1),(0.1,0.1),(0.1,0.1)]
+        gold_processed_dims_default = [0,1,1,1]
+        gold_shape_out_default = numpy.array(data.shape) + [0,4,4,4]
+
+        gold_width_tuple = [(0,0),(1,2),(1,2),(1,2)]
+        gold_value_tuple = [(0,0),(0.1,0.2),(0.1,0.2),(0.1,0.2)]
+        gold_shape_out_tuple = numpy.array(data.shape) + [0,3,3,3]
+
+        gold_width_dict = [pad_width.get(x,(0,0)) for x in dim_order]
+        gold_value_dict = [pad_values.get(x,(0,0)) for x in dim_order]
+        gold_processed_dims_dict = [1,1,0,1]
+        gold_shape_out_dict = numpy.array(data.shape) + [7+8,5+6,0,3+4]
+
+        # check pad_width set-up
+        proc = Padder('constant', pad_width=2, pad_values=0.1)
+        proc._parse_input(data)
+        self.assertListEqual(gold_width_default, proc._pad_width_param)
+        self.assertListEqual(gold_value_default, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
+
+        proc = Padder('constant', pad_width=(1,2), pad_values=0.1)
+        proc._parse_input(data)
+        self.assertListEqual(gold_width_tuple, proc._pad_width_param)
+        self.assertListEqual(gold_value_default, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_tuple, proc._shape_out)
+
+        proc = Padder('constant', pad_width=pad_width, pad_values=0.1)
+        proc._parse_input(data)
+        gold_value_dict_custom = [(0,0) if x == (0,0) else (0.1,0.1)  for x in gold_width_dict]
+        self.assertListEqual(gold_width_dict, proc._pad_width_param)
+        self.assertListEqual(gold_value_dict_custom, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_dict, proc._shape_out)
+
+        # check pad_value set-up
+        proc = Padder('constant', pad_width=2, pad_values=(0.1,0.2))
+        proc._parse_input(data)
+        self.assertListEqual(gold_width_default, proc._pad_width_param)
+        self.assertListEqual(gold_value_tuple, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
+
+        proc = Padder('constant', pad_width=2, pad_values=pad_values)
+        proc._parse_input(data)
+        gold_width_dict_custom = [(0,0) if x == (0,0) else (2,2)  for x in gold_value_dict]
+        gold_shape_out_dict_custom = numpy.array(data.shape) + [4,4,0,4]
+        self.assertListEqual(gold_width_dict_custom, proc._pad_width_param)
+        self.assertListEqual(gold_value_dict, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_dict_custom, proc._shape_out)
+
+        proc = Padder('constant', pad_width=pad_width, pad_values=(0.1,0.2))
+        proc._parse_input(data)
+        gold_value_dictionary_custom = [(0,0) if x == (0,0) else (0.1,0.2)  for x in gold_width_dict]
+        self.assertListEqual(gold_width_dict, proc._pad_width_param)
+        self.assertListEqual(gold_value_dictionary_custom, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_dict, proc._shape_out)
+
+        proc = Padder('constant', pad_width=pad_width, pad_values=pad_values)
+        proc._parse_input(data)
+        self.assertListEqual(gold_width_dict, proc._pad_width_param)
+        self.assertListEqual(gold_value_dict, proc._pad_values_param)
+        self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
+        numpy.testing.assert_array_equal(gold_shape_out_dict, proc._shape_out)
+
+        proc = Padder('constant', pad_width=pad_width, pad_values={'horizontal_x':(0.5,0.6)})
+        # raise an error as not all axes values defined
+        with self.assertRaises(ValueError):
+            proc._parse_input(data)
+
+
+    def test_process_acquisition_geometry(self):
+
+        geometry = self.ag
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
+        proc.set_input(geometry)
+        geometry_padded = proc._process_acquisition_geometry()
+
+        self.assertEquals(geometry_padded, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
+
+
+        proc = Padder('constant', pad_width={'angle':5}, pad_values=0.0)
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(geometry)
+
+
+    def test_process_image_geometry(self):
+
+        geometry = self.ig
+
+        proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
+        proc.set_input(geometry)
+        geometry_padded = proc._process_image_geometry()
+
+        self.assertEquals(geometry_padded, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
+
+
+    def test_process_data(self):
+
+        geometry = self.ig
+        data = geometry.allocate('random')
+
+        proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
+        proc.set_input(data)
+        arr_padded = proc._process_data(data)
+
+        c = self.ig_pad_width['channel']
+        v = self.ig_pad_width['vertical']
+        hy = self.ig_pad_width['horizontal_y']
+        hx = self.ig_pad_width['horizontal_x']
+
+        data_gold = self.ig_padded.allocate(0.5)
+        data_gold.array[c[0]:-c[1],v[0]:-v[1],hy[0]:-hy[1],hx[0]:-hx[1]] = data.array
+
+        numpy.testing.assert_array_equal(data_gold.array, arr_padded)
+
+
+    def test_process_acquisition(self):
+
+        c = self.ag_pad_width['channel']
+        v = self.ag_pad_width['vertical']
+        h = self.ag_pad_width['horizontal']
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.5)
+
+        data_in = self.ag.allocate('random')
+
+        data_gold = self.ag_padded.allocate(0.5)
+        data_gold.array[c[0]:-c[1],:,v[0]:-v[1],h[0]:-h[1]] = data_in.array
+
+        proc.set_input(data_in.geometry)
+        geometry_padded = proc.get_output()
+        self.assertEquals(geometry_padded, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
+
+        proc.set_input(data_in)
+        data_padded = proc.get_output()
+
+        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
+        self.assertEquals(data_padded.geometry, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ag_padded))
+
+        data_padded.fill(0)
+        proc.get_output(out=data_padded)
+
+        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
+        self.assertEquals(data_padded.geometry, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ag_padded))
+
+
+    def test_process_image(self):
+
+        c = self.ig_pad_width['channel']
+        v = self.ig_pad_width['vertical']
+        hy = self.ig_pad_width['horizontal_y']
+        hx = self.ig_pad_width['horizontal_x']
+
+        proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
+
+        data_in = self.ig.allocate('random')
+
+        data_gold = self.ig_padded.allocate(0.5)
+        data_gold.array[c[0]:-c[1],v[0]:-v[1],hy[0]:-hy[1],hx[0]:-hx[1]] = data_in.array
+
+        proc.set_input(data_in.geometry)
+        geometry_padded = proc.get_output()
+        self.assertEquals(geometry_padded, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
+
+        proc.set_input(data_in)
+        data_padded = proc.get_output()
+
+        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
+        self.assertEquals(data_padded.geometry, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ig_padded))
+
+        data_padded.fill(0)
+        proc.get_output(out=data_padded)
+
+        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
+        self.assertEquals(data_padded.geometry, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ig_padded))
+
+
+    def test_process_data_container(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        data_in = DataContainer(arr,False,['LABEL_A','LABEL_B','LABEL_C'])
+
+        pad_width = {'LABEL_A':(1,2),'LABEL_B':(2,3),'LABEL_C':(4,3)}
+        a = pad_width['LABEL_A']
+        b = pad_width['LABEL_B']
+        c = pad_width['LABEL_C']
+
+        shape_out = numpy.array(arr.shape) + [a[0]+a[1],b[0]+b[1],c[0]+c[1]]
+        data_gold = numpy.ones(shape_out,dtype=numpy.float32) * 0.5
+        data_gold[a[0]:-a[1],b[0]:-b[1],c[0]:-c[1]] = data_in.array
+
+        proc = Padder('constant', pad_width=pad_width, pad_values=0.5)
+        proc.set_input(data_in)
+        data_padded = proc.get_output()
+        numpy.testing.assert_array_equal(data_gold, data_padded.array)
+
+        data_padded.fill(0)
+        proc.get_output(out=data_padded)
+        numpy.testing.assert_array_equal(data_gold, data_padded.array)
+
+
+    def test_results_constant(self):
+
+        """
+        in:
+        0 1 2
+        3 4 5
+        6 7 8
+
+        out:
+        v v v v v
+        v 0 1 2 v
+        v 3 4 5 v
+        v 6 7 8 v
+        v v v v v
+        """
+        value = 0.5
+        width = 1
+        proc = Padder.constant(pad_width=width, constant_values=value)
+        proc.set_input(self.data_test)
+        data_out = proc.get_output()
+
+        shape_padded = (3+width*2, 3+width*2)
+        arr_gold = numpy.ones((shape_padded), dtype=numpy.float32) * value
+        arr_gold[width:-width,width:-width] = self.data_test.array
+
+        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
+
+    def test_results_edge(self):
+
+        """
+        in:
+        0 1 2
+        3 4 5
+        6 7 8
+
+        out:
+        0 0 1 2 2
+        0 0 1 2 2
+        3 3 4 5 5
+        6 6 7 8 8
+        6 6 7 8 8
+        """
+
+        width = 1 
+        proc = Padder.edge(pad_width=width)
+        proc.set_input(self.data_test)
+        data_out = proc.get_output()
+
+        shape_padded = (3+width*2, 3+width*2)
+        arr_gold = numpy.zeros((shape_padded), dtype=numpy.float32)
+        arr_gold[width:-width,width:-width] = self.data_test.array
+        arr_gold[0,:] = [0,0,1,2,2]
+        arr_gold[-1,:] = [6,6,7,8,8]
+        arr_gold[:,0] = [0,0,3,6,6]
+        arr_gold[:,-1] = [2,2,5,8,8]
+
+        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
+
+    def test_results_linear_ramp(self):
+        """
+        in:
+        0 1 2
+        3 4 5
+        6 7 8
+
+        out:
+        v   v           v           v           v                   v
+        v   0           1           2           (v+2)/2             v
+        v   3           4           5           (v+5)/2             v
+        v   6           7           8           (v+8)/2             v
+        v   (v+6)/2     (v+7)/2     (v+8)/2     ((v+8)/2 + v)/2     v
+        v   v           v           v           v                   v
+        """
+        value = 0.5
+        width = (1,2)
+        proc = Padder.linear_ramp(pad_width=width, end_values=value)
+        proc.set_input(self.data_test)
+        data_out = proc.get_output()
+
+        shape_padded = (3+width[0]+width[1], 3+width[0]+width[1])
+        arr_gold = numpy.ones((shape_padded), dtype=numpy.float32) * value
+        arr_gold[width[0]:-width[1],width[0]:-width[1]] = self.data_test.array
+
+        arr_gold[-2,:] = (arr_gold[-3,:] + arr_gold[-1,:])/2
+        arr_gold[:,-2] = (arr_gold[:,-3] + arr_gold[:,-1])/2
+
+        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
+
+    def test_results_reflect(self):
+        """
+        in:
+        0 1 2
+        3 4 5
+        6 7 8
+
+        out:
+        4 3 4 5 4
+        1 0 1 2 1
+        4 3 4 5 4
+        7 6 7 8 7
+        4 3 4 5 4
+        """
+
+        width = 1 
+        proc = Padder.reflect(pad_width=width)
+        proc.set_input(self.data_test)
+        data_out = proc.get_output()
+
+        shape_padded = (3+width*2, 3+width*2)
+        arr_gold = numpy.zeros((shape_padded), dtype=numpy.float32)
+        arr_gold[width:-width,width:-width] = self.data_test.array
+        arr_gold[0,:] = [4,3,4,5,4]
+        arr_gold[-1,:] = [4,3,4,5,4]
+        arr_gold[:,0] = [4,1,4,7,4]
+        arr_gold[:,-1] = [4,1,4,7,4]
+
+        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
+    def test_results_symmetric(self):
+        """
+        in:
+        0 1 2
+        3 4 5
+        6 7 8
+
+        out:
+        0 0 1 2 2
+        0 0 1 2 2
+        3 3 4 5 5
+        6 6 7 8 8
+        6 6 7 8 8
+        """
+
+        width = 1 
+        proc = Padder.symmetric(pad_width=width)
+        proc.set_input(self.data_test)
+        data_out = proc.get_output()
+
+        shape_padded = (3+width*2, 3+width*2)
+        arr_gold = numpy.zeros((shape_padded), dtype=numpy.float32)
+        arr_gold[width:-width,width:-width] = self.data_test.array
+        arr_gold[0,:] = [0,0,1,2,2]
+        arr_gold[-1,:] = [6,6,7,8,8]
+        arr_gold[:,0] = [0,0,3,6,6]
+        arr_gold[:,-1] = [2,2,5,8,8]
+
+        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
+
+    def test_results_wrap(self):
+        """
+        in:
+        0 1 2
+        3 4 5
+        6 7 8
+
+        out:
+        8 6 7 8 6
+        2 0 1 2 0
+        5 3 4 5 3
+        8 6 7 8 6
+        2 0 1 2 0
+        """
+
+        width = 1 
+        proc = Padder.wrap(pad_width=width)
+        proc.set_input(self.data_test)
+        data_out = proc.get_output()
+
+        shape_padded = (3+width*2, 3+width*2)
+        arr_gold = numpy.zeros((shape_padded), dtype=numpy.float32)
+        arr_gold[width:-width,width:-width] = self.data_test.array
+        arr_gold[0,:] = [8,6,7,8,6]
+        arr_gold[-1,:] = [2,0,1,2,0]
+        arr_gold[:,0] = [8,2,5,8,2]
+        arr_gold[:,-1] = [6,0,3,6,0]
+
+        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
 
 class TestDataProcessor(unittest.TestCase):
    

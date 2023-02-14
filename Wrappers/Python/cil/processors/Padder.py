@@ -29,31 +29,30 @@ class Padder(DataProcessor):
     '''
 
     @staticmethod
-    def constant(pad_width=None, constant_values=0):
+    def constant(pad_width=None, constant_values=0.0):
         """
         Padder processor wrapping numpy.pad with mode `constant` 
         Pads the data with a constant value border.
+        Pads in all *spatial* dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
 
         Parameters
         ----------
         pad_width: int, tuple, dict
-            The size of the border along each axis
-        constant_values: float, tuple, dict
-            The value of the border
+            The size of the border along each axis, see usage notes
+        constant_values: float, tuple, dict, default=0.0
+            The value of the border, see usage notes
 
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - An integer value will pad with a border of this size in all *spatial* dimensions and directions
-         - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
-         - A dictionary will apply the specified padding in each requested dimension: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each axis will be padded with a border of this size
+         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
         
         `constant_values` behaviour (value of pixels):
-         - A single value will be used for borders in all padded directions and dimensions
-         - A tuple of values will be used asymmetrically by each dimension i.e. (before, after)
-         - A dictionary will set the values for the requested dimension only: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}
+         - float: Each border will be set to this value
+         - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)
+         - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
         """
 
         processor = Padder(pad_width=pad_width, mode='constant', pad_values=constant_values)
@@ -63,48 +62,45 @@ class Padder(DataProcessor):
     def edge(pad_width=None):
         """
         Padder processor wrapping numpy.pad with mode `edge` 
-        Pads the data by extending the edge values in to the border
+        Pads the data by extending the edge values in to the border.
+        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
         pad_width: int, tuple, dict
-            The size of the border along each axis
+            The size of the border along each axis, see usage notes
 
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - An integer value will pad with a border of this size in all *spatial* dimensions and directions
-         - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
-         - A dictionary will apply the specified padding in each requested dimension: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}      
+         - int: Each axis will be padded with a border of this size
+         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
         """
 
         processor = Padder(pad_width=pad_width, mode='edge')
         return processor
     
     @staticmethod
-    def linear_ramp(pad_width=None, end_values=0):
+    def linear_ramp(pad_width=None, end_values=0.0):
         '''Padder processor wrapping numpy.pad with mode `linear_ramp` 
         Pads the data with values calculated from a linear ramp between the array edge value and the set end_value.
+        Pads in all *spatial* dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
 
-        Parameters
-        ----------
         pad_width: int, tuple, dict
-            The size of the border along each axis
-        end_values: float, tuple, dict
-            The target value of the linear_ramp
+            The size of the border along each axis, see usage notes
+        end_values: float, tuple, dict, default=0.0
+            The target value of the linear_ramp, see usage notes
 
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - An integer value will pad with a border of this size in all *spatial* dimensions and directions
-         - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
-         - A dictionary will apply the specified padding in each requested dimension: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}
-        
+         - int: Each axis will be padded with a border of this size
+         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}  
+
         `end_values` behaviour:
-         - A single value will be used for borders in all padded directions and dimensions
-         - A tuple of values will be used asymmetrically by each dimension i.e. (before, after)
-         - A dictionary will set the values for the requested dimension only: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}
+         - float: Each border will use this end value
+         - tuple(float, float): Each border end value will be used asymmetrically for each axis i.e. (before, after)
+         - dict: Specified axes and end values: e.g. {'horizontal':(8, 23), 'channel':5}
         '''
         processor = Padder(pad_width=pad_width, mode='linear_ramp', pad_values=end_values)
         return processor
@@ -113,20 +109,18 @@ class Padder(DataProcessor):
     def reflect(pad_width=None):
         """
         Padder processor wrapping numpy.pad with mode `reflect` 
-        Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.
-        
-        Parameters
-        ----------
+        Pads with the reflection of the data mirrored along first and last values each axis.
+        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
+
         pad_width: int, tuple, dict
-            The size of the border along each axis
+            The size of the border along each axis, see usage notes
 
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - An integer value will pad with a border of this size in all *spatial* dimensions and directions
-         - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
-         - A dictionary will apply the specified padding in each requested dimension: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}      
+         - int: Each axis will be padded with a border of this size
+         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
         """
         processor = Padder(pad_width=pad_width, mode='reflect')
         return processor
@@ -135,7 +129,8 @@ class Padder(DataProcessor):
     def symmetric(pad_width=None):
         """
         Padder processor wrapping numpy.pad with mode `symmetric`
-        Pads with the reflection of the vector mirrored along the edge of the array.
+        Pads with the reflection of the data mirrored along the edge of the array.
+        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
         Parameters
         ----------
@@ -158,6 +153,7 @@ class Padder(DataProcessor):
         """
         Padder processor wrapping numpy.pad with mode `wrap`
         Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.
+        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
         Parameters
         ----------
@@ -240,13 +236,6 @@ class Padder(DataProcessor):
             if data.dtype != np.float32:
                 raise TypeError("Expected float32")
 
-        if not ((isinstance(data, ImageData)) or 
-                (isinstance(data, AcquisitionData))):
-            raise TypeError('Processor supports only following data types:\n' +
-                            ' - ImageData\n - AcquisitionData')
-
-        if (data.geometry == None):
-            raise ValueError('Geometry is not defined.')
 
         if self.mode not in ['constant', 'edge', 'linear_ramp', 'reflect', 'symmetric', 'wrap']:
             raise Exception("Wrong mode. One of the following is expected:\n" +
@@ -255,26 +244,40 @@ class Padder(DataProcessor):
         if (self.pad_width == None):
             raise ValueError('Please, specify pad_width')
 
-
         self._parse_input(data)
     
         return True 
 
-    def _create_tuple(self, value):
+    def _create_tuple(self, value, dtype):
         try:
-            out = (int(value),int(value))
+            out = (dtype(value),dtype(value))
         except TypeError:
             try:
-                out = (int(value[0]),int(value[1]))
+                out = (dtype(value[0]),dtype(value[1]))
             except:
                 raise TypeError()
 
         return out
 
+    def _get_dimensions_from_dict(self, dict):
+
+        dimensions = []
+        for k in dict.keys():
+            if k == 'angle':            
+                raise NotImplementedError('Cannot use Padder to pad the angle dimension')
+            
+            if k not in self._labels_in:
+                raise ValueError('Dimension label not found in data. Expected labels from {0}. Got {1}'.format(self._geometry.dimension_labels, k))
+
+            dimensions.append(k)
+        return dimensions
+
+
     def _parse_input(self, data):
 
         offset = 4-data.ndim
 
+        #set defaults
         self._labels_in = [None]*4
         self._labels_in[offset::] = data.dimension_labels
 
@@ -288,64 +291,63 @@ class Padder(DataProcessor):
         self._pad_width_param = [(0,0)]*4
         self._pad_values_param = [(0,0)]*4
 
-
-        # apply to spatial dimensions only by default
-        # dimensions to process
-        spatial_dimensions =[
-            'vertical',
-            'horizontal',
-            'horizontal_y',
-            'horizontal_x',
-            'channel'
-        ]
         
-        if isinstance(self.pad_width, dict):
-            for k, v in self.pad_width.items():
-                if k == 'angle':            
-                    raise NotImplementedError('Cannot use Padder to pad the angle dimension')
+        # if pad_width or set_values is passed a dictionary these keys specify the axes to run over
+        if isinstance(self.pad_width, dict) and isinstance(self.pad_values, dict):
+            
+            if self.pad_width.keys() != self.pad_values.keys():
+                raise ValueError('Dictionaries must contain the same axes')
+            
+            dimensions = self._get_dimensions_from_dict(self.pad_width)
 
-                try:
-                    i = self._labels_in.index(k)
-                except:
-                    raise ValueError('Dimension label not found in data. Expected labels from {0}. Got {1}'.format(data.dimension_labels, k))
+        elif isinstance(self.pad_width, dict):
+            dimensions = self._get_dimensions_from_dict(self.pad_width)
 
-                try:
-                    self._pad_width_param[i] = self._create_tuple(v)
-                except TypeError:
-                    raise TypeError("`pad_width` for axis {0} should be a integer or a tuple of integers. Got {1}".format(k, v))    
+        elif isinstance(self.pad_values, dict):
+            dimensions = self._get_dimensions_from_dict(self.pad_values)
 
         else:
+            spatial_dimensions =[
+                        'vertical',
+                        'horizontal',
+                        'horizontal_y',
+                        'horizontal_x'
+                    ]
+
+            dimensions = list(set(spatial_dimensions) & set(self._labels_in))
+
+
+        # get pad_widths for these dimensions
+        for dim in dimensions:
             try:
-                pad = self._create_tuple(self.pad_width)
+                values = self.pad_width[dim]
             except TypeError:
-                raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0}".format(v))    
+                values = self.pad_width
 
-            for i, dim in enumerate(self._labels_in):
-                if dim in spatial_dimensions:
-                    self._pad_width_param[i] = pad
+            try:
+                i = self._labels_in.index(dim)
+                self._pad_width_param[i] = self._create_tuple(values, int)
+            except TypeError:
+                raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0} for axis {1}".format(values, dim))    
 
-        # create list of processed axes and new_shape
+        # get pad_values for these dimensions
+        for dim in dimensions:
+            try:
+                values = self.pad_values[dim]
+            except TypeError:
+                values = self.pad_values
+
+            try:
+                i = self._labels_in.index(dim)
+                self._pad_values_param[i] = self._create_tuple(values, float)
+            except TypeError:
+                raise TypeError("`pad_values` should be a float or a tuple of floats. Got {0} for axis {1}".format(values, dim))    
+
+        #create list of processed axes and new_shape
         for i in range(4):
            if self._pad_width_param[i] != (0,0):
                 self._processed_dims[i] = 1 
                 self._shape_out[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
-
-
-        for i, dim in enumerate(self._labels_in):
-            # only get values for axes we're processing
-            if self._processed_dims[i]:
-                try:
-                    # if passed a dictionary must have values for each padded axis
-                    values = self.pad_values[dim]
-                except KeyError:
-                    raise KeyError("Corresponding value not found for padded axis {0}".format(dim))
-                except TypeError:
-                    values = self.pad_values
-
-                try:
-                    self._pad_values_param[i] = self._create_tuple(values)
-                except TypeError:
-                    raise TypeError("`pad_values` should be a integer or a tuple of integers. Got {0} for axis {1}".format(v, dim))    
 
 
     def _process_acquisition_geometry(self):

@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 import functools
-from cil.framework import BlockDataContainer
+from cil.framework.BlockDataContainer import BlockDataContainer
 
 class BlockGeometry(object):
     

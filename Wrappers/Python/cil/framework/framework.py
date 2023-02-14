@@ -40,7 +40,7 @@ else:
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
-from cil.framework import BlockGeometry
+from cil.framework.BlockGeometry import BlockGeometry
 
 class Partitioner(object):
     '''Base class for partitioners'''
@@ -110,7 +110,7 @@ class Partitioner(object):
             ag.set_angles(self.angles[boolbatch])
             ags.append(ag)
         
-        return BlockGeometry.BlockGeometry(*ags)
+        return BlockGeometry(*ags)
 
     def _convert_indices_to_masks(self, batches, num_indices):
         boolbatches = []
@@ -135,17 +135,11 @@ class Partitioner(object):
     def _partition_sequential(self, num_batches):
         indices = len(self.angles)
         batches = self._partition_indices(num_batches, indices, False)
-        geometry = self
-        angles = geometry.angles
-        
         return self._convert_indices_to_BlockGeometry(batches, indices)
         
     def _partition_staggered(self, num_batches):
         indices = len(self.angles)
         batches = self._partition_indices(num_batches, indices, True)
-        geometry = self
-        angles = geometry.angles
-        
         return self._convert_indices_to_BlockGeometry(batches, indices)
 
     def _partition_random_permutation(self, num_batches, seed=None):
@@ -3584,6 +3578,18 @@ class AcquisitionData(DataContainer):
             return out
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+
+    def partition(self, num_batches, method):
+        blk_geo = self.geometry.partition(num_batches, method)
+        indices = len(self.geometry.angles)
+        batches = self.geometry._partition_indices(num_batches, indices, False)
+        batches = self.geometry._convert_indices_to_masks(batches, indices)
+
+        out = blk_geo.allocate(None)
+        out.geometry = blk_geo
+        for i in range(num_batches):
+            out[i].fill(self.array[batches[i]])
+        return out
 
 class Processor(object):
 

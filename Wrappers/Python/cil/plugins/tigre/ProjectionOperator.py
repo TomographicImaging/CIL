@@ -16,6 +16,8 @@
 
 from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
 from cil.framework import DataOrder
+from cil.framework.BlockGeometry import  BlockGeometry
+from cil.optimisation.operators import BlockOperator
 from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
@@ -35,7 +37,25 @@ try:
 except ModuleNotFoundError:
     has_gpu_sel = False
 
+
 class ProjectionOperator(LinearOperator):
+    def __new__(cls, image_geometry=None, acquisition_geometry=None, \
+        direct_method='interpolated',adjoint_weights='matched', **kwargs):
+        if isinstance(acquisition_geometry, BlockGeometry):
+            logging.info("BlockOperator is returned.")
+
+            K = []
+            for ag in acquisition_geometry:
+                K.append(
+                    ProjectionOperator_ag(image_geometry=image_geometry, acquisition_geometry=ag, \
+                        direct_method=direct_method, adjoint_weights=adjoint_weights, **kwargs)
+                )
+            return BlockOperator(*K)
+        else:
+            logging.info("Standard Operator is returned.")
+            return super(ProjectionOperator, cls).__new__(ProjectionOperator_ag)
+
+class ProjectionOperator_ag(ProjectionOperator):
     '''TIGRE Projection Operator'''
 
     def __init__(self, image_geometry=None, acquisition_geometry=None, direct_method='interpolated',adjoint_weights='matched', **kwargs): 

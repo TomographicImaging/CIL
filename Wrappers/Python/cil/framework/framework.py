@@ -71,27 +71,33 @@ class Partitioner(object):
         # Partition the indices into batches.
         if isinstance(indices, int):
             indices = list(range(indices))
-            
+
         num_indices = len(indices)
         # sanity check
         if num_indices < num_batches:
-            raise ValueError('The number of batches must be less than or equal to the number of indices.')
-            
-        if stagger:
-            batches = [ indices[i::num_batches] for i in range(num_batches) ]
+            raise ValueError(
+                'The number of batches must be less than or equal to the number of indices.'
+            )
 
-        else:    
-            batch_size = num_indices // num_batches
-            # normally the last batch will be the same size or larger than the others
-            if num_indices/num_batches - batch_size > 0.5:
-                # makes the last batch smaller if the number of indices is not divisible by the number of batches
-                batch_size += 1
-                
-            batches = [indices[i * batch_size : (i + 1) * batch_size : 1] for i in range(num_batches-1)]
-            
-            # Add any remaining indices to the last batch.
-            # the last batch may be of different size than the others
-            batches.append(indices[(num_batches-1) * batch_size:])
+        if stagger:
+            batches = [indices[i::num_batches] for i in range(num_batches)]
+
+        else:
+            # we split the indices with floor(N/M)+1 indices in N%M groups
+            # and floor(N/M) indices in the remaining M - N%M groups.
+
+            # rename num_indices to N for brevity
+            N = num_indices
+            # rename num_batches to M for brevity
+            M = num_batches
+            batches = [
+                indices[j:j + math.floor(N / M) + 1] for j in range(N % M)
+            ]
+            offset = N % M * (math.floor(N / M) + 1)
+            for i in range(M - N % M):
+                start = offset + i * math.floor(N / M)
+                end = start + math.floor(N / M)
+                batches.append(indices[start:end])
 
         return batches
     

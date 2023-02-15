@@ -17,10 +17,57 @@
 
 from cil.framework import DataOrder
 from cil.optimisation.operators import LinearOperator, ChannelwiseOperator
+from cil.framework.BlockGeometry import  BlockGeometry
+from cil.optimisation.operators import BlockOperator
 from cil.plugins.astra.operators import AstraProjector3D
 from cil.plugins.astra.operators import AstraProjector2D
+import logging
+
 
 class ProjectionOperator(LinearOperator):
+    """
+    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
+
+    Parameters
+    ----------
+
+    image_geometry : ImageGeometry, default used if None
+        A description of the area/volume to reconstruct
+
+    acquisition_geometry : AcquisitionGeometry, BlockGeometry
+        A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.
+
+    device : string, default='gpu'
+        'gpu' will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, 'cpu' will run on CPU using the ASTRA 2D CPU Projectors
+
+    Example
+    -------
+    >>> from cil.plugins.astra import ProjectionOperator
+    >>> PO = ProjectionOperator(image.geometry, data.geometry)
+    >>> forward_projection = PO.direct(image)
+    >>> backward_projection = PO.adjoint(data)
+
+    Notes
+    -----
+    For multichannel data the ProjectionOperator will broadcast across all channels.
+    """
+    def __new__(cls, image_geometry=None, acquisition_geometry=None, \
+        device='gpu', **kwargs):
+        if isinstance(acquisition_geometry, BlockGeometry):
+            logging.info("BlockOperator is returned.")
+
+            K = []
+            for ag in acquisition_geometry:
+                K.append(
+                    ProjectionOperator_ag(image_geometry=image_geometry, acquisition_geometry=ag, \
+                        device=device, **kwargs)
+                )
+            return BlockOperator(*K)
+        else:
+            logging.info("Standard Operator is returned.")
+            return super(ProjectionOperator, cls).__new__(ProjectionOperator_ag)
+
+class ProjectionOperator_ag(ProjectionOperator):
 
     """
     ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
@@ -57,7 +104,7 @@ class ProjectionOperator(LinearOperator):
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
-        super(ProjectionOperator, self).__init__(domain_geometry=image_geometry, range_geometry=acquisition_geometry)
+        super(ProjectionOperator_ag, self).__init__(domain_geometry=image_geometry, range_geometry=acquisition_geometry)
 
         DataOrder.check_order_for_engine('astra', image_geometry)
         DataOrder.check_order_for_engine('astra', acquisition_geometry) 

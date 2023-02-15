@@ -17,8 +17,8 @@
 import unittest
 import numpy
 from cil.framework import DataContainer
-from cil.framework import ImageGeometry, ImageData
-from cil.framework import AcquisitionGeometry
+from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
+from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
 from timeit import default_timer as timer
 
@@ -506,6 +506,107 @@ class TestBinner(unittest.TestCase):
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
    
 
+
+    def test_process_acquisition(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        geometry = AcquisitionGeometry.create_Parallel3D().set_angles([0,90]).set_panel([4,3])
+        data_in = AcquisitionData(arr, False, geometry)
+
+        roi = {'vertical':(None,None,2),'angle':(None,None,2),'horizontal':(None,None,2)}
+        proc = Binner(roi)
+
+        geometry_gold = AcquisitionGeometry.create_Parallel2D().set_angles([45]).set_panel(2,2)      
+        el1 = (0+1+4+5+12+13+16+17)/8
+        el2 = (2+3+6+7+14+15+18+19)/8
+        data_gold = numpy.array([el1,el2],dtype=numpy.float32)
+
+        proc.set_input(data_in.geometry)
+        geometry_out = proc.process()
+        self.assertEquals(geometry_out, geometry_gold,
+        msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
+
+        proc.set_input(data_in)
+        data_out = proc.process()
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+        data_out.fill(0)
+        proc.process(out=data_out)
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+
+    def test_process_image(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        geometry = ImageGeometry(4,3,2)
+        data_in = ImageData(arr, False, geometry)
+
+        roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
+        proc = Binner(roi)
+
+        geometry_gold = VectorGeometry(2,dimension_labels='horizontal_x')        
+        el1 = (0+1+4+5+12+13+16+17)/8
+        el2 = (2+3+6+7+14+15+18+19)/8
+        data_gold = numpy.array([el1,el2],dtype=numpy.float32)
+
+        proc.set_input(data_in.geometry)
+        geometry_out = proc.process()
+        self.assertEquals(geometry_out, geometry_gold,
+        msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
+
+        proc.set_input(data_in)
+        data_out = proc.process()
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+        data_out.fill(0)
+        proc.process(out=data_out)
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+
+    def test_process_data_container(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        data_in = DataContainer(arr,False)
+
+        #default labels
+        roi = {'dimension_00':(None,None,2),'dimension_01':(None,None,2),'dimension_02':(None,None,2)}
+
+        el1 = (0+1+4+5+12+13+16+17)/8
+        el2 = (2+3+6+7+14+15+18+19)/8
+        data_gold = numpy.array([el1,el2],dtype=numpy.float32)
+
+        proc = Binner(roi)
+        proc.set_input(data_in)
+        data_out = proc.process()
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
+        data_out.fill(0)
+        proc.process(out=data_out)
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
+        # custom labels
+        data_in = DataContainer(arr,False,['LABEL_A','LABEL_B','LABEL_C'])
+
+        roi = {'LABEL_A':(None,None,2),'LABEL_B':(None,None,2),'LABEL_C':(None,None,2)}
+
+        proc = Binner(roi)
+        proc.set_input(data_in)
+        data_out = proc.process()
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
+
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_imagedata_full(self):
         """
@@ -811,8 +912,13 @@ class TestSlicer(unittest.TestCase):
                 {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
                 
                 # slice to single dimension
-                {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(4,5,8),'horizontal_y':(None,None,16)},
+                {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,4),'horizontal_y':(None,None,16)},
+
+                 # slice to single element
+                {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None, None,8),'horizontal_y':(None,None,16)},
+
         ]
+
 
         offset_x =0.1*(8-1-1*4)/2
         offset_y =0.2*(16-1-3 * 5)/2
@@ -821,8 +927,9 @@ class TestSlicer(unittest.TestCase):
         ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
                     ImageGeometry(2,4,4,0.4,1.0,2.1,center_x=-offset_x,center_y=-offset_y,center_z=-offset_z,channels=2),
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_x=-0.05,center_y=-0.5,center_z=-1.05,channels=2),
-                    ImageGeometry(1,1,1,0.8,3.2,8.4,center_x=0.05,center_y=-1.5,center_z=-4.05, channels=1),
-        ]
+                    VectorGeometry(2, dimension_labels='horizontal_x'),
+                    None
+        ]   
 
         #channel spacing isn't an initialisation argument
         ig_gold[1].channel_spacing=3
@@ -1042,6 +1149,100 @@ class TestSlicer(unittest.TestCase):
         fp_roi = PO.direct(phantom)
 
         numpy.testing.assert_allclose(fp_roi.array, fp_sliced.array, 1e-4)
+
+
+    def test_process_acquisition(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        geometry = AcquisitionGeometry.create_Parallel3D().set_angles([0,90]).set_panel([4,3])
+        data_in = AcquisitionData(arr, False, geometry)
+
+        roi = {'vertical':(None,None,2),'angle':(None,None,2),'horizontal':(None,None,2)}
+        proc = Slicer(roi)
+
+        geometry_gold = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.5,  0. ,  0. ]).set_angles([0]).set_panel([2,2],[2,2])      
+        data_gold = numpy.squeeze(data_in.array[::2,::2,::2])
+
+        proc.set_input(data_in.geometry)
+        geometry_out = proc.process()
+        self.assertEquals(geometry_out, geometry_gold,
+        msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
+
+        proc.set_input(data_in)
+        data_out = proc.process()
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+        data_out.fill(0)
+        proc.process(out=data_out)
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+
+    def test_process_image(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        geometry = ImageGeometry(4,3,2)
+        data_in = ImageData(arr, False, geometry)
+
+        roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
+        proc = Slicer(roi)
+
+        geometry_gold = ImageGeometry(2,2,1, 2,2,2, -0.5,0, -0.5)        
+        data_gold = numpy.squeeze(data_in.array[::2,::2,::2])
+
+        proc.set_input(data_in.geometry)
+        geometry_out = proc.process()
+        self.assertEquals(geometry_out, geometry_gold,
+        msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
+
+        proc.set_input(data_in)
+        data_out = proc.process()
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+        data_out.fill(0)
+        proc.process(out=data_out)
+
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+        self.assertEquals(data_out.geometry, geometry_gold,
+        msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
+
+
+    def test_process_data_container(self):
+
+        arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
+        data_in = DataContainer(arr,False)
+
+        #default labels
+        roi = {'dimension_00':(None,None,2),'dimension_01':(None,None,2),'dimension_02':(None,None,2)}
+
+        data_gold = numpy.squeeze(data_in.array[::2,::2,::2])
+        proc = Slicer(roi)
+        proc.set_input(data_in)
+        data_out = proc.process()
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
+        data_out.fill(0)
+        proc.process(out=data_out)
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
+        # custom labels
+        data_in = DataContainer(arr,False,['LABEL_A','LABEL_B','LABEL_C'])
+
+        roi = {'LABEL_A':(None,None,2),'LABEL_B':(None,None,2),'LABEL_C':(None,None,2)}
+
+        proc = Slicer(roi)
+        proc.set_input(data_in)
+        data_out = proc.process()
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
 
 class TestCentreOfRotation_parallel(unittest.TestCase):
     
@@ -1317,23 +1518,23 @@ class TestPaddder(unittest.TestCase):
         data_gold.array[c[0]:-c[1],:,v[0]:-v[1],h[0]:-h[1]] = data_in.array
 
         proc.set_input(data_in.geometry)
-        geometry_padded = proc.get_output()
-        self.assertEquals(geometry_padded, self.ag_padded,
-        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
+        geometry_out = proc.process()
+        self.assertEquals(geometry_out, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ag_padded))
 
         proc.set_input(data_in)
-        data_padded = proc.get_output()
+        data_out = proc.process()
 
-        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
-        self.assertEquals(data_padded.geometry, self.ag_padded,
-        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ag_padded))
+        numpy.testing.assert_array_equal(data_gold.array, data_out.array)
+        self.assertEquals(data_out.geometry, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
-        data_padded.fill(0)
-        proc.get_output(out=data_padded)
+        data_out.fill(0)
+        proc.process(out=data_out)
 
-        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
-        self.assertEquals(data_padded.geometry, self.ag_padded,
-        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ag_padded))
+        numpy.testing.assert_array_equal(data_gold.array, data_out.array)
+        self.assertEquals(data_out.geometry, self.ag_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
 
     def test_process_image(self):
@@ -1351,34 +1552,35 @@ class TestPaddder(unittest.TestCase):
         data_gold.array[c[0]:-c[1],v[0]:-v[1],hy[0]:-hy[1],hx[0]:-hx[1]] = data_in.array
 
         proc.set_input(data_in.geometry)
-        geometry_padded = proc.get_output()
-        self.assertEquals(geometry_padded, self.ig_padded,
-        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
+        geometry_out = proc.process()
+        self.assertEquals(geometry_out, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ig_padded))
 
         proc.set_input(data_in)
-        data_padded = proc.get_output()
+        data_out = proc.process()
 
-        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
-        self.assertEquals(data_padded.geometry, self.ig_padded,
-        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ig_padded))
+        numpy.testing.assert_array_equal(data_gold.array, data_out.array)
+        self.assertEquals(data_out.geometry, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
-        data_padded.fill(0)
-        proc.get_output(out=data_padded)
+        data_out.fill(0)
+        proc.process(out=data_out)
 
-        numpy.testing.assert_array_equal(data_gold.array, data_padded.array)
-        self.assertEquals(data_padded.geometry, self.ig_padded,
-        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_padded.geometry, self.ig_padded))
+        numpy.testing.assert_array_equal(data_gold.array, data_out.array)
+        self.assertEquals(data_out.geometry, self.ig_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
 
     def test_process_data_container(self):
 
         arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
-        data_in = DataContainer(arr,False,['LABEL_A','LABEL_B','LABEL_C'])
+        data_in = DataContainer(arr,False)
 
-        pad_width = {'LABEL_A':(1,2),'LABEL_B':(2,3),'LABEL_C':(4,3)}
-        a = pad_width['LABEL_A']
-        b = pad_width['LABEL_B']
-        c = pad_width['LABEL_C']
+        #default labels
+        pad_width = {'dimension_00':(1,2),'dimension_01':(2,3),'dimension_02':(4,3)}
+        a = pad_width['dimension_00']
+        b = pad_width['dimension_01']
+        c = pad_width['dimension_02']
 
         shape_out = numpy.array(arr.shape) + [a[0]+a[1],b[0]+b[1],c[0]+c[1]]
         data_gold = numpy.ones(shape_out,dtype=numpy.float32) * 0.5
@@ -1386,12 +1588,22 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=pad_width, pad_values=0.5)
         proc.set_input(data_in)
-        data_padded = proc.get_output()
-        numpy.testing.assert_array_equal(data_gold, data_padded.array)
+        data_out = proc.process()
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
 
-        data_padded.fill(0)
-        proc.get_output(out=data_padded)
-        numpy.testing.assert_array_equal(data_gold, data_padded.array)
+        data_out.fill(0)
+        proc.process(out=data_out)
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
+
+        # custom labels
+        data_in = DataContainer(arr,False,['LABEL_A','LABEL_B','LABEL_C'])
+
+        pad_width = {'LABEL_A':(1,2),'LABEL_B':(2,3),'LABEL_C':(4,3)}
+
+        proc = Padder('constant', pad_width=pad_width, pad_values=0.5)
+        proc.set_input(data_in)
+        data_out = proc.process()
+        numpy.testing.assert_array_equal(data_gold, data_out.array)
 
 
     def test_results_constant(self):

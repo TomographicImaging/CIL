@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
 import numpy as np
 import weakref
 import logging
@@ -91,6 +91,8 @@ class Slicer(DataProcessor):
             '_processed_dims':None, 
             '_shape_in':None, 
             '_shape_out':None, 
+            'shape_out':None,
+            'labels_out':None,
             '_labels_in':None,
             '_pixel_indices':None,
             '_accelerated': True
@@ -164,7 +166,8 @@ class Slicer(DataProcessor):
         self._configure()
         # set boolean of dimensions to process
         self._processed_dims = [0 if self._shape_out[i] == self._shape_in[i] else 1 for i in range(4)]
-
+        self.shape_out = tuple([i for i in self._shape_out if i > 1])
+        self.labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out) if x > 1]      
 
     def _parse_roi(self, ndim, shape, dimension_labels):
         '''
@@ -245,15 +248,6 @@ class Slicer(DataProcessor):
         self._pixel_indices = [(x[0],x[-1]) for x in self._roi_ordered]
 
 
-    def _process_data(self, dc_in, dc_out):
-        """
-        Slice the data array
-        """
-        slice_obj = tuple([slice(x.start, x.stop, x.step) for x in self._roi_ordered])
-        arr_in = dc_in.array.reshape(self._shape_in)
-        dc_out.fill(np.squeeze(arr_in[slice_obj]))
-
-
     def _get_slice_position(self, roi):
         """
         Return the vertical position to extract a single slice for sliced geometry
@@ -328,8 +322,13 @@ class Slicer(DataProcessor):
         """
         Creates the new image geometry
         """
-        geometry_new = self._geometry.copy()
 
+        if len(self.shape_out) == 0:
+            return None
+        elif len(self.shape_out) ==1:
+            return VectorGeometry(self.shape_out[0], dimension_labels=self.labels_out[0])
+
+        geometry_new = self._geometry.copy()
         for i, axis in enumerate(self._labels_in):
 
             if not self._processed_dims[i]:
@@ -365,6 +364,14 @@ class Slicer(DataProcessor):
         return geometry_new
 
 
+    def _process_data(self, dc_in, dc_out):
+        """
+        Slice the data array
+        """
+        slice_obj = tuple([slice(x.start, x.stop, x.step) for x in self._roi_ordered])
+        arr_in = dc_in.array.reshape(self._shape_in)
+        dc_out.fill(np.squeeze(arr_in[slice_obj]))
+
     def process(self, out=None):
         """
         Processes the input data
@@ -387,7 +394,7 @@ class Slicer(DataProcessor):
         elif isinstance(self._geometry, AcquisitionGeometry):
             new_geometry = self._process_acquisition_geometry()
         else:
-            new_geometry = None
+            new_geometry = None           
 
         # return if just acting on geometry
         if not self._data_array:
@@ -398,13 +405,13 @@ class Slicer(DataProcessor):
             if new_geometry is not None:
                 data_out = new_geometry.allocate(None)
             else:
-                processed_array = np.empty(self._shape_out,dtype=np.float32)
-                data_out = DataContainer(processed_array,False, data.dimension_labels)
+                processed_array = np.empty(self.shape_out,dtype=np.float32)
+                data_out = DataContainer(processed_array,False, self.labels_out)
         else:
             try:
-                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self._shape_out)
+                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self.shape_out)
             except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
+                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self.shape_out, np.float32, out.array.shape, out.array.dtype))
 
             if new_geometry is not None:
                 if out.geometry != new_geometry:

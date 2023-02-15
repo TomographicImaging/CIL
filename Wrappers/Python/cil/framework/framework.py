@@ -49,8 +49,6 @@ class Partitioner(object):
     STAGGERED = 'staggered'
     RANDOM_PERMUTATION = 'random_permutation'
 
-    def __init__(self, **kwargs):
-        pass
     def _partition_indices(self, num_batches, indices, stagger=False):
         """Partition a list of indices into num_batches of indices.
         Parameters

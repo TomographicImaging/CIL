@@ -335,15 +335,20 @@ class TestBinner(unittest.TestCase):
                 # crop and bin
                 {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
                 
-                # bin to single dimension
+                # bin to vector
+                {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,4),'horizontal_y':(None,None,16)},
+
+                #bin to single element
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,8),'horizontal_y':(None,None,16)},
+
         ]
 
         ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
                     ImageGeometry(2,3,4,0.4,1.0,2.1,center_y=-0.1,channels=1),
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_y=-0.4, center_z=-0.6, channels=1),
-                    ImageGeometry(1,1,1,0.8,3.2,8.4,channels=1)
-        ]
+                    VectorGeometry(2, dimension_labels='horizontal_x'),
+                    None
+        ]   
 
         #channel spacing isn't an initialisation argument
         ig_gold[1].channel_spacing=3

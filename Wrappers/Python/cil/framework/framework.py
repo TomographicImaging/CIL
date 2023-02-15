@@ -112,6 +112,15 @@ class Partitioner(object):
         
         return BlockGeometry(*ags)
 
+    def _convert_masks_to_BlockGeometry(self, masks):
+        ags = []
+        for mask in masks:
+            ag = self.geometry.copy()
+            ag.set_angles(self.geometry.angles[mask])
+            ags.append(ag)
+        
+        return BlockGeometry(*ags)
+
     def _convert_indices_to_masks(self, batches, num_indices):
         boolbatches = []
         for batch in batches:
@@ -122,39 +131,52 @@ class Partitioner(object):
         
         return boolbatches
 
-    def partition(self, num_batches, mode):
+    def _partition_data(self, num_batches, method):
+        blk_geo = self.geometry.partition(num_batches, method)
+        indices = len(self.geometry.angles)
+        batches = self.geometry._partition_indices(num_batches, indices, False)
+        batches = self.geometry._convert_indices_to_masks(batches, indices)
+
+        out = blk_geo.allocate(None)
+        out.geometry = blk_geo
+        for i in range(num_batches):
+            out[i].fill(self.array[batches[i]])
+        return out
+
+    def partition(self, num_batches, mode, seed=None):
         if mode == Partitioner.SEQUENTIAL:
-            return self._partition_sequential(num_batches)
+            return self._partition_deterministic(num_batches, stagger=False)
         elif mode == Partitioner.STAGGERED:
-            return self._partition_staggered(num_batches)
+            return self._partition_deterministic(num_batches, stagger=True)
         elif mode == Partitioner.RANDOM_PERMUTATION:
-            return self._partition_random_permutation(num_batches)
+            return self._partition_random_permutation(num_batches, seed=seed)
         else:
             raise ValueError('Unknown partition mode {}'.format(mode))
 
-    def _partition_sequential(self, num_batches):
-        indices = len(self.angles)
-        batches = self._partition_indices(num_batches, indices, False)
-        return self._convert_indices_to_BlockGeometry(batches, indices)
+    def _partition_deterministic(self, num_batches, stagger=False, indices=None):
+        if indices is None:
+            indices = self.geometry.num_projections
+        masks = self._partition_indices(num_batches, indices, stagger)
+        masks = self._convert_indices_to_masks(masks, indices)
+        blk_geo = self._convert_masks_to_BlockGeometry(masks)
         
-    def _partition_staggered(self, num_batches):
-        indices = len(self.angles)
-        batches = self._partition_indices(num_batches, indices, True)
-        return self._convert_indices_to_BlockGeometry(batches, indices)
-
+        # copy data
+        out = blk_geo.allocate(None)
+        out.geometry = blk_geo
+        for i in range(num_batches):
+            out[i].fill(self.array[masks[i]])
+        return out
+         
     def _partition_random_permutation(self, num_batches, seed=None):
         if seed is not None:
             numpy.random.seed(seed)
         
-        indices = numpy.arange(len(self.angles))
+        indices = numpy.arange(len(self.geometry.angles))
         numpy.random.shuffle(indices)
 
         indices = list(indices)            
-        batches = self._partition_indices(num_batches, indices, False)
-        geometry = self
-        angles = geometry.angles
         
-        return self._convert_indices_to_BlockGeometry(batches, indices)
+        return self._partition_deterministic(num_batches, stagger=False, indices=indices)
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -1938,7 +1960,7 @@ class Configuration(object):
         return False
 
 
-class AcquisitionGeometry(Partitioner, object):
+class AcquisitionGeometry(object):
     """This class holds the AcquisitionGeometry of the system.
     
     Please initialise the AcquisitionGeometry using the using the static methods:
@@ -3492,7 +3514,7 @@ class ImageData(DataContainer):
             return image_data_out
 
 
-class AcquisitionData(DataContainer):
+class AcquisitionData(DataContainer, Partitioner):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
 
@@ -3578,18 +3600,6 @@ class AcquisitionData(DataContainer):
             return out
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
-
-    def partition(self, num_batches, method):
-        blk_geo = self.geometry.partition(num_batches, method)
-        indices = len(self.geometry.angles)
-        batches = self.geometry._partition_indices(num_batches, indices, False)
-        batches = self.geometry._convert_indices_to_masks(batches, indices)
-
-        out = blk_geo.allocate(None)
-        out.geometry = blk_geo
-        for i in range(num_batches):
-            out[i].fill(self.array[batches[i]])
-        return out
 
 class Processor(object):
 

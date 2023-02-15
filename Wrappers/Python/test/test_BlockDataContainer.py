@@ -18,7 +18,7 @@ import unittest
 from utils import initialise_tests
 import numpy as np
 from cil.framework import ImageGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
+from cil.framework import ImageData, AcquisitionData, Partitioner
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
@@ -431,7 +431,7 @@ class TestBlockDataContainer(BDCUnittest):
         cp2 = BlockDataContainer(data0+1, data1+1)
 
         data0.fill(data2)
-        self.assertnpArrayEqual(data0.as_array(), data2.as_array())
+        np.testing.assert_array_equal(data0.as_array(), data2.as_array())
         data0 = ImageData(geometry=ig0)
 
         cp0.fill(cp2)
@@ -864,23 +864,47 @@ class TestBlockGeometry(unittest.TestCase):
 
 class TestAcquisitionDataPartition(unittest.TestCase):
     def setUp(self):
-        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        self.data = data.get_slice(vertical='centre')
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+        self.data = data
 
     def test_partition(self):
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.data = data.get_slice(vertical='centre')
+        # split in num_batches
+        num_batches = 13
 
-        data = self.data.partition(10, 'sequential')
+        data = self.data.partition(num_batches, 'sequential')
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
         
         # ig = data.get_ImageGeometry()
-        assert len(data.containers) == 10
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs)
 
+        data = self.data.partition(num_batches, Partitioner.STAGGERED)
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=True)
+        
+        # ig = data.get_ImageGeometry()
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs)
+
+
+    def assertDataIsTheSame(self, data, idxs):
         # let's check that the data is the same
         k = 0
+        wrong = 0
         for i, el in enumerate(data):
             for j in range(el.shape[0]):
-                np.testing.assert_array_equal(el.as_array()[j], self.data.as_array()[k])
+                idx = idxs[i][j]
+                try:
+                    np.testing.assert_array_equal(el.as_array()[j], self.data.as_array()[idx])
+                except AssertionError:
+                    wrong += 1
                 k += 1
                 
-        
+        assert wrong == 0

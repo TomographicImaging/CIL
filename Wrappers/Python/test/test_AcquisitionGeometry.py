@@ -1511,20 +1511,29 @@ class TestSubset(unittest.TestCase):
         for i,r in enumerate(ret):
             np.testing.assert_array_equal(np.asarray(r, dtype=bool), gold[i])
 
-    def test_AcquisitionGeometry_split_to_BlockGeometry(self):
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer(self):
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
             .set_panel(num_pixels=10)\
             .set_angles(angles=range(9))
 
-        self.AcquisitionGeometry_split_to_BlockGeometry(AG, 'sequential', 1)
-        self.AcquisitionGeometry_split_to_BlockGeometry(AG, 'staggered', 1)
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
 
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
 
-    def AcquisitionGeometry_split_to_BlockGeometry(self, ag, method, seed):
+        # self.AcquisitionGeometry_split_to_BlockDataContainer(data, 'sequential', 1)
+        # self.AcquisitionGeometry_split_to_BlockDataContainer(data, 'staggered', 1)
+
+    def AcquisitionGeometry_split_to_BlockGeometry(self, data, method, seed):
         num_batches = 4
         np.random.seed(seed)
-        bg = ag.partition(num_batches, method)
-        num_indices = len(ag.angles)
+        datasplit = data.partition(num_batches, method)
+        bg = datasplit.geometry
+        ag = data.geometry
+        num_indices = ag.num_projections
 
         gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
         if method == Partitioner.SEQUENTIAL:
@@ -1554,6 +1563,21 @@ class TestSubset(unittest.TestCase):
 
             gold[3][3] = True
             gold[3][7] = True
+        elif method == Partitioner.RANDOM_PERMUTATION:
+            # with seed==1 gold = [[8, 2, 6], [7, 1], [0, 4], [3, 5]]
+            gold[0][8] = True
+            gold[0][2] = True
+            gold[0][6] = True
+
+            gold[1][7] = True
+            gold[1][1] = True
+
+            gold[2][0] = True
+            gold[2][4] = True
+
+            gold[3][3] = True
+            gold[3][5] = True
+
 
         for i, geo in enumerate(bg):
             np.testing.assert_allclose(geo.angles, ag.angles[gold[i]])

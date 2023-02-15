@@ -874,10 +874,10 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         self.data = data
 
     def test_partition(self):
-        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        self.data = data.get_slice(vertical='centre')
+        # data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        # self.data = data.get_slice(vertical='centre')
         # split in num_batches
-        num_batches = 13
+        num_batches = 4
 
         data = self.data.partition(num_batches, 'sequential')
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)

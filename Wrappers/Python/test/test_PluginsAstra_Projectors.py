@@ -18,11 +18,14 @@ import unittest
 from cil.framework import AcquisitionGeometry
 import numpy as np
 from utils import has_astra, has_nvidia, initialise_tests
+from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
+from cil.utilities import dataexample
 
 initialise_tests()
 
 if has_astra:
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
+    from cil.plugins.astra.operators import ProjectionOperator
 
 class TestAstraProjectors(unittest.TestCase):
     def setUp(self): 
@@ -159,3 +162,14 @@ class TestAstraProjectors(unittest.TestCase):
         with self.assertRaises(ValueError):
             A3 = AstraProjector3D(ig3_2, self.ag3)
 
+class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBlockOperator):
+    def setUp(self):
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data = data.get_slice(vertical='centre')
+        ig = self.data.geometry.get_ImageGeometry()
+        self.datasplit = self.data.partition(10, 'sequential')
+        
+
+        K = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.datasplit.geometry)
+        A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
+        self.projectionOperator = (A, K)

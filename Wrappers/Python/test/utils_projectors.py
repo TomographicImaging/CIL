@@ -480,3 +480,53 @@ class TestCommon_FBP_SIM(SimData):
         reco = self.FBP(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
 
+class TestCommon_ProjectionOperatorBlockOperator(object):
+    # def setUp(self):
+    #     data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+    #     self.data = data.get_slice(vertical='centre')
+    #     K = ProjectionOperator(image_geometry=ig, acquisition_geometry=data.geometry)
+    #     A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
+    #     self.projectionOperator = (A, K)
+
+    def test_partition(self):
+        
+        A, K = self.projectionOperator
+
+        u = A.adjoint(self.data)
+        v = K.adjoint(self.datasplit)
+
+        # the images are not entirely the same as the BlockOperator's requires to 
+        # add all the data of the adjoint operator, which may result in a slightly
+        # different image
+        np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
+
+        x = A.direct(u)
+        y = K.direct(v)
+
+        # let's check that the data is the same
+        k = 0
+        wrong = 0
+        for i, el in enumerate(y.containers):
+            for j in range(el.shape[0]):
+                try:
+                    np.testing.assert_allclose(el.as_array()[j], x.as_array()[k], atol=7e-2, rtol=1e-6)
+                except AssertionError as ae:
+                    print(ae)
+                    wrong += 1
+                # show2D([el.as_array()[j], x.as_array()[k]], cmap=['inferno', 'inferno'])
+                k += 1
+
+        assert wrong == 0
+        
+        # reassemlbe the data
+        out = x * 0
+        k = 0
+        for i, el in enumerate(y.containers):
+            # print (i, el.shape)
+            for j in range(el.shape[0]):
+                out.array[k] = el.as_array()[j]
+                k += 1
+
+        # show2D([out, x, out-x], cmap=['inferno', 'inferno', 'seismic'], title=['out', 'x', 'diff'], \
+        #     num_cols=3)
+        np.testing.assert_allclose(out.as_array(), x.as_array(), atol=1e-2, rtol=1e-6)

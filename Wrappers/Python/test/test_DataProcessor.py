@@ -677,9 +677,7 @@ class TestBinner(unittest.TestCase):
     def test_aqdata_full_tigre(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
-
         This ensures the offsets are correctly set and the same window of data is output in both cases.
-
         Tigre geometry bug means this does not pass.
         """
 
@@ -1355,7 +1353,7 @@ class TestPaddder(unittest.TestCase):
 
         self.ig = ImageGeometry(5,4,3,center_x=0.5,center_y=1,center_z=-0.5,channels=2)
         self.ig_pad_width = {'channel':(1,2),'vertical':(3,2),'horizontal_x':(2,1), 'horizontal_y':(2,3)}
-        self.ig_padded = ImageGeometry(8,9,8,center_x=1,center_y=0.5,center_z=0, channels=5)
+        self.ig_padded = ImageGeometry(8,9,8,center_x=0,center_y=1.5,center_z=-1, channels=5)
 
 
         arr_in = numpy.arange(9, dtype=numpy.float32).reshape(3,3)
@@ -1787,6 +1785,84 @@ class TestPaddder(unittest.TestCase):
         arr_gold[:,-1] = [6,0,3,6,0]
 
         numpy.testing.assert_array_equal(arr_gold, data_out.array)
+
+
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_pad_ad_full(self):
+        """
+        This test pads a acquisition data asymmetrically.
+        It then compares the FBP of the padded and unpadded data on the same ImageGeometry.
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+
+        data.log(out=data)
+        data *=-1
+
+        recon_orig = FBP(data).run(verbose=0)
+        recon_orig.apply_circular_mask()
+
+        proc = Padder('constant',pad_width=(5,40),pad_values=0.0)
+        proc.set_input(data)
+        data_padded = proc.get_output()
+
+        recon_new = FBP(data_padded, recon_orig.geometry).run(verbose=0)
+        recon_new.apply_circular_mask()
+
+        numpy.testing.assert_allclose(recon_orig.array, recon_new.array, atol=1e-4)
+
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_pad_id_full(self):
+        """
+        This test pads an image data asymmetrically.
+        It then compares the forward projection of the padded and unpadded phantom on the same AcquisitionGeometry.
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        ag.set_labels(['vertical','angle','horizontal'])
+
+        PO = AstraProjectionOperator(phantom.geometry, ag)
+        fp_orig = PO.direct(phantom)
+
+        proc = Padder('constant',pad_width={'vertical':(10,40),'horizontal_y':(40,10),'horizontal_x':(5,90)},pad_values=0.0)
+        proc.set_input(phantom)
+        phantom_padded = proc.get_output()
+
+        PO = AstraProjectionOperator(phantom_padded.geometry, ag)
+        fp_new = PO.direct(phantom_padded)
+
+        numpy.testing.assert_allclose(fp_orig.array, fp_new.array, atol=1e-3)
+
+
+    @unittest.skip
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_pad_id_full_tigre(self):
+        """
+        This test pads an image data asymmetrically.
+        It then compares the forward projection of the padded and unpadded phantom on the same AcquisitionGeometry.
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+
+        Tigre geometry bug means this does not pass.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = TigreProjectionOperator(phantom.geometry, ag)
+        fp_orig = PO.direct(phantom)
+
+        proc = Padder('constant',pad_width={'vertical':(10,40),'horizontal_y':(40,10),'horizontal_x':(5,90)},pad_values=0.0)
+        proc.set_input(phantom)
+        phantom_padded = proc.get_output()
+
+        PO = TigreProjectionOperator(phantom_padded.geometry, ag)
+        fp_new = PO.direct(phantom_padded)
+
+        numpy.testing.assert_allclose(fp_orig.array, fp_new.array, atol=1e-3)
 
 
 class TestDataProcessor(unittest.TestCase):

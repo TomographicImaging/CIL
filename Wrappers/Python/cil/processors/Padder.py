@@ -398,15 +398,15 @@ class Padder(DataProcessor):
             elif dim == 'vertical':
                 geometry.voxel_num_z += self._pad_width_param[i][0]
                 geometry.voxel_num_z += self._pad_width_param[i][1]
-                geometry.center_z += offset * geometry.voxel_size_z
+                geometry.center_z -= offset * geometry.voxel_size_z
             elif dim == 'horizontal_x':
                 geometry.voxel_num_x += self._pad_width_param[i][0]
                 geometry.voxel_num_x += self._pad_width_param[i][1]
-                geometry.center_x += offset * geometry.voxel_size_x
+                geometry.center_x -= offset * geometry.voxel_size_x
             elif dim == 'horizontal_y':
                 geometry.voxel_num_y += self._pad_width_param[i][0]
                 geometry.voxel_num_y += self._pad_width_param[i][1]
-                geometry.center_y += offset * geometry.voxel_size_y
+                geometry.center_y -= offset * geometry.voxel_size_y
 
         return geometry
 

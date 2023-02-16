@@ -174,6 +174,6 @@ class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBl
         A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
         self.projectionOperator = (A, K)
 
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA and a GPU")
     def test_partition(self):
         self.partition_test()

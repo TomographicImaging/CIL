@@ -121,6 +121,8 @@ class Partitioner(object):
 
     def _convert_indices_to_masks(self, batches, num_indices):
         boolbatches = []
+        if isinstance(num_indices, list):
+            num_indices = len(num_indices)
         for batch in batches:
             boolbatch = numpy.zeros(num_indices, dtype=bool)
             for j in batch:
@@ -128,18 +130,6 @@ class Partitioner(object):
             boolbatches.append(boolbatch)
         
         return boolbatches
-
-    def _partition_data(self, num_batches, method):
-        blk_geo = self.geometry.partition(num_batches, method)
-        indices = len(self.geometry.angles)
-        batches = self.geometry._partition_indices(num_batches, indices, False)
-        batches = self.geometry._convert_indices_to_masks(batches, indices)
-
-        out = blk_geo.allocate(None)
-        out.geometry = blk_geo
-        for i in range(num_batches):
-            out[i].fill(self.array[batches[i]])
-        return out
 
     def partition(self, num_batches, mode, seed=None):
         if mode == Partitioner.SEQUENTIAL:
@@ -169,7 +159,7 @@ class Partitioner(object):
         if seed is not None:
             numpy.random.seed(seed)
         
-        indices = numpy.arange(len(self.geometry.angles))
+        indices = numpy.arange(self.geometry.num_projections)
         numpy.random.shuffle(indices)
 
         indices = list(indices)            

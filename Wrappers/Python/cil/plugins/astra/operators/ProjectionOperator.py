@@ -30,10 +30,10 @@ class ProjectionOperator(LinearOperator):
     Parameters
     ----------
 
-    image_geometry : ImageGeometry, default used if None
+    image_geometry : ``ImageGeometry``, default used if None
         A description of the area/volume to reconstruct
 
-    acquisition_geometry : AcquisitionGeometry, BlockGeometry
+    acquisition_geometry : ``AcquisitionGeometry``, ``BlockGeometry``
         A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.
 
     device : string, default='gpu'

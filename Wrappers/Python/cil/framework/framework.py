@@ -149,35 +149,38 @@ class Partitioner(object):
     def partition(self, num_batches, mode, seed=None):
         '''Partition the data into ``num_batches`` batches using the specified ``mode``.
         
+
+        The modes are
+        
+        1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.
+        
+        2. ``staggered`` - The data will be partitioned into ``num_batches`` batches of sequential indices, with stride equal to ``num_batches``.
+        
+        3. ``random_permutation`` - The data will be partitioned into ``num_batches`` batches of random indices.
+
         Parameters
         ----------
-        num_batches : int
-            The number of batches to partition the data into.
-        mode : str
-            The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.
-        seed : int, optional
-            The seed to use for the random permutation. If not specified, the random number
-            generator will not be seeded.
+            num_batches : int
+                The number of batches to partition the data into.
+            mode : str
+                The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.
+            seed : int, optional
+                The seed to use for the random permutation. If not specified, the random number
+                generator will not be seeded.
 
 
         Returns
         -------
-        BlockDataContainer
+            BlockDataContainer
 
-        This method will partition the data into ``num_batches`` batches using the specified ``mode``. The modes are
-        
-        1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.
-        2. ``staggered`` - The data will be partitioned into ``num_batches`` batches of sequential indices, 
-        with stride equal to ``num_batches``.
-        3. ``random_permutation`` - The data will be partitioned into ``num_batches`` batches of random indices.
-
-        Example:
+        Example
+        -------
         
         Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:
-        
-        1. ``sequential`` - [[0, 1, 2], [3, 4], [5, 6], [7, 8]]
-        2. ``staggered`` - [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
-        3. ``random_permutation`` with seed 1 - [[8, 2, 6], [7, 1], [0, 4], [3, 5]]
+    
+        1. [[0, 1, 2], [3, 4], [5, 6], [7, 8]] with ``sequential``
+        2. [[0, 4, 8], [1, 5], [2, 6], [3, 7]] with ``staggered``
+        3. [[8, 2, 6], [7, 1], [0, 4], [3, 5]] with ``random_permutation`` and seed 1
 
         '''
         if mode == Partitioner.SEQUENTIAL:

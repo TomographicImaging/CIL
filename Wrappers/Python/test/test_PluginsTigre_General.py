@@ -326,4 +326,8 @@ class TestTIGREBlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBlo
         A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
         self.projectionOperator = (A, K)
 
+    @unittest.skipUnless(has_tigre, "Requires ASTRA")
+    def test_partition(self):
+        self.partition_test()
+
     

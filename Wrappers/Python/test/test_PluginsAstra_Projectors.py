@@ -173,3 +173,7 @@ class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBl
         K = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.datasplit.geometry)
         A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
         self.projectionOperator = (A, K)
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_partition(self):
+        self.partition_test()

@@ -487,8 +487,7 @@ class TestCommon_ProjectionOperatorBlockOperator(object):
     #     K = ProjectionOperator(image_geometry=ig, acquisition_geometry=data.geometry)
     #     A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
     #     self.projectionOperator = (A, K)
-
-    def test_partition(self):
+    def partition_test(self):
         
         A, K = self.projectionOperator
 

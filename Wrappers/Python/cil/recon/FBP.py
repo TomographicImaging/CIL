@@ -233,7 +233,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
         # frequency bins in cycles/pixel
         freq = fftfreq(filter_length)
-        # in radians
+        # in pi rad/pixel
         freq*=2
 
         ramp = abs(freq)

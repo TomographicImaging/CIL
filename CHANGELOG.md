@@ -1,4 +1,7 @@
 * Next
+  - BlockGeometry is iterable
+  - Added `partition` to `AcquisitionData` to partition the data with 3 methods: `sequential`, `staggered` and `random_permutation`
+  - TIGRE and ASTRA `ProjectionOperator` now support `BlockGeometry` as `acquisition_geometry` parameter, returning a `BlockOperator`
   - Added RAWFileWriter to export data containers to raw files
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
   - Implemented IndicatorBox in numba and numpy

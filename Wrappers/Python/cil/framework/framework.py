@@ -43,7 +43,13 @@ cilacc = ctypes.cdll.LoadLibrary(dll)
 from cil.framework.BlockGeometry import BlockGeometry
 
 class Partitioner(object):
-    '''Base class for partitioners'''
+    '''Interface for AcquisitionData to be able to partition itself in a number of sub-sets.
+    
+    This class, by multiple inheritance with AcquisitionData, allows the user to partition the data, 
+    by using the method ``partition``. 
+    The partitioning will generate a ``BlockDataContainer`` with appropriate ``AcquisitionData``.
+
+    '''
     # modes of partitioning
     SEQUENTIAL = 'sequential'
     STAGGERED = 'staggered'
@@ -98,19 +104,19 @@ class Partitioner(object):
                 batches.append(indices[start:end])
 
         return batches
-    
-    def _convert_indices_to_BlockGeometry(self, batches, num_indices):
-        boolbatches = self._convert_indices_to_masks(batches, num_indices)
-
-        ags = []
-        for boolbatch in boolbatches:
-            ag = self.copy()
-            ag.set_angles(self.angles[boolbatch])
-            ags.append(ag)
-        
-        return BlockGeometry(*ags)
 
     def _convert_masks_to_BlockGeometry(self, masks):
+        '''Convert a list of boolean masks to a list of BlockGeometry.
+        
+        Parameters
+        ----------
+          masks : list of boolean array
+              A list of boolean masks.
+            
+        Returns
+        -------
+            BlockGeometry
+        '''
         ags = []
         for mask in masks:
             ag = self.geometry.copy()
@@ -120,6 +126,15 @@ class Partitioner(object):
         return BlockGeometry(*ags)
 
     def _convert_indices_to_masks(self, batches, num_indices):
+        '''Convert a list of batches of indices to a list of boolean masks.
+        
+        Parameters
+        ----------
+        batches : list of list of int
+            A list of batches of indices.
+        num_indices : int, list of int
+            The number of indices in the original list. If a list is passed, it will be calculated
+            as the length of the list'''
         boolbatches = []
         if isinstance(num_indices, list):
             num_indices = len(num_indices)
@@ -132,6 +147,39 @@ class Partitioner(object):
         return boolbatches
 
     def partition(self, num_batches, mode, seed=None):
+        '''Partition the data into ``num_batches`` batches using the specified ``mode``.
+        
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the data into.
+        mode : str
+            The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.
+        seed : int, optional
+            The seed to use for the random permutation. If not specified, the random number
+            generator will not be seeded.
+
+
+        Returns
+        -------
+        BlockDataContainer
+
+        This method will partition the data into ``num_batches`` batches using the specified ``mode``. The modes are
+        
+        1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.
+        2. ``staggered`` - The data will be partitioned into ``num_batches`` batches of sequential indices, 
+        with stride equal to ``num_batches``.
+        3. ``random_permutation`` - The data will be partitioned into ``num_batches`` batches of random indices.
+
+        Example:
+        
+        Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:
+        
+        1. ``sequential`` - [[0, 1, 2], [3, 4], [5, 6], [7, 8]]
+        2. ``staggered`` - [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+        3. ``random_permutation`` with seed 1 - [[8, 2, 6], [7, 1], [0, 4], [3, 5]]
+
+        '''
         if mode == Partitioner.SEQUENTIAL:
             return self._partition_deterministic(num_batches, stagger=False)
         elif mode == Partitioner.STAGGERED:
@@ -142,6 +190,17 @@ class Partitioner(object):
             raise ValueError('Unknown partition mode {}'.format(mode))
 
     def _partition_deterministic(self, num_batches, stagger=False, indices=None):
+        '''Partition the data into ``num_batches`` batches.
+        
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the data into.
+        stagger : bool, optional
+            If ``True``, the batches will be staggered. Default is ``False``.
+        indices : list of int, optional
+            The indices to partition. If not specified, the indices will be generated from the number of projections.
+        '''
         if indices is None:
             indices = self.geometry.num_projections
         masks = self._partition_indices(num_batches, indices, stagger)
@@ -156,6 +215,17 @@ class Partitioner(object):
         return out
          
     def _partition_random_permutation(self, num_batches, seed=None):
+        '''Partition the data into ``num_batches`` batches using a random permutation.
+
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the data into.
+        seed : int, optional
+            The seed to use for the random permutation. If not specified, the random number generator
+            will not be seeded.
+
+        '''
         if seed is not None:
             numpy.random.seed(seed)
         
@@ -2557,21 +2627,6 @@ class AcquisitionGeometry(object):
         
         return out
 
-    def split(self, num_batches, mode):
-        '''splits the geometry into num_batches sub-geometries with the specified mode
-
-        Parameters:
-        -----------
-
-        num_batches : int
-            number of batches to split the geometry into
-        mode : str
-            'sequential', 'staggered', 'random_permutation'
-
-
-        '''
-        return self.partition(num_batches, mode)
-    
 class DataContainer(object):
     '''Generic class to hold data
     

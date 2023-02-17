@@ -1,5 +1,10 @@
 * Next
   - Added pre-set filters for `recon.FBP` and `recon.FDK`. Filters now include ram-lak, hamming, hann, cosine, shepp-logan.
+  - Added RAWFileWriter to export data containers to raw files
+  - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
+  - Implemented IndicatorBox in numba and numpy
+  - Dropped support for Python 3.6 and NumPy 1.15
+  - Jenkins PR tests on Python 3.8 and NumPy 1.20
   - added yml file to create test environment
   - LeastSquares fixed docstring and unified gradient code when out is passed or not.
   - Add compression to 8bit and 16bit to TIFFWriter
@@ -10,12 +15,21 @@
   - Binner processor reworked:
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
+  - Slicer refactoring
+    - Returned geometry is correctly offset where slicing/cropping moves the origin
   - Github Actions:
+    - update test python and numpy versions to 3.9 and 1.22
+    - Update conda build action to v1.4.4
+    - Fixes actions to run on ubuntu-20.04
     - Update version of upload_artifact github action to version 3.1.1
     - Update version of download_artifact github action to version 3.0.1
     - Update version of checkout github action to version 3.1.0
     - Update build-sphinx action to version 0.1.3
+  - `io.utilities.HDF5_utilities` Added utility functions to browse hdf5 files and read datasets into numpy array
+  - Implemented the analytical norm for GradientOperator
   - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
+  - ROI selection, aspect ratio toggle and Play widget added to islicer
+  - Add show1D display utility
 
 * 22.1.0
   - use assert_allclose in test_DataContainer

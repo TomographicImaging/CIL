@@ -14,12 +14,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.import numpy as np
-from cil.io import *
+
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData
 import os, re
-import sys
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-import datetime
+
 pilAvailable = True
 try:    
     from PIL import Image
@@ -36,29 +35,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def compress_data(data, scale, offset, dtype):
-    '''Compress data to dtype using scale and offset
-    
-    Parameters
-    ----------
-    data : numpy array
-    scale : float
-    offset : float
-    dtype : numpy dtype
-    
-    returns compressed casted data'''
-    if dtype == data.dtype:
-        return data
-    if data.ndim > 2:
-        # compress each slice
-        tmp = np.empty(data.shape, dtype=dtype)
-        for i in range(data.shape[0]):
-            tmp[i] = compress_data(data[i], scale, offset, dtype)
-    else:
-        tmp = data * scale + offset
-        tmp = tmp.astype(dtype)
-    return tmp
-
 def save_scale_offset(fname, scale, offset):
     '''Save scale and offset to file
     
@@ -74,11 +50,8 @@ def save_scale_offset(fname, scale, offset):
     utilities.save_dict_to_file(txt, d)
 
 class TIFFWriter(object):
-    '''Write a DataSet to disk as a TIFF file or stack'''
-    
-    def __init__(self,
-                 **kwargs):
-        '''
+    '''Write a DataSet to disk as a TIFF file or stack of TIFF files
+
 
         Parameters
         ----------
@@ -95,15 +68,25 @@ class TIFFWriter(object):
             'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
 
 
-        Note:
-        -----
+        Note
+        ----
 
-        If compression 'uint8' or 'unit16' are used, the scale and offset used to compress the data are saved 
-        in a file called `scaleoffset.json` in the same directory as the TIFF file(s).
+          If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved 
+          in a file called ``scaleoffset.json`` in the same directory as the TIFF file(s).
 
-        The original data can be obtained by: `original_data = (compressed_data - offset) / scale`
-        '''
+          The original data can be obtained by: ``original_data = (compressed_data - offset) / scale``
         
+        Note
+        ----
+        
+          In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
+          not as a single multi-page TIFF file.
+        '''
+
+    
+    def __init__(self, **kwargs):
+
+
         self.data_container = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         counter_offset = kwargs.get('counter_offset', 0)
@@ -147,6 +130,7 @@ class TIFFWriter(object):
 
     
     def write(self):
+        '''Write data to disk'''
         if not os.path.isdir(self.dir_name):
             os.mkdir(self.dir_name)
 
@@ -160,7 +144,7 @@ class TIFFWriter(object):
                 fname = "{}.tiff".format(os.path.join(self.dir_name, self.file_name))
             with open(fname, 'wb') as f:
                 Image.fromarray(
-                    compress_data(self.data_container.as_array() , self.scale, self.offset, self.dtype)
+                    utilities.compress_data(self.data_container.as_array() , self.scale, self.offset, self.dtype)
                     ).save(f, 'tiff')
         elif ndim == 3:
             for sliceno in range(self.data_container.shape[0]):
@@ -172,7 +156,7 @@ class TIFFWriter(object):
                     sliceno + self.counter_offset)
                 with open(fname, 'wb') as f:
                     Image.fromarray(
-                            compress_data(self.data_container.as_array()[sliceno] , self.scale, self.offset, self.dtype)
+                            utilities.compress_data(self.data_container.as_array()[sliceno] , self.scale, self.offset, self.dtype)
                         ).save(f, 'tiff')
         elif ndim == 4:
             # find how many decimal places self.data_container.shape[0] and shape[1] have
@@ -190,7 +174,7 @@ class TIFFWriter(object):
                         self.data_container.shape[3] , sliceno1, sliceno2)
                     with open(fname, 'wb') as f:
                         Image.fromarray(
-                            compress_data(self.data_container.as_array()[sliceno1][sliceno2] , self.scale, self.offset, self.dtype)
+                            utilities.compress_data(self.data_container.as_array()[sliceno1][sliceno2] , self.scale, self.offset, self.dtype)
                         ).save(f, 'tiff')
         else:
             raise ValueError('Cannot handle more than 4 dimensions')
@@ -208,9 +192,7 @@ class TIFFWriter(object):
 
 class TIFFStackReader(object):
     
-    def __init__(self, 
-                 **kwargs):
-        ''' 
+    ''' 
         Basic TIFF redaer which loops through all tiff files in a specific 
         folder and load them in alphabetic order
         
@@ -222,9 +204,9 @@ class TIFFStackReader(object):
                    
         roi : dictionary, default `None`
             dictionary with roi to load 
-            {'axis_0': (start, end, step), 
-                'axis_1': (start, end, step), 
-                'axis_2': (start, end, step)}
+            ``{'axis_0': (start, end, step), 
+               'axis_1': (start, end, step), 
+               'axis_2': (start, end, step)}``
             Files are stacked along axis_0. axis_1 and axis_2 correspond
             to row and column dimensions, respectively.
             Files are stacked in alphabetic order. 
@@ -265,8 +247,9 @@ class TIFFStackReader(object):
         >>> writer.write(original_data)
         >>> reader = TIFFStackReader(file_name = '/path/to/folder')
         >>> about_original_data = reader.read_rescaled()
-        '''
-        
+    '''
+
+    def __init__(self, **kwargs):    
         self.file_name = kwargs.get('file_name', None)
         roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
         transpose = kwargs.get('transpose', False)
@@ -296,9 +279,7 @@ class TIFFStackReader(object):
                    
         roi : dictionary, default `None`
             dictionary with roi to load 
-            {'axis_0': (start, end, step), 
-                'axis_1': (start, end, step), 
-                'axis_2': (start, end, step)}
+            ``{'axis_0': (start, end, step), 'axis_1': (start, end, step), 'axis_2': (start, end, step)}``
             Files are stacked along axis_0. axis_1 and axis_2 correspond
             to row and column dimensions, respectively.
             Files are stacked in alphabetic order. 
@@ -611,22 +592,3 @@ class TIFFStackReader(object):
         data -= offset
         data /= scale
         return data
-
-'''
-import matplotlib.pyplot as plt
-from cil.io import TIFFStackReader
-
-path = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/'
-
-reader = TIFFStackReader()
-reader.set_up(path = path,
-              n_images = 100,
-              binning = {'axis_0': 5, 'axis_1': 6},
-              roi = {'axis_0': (100,900), 'axis_1': (200,700)},
-              skip = 100)
-
-data = reader.load_images()
-
-plt.imshow(data[1, :, :])
-plt.show()
-'''

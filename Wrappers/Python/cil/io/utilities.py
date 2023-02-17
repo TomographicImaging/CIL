@@ -17,6 +17,7 @@
 import numpy as np
 import json
 import logging
+import h5py
 
 logger = logging.getLogger(__name__)
 
@@ -132,3 +133,191 @@ def save_dict_to_file(fname, dictionary):
     with open(fname, 'w') as configfile:
         json.dump(dictionary, configfile)
 
+def compress_data(data, scale, offset, dtype):
+    '''Compress data to dtype using scale and offset
+    
+    Parameters
+    ----------
+    data : numpy array
+    scale : float
+    offset : float
+    dtype : numpy dtype
+    
+    returns compressed casted data'''
+    if dtype == data.dtype:
+        return data
+    if data.ndim > 2:
+        # compress each slice
+        tmp = np.empty(data.shape, dtype=dtype)
+        for i in range(data.shape[0]):
+            tmp[i] = compress_data(data[i], scale, offset, dtype)
+    else:
+        tmp = data * scale + offset
+        tmp = tmp.astype(dtype)
+    return tmp
+
+class HDF5_utilities(object): 
+
+    """
+    Utility methods to read in from a generic HDF5 file and extract the relevant data
+    """
+    def __init__(self):
+        pass
+        
+
+    @staticmethod
+    def _descend_obj(obj, sep='\t', depth=-1):
+        """
+        Parameters
+        ----------
+        obj: str
+            The initial group to print the metadata for
+        sep: str, default '\t'
+            The separator to use for the output
+        depth: int
+            depth to print from starting object. Values 1-N, if -1 will print all
+        """
+        if depth != 0:
+            if type(obj) in [h5py._hl.group.Group, h5py._hl.files.File]:
+                for key in obj.keys():
+                    print(sep, '-', key, ':', obj[key])
+                    HDF5_utilities._descend_obj(obj[key], sep=sep+'\t', depth=depth-1)
+            elif type(obj) == h5py._hl.dataset.Dataset:
+                for key in obj.attrs.keys():
+                    print(sep+'\t', '-', key, ':', obj.attrs[key])
+
+
+    @staticmethod
+    def print_metadata(filename, group='/', depth=-1):
+        """
+        Prints the file metadata
+
+        Parameters
+        ----------
+        filename: str
+            The full path to the HDF5 file
+        group: (str), default: '/'
+            a specific group to print the metadata for, this defaults to the root group
+        depth: int, default -1
+            depth of group to output the metadata for, -1 is fully recursive
+        """
+        with h5py.File(filename, 'r') as f:
+            HDF5_utilities._descend_obj(f[group], depth=depth)
+
+
+    @staticmethod
+    def get_dataset_metadata(filename, dset_path):
+        """
+        Returns the dataset metadata as a dictionary
+
+        Parameters
+        ----------
+        filename: str
+            The full path to the HDF5 file
+        dset_path: str
+            The internal path to the requested dataset
+
+        Returns
+        -------
+        A dictionary containing keys, values are `None` if attribute can't be read.:
+            ndim, shape, size, dtype, nbytes, compression, chunks, is_virtual
+        """
+        with h5py.File(filename, 'r') as f:
+                dset = f.get(dset_path, )
+
+                attribs = {
+                    'ndim':None, 
+                    'shape':None,
+                    'size':None,
+                    'dtype':None,
+                    'compression':None, 
+                    'chunks':None, 
+                    'is_virtual':None}
+                
+                for x in attribs.keys():
+                    try:
+                        attribs[x] = getattr(dset, x)
+                    except AttributeError:
+                        pass
+
+                return attribs
+
+
+
+    @staticmethod
+    def read(filename, dset_path, source_sel=None, dtype=np.float32):
+        """
+        Reads a dataset entry and returns a numpy array with the requested data
+
+        Parameters
+        ----------
+        filename: str
+            The full path to the HDF5 file
+        dset_path: str
+            The internal path to the requested dataset
+        source_sel: tuple of slice objects, optional
+            The selection of slices in each source dimension to return
+        dtype: numpy type, default np.float32
+            the numpy data type for the returned array
+    
+            
+        Returns
+        -------
+        numpy.ndarray
+            The requested data
+
+        Note
+        ----
+        source_sel takes a tuple of slice objects to defining crop and slicing behaviour
+
+        This can be constructed using numpy indexing, i.e. the following lines are equivalent.
+
+        >>> source_sel = (slice(2, 4, None), slice(2, 10, 2)) 
+
+        >>> source_sel = np.s_[2:4,2:10:2]
+        """
+
+        with h5py.File(filename, 'r') as f:
+            dset = f.get(dset_path)
+
+            if source_sel == None:
+                source_sel = tuple([slice(None)]*dset.ndim)
+
+            arr = np.asarray(dset[source_sel],dtype=dtype, order='C')
+
+        return arr 
+
+
+    @staticmethod
+    def read_to(filename, dset_path, out, source_sel=None, dest_sel=None):
+        """
+        Reads a dataset entry and directly fills a numpy array with the requested data
+
+        Parameters
+        ----------
+        filename: str
+            The full path to the HDF5 file
+        dset_path: str
+            The internal path to the requested dataset
+        out: numpy.ndarray
+            The output array to be filled
+        source_sel: tuple of slice objects, optional
+            The selection of slices in each source dimension to return
+        dest_sel: tuple of slice objects, optional
+            The selection of slices in each destination dimension to fill
+
+
+        Note
+        ----
+        source_sel and dest_sel take a tuple of slice objects to defining crop and slicing behaviour
+
+        This can be constructed using numpy indexing, i.e. the following lines are equivalent.
+
+        >>> source_sel = (slice(2, 4, None), slice(2, 10, 2)) 
+
+        >>> source_sel = np.s_[2:4,2:10:2]
+        """
+
+        with h5py.File(filename, 'r') as f:
+            dset = f.get(dset_path)
+            dset.read_direct(out, source_sel, dest_sel)

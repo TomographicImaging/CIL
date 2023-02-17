@@ -57,6 +57,7 @@ class Partitioner(object):
 
     def _partition_indices(self, num_batches, indices, stagger=False):
         """Partition a list of indices into num_batches of indices.
+        
         Parameters
         ----------
         num_batches : int
@@ -67,7 +68,8 @@ class Partitioner(object):
         stagger : bool, default False
             If True, the indices will be staggered across the batches.
 
-        -------
+        Returns
+        --------
         list of list of int
             A list of batches of indices.
         """
@@ -134,7 +136,13 @@ class Partitioner(object):
             A list of batches of indices.
         num_indices : int, list of int
             The number of indices in the original list. If a list is passed, it will be calculated
-            as the length of the list'''
+            as the length of the list
+            
+        Returns
+        -------- 
+        list
+            List of boolean masks   
+'''
         boolbatches = []
         if isinstance(num_indices, list):
             num_indices = len(num_indices)
@@ -160,18 +168,19 @@ class Partitioner(object):
 
         Parameters
         ----------
-            num_batches : int
-                The number of batches to partition the data into.
-            mode : str
-                The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.
-            seed : int, optional
-                The seed to use for the random permutation. If not specified, the random number
-                generator will not be seeded.
+        num_batches : int
+            The number of batches to partition the data into.
+        mode : str
+            The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.
+        seed : int, optional
+            The seed to use for the random permutation. If not specified, the random number
+            generator will not be seeded.
 
 
         Returns
         -------
-            BlockDataContainer
+        BlockDataContainer
+            Block of `AcquisitionData` objects containing the data requested in each batch
 
         Example
         -------

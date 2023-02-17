@@ -120,7 +120,7 @@ class Partitioner(object):
         ags = []
         for mask in masks:
             ag = self.geometry.copy()
-            ag.set_angles(self.geometry.angles[mask])
+            ag.config.angles.angle_data = self.geometry.angles[mask]
             ags.append(ag)
         
         return BlockGeometry(*ags)

@@ -499,33 +499,47 @@ class TestCommon_ProjectionOperatorBlockOperator(object):
         # different image
         np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
 
+        # test if using data output
+
+        v.fill(0)
+        K.adjoint(self.datasplit, out=v)
+        np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
+
+
+
         x = A.direct(u)
         y = K.direct(v)
 
         # let's check that the data is the same
-        k = 0
-        wrong = 0
-        for i, el in enumerate(y.containers):
-            for j in range(el.shape[0]):
-                try:
-                    np.testing.assert_allclose(el.as_array()[j], x.as_array()[k], atol=7e-2, rtol=1e-6)
-                except AssertionError as ae:
-                    print(ae)
-                    wrong += 1
-                # show2D([el.as_array()[j], x.as_array()[k]], cmap=['inferno', 'inferno'])
-                k += 1
+        def check_data_is_the_same(x,y):
+            k = 0
+            wrong = 0
+            for el in y.containers:
+                for j in range(el.shape[0]):
+                    try:
+                        np.testing.assert_allclose(el.as_array()[j], x.as_array()[k], atol=7e-2, rtol=1e-6)
+                    except AssertionError as ae:
+                        print(ae)
+                        wrong += 1
+                    # show2D([el.as_array()[j], x.as_array()[k]], cmap=['inferno', 'inferno'])
+                    k += 1
 
-        assert wrong == 0
+            assert wrong == 0
         
-        # reassemlbe the data
-        out = x * 0
-        k = 0
-        for i, el in enumerate(y.containers):
-            # print (i, el.shape)
-            for j in range(el.shape[0]):
-                out.array[k] = el.as_array()[j]
-                k += 1
+            # reassemlbe the data
+            out = x * 0
+            k = 0
+            for i, el in enumerate(y.containers):
+                # print (i, el.shape)
+                for j in range(el.shape[0]):
+                    out.array[k] = el.as_array()[j]
+                    k += 1
 
-        # show2D([out, x, out-x], cmap=['inferno', 'inferno', 'seismic'], title=['out', 'x', 'diff'], \
-        #     num_cols=3)
-        np.testing.assert_allclose(out.as_array(), x.as_array(), atol=1e-2, rtol=1e-6)
+            # show2D([out, x, out-x], cmap=['inferno', 'inferno', 'seismic'], title=['out', 'x', 'diff'], \
+            #     num_cols=3)
+            np.testing.assert_allclose(out.as_array(), x.as_array(), atol=1e-2, rtol=1e-6)
+
+        check_data_is_the_same(x,y)
+        y.fill(0)
+        K.direct(v, out=y)
+        check_data_is_the_same(x,y)

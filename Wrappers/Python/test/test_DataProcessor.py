@@ -1352,9 +1352,9 @@ class TestPaddder(unittest.TestCase):
     
     def setUp(self):
 
-        self.ag = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,360]).set_panel([16,16],[0.1,0.1]).set_channels(4)
+        self.ag = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,270]).set_panel([16,16],[0.1,0.1]).set_channels(4)
         self.ag_pad_width = {'channel':(1,2),'vertical':(3,4),'horizontal':(5,6)}
-        self.ag_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.05, 0., -0.15]).set_angles([0,90,180,360]).set_panel([27,23],[0.1,0.1]).set_channels(7)
+        self.ag_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.05, 0., -0.15]).set_angles([0,90,180,270]).set_panel([27,23],[0.1,0.1]).set_channels(7)
 
         self.ig = ImageGeometry(5,4,3,center_x=0.5,center_y=1,center_z=-0.5,channels=2)
         self.ig_pad_width = {'channel':(1,2),'vertical':(3,2),'horizontal_x':(2,1), 'horizontal_y':(2,3)}
@@ -1471,8 +1471,17 @@ class TestPaddder(unittest.TestCase):
 
 
         proc = Padder('constant', pad_width={'angle':5}, pad_values=0.0)
-        with self.assertRaises(NotImplementedError):
-            proc.set_input(geometry)
+        proc.set_input(geometry)
+        geometry_padded = proc._process_acquisition_geometry()
+
+        geometry_gold = geometry.copy()
+        geometry_gold.config.angles.angle_data = [\
+            -450., -360., -270., -180.,  -90.,\
+            0.,   90.,  180.,  270.,\
+            360., 450.,  540., 630., 720.]
+
+        self.assertEquals(geometry_padded, geometry_gold,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
     def test_process_image_geometry(self):

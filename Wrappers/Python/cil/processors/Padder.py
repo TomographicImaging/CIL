@@ -53,6 +53,9 @@ class Padder(DataProcessor):
          - float: Each border will be set to this value
          - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)
          - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
+
+        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.
         """
 
         processor = Padder(pad_width=pad_width, mode='constant', pad_values=constant_values)
@@ -73,7 +76,10 @@ class Padder(DataProcessor):
         `pad_width` behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}  
+
+        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.    
         """
 
         processor = Padder(pad_width=pad_width, mode='edge')
@@ -101,6 +107,9 @@ class Padder(DataProcessor):
          - float: Each border will use this end value
          - tuple(float, float): Each border end value will be used asymmetrically for each axis i.e. (before, after)
          - dict: Specified axes and end values: e.g. {'horizontal':(8, 23), 'channel':5}
+
+        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.
         '''
         processor = Padder(pad_width=pad_width, mode='linear_ramp', pad_values=end_values)
         return processor
@@ -120,7 +129,10 @@ class Padder(DataProcessor):
         `pad_width` behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+
+        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.
         """
         processor = Padder(pad_width=pad_width, mode='reflect')
         return processor
@@ -144,6 +156,9 @@ class Padder(DataProcessor):
          - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
          - A dictionary will apply the specified padding in each requested dimension: e.g.
         {'horizontal':(8, 23), 'vertical': 10}     
+
+        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.
         """
         processor = Padder(pad_width=pad_width, mode='symmetric')
         return processor
@@ -167,6 +182,9 @@ class Padder(DataProcessor):
          - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
          - A dictionary will apply the specified padding in each requested dimension: e.g.
         {'horizontal':(8, 23), 'vertical': 10}     
+
+        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.
         """
         processor = Padder(pad_width=pad_width, mode='wrap')
         return processor
@@ -263,9 +281,6 @@ class Padder(DataProcessor):
 
         dimensions = []
         for k in dict.keys():
-            if k == 'angle':            
-                raise NotImplementedError('Cannot use Padder to pad the angle dimension')
-            
             if k not in self._labels_in:
                 raise ValueError('Dimension label not found in data. Expected labels from {0}. Got {1}'.format(self._geometry.dimension_labels, k))
 
@@ -368,7 +383,16 @@ class Padder(DataProcessor):
                 geometry.set_channels(num_channels= geometry.config.channels.num_channels + \
                 self._pad_width_param[i][0] + self._pad_width_param[i][1])
             elif dim == 'angle':
-                raise NotImplementedError('Cannot use Padder to pad in the angle dimension')
+                # extrapolate pre-values from a[1]-a[0]
+                # extrapolate post-values from a[-1]-a[-2]
+
+                a = self._geometry.angles
+                end_values = (
+                    a[0]-(a[1]-a[0] )* self._pad_width_param[i][0],
+                    a[-1]+(a[-1]-a[-2] )* self._pad_width_param[i][1]
+                    )
+                geometry.config.angles.angle_data = np.pad(a, (self._pad_width_param[i][0],self._pad_width_param[i][1]), mode='linear_ramp',end_values=end_values)
+
             elif dim == 'vertical':
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][0] 
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][1]

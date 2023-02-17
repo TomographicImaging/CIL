@@ -163,8 +163,8 @@ class GenericFilteredBackProjection(Reconstructor):
         ----------
         filter : string, numpy.ndarray, default='ram-lak'
             Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.
-        cutoff : float, default=1
-            The cut-off frequency of the filter between 0 - 1 radians. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)
+        cutoff : float, default = 1
+            The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)
 
         Notes
         -----

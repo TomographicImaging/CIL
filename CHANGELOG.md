@@ -1,4 +1,5 @@
 * Next
+  - Added pre-set filters for `recon.FBP` and `recon.FDK`. Filters now include ram-lak, hamming, hann, cosine, shepp-logan.
   - Added RAWFileWriter to export data containers to raw files
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
   - Implemented IndicatorBox in numba and numpy

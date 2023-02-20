@@ -342,15 +342,23 @@
                 <span class="c1">#create default filter type of new length</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
         
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">preset_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;hann&#39;</span><span class="p">]</span>
  
-    <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set the filter used by the reconstruction. </span>
+<span class="sd">        Set the filter used by the reconstruction.</span>
+
+<span class="sd">        Pre-set filters are constructed in the frequency domain.        </span>
+<span class="sd">        Pre-set filters are: &#39;ram-lak&#39;, &#39;shepp-logan&#39;, &#39;cosine&#39;, &#39;hamming&#39;, &#39;hann&#39;</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        filter: string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
-<span class="sd">            The filter to be applied. Can be a string from: &#39;ram-lak&#39; or a numpy array.</span>
+<span class="sd">        filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
+<span class="sd">            Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</span>
+<span class="sd">        cutoff : float, default = 1</span>
+<span class="sd">            The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -363,13 +371,11 @@
 <span class="sd">        - [N/2:N-1] negative frequencies</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="ow">and</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="nb">filter</span>
 
-            <span class="k">if</span> <span class="nb">filter</span> <span class="o">==</span> <span class="s1">&#39;ram-lak&#39;</span><span class="p">:</span>
-                <span class="n">filter_length</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span>
-                <span class="n">freq</span> <span class="o">=</span> <span class="n">fftfreq</span><span class="p">(</span><span class="n">filter_length</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span> <span class="p">[</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">freq</span> <span class="p">]</span> <span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="ow">and</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">preset_filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="nb">filter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span> <span class="o">=</span> <span class="n">cutoff</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -384,7 +390,7 @@
 
     <span class="k">def</span> <span class="nf">get_filter_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the filter in used in the frequency domain. </span>
+<span class="sd">        Returns the filter array in the frequency domain. </span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -402,9 +408,43 @@
 <span class="sd">        - [N/2:N-1] negative frequencies</span>
 
 <span class="sd">        The array can be modified and passed back using set_filter()</span>
+
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+
+<span class="sd">        Filter reference in frequency domain:</span>
+<span class="sd">        Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.</span>
+
+<span class="sd">        Plantagie, L. Algebraic filters for filtered backprojection, 2017</span>
+<span class="sd">        https://hdl.handle.net/1887/48289</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span>
+
+        <span class="n">filter_length</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span>
+
+        <span class="c1"># frequency bins in cycles/pixel</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">fftfreq</span><span class="p">(</span><span class="n">filter_length</span><span class="p">)</span>
+        <span class="c1"># in pi rad/pixel</span>
+        <span class="n">freq</span><span class="o">*=</span><span class="mi">2</span>
+
+        <span class="n">ramp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="n">ramp</span><span class="p">[</span><span class="n">ramp</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;ram-lak&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">freq</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;cosine&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hamming&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.54</span> <span class="o">+</span> <span class="mf">0.46</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hann&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span> 
         
     <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="ne">NotImplementedError</span>
@@ -513,7 +553,7 @@
         <span class="p">(</span><span class="n">yy</span><span class="p">,</span> <span class="n">xx</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xv</span><span class="p">,</span> <span class="n">yv</span><span class="p">)</span>
 
         <span class="n">principal_ray_length</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">dist_source_center</span> <span class="o">+</span> <span class="n">ag</span><span class="o">.</span><span class="n">dist_center_detector</span>
-        <span class="n">scaling</span> <span class="o">=</span>  <span class="n">ag</span><span class="o">.</span><span class="n">magnification</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span> <span class="p">)</span> 
+        <span class="n">scaling</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">magnification</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">scaling</span> <span class="o">*</span> <span class="n">principal_ray_length</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">principal_ray_length</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">xx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 
 
@@ -559,7 +599,9 @@
 
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>    
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>        
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>        
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span> 
 
@@ -644,12 +686,11 @@
     <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
 
         <span class="n">ag</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
-        <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">==</span><span class="s1">&#39;tigre&#39;</span><span class="p">:</span>
-            <span class="n">weight</span> <span class="o">/=</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">weight</span> <span class="o">/=</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_v</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">,</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span><span class="p">),</span><span class="n">weight</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">scaling</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">==</span><span class="s1">&#39;astra&#39;</span><span class="p">:</span>
+            <span class="n">scaling</span> <span class="o">/=</span>  <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">,</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span><span class="p">),</span><span class="n">scaling</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_slices</span><span class="p">):</span>
@@ -770,7 +811,9 @@
 
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>    
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>        
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>        
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span> 
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Split processing: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">)</span> 

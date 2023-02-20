@@ -248,6 +248,14 @@
 <p>This module allows the user to run pre-configured reconstruction algorithms on their data.</p>
 <div class="section" id="analytical-reconstruction">
 <h2>Analytical Reconstruction<a class="headerlink" href="#analytical-reconstruction" title="Permalink to this headline">#</a></h2>
+<p>The CIL analytical reconstructions use CIL to filter and prepare the data using highly optimised routines. The filtered data is then
+backprojected using projectors from TIGRE or ASTRA-TOOLBOX.</p>
+<p>Standard FBP (filtered-backprojection) should be used for parallel-beam data. FDK (Feldkamp, Davis, and Kress) is a filtered-backprojection
+algorithm for reconstruction of cone-beam data measured with a standard circular orbit.</p>
+<p>The filter can be set to a predefined function, or a custom filter can be set. The predefined filters take the following forms:</p>
+<div class="align-center figure">
+<img alt="FBP Filters" src="_images/FBP_filters1.png" />
+</div>
 <div class="section" id="fbp-reconstructor-for-parallel-beam-geometry">
 <h3>FBP - Reconstructor for parallel-beam geometry<a class="headerlink" href="#fbp-reconstructor-for-parallel-beam-geometry" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
@@ -318,7 +326,7 @@ It is recommended to tune it too your hardware requirements using 8, 16 or 32 sl
 <dl class="py method">
 <dt id="cil.recon.FBP.get_filter_array">
 <code class="sig-name descname"><span class="pre">get_filter_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.get_filter_array" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the filter in used in the frequency domain.</p>
+<dd><p>Returns the filter array in the frequency domain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>An array containing the filter values</p>
@@ -336,6 +344,11 @@ It is recommended to tune it too your hardware requirements using 8, 16 or 32 sl
 <li><p>[N/2:N-1] negative frequencies</p></li>
 </ul>
 <p>The array can be modified and passed back using set_filter()</p>
+<p class="rubric">Notes</p>
+<p>Filter reference in frequency domain:
+Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.</p>
+<p>Plantagie, L. Algebraic filters for filtered backprojection, 2017
+<a class="reference external" href="https://hdl.handle.net/1887/48289">https://hdl.handle.net/1887/48289</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -354,11 +367,16 @@ Higher orders will yield more accurate results but increase computation time.</p
 
 <dl class="py method">
 <dt id="cil.recon.FBP.set_filter">
-<code class="sig-name descname"><span class="pre">set_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_filter" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">set_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_filter" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the filter used by the reconstruction.</p>
+<p>Pre-set filters are constructed in the frequency domain.
+Pre-set filters are: ‘ram-lak’, ‘shepp-logan’, ‘cosine’, ‘hamming’, ‘hann’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em><em>, </em><em>default = 1</em>) – The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -456,7 +474,7 @@ True will filter projections in-place.</p>
 <dl class="py method">
 <dt id="cil.recon.FDK.get_filter_array">
 <code class="sig-name descname"><span class="pre">get_filter_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.get_filter_array" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the filter in used in the frequency domain.</p>
+<dd><p>Returns the filter array in the frequency domain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>An array containing the filter values</p>
@@ -474,6 +492,11 @@ True will filter projections in-place.</p>
 <li><p>[N/2:N-1] negative frequencies</p></li>
 </ul>
 <p>The array can be modified and passed back using set_filter()</p>
+<p class="rubric">Notes</p>
+<p>Filter reference in frequency domain:
+Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.</p>
+<p>Plantagie, L. Algebraic filters for filtered backprojection, 2017
+<a class="reference external" href="https://hdl.handle.net/1887/48289">https://hdl.handle.net/1887/48289</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -498,11 +521,16 @@ Higher orders will yield more accurate results but increase computation time.</p
 
 <dl class="py method">
 <dt id="cil.recon.FDK.set_filter">
-<code class="sig-name descname"><span class="pre">set_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_filter" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">set_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_filter" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the filter used by the reconstruction.</p>
+<p>Pre-set filters are constructed in the frequency domain.
+Pre-set filters are: ‘ram-lak’, ‘shepp-logan’, ‘cosine’, ‘hamming’, ‘hann’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em><em>, </em><em>default = 1</em>) – The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

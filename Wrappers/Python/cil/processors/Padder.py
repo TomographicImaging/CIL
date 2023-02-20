@@ -59,12 +59,12 @@ class Padder(DataProcessor):
     -------
     >>> processor = Padder.edge(pad_width=1)
     >>> processor.set_input(data)
-    >>> data_sliced = processor.get_output()
+    >>> data_padded = processor.get_output()
     >>> print(data.array)
     [[0. 1. 2.]
     [3. 4. 5.]
     [6. 7. 8.]]
-    >>> print(data_sliced.array)
+    >>> print(data_padded.array)
     [[0. 0. 1. 2. 2.]
     [0. 0. 1. 2. 2.]
     [3. 3. 4. 5. 5.]
@@ -75,12 +75,12 @@ class Padder(DataProcessor):
     -------
     >>> processor = Padder.constant(pad_width={'horizontal_y':(1,1),'horizontal_x':(1,2)}, constant_values=(-1.0, 1.0))
     >>> processor.set_input(data)
-    >>> data_sliced = processor.get_output()
+    >>> data_padded = processor.get_output()
     >>> print(data.array)
     [[0. 1. 2.]
     [3. 4. 5.]
     [6. 7. 8.]]
-    >>> print(data_sliced.array)
+    >>> print(data_padded.array)
     [[-1. -1. -1. -1.  1.  1.]
     [-1.  0.  1.  2.  1.  1.]
     [-1.  3.  4.  5.  1.  1.]
@@ -124,12 +124,12 @@ class Padder(DataProcessor):
         -------
         >>> processor = Padder.constant(pad_width=1, constant_values=0.0)
         >>> processor.set_input(data)
-        >>> data_sliced = processor.get_output()
+        >>> data_padded = processor.get_output()
         >>> print(data.array)
         [[0. 1. 2.]
         [3. 4. 5.]
         [6. 7. 8.]]
-        >>> print(data_sliced.array)
+        >>> print(data_padded.array)
         [[0. 0. 0. 0. 0.]
         [0. 0. 1. 2. 0.]
         [0. 3. 4. 5. 0.]
@@ -167,12 +167,12 @@ class Padder(DataProcessor):
         -------
         >>> processor = Padder.edge(pad_width=1)
         >>> processor.set_input(data)
-        >>> data_sliced = processor.get_output()
+        >>> data_padded = processor.get_output()
         >>> print(data.array)
         [[0. 1. 2.]
         [3. 4. 5.]
         [6. 7. 8.]]
-        >>> print(data_sliced.array)
+        >>> print(data_padded.array)
         [[0. 0. 1. 2. 2.]
         [0. 0. 1. 2. 2.]
         [3. 3. 4. 5. 5.]
@@ -216,12 +216,12 @@ class Padder(DataProcessor):
         -------
         >>> processor = Padder.linear_ramp(pad_width=2, end_values=0.0)
         >>> processor.set_input(data)
-        >>> data_sliced = processor.get_output()
+        >>> data_padded = processor.get_output()
         >>> print(data.array)
         [[0. 1. 2.]
         [3. 4. 5.]
         [6. 7. 8.]]
-        >>> print(data_sliced.array)
+        >>> print(data_padded.array)
         [[0.  0.  0.  0.  0.  0.  0. ]
         [0.  0.  0.  0.5 1.  0.5 0. ]
         [0.  0.  0.  1.  2.  1.  0. ]
@@ -260,12 +260,12 @@ class Padder(DataProcessor):
         -------
         >>> processor = Padder.reflect(pad_width=1)
         >>> processor.set_input(data)
-        >>> data_sliced = processor.get_output()
+        >>> data_padded = processor.get_output()
         >>> print(data.array)
         [[0. 1. 2.]
         [3. 4. 5.]
         [6. 7. 8.]]
-        >>> print(data_sliced.array)
+        >>> print(data_padded.array)
         [[4. 3. 4. 5. 4.]
         [1. 0. 1. 2. 1.]
         [4. 3. 4. 5. 4.]
@@ -304,12 +304,12 @@ class Padder(DataProcessor):
         -------
         >>> processor = Padder.symmetric(pad_width=1)
         >>> processor.set_input(data)
-        >>> data_sliced = processor.get_output()
+        >>> data_padded = processor.get_output()
         >>> print(data.array)
         [[0. 1. 2.]
         [3. 4. 5.]
         [6. 7. 8.]]
-        >>> print(data_sliced.array)
+        >>> print(data_padded.array)
         [[0. 0. 1. 2. 2.]
         [0. 0. 1. 2. 2.]
         [3. 3. 4. 5. 5.]
@@ -349,12 +349,12 @@ class Padder(DataProcessor):
         -------
         >>> processor = Padder.wrap(pad_width=1)
         >>> processor.set_input(data)
-        >>> data_sliced = processor.get_output()
+        >>> data_padded = processor.get_output()
         >>> print(data.array)
         [[0. 1. 2.]
         [3. 4. 5.]
         [6. 7. 8.]]
-        >>> print(data_sliced.array)
+        >>> print(data_padded.array)
         [[8. 6. 7. 8. 6.]
         [2. 0. 1. 2. 0.]
         [5. 3. 4. 5. 3.]

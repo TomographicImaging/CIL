@@ -119,7 +119,7 @@ cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
 cmake --build . --target install
 ```
 
-If targeting an active conda environment then the `<install_directory>` can be set to `${CONDA_PREFIX}`.
+If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable, `${CONDA_PREFIX}` in bash, or `%CONDA_PREFIX%` if using Anaconda Prompt on Windows.
 
 If not installing to a conda environment then the user will also need to set the locations of the IPP library and includes, and the path to CIL.
 

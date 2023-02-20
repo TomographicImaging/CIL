@@ -2,6 +2,7 @@
   - BlockGeometry is iterable
   - Added `partition` to `AcquisitionData` to partition the data with 3 methods: `sequential`, `staggered` and `random_permutation`
   - TIGRE and ASTRA `ProjectionOperator` now support `BlockGeometry` as `acquisition_geometry` parameter, returning a `BlockOperator`
+  - Added pre-set filters for `recon.FBP` and `recon.FDK`. Filters now include ram-lak, hamming, hann, cosine, shepp-logan.
   - Added RAWFileWriter to export data containers to raw files
   - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
   - Implemented IndicatorBox in numba and numpy
@@ -17,6 +18,8 @@
   - Binner processor reworked:
     - Significant speed increase available via the C++ backend
     - Returned geometry is correctly offset where binning/cropping moves the origin
+  - Slicer refactoring
+    - Returned geometry is correctly offset where slicing/cropping moves the origin
   - Github Actions:
     - update test python and numpy versions to 3.9 and 1.22
     - Update conda build action to v1.4.4

@@ -31,7 +31,7 @@ class Padder(DataProcessor):
     @staticmethod
     def constant(pad_width=None, constant_values=0.0):
         """
-        Padder processor wrapping numpy.pad with mode `constant` 
+        Padder processor wrapping numpy.pad with mode `constant`.
         Pads the data with a constant value border.
         Pads in all *spatial* dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
 
@@ -154,8 +154,8 @@ class Padder(DataProcessor):
         `pad_width` behaviour (number of pixels):
          - An integer value will pad with a border of this size in all *spatial* dimensions and directions
          - A tuple will pad with an asymmetric border in all *spatial* dimensions i.e. (before, after)
-         - A dictionary will apply the specified padding in each requested dimension: e.g.
-        {'horizontal':(8, 23), 'vertical': 10}     
+         - A dictionary will apply the specified padding in each requested dimension: e.g. \
+{'horizontal':(8, 23), 'vertical': 10}     
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
         and the last two angles in geometry.angles. The user should ensure the output is as expected.
@@ -259,7 +259,7 @@ class Padder(DataProcessor):
             raise Exception("Wrong mode. One of the following is expected:\n" +
                             "constant, edge, linear_ramp, reflect, symmetric, wrap")
 
-        if (self.pad_width == None):
+        if self.pad_width is None:
             raise ValueError('Please, specify pad_width')
 
         self._parse_input(data)

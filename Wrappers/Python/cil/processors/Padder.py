@@ -26,6 +26,7 @@ class Padder(DataProcessor):
     """
     Processor to pad an array with a border, wrapping numpy.pad. See https://numpy.org/doc/stable/reference/generated/numpy.pad.html
 
+
     It is recommended to use the static methods to configure your Padder object rather than initialising this class directly. See examples for details.
        
 
@@ -93,8 +94,9 @@ class Padder(DataProcessor):
     def constant(pad_width=None, constant_values=0.0):
         """
         Padder processor wrapping numpy.pad with mode `constant`.
-        Pads the data with a constant value border.
-        Pads in all *spatial* dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
+        
+        Pads the data with a constant value border. Pads in all *spatial*
+        dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
 
         Parameters
         ----------
@@ -143,9 +145,10 @@ class Padder(DataProcessor):
     @staticmethod
     def edge(pad_width=None):
         """
-        Padder processor wrapping numpy.pad with mode `edge` 
-        Pads the data by extending the edge values in to the border.
-        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
+        Padder processor wrapping numpy.pad with mode `edge`.
+
+        Pads the data by extending the edge values in to the border. Pads in all *spatial*
+        dimensions unless a dictionary is passed to `pad_width`.
 
         pad_width: int, tuple, dict
             The size of the border along each axis, see usage notes
@@ -184,8 +187,10 @@ class Padder(DataProcessor):
     @staticmethod
     def linear_ramp(pad_width=None, end_values=0.0):
         """Padder processor wrapping numpy.pad with mode `linear_ramp` 
-        Pads the data with values calculated from a linear ramp between the array edge value and the set end_value.
-        Pads in all *spatial* dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
+
+        Pads the data with values calculated from a linear ramp between the array edge
+        value and the set end_value. Pads in all *spatial* dimensions unless a dictionary
+        is passed to either `pad_width` or `constant_values`
 
         pad_width: int, tuple, dict
             The size of the border along each axis, see usage notes
@@ -233,7 +238,8 @@ class Padder(DataProcessor):
     @staticmethod
     def reflect(pad_width=None):
         """
-        Padder processor wrapping numpy.pad with mode `reflect` 
+        Padder processor wrapping numpy.pad with mode `reflect`.
+
         Pads with the reflection of the data mirrored along first and last values each axis.
         Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
@@ -274,7 +280,8 @@ class Padder(DataProcessor):
     @staticmethod
     def symmetric(pad_width=None):
         """
-        Padder processor wrapping numpy.pad with mode `symmetric`
+        Padder processor wrapping numpy.pad with mode `symmetric`.
+
         Pads with the reflection of the data mirrored along the edge of the array.
         Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
@@ -317,9 +324,11 @@ class Padder(DataProcessor):
     @staticmethod
     def wrap(pad_width=None):
         """
-        Padder processor wrapping numpy.pad with mode `wrap`
-        Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.
-        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
+        Padder processor wrapping numpy.pad with mode `wrap`.
+
+        Pads with the wrap of the vector along the axis. The first values are used to pad the
+        end and the end values are used to pad the beginning. Pads in all *spatial* dimensions
+        unless a dictionary is passed to `pad_width`.
 
         Parameters
         ----------

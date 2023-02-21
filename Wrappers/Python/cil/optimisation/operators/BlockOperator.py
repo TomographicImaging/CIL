@@ -376,6 +376,10 @@ class BlockOperator(Operator):
     def __getitem__(self, index):
         '''returns the index-th operator in the block irrespectively of it's shape'''
         return self.operators[index]
+
+    def get_as_list(self):
+        '''returns the list of operators'''
+        return self.operators
         
         
         

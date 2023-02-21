@@ -17,7 +17,6 @@
 import numpy
 from numbers import Number
 import functools
-from cil.framework import DataContainer
 from cil.utilities.multiprocessing import NUM_THREADS
 
 class BlockDataContainer(object):
@@ -33,9 +32,8 @@ class BlockDataContainer(object):
        work as long as the number of `rows` and element of the arrays match,
        indipendently on the fact that the `BlockDataContainer` could be nested
     3) algebra between `BlockDataContainer` and one `DataContainer` is possible.
-       It will require that all the `DataContainers` in the block to be
-       compatible with the `DataContainer` we want to algebra with. Should we 
-       require that the `DataContainer` is the same type? Like `ImageData` or `AcquisitionData`?
+       It will require all the `DataContainers` in the block to be
+       compatible with the `DataContainer` we want to operate with. 
     4) algebra between `BlockDataContainer` and a `Number` is possible and it
        will be done with each element of the `BlockDataContainer` even if nested
 

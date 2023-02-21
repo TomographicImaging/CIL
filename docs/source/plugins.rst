@@ -64,7 +64,7 @@ Projection Operator
 
 .. autoclass:: cil.plugins.tigre.ProjectionOperator
    :members:
-   :special-members:
+   
 
 
 ASTRA

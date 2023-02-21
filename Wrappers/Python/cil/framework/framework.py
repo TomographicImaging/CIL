@@ -3761,7 +3761,7 @@ class VectorData(DataContainer):
         deep_copy = True
         # need to pass the geometry, othewise None
         super(VectorData, self).__init__(out, deep_copy, self.geometry.dimension_labels, geometry = self.geometry)
-    
+
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -3779,7 +3779,7 @@ class VectorGeometry(object):
     def __init__(self, 
                  length, **kwargs):
         
-        self.length = length
+        self.length = int(length)
         self.shape = (length, )
         self.dtype = kwargs.get('dtype', numpy.float32)
         self.dimension_labels = kwargs.get('dimension_labels', None)
@@ -3802,6 +3802,14 @@ class VectorGeometry(object):
             and self.dimension_labels == other.dimension_labels:
             return True
         return False
+
+    def __str__ (self):
+        repres = ""
+        repres += "Length: {0}\n".format(self.length)
+        repres += "Shape: {0}\n".format(self.shape)
+        repres += "Dimension_labels: {0}\n".format(self.dimension_labels)
+
+        return repres
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance

@@ -4637,9 +4637,8 @@ will fail</p></li>
 work as long as the number of <cite>rows</cite> and element of the arrays match,
 indipendently on the fact that the <cite>BlockDataContainer</cite> could be nested</p></li>
 <li><p>algebra between <cite>BlockDataContainer</cite> and one <cite>DataContainer</cite> is possible.
-It will require that all the <cite>DataContainers</cite> in the block to be
-compatible with the <cite>DataContainer</cite> we want to algebra with. Should we
-require that the <cite>DataContainer</cite> is the same type? Like <cite>ImageData</cite> or <cite>AcquisitionData</cite>?</p></li>
+It will require all the <cite>DataContainers</cite> in the block to be
+compatible with the <cite>DataContainer</cite> we want to operate with.</p></li>
 <li><p>algebra between <cite>BlockDataContainer</cite> and a <cite>Number</cite> is possible and it
 will be done with each element of the <cite>BlockDataContainer</cite> even if nested</p></li>
 </ol>
@@ -5224,6 +5223,12 @@ Otherwise it is a BlockGeometry.</p>
 <dt id="cil.optimisation.operators.BlockOperator.__getitem__">
 <code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.__getitem__" title="Permalink to this definition">#</a></dt>
 <dd><p>returns the index-th operator in the block irrespectively of it’s shape</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.operators.BlockOperator.get_as_list">
+<code class="sig-name descname"><span class="pre">get_as_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.get_as_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.get_as_list" title="Permalink to this definition">#</a></dt>
+<dd><p>returns the list of operators</p>
 </dd></dl>
 
 </dd></dl>

@@ -613,10 +613,6 @@ This is provided for simple and offset parallel-beam geometries only</p>
 <dl class="py class">
 <dt id="cil.plugins.tigre.ProjectionOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></code><code class="sig-name descname"><span class="pre">ProjectionOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'matched'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>TIGRE Projection Operator</p>
-<dl class="py method">
-<dt id="cil.plugins.tigre.ProjectionOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'matched'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>ProjectionOperator configures and calls TIGRE Projectors for your dataset.</p>
 <p>Please refer to the TIGRE documentation for futher descriptions
 <a class="reference external" href="https://github.com/CERN/TIGRE">https://github.com/CERN/TIGRE</a>
@@ -624,8 +620,8 @@ This is provided for simple and offset parallel-beam geometries only</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
-<li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – A description of the acquisition data</p></li>
+<li><p><strong>image_geometry</strong> (<cite>ImageGeometry</cite>, default used if None) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>acquisition_geometry</strong> (<cite>AcquisitionGeometry</cite>, <cite>BlockGeometry</cite>) – A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.</p></li>
 <li><p><strong>direct_method</strong> (<em>str</em><em>,  </em><em>default 'interpolated'</em>) – The method used by the forward projector, ‘Siddon’ for ray-voxel intersection, ‘interpolated’ for interpolated projection</p></li>
 <li><p><strong>adjoint_weights</strong> (<em>str</em><em>, </em><em>default 'matched'</em>) – The weighting method used by the cone-beam backward projector, ‘matched’ for weights to approximately match the ‘interpolated’ forward projector, ‘FDK’ for FDK weights</p></li>
 </ul>
@@ -638,33 +634,6 @@ This is provided for simple and offset parallel-beam geometries only</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">backward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.tigre.ProjectionOperator.direct">
-<code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the application of the Operator on x</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.tigre.ProjectionOperator.adjoint">
-<code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the adjoint/inverse operation</p>
-<p>only available to linear operators</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.tigre.ProjectionOperator.domain_geometry">
-<code class="sig-name descname"><span class="pre">domain_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.domain_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.domain_geometry" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the domain of the Operator: X space</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.tigre.ProjectionOperator.range_geometry">
-<code class="sig-name descname"><span class="pre">range_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.range_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.range_geometry" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the range of the Operator: Y space</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -737,13 +706,13 @@ for forward and back projections and filter back projection reconstruction.</p>
 <h3>Projection Operator<a class="headerlink" href="#id7" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.plugins.astra.ProjectionOperator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></code><code class="sig-name descname"><span class="pre">ProjectionOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></code><code class="sig-name descname"><span class="pre">ProjectionOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator" title="Permalink to this definition">#</a></dt>
 <dd><p>ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
-<li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – A description of the acquisition data</p></li>
+<li><p><strong>image_geometry</strong> (<code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code>, default used if None) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>acquisition_geometry</strong> (<code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="docutils literal notranslate"><span class="pre">BlockGeometry</span></code>) – A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.</p></li>
 <li><p><strong>device</strong> (<em>string</em><em>, </em><em>default='gpu'</em>) – ‘gpu’ will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, ‘cpu’ will run on CPU using the ASTRA 2D CPU Projectors</p></li>
 </ul>
 </dd>
@@ -757,64 +726,6 @@ for forward and back projections and filter back projection reconstruction.</p>
 </div>
 <p class="rubric">Notes</p>
 <p>For multichannel data the ProjectionOperator will broadcast across all channels.</p>
-<dl class="py method">
-<dt id="cil.plugins.astra.ProjectionOperator.direct">
-<code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Applies the direct of the operator i.e. the forward projection.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>IM</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – The image/volume to be projected.</p></li>
-<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.astra.ProjectionOperator.adjoint">
-<code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DATA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Applies the adjoint of the operator, i.e. the backward projection.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>DATA</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The projections/sinograms to be projected.</p></li>
-<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.astra.ProjectionOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the LinearOperator calculated by the PowerMethod with default values.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.astra.ProjectionOperator.domain_geometry">
-<code class="sig-name descname"><span class="pre">domain_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.domain_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.domain_geometry" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the domain of the Operator: X space</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.plugins.astra.ProjectionOperator.range_geometry">
-<code class="sig-name descname"><span class="pre">range_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.range_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator.range_geometry" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the range of the Operator: Y space</p>
-</dd></dl>
-
 </dd></dl>
 
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>

@@ -234,6 +234,214 @@
 
 <span class="n">cilacc</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">dll</span><span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">cil.framework.BlockGeometry</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+
+<span class="k">class</span> <span class="nc">Partitioner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Interface for AcquisitionData to be able to partition itself in a number of batches.</span>
+<span class="sd">    </span>
+<span class="sd">    This class, by multiple inheritance with AcquisitionData, allows the user to partition the data, </span>
+<span class="sd">    by using the method ``partition``. </span>
+<span class="sd">    The partitioning will generate a ``BlockDataContainer`` with appropriate ``AcquisitionData``.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># modes of partitioning</span>
+    <span class="n">SEQUENTIAL</span> <span class="o">=</span> <span class="s1">&#39;sequential&#39;</span>
+    <span class="n">STAGGERED</span> <span class="o">=</span> <span class="s1">&#39;staggered&#39;</span>
+    <span class="n">RANDOM_PERMUTATION</span> <span class="o">=</span> <span class="s1">&#39;random_permutation&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_partition_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Partition a list of indices into num_batches of indices.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_batches : int</span>
+<span class="sd">            The number of batches to partition the indices into.</span>
+<span class="sd">        indices : list of int, int</span>
+<span class="sd">            The indices to partition. If passed a list, this list will be partitioned in ``num_batches``</span>
+<span class="sd">            partitions. If passed an int the indices will be generated automatically using ``range(indices)``.</span>
+<span class="sd">        stagger : bool, default False</span>
+<span class="sd">            If True, the indices will be staggered across the batches.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        list of list of int</span>
+<span class="sd">            A list of batches of indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Partition the indices into batches.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
+
+        <span class="n">num_indices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+        <span class="c1"># sanity check</span>
+        <span class="k">if</span> <span class="n">num_indices</span> <span class="o">&lt;</span> <span class="n">num_batches</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;The number of batches must be less than or equal to the number of indices.&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stagger</span><span class="p">:</span>
+            <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">num_batches</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">)]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># we split the indices with floor(N/M)+1 indices in N%M groups</span>
+            <span class="c1"># and floor(N/M) indices in the remaining M - N%M groups.</span>
+
+            <span class="c1"># rename num_indices to N for brevity</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="n">num_indices</span>
+            <span class="c1"># rename num_batches to M for brevity</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">num_batches</span>
+            <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">indices</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">N</span> <span class="o">%</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">N</span> <span class="o">%</span> <span class="n">M</span><span class="p">):</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="n">M</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="n">M</span><span class="p">)</span>
+                <span class="n">batches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">batches</span>
+
+    <span class="k">def</span> <span class="nf">_convert_masks_to_BlockGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">masks</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convert a list of boolean masks to a list of BlockGeometry.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">          masks : list of boolean array</span>
+<span class="sd">              A list of boolean masks.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            BlockGeometry</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">:</span>
+            <span class="n">ag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">ag</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+            <span class="n">ags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">ags</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_convert_indices_to_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convert a list of batches of indices to a list of boolean masks.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batches : list of list of int</span>
+<span class="sd">            A list of batches of indices.</span>
+<span class="sd">        num_indices : int, list of int</span>
+<span class="sd">            The number of indices in the original list. If a list is passed, it will be calculated</span>
+<span class="sd">            as the length of the list</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------- </span>
+<span class="sd">        list</span>
+<span class="sd">            List of boolean masks   </span>
+<span class="sd">&#39;&#39;&#39;</span>
+        <span class="n">boolbatches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">num_indices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_indices</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+            <span class="n">boolbatch</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+                <span class="n">boolbatch</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">boolbatches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">boolbatch</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">boolbatches</span>
+
+    <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches using the specified ``mode``.</span>
+<span class="sd">        </span>
+
+<span class="sd">        The modes are</span>
+<span class="sd">        </span>
+<span class="sd">        1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.</span>
+<span class="sd">        </span>
+<span class="sd">        2. ``staggered`` - The data will be partitioned into ``num_batches`` batches of sequential indices, with stride equal to ``num_batches``.</span>
+<span class="sd">        </span>
+<span class="sd">        3. ``random_permutation`` - The data will be partitioned into ``num_batches`` batches of random indices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_batches : int</span>
+<span class="sd">            The number of batches to partition the data into.</span>
+<span class="sd">        mode : str</span>
+<span class="sd">            The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.</span>
+<span class="sd">        seed : int, optional</span>
+<span class="sd">            The seed to use for the random permutation. If not specified, the random number</span>
+<span class="sd">            generator will not be seeded.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        BlockDataContainer</span>
+<span class="sd">            Block of `AcquisitionData` objects containing the data requested in each batch</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        </span>
+<span class="sd">        Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:</span>
+<span class="sd">    </span>
+<span class="sd">        1. [[0, 1, 2], [3, 4], [5, 6], [7, 8]] with ``sequential``</span>
+<span class="sd">        2. [[0, 4, 8], [1, 5], [2, 6], [3, 7]] with ``staggered``</span>
+<span class="sd">        3. [[8, 2, 6], [7, 1], [0, 4], [3, 5]] with ``random_permutation`` and seed 1</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">SEQUENTIAL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_deterministic</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">STAGGERED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_deterministic</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">RANDOM_PERMUTATION</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_random_permutation</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown partition mode </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_partition_deterministic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_batches : int</span>
+<span class="sd">            The number of batches to partition the data into.</span>
+<span class="sd">        stagger : bool, optional</span>
+<span class="sd">            If ``True``, the batches will be staggered. Default is ``False``.</span>
+<span class="sd">        indices : list of int, optional</span>
+<span class="sd">            The indices to partition. If not specified, the indices will be generated from the number of projections.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_indices</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">stagger</span><span class="p">)</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_indices_to_masks</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+        <span class="n">blk_geo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_masks_to_BlockGeometry</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span>
+        
+        <span class="c1"># copy data</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">blk_geo</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">blk_geo</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">masks</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">out</span>
+         
+    <span class="k">def</span> <span class="nf">_partition_random_permutation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches using a random permutation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_batches : int</span>
+<span class="sd">            The number of batches to partition the data into.</span>
+<span class="sd">        seed : int, optional</span>
+<span class="sd">            The seed to use for the random permutation. If not specified, the random number generator</span>
+<span class="sd">            will not be seeded.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+        <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>            
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_deterministic</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+
 <span class="k">def</span> <span class="nf">find_key</span><span class="p">(</span><span class="n">dic</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;return the key of dictionary dic given the value&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dic</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">val</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -2624,7 +2832,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Value </span><span class="si">{}</span><span class="s1"> unknown&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">out</span></div></div>
-    
+
 <div class="viewcode-block" id="DataContainer"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer">[docs]</a><span class="k">class</span> <span class="nc">DataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Generic class to hold data</span>
 <span class="sd">    </span>
@@ -3555,7 +3763,7 @@
             <span class="k">return</span> <span class="n">image_data_out</span></div></div>
 
 
-<div class="viewcode-block" id="AcquisitionData"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionData">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionData"><a class="viewcode-back" href="../../../framework.html#cil.framework.AcquisitionData">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">Partitioner</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;DataContainer for holding 2D or 3D sinogram&#39;&#39;&#39;</span>
     <span class="n">__container_priority__</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -4092,6 +4300,8 @@
                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">order_requested</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">),</span> <span class="n">engine</span><span class="p">))</span></div>
 
 
+
+        
 </pre></div>
 
               </div>

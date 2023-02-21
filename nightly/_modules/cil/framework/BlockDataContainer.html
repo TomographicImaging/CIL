@@ -211,7 +211,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 
 <div class="viewcode-block" id="BlockDataContainer"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer">[docs]</a><span class="k">class</span> <span class="nc">BlockDataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -227,9 +226,8 @@
 <span class="sd">       work as long as the number of `rows` and element of the arrays match,</span>
 <span class="sd">       indipendently on the fact that the `BlockDataContainer` could be nested</span>
 <span class="sd">    3) algebra between `BlockDataContainer` and one `DataContainer` is possible.</span>
-<span class="sd">       It will require that all the `DataContainers` in the block to be</span>
-<span class="sd">       compatible with the `DataContainer` we want to algebra with. Should we </span>
-<span class="sd">       require that the `DataContainer` is the same type? Like `ImageData` or `AcquisitionData`?</span>
+<span class="sd">       It will require all the `DataContainers` in the block to be</span>
+<span class="sd">       compatible with the `DataContainer` we want to operate with. </span>
 <span class="sd">    4) algebra between `BlockDataContainer` and a `Number` is possible and it</span>
 <span class="sd">       will be done with each element of the `BlockDataContainer` even if nested</span>
 

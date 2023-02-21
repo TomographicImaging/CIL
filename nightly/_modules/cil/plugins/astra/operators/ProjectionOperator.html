@@ -208,14 +208,61 @@
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
 
-
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">ChannelwiseOperator</span>
+<span class="kn">from</span> <span class="nn">cil.framework.BlockGeometry</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">BlockOperator</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector3D</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector2D</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
 
 <div class="viewcode-block" id="ProjectionOperator"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator">[docs]</a><span class="k">class</span> <span class="nc">ProjectionOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    image_geometry : ``ImageGeometry``, default used if None</span>
+<span class="sd">        A description of the area/volume to reconstruct</span>
+
+<span class="sd">    acquisition_geometry : ``AcquisitionGeometry``, ``BlockGeometry``</span>
+<span class="sd">        A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.</span>
+
+<span class="sd">    device : string, default=&#39;gpu&#39;</span>
+<span class="sd">        &#39;gpu&#39; will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, &#39;cpu&#39; will run on CPU using the ASTRA 2D CPU Projectors</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from cil.plugins.astra import ProjectionOperator</span>
+<span class="sd">    &gt;&gt;&gt; PO = ProjectionOperator(image.geometry, data.geometry)</span>
+<span class="sd">    &gt;&gt;&gt; forward_projection = PO.direct(image)</span>
+<span class="sd">    &gt;&gt;&gt; backward_projection = PO.adjoint(data)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For multichannel data the ProjectionOperator will broadcast across all channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
+        <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">BlockGeometry</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;BlockOperator is returned.&quot;</span><span class="p">)</span>
+
+            <span class="n">K</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ag</span> <span class="ow">in</span> <span class="n">acquisition_geometry</span><span class="p">:</span>
+                <span class="n">K</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">ProjectionOperator_ag</span><span class="p">(</span><span class="n">image_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">,</span> \
+                        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Standard Operator is returned.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span>
+                         <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">ProjectionOperator_ag</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">ProjectionOperator_ag</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</span>
 
@@ -243,18 +290,25 @@
 <span class="sd">    For multichannel data the ProjectionOperator will broadcast across all channels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
-        
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
+
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">image_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator_ag</span><span class="p">,</span>
+              <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span>
+                             <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
 
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span> 
+        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span> <span class="o">=</span> <span class="n">image_geometry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
@@ -263,19 +317,23 @@
         <span class="n">volume_geometry_sc</span> <span class="o">=</span> <span class="n">image_geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
-            <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector3D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span> <span class="n">sinogram_geometry_sc</span><span class="p">)</span>
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector3D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span>
+                                        <span class="n">sinogram_geometry_sc</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
-            <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector2D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span> <span class="n">sinogram_geometry_sc</span><span class="p">,</span>  <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector2D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span>
+                                        <span class="n">sinogram_geometry_sc</span><span class="p">,</span>
+                                        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot process 3D data without a GPU&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> 
-            <span class="n">operator_full</span> <span class="o">=</span> <span class="n">ChannelwiseOperator</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">operator_full</span> <span class="o">=</span> <span class="n">ChannelwiseOperator</span><span class="p">(</span>
+                <span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator_full</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
 
-<div class="viewcode-block" id="ProjectionOperator.direct"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Applies the direct of the operator i.e. the forward projection.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -292,9 +350,9 @@
 <span class="sd">            The processed data. Suppressed if `out` is passed</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="ProjectionOperator.adjoint"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Applies the adjoint of the operator, i.e. the backward projection.</span>
 
 <span class="sd">        Parameters</span>
@@ -310,16 +368,16 @@
 <span class="sd">        DataContainer</span>
 <span class="sd">            The processed data. Suppressed if `out` is passed</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="ProjectionOperator.calculate_norm"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>    </div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ProjectionOperator.domain_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span></div>
-    
-<div class="viewcode-block" id="ProjectionOperator.range_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span></div></div>
+    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span>
+
+    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span>
 </pre></div>
 
               </div>

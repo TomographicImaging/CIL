@@ -210,6 +210,8 @@
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
+<span class="kn">from</span> <span class="nn">cil.framework.BlockGeometry</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">BlockOperator</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">CIL2TIGREGeometry</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -218,10 +220,11 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">_Atb</span> <span class="kn">import</span> <span class="n">_Atb_ext</span> <span class="k">as</span> <span class="n">Atb</span>
     <span class="kn">from</span> <span class="nn">_Ax</span> <span class="kn">import</span> <span class="n">_Ax_ext</span> <span class="k">as</span> <span class="n">Ax</span>
-    
+
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;This plugin requires the additional package TIGRE</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
-            <span class="s2">&quot;Please install it via conda as tigre from the ccpi channel&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span>
+        <span class="s2">&quot;This plugin requires the additional package TIGRE</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+        <span class="s2">&quot;Please install it via conda as tigre from the ccpi channel&quot;</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">tigre.utilities.gpu</span> <span class="kn">import</span> <span class="n">GpuIds</span>
@@ -229,11 +232,66 @@
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
     <span class="n">has_gpu_sel</span> <span class="o">=</span> <span class="kc">False</span>
 
+
 <div class="viewcode-block" id="ProjectionOperator"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.ProjectionOperator">[docs]</a><span class="k">class</span> <span class="nc">ProjectionOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ProjectionOperator configures and calls TIGRE Projectors for your dataset.</span>
+
+<span class="sd">        Please refer to the TIGRE documentation for futher descriptions</span>
+<span class="sd">        https://github.com/CERN/TIGRE</span>
+<span class="sd">        https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010</span>
+<span class="sd">                        </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        image_geometry : `ImageGeometry`, default used if None</span>
+<span class="sd">            A description of the area/volume to reconstruct</span>
+
+<span class="sd">        acquisition_geometry :`AcquisitionGeometry`, `BlockGeometry`</span>
+<span class="sd">            A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.</span>
+
+<span class="sd">        direct_method : str,  default &#39;interpolated&#39;</span>
+<span class="sd">            The method used by the forward projector, &#39;Siddon&#39; for ray-voxel intersection, &#39;interpolated&#39; for interpolated projection</span>
+
+<span class="sd">        adjoint_weights : str, default &#39;matched&#39;</span>
+<span class="sd">            The weighting method used by the cone-beam backward projector, &#39;matched&#39; for weights to approximately match the &#39;interpolated&#39; forward projector, &#39;FDK&#39; for FDK weights</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; from cil.plugins.tigre import ProjectionOperator</span>
+<span class="sd">        &gt;&gt;&gt; PO = ProjectionOperator(image.geometry, data.geometry)</span>
+<span class="sd">        &gt;&gt;&gt; forward_projection = PO.direct(image)</span>
+<span class="sd">        &gt;&gt;&gt; backward_projection = PO.adjoint(data)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
+        <span class="n">direct_method</span><span class="o">=</span><span class="s1">&#39;interpolated&#39;</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;matched&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">BlockGeometry</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;BlockOperator is returned.&quot;</span><span class="p">)</span>
+
+            <span class="n">K</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ag</span> <span class="ow">in</span> <span class="n">acquisition_geometry</span><span class="p">:</span>
+                <span class="n">K</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">ProjectionOperator_ag</span><span class="p">(</span><span class="n">image_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">,</span> \
+                        <span class="n">direct_method</span><span class="o">=</span><span class="n">direct_method</span><span class="p">,</span> <span class="n">adjoint_weights</span><span class="o">=</span><span class="n">adjoint_weights</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Standard Operator is returned.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span>
+                         <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">ProjectionOperator_ag</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">ProjectionOperator_ag</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;TIGRE Projection Operator&#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="ProjectionOperator.__init__"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.ProjectionOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direct_method</span><span class="o">=</span><span class="s1">&#39;interpolated&#39;</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;matched&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> 
-<span class="w">    </span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">direct_method</span><span class="o">=</span><span class="s1">&#39;interpolated&#39;</span><span class="p">,</span>
+                 <span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;matched&#39;</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ProjectionOperator configures and calls TIGRE Projectors for your dataset.</span>
 
@@ -270,34 +328,45 @@
 
         <span class="k">if</span> <span class="n">acquisition_geometry_old</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">acquisition_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry_old</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;aquisition_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;aquisition_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">image_geometry</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 
         <span class="n">device</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">device</span> <span class="o">!=</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;TIGRE projectors are GPU only. Got device = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;TIGRE projectors are GPU only. Got device = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">device</span><span class="p">))</span>
 
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span> 
+        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span>\
              <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
-             
-        <span class="k">if</span> <span class="n">direct_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;interpolated&#39;</span><span class="p">,</span><span class="s1">&#39;Siddon&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;direct_method expected &#39;interpolated&#39; or &#39;Siddon&#39; got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">direct_method</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">adjoint_weights</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;matched&#39;</span><span class="p">,</span><span class="s1">&#39;FDK&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;adjoint_weights expected &#39;matched&#39; or &#39;FDK&#39; got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">adjoint_weights</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">direct_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;interpolated&#39;</span><span class="p">,</span> <span class="s1">&#39;Siddon&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;direct_method expected &#39;interpolated&#39; or &#39;Siddon&#39; got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
+                <span class="nb">format</span><span class="p">(</span><span class="n">direct_method</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;direct&#39;</span><span class="p">:</span><span class="n">direct_method</span><span class="p">,</span><span class="s1">&#39;adjoint&#39;</span><span class="p">:</span><span class="n">adjoint_weights</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">adjoint_weights</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;matched&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;adjoint_weights expected &#39;matched&#39; or &#39;FDK&#39; got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">adjoint_weights</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;direct&#39;</span><span class="p">:</span> <span class="n">direct_method</span><span class="p">,</span> <span class="s1">&#39;adjoint&#39;</span><span class="p">:</span> <span class="n">adjoint_weights</span><span class="p">}</span>
 
         <span class="c1">#set up TIGRE geometry</span>
-        <span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span><span class="o">=</span> <span class="n">CIL2TIGREGeometry</span><span class="o">.</span><span class="n">getTIGREGeometry</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+        <span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span> <span class="o">=</span> <span class="n">CIL2TIGREGeometry</span><span class="o">.</span><span class="n">getTIGREGeometry</span><span class="p">(</span>
+            <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
 
         <span class="n">tigre_geom</span><span class="o">.</span><span class="n">check_geo</span><span class="p">(</span><span class="n">tigre_angles</span><span class="p">)</span>
         <span class="n">tigre_geom</span><span class="o">.</span><span class="n">cast_to_single</span><span class="p">()</span>
@@ -305,22 +374,22 @@
 
         <span class="c1">#set up TIGRE GPU targets (from 2.2)</span>
         <span class="k">if</span> <span class="n">has_gpu_sel</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gpuids</span> <span class="o">=</span> <span class="n">GpuIds</span><span class="p">()</span></div>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">gpuids</span> <span class="o">=</span> <span class="n">GpuIds</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__call_Ax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">has_gpu_sel</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Ax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;direct&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpuids</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Ax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;direct&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpuids</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Ax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;direct&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Ax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;direct&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="ProjectionOperator.direct"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.ProjectionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">is2D</span><span class="p">:</span>
-            <span class="n">data_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">data_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__call_Ax</span><span class="p">(</span><span class="n">data_temp</span><span class="p">)</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -331,48 +400,52 @@
             <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_range_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span>
+                                  <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_range_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                                  <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span></div>
-
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__call_Atb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">has_gpu_sel</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Atb</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;adjoint&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpuids</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Atb</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;adjoint&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">gpuids</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Atb</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;adjoint&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Atb</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;adjoint&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="ProjectionOperator.adjoint"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.ProjectionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-        
+
         <span class="c1">#if single angle projection add the dimension in for TIGRE</span>
         <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">ANGLE</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">is2D</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__call_Atb</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__call_Atb</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span>
+                            <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                            <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span></div>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain_geometry</span>
 
-<div class="viewcode-block" id="ProjectionOperator.domain_geometry"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.ProjectionOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain_geometry</span></div>
-
-
-<div class="viewcode-block" id="ProjectionOperator.range_geometry"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.ProjectionOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_range_geometry</span></div></div>
-        
+    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_range_geometry</span>
 </pre></div>
 
               </div>

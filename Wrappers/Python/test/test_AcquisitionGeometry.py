@@ -1524,9 +1524,6 @@ class TestSubset(unittest.TestCase):
         self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
         self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
 
-        # self.AcquisitionGeometry_split_to_BlockDataContainer(data, 'sequential', 1)
-        # self.AcquisitionGeometry_split_to_BlockDataContainer(data, 'staggered', 1)
-
     def AcquisitionGeometry_split_to_BlockGeometry(self, data, method, seed):
         num_batches = 4
         np.random.seed(seed)

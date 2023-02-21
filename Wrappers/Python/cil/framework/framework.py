@@ -43,7 +43,7 @@ cilacc = ctypes.cdll.LoadLibrary(dll)
 from cil.framework.BlockGeometry import BlockGeometry
 
 class Partitioner(object):
-    '''Interface for AcquisitionData to be able to partition itself in a number of sub-sets.
+    '''Interface for AcquisitionData to be able to partition itself in a number of batches.
     
     This class, by multiple inheritance with AcquisitionData, allows the user to partition the data, 
     by using the method ``partition``. 

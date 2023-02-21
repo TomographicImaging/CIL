@@ -211,272 +211,655 @@
 
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span>  <span class="n">DataContainer</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
 
 <div class="viewcode-block" id="Padder"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder">[docs]</a><span class="k">class</span> <span class="nc">Padder</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Processor to pad an array, wrapping numpy.pad</span>
-<span class="sd">    See https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processor to pad an array with a border, wrapping numpy.pad. See https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+
+
+<span class="sd">    It is recommended to use the static methods to configure your Padder object rather than initialising this class directly. See examples for details.</span>
+<span class="sd">       </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mode: str</span>
+<span class="sd">        The method used to populate the border data. Accepts: &#39;constant&#39;, &#39;edge&#39;, &#39;linear_ramp&#39;, &#39;reflect&#39;, &#39;symmetric&#39;, &#39;wrap&#39;</span>
+<span class="sd">    pad_width: int, tuple, dict</span>
+<span class="sd">        The size of the border along each axis, see usage notes</span>
+<span class="sd">    pad_values: float, tuple, dict, default=0.0</span>
+<span class="sd">        The additional values needed by some of the modes</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `pad_width` behaviour (number of pixels):</span>
+<span class="sd">        - int: Each axis will be padded with a border of this size</span>
+<span class="sd">        - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">        - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}      </span>
+<span class="sd">    </span>
+<span class="sd">    `pad_values` behaviour:</span>
+<span class="sd">        - float: Each border will use this value</span>
+<span class="sd">        - tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)</span>
+<span class="sd">        - dict: Specified axes and values: e.g. {&#39;horizontal&#39;:(8, 23), &#39;channel&#39;:5}</span>
+
+<span class="sd">    If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">    and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; processor = Padder.edge(pad_width=1)</span>
+<span class="sd">    &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">    &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">    [[0. 1. 2.]</span>
+<span class="sd">    [3. 4. 5.]</span>
+<span class="sd">    [6. 7. 8.]]</span>
+<span class="sd">    &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">    [[0. 0. 1. 2. 2.]</span>
+<span class="sd">    [0. 0. 1. 2. 2.]</span>
+<span class="sd">    [3. 3. 4. 5. 5.]</span>
+<span class="sd">    [6. 6. 7. 8. 8.]</span>
+<span class="sd">    [6. 6. 7. 8. 8.]]</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; processor = Padder.constant(pad_width={&#39;horizontal_y&#39;:(1,1),&#39;horizontal_x&#39;:(1,2)}, constant_values=(-1.0, 1.0))</span>
+<span class="sd">    &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">    &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">    [[0. 1. 2.]</span>
+<span class="sd">    [3. 4. 5.]</span>
+<span class="sd">    [6. 7. 8.]]</span>
+<span class="sd">    &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">    [[-1. -1. -1. -1.  1.  1.]</span>
+<span class="sd">    [-1.  0.  1.  2.  1.  1.]</span>
+<span class="sd">    [-1.  3.  4.  5.  1.  1.]</span>
+<span class="sd">    [-1.  6.  7.  8.  1.  1.]</span>
+<span class="sd">    [-1.  1.  1.  1.  1.  1.]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
 
 <div class="viewcode-block" id="Padder.constant"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.constant">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Padder processor wrapping numpy.pad with mode `constant` </span>
-<span class="sd">        Pads with a constant value.</span>
+    <span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Padder processor wrapping numpy.pad with mode `constant`.</span>
+<span class="sd">        </span>
+<span class="sd">        Pads the data with a constant value border. Pads in all *spatial*</span>
+<span class="sd">        dimensions unless a dictionary is passed to either `pad_width` or `constant_values`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-<span class="sd">        constant_values: float, tuple, dict</span>
-<span class="sd">            The values to set the padded values for each axis</span>
+<span class="sd">            The size of the border along each axis, see usage notes</span>
+<span class="sd">        constant_values: float, tuple, dict, default=0.0</span>
+<span class="sd">            The value of the border, see usage notes</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
-<span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
-<span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
-<span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="n">constant_values</span><span class="p">)</span>
+<span class="sd">        `pad_width` behaviour (number of pixels):</span>
+<span class="sd">         - int: Each axis will be padded with a border of this size</span>
+<span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}      </span>
+<span class="sd">        </span>
+<span class="sd">        `constant_values` behaviour (value of pixels):</span>
+<span class="sd">         - float: Each border will be set to this value</span>
+<span class="sd">         - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes and values: e.g. {&#39;horizontal&#39;:(8, 23), &#39;channel&#39;:5}</span>
+
+<span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+<span class="sd">        </span>
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; processor = Padder.constant(pad_width=1, constant_values=0.0)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">        &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">        [[0. 1. 2.]</span>
+<span class="sd">        [3. 4. 5.]</span>
+<span class="sd">        [6. 7. 8.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">        [[0. 0. 0. 0. 0.]</span>
+<span class="sd">        [0. 0. 1. 2. 0.]</span>
+<span class="sd">        [0. 3. 4. 5. 0.]</span>
+<span class="sd">        [0. 6. 7. 8. 0.]</span>
+<span class="sd">        [0. 0. 0. 0. 0.]]</span>
+<span class="sd">                    </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">pad_values</span><span class="o">=</span><span class="n">constant_values</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
+
 
 <div class="viewcode-block" id="Padder.edge"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.edge">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `edge` </span>
-<span class="sd">        Pads with the edge values of array.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Padder processor wrapping numpy.pad with mode `edge`.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="sd">        Pads the data by extending the edge values in to the border. Pads in all *spatial*</span>
+<span class="sd">        dimensions unless a dictionary is passed to `pad_width`.</span>
+
 <span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
+<span class="sd">            The size of the border along each axis, see usage notes</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
-<span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
-<span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
-<span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        `pad_width` behaviour (number of pixels):</span>
+<span class="sd">         - int: Each axis will be padded with a border of this size</span>
+<span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}  </span>
+
+<span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.    </span>
+<span class="sd">        </span>
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; processor = Padder.edge(pad_width=1)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">        &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">        [[0. 1. 2.]</span>
+<span class="sd">        [3. 4. 5.]</span>
+<span class="sd">        [6. 7. 8.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">        [[0. 0. 1. 2. 2.]</span>
+<span class="sd">        [0. 0. 1. 2. 2.]</span>
+<span class="sd">        [3. 3. 4. 5. 5.]</span>
+<span class="sd">        [6. 6. 7. 8. 8.]</span>
+<span class="sd">        [6. 6. 7. 8. 8.]]</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
 <div class="viewcode-block" id="Padder.linear_ramp"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.linear_ramp">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">linear_ramp</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
-<span class="sd">        Pads with the linear ramp between end_value and the array edge value.</span>
+    <span class="k">def</span> <span class="nf">linear_ramp</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="sd">        Pads the data with values calculated from a linear ramp between the array edge</span>
+<span class="sd">        value and the set end_value. Pads in all *spatial* dimensions unless a dictionary</span>
+<span class="sd">        is passed to either `pad_width` or `constant_values`</span>
+
 <span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-<span class="sd">        end_values: float, tuple, dict</span>
-<span class="sd">            The values used for the ending value of the linear_ramp</span>
-<span class="sd"> </span>
+<span class="sd">            The size of the border along each axis, see usage notes</span>
+<span class="sd">        end_values: float, tuple, dict, default=0.0</span>
+<span class="sd">            The target value of the linear_ramp, see usage notes</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
-<span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
-<span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
-<span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="n">end_values</span><span class="p">)</span>
+<span class="sd">        `pad_width` behaviour (number of pixels):</span>
+<span class="sd">         - int: Each axis will be padded with a border of this size</span>
+<span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}  </span>
+
+<span class="sd">        `end_values` behaviour:</span>
+<span class="sd">         - float: Each border will use this end value</span>
+<span class="sd">         - tuple(float, float): Each border end value will be used asymmetrically for each axis i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes and end values: e.g. {&#39;horizontal&#39;:(8, 23), &#39;channel&#39;:5}</span>
+
+<span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; processor = Padder.linear_ramp(pad_width=2, end_values=0.0)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">        &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">        [[0. 1. 2.]</span>
+<span class="sd">        [3. 4. 5.]</span>
+<span class="sd">        [6. 7. 8.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">        [[0.  0.  0.  0.  0.  0.  0. ]</span>
+<span class="sd">        [0.  0.  0.  0.5 1.  0.5 0. ]</span>
+<span class="sd">        [0.  0.  0.  1.  2.  1.  0. ]</span>
+<span class="sd">        [0.  1.5 3.  4.  5.  2.5 0. ]</span>
+<span class="sd">        [0.  3.  6.  7.  8.  4.  0. ]</span>
+<span class="sd">        [0.  1.5 3.  3.5 4.  2.  0. ]</span>
+<span class="sd">        [0.  0.  0.  0.  0.  0.  0. ]]</span>
+<span class="sd">                    </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span> <span class="n">pad_values</span><span class="o">=</span><span class="n">end_values</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
+
 <div class="viewcode-block" id="Padder.reflect"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.reflect">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `reflect` </span>
-<span class="sd">        Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Padder processor wrapping numpy.pad with mode `reflect`.</span>
+
+<span class="sd">        Pads with the reflection of the data mirrored along first and last values each axis.</span>
+<span class="sd">        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.</span>
+
 <span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
+<span class="sd">            The size of the border along each axis, see usage notes</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
-<span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
-<span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
-<span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        `pad_width` behaviour (number of pixels):</span>
+<span class="sd">         - int: Each axis will be padded with a border of this size</span>
+<span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+
+<span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; processor = Padder.reflect(pad_width=1)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">        &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">        [[0. 1. 2.]</span>
+<span class="sd">        [3. 4. 5.]</span>
+<span class="sd">        [6. 7. 8.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">        [[4. 3. 4. 5. 4.]</span>
+<span class="sd">        [1. 0. 1. 2. 1.]</span>
+<span class="sd">        [4. 3. 4. 5. 4.]</span>
+<span class="sd">        [7. 6. 7. 8. 7.]</span>
+<span class="sd">        [4. 3. 4. 5. 4.]]</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
+
 <div class="viewcode-block" id="Padder.symmetric"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.symmetric">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">symmetric</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `symmetric`</span>
-<span class="sd">        Pads with the reflection of the vector mirrored along the edge of the array.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Padder processor wrapping numpy.pad with mode `symmetric`.</span>
+
+<span class="sd">        Pads with the reflection of the data mirrored along the edge of the array.</span>
+<span class="sd">        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
+<span class="sd">            The size of the border along each axis</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
-<span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
-<span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
-<span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        `pad_width` behaviour (number of pixels):</span>
+<span class="sd">         - int: Each axis will be padded with a border of this size</span>
+<span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+
+<span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; processor = Padder.symmetric(pad_width=1)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">        &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">        [[0. 1. 2.]</span>
+<span class="sd">        [3. 4. 5.]</span>
+<span class="sd">        [6. 7. 8.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">        [[0. 0. 1. 2. 2.]</span>
+<span class="sd">        [0. 0. 1. 2. 2.]</span>
+<span class="sd">        [3. 3. 4. 5. 5.]</span>
+<span class="sd">        [6. 6. 7. 8. 8.]</span>
+<span class="sd">        [6. 6. 7. 8. 8.]]</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;symmetric&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
+
 <div class="viewcode-block" id="Padder.wrap"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.wrap">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `wrap`</span>
-<span class="sd">        Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Padder processor wrapping numpy.pad with mode `wrap`.</span>
+
+<span class="sd">        Pads with the wrap of the vector along the axis. The first values are used to pad the</span>
+<span class="sd">        end and the end values are used to pad the beginning. Pads in all *spatial* dimensions</span>
+<span class="sd">        unless a dictionary is passed to `pad_width`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
+<span class="sd">            The size of the border along each axis</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
-<span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
-<span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
-<span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        `pad_width` behaviour (number of pixels):</span>
+<span class="sd">         - int: Each axis will be padded with a border of this size</span>
+<span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+
+<span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; processor = Padder.wrap(pad_width=1)</span>
+<span class="sd">        &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">        &gt;&gt;&gt; data_padded = processor.get_output()</span>
+<span class="sd">        &gt;&gt;&gt; print(data.array)</span>
+<span class="sd">        [[0. 1. 2.]</span>
+<span class="sd">        [3. 4. 5.]</span>
+<span class="sd">        [6. 7. 8.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(data_padded.array)</span>
+<span class="sd">        [[8. 6. 7. 8. 6.]</span>
+<span class="sd">        [2. 0. 1. 2. 0.]</span>
+<span class="sd">        [5. 3. 4. 5. 3.]</span>
+<span class="sd">        [8. 6. 7. 8. 6.]</span>
+<span class="sd">        [2. 0. 1. 2. 0.]]</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wrap&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
+
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span>
                  <span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                 <span class="n">end_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+                 <span class="n">pad_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
                 <span class="s1">&#39;pad_width&#39;</span><span class="p">:</span> <span class="n">pad_width</span><span class="p">,</span>
-                <span class="s1">&#39;constant_values&#39;</span><span class="p">:</span> <span class="n">constant_values</span><span class="p">,</span>
-                <span class="s1">&#39;end_values&#39;</span><span class="p">:</span> <span class="n">end_values</span><span class="p">}</span>
+                <span class="s1">&#39;pad_values&#39;</span><span class="p">:</span> <span class="n">pad_values</span><span class="p">,</span>
+                <span class="s1">&#39;_data_array&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="s1">&#39;_geometry&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                <span class="s1">&#39;_shape_in&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;_shape_out&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;_labels_in&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;_processed_dims&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;_pad_width_param&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;_pad_values_param&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">Padder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
+<div class="viewcode-block" id="Padder.set_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.set_input">[docs]</a>    <span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the input data to the processor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset : DataContainer, Geometry</span>
+<span class="sd">            The input DataContainer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,(</span><span class="n">AcquisitionGeometry</span><span class="p">,</span><span class="n">ImageGeometry</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data not compatible&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">))</span></div>
+
+
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 
-                <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                            <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ImageData</span><span class="p">,</span><span class="n">AcquisitionData</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
 
-        <span class="k">elif</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Geometry is not defined.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">,</span> <span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span> <span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="s1">&#39;symmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;wrap&#39;</span><span class="p">]:</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1"> - DataContainer</span><span class="se">\n</span><span class="s1"> - ImageGeometry</span><span class="se">\n</span><span class="s1"> - AcquisitionGeometry&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected float32&quot;</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">,</span> <span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span> <span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="s1">&#39;symmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;wrap&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong mode. One of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                             <span class="s2">&quot;constant, edge, linear_ramp, reflect, symmetric, wrap&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, specify pad_width&#39;</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    
+        <span class="k">return</span> <span class="kc">True</span> 
+
+    <span class="k">def</span> <span class="nf">_create_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">dtype</span><span class="p">(</span><span class="n">value</span><span class="p">),</span><span class="n">dtype</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">dtype</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">dtype</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">_get_dimensions_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dimension label not found in data. Expected labels from </span><span class="si">{0}</span><span class="s1">. Got </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+
+            <span class="n">dimensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dimensions</span>
+
+
+    <span class="k">def</span> <span class="nf">_parse_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">4</span><span class="o">-</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span>
+
+        <span class="c1">#set defaults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">[</span><span class="n">offset</span><span class="p">::]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="p">[</span><span class="n">offset</span><span class="p">::]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span><span class="o">*</span><span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span><span class="o">*</span><span class="mi">4</span>
+
+        
+        <span class="c1"># if pad_width or set_values is passed a dictionary these keys specify the axes to run over</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dictionaries must contain the same axes&#39;</span><span class="p">)</span>
+            
+            <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dimensions_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dimensions_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dimensions_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span> 
+            <span class="n">spatial_dimensions</span> <span class="o">=</span><span class="p">[</span>
+                        <span class="s1">&#39;vertical&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;horizontal_y&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;horizontal_x&#39;</span>
+                    <span class="p">]</span>
+
+            <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">spatial_dimensions</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">))</span>
+
+
+        <span class="c1"># get pad_widths for these dimensions</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_tuple</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`pad_width` should be a integer or a tuple of integers. Got </span><span class="si">{0}</span><span class="s2"> for axis </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>    
+
+        <span class="c1"># get pad_values for these dimensions</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_tuple</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`pad_values` should be a float or a tuple of floats. Got </span><span class="si">{0}</span><span class="s2"> for axis </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>    
+
+        <span class="c1">#create list of processed axes and new_shape</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+           <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="nf">_process_acquisition_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the new acquisition geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="mf">0.5</span>
+            <span class="n">system_detector</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span>
+
+            <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;channel&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">num_channels</span><span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+                <span class="c1"># extrapolate pre-values from a[1]-a[0]</span>
+                <span class="c1"># extrapolate post-values from a[-1]-a[-2]</span>
+
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">angles</span>
+                <span class="n">end_values</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span><span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span><span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span><span class="n">end_values</span><span class="o">=</span><span class="n">end_values</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">*</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">direction_y</span> <span class="o">*</span> <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">*</span> <span class="n">system_detector</span><span class="o">.</span><span class="n">direction_x</span> <span class="o">*</span> <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="n">geometry</span>
+
+    <span class="k">def</span> <span class="nf">_process_image_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the new image geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="mf">0.5</span>
+
+            <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;channel&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">center_z</span> <span class="o">-=</span> <span class="n">offset</span> <span class="o">*</span> <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_z</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;horizontal_x&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">center_x</span> <span class="o">-=</span> <span class="n">offset</span> <span class="o">*</span> <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_x</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;horizontal_y&#39;</span><span class="p">:</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">geometry</span><span class="o">.</span><span class="n">center_y</span> <span class="o">-=</span> <span class="n">offset</span> <span class="o">*</span> <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_y</span>
+
+        <span class="k">return</span> <span class="n">geometry</span>
+
+
+    <span class="k">def</span> <span class="nf">_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dc_in</span><span class="p">):</span>
+        <span class="n">arr_in</span> <span class="o">=</span> <span class="n">dc_in</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="s1">&#39;symmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;wrap&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">]:</span>
+            <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;constant&#39;</span><span class="p">:</span>
+            <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> \
+                <span class="n">constant_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;linear_ramp&#39;</span><span class="p">:</span>
+            <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> \
+                <span class="n">end_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">arr_out</span>
+
 
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span>
-        <span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span>
-        <span class="n">geometry_0</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="c1"># create a new geometry for the new dataset</span>
-        <span class="n">geometry</span> <span class="o">=</span> <span class="n">geometry_0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="n">pad_width_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_param</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="s1">&#39;pad_width&#39;</span><span class="p">)</span>
-        
-        <span class="n">constant_values_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_param</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_values</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> \
-             <span class="s1">&#39;constant_values&#39;</span><span class="p">)</span>
+        <span class="c1"># pad geometry</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
+            <span class="n">new_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_image_geometry</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">):</span>
+            <span class="n">new_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_acquisition_geometry</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_geometry</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">end_values_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_param</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_values</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="s1">&#39;end_values&#39;</span><span class="p">)</span>
+        <span class="c1"># return if just acting on geometry</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_geometry</span>
 
-        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
+        <span class="c1"># pad data</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">arr_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;channel&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;horizontal_x&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;horizontal_y&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-            
-            <span class="c1"># if AcquisitionData</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_geometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span><span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">new_geometry</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_geometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span><span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">new_geometry</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;channel&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">num_channels</span><span class="o">=</span><span class="n">geometry_0</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">+</span> \
-                        <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-                <span class="k">elif</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
-                    <span class="c1"># pad angles vector</span>
-                    <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="n">dimension_labels</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pad_width_param</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data_padded</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span><span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="n">geometry</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The geometry in the argument out we received is not consistent with the requested padding.&#39;</span><span class="p">)</span>
-            <span class="n">data_padded</span> <span class="o">=</span> <span class="n">out</span>
-        
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="s1">&#39;symmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;wrap&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">]:</span>
-            <span class="n">data_padded</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;constant&#39;</span><span class="p">:</span>
-            <span class="n">data_padded</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> \
-                <span class="n">constant_values</span><span class="o">=</span><span class="n">constant_values_param</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;linear_ramp&#39;</span><span class="p">:</span>
-            <span class="n">data_padded</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> \
-                <span class="n">end_values</span><span class="o">=</span><span class="n">end_values_param</span><span class="p">))</span>
-        
-        <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data_padded</span>
+            <span class="c1"># check size and shape if passed out</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Array of `out` not compatible. Expected shape: </span><span class="si">{0}</span><span class="s2">, data type: </span><span class="si">{1}</span><span class="s2"> Got shape: </span><span class="si">{2}</span><span class="s2">, data type: </span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
 
-
-    <span class="k">def</span> <span class="nf">_parse_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">descr</span><span class="p">):</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
-            <span class="n">pad_param</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">param</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">param</span><span class="p">))]</span> <span class="o">*</span> <span class="n">ndim</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="c1"># create a list of tuples containing 2 ints in each tuple</span>
-            <span class="n">pad_param</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">param</span><span class="p">])</span> <span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">pad_param</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">*</span> <span class="n">ndim</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Cannot use Padder to pad the angle dimension&#39;</span><span class="p">)</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">Number</span><span class="p">):</span>
-                    <span class="n">pad_param</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="c1"># create a tuple containing 2 ints</span>
-                    <span class="n">pad_param</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot parse provided </span><span class="si">{}</span><span class="s1">. Expecting a number or tuple of length 2. Got </span><span class="si">{}</span><span class="s1">&#39;</span>\
-                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">descr</span><span class="p">,</span> <span class="n">param</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot parse provided </span><span class="si">{}</span><span class="s1">. Expecting int, tuple or dictionary with dimension lables. Got&#39;</span>\
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">descr</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">param</span><span class="p">)))</span>
-
-        <span class="k">return</span> <span class="n">pad_param</span></div>
-
+            <span class="k">if</span> <span class="n">new_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="n">new_geometry</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry of `out` not as expected. Got </span><span class="si">{0}</span><span class="s2">, expected </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">new_geometry</span><span class="p">))</span>
+            
+            <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 </pre></div>
 
               </div>

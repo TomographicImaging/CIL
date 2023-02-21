@@ -502,115 +502,334 @@ ImageData, AcquisitionData, DataContainer, ImageGeometry, AcquisitionGeometry</p
 <h3>Data Padder<a class="headerlink" href="#data-padder" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.processors.Padder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Padder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder" title="Permalink to this definition">#</a></dt>
-<dd><p>Processor to pad an array, wrapping numpy.pad
-See <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">https://numpy.org/doc/stable/reference/generated/numpy.pad.html</a></p>
-<dl class="py method">
-<dt id="cil.processors.Padder.constant">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">constant</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.constant" title="Permalink to this definition">#</a></dt>
-<dd><p>Padder processor wrapping numpy.pad with mode <cite>constant</cite>
-Pads with a constant value.</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Padder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder" title="Permalink to this definition">#</a></dt>
+<dd><p>Processor to pad an array with a border, wrapping numpy.pad. See <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">https://numpy.org/doc/stable/reference/generated/numpy.pad.html</a></p>
+<p>It is recommended to use the static methods to configure your Padder object rather than initialising this class directly. See examples for details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p></li>
-<li><p><strong>constant_values</strong> (<em>float</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The values to set the padded values for each axis</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – The method used to populate the border data. Accepts: ‘constant’, ‘edge’, ‘linear_ramp’, ‘reflect’, ‘symmetric’, ‘wrap’</p></li>
+<li><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The size of the border along each axis, see usage notes</p></li>
+<li><p><strong>pad_values</strong> (<em>float</em><em>, </em><em>tuple</em><em>, </em><em>dict</em><em>, </em><em>default=0.0</em>) – The additional values needed by some of the modes</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If passed a single value it will pad symmetrically in all dimensions.
-If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
-If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
-{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+<dt><cite>pad_values</cite> behaviour:</dt><dd><ul class="simple">
+<li><p>float: Each border will use this value</p></li>
+<li><p>tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)</p></li>
+<li><p>dict: Specified axes and values: e.g. {‘horizontal’:(8, 23), ‘channel’:5}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 0. 1. 2. 2.]</span>
+<span class="go">[0. 0. 1. 2. 2.]</span>
+<span class="go">[3. 3. 4. 5. 5.]</span>
+<span class="go">[6. 6. 7. 8. 8.]</span>
+<span class="go">[6. 6. 7. 8. 8.]]</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)},</span> <span class="n">constant_values</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[-1. -1. -1. -1.  1.  1.]</span>
+<span class="go">[-1.  0.  1.  2.  1.  1.]</span>
+<span class="go">[-1.  3.  4.  5.  1.  1.]</span>
+<span class="go">[-1.  6.  7.  8.  1.  1.]</span>
+<span class="go">[-1.  1.  1.  1.  1.  1.]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="cil.processors.Padder.constant">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">constant</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.constant" title="Permalink to this definition">#</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>constant</cite>.</p>
+<p>Pads the data with a constant value border. Pads in all <em>spatial</em>
+dimensions unless a dictionary is passed to either <cite>pad_width</cite> or <cite>constant_values</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The size of the border along each axis, see usage notes</p></li>
+<li><p><strong>constant_values</strong> (<em>float</em><em>, </em><em>tuple</em><em>, </em><em>dict</em><em>, </em><em>default=0.0</em>) – The value of the border, see usage notes</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+<dt><cite>constant_values</cite> behaviour (value of pixels):</dt><dd><ul class="simple">
+<li><p>float: Each border will be set to this value</p></li>
+<li><p>tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)</p></li>
+<li><p>dict: Specified axes and values: e.g. {‘horizontal’:(8, 23), ‘channel’:5}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 0. 0. 0. 0.]</span>
+<span class="go">[0. 0. 1. 2. 0.]</span>
+<span class="go">[0. 3. 4. 5. 0.]</span>
+<span class="go">[0. 6. 7. 8. 0.]</span>
+<span class="go">[0. 0. 0. 0. 0.]]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.processors.Padder.edge">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">edge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.edge" title="Permalink to this definition">#</a></dt>
-<dd><p>Padder processor wrapping numpy.pad with mode <cite>edge</cite>
-Pads with the edge values of array.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>edge</cite>.</p>
+<p>Pads the data by extending the edge values in to the border. Pads in all <em>spatial</em>
+dimensions unless a dictionary is passed to <cite>pad_width</cite>.</p>
+<dl class="simple">
+<dt>pad_width: int, tuple, dict</dt><dd><p>The size of the border along each axis, see usage notes</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If passed a single value it will pad symmetrically in all dimensions.
-If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
-If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
-{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 0. 1. 2. 2.]</span>
+<span class="go">[0. 0. 1. 2. 2.]</span>
+<span class="go">[3. 3. 4. 5. 5.]</span>
+<span class="go">[6. 6. 7. 8. 8.]</span>
+<span class="go">[6. 6. 7. 8. 8.]]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.processors.Padder.linear_ramp">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">linear_ramp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.linear_ramp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.linear_ramp" title="Permalink to this definition">#</a></dt>
-<dd><p>Padder processor wrapping numpy.pad with mode <cite>linear_ramp</cite>
-Pads with the linear ramp between end_value and the array edge value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p></li>
-<li><p><strong>end_values</strong> (<em>float</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The values used for the ending value of the linear_ramp</p></li>
-</ul>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">linear_ramp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.linear_ramp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.linear_ramp" title="Permalink to this definition">#</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>linear_ramp</cite></p>
+<p>Pads the data with values calculated from a linear ramp between the array edge
+value and the set end_value. Pads in all <em>spatial</em> dimensions unless a dictionary
+is passed to either <cite>pad_width</cite> or <cite>constant_values</cite></p>
+<dl class="simple">
+<dt>pad_width: int, tuple, dict</dt><dd><p>The size of the border along each axis, see usage notes</p>
+</dd>
+<dt>end_values: float, tuple, dict, default=0.0</dt><dd><p>The target value of the linear_ramp, see usage notes</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If passed a single value it will pad symmetrically in all dimensions.
-If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
-If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
-{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+<dt><cite>end_values</cite> behaviour:</dt><dd><ul class="simple">
+<li><p>float: Each border will use this end value</p></li>
+<li><p>tuple(float, float): Each border end value will be used asymmetrically for each axis i.e. (before, after)</p></li>
+<li><p>dict: Specified axes and end values: e.g. {‘horizontal’:(8, 23), ‘channel’:5}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">linear_ramp</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0.  0.  0.  0.  0.  0.  0. ]</span>
+<span class="go">[0.  0.  0.  0.5 1.  0.5 0. ]</span>
+<span class="go">[0.  0.  0.  1.  2.  1.  0. ]</span>
+<span class="go">[0.  1.5 3.  4.  5.  2.5 0. ]</span>
+<span class="go">[0.  3.  6.  7.  8.  4.  0. ]</span>
+<span class="go">[0.  1.5 3.  3.5 4.  2.  0. ]</span>
+<span class="go">[0.  0.  0.  0.  0.  0.  0. ]]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.processors.Padder.reflect">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">reflect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.reflect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.reflect" title="Permalink to this definition">#</a></dt>
-<dd><p>Padder processor wrapping numpy.pad with mode <cite>reflect</cite>
-Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>reflect</cite>.</p>
+<p>Pads with the reflection of the data mirrored along first and last values each axis.
+Pads in all <em>spatial</em> dimensions unless a dictionary is passed to <cite>pad_width</cite>.</p>
+<dl class="simple">
+<dt>pad_width: int, tuple, dict</dt><dd><p>The size of the border along each axis, see usage notes</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If passed a single value it will pad symmetrically in all dimensions.
-If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
-If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
-{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[4. 3. 4. 5. 4.]</span>
+<span class="go">[1. 0. 1. 2. 1.]</span>
+<span class="go">[4. 3. 4. 5. 4.]</span>
+<span class="go">[7. 6. 7. 8. 7.]</span>
+<span class="go">[4. 3. 4. 5. 4.]]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.processors.Padder.symmetric">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">symmetric</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.symmetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.symmetric" title="Permalink to this definition">#</a></dt>
-<dd><p>Padder processor wrapping numpy.pad with mode <cite>symmetric</cite>
-Pads with the reflection of the vector mirrored along the edge of the array.</p>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>symmetric</cite>.</p>
+<p>Pads with the reflection of the data mirrored along the edge of the array.
+Pads in all <em>spatial</em> dimensions unless a dictionary is passed to <cite>pad_width</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The size of the border along each axis</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If passed a single value it will pad symmetrically in all dimensions.
-If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
-If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
-{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">symmetric</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 0. 1. 2. 2.]</span>
+<span class="go">[0. 0. 1. 2. 2.]</span>
+<span class="go">[3. 3. 4. 5. 5.]</span>
+<span class="go">[6. 6. 7. 8. 8.]</span>
+<span class="go">[6. 6. 7. 8. 8.]]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.processors.Padder.wrap">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">wrap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.wrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.wrap" title="Permalink to this definition">#</a></dt>
-<dd><p>Padder processor wrapping numpy.pad with mode <cite>wrap</cite>
-Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.</p>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>wrap</cite>.</p>
+<p>Pads with the wrap of the vector along the axis. The first values are used to pad the
+end and the end values are used to pad the beginning. Pads in all <em>spatial</em> dimensions
+unless a dictionary is passed to <cite>pad_width</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The size of the border along each axis</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If passed a single value it will pad symmetrically in all dimensions.
-If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
-If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
-{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+<dl class="simple">
+<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<li><p>int: Each axis will be padded with a border of this size</p></li>
+<li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
+<li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
+</ul>
+</dd>
+</dl>
+<p>If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
+and the last two angles in geometry.angles. The user should ensure the output is as expected.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_padded</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_padded</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[8. 6. 7. 8. 6.]</span>
+<span class="go">[2. 0. 1. 2. 0.]</span>
+<span class="go">[5. 3. 4. 5. 3.]</span>
+<span class="go">[8. 6. 7. 8. 6.]</span>
+<span class="go">[2. 0. 1. 2. 0.]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>Geometry</em>) – The input DataContainer</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -626,17 +845,6 @@ If passed a dictionary it will apply the specified padding to the required dimen
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Padder.set_input">
-<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Padder.set_input" title="Permalink to this definition">#</a></dt>
-<dd><p>Set the input data to the processor</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
 </dd></dl>

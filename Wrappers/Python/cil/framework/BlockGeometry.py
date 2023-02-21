@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 import functools
-from cil.framework import BlockDataContainer
+from cil.framework.BlockDataContainer import BlockDataContainer
 
 class BlockGeometry(object):
     
@@ -90,3 +90,16 @@ class BlockGeometry(object):
 
         return BlockDataContainer(*containers)
            
+    def __iter__(self):
+        '''BlockGeometry is an iterable'''
+        return self
+    
+    def __next__(self):
+        '''BlockGeometry is an iterable'''
+        if self.index < len(self.geometries):
+            result = self.geometries[self.index]
+            self.index += 1
+            return result
+        else:
+            self.index = 0
+            raise StopIteration

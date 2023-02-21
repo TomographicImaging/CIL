@@ -1,4 +1,4 @@
-name: cil_dev_test
+name: cil_dev
 channels:
   - conda-forge
   - intel

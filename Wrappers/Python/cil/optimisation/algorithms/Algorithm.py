@@ -26,14 +26,14 @@ class Algorithm(object):
       provides the minimal infrastructure.
 
       Algorithms are iterables so can be easily run in a for loop. They will
-      stop as soon as the stop cryterion is met.
+      stop as soon as the stop criterion is met.
       The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and
       and :code:`update_objective` methods
       
       A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
       a :code:`callback` function that receives the current iteration number and the actual objective
       value and can be used to trigger print to screens and other user interactions. The :code:`run`
-      method will stop when the stopping cryterion is met. 
+      method will stop when the stopping criterion is met. 
    '''
 
     def __init__(self, **kwargs):
@@ -73,10 +73,10 @@ class Algorithm(object):
         raise NotImplementedError()
     
     def should_stop(self):
-        '''default stopping cryterion: number of iterations
+        '''default stopping criterion: number of iterations
         
         The user can change this in concrete implementatition of iterative algorithms.'''
-        return self.max_iteration_stop_cryterion()
+        return self.max_iteration_stop_criterion()
     
     def __set_up_logger(self, fname):
         """Set up the logger if desired"""
@@ -87,8 +87,8 @@ class Algorithm(object):
             self.logger.setLevel(logging.INFO)
             self.logger.addHandler(handler)
     
-    def max_iteration_stop_cryterion(self):
-        '''default stop cryterion for iterative algorithm: max_iteration reached'''
+    def max_iteration_stop_criterion(self):
+        '''default stop criterion for iterative algorithm: max_iteration reached'''
         return self.iteration > self.max_iteration
     def __iter__(self):
         '''Algorithm is an iterable'''
@@ -266,7 +266,7 @@ class Algorithm(object):
             else:
                 raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
-            print ("Stop cryterion has been reached.")
+            print ("Stop criterion has been reached.")
         if iterations is None :
             iterations = self.max_iteration
 

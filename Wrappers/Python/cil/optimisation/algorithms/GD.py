@@ -160,7 +160,7 @@ class GD(Algorithm):
         self.k = 0
         
     def should_stop(self):
-        return self.max_iteration_stop_cryterion() or \
+        return self.max_iteration_stop_criterion() or \
             numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol, 
                 atol=self.atol, equal_nan=False)
 

@@ -29,20 +29,19 @@ except:
 
 
 class NEXUSDataWriter(object):
+    ''' Create a writer for NEXUS files.
     
-    def __init__(self,
-                 **kwargs):
-
-        '''
-        Constructor 
-
-        :param data: The dataset to write to file
-        :type data: AcquisitionData, ImageData
-        :param file_name: file name to write
-        :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
-        :type compression: int, default 0
-        '''
+    Parameters
+    ----------
+    data: The dataset to write to file
+        AcquisitionData, ImageData
+    file_name: The file name to write
+        os.path or string, default None
+    compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
+        int, default 0
+    '''
+    
+    def __init__(self, **kwargs):
 
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)

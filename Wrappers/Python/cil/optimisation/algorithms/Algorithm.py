@@ -90,6 +90,12 @@ class Algorithm(object):
     def max_iteration_stop_criterion(self):
         '''default stop criterion for iterative algorithm: max_iteration reached'''
         return self.iteration > self.max_iteration
+    
+    def max_iteration_stop_cryterion(self):
+        '''This is a deprecated method. Please use max_iteration_stop_criterion'''
+        logging.warn("max_iteration_stop_cryterion is deprecated and will be removed in the following release. Please use max_iteration_stop_criterion.")
+        return self.max_iteration_stop_criterion()
+
     def __iter__(self):
         '''Algorithm is an iterable'''
         return self

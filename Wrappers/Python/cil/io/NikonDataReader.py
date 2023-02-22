@@ -37,16 +37,6 @@ class NikonDataReader(object):
                 {'angle': (start, end, step), 
                  'horizontal': (start, end, step), 
                  'vertical': (start, end, step)}
-                Files are stacked along axis_0. axis_1 and axis_2 correspond
-                to row and column dimensions, respectively.
-                Files are stacked in alphabetic order. 
-                To skip projections or to change number of projections to load, 
-                adjust 'angle'. For instance, 'angle': (100, 300)
-                will skip first 100 projections and will load 200 projections.
-                'angle': -1 is a shortcut to load all elements along axis.
-                Start and end can be specified as None which is equivalent 
-                to start = 0 and end = load everything to the end, respectively.
-                Start and end also can be negative.
             
         normalise: bool, normalises loaded projections by detector 
                 white level (I_0). Default value is True
@@ -60,13 +50,26 @@ class NikonDataReader(object):
                 In 'slice' mode 'step' defines standard numpy slicing.
                 Note: in general 
                 output array size in bin mode != output array size in slice mode
-        
-        Output
-        ------
-        
-        Acquisition data with corresponding geometry, arranged as ['angle', horizontal'] 
-        if a single slice is loaded and ['vertical, 'angle', horizontal'] 
-        if more than 1 slices are loaded.
+
+
+
+        Notes
+        -----
+        `roi` behaviour:
+            Files are stacked along axis_0. axis_1 and axis_2 correspond
+            to row and column dimensions, respectively.
+            
+            Files are stacked in alphabetic order. 
+            
+            To skip projections or to change number of projections to load, 
+            adjust 'angle'. For instance, 'angle': (100, 300)
+            will skip first 100 projections and will load 200 projections.
+            
+            ``'angle': -1`` is a shortcut to load all elements along axis.
+                
+            ``start`` and ``end`` can be specified as ``None`` which is equivalent
+            to ``start = 0`` and ``end = load everything to the end``, respectively.
+            Start and end also can be negative.
                     
         '''
         
@@ -341,7 +344,9 @@ class NikonDataReader(object):
     def read(self):
         
         '''
-        Reads projections and return AcquisitionData container
+        Reads projections and returns AcquisitionData with corresponding geometry,
+        arranged as ['angle', horizontal'] if a single slice is loaded
+        and ['vertical, 'angle', horizontal'] if more than 1 slice is loaded.
         '''
         
         reader = TIFFStackReader()

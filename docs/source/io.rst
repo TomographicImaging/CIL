@@ -45,8 +45,7 @@ Nikon
 
 ZEISS
 =====
-
-.. autoclass:: cil.io.TXRMDataReader
+.. autoclass:: cil.io.ZEISSDataReader
    :members:
    :special-members:
 

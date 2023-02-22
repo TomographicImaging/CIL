@@ -2,7 +2,7 @@ Framework
 *********
 
 
-AcquisitonGeometry
+AcquisitionGeometry
 ==================
 
 The :code:`AcquisitionGeometry` class holds the system acquisition parameters. 
@@ -73,7 +73,7 @@ BlockGeometry
 Data Containers
 ===============
 
-:code:`AcquisiionData` and :code:`ImageData` inherit from the same parent :code:`DataContainer` class, 
+:code:`AcquisitionData` and :code:`ImageData` inherit from the same parent :code:`DataContainer` class, 
 therefore they largely behave the same way.
 
 There are algebraic operations defined for both :code:`AcquisitionData` and :code:`ImageData`. 

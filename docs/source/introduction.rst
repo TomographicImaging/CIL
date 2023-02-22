@@ -9,7 +9,7 @@ The framework comprises:
 * :code:`cil.io` module which provides a number of loaders for real CT machines, e.g. Nikon. It also provides reader and writer to save to NeXuS file format.
 * :code:`cil.optimisation` module allows the user to create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.
 * :code:`cil.plugins` module which allows CIL to use selected functionality from ASTRA, TIGRE, TomoPhantom and the Regularisation Toolkit
-* :code:`cil.processors` module contains tools for data manipulation and common CT pre-processoing steps
+* :code:`cil.processors` module contains tools for data manipulation and common CT pre-processing steps
 * :code:`cil.recon` module contains an optimised FDK/FBP reconstructors, making using the both CIL accelerated libraries and the Tigre/ASTRA back-projectors
 * :code:`cil.utilities` module contains a selection of display tools for 2D and 3D data, as well as real and simulated test datasets
 
@@ -17,7 +17,7 @@ The framework comprises:
 CT Geometry
 ==========
 
-Please refer to `this <https://github.com/vais-ral/CIL-Demos/blob/v19.10.1/Notebooks/00_building_blocks.ipynb>`_ notebook on the CIL-Demos 
+Please refer to `this <https://github.com/TomographicImaging/CIL-Demos/blob/main/demos/1_Introduction/00_CIL_geometry.ipynb>`_ notebook on the CIL-Demos 
 repository for full description.
 
 
@@ -115,7 +115,7 @@ where,
 * :math:`\alpha` is the regularisation parameter
 * :math:`L` is a regularisation operator
 
-The first term measures the fidelity of the solution to the data. The second term meausures the 
+The first term measures the fidelity of the solution to the data. The second term measures the 
 fidelity to the prior knowledge we have imposed on the system, operator :math:`L`.  
 
 This can be re-written equivalently in the block matrix form:

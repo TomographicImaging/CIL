@@ -84,17 +84,10 @@ class TIFFWriter(object):
         '''
 
     
-    def __init__(self, **kwargs):
-
-
-        self.data_container = kwargs.get('data', None)
-        self.file_name = kwargs.get('file_name', None)
-        counter_offset = kwargs.get('counter_offset', 0)
-        compression = kwargs.get('compression', None)
+    def __init__(self, data=None, file_name=None, counter_offset=0, compression=None):
         
-        if ((self.data_container is not None) and (self.file_name is not None)):
-            self.set_up(data = self.data_container,
-                        file_name = self.file_name, 
+        if ((data is not None) and (file_name is not None)):
+            self.set_up(data = data, file_name = file_name, 
                         counter_offset=counter_offset,
                         compression=compression)
         

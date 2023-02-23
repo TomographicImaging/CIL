@@ -3148,14 +3148,6 @@ class DataContainer(object):
         if ret_out:
             return out
 
-
-    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
-        '''Deprecated. Alias of _axpby'''
-        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
-              DeprecationWarning)
-        self._axpby(a,b,y,out, dtype, num_threads)
-
-
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
         

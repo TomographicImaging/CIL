@@ -69,7 +69,7 @@ class ZEISSDataReader(object):
             logger_dxchange.setLevel(logging.ERROR)
 
         if file_name is not None:
-            self.set_up(file_name = file_name, roi = roi)
+            self.set_up(file_name, roi = roi)
 
 
     def set_up(self, 

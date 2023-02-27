@@ -479,7 +479,7 @@ class TestGradients(CCPiTestClass):
         Grad2 = GradientOperator(self.ig2, correlation = 'Space', backend='numpy')
         
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
-        norm = LinearOperator.PowerMethod(E2, max_iterations=self.iterations)
+        norm = LinearOperator.PowerMethod(E2, max_iteration=self.iterations)
         numpy.testing.assert_almost_equal(norm, 
            numpy.sqrt(8), decimal = self.decimal)
         

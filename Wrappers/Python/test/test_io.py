@@ -519,3 +519,6 @@ class Test_HDF5_utilities(unittest.TestCase):
 
         HDF5_utilities.read_to(self.path, self.dset_path, data_partial, source_sel=subset, dest_sel=subset)
         np.testing.assert_allclose(data_partial_by_hand,data_partial)
+
+if __name__ == '__main__':
+    unittest.main()

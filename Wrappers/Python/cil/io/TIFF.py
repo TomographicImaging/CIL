@@ -189,8 +189,8 @@ class TIFFWriter(object):
 class TIFFStackReader(object):
     
     ''' 
-        Basic TIFF redaer which loops through all tiff files in a specific 
-        folder and load them in alphabetic order
+        Basic TIFF reader which loops through all tiff files in a specific 
+        folder and loads them in alphabetic order
         
         Parameters
         ----------
@@ -199,33 +199,49 @@ class TIFFStackReader(object):
             Path to folder with tiff files, list of paths of tiffs, or single tiff file
                    
         roi : dictionary, default `None`
-            dictionary with roi to load 
+            dictionary with roi to load: 
             ``{'axis_0': (start, end, step), 
                'axis_1': (start, end, step), 
                'axis_2': (start, end, step)}``
-            Files are stacked along axis_0. axis_1 and axis_2 correspond
-            to row and column dimensions, respectively.
-            Files are stacked in alphabetic order. 
-            To skip files or to change number of files to load, 
-            adjust axis_0. For instance, 'axis_0': (100, 300)
-            will skip first 100 files and will load 200 files.
-            'axis_0': -1 is a shortcut to load all elements along axis.
-            Start and end can be specified as None which is equivalent 
-            to start = 0 and end = load everything to the end, respectively.
-            Start and end also can be negative.
-            Notes: roi is specified for axes before transpose.
+            roi is specified for axes before transpose.
             
         transpose : bool, default False
             Whether to transpose loaded images
                     
-        mode : str, default 'bin'. Accepted values 'bin', 'slice'
-            Referring to the 'step' defined in the roi parameter, in bin mode, 'step' number of pixels 
-            are binned together, values of resulting binned pixels are calculated as average. 
-            In 'slice' mode 'step' defines standard numpy slicing. 
+        mode : str, {'bin', 'slice'}, default 'bin'.
+            Defines the 'step' in the roi parameter:
+            
+            In bin mode, 'step' number of pixels 
+            are binned together, values of resulting binned pixels are calculated as average.
+
+            In 'slice' mode 'step' defines standard numpy slicing.
+
             Note: in general output array size in bin mode != output array size in slice mode
         
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
+
+
+        Notes:
+        ------
+        roi behaviour:
+            Files are stacked along ``axis_0``, in alphabetical order.
+            
+            ``axis_1`` and ``axis_2`` correspond
+            to row and column dimensions, respectively.
+
+            To skip files or to change number of files to load, 
+            adjust ``axis_0``. For instance, ``'axis_0': (100, 300)``
+            will skip first 100 files and will load 200 files.
+
+            ``'axis_0': -1`` is a shortcut to load all elements along axis 0.
+
+            ``start`` and ``end`` can be specified as ``None`` which is equivalent 
+            to ``start = 0`` and ``end = load everything to the end``, respectively.
+
+            Start and end also can be negative.
+
+            roi is specified for axes before transpose.
                     
 
         Example:
@@ -245,12 +261,8 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, **kwargs):    
-        self.file_name = kwargs.get('file_name', None)
-        roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
-        transpose = kwargs.get('transpose', False)
-        mode = kwargs.get('mode', 'bin')
-        dtype = kwargs.get('dtype', np.float32)
+    def __init__(self, file_name=None, roi={'axis_0': -1, 'axis_1': -1, 'axis_2': -1}, transpose=False, mode='bin', dtype=np.float32):    
+        self.file_name = file_name
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,

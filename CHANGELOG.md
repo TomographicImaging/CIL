@@ -1,7 +1,7 @@
 * x.x.x
   - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
   - Removed (previously deprecated) `very_verbose` parameter in `Algorithm`'s run method.
-  - Removed (previously deprecated) `axpby` method.
+  - Removed (previously deprecated) `axpby` method in DataContainer.
 
 * 22.2.0
   - BlockGeometry is iterable

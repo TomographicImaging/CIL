@@ -994,4 +994,3 @@ class TestOperatorCompositionSum(unittest.TestCase):
                                                 2 * out2.as_array())
         numpy.testing.assert_array_almost_equal(d_out.as_array(),
                                                 2 * out2.as_array())
-

@@ -40,13 +40,14 @@ class NEXUSDataWriter(object):
         :type data: AcquisitionData, ImageData
         :param file_name: file name to write
         :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
-        :type compression: int, default 0
+        :param compression: The lossy compression to apply, default None will not compress data. uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.
+        :type compression: str, {'uint8', 'uint16', None}, default None
+
         '''
 
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
-        self.compression = kwargs.get('compression', 0)
+        self.compression = kwargs.get('compression', None)
 
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data = self.data,
@@ -55,7 +56,7 @@ class NEXUSDataWriter(object):
     def set_up(self,
                data = None,
                file_name = None,
-               compression = 0):
+               compression = None):
 
         '''
         set up writer

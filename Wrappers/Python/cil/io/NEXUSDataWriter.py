@@ -44,6 +44,9 @@ class NEXUSDataWriter(object):
     
     def __init__(self, data=None, file_name=None, compression=0):
 
+        self.data = data
+        self.file_name = file_name
+
         if ((data is not None) and (file_name is not None)):
             self.set_up(data = data, file_name = file_name, compression=compression)
         

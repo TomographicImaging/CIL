@@ -63,6 +63,9 @@ class ZEISSDataReader(object):
     '''
     
     def __init__(self, file_name=None, roi=None):
+
+        self.file_name = file_name
+
         # Set logging level for dxchange reader.py
         logger_dxchange = logging.getLogger(name='dxchange.reader')
         if logger_dxchange is not None:

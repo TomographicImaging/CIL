@@ -71,11 +71,18 @@ class NikonDataReader(object):
             Start and end also can be negative.
                     
         '''
-        self.set_up(file_name = file_name,
-                    roi = roi,
-                    normalise = normalise,
-                    mode = mode,
-                    fliplr = fliplr)
+        self.file_name = file_name
+        self.roi = roi
+        self.normalise = normalise
+        self.mode = mode
+        self.fliplr = fliplr
+
+        if file_name is not None:
+            self.set_up(file_name = file_name,
+                        roi = roi,
+                        normalise = normalise,
+                        mode = mode,
+                        fliplr = fliplr)
             
     def set_up(self, 
                file_name = None, 

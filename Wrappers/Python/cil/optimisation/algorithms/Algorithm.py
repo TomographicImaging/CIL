@@ -44,7 +44,7 @@ class Algorithm(object):
         
         :param max_iteration: maximum number of iterations
         :type max_iteration: int, optional, default 0
-        :param update_objectice_interval: the interval every which we would save the current\
+        :param update_objective_interval: the interval every which we would save the current\
                                        objective. 1 means every iteration, 2 every 2 iteration\
                                        and so forth. This is by default 1 and should be increased\
                                        when evaluating the objective is computationally expensive.
@@ -75,7 +75,7 @@ class Algorithm(object):
     def should_stop(self):
         '''default stopping criterion: number of iterations
         
-        The user can change this in concrete implementatition of iterative algorithms.'''
+        The user can change this in concrete implementation of iterative algorithms.'''
         return self.max_iteration_stop_criterion()
     
     def __set_up_logger(self, fname):
@@ -246,26 +246,21 @@ class Algorithm(object):
                                screen. Notice that printing will not evaluate the objective function
                                and so the print might be out of sync wrt the calculation of the objective.
                                In such cases nan will be printed.
-        :param very_verbose: deprecated bool, useful for algorithms with primal and dual objectives (PDHG), 
-                            prints to screen both primal and dual
         '''
         print_interval = kwargs.get('print_interval', self.update_objective_interval)
         if print_interval > self.update_objective_interval:
             print_interval = self.update_objective_interval
-        if isinstance(verbose, bool):
-            very_verbose = kwargs.get('very_verbose', False)
+        if verbose == 0:
+            verbose = False
+            very_verbose = False
+        elif verbose == 1:
+            verbose = True
+            very_verbose = False
+        elif verbose == 2:
+            verbose = True
+            very_verbose = True
         else:
-            if verbose == 0:
-                verbose = False
-                very_verbose = False
-            elif verbose == 1:
-                verbose = True
-                very_verbose = False
-            elif verbose == 2:
-                verbose = True
-                very_verbose = True
-            else:
-                raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
+            raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
             print ("Stop criterion has been reached.")
         if iterations is None :

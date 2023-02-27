@@ -60,7 +60,7 @@ class SPDHG(Algorithm):
     Note
     ----
     
-    Convergence is guaranted provided that [2, eq. (12)]:
+    Convergence is guaranteed provided that [2, eq. (12)]:
     
     .. math:: 
     
@@ -70,7 +70,7 @@ class SPDHG(Algorithm):
     ----
     
     Notation for primal and dual step-sizes are reversed with comparison
-        to PDGH.py
+        to PDHG.py
 
     Note
     ----
@@ -95,11 +95,6 @@ class SPDHG(Algorithm):
                  initial=None, prob=None, gamma=1.,**kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
-
-
-        if kwargs.get('use_axpby', None) is not None:
-                warnings.warn('The use of the "use_axpby" parameter is deprecated and will not be used by this algorithm',
-                   DeprecationWarning, stacklevel=4)
 
 
         if f is not None and operator is not None and g is not None:

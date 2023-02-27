@@ -120,7 +120,7 @@ class CGLS(Algorithm):
         
     def should_stop(self):
         '''stopping criterion'''
-        return self.flag() or self.max_iteration_stop_cryterion()
+        return self.flag() or self.max_iteration_stop_criterion()
  
     def flag(self):
         '''returns whether the tolerance has been reached'''

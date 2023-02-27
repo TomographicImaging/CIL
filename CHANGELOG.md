@@ -1,5 +1,5 @@
 * x.x.x
-  - Deprecated `max_iteration_stop_cryterion` method in the Algorithm class, and added `max_iteration_stop_criterion` in its place
+  - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
 
 * 22.2.0
   - BlockGeometry is iterable

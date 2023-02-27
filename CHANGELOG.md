@@ -1,3 +1,6 @@
+* x.x.x
+  - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
+
 * 22.2.0
   - BlockGeometry is iterable
   - Added `partition` to `AcquisitionData` to partition the data with 3 methods: `sequential`, `staggered` and `random_permutation`

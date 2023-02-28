@@ -107,22 +107,21 @@ class Partitioner(object):
 
         return batches
 
-    def _convert_masks_to_BlockGeometry(self, masks):
+    def _construct_BlockGeometry_from_indices(self, indices):
         '''Convert a list of boolean masks to a list of BlockGeometry.
         
         Parameters
         ----------
-          masks : list of boolean array
-              A list of boolean masks.
+          indices : list of lists of indices
             
         Returns
         -------
             BlockGeometry
         '''
         ags = []
-        for mask in masks:
+        for mask in indices:
             ag = self.geometry.copy()
-            ag.config.angles.angle_data = self.geometry.angles[mask]
+            ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
             ags.append(ag)
         
         return BlockGeometry(*ags)
@@ -215,15 +214,18 @@ class Partitioner(object):
         '''
         if indices is None:
             indices = self.geometry.num_projections
-        masks = self._partition_indices(num_batches, indices, stagger)
-        masks = self._convert_indices_to_masks(masks, indices)
-        blk_geo = self._convert_masks_to_BlockGeometry(masks)
+        partition_indices = self._partition_indices(num_batches, indices, stagger)
+        blk_geo = self._construct_BlockGeometry_from_indices(partition_indices)
         
         # copy data
         out = blk_geo.allocate(None)
         out.geometry = blk_geo
+        axis = self.dimension_labels.index('angle')
+            
         for i in range(num_batches):
-            out[i].fill(self.array[masks[i]])
+            out[i].fill(
+                numpy.take(self.array, partition_indices[i], axis=axis)
+            )
         return out
          
     def _partition_random_permutation(self, num_batches, seed=None):

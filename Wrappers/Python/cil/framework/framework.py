@@ -3413,10 +3413,6 @@ class ImageData(DataContainer):
                  geometry=None, 
                  **kwargs):
 
-        if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
-              DeprecationWarning)
-
         dtype = kwargs.get('dtype', numpy.float32)
     
 
@@ -3587,9 +3583,6 @@ class AcquisitionData(DataContainer, Partitioner):
                  deep_copy=True, 
                  geometry = None,
                  **kwargs):
-        if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
-              DeprecationWarning)
 
         dtype = kwargs.get('dtype', numpy.float32)
 

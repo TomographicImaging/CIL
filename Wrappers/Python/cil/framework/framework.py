@@ -126,33 +126,6 @@ class Partitioner(object):
         
         return BlockGeometry(*ags)
 
-    def _convert_indices_to_masks(self, batches, num_indices):
-        '''Convert a list of batches of indices to a list of boolean masks.
-        
-        Parameters
-        ----------
-        batches : list of list of int
-            A list of batches of indices.
-        num_indices : int, list of int
-            The number of indices in the original list. If a list is passed, it will be calculated
-            as the length of the list
-            
-        Returns
-        -------- 
-        list
-            List of boolean masks   
-'''
-        boolbatches = []
-        if isinstance(num_indices, list):
-            num_indices = len(num_indices)
-        for batch in batches:
-            boolbatch = numpy.zeros(num_indices, dtype=bool)
-            for j in batch:
-                boolbatch[j] = True
-            boolbatches.append(boolbatch)
-        
-        return boolbatches
-
     def partition(self, num_batches, mode, seed=None):
         '''Partition the data into ``num_batches`` batches using the specified ``mode``.
         

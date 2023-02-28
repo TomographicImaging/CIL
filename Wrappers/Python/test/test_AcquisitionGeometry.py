@@ -1465,56 +1465,39 @@ class TestSubset(unittest.TestCase):
 
         self.assertListEqual(ret, gold)
 
-    def test_convert_to_mask(self):
-        par = Partitioner()
-
-        num_batches = 4
-        num_indices = 9
-        indices = list(range(num_indices))
-        ret = par._partition_indices(num_batches, indices, stagger=False)
-        ret = par._convert_indices_to_masks(ret, num_indices)
-        # gold = [[0, 1, 2], [3, 4] ,[5, 6], [7, 8]]
-        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
-        gold[0][0] = True
-        gold[0][1] = True
-        gold[0][2] = True
-
-        gold[1][3] = True
-        gold[1][4] = True
-
-        gold[2][5] = True
-        gold[2][6] = True
-
-        gold[3][7] = True
-        gold[3][8] = True
-        
-        for i,r in enumerate(ret):
-            np.testing.assert_array_equal(np.asarray(r, dtype=bool), gold[i])
-
-        ret = par._partition_indices(num_batches, indices, stagger=True)
-        ret = par._convert_indices_to_masks(ret, num_indices)
-        # gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
-        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
-        gold[0][0] = True
-        gold[0][4] = True
-        gold[0][8] = True
-
-        gold[1][1] = True
-        gold[1][5] = True
-
-        gold[2][2] = True
-        gold[2][6] = True
-
-        gold[3][3] = True
-        gold[3][7] = True
-
-        for i,r in enumerate(ret):
-            np.testing.assert_array_equal(np.asarray(r, dtype=bool), gold[i])
-
     def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer(self):
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
             .set_panel(num_pixels=10)\
             .set_angles(angles=range(9))
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer_2D_order1(self):
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))\
+            .set_labels(['angle','horizontal'])
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+    
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer_2D_order2(self):
+        
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))\
+            .set_labels(['horizontal', 'angle'])
 
         data = AG.allocate(None)
         for i in range(AG.num_projections):
@@ -1534,47 +1517,15 @@ class TestSubset(unittest.TestCase):
 
         gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
         if method == Partitioner.SEQUENTIAL:
-            gold[0][0] = True
-            gold[0][1] = True
-            gold[0][2] = True
-
-            gold[1][3] = True
-            gold[1][4] = True
-
-            gold[2][5] = True
-            gold[2][6] = True
-
-            gold[3][7] = True
-            gold[3][8] = True
+            gold = [[0, 1, 2], [3, 4], [5, 6], [7, 8]]
+            
         elif method == Partitioner.STAGGERED:
-            # gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
-            gold[0][0] = True
-            gold[0][4] = True
-            gold[0][8] = True
-
-            gold[1][1] = True
-            gold[1][5] = True
-
-            gold[2][2] = True
-            gold[2][6] = True
-
-            gold[3][3] = True
-            gold[3][7] = True
+            gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+            
         elif method == Partitioner.RANDOM_PERMUTATION:
-            # with seed==1 gold = [[8, 2, 6], [7, 1], [0, 4], [3, 5]]
-            gold[0][8] = True
-            gold[0][2] = True
-            gold[0][6] = True
-
-            gold[1][7] = True
-            gold[1][1] = True
-
-            gold[2][0] = True
-            gold[2][4] = True
-
-            gold[3][3] = True
-            gold[3][5] = True
-
+            # with seed==1 
+            gold = [[8, 2, 6], [7, 1], [0, 4], [3, 5]]
+            
 
         for i, geo in enumerate(bg):
-            np.testing.assert_allclose(geo.angles, ag.angles[gold[i]])
+            np.testing.assert_allclose(geo.angles, np.asarray(gold[i]))

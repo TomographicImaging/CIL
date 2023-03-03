@@ -301,52 +301,24 @@
 
         <span class="k">return</span> <span class="n">batches</span>
 
-    <span class="k">def</span> <span class="nf">_convert_masks_to_BlockGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">masks</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_construct_BlockGeometry_from_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Convert a list of boolean masks to a list of BlockGeometry.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">          masks : list of boolean array</span>
-<span class="sd">              A list of boolean masks.</span>
+<span class="sd">          indices : list of lists of indices</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            BlockGeometry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">ags</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
             <span class="n">ag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">ag</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+            <span class="n">ag</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">ags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">ags</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_convert_indices_to_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convert a list of batches of indices to a list of boolean masks.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        batches : list of list of int</span>
-<span class="sd">            A list of batches of indices.</span>
-<span class="sd">        num_indices : int, list of int</span>
-<span class="sd">            The number of indices in the original list. If a list is passed, it will be calculated</span>
-<span class="sd">            as the length of the list</span>
-<span class="sd">            </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------- </span>
-<span class="sd">        list</span>
-<span class="sd">            List of boolean masks   </span>
-<span class="sd">&#39;&#39;&#39;</span>
-        <span class="n">boolbatches</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">num_indices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_indices</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
-            <span class="n">boolbatch</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
-                <span class="n">boolbatch</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">boolbatches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">boolbatch</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">boolbatches</span>
 
     <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches using the specified ``mode``.</span>
@@ -409,15 +381,18 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span>
-        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_indices</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">stagger</span><span class="p">)</span>
-        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_indices_to_masks</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-        <span class="n">blk_geo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_masks_to_BlockGeometry</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span>
+        <span class="n">partition_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_indices</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">stagger</span><span class="p">)</span>
+        <span class="n">blk_geo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_BlockGeometry_from_indices</span><span class="p">(</span><span class="n">partition_indices</span><span class="p">)</span>
         
         <span class="c1"># copy data</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">blk_geo</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">blk_geo</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
+            
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
-            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">masks</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">partition_indices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
          
     <span class="k">def</span> <span class="nf">_partition_random_permutation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

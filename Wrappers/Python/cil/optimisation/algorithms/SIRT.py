@@ -102,20 +102,18 @@ class SIRT(Algorithm):
         logging.info("{} setting up".format(self.__class__.__name__, ))
         
         self.x = initial.copy()
+        self.tmp_x = self.x * 0.0
         self.operator = operator
         self.data = data
         
         self.r = data.copy()
         
-        self.relax_par = 1.0
+        # relaxation parameter was set to 1.0 and not exposed to the user: removed
         
         self.constraint = constraint
         if constraint is None:
             if lower is not None or upper is not None:
-                if lower is None:
-                    lower=-inf
-                if upper is None:
-                    upper=inf
+                # IndicatorBox accepts None for lower and/or upper
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
                 
         # Set up scaling matrices D and M.
@@ -147,12 +145,19 @@ class SIRT(Algorithm):
 
         """
         
-        self.r = self.data - self.operator.direct(self.x)
+        # self.r = self.data - self.operator.direct(self.x)
+        self.operator.direct(self.x, out=self.r)
+        self.r.sapyb(-1, self.data, 1.0, out=self.r)
         
-        self.x += self.relax_par * (self.D*self.operator.adjoint(self.M*self.r))
+        # self.x += self.relax_par * (self.D*self.operator.adjoint(self.M*self.r))
+        self.r *= self.M
+        self.operator.adjoint(self.r, out=self.tmp_x)
+        self.x.sapyb(1.0, self.tmp_x, self.D, out=self.x)
+
         
         if self.constraint is not None:
-            self.x = self.constraint.proximal(self.x, tau=1)
+            # IndicatorBox allows inplace operation for proximal
+            self.x = self.constraint.proximal(self.x, tau=1, out=self.x)
 
     def update_objective(self):
         r"""Returns the objective 

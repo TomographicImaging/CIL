@@ -553,7 +553,7 @@ class TestBlockDataContainer(BDCUnittest):
         out = cp1 * 0. 
         cp2 = out + [1,3]
 
-        cp2.axpby(3,-2, cp1 ,out, num_threads=4)
+        cp2.sapyb(3, cp1, -2, out, num_threads=4)
 
         # output should be [ [ -1 , 7 ] , 3]
         res0 = ig0.allocate(-1)

@@ -157,7 +157,7 @@ class SIRT(Algorithm):
         
         if self.constraint is not None:
             # IndicatorBox allows inplace operation for proximal
-            self.x = self.constraint.proximal(self.x, tau=1, out=self.x)
+            self.constraint.proximal(self.x, tau=1, out=self.x)
 
     def update_objective(self):
         r"""Returns the objective 

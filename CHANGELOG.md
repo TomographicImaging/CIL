@@ -1,4 +1,5 @@
 * x.x.x
+  - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Partitioner is now able to create batches even if angle is not the outer dimension
   - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
 

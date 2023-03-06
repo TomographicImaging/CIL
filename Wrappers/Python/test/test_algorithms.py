@@ -25,9 +25,10 @@ from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
+from cil.framework import BlockGeometry
 
 from cil.optimisation.operators import IdentityOperator
-from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator, MatrixOperator
+from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
 from cil.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, OperatorCompositionFunction
@@ -43,9 +44,10 @@ from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
 
+
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
-import os, sys, time
+import time
 import warnings
 from cil.optimisation.functions import Rosenbrock
 from cil.framework import VectorData, VectorGeometry
@@ -701,8 +703,30 @@ class TestSIRT(unittest.TestCase):
         
         self.assertFalse(np.any(sirt.M == inf))
         self.assertFalse(np.any(sirt.D == inf))   
-                                             
+
+    def test_SIRT_remove_nan_or_inf_with_BlockDataContainer(self):
+        np.random.seed(10)
+        # set up matrix, vectordata
+        n, m = 50, 50
+
+        A = np.random.uniform(0, 1,(m, n)).astype('float32')
+        b = A.dot(np.random.randn(n))
+
+        A[0:10,:] = 0.
+        A[:,10:20] = 0.
+        Aop = BlockOperator( MatrixOperator(A*1), MatrixOperator(A*2) )
+        bop = BlockDataContainer( VectorData(b*1), VectorData(b*2) )  
         
+        ig = BlockGeometry(self.ig.copy(), self.ig.copy())
+        tmp_initial = ig.allocate()
+
+        sirt = SIRT(initial = tmp_initial, operator=Aop, data=bop, max_iteration=5)
+        sirt._remove_nan_or_inf(sirt.M)
+        for el in sirt.M.containers:
+            self.assertFalse(np.any(el == inf))
+        
+        sirt._remove_nan_or_inf(sirt.D)
+        self.assertFalse(np.any(sirt.D == inf))
 
 class TestSPDHG(unittest.TestCase):
 

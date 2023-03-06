@@ -16,9 +16,9 @@
 #   limitations under the License.
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
+from cil.framework import BlockDataContainer
 from numpy import inf
 import numpy
-import warnings
 import logging
 
 class SIRT(Algorithm):    
@@ -117,11 +117,14 @@ class SIRT(Algorithm):
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
                 
         # Set up scaling matrices D and M.
-        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
-        self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+        self._set_up_scaling_matrices()
 
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
+
+    def _set_up_scaling_matrices(self):
+        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
+        self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
     def fix_weights(self):
 
@@ -131,11 +134,18 @@ class SIRT(Algorithm):
         
         # fix for possible +inf, -inf, nan values 
         for arr in [self.M, self.D]:  
- 
-            tmp = arr.as_array()
-            arr_replace = numpy.isfinite(tmp)
-            tmp[~arr_replace] = 1.0     
-            arr.fill(tmp)                     
+            self._remove_nan_or_inf(arr, replace_with=1.0)
+
+    def _remove_nan_or_inf(self, datacontainer, replace_with=1.0):
+        """Replace nan and inf with a given value."""
+        if isinstance(datacontainer, BlockDataContainer):
+            for block in datacontainer.containers:
+                self._remove_nan_or_inf(block, replace_with=replace_with)
+            return
+        tmp = datacontainer.as_array()
+        arr_replace = numpy.isfinite(tmp)
+        tmp[~arr_replace] = replace_with     
+        datacontainer.fill(tmp)
 
     def update(self):
 
@@ -166,8 +176,3 @@ class SIRT(Algorithm):
 
         """
         self.loss.append(self.r.squared_norm())
-
-
-
-
-

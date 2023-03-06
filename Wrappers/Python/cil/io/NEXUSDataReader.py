@@ -32,15 +32,13 @@ class NEXUSDataReader(object):
 
     Parameters
     ----------
-    **kwargs : dict, optional
-        Arguments to the constructor. One of these should be `file_name`: the
-        full path to the NeXus file to read.
+    file_name: str
+        the full path to the NeXus file to read.
     """
 
-    def __init__(self,
-                 **kwargs):
-        
-        self.file_name = kwargs.get('file_name', None)
+    def __init__(self, file_name):
+
+        self.file_name = file_name
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name)

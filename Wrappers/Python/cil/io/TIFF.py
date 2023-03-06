@@ -261,7 +261,7 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, file_name=None, roi={'axis_0': -1, 'axis_1': -1, 'axis_2': -1}, transpose=False, mode='bin', dtype=np.float32):    
+    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', dtype=np.float32):    
         self.file_name = file_name
         
         if self.file_name is not None:

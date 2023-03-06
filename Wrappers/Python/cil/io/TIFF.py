@@ -272,7 +272,7 @@ class TIFFStackReader(object):
             
     def set_up(self, 
                file_name = None,
-               roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1},
+               roi = None,
                transpose = False,
                mode = 'bin', 
                dtype = np.float32):
@@ -320,6 +320,9 @@ class TIFFStackReader(object):
         
         if file_name == None:
             raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
+        
+        if self.roi is None:
+            self.roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1}
             
         # check that PIL library is installed
         if (pilAvailable == False):

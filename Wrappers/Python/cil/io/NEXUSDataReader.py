@@ -36,7 +36,7 @@ class NEXUSDataReader(object):
         the full path to the NeXus file to read.
     """
 
-    def __init__(self, file_name):
+    def __init__(self, file_name=None):
 
         self.file_name = file_name
         

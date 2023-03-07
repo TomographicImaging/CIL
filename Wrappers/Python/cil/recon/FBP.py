@@ -93,13 +93,13 @@ class GenericFilteredBackProjection(Reconstructor):
 
         Parameters
         ----------
-        inplace: boolian
+        inplace: boolean
             Sets the inplace filtering of projections
         """
         if type(inplace) is bool:
             self._filter_inplace= inplace
         else:
-            raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
+            raise TypeError("set_filter_inplace expected a boolean. Got {}".format(type(inplace)))
 
 
     def _default_fft_order(self):
@@ -372,7 +372,7 @@ class FDK(GenericFilteredBackProjection):
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
         verbose : int, default=1
-           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
         -------
@@ -442,7 +442,7 @@ class FBP(GenericFilteredBackProjection):
 
     Notes
     -----
-    The reconstructor can be futher customised using additional 'set' methods provided.
+    The reconstructor can be further customised using additional 'set' methods provided.
     """
 
     supported_backends = ['tigre', 'astra']
@@ -528,7 +528,7 @@ class FBP(GenericFilteredBackProjection):
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
 
         verbose : int, default=1
-           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
         -------

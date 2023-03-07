@@ -166,4 +166,3 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         assert ag3d == self.ag3d
 
-

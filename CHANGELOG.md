@@ -3,6 +3,8 @@
   - Removed (previously deprecated) `very_verbose` parameter in `Algorithm`'s run method.
   - Removed (previously deprecated) `axpby` method in DataContainer.
   - Deprecate use of integer compression in NEXUSDataWriter.
+  - Improved and tidied up documentation for all readers and writers, including hiding special members.
+  - Use arguments instead of kwargs in all readers and writers with multiple kwargs, making documentation easier.
 
 * 22.2.0
   - BlockGeometry is iterable

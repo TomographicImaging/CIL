@@ -380,7 +380,7 @@ where,
 * :math:`\alpha` is the regularisation parameter
 * :math:`L` is a regularisation operator
 
-The first term measures the fidelity of the solution to the data. The second term meausures the 
+The first term measures the fidelity of the solution to the data. The second term measures the 
 fidelity to the prior knowledge we have imposed on the system, operator :math:`L`.  
 
 This can be re-written equivalently in the block matrix form:

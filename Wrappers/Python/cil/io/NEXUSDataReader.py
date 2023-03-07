@@ -32,14 +32,13 @@ class NEXUSDataReader(object):
 
     Parameters
     ----------
-    **kwargs : dict, optional
-        Arguments to the constructor. One of these should be `file_name`.
+    file_name: str
+        the full path to the NeXus file to read.
     """
 
-    def __init__(self,
-                 **kwargs):
-        
-        self.file_name = kwargs.get('file_name', None)
+    def __init__(self, file_name=None):
+
+        self.file_name = file_name
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name)
@@ -284,7 +283,7 @@ class NEXUSDataReader(object):
             self.get_geometry()
 
         #allocate data container as requested type
-        output = self._geometry.allocate(None,dtype=dtype)
+        output = self._geometry.allocate(None, dtype=dtype)
 
         with h5py.File(self.file_name,'r') as dfile:
 

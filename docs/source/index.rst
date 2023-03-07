@@ -19,7 +19,7 @@ operators and functions as well a collection of useful example operators and
 functions. Both smooth and non-smooth functions can be used.
 
 Further, it provides a number of high-level generic implementations of 
-optimisation algorithms to solve genericlly formulated optimisation problems 
+optimisation algorithms to solve generically formulated optimisation problems 
 constructed from operator and function objects.
 
 Demos and Examples

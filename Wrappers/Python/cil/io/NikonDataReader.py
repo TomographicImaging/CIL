@@ -22,66 +22,68 @@ import os
     
         
 class NikonDataReader(object):
+    '''Basic reader for xtekct files
     
-    def __init__(self, 
-                 **kwargs):
-        '''Basic reader for xtekct files
-        
-        Parameters
-        ----------
+    Parameters
+    ----------
 
+    file_name: str 
+        full path to .xtekct file
+        
+    roi: dict
+        dictionary with roi to load:
+        {'angle': (start, end, step), 
+            'horizontal': (start, end, step), 
+            'vertical': (start, end, step)}
+        
+    normalise: bool, default=True
+        normalises loaded projections by detector white level (I_0)
+                        
+    fliplr: bool, default = False,
+        flip projections in the left-right direction (about vertical axis)
+                        
+    mode: str: {'bin', 'slice'}, default='bin'
+        In bin mode, 'step' number of pixels is binned together,
+        values of resulting binned pixels are calculated as average. 
+        In 'slice' mode 'step' defines standard numpy slicing.
+        Note: in general output array size in bin mode != output array size in slice mode
+
+
+    Notes
+    -----
+    `roi` behaviour:
+        Files are stacked along axis_0. axis_1 and axis_2 correspond
+        to row and column dimensions, respectively.
+        
+        Files are stacked in alphabetic order. 
+        
+        To skip projections or to change number of projections to load, 
+        adjust 'angle'. For instance, 'angle': (100, 300)
+        will skip first 100 projections and will load 200 projections.
+        
+        ``'angle': -1`` is a shortcut to load all elements along axis.
             
-        file_name: str with full path to .xtekct file
-            
-        roi: dictionary with roi to load 
-                {'angle': (start, end, step), 
-                 'horizontal': (start, end, step), 
-                 'vertical': (start, end, step)}
-                Files are stacked along axis_0. axis_1 and axis_2 correspond
-                to row and column dimensions, respectively.
-                Files are stacked in alphabetic order. 
-                To skip projections or to change number of projections to load, 
-                adjust 'angle'. For instance, 'angle': (100, 300)
-                will skip first 100 projections and will load 200 projections.
-                'angle': -1 is a shortcut to load all elements along axis.
-                Start and end can be specified as None which is equivalent 
-                to start = 0 and end = load everything to the end, respectively.
-                Start and end also can be negative.
-            
-        normalise: bool, normalises loaded projections by detector 
-                white level (I_0). Default value is True
-                            
-        fliplr: bool, default = False, flip projections in the left-right direction
-                (about vertical axis)
-                            
-        mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
-                of pixels is binned together, values of resulting binned
-                pixels are calculated as average. 
-                In 'slice' mode 'step' defines standard numpy slicing.
-                Note: in general 
-                output array size in bin mode != output array size in slice mode
-        
-        Output
-        ------
-        
-        Acquisition data with corresponding geometry, arranged as ['angle', horizontal'] 
-        if a single slice is loaded and ['vertical, 'angle', horizontal'] 
-        if more than 1 slices are loaded.
-                    
-        '''
-        
-        self.file_name = kwargs.get('file_name', None)
-        self.roi = kwargs.get('roi', {'angle': -1, 'horizontal': -1, 'vertical': -1})
-        self.normalise = kwargs.get('normalise', True)
-        self.mode = kwargs.get('mode', 'bin')
-        self.fliplr = kwargs.get('fliplr', False)
-        
-        if self.file_name is not None:
-            self.set_up(file_name = self.file_name,
-                        roi = self.roi,
-                        normalise = self.normalise,
-                        mode = self.mode,
-                        fliplr = self.fliplr)
+        ``start`` and ``end`` can be specified as ``None`` which is equivalent
+        to ``start = 0`` and ``end = load everything to the end``, respectively.
+        Start and end also can be negative.
+                
+    '''
+    
+    def __init__(self, file_name = None, roi= {'angle': -1, 'horizontal': -1, 'vertical': -1},
+                 normalise=True, mode='bin', fliplr=False):
+
+        self.file_name = file_name
+        self.roi = roi
+        self.normalise = normalise
+        self.mode = mode
+        self.fliplr = fliplr
+
+        if file_name is not None:
+            self.set_up(file_name = file_name,
+                        roi = roi,
+                        normalise = normalise,
+                        mode = mode,
+                        fliplr = fliplr)
             
     def set_up(self, 
                file_name = None, 
@@ -96,7 +98,7 @@ class NikonDataReader(object):
         self.mode = mode
         self.fliplr = fliplr
         
-        if self.file_name == None:
+        if self.file_name is None:
             raise Exception('Path to xtekct file is required.')
         
         # check if xtekct file exists
@@ -200,8 +202,6 @@ class NikonDataReader(object):
                     self.tiff_directory_path = os.path.dirname(self.file_name)
                 else:
                     self.tiff_directory_path = os.path.join(os.path.dirname(self.file_name), input_folder_name)
-
-
 
 
         self._roi_par = [[0, num_projections, 1] ,[0, pixel_num_v_0, 1], [0, pixel_num_h_0, 1]]
@@ -341,7 +341,9 @@ class NikonDataReader(object):
     def read(self):
         
         '''
-        Reads projections and return AcquisitionData container
+        Reads projections and returns AcquisitionData with corresponding geometry,
+        arranged as ['angle', horizontal'] if a single slice is loaded
+        and ['vertical, 'angle', horizontal'] if more than 1 slice is loaded.
         '''
         
         reader = TIFFStackReader()

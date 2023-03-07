@@ -34,21 +34,20 @@ as NeXuS files.
    :inherited-members:
 .. autoclass:: cil.io.NEXUSDataWriter
    :members:
-   :special-members:
+   :inherited-members:
 |
 
 Nikon
 =====
 .. autoclass:: cil.io.NikonDataReader
    :members:
-   :special-members:
+   :inherited-members:
 
 ZEISS
 =====
-
-.. autoclass:: cil.io.TXRMDataReader
+.. autoclass:: cil.io.ZEISSDataReader
    :members:
-   :special-members:
+   :inherited-members:
 
 TIFF Reader/Writer
 ==================

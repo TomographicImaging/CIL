@@ -29,28 +29,26 @@ except:
 
 
 class NEXUSDataWriter(object):
+    ''' Create a writer for NEXUS files.
     
-    def __init__(self,
-                 **kwargs):
+    Parameters
+    ----------
+    data: AcquisitionData, ImageData, 
+        The dataset to write to file
+    file_name: os.path or string, default None
+        The file name to write
+    compression: int, default 0
+        The lossy compression to apply, default 0 will not compress data.
+        8 or 16 will compress to 8 and 16 bit dtypes respectively.
+    '''
+    
+    def __init__(self, data=None, file_name=None, compression=0):
 
-        '''
-        Constructor 
+        self.data = data
+        self.file_name = file_name
 
-        :param data: The dataset to write to file
-        :type data: AcquisitionData, ImageData
-        :param file_name: file name to write
-        :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
-        :type compression: int, default 0
-        '''
-
-        self.data = kwargs.get('data', None)
-        self.file_name = kwargs.get('file_name', None)
-        self.compression = kwargs.get('compression', 0)
-
-        if ((self.data is not None) and (self.file_name is not None)):
-            self.set_up(data = self.data,
-                        file_name = self.file_name, compression=self.compression)
+        if ((data is not None) and (file_name is not None)):
+            self.set_up(data = data, file_name = file_name, compression=compression)
         
     def set_up(self,
                data = None,
@@ -58,17 +56,26 @@ class NEXUSDataWriter(object):
                compression = 0):
 
         '''
-        set up writer
+        Set up the writer
 
-        :param data: The dataset to write to file
-        :type data: AcquisitionData, ImageData
-        :param file_name: file name to write
-        :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
-        :type compression: int, default 0
-        '''        
+        data: AcquisitionData, ImageData, 
+            The dataset to write to file
+        file_name: os.path or string, default None
+            The file name to write
+        compression: int, default 0
+            The lossy compression to apply, default 0 will not compress data.
+            8 or 16 will compress to 8 and 16 bit dtypes respectively.
+        '''
         self.data = data
-        self.file_name = os.path.abspath(file_name)
+        self.file_name = file_name
+        
+        if self.file_name is None:
+            raise Exception('Path to write file is required.')
+        else:
+            self.file_name = os.path.abspath(file_name)
+
+        if self.data is None:
+            raise Exception('Data to write is required.')
 
         if not self.file_name.endswith('nxs') and not self.file_name.endswith('nex'):
             self.file_name+='.nxs'

@@ -30,7 +30,7 @@ class NikonDataReader(object):
     file_name: str 
         full path to .xtekct file
         
-    roi: dict
+    roi: dict, default=None
         dictionary with roi to load:
         {'angle': (start, end, step), 
             'horizontal': (start, end, step), 
@@ -69,7 +69,7 @@ class NikonDataReader(object):
                 
     '''
     
-    def __init__(self, file_name = None, roi= {'angle': -1, 'horizontal': -1, 'vertical': -1},
+    def __init__(self, file_name = None, roi= None,
                  normalise=True, mode='bin', fliplr=False):
 
         self.file_name = file_name
@@ -87,7 +87,7 @@ class NikonDataReader(object):
             
     def set_up(self, 
                file_name = None, 
-               roi = {'angle': -1, 'horizontal': -1, 'vertical': -1},
+               roi = None,
                normalise = True,
                mode = 'bin',
                fliplr = False):
@@ -112,6 +112,9 @@ class NikonDataReader(object):
         for key in self.roi.keys():
             if key not in ['angle', 'horizontal', 'vertical']:
                 raise Exception("Wrong label. One of the following is expected: angle, horizontal, vertical")
+            
+        if self.roi is None:
+            self.roi= {'angle': -1, 'horizontal': -1, 'vertical': -1}
         
         roi = self.roi.copy()
         

@@ -98,14 +98,15 @@ class ZEISSDataReader(object):
             ``start`` and ``end`` can be specified as ``None`` which is equivalent
             to ``start = 0`` and ``end = load everything to the end``, respectively.
 
-            *Acquisition Data*
+            **Acquisition Data**
+            
             The axis labels in the `roi` dict for `AcquisitionData` will be:
-            `{'angle':(...),'vertical':(...),'horizontal':(...)}`
+            ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
 
-            *Image Data*
+            **Image Data**
 
             The axis labels in the `roi` dict for `ImageData` will be:
-            `{'angle':(...),'vertical':(...),'horizontal':(...)}`
+            ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
 
             To skip files or to change number of files to load,
             adjust ``vertical``. E.g. ``'vertical': (100, 300)`` will skip first 100 files

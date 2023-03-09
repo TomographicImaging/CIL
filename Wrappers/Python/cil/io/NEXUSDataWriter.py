@@ -39,7 +39,7 @@ class NEXUSDataWriter(object):
         The file name to write
     compression: str, {'uint8', 'uint16', None}, default None
         The lossy compression to apply, default None will not compress data.
-       uint8 or unit16 will compress to 8 and 16 bit dtypes respectively..
+        uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.
     '''
     
     def __init__(self, data=None, file_name=None, compression=0):

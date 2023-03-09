@@ -15,17 +15,17 @@ as NeXuS files.
 
   # initialise NEXUS Writer
   writer = NEXUSDataWriter()
-  writer.set_up(file_name='tmp_nexus.nxs',
-              data_container=my_data)
+  writer.set_up(data=my_data,
+              file_name='tmp_nexus.nxs')
   # write data
-  writer.write_file()
+  writer.write()
 
   # read data
   # initialize NEXUS reader
   reader = NEXUSDataReader()
-  reader.set_up(nexus_file='tmp_nexus.nxs')
+  reader.set_up(file_name='tmp_nexus.nxs')
   # load data
-  ad1 = reader.load_data()
+  ad1 = reader.read()
   # get AcquisitionGeometry
   ag1 = reader.get_geometry()
 

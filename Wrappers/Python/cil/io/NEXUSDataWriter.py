@@ -42,7 +42,7 @@ class NEXUSDataWriter(object):
         uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.
     '''
     
-    def __init__(self, data=None, file_name=None, compression=0):
+    def __init__(self, data=None, file_name=None, compression=None):
 
         self.data = data
         self.file_name = file_name

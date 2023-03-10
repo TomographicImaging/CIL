@@ -213,6 +213,7 @@
 <span class="c1">#                   Andrew Sharits (UES,Inc.)</span>
 <span class="c1">#                   Edoardo Pasca (UKRI-STFC)</span>
 <span class="c1">#                   Gemma Fardell (UKRI-STFC)</span>
+<span class="c1">#                   Laura Murgatroyd (UKRI-STFC)</span>
 
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">DataOrder</span>
@@ -228,56 +229,82 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">ZEISSDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ZEISSDataReader"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader">[docs]</a><span class="k">class</span> <span class="nc">ZEISSDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create a reader for ZEISS files</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_name: str</span>
+<span class="sd">        file name to read</span>
+<span class="sd">    roi: dict, default None </span>
+<span class="sd">        dictionary with roi to load for each axis:</span>
+<span class="sd">        ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
+<span class="sd">        ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `roi` behaviour:</span>
+<span class="sd">        For ImageData to skip files or to change number of files to load,</span>
+<span class="sd">        adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
+<span class="sd">        and will load 200 files.</span>
+<span class="sd">        </span>
+<span class="sd">        ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
+
+<span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
+<span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Constructor</span>
-<span class="sd">        </span>
-<span class="sd">        :param file_name: file name to read</span>
-<span class="sd">        :type file_name: os.path or string</span>
-<span class="sd">        :param roi: dictionary with roi to load for each axis.</span>
-<span class="sd">                {&#39;axis_labels_1&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_labels_2&#39;: (start, end, step)}</span>
-<span class="sd">                axis_labels are definied by ImageGeometry and AcquisitionGeometry dimension labels.</span>
-<span class="sd">                e.g. for ImageData to skip files or to change number of files to load, </span>
-<span class="sd">                adjust &#39;vertical&#39;. For instance, &#39;vertical&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 files and will load 200 files.</span>
-<span class="sd">                &#39;axis_label&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative using numpy indexing.</span>
-<span class="sd">        :type roi: dictionary, default None</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+
         <span class="c1"># Set logging level for dxchange reader.py</span>
         <span class="n">logger_dxchange</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;dxchange.reader&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">logger_dxchange</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger_dxchange</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
 
 
-    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+<div class="viewcode-block" id="ZEISSDataReader.set_up"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                <span class="n">file_name</span><span class="p">,</span>
                <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Set up the reader</span>
+
 <span class="sd">        </span>
-<span class="sd">        :param file_name: file name to read</span>
-<span class="sd">        :type file_name: os.path or string, default None</span>
-<span class="sd">        :param roi: dictionary with roi to load for each axis.</span>
-<span class="sd">                {&#39;axis_labels_1&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_labels_2&#39;: (start, end, step)}</span>
-<span class="sd">                axis_labels are definied by ImageGeometry and AcquisitionGeometry dimension labels.</span>
-<span class="sd">                e.g. for ImageData to skip files or to change number of files to load, </span>
-<span class="sd">                adjust &#39;vertical&#39;. For instance, &#39;vertical&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 files and will load 200 files.</span>
-<span class="sd">                &#39;axis_label&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative using numpy indexing.</span>
-<span class="sd">        :type roi: dictionary, default None</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name: str</span>
+<span class="sd">            file name to read</span>
+<span class="sd">        roi: dict, default None </span>
+<span class="sd">            dictionary with roi to load for each axis:</span>
+<span class="sd">            ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
+<span class="sd">            ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        `roi` behaviour:           </span>
+<span class="sd">            ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
+
+<span class="sd">            ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
+<span class="sd">            to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
+
+<span class="sd">            **Acquisition Data**</span>
+<span class="sd">            </span>
+<span class="sd">            The axis labels in the `roi` dict for `AcquisitionData` will be:</span>
+<span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
+
+<span class="sd">            **Image Data**</span>
+
+<span class="sd">            The axis labels in the `roi` dict for `ImageData` will be:</span>
+<span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
+
+<span class="sd">            To skip files or to change number of files to load,</span>
+<span class="sd">            adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
+<span class="sd">            and will load 200 files.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1"># check if file exists</span>
@@ -286,7 +313,7 @@
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
         
         <span class="n">file_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;txrm&#39;</span><span class="p">,</span><span class="s1">&#39;txm&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;txrm&#39;</span><span class="p">,</span> <span class="s1">&#39;txm&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;This reader can only process TXRM or TXM files. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
@@ -331,7 +358,7 @@
         <span class="k">if</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data geometry&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;acquisition&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_acq_geometry</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_image_geometry</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_image_geometry</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">read_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Read one image to get the metadata</span>
@@ -372,7 +399,7 @@
 
         <span class="k">return</span> <span class="n">metadata</span>
     
-    <span class="k">def</span> <span class="nf">slice_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="ZEISSDataReader.slice_metadata"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader.slice_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">slice_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">metadata</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Slices metadata to configure geometry before reading data</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -392,7 +419,7 @@
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;number_of_images&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_slc</span><span class="p">)</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">width_slc</span><span class="p">)</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">height_slc</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">metadata</span>
+        <span class="k">return</span> <span class="n">metadata</span></div>
         
     <span class="k">def</span> <span class="nf">_setup_acq_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -426,7 +453,7 @@
                                     <span class="n">voxel_num_z</span><span class="o">=</span><span class="n">slices</span><span class="p">,</span>
                                     <span class="n">voxel_size_z</span><span class="o">=</span><span class="n">voxel_size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ZEISSDataReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reads projections and return Acquisition (TXRM) or Image (TXM) Data container</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -449,27 +476,27 @@
             <span class="k">return</span> <span class="n">acq_data</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ig_data</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">array</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-            <span class="k">return</span> <span class="n">ig_data</span>
+            <span class="k">return</span> <span class="n">ig_data</span></div>
 
 
-    <span class="k">def</span> <span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ZEISSDataReader.get_geometry"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader.get_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return Acquisition (TXRM) or Image (TXM) Geometry object</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span></div>
 
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ZEISSDataReader.get_metadata"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;return the metadata of the file&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span></div></div>
 
 
-<div class="viewcode-block" id="TXRMDataReader"><a class="viewcode-back" href="../../../io.html#cil.io.TXRMDataReader">[docs]</a><span class="k">class</span> <span class="nc">TXRMDataReader</span><span class="p">(</span><span class="n">ZEISSDataReader</span><span class="p">):</span>
-<div class="viewcode-block" id="TXRMDataReader.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.TXRMDataReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+<span class="k">class</span> <span class="nc">TXRMDataReader</span><span class="p">(</span><span class="n">ZEISSDataReader</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead&#39;</span><span class="p">,</span>
               <span class="ne">DeprecationWarning</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead&#39;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
               </div>

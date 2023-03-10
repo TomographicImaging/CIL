@@ -505,7 +505,7 @@ method will stop when the stopping criterion is met.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_iteration</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – maximum number of iterations</p></li>
-<li><p><strong>update_objectice_interval</strong> – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
+<li><p><strong>update_objective_interval</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 1</em>) – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
 <li><p><strong>log_file</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – log verbose output to file</p></li>
 </ul>
 </dd>
@@ -528,7 +528,7 @@ method will stop when the stopping criterion is met.</p>
 <dt id="cil.optimisation.algorithms.Algorithm.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.should_stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -650,8 +650,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -811,8 +809,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -828,7 +824,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.GD.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/GD.html#GD.should_stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.GD.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 </dd></dl>
@@ -978,8 +974,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -1155,8 +1149,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -1166,7 +1158,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.SIRT.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1241,7 +1233,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_iteration</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – maximum number of iterations</p></li>
-<li><p><strong>update_objectice_interval</strong> – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
+<li><p><strong>update_objective_interval</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 1</em>) – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
 <li><p><strong>log_file</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – log verbose output to file</p></li>
 </ul>
 </dd>
@@ -1496,8 +1488,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -1507,7 +1497,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.ISTA.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1579,7 +1569,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_iteration</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – maximum number of iterations</p></li>
-<li><p><strong>update_objectice_interval</strong> – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
+<li><p><strong>update_objective_interval</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 1</em>) – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
 <li><p><strong>log_file</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – log verbose output to file</p></li>
 </ul>
 </dd>
@@ -1824,8 +1814,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -1841,7 +1829,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.FISTA.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2170,8 +2158,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -2181,7 +2167,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.PDHG.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2309,8 +2295,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -2320,7 +2304,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.LADMM.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2361,7 +2345,7 @@ prints to screen both primal and dual</p></li>
 <p>Example of usage: See <a class="reference external" href="https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py">https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py</a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Convergence is guaranted provided that [2, eq. (12)]:</p>
+<p>Convergence is guaranteed provided that [2, eq. (12)]:</p>
 <div class="math notranslate nohighlight">
 \[\]</div>
 <p>|sigma[i]^{1/2} * K[i] * tau^{1/2} |^2  &lt; p_i for all i</p>
@@ -2369,7 +2353,7 @@ prints to screen both primal and dual</p></li>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <dl class="simple">
-<dt>Notation for primal and dual step-sizes are reversed with comparison</dt><dd><p>to PDGH.py</p>
+<dt>Notation for primal and dual step-sizes are reversed with comparison</dt><dd><p>to PDHG.py</p>
 </dd>
 </dl>
 </div>
@@ -2506,8 +2490,6 @@ last objective function value and the current solution and gets executed at each
 screen. Notice that printing will not evaluate the objective function
 and so the print might be out of sync wrt the calculation of the objective.
 In such cases nan will be printed.</p></li>
-<li><p><strong>very_verbose</strong> – deprecated bool, useful for algorithms with primal and dual objectives (PDHG),
-prints to screen both primal and dual</p></li>
 </ul>
 </dd>
 </dl>
@@ -2517,7 +2499,7 @@ prints to screen both primal and dual</p></li>
 <dt id="cil.optimisation.algorithms.SPDHG.should_stop">
 <code class="sig-name descname"><span class="pre">should_stop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.should_stop" title="Permalink to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
-<p>The user can change this in concrete implementatition of iterative algorithms.</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2672,7 +2654,7 @@ method. Subsequent calls will return the cached norm.</p>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.PowerMethod">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">#</a></dt>
 <dd><p>Power method or Power iteration algorithm</p>
 <p>The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
 absolute value in the real case and module in the complex case.
@@ -4600,7 +4582,7 @@ problems in the following form:</p>
 <li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the regularisation parameter</p></li>
 <li><p><span class="math notranslate nohighlight">\(L\)</span> is a regularisation operator</p></li>
 </ul>
-<p>The first term measures the fidelity of the solution to the data. The second term meausures the
+<p>The first term measures the fidelity of the solution to the data. The second term measures the
 fidelity to the prior knowledge we have imposed on the system, operator <span class="math notranslate nohighlight">\(L\)</span>.</p>
 <p>This can be re-written equivalently in the block matrix form:</p>
 <div class="math notranslate nohighlight">

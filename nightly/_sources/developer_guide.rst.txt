@@ -22,7 +22,7 @@ Creator
 
 To create an instance of a class, the creator of a class should require the **essential** and **often-configured** parameters as named parameters. 
 
-It should not accept positional arguments `*args` or keyworded arguments `**kwargs` so that the user can clearly understand what parameters are necessary to 
+It should not accept positional arguments `*args` or key-worded arguments `**kwargs` so that the user can clearly understand what parameters are necessary to 
 create the instance.
 
 Setter methods and properties

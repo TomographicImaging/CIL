@@ -3317,14 +3317,6 @@
         <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span></div>
 
-
-<div class="viewcode-block" id="DataContainer.axpby"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Deprecated. Alias of _axpby&#39;&#39;&#39;</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The use of axpby is deprecated and will be removed in following version. Use sapyb instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span></div>
-
-
     <span class="k">def</span> <span class="nf">_axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;performs axpby with cilacc C library, can be done in-place.</span>
 <span class="sd">        </span>
@@ -3590,10 +3582,6 @@
                  <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     
 
@@ -3764,9 +3752,6 @@
                  <span class="n">deep_copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
                  <span class="n">geometry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 

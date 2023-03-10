@@ -272,13 +272,13 @@ The framework comprises:</p>
 <li><p><code class="code docutils literal notranslate"><span class="pre">cil.io</span></code> module which provides a number of loaders for real CT machines, e.g. Nikon. It also provides reader and writer to save to NeXuS file format.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">cil.optimisation</span></code> module allows the user to create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">cil.plugins</span></code> module which allows CIL to use selected functionality from ASTRA, TIGRE, TomoPhantom and the Regularisation Toolkit</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">cil.processors</span></code> module contains tools for data manipulation and common CT pre-processoing steps</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.processors</span></code> module contains tools for data manipulation and common CT pre-processing steps</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">cil.recon</span></code> module contains an optimised FDK/FBP reconstructors, making using the both CIL accelerated libraries and the Tigre/ASTRA back-projectors</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">cil.utilities</span></code> module contains a selection of display tools for 2D and 3D data, as well as real and simulated test datasets</p></li>
 </ul>
 <div class="section" id="ct-geometry">
 <h2>CT Geometry<a class="headerlink" href="#ct-geometry" title="Permalink to this headline">#</a></h2>
-<p>Please refer to <a class="reference external" href="https://github.com/vais-ral/CIL-Demos/blob/v19.10.1/Notebooks/00_building_blocks.ipynb">this</a> notebook on the CIL-Demos
+<p>Please refer to <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/demos/1_Introduction/00_CIL_geometry.ipynb">this</a> notebook on the CIL-Demos
 repository for full description.</p>
 <p>In conventional CT systems, an object is placed between a source emitting X-rays and a detector array
 measuring the X-ray transmission images of the incident X-rays. Typically, either the object is placed
@@ -352,7 +352,7 @@ can be defined for multi-channel (spectral/time) CT data using <code class="code
 <li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the regularisation parameter</p></li>
 <li><p><span class="math notranslate nohighlight">\(L\)</span> is a regularisation operator</p></li>
 </ul>
-<p>The first term measures the fidelity of the solution to the data. The second term meausures the
+<p>The first term measures the fidelity of the solution to the data. The second term measures the
 fidelity to the prior knowledge we have imposed on the system, operator <span class="math notranslate nohighlight">\(L\)</span>.</p>
 <p>This can be re-written equivalently in the block matrix form:</p>
 <div class="math notranslate nohighlight">

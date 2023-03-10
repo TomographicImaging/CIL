@@ -238,7 +238,7 @@
 <span class="sd">        </span>
 <span class="sd">        :param max_iteration: maximum number of iterations</span>
 <span class="sd">        :type max_iteration: int, optional, default 0</span>
-<span class="sd">        :param update_objectice_interval: the interval every which we would save the current\</span>
+<span class="sd">        :param update_objective_interval: the interval every which we would save the current\</span>
 <span class="sd">                                       objective. 1 means every iteration, 2 every 2 iteration\</span>
 <span class="sd">                                       and so forth. This is by default 1 and should be increased\</span>
 <span class="sd">                                       when evaluating the objective is computationally expensive.</span>
@@ -269,7 +269,7 @@
 <div class="viewcode-block" id="Algorithm.should_stop"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;default stopping criterion: number of iterations</span>
 <span class="sd">        </span>
-<span class="sd">        The user can change this in concrete implementatition of iterative algorithms.&#39;&#39;&#39;</span>
+<span class="sd">        The user can change this in concrete implementation of iterative algorithms.&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_criterion</span><span class="p">()</span></div>
     
     <span class="k">def</span> <span class="nf">__set_up_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
@@ -440,26 +440,21 @@
 <span class="sd">                               screen. Notice that printing will not evaluate the objective function</span>
 <span class="sd">                               and so the print might be out of sync wrt the calculation of the objective.</span>
 <span class="sd">                               In such cases nan will be printed.</span>
-<span class="sd">        :param very_verbose: deprecated bool, useful for algorithms with primal and dual objectives (PDHG), </span>
-<span class="sd">                            prints to screen both primal and dual</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">print_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;print_interval&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">print_interval</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">:</span>
             <span class="n">print_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="n">very_verbose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;very_verbose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;verbose should be 0, 1 or 2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span> <span class="p">(</span><span class="n">verbose</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;verbose should be 0, 1 or 2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span> <span class="p">(</span><span class="n">verbose</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span><span class="p">():</span>
             <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Stop criterion has been reached.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>

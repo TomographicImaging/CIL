@@ -223,46 +223,53 @@
 
 
 <div class="viewcode-block" id="NEXUSDataWriter"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataWriter">[docs]</a><span class="k">class</span> <span class="nc">NEXUSDataWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Create a writer for NEXUS files.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: AcquisitionData, ImageData, </span>
+<span class="sd">        The dataset to write to file</span>
+<span class="sd">    file_name: os.path or string, default None</span>
+<span class="sd">        The file name to write</span>
+<span class="sd">    compression: str, {&#39;uint8&#39;, &#39;uint16&#39;, None}, default None</span>
+<span class="sd">        The lossy compression to apply, default None will not compress data.</span>
+<span class="sd">        uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     
-<div class="viewcode-block" id="NEXUSDataWriter.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataWriter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Constructor </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
 
-<span class="sd">        :param data: The dataset to write to file</span>
-<span class="sd">        :type data: AcquisitionData, ImageData</span>
-<span class="sd">        :param file_name: file name to write</span>
-<span class="sd">        :type file_name: os.path or string, default None</span>
-<span class="sd">        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.</span>
-<span class="sd">        :type compression: int, default 0</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;compression&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-                        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="p">((</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
         
 <div class="viewcode-block" id="NEXUSDataWriter.set_up"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataWriter.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="n">compression</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+               <span class="n">compression</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        set up writer</span>
+<span class="sd">        Set up the writer</span>
 
-<span class="sd">        :param data: The dataset to write to file</span>
-<span class="sd">        :type data: AcquisitionData, ImageData</span>
-<span class="sd">        :param file_name: file name to write</span>
-<span class="sd">        :type file_name: os.path or string, default None</span>
-<span class="sd">        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.</span>
-<span class="sd">        :type compression: int, default 0</span>
-<span class="sd">        &#39;&#39;&#39;</span>        
+<span class="sd">        data: AcquisitionData, ImageData, </span>
+<span class="sd">            The dataset to write to file</span>
+<span class="sd">        file_name: os.path or string, default None</span>
+<span class="sd">            The file name to write</span>
+<span class="sd">        compression: int, default 0</span>
+<span class="sd">            The lossy compression to apply, default 0 will not compress data.</span>
+<span class="sd">            8 or 16 will compress to 8 and 16 bit dtypes respectively.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Path to write file is required.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Data to write is required.&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nxs&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nex&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">+=</span><span class="s1">&#39;.nxs&#39;</span>

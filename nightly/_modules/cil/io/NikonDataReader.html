@@ -216,70 +216,72 @@
     
         
 <div class="viewcode-block" id="NikonDataReader"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader">[docs]</a><span class="k">class</span> <span class="nc">NikonDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    
-<div class="viewcode-block" id="NikonDataReader.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Basic reader for xtekct files</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Basic reader for xtekct files</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
 
-<span class="sd">            </span>
-<span class="sd">        file_name: str with full path to .xtekct file</span>
-<span class="sd">            </span>
-<span class="sd">        roi: dictionary with roi to load </span>
-<span class="sd">                {&#39;angle&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;horizontal&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;vertical&#39;: (start, end, step)}</span>
-<span class="sd">                Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
-<span class="sd">                to row and column dimensions, respectively.</span>
-<span class="sd">                Files are stacked in alphabetic order. </span>
-<span class="sd">                To skip projections or to change number of projections to load, </span>
-<span class="sd">                adjust &#39;angle&#39;. For instance, &#39;angle&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 projections and will load 200 projections.</span>
-<span class="sd">                &#39;angle&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative.</span>
-<span class="sd">            </span>
-<span class="sd">        normalise: bool, normalises loaded projections by detector </span>
-<span class="sd">                white level (I_0). Default value is True</span>
-<span class="sd">                            </span>
-<span class="sd">        fliplr: bool, default = False, flip projections in the left-right direction</span>
-<span class="sd">                (about vertical axis)</span>
-<span class="sd">                            </span>
-<span class="sd">        mode: str, &#39;bin&#39; (default) or &#39;slice&#39;. In bin mode, &#39;step&#39; number</span>
-<span class="sd">                of pixels is binned together, values of resulting binned</span>
-<span class="sd">                pixels are calculated as average. </span>
-<span class="sd">                In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
-<span class="sd">                Note: in general </span>
-<span class="sd">                output array size in bin mode != output array size in slice mode</span>
+<span class="sd">    file_name: str </span>
+<span class="sd">        full path to .xtekct file</span>
 <span class="sd">        </span>
-<span class="sd">        Output</span>
-<span class="sd">        ------</span>
+<span class="sd">    roi: dict, default=None</span>
+<span class="sd">        dictionary with roi to load:</span>
+<span class="sd">        {&#39;angle&#39;: (start, end, step), </span>
+<span class="sd">            &#39;horizontal&#39;: (start, end, step), </span>
+<span class="sd">            &#39;vertical&#39;: (start, end, step)}</span>
 <span class="sd">        </span>
-<span class="sd">        Acquisition data with corresponding geometry, arranged as [&#39;angle&#39;, horizontal&#39;] </span>
-<span class="sd">        if a single slice is loaded and [&#39;vertical, &#39;angle&#39;, horizontal&#39;] </span>
-<span class="sd">        if more than 1 slices are loaded.</span>
-<span class="sd">                    </span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;roi&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normalise&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fliplr&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
-                        <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">,</span>
-                        <span class="n">normalise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span><span class="p">,</span>
-                        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-                        <span class="n">fliplr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span><span class="p">)</span></div>
+<span class="sd">    normalise: bool, default=True</span>
+<span class="sd">        normalises loaded projections by detector white level (I_0)</span>
+<span class="sd">                        </span>
+<span class="sd">    fliplr: bool, default = False,</span>
+<span class="sd">        flip projections in the left-right direction (about vertical axis)</span>
+<span class="sd">                        </span>
+<span class="sd">    mode: str: {&#39;bin&#39;, &#39;slice&#39;}, default=&#39;bin&#39;</span>
+<span class="sd">        In bin mode, &#39;step&#39; number of pixels is binned together,</span>
+<span class="sd">        values of resulting binned pixels are calculated as average. </span>
+<span class="sd">        In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
+<span class="sd">        Note: in general output array size in bin mode != output array size in slice mode</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `roi` behaviour:</span>
+<span class="sd">        Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
+<span class="sd">        to row and column dimensions, respectively.</span>
+<span class="sd">        </span>
+<span class="sd">        Files are stacked in alphabetic order. </span>
+<span class="sd">        </span>
+<span class="sd">        To skip projections or to change number of projections to load, </span>
+<span class="sd">        adjust &#39;angle&#39;. For instance, &#39;angle&#39;: (100, 300)</span>
+<span class="sd">        will skip first 100 projections and will load 200 projections.</span>
+<span class="sd">        </span>
+<span class="sd">        ``&#39;angle&#39;: -1`` is a shortcut to load all elements along axis.</span>
+<span class="sd">            </span>
+<span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
+<span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
+<span class="sd">        Start and end also can be negative.</span>
+<span class="sd">                </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">normalise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="n">fliplr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span> <span class="o">=</span> <span class="n">normalise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span> <span class="o">=</span> <span class="n">fliplr</span>
+
+        <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span>
+                        <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">,</span>
+                        <span class="n">normalise</span> <span class="o">=</span> <span class="n">normalise</span><span class="p">,</span>
+                        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="p">,</span>
+                        <span class="n">fliplr</span> <span class="o">=</span> <span class="n">fliplr</span><span class="p">)</span>
             
     <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-               <span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
+               <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">normalise</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span>
                <span class="n">fliplr</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
@@ -290,7 +292,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span> <span class="o">=</span> <span class="n">fliplr</span>
         
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Path to xtekct file is required.&#39;</span><span class="p">)</span>
         
         <span class="c1"># check if xtekct file exists</span>
@@ -304,6 +306,9 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong label. One of the following is expected: angle, horizontal, vertical&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
         
         <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         
@@ -394,8 +399,6 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">tiff_directory_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">tiff_directory_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">),</span> <span class="n">input_folder_name</span><span class="p">)</span>
-
-
 
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_projections</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="p">,[</span><span class="mi">0</span><span class="p">,</span> <span class="n">pixel_num_v_0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">pixel_num_h_0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
@@ -535,7 +538,9 @@
 <div class="viewcode-block" id="NikonDataReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.NikonDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Reads projections and return AcquisitionData container</span>
+<span class="sd">        Reads projections and returns AcquisitionData with corresponding geometry,</span>
+<span class="sd">        arranged as [&#39;angle&#39;, horizontal&#39;] if a single slice is loaded</span>
+<span class="sd">        and [&#39;vertical, &#39;angle&#39;, horizontal&#39;] if more than 1 slice is loaded.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">()</span>

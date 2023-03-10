@@ -226,14 +226,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    **kwargs : dict, optional</span>
-<span class="sd">        Arguments to the constructor. One of these should be `file_name`.</span>
+<span class="sd">    file_name: str</span>
+<span class="sd">        the full path to the NeXus file to read.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
@@ -478,7 +477,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">get_geometry</span><span class="p">()</span>
 
         <span class="c1">#allocate data container as requested type</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
 

@@ -139,7 +139,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  return_all=False,  **deprecated_args):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  return_all=False):
 
         r"""Power method or Power iteration algorithm 
         

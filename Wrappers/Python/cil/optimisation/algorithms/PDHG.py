@@ -223,10 +223,6 @@ class PDHG(Algorithm):
 
         super(PDHG, self).__init__(**kwargs)
 
-        if kwargs.get('use_axpby', None) is not None:
-                warnings.warn('The use of the "use_axpby" parameter is deprecated and will not be used by this algorithm',
-                   DeprecationWarning, stacklevel=4)
-
         self._tau = None
         self._sigma = None 
         

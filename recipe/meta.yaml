@@ -27,7 +27,7 @@ test:
     - astra-toolbox>=1.9.9.dev5,<2.1
 
   source_files:
-    - ./Wrappers/Python/test     # [win]
+    - ./Wrappers/Python/test # [win]
     - ./Wrappers/Python/test # [not win] 
 
   commands:

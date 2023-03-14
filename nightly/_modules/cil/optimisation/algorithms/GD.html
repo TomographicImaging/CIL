@@ -354,7 +354,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
         
 <div class="viewcode-block" id="GD.should_stop"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.GD.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_criterion</span><span class="p">()</span> <span class="ow">or</span> \
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_cryterion</span><span class="p">()</span> <span class="ow">or</span> \
             <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(),</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> 
                 <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">equal_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
 

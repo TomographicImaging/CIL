@@ -278,13 +278,17 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">counter_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">counter_offset</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;counter_offset&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;compression&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">counter_offset</span> <span class="o">=</span> <span class="n">counter_offset</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span> 
+        <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="p">,</span>
+                        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> 
                         <span class="n">counter_offset</span><span class="o">=</span><span class="n">counter_offset</span><span class="p">,</span>
                         <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
         
@@ -383,8 +387,8 @@
 <div class="viewcode-block" id="TIFFStackReader"><a class="viewcode-back" href="../../../io.html#cil.io.TIFFStackReader">[docs]</a><span class="k">class</span> <span class="nc">TIFFStackReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">        Basic TIFF reader which loops through all tiff files in a specific </span>
-<span class="sd">        folder and loads them in alphabetic order</span>
+<span class="sd">        Basic TIFF redaer which loops through all tiff files in a specific </span>
+<span class="sd">        folder and load them in alphabetic order</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -393,49 +397,33 @@
 <span class="sd">            Path to folder with tiff files, list of paths of tiffs, or single tiff file</span>
 <span class="sd">                   </span>
 <span class="sd">        roi : dictionary, default `None`</span>
-<span class="sd">            dictionary with roi to load: </span>
+<span class="sd">            dictionary with roi to load </span>
 <span class="sd">            ``{&#39;axis_0&#39;: (start, end, step), </span>
 <span class="sd">               &#39;axis_1&#39;: (start, end, step), </span>
 <span class="sd">               &#39;axis_2&#39;: (start, end, step)}``</span>
-<span class="sd">            roi is specified for axes before transpose.</span>
+<span class="sd">            Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
+<span class="sd">            to row and column dimensions, respectively.</span>
+<span class="sd">            Files are stacked in alphabetic order. </span>
+<span class="sd">            To skip files or to change number of files to load, </span>
+<span class="sd">            adjust axis_0. For instance, &#39;axis_0&#39;: (100, 300)</span>
+<span class="sd">            will skip first 100 files and will load 200 files.</span>
+<span class="sd">            &#39;axis_0&#39;: -1 is a shortcut to load all elements along axis.</span>
+<span class="sd">            Start and end can be specified as None which is equivalent </span>
+<span class="sd">            to start = 0 and end = load everything to the end, respectively.</span>
+<span class="sd">            Start and end also can be negative.</span>
+<span class="sd">            Notes: roi is specified for axes before transpose.</span>
 <span class="sd">            </span>
 <span class="sd">        transpose : bool, default False</span>
 <span class="sd">            Whether to transpose loaded images</span>
 <span class="sd">                    </span>
-<span class="sd">        mode : str, {&#39;bin&#39;, &#39;slice&#39;}, default &#39;bin&#39;.</span>
-<span class="sd">            Defines the &#39;step&#39; in the roi parameter:</span>
-<span class="sd">            </span>
-<span class="sd">            In bin mode, &#39;step&#39; number of pixels </span>
-<span class="sd">            are binned together, values of resulting binned pixels are calculated as average.</span>
-
-<span class="sd">            In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
-
+<span class="sd">        mode : str, default &#39;bin&#39;. Accepted values &#39;bin&#39;, &#39;slice&#39;</span>
+<span class="sd">            Referring to the &#39;step&#39; defined in the roi parameter, in bin mode, &#39;step&#39; number of pixels </span>
+<span class="sd">            are binned together, values of resulting binned pixels are calculated as average. </span>
+<span class="sd">            In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing. </span>
 <span class="sd">            Note: in general output array size in bin mode != output array size in slice mode</span>
 <span class="sd">        </span>
 <span class="sd">        dtype : numpy type, string, default np.float32</span>
 <span class="sd">            Requested type of the read image. If set to None it defaults to the type of the saved file.</span>
-
-
-<span class="sd">        Notes:</span>
-<span class="sd">        ------</span>
-<span class="sd">        roi behaviour:</span>
-<span class="sd">            Files are stacked along ``axis_0``, in alphabetical order.</span>
-<span class="sd">            </span>
-<span class="sd">            ``axis_1`` and ``axis_2`` correspond</span>
-<span class="sd">            to row and column dimensions, respectively.</span>
-
-<span class="sd">            To skip files or to change number of files to load, </span>
-<span class="sd">            adjust ``axis_0``. For instance, ``&#39;axis_0&#39;: (100, 300)``</span>
-<span class="sd">            will skip first 100 files and will load 200 files.</span>
-
-<span class="sd">            ``&#39;axis_0&#39;: -1`` is a shortcut to load all elements along axis 0.</span>
-
-<span class="sd">            ``start`` and ``end`` can be specified as ``None`` which is equivalent </span>
-<span class="sd">            to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
-
-<span class="sd">            Start and end also can be negative.</span>
-
-<span class="sd">            roi is specified for axes before transpose.</span>
 <span class="sd">                    </span>
 
 <span class="sd">        Example:</span>
@@ -449,14 +437,18 @@
 <span class="sd">        Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the</span>
 <span class="sd">        read data to approximately the original data with the following code:</span>
 
-<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, compression=&#39;uint8&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, compression=8)</span>
 <span class="sd">        &gt;&gt;&gt; writer.write(original_data)</span>
 <span class="sd">        &gt;&gt;&gt; reader = TIFFStackReader(file_name = &#39;/path/to/folder&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; about_original_data = reader.read_rescaled()</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>    
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;roi&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;axis_0&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+        <span class="n">transpose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transpose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
@@ -466,7 +458,7 @@
             
     <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;axis_0&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
                <span class="n">transpose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> 
                <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
@@ -514,9 +506,6 @@
         
         <span class="k">if</span> <span class="n">file_name</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs&#39;</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;axis_0&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
             
         <span class="c1"># check that PIL library is installed</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">pilAvailable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>

@@ -449,7 +449,7 @@
 <span class="sd">        Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the</span>
 <span class="sd">        read data to approximately the original data with the following code:</span>
 
-<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, compression=8)</span>
+<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, compression=&#39;uint8&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; writer.write(original_data)</span>
 <span class="sd">        &gt;&gt;&gt; reader = TIFFStackReader(file_name = &#39;/path/to/folder&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; about_original_data = reader.read_rescaled()</span>

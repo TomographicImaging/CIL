@@ -255,7 +255,7 @@ class TIFFStackReader(object):
         Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
         read data to approximately the original data with the following code:
 
-        >>> writer = TIFFWriter(file_name = '/path/to/folder', compression=8)
+        >>> writer = TIFFWriter(file_name = '/path/to/folder', compression='uint8')
         >>> writer.write(original_data)
         >>> reader = TIFFStackReader(file_name = '/path/to/folder')
         >>> about_original_data = reader.read_rescaled()

@@ -2012,9 +2012,9 @@ class AcquisitionGeometry(object):
 
     `AcquisitionGeometry.create_Parallel2D()`
 
-    `AcquisitionGeometry.create_Cone3D()`
+    `AcquisitionGeometry.create_Cone2D()`
 
-    `AcquisitionGeometry.create_Parallel2D()`
+    `AcquisitionGeometry.create_Parallel3D()`
 
     `AcquisitionGeometry.create_Cone3D()`
     """

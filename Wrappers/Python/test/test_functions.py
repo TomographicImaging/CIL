@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2023 United Kingdom Research and Innovation
-#  Copyright 2023 The University of Manchester
-#
-# Author(s):
-#   Evangelos Papoutsellis (UKRI)
-#   Edoardo Pasca (UKRI)
-#   Gemma Fardell (UKRI)
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,6 +13,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 

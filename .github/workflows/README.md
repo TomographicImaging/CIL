@@ -1,5 +1,3 @@
-# Authors:
-# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # GitHub Actions
 
 There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [conda_and_docs_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/conda_and_docs_build.yml) 

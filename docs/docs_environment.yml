@@ -15,7 +15,9 @@
 #  limitations under the License.
 #
 # Authors:
-# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txtname: docs
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
+name: docs
 channels:
   - conda-forge
   - intel

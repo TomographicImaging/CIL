@@ -15,7 +15,9 @@
       limitations under the License.
     
      Authors:
-     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txtFramework 
+     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
+Framework 
 *********
 
 

@@ -15,7 +15,8 @@ REM  See the License for the specific language governing permissions and
 REM  limitations under the License.
 REM
 REM Authors:
-REM CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt@ECHO OFF
+REM CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+@ECHO OFF
 
 pushd %~dp0
 

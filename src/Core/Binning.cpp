@@ -17,6 +17,7 @@
 // Authors:
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
+#include "Binning.h"
 #include <iostream>
 #include <stdio.h>
 #include <cstring>

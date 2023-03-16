@@ -15,7 +15,9 @@
 ##  limitations under the License.
 ##
 ## Authors:
-## CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt# Minimal makefile for Sphinx documentation
+## CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
+# Minimal makefile for Sphinx documentation
 #
 
 # You can set these variables from the command line.

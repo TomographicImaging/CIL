@@ -18,6 +18,7 @@
      CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
      Kyle Pidgeon (UKRI-STFC)
 
+Developers' Guide
 *****************
 
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with 

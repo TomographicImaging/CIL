@@ -3,6 +3,7 @@
   - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
   - Improved and tidied up documentation for all readers and writers, including hiding special members.
   - Use arguments instead of kwargs in all readers and writers with multiple kwargs, making documentation easier.
+  - Update Apache2 License Headers.
 
 * 22.2.0
   - BlockGeometry is iterable

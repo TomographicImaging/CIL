@@ -1,4 +1,4 @@
-* x.x.x
+* 23.0.0
   - Partitioner is now able to create batches even if angle is not the outer dimension
   - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
   - Removed (previously deprecated) `very_verbose` parameter in `Algorithm`'s run method.

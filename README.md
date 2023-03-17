@@ -19,13 +19,13 @@ The documentation for CIL can be accessed [here](https://tomographicimaging.gith
 Binary installation of CIL can be done with `conda`. Install a new environment using:
 
 ```bash
-conda create --name cil -c conda-forge -c intel -c ccpi cil=22.2.0
+conda create --name cil -c conda-forge -c intel -c ccpi cil=23.0.0
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```bash
-conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil=22.2.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
+conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil=23.0.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
 ```
 
 where,
@@ -38,7 +38,7 @@ where,
 
 ```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
 
-```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector (installing tigre via conda requires 9.2).
+```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector (installing tigre via conda requires 10.2).
 
 
 ## Dependency

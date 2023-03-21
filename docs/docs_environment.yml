@@ -30,7 +30,7 @@ dependencies:
   - scikit-image
   - packaging
   - numba
-  - tigre=2.2
+  - tigre=2.4
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
   - pydata-sphinx-theme<0.9
@@ -41,7 +41,7 @@ dependencies:
   - sphinx-click=2.7
   - sphinx-copybutton=0.3
   - astra-toolbox>=1.9.9.dev5,<2.1
-  - ccpi-regulariser=21.0.0
+  - ccpi-regulariser=22.0.0
   - tomophantom=2.0.0
   - ipywidgets
   - tqdm

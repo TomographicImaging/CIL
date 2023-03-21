@@ -27,7 +27,7 @@ Further, it provides a number of high-level generic implementations of optimisat
 
 The fundamental components are:
 
-+ :code:`Operator`: A class specifying a (currently linear) operator
++ :code:`Operator`: A class specifying a (currently linear) operator.
 + :code:`Function`: A class specifying mathematical functions such as a least squares data fidelity.
 + :code:`Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted.
 

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Framework &#8212; CIL 22.2.0 documentation</title>
+    <title>Framework &#8212; CIL 23.0.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -117,7 +117,7 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="developer_guide.html">
-  Developer’s guide
+  Developers’ Guide
  </a>
 </li>
 
@@ -182,7 +182,7 @@
 <li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developers’ Guide</a></li>
 </ul>
 
   <div role="note" aria-label="source link">
@@ -342,8 +342,8 @@
 <dd><p>This class holds the AcquisitionGeometry of the system.</p>
 <p>Please initialise the AcquisitionGeometry using the using the static methods:</p>
 <p><cite>AcquisitionGeometry.create_Parallel2D()</cite></p>
-<p><cite>AcquisitionGeometry.create_Cone3D()</cite></p>
-<p><cite>AcquisitionGeometry.create_Parallel2D()</cite></p>
+<p><cite>AcquisitionGeometry.create_Cone2D()</cite></p>
+<p><cite>AcquisitionGeometry.create_Parallel3D()</cite></p>
 <p><cite>AcquisitionGeometry.create_Cone3D()</cite></p>
 </dd></dl>
 
@@ -817,12 +817,6 @@ returns [1,0]</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.framework.DataContainer.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.axpby" title="Permalink to this definition">#</a></dt>
-<dd><p>Deprecated. Alias of _axpby</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.framework.DataContainer.exp">
 <code class="sig-name descname"><span class="pre">exp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.exp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.exp" title="Permalink to this definition">#</a></dt>
 <dd><p>Applies exp pixel-wise to the DataContainer</p>
@@ -891,12 +885,6 @@ returns [1,0]</p>
 <dt id="cil.framework.AcquisitionData.as_array">
 <code class="sig-name descname"><span class="pre">as_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.as_array" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the pointer to the array.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.framework.AcquisitionData.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.axpby" title="Permalink to this definition">#</a></dt>
-<dd><p>Deprecated. Alias of _axpby</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1147,12 +1135,6 @@ generator will not be seeded.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.framework.ImageData.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.axpby" title="Permalink to this definition">#</a></dt>
-<dd><p>Deprecated. Alias of _axpby</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.framework.ImageData.clone">
 <code class="sig-name descname"><span class="pre">clone</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.clone" title="Permalink to this definition">#</a></dt>
 <dd><p>returns a copy of DataContainer</p>
@@ -1335,12 +1317,6 @@ returns [1,0]</p>
 <dt id="cil.framework.VectorData.as_array">
 <code class="sig-name descname"><span class="pre">as_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.as_array" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the pointer to the array.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.framework.VectorData.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.axpby" title="Permalink to this definition">#</a></dt>
-<dd><p>Deprecated. Alias of _axpby</p>
 </dd></dl>
 
 <dl class="py method">

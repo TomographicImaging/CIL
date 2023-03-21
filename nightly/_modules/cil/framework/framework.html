@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.framework &#8212; CIL 22.2.0 documentation</title>
+    <title>cil.framework.framework &#8212; CIL 23.0.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -115,7 +115,7 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../developer_guide.html">
-  Developer’s guide
+  Developers’ Guide
  </a>
 </li>
 
@@ -157,7 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">CIL Plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developers’ Guide</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -193,21 +193,24 @@
                 
   <h1>Source code for cil.framework.framework</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
-<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
-<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+<span class="c1">#  Copyright 2018 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2018 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1">#   you may not use this file except in compliance with the License.</span>
-<span class="c1">#   You may obtain a copy of the License at</span>
-
-<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
-
-<span class="c1">#   Unless required by applicable law or agreed to in writing, software </span>
-<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1">#   See the License for the specific language governing permissions and</span>
-<span class="c1">#   limitations under the License.</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -301,52 +304,24 @@
 
         <span class="k">return</span> <span class="n">batches</span>
 
-    <span class="k">def</span> <span class="nf">_convert_masks_to_BlockGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">masks</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_construct_BlockGeometry_from_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Convert a list of boolean masks to a list of BlockGeometry.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">          masks : list of boolean array</span>
-<span class="sd">              A list of boolean masks.</span>
+<span class="sd">          indices : list of lists of indices</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            BlockGeometry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">ags</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
             <span class="n">ag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">ag</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+            <span class="n">ag</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">ags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">ags</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_convert_indices_to_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convert a list of batches of indices to a list of boolean masks.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        batches : list of list of int</span>
-<span class="sd">            A list of batches of indices.</span>
-<span class="sd">        num_indices : int, list of int</span>
-<span class="sd">            The number of indices in the original list. If a list is passed, it will be calculated</span>
-<span class="sd">            as the length of the list</span>
-<span class="sd">            </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------- </span>
-<span class="sd">        list</span>
-<span class="sd">            List of boolean masks   </span>
-<span class="sd">&#39;&#39;&#39;</span>
-        <span class="n">boolbatches</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">num_indices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_indices</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
-            <span class="n">boolbatch</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
-                <span class="n">boolbatch</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">boolbatches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">boolbatch</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">boolbatches</span>
 
     <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches using the specified ``mode``.</span>
@@ -409,15 +384,18 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span>
-        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_indices</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">stagger</span><span class="p">)</span>
-        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_indices_to_masks</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-        <span class="n">blk_geo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_masks_to_BlockGeometry</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span>
+        <span class="n">partition_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_indices</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">stagger</span><span class="p">)</span>
+        <span class="n">blk_geo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_BlockGeometry_from_indices</span><span class="p">(</span><span class="n">partition_indices</span><span class="p">)</span>
         
         <span class="c1"># copy data</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">blk_geo</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">blk_geo</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
+            
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
-            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">masks</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">partition_indices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
          
     <span class="k">def</span> <span class="nf">_partition_random_permutation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -2231,9 +2209,9 @@
 
 <span class="sd">    `AcquisitionGeometry.create_Parallel2D()`</span>
 
-<span class="sd">    `AcquisitionGeometry.create_Cone3D()`</span>
+<span class="sd">    `AcquisitionGeometry.create_Cone2D()`</span>
 
-<span class="sd">    `AcquisitionGeometry.create_Parallel2D()`</span>
+<span class="sd">    `AcquisitionGeometry.create_Parallel3D()`</span>
 
 <span class="sd">    `AcquisitionGeometry.create_Cone3D()`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3342,14 +3320,6 @@
         <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span></div>
 
-
-<div class="viewcode-block" id="DataContainer.axpby"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Deprecated. Alias of _axpby&#39;&#39;&#39;</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The use of axpby is deprecated and will be removed in following version. Use sapyb instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span></div>
-
-
     <span class="k">def</span> <span class="nf">_axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;performs axpby with cilacc C library, can be done in-place.</span>
 <span class="sd">        </span>
@@ -3615,10 +3585,6 @@
                  <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     
 
@@ -3789,9 +3755,6 @@
                  <span class="n">deep_copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
                  <span class="n">geometry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;suppress_warning&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 

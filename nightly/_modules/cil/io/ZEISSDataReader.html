@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.ZEISSDataReader &#8212; CIL 22.2.0 documentation</title>
+    <title>cil.io.ZEISSDataReader &#8212; CIL 23.0.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -115,7 +115,7 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../developer_guide.html">
-  Developer’s guide
+  Developers’ Guide
  </a>
 </li>
 
@@ -157,7 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">CIL Plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developers’ Guide</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -193,26 +193,24 @@
                 
   <h1>Source code for cil.io.ZEISSDataReader</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
-<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
-<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
-
-<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1">#   you may not use this file except in compliance with the License.</span>
-<span class="c1">#   You may obtain a copy of the License at</span>
-
-<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
-
-<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1">#   See the License for the specific language governing permissions and</span>
-<span class="c1">#   limitations under the License.</span>
-
-<span class="c1">#   Authored by:    Jakob S. Jørgensen (DTU)</span>
-<span class="c1">#                   Andrew Sharits (UES,Inc.)</span>
-<span class="c1">#                   Edoardo Pasca (UKRI-STFC)</span>
-<span class="c1">#                   Gemma Fardell (UKRI-STFC)</span>
+<span class="c1">#  Copyright 2022 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+<span class="c1"># Andrew Shartis (UES, Inc.)</span>
 
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">DataOrder</span>
@@ -229,55 +227,81 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZEISSDataReader"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader">[docs]</a><span class="k">class</span> <span class="nc">ZEISSDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create a reader for ZEISS files</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_name: str</span>
+<span class="sd">        file name to read</span>
+<span class="sd">    roi: dict, default None </span>
+<span class="sd">        dictionary with roi to load for each axis:</span>
+<span class="sd">        ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
+<span class="sd">        ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `roi` behaviour:</span>
+<span class="sd">        For ImageData to skip files or to change number of files to load,</span>
+<span class="sd">        adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
+<span class="sd">        and will load 200 files.</span>
+<span class="sd">        </span>
+<span class="sd">        ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
+
+<span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
+<span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Constructor</span>
-<span class="sd">        </span>
-<span class="sd">        :param file_name: file name to read</span>
-<span class="sd">        :type file_name: os.path or string</span>
-<span class="sd">        :param roi: dictionary with roi to load for each axis.</span>
-<span class="sd">                {&#39;axis_labels_1&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_labels_2&#39;: (start, end, step)}</span>
-<span class="sd">                axis_labels are definied by ImageGeometry and AcquisitionGeometry dimension labels.</span>
-<span class="sd">                e.g. for ImageData to skip files or to change number of files to load, </span>
-<span class="sd">                adjust &#39;vertical&#39;. For instance, &#39;vertical&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 files and will load 200 files.</span>
-<span class="sd">                &#39;axis_label&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative using numpy indexing.</span>
-<span class="sd">        :type roi: dictionary, default None</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+
         <span class="c1"># Set logging level for dxchange reader.py</span>
         <span class="n">logger_dxchange</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;dxchange.reader&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">logger_dxchange</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger_dxchange</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ZEISSDataReader.set_up"><a class="viewcode-back" href="../../../io.html#cil.io.ZEISSDataReader.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                <span class="n">file_name</span><span class="p">,</span>
                <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Set up the reader</span>
+
 <span class="sd">        </span>
-<span class="sd">        :param file_name: file name to read</span>
-<span class="sd">        :type file_name: os.path or string, default None</span>
-<span class="sd">        :param roi: dictionary with roi to load for each axis.</span>
-<span class="sd">                {&#39;axis_labels_1&#39;: (start, end, step), </span>
-<span class="sd">                 &#39;axis_labels_2&#39;: (start, end, step)}</span>
-<span class="sd">                axis_labels are definied by ImageGeometry and AcquisitionGeometry dimension labels.</span>
-<span class="sd">                e.g. for ImageData to skip files or to change number of files to load, </span>
-<span class="sd">                adjust &#39;vertical&#39;. For instance, &#39;vertical&#39;: (100, 300)</span>
-<span class="sd">                will skip first 100 files and will load 200 files.</span>
-<span class="sd">                &#39;axis_label&#39;: -1 is a shortcut to load all elements along axis.</span>
-<span class="sd">                Start and end can be specified as None which is equivalent </span>
-<span class="sd">                to start = 0 and end = load everything to the end, respectively.</span>
-<span class="sd">                Start and end also can be negative using numpy indexing.</span>
-<span class="sd">        :type roi: dictionary, default None</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name: str</span>
+<span class="sd">            file name to read</span>
+<span class="sd">        roi: dict, default None </span>
+<span class="sd">            dictionary with roi to load for each axis:</span>
+<span class="sd">            ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
+<span class="sd">            ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        `roi` behaviour:           </span>
+<span class="sd">            ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
+
+<span class="sd">            ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
+<span class="sd">            to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
+
+<span class="sd">            **Acquisition Data**</span>
+<span class="sd">            </span>
+<span class="sd">            The axis labels in the `roi` dict for `AcquisitionData` will be:</span>
+<span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
+
+<span class="sd">            **Image Data**</span>
+
+<span class="sd">            The axis labels in the `roi` dict for `ImageData` will be:</span>
+<span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
+
+<span class="sd">            To skip files or to change number of files to load,</span>
+<span class="sd">            adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
+<span class="sd">            and will load 200 files.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1"># check if file exists</span>
@@ -286,7 +310,7 @@
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
         
         <span class="n">file_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;txrm&#39;</span><span class="p">,</span><span class="s1">&#39;txm&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;txrm&#39;</span><span class="p">,</span> <span class="s1">&#39;txm&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;This reader can only process TXRM or TXM files. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>

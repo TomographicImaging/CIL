@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.Algorithm &#8212; CIL 22.2.0 documentation</title>
+    <title>cil.optimisation.algorithms.Algorithm &#8212; CIL 23.0.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -115,7 +115,7 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../../developer_guide.html">
-  Developer’s guide
+  Developers’ Guide
  </a>
 </li>
 
@@ -157,7 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../utilities.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">CIL Plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developers’ Guide</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -193,21 +193,23 @@
                 
   <h1>Source code for cil.optimisation.algorithms.Algorithm</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
-<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
-<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
-
-<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class="c1">#   you may not use this file except in compliance with the License.</span>
-<span class="c1">#   You may obtain a copy of the License at</span>
-
-<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
-
-<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c1">#   See the License for the specific language governing permissions and</span>
-<span class="c1">#   limitations under the License.</span>
+<span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
 <span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">functools</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span><span class="p">,</span> <span class="n">Number</span>
@@ -220,14 +222,14 @@
 <span class="sd">      provides the minimal infrastructure.</span>
 
 <span class="sd">      Algorithms are iterables so can be easily run in a for loop. They will</span>
-<span class="sd">      stop as soon as the stop cryterion is met.</span>
+<span class="sd">      stop as soon as the stop criterion is met.</span>
 <span class="sd">      The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and</span>
 <span class="sd">      and :code:`update_objective` methods</span>
 <span class="sd">      </span>
 <span class="sd">      A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts</span>
 <span class="sd">      a :code:`callback` function that receives the current iteration number and the actual objective</span>
 <span class="sd">      value and can be used to trigger print to screens and other user interactions. The :code:`run`</span>
-<span class="sd">      method will stop when the stopping cryterion is met. </span>
+<span class="sd">      method will stop when the stopping criterion is met. </span>
 <span class="sd">   &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Algorithm.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -238,7 +240,7 @@
 <span class="sd">        </span>
 <span class="sd">        :param max_iteration: maximum number of iterations</span>
 <span class="sd">        :type max_iteration: int, optional, default 0</span>
-<span class="sd">        :param update_objectice_interval: the interval every which we would save the current\</span>
+<span class="sd">        :param update_objective_interval: the interval every which we would save the current\</span>
 <span class="sd">                                       objective. 1 means every iteration, 2 every 2 iteration\</span>
 <span class="sd">                                       and so forth. This is by default 1 and should be increased\</span>
 <span class="sd">                                       when evaluating the objective is computationally expensive.</span>
@@ -267,10 +269,10 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
     
 <div class="viewcode-block" id="Algorithm.should_stop"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stopping cryterion: number of iterations</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stopping criterion: number of iterations</span>
 <span class="sd">        </span>
-<span class="sd">        The user can change this in concrete implementatition of iterative algorithms.&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_cryterion</span><span class="p">()</span></div>
+<span class="sd">        The user can change this in concrete implementation of iterative algorithms.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_criterion</span><span class="p">()</span></div>
     
     <span class="k">def</span> <span class="nf">__set_up_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the logger if desired&quot;&quot;&quot;</span>
@@ -281,9 +283,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
     
-<div class="viewcode-block" id="Algorithm.max_iteration_stop_cryterion"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.max_iteration_stop_cryterion">[docs]</a>    <span class="k">def</span> <span class="nf">max_iteration_stop_cryterion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stop cryterion for iterative algorithm: max_iteration reached&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Algorithm.max_iteration_stop_criterion"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">[docs]</a>    <span class="k">def</span> <span class="nf">max_iteration_stop_criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stop criterion for iterative algorithm: max_iteration reached&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span></div>
+
 <div class="viewcode-block" id="Algorithm.__iter__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.Algorithm.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -439,28 +442,23 @@
 <span class="sd">                               screen. Notice that printing will not evaluate the objective function</span>
 <span class="sd">                               and so the print might be out of sync wrt the calculation of the objective.</span>
 <span class="sd">                               In such cases nan will be printed.</span>
-<span class="sd">        :param very_verbose: deprecated bool, useful for algorithms with primal and dual objectives (PDHG), </span>
-<span class="sd">                            prints to screen both primal and dual</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">print_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;print_interval&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">print_interval</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">:</span>
             <span class="n">print_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="n">very_verbose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;very_verbose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;verbose should be 0, 1 or 2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span> <span class="p">(</span><span class="n">verbose</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;verbose should be 0, 1 or 2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span> <span class="p">(</span><span class="n">verbose</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span><span class="p">():</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Stop cryterion has been reached.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Stop criterion has been reached.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
             <span class="n">iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span>
 

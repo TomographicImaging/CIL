@@ -27,7 +27,6 @@ To install CIL and the additional packages and plugins needed to run the [CIL de
 ```bash
 conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil=23.0.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
 ```
-
 where,
 
 ```astra-toolbox``` will allow you to use CIL with the [ASTRA toolbox](http://www.astra-toolbox.com/) projectors (GPLv3 license).

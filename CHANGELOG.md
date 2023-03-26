@@ -1,3 +1,6 @@
+* 23.0.1
+  - Fix bug with NikonReader requiring ROI to be set in constructor.
+
 * 23.0.0
   - Partitioner is now able to create batches even if angle is not the outer dimension
   - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`

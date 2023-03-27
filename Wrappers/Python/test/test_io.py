@@ -24,7 +24,7 @@ from cil.framework import AcquisitionGeometry
 import numpy as np
 import os
 from cil.framework import ImageGeometry
-from cil.io import TXRMDataReader, NEXUSDataReader
+from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
@@ -522,3 +522,37 @@ class Test_HDF5_utilities(unittest.TestCase):
 
         HDF5_utilities.read_to(self.path, self.dset_path, data_partial, source_sel=subset, dest_sel=subset)
         np.testing.assert_allclose(data_partial_by_hand,data_partial)
+
+
+class TestNikonReader(unittest.TestCase):
+
+    def test_setup(self):
+
+        reader = NikonDataReader()
+        self.assertEqual(reader.file_name, None)
+        self.assertEqual(reader.roi, None)
+        self.assertTrue(reader.normalise)
+        self.assertEqual(reader.mode, 'bin')
+        self.assertFalse(reader.fliplr)
+
+        roi = {'vertical':(1,-1),'horizontal':(1,-1),'angle':(1,-1)}
+        reader = NikonDataReader(file_name=None, roi=roi, normalise=False, mode='slice', fliplr=True)
+        self.assertEqual(reader.file_name, None)
+        self.assertEqual(reader.roi, roi)
+        self.assertFalse(reader.normalise)
+        self.assertEqual(reader.mode, 'slice')
+        self.assertTrue(reader.fliplr)
+
+        with self.assertRaises(FileNotFoundError):
+            reader = NikonDataReader(file_name='no-file')
+        
+
+class TestZeissReader(unittest.TestCase):
+
+    def test_setup(self):
+
+        reader = ZEISSDataReader()
+        self.assertEqual(reader.file_name, None)
+
+        with self.assertRaises(FileNotFoundError):
+            reader = ZEISSDataReader(file_name='no-file')

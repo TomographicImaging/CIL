@@ -102,11 +102,11 @@ class NikonDataReader(object):
         self.fliplr = fliplr
         
         if self.file_name is None:
-            raise Exception('Path to xtekct file is required.')
+            raise ValueError('Path to xtekct file is required.')
         
         # check if xtekct file exists
         if not(os.path.isfile(self.file_name)):
-            raise Exception('File\n {}\n does not exist.'.format(self.file_name))
+            raise FileNotFoundError('File\n {}\n does not exist.'.format(self.file_name))
         
         if os.path.basename(self.file_name).split('.')[-1].lower() != 'xtekct':
             raise TypeError('This reader can only process xtekct files. Got {}'.format(os.path.basename(self.file_name)))
@@ -117,7 +117,7 @@ class NikonDataReader(object):
         # check labels     
         for key in self.roi.keys():
             if key not in ['angle', 'horizontal', 'vertical']:
-                raise Exception("Wrong label. One of the following is expected: angle, horizontal, vertical")            
+                raise ValueError("Wrong label. One of the following is expected: angle, horizontal, vertical")            
         
         roi = self.roi.copy()
         

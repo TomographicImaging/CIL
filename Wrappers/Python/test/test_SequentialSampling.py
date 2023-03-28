@@ -1,9 +1,9 @@
 import unittest
-# from utils import initialise_tests
+from utils import initialise_tests
 from cil.optimisation.utilities import SequentialSampling
 import numpy as np                  
                   
-# initialise_tests()
+initialise_tests()
 
 
 

@@ -133,6 +133,24 @@ class SequentialSampling:
         else: 
             self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)] # list of lists
 
+    def show_epochs(self, epochs):
+        
+        total_its = epochs * self.num_indices
+        for _ in range(total_its):
+            next(self)
+                    
+        if self.batch_size==1:
+            k = 0
+            for i in range(epochs):
+                print(" Epoch : {}, indices used : {} ".format(i, self.indices_used[k:k+self.num_indices]))    
+                k+=self.num_indices 
+            print("")   
+        else:
+            k=0
+            for i in range(epochs):
+                print(" Epoch : {}, batches used : {} ".format(i, self.indices_used[k:k+self.num_batches]))                 
+                k += self.num_batches            
+
 class SequentialIndex(SequentialSampling):   
     
     def __next__(self):
@@ -162,32 +180,8 @@ class SequentialBatch(SequentialIndex):
 
         
                 
-                                         
-    # def __next__(self):
-        
-    #     if isinstance(self.batch_size, (list,int)):
-    #         tmp = self.partition_list[self.index]
-    #     else:
-    #         tmp = self.list_of_indices[self.index]
-    #     self.indices_used.append(tmp)  
-    #     self.index += 1
-        
-    #     if self.index == self.num_batches:
-    #         self.index=0 
-                    
-    #     return tmp  
+                                        
 
-    def show_epochs(self, epochs):
-        
-        total_its = epochs * self.num_indices
-        for _ in range(total_its):
-            next(self)
-
-        k = 0
-        for i in range(epochs):
-            print(" Epoch : {}, indices used : {} ".format(i, self.indices_used[k:k+self.num_batches]))    
-            k+=self.num_batches 
-        print("")  
 
 
 

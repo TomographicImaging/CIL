@@ -9,90 +9,103 @@ class TestRandomSampling(unittest.TestCase):
                     
     def setUp(self):
             
-        self.len_list = 10     
+        self.num_indices = 10     
         self.seed = 19  
-        self.batch_size = 2
-        self.epochs = 3
-
-        # uniform with replacement
-        self.rs_uniform = RandomSampling(self.len_list, seed=self.seed) 
-
-        # uniform without replacement
-        self.rs_uniform_without_replacement = RandomSampling(self.len_list, replace=False, seed=self.seed) 
-
-        # uniform with replacement batch_size>1
-        self.rs_uniform_batch = RandomSampling(self.len_list, batch_size=self.batch_size, seed=self.seed) 
-
-        # uniform without replacement batch_size>1
-        self.rs_uniform_without_replacement_batch = RandomSampling(self.len_list, batch_size=self.batch_size, replace=False, seed=self.seed) 
-
-        # uniform without replacement unequal batch_size
-        self.rs_uniform_unequal_batch = RandomSampling(self.len_list, batch_size=3, seed=self.seed) 
 
 
-    def test_random_sampling_uniform_with_replacement(self):
+    def test_random_sampling_diff_num_batches(self):
 
-        list_generated_seed_19 = [5, 4, 3, 9, 3, 2, 8, 0, 4, 3]
+        # test random sampling with different num_batches, with default options
 
-        # check static method
-        sm_rs_uniform = RandomSampling.uniform(self.len_list, seed=self.seed)
-        
-        for _ in range(10):
-            next(self.rs_uniform)
-            next(sm_rs_uniform)
+        sq1 = RandomSampling(self.num_indices, self.num_indices, seed=self.seed)         
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [5, 4, 3, 9, 3, 2, 8, 0, 4, 3])
 
-        self.assertListEqual(self.rs_uniform.indices_used, list_generated_seed_19)
-        self.assertListEqual(self.rs_uniform.indices_used, sm_rs_uniform.indices_used)
+        sq1 = RandomSampling(self.num_indices, 2, seed=self.seed)         
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[5, 4, 3, 9, 3], [2, 8, 0, 4, 3]])        
 
+        sq1 = RandomSampling(self.num_indices, 5, seed=self.seed)         
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[5, 4], [3, 9], [3, 2], [8, 0], [4, 3]])        
 
-    def test_random_sampling_uniform_without_replacement(self):
+    def test_random_sampling_ueven_batch_size(self):
 
-        list_generated_seed_19 = [7, 8, 9, 2, 1, 4, 6, 5, 0, 3]
+        # test random sampling with ueven batch_size
 
-        # check static method
-        sm_rs_uniform_without_replacement = RandomSampling.uniform_no_replacement(self.len_list, seed=self.seed)        
-        
-        for _ in range(10):
-            next(self.rs_uniform_without_replacement)
-            next(sm_rs_uniform_without_replacement)
-
-        self.assertListEqual(self.rs_uniform_without_replacement.indices_used, list_generated_seed_19)        
-        self.assertListEqual(self.rs_uniform_without_replacement.indices_used, sm_rs_uniform_without_replacement.indices_used)        
-
-    def test_random_sampling_uniform_with_replacement_batch(self):
-
-        batches_generated_seed_19 = [[5, 4], [3, 9], [3, 2], [8, 0], [4, 3], [5, 4], [3, 9], [3, 2], [8, 0], [4, 3]]
-        
-        for _ in range(10):
-            next(self.rs_uniform_batch)
-
-        for i in range(int(self.len_list/self.batch_size)):
-            self.assertListEqual(self.rs_uniform_batch.indices_used[i], batches_generated_seed_19[i]) 
-
-    def test_random_sampling_uniform_with_replacement_batch(self):
-
-        unequal_batches_generated_seed_19 = [[5, 4, 3], [9, 3, 2], [8, 0, 4], [3]]
-        
-        
-        for _ in range(int(self.len_list/self.batch_size)+1):
-            next(self.rs_uniform_unequal_batch)
-
-        for i in range(int(self.len_list/3)+1):
-            self.assertListEqual(self.rs_uniform_unequal_batch.indices_used[i], unequal_batches_generated_seed_19[i])                
-
-    def test_random_sampling_uniform_without_replacement_batch(self):
-
-        batches_generated_seed_19 = [[7, 8], [9, 2], [1, 4], [6, 5], [0, 3]]
-        
-        
-        for _ in range(int(self.len_list/self.batch_size)):
-            next(self.rs_uniform_without_replacement_batch)
-
-        for i in range(int(self.len_list/self.batch_size)):
-            self.assertListEqual(self.rs_uniform_without_replacement_batch.indices_used[i], batches_generated_seed_19[i])                
+        sq1 = RandomSampling(self.num_indices, 3, seed=self.seed)         
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[5, 4, 3, 9], [3, 2, 8, 0], [4, 3]])        
 
 
+    def test_random_sampling_list_batch_size(self): 
+
+        # batch_size in the ueven case as a list
+        sq1 = RandomSampling(self.num_indices, num_batches = 4, batch_size = [2,3,3,2], seed=self.seed)         
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[5, 4], [3, 9, 3], [2, 8, 0], [4, 3]])                  
+
+        # batch_size in the ueven case as a list
+        sq1 = RandomSampling(self.num_indices, num_batches = 3, batch_size = [2,3,5], seed=self.seed)                 
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[5, 4], [3, 9, 3], [2, 8, 0, 4, 3]])   
+       
+    def test_random_sampling_list_batch_size_error(self):     
+
+        # when the sum of each batch_size in the list does not sum to num_indices
+        with self.assertRaises(ValueError) as err:            
+            sq1 = RandomSampling(self.num_indices, num_batches = 4, batch_size = [2,3,3,1])         
+
+        # when the len of the list batch_size < num_batches
+        with self.assertRaises(ValueError) as err:            
+            sq1 = RandomSampling(self.num_indices, num_batches = 4, batch_size = [2,3,5])         
+       
+
+    def test_random_sampling_without_replacement(self):
+
+        sq1 = RandomSampling(self.num_indices, num_batches = 2, replace = False, seed=self.seed)                 
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[7, 8, 9, 2, 1], [4, 6, 5, 0, 3]])   
+                
+
+    def test_random_sampling_without_replacement_with_shuffle(self):
+
+        sq1 = RandomSampling(self.num_indices, num_batches = 2, replace = False, seed=self.seed)                 
+        for _ in range(2*sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[7, 8, 9, 2, 1], [4, 6, 5, 0, 3], 
+                                                [7, 0, 2, 1, 9], [3, 4, 5, 8, 6]])   
+           
+
+    def test_random_sampling_without_replacement_without_shuffle(self):
+
+        sq1 = RandomSampling(self.num_indices, num_batches = 2, replace = False, shuffle = False, seed=self.seed)                 
+        for _ in range(2*sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[7, 8, 9, 2, 1], [4, 6, 5, 0, 3], 
+                                                [7, 8, 9, 2, 1], [4, 6, 5, 0, 3]])   
 
 
+    def test_random_sampling_with_prob(self):
 
-    
+        prob = [1./self.num_indices]*self.num_indices #uniform
+        sq1 = RandomSampling(self.num_indices, num_batches = 5, prob=prob, seed=self.seed)                 
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[4, 9], [2, 0], [3, 7], [7, 5], [3, 9]])                                                   
+           
+        np.random.seed(self.seed)
+        tmp_p = [np.random.random() for i in range(self.num_indices)]
+        prob = [i/sum(tmp_p) for i in tmp_p] #non uniform
+        sq1 = RandomSampling(self.num_indices, num_batches = 5, prob=prob, seed=self.seed)                 
+        for _ in range(sq1.num_batches):
+            next(sq1)
+        self.assertListEqual(sq1.indices_used, [[6, 9], [4, 1], [4, 8], [8, 7], [4, 9]])                                                   
+                      

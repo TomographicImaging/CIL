@@ -40,8 +40,4 @@ class SAGAFunction(SAGFunction):
 
         # Update the full gradient estimator: add (gradient F_{subset_num} (x) - subset_gradient_in_memory_{subset_num}) to the current full_gradient
         self.tmp_full_gradient.sapyb(1., self.func_grad_diff, 1., out=self.tmp_full_gradient)
-       
-
-
-
     

@@ -1,6 +1,6 @@
 from cil.optimisation.functions import SumFunction
 from cil.optimisation.utilities import RandomSampling
-
+import numbers
 class ApproximateGradientSumFunction(SumFunction):
 
     r"""ApproximateGradientSumFunction represents the following sum 
@@ -40,7 +40,6 @@ class ApproximateGradientSumFunction(SumFunction):
     def __init__(self, functions, selection=None):    
                         
         self.functions_used = []   
-        self.functions_passes = [0] 
         if selection is None:
             self.selection = RandomSampling.uniform(len(functions))
         else:
@@ -72,10 +71,17 @@ class ApproximateGradientSumFunction(SumFunction):
 
         """ Computes the gradient for each selected function at :code:`x`."""   
         self.next_function()
-        return self.approximate_gradient(self.function_num, x, out=out)
+
+        # single function 
+        if isinstance(self.function_num, numbers.Number):
+            return self.approximate_gradient(self.function_num, x, out=out)
+        else:            
+            raise ValueError("Batch gradient is not implemented")
                
     def next_function(self):
         
         """ Selects the next function or the next batch of functions from the list of :code:`functions` using the :code:`selection`."""        
         self.function_num = next(self.selection)
+        
+        # append each function used at this iteration
         self.functions_used.append(self.function_num)

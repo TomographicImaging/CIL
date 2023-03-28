@@ -59,6 +59,19 @@ class SequentialSampling:
 
 
     """    
+
+    def __new__(cls, num_indices, num_batches=None, step_size = None, batch_size = None):
+        
+        cls.num_batches = num_batches
+
+        if cls.num_batches is None:
+            cls.num_batches = num_indices
+        
+        if cls.num_batches == num_indices:
+            return super(SequentialSampling, cls).__new__(SequentialIndex)
+        else:
+            return super(SequentialSampling, cls).__new__(SequentialBatch)
+
                 
     def __init__(self, num_indices, num_batches = None, step_size = None, batch_size = None):
         
@@ -66,6 +79,10 @@ class SequentialSampling:
         self.num_batches = num_batches
         self.step_size = step_size
         self.batch_size = batch_size
+        # store indices
+        self.indices_used = []
+        self.index = 0 
+        
 
         # default values
         if self.num_batches is None:
@@ -75,9 +92,7 @@ class SequentialSampling:
         if self.step_size is None:
             self.step_size = self.num_batches
         
-        # store indices
-        self.indices_used = []
-        
+
         # check if equal batches
         # if equal batch_size then batch_size = self.num_indices//self.num_batches
         # if not equal batch_size then default batch_size = (self.num_indices//self.num_batches)+1
@@ -117,23 +132,50 @@ class SequentialSampling:
             self.partition_list = [list(islice(iterator_list, 0, i)) for i in self.batch_size] # list of lists
         else: 
             self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)] # list of lists
-        
-        self.index = 0
-                
-                                         
+
+class SequentialIndex(SequentialSampling):   
+    
+    def __next__(self):
+
+        index_num = self.list_of_indices[self.index]
+        self.index+=1   
+
+        if self.index == self.num_indices:
+            self.index = 0                
+
+        self.indices_used.append(index_num)
+
+        return index_num  
+
+class SequentialBatch(SequentialIndex):
+            
     def __next__(self):
         
-        if isinstance(self.batch_size, (list,int)):
-            tmp = self.partition_list[self.index]
-        else:
-            tmp = self.list_of_indices[self.index]
-        self.indices_used.append(tmp)  
-        self.index += 1
+        tmp_list = list(self.partition_list[self.index])
+        self.indices_used.append(tmp_list)         
+        self.index+=1
         
-        if self.index == self.num_batches:
-            self.index=0 
+        if self.index==len(self.partition_list):
+            self.index=0            
+                                               
+        return tmp_list        
+
+        
+                
+                                         
+    # def __next__(self):
+        
+    #     if isinstance(self.batch_size, (list,int)):
+    #         tmp = self.partition_list[self.index]
+    #     else:
+    #         tmp = self.list_of_indices[self.index]
+    #     self.indices_used.append(tmp)  
+    #     self.index += 1
+        
+    #     if self.index == self.num_batches:
+    #         self.index=0 
                     
-        return tmp  
+    #     return tmp  
 
     def show_epochs(self, epochs):
         
@@ -147,7 +189,6 @@ class SequentialSampling:
             k+=self.num_batches 
         print("")  
 
-                          
 
 
     

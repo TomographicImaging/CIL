@@ -109,6 +109,7 @@ class RandomSampling():
         self.prob = prob
         self.replace = replace
         self.shuffle = shuffle
+        # store indices
         self.indices_used = []
         self.index = 0
         self.seed = seed

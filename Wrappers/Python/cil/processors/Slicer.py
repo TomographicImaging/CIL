@@ -283,7 +283,11 @@ class Slicer(DataProcessor):
                 if n_elements > 1:
                     # difference in end indices, minus differences in start indices, divided by 2
                     pixel_offset = ((self._shape_in[vert_ind] -1 - self._pixel_indices[vert_ind][1]) - self._pixel_indices[vert_ind][0])*0.5
-                    system_detector.position = system_detector.position - pixel_offset * system_detector.direction_y * geometry_new.config.panel.pixel_size[1]
+                    if 'bottom' in geometry_new.config.panel.origin:
+                        system_detector.position = system_detector.position - pixel_offset * system_detector.direction_y * geometry_new.config.panel.pixel_size[1]
+                    else:
+                        system_detector.position = system_detector.position + pixel_offset * system_detector.direction_y * geometry_new.config.panel.pixel_size[1]
+                        
                     geometry_new.config.panel.num_pixels[1] = n_elements
                 else:
                     try:
@@ -314,7 +318,11 @@ class Slicer(DataProcessor):
 
             elif axis == 'horizontal':
                 pixel_offset = ((self._shape_in[i] -1 - self._pixel_indices[i][1]) - self._pixel_indices[i][0])*0.5
-                system_detector.position = system_detector.position - pixel_offset * system_detector.direction_x * geometry_new.config.panel.pixel_size[0]
+
+                if 'left' in geometry_new.config.panel.origin:
+                    system_detector.position = system_detector.position - pixel_offset * system_detector.direction_x * geometry_new.config.panel.pixel_size[0]
+                else:
+                    system_detector.position = system_detector.position + pixel_offset * system_detector.direction_x * geometry_new.config.panel.pixel_size[0]
                 geometry_new.config.panel.num_pixels[0] = n_elements
                 geometry_new.config.panel.pixel_size[0] *= roi.step
 

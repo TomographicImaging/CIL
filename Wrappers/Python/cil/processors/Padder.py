@@ -574,12 +574,19 @@ class Padder(DataProcessor):
             elif dim == 'vertical':
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][0] 
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][1]
-                system_detector.position = system_detector.position - offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
+
+                if 'bottom' in geometry.config.panel.origin:
+                    system_detector.position = system_detector.position - offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
+                else:
+                    system_detector.position = system_detector.position + offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
+                    
             elif dim == 'horizontal':
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][0]
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][1]
-                system_detector.position = system_detector.position - offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
-        
+                if 'left' in geometry.config.panel.origin:
+                    system_detector.position = system_detector.position - offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
+                else:
+                    system_detector.position = system_detector.position + offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
         return geometry
 
     def _process_image_geometry(self):

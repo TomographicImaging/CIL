@@ -26,42 +26,61 @@ import logging
 
 class NikonDataReader(Reader):
 
-    '''Basic reader for xtekct files
+    '''Reader for xtekct files
+
+    This will read xtekct files and allow you create a CIL `AcquisitionData`.
+
+    If configured the geometry will respect any centre of rotation offset.
     
     Parameters
     ----------
-
     file_name: str 
         full path to .xtekct file
+
+    Example
+    -------
+    Read in your Nikon dataset
+    >>> reader = NikonDataReader('path/to/my/dataset.xtekct')
+    >>> data = reader.read()
+
+    Example
+    -------
+    Read in a region of interest (ROI). This is done by using `set_panel_roi`.
+    `preview` can then be used to preview 2 angles of the normalised data with the requested ROI.
+    Reset the configured ROI with `reset`
+
+    >>> reader = NikonDataReader('path/to/my/dataset.xtekct')
+    >>> reader.set_panel_roi(vertical=(100,100), horizontal=(50,50))
+    >>> reader.preview()
+    >>> data = reader.read()
 
     '''
     
     supported_extensions=['xtekct']
 
-    def __init__(self, file_name = None, fliplr=False, **deprecated_kwargs):
+    def __init__(self, file_name = None, **deprecated_kwargs):
 
-        self._fliplr = fliplr
         super().__init__(file_name)
 
         if deprecated_kwargs.get('roi', None) is not None:
             logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_projections()' instead")
-
+            
             roi = deprecated_kwargs.pop('roi')
             self.set_projections(roi.get('angle')) 
             self.set_panel_roi(vertical=roi.get('vertical'), horizontal=roi.get('horizontal'))
 
         if deprecated_kwargs.pop('normalise', None) is not None:
-            logging.warning("Input argument `normalise` has been deprecated.\
+            raise DeprecationWarning("Input argument `normalise` has been deprecated.\
                 The 'read' method will return the normalised data.\
                 The 'get_data_array' method will return the data array without processing")
 
         if deprecated_kwargs.pop('mode', None) is not None:
-            logging.warning("Input argument `mode` has been deprecated.\
+            raise DeprecationWarning("Input argument `mode` has been deprecated.\
                 Please use methods 'set_panel_roi()' to bin on the spatial domain \
                 and 'set_projections()' to slice on the anglura domain")
 
         if deprecated_kwargs.pop('fliplr', None) is not None:
-            logging.warning("Input argument `fliplr` has been deprecated.")
+            raise PendingDeprecationWarning("Input argument `fliplr` has been deprecated.")
             
         if deprecated_kwargs:
             logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
@@ -71,8 +90,7 @@ class NikonDataReader(Reader):
 
     def _read_metadata(self):
         """
-        Populate a dictionary of used fields and values in original dataset
-        
+        Constructs a dictionary `self._metadata` of the values used from the metadata. 
         """
         self._metadata = {}
 
@@ -103,9 +121,7 @@ class NikonDataReader(Reader):
 
     def _create_geometry(self):
         """
-        Create the AcquisitionGeometry for the full dataset using the values in self.metadata
-
-        save in self._acquisition_geometry
+        Create the `AcquisitionGeometry` `self._acquisition_geometry` that describes the full dataset
         """
 
         #angles from xtekct ignore *.ang and _ctdata.txt as not correct
@@ -146,11 +162,7 @@ class NikonDataReader(Reader):
         rotation_axis_direction = rot_matrix.dot([0,0,1])
 
 
-        if self._fliplr:
-            origin = 'top-left'
-        else:
-            origin = 'top-right'
-
+        origin = 'top-right'
 
         if ['DetectorPixelsY'] == 1:
             self._acquisition_geometry = AcquisitionGeometry.create_Cone2D(source_position=[0, 0 ],
@@ -177,32 +189,32 @@ class NikonDataReader(Reader):
             self._acquisition_geometry.set_labels(labels=['angle', 'vertical', 'horizontal'])
 
 
-    def get_flatfield_array(self):
+    def get_raw_flatfield(self):
         """
-        return numpy array with the raw flatfield image if applicable. 
-        """
-        return None
-
-
-    def get_darkfield_array(self):
-        """
-        return numpy array with the raw darkfield image if applicable. 
+        Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
         """
         return None
 
 
-    def get_data_array(self):
+    def get_raw_darkfield(self):
         """
-        return numpy array with the full raw data.
+        Returns a `numpy.ndarray` with the raw dark-field images in the format they are stored.
         """
-        
-        data_reader = TIFFStackReader(file_name = self._data_path)
+        return None
+
+
+    def get_raw_data(self):
+        """
+        Returns a `numpy.ndarray` with the raw data in the format they are stored.
+        """
+        data_reader = TIFFStackReader(file_name = self._data_path, dtype=None)
         return data_reader.read()
 
 
     def _create_normalisation_correction(self):
         """
-        Save the normalisation images to be used in self._normalisation
+        Process the normalisation images as required and store the full scale versions 
+        in self._normalisation for future use by `_apply_normalisation`  
         """
 
         self._normalisation = 1/np.float32(self.metadata['WhiteLevel'])
@@ -210,24 +222,19 @@ class NikonDataReader(Reader):
 
     def _apply_normalisation(self, data_array):
         """
-        Apply normalisation to the data respecting roi
+        Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
         """
         data_array *= self._normalisation
 
 
     def _get_data(self, proj_slice=None):
         """
-        The methods to access the data and return a numpy array
-
-        proj as a slice oject
-        
-        datareader - tiff, raw, dxchange, matlab
+        Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
         """
 
         if proj_slice is not None:
-            selection = slice(*proj_slice)
             roi = { 
-                'axis_0': (selection.start, selection.stop, selection.step),
+                'axis_0': (proj_slice.start, proj_slice.stop, proj_slice.step),
                 'axis_1': (self._slice_list[1].start, self._slice_list[1].stop),
                 'axis_2': (self._slice_list[2].start, self._slice_list[2].stop)
             }
@@ -238,6 +245,6 @@ class NikonDataReader(Reader):
                     'axis_2': (self._slice_list[2].start, self._slice_list[2].stop)
                 }
 
-        data_reader = TIFFStackReader(self._data_path, roi=roi)
+        data_reader = TIFFStackReader(self._data_path, roi=roi, mode='slice')
 
         return data_reader.read()

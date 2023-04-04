@@ -88,20 +88,20 @@ class L2NormSquared(Function):
             b) :math:`F'(x) = 2(x-b)`
                 
         """
-                
-        if out is not None:
+        should_return = False
+        if out is None:
+            should_return = True
+            if self.b is None:
+                return 2*x
+            out = x.copy()
             
-            out.fill(x)
-            if self.b is not None:
-                out -= self.b
-            out *= 2
-            
+        if self.b is not None:
+            x.sapyb(2, self.b, -2, out=out)
         else:
-            
-            y = x
-            if self.b is not None:
-                y = x - self.b
-            return 2*y
+            x.multiply(2, out=out)
+        
+        if should_return:
+            return out
         
                                                        
     def convex_conjugate(self, x):
@@ -133,24 +133,21 @@ class L2NormSquared(Function):
                 b) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
                         
         """            
-
+        mult = 1/(1+2*tau)
+        should_return = False      
         if out is None:
-            
+            should_return = True
             if self.b is None:
-                return x/(1+2*tau)
-            else:
-                tmp = x.subtract(self.b)
-                tmp /= (1+2*tau)
-                tmp += self.b
-                return tmp
-
+                return x*mult
+            out = x.copy()
+            
+        if self.b is not None:
+            x.sapyb(mult, self.b, (1-mult), out=out)
         else:
-            if self.b is not None:
-                x.subtract(self.b, out=out)
-                out /= (1+2*tau)
-                out += self.b
-            else:
-                x.divide((1+2*tau), out=out)
+            x.multiply(mult, out=out)
+        
+        if should_return:
+            return out
 
 
 class WeightedL2NormSquared(Function):

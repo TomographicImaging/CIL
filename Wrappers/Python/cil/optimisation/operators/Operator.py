@@ -141,13 +141,16 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  return_all=False):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, symmetric=False):
 
         r"""Power method or Power iteration algorithm 
         
         The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
         absolute value in the real case and module in the complex case.        
-        For the non-square case, the power method is applied for the matrix :math: A^{T}*A.
+        Since we cannot estimate if the operator is diagonisable, the power method is applied on the diagonizable operator
+        :math:`A^{T}*A`.
+        
+        If the operator :math:`A` is diagonizable, the user can pass the flag `symmetric=True`.
 
         Parameters
         ----------
@@ -161,6 +164,8 @@ class LinearOperator(Operator):
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         return_all: boolean, default = False
             Toggles the verbosity of the return
+        symmetric: boolean, default False
+             Set this to True if the operator is symmetric
     
 
         Returns
@@ -188,16 +193,6 @@ class LinearOperator(Operator):
         2.0005647295658866
 
         """
-
-        # Default case: non-symmetric
-        symmetric = False
-        try:
-            if operator.domain_geometry()==operator.range_geometry():
-                symmetric = True
-        except AssertionError:
-            # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
-            pass
-
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')
         else:

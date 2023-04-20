@@ -166,17 +166,17 @@ class Reader(ABC):
         if self._bin:
             binner = Binner(roi={'vertical':(None,None,self._bin_roi[0]),'horizontal':(None,None,self._bin_roi[1])})
 
-            output_array = np.empty(shape_out, dtype=np.float32)
+            output_array = np.empty(shape_out, dtype=np.float32).ravel()
 
             for count, ind in enumerate(projs_indices):
                 arr = self._get_data(proj_slice=slice(ind,ind+1,None))
                 self._apply_normalisation(arr)
 
-                proj_unbinned=DataContainer(arr,False,['vertical','horizontal'])
+                proj_unbinned=DataContainer(arr,False,['angle','vertical','horizontal'])
                 binner.set_input(proj_unbinned) 
                 proj_binned = binner.get_output() 
 
-                output_array[count:count+1,:,:]= proj_binned.array
+                output_array[count * proj_binned.size : (count+1) * proj_binned.size]= proj_binned.array
 
             return output_array
         else:
@@ -267,9 +267,9 @@ class Reader(ABC):
             else:
                 raise ValueError("Nope")
         
-            # test that indices are valid
             try:
                 angles = self.geometry.angles[(angle_indices)]
+
             except IndexError:
                 raise ValueError("Out of range")
             

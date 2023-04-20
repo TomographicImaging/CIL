@@ -20,7 +20,7 @@
 import unittest
 from unittest.mock import patch, mock_open, Mock
 from utils import initialise_tests
-from cil.framework import AcquisitionGeometry
+from cil.framework import AcquisitionGeometry, AcquisitionData
 import numpy as np
 import os
 from cil.framework import ImageGeometry
@@ -176,6 +176,17 @@ class TestReaderBaseClass(unittest.TestCase):
         np.testing.assert_allclose(data, data_gold,rtol=1e-6)
 
 
+        #  test with binning
+            # all
+            # list
+            # slice
+
+        # with no binning
+            # all
+            # list
+            # slice
+
+
     def test_set_panel_roi(self):
 
         reader = self.create_reader()
@@ -250,31 +261,76 @@ class TestReaderBaseClass(unittest.TestCase):
 
     def test_get_geometry(self):
 
-        #reflects roi changes
+        # reflects roi changes
         reader = self.create_reader()
 
-        # check geometry
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([4,8],[0.2,0.2]).set_angles([0,45,90])
+
+        self.assertEquals(reader.geometry, ag)
+        self.assertEquals(reader.get_geometry(), ag)
         
-        reader.set_panel_roi()
-        reader.set_projections()
+        reader.set_panel_roi(horizontal=(2,4,2),vertical=(1,-2,2))
+        reader.set_projections(2)
 
-        # check geometry
-
-        pass
+        ag = AcquisitionGeometry.create_Parallel3D(detector_position=[ 0.2, 0. ,-0.2]).set_panel([1,2],[0.4,0.4]).set_angles([90])
+        self.assertEquals(reader.get_geometry(), ag)
 
 
     def test_read(self):
+
         #reflects roi changes
         reader = self.create_reader()
 
-        reader.read()
+        acquisition_data = reader.read()
 
-        # check type, geometry, data
+        self.assertIsInstance(acquisition_data, AcquisitionData)
 
-        # set roi
-        # check type, geometry, data
- 
-        pass
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([4,8],[0.2,0.2]).set_angles([0,45,90])
+        self.assertEquals(acquisition_data.geometry, ag)
+
+        norm = reader.flat_field - reader.dark_field
+        data_gold = (reader.data.astype(np.float32) - reader.dark_field.astype(np.float32)) / norm.astype(np.float32)
+
+        np.testing.assert_allclose(acquisition_data.array, data_gold,rtol=1e-6)
+        self.assertEqual(acquisition_data.array.dtype, np.float32)
+
+
+
+        # test with roi and binning
+        reader.set_panel_roi(horizontal=(2,4,2),vertical=(1,-2,2))
+        reader.set_projections(2)
+
+        acquisition_data = reader.read()
+        self.assertIsInstance(acquisition_data, AcquisitionData)
+
+        ag = AcquisitionGeometry.create_Parallel3D(detector_position=[ 0.2, 0. ,-0.2]).set_panel([1,2],[0.4,0.4]).set_angles([90])
+        self.assertEquals(acquisition_data.geometry, ag)
+
+        norm = reader.flat_field - reader.dark_field
+        data_byhand = (reader.data.astype(np.float32) - reader.dark_field.astype(np.float32)) / norm.astype(np.float32)
+        data_byhand = data_byhand[2,1:-3, 2:4].mean(-1).reshape(2,2).mean(-1)
+        np.testing.assert_allclose(acquisition_data.array, data_byhand,rtol=1e-6)
+        self.assertEqual(acquisition_data.array.dtype, np.float32)
+
+
+
+        # test with roi and binning
+        reader.reset()
+        reader.set_projections(2)
+
+        acquisition_data = reader.read()
+        self.assertIsInstance(acquisition_data, AcquisitionData)
+
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([4,8],[0.2,0.2]).set_angles([90])
+        self.assertEquals(acquisition_data.geometry, ag)
+
+        norm = reader.flat_field - reader.dark_field
+        data_byhand = (reader.data.astype(np.float32) - reader.dark_field.astype(np.float32)) / norm.astype(np.float32)
+        data_byhand = data_byhand[2]
+        np.testing.assert_allclose(acquisition_data.array, data_byhand,rtol=1e-6)
+        self.assertEqual(acquisition_data.array.dtype, np.float32)
+
+
 
 
 class TestNikonDataReader(unittest.TestCase):

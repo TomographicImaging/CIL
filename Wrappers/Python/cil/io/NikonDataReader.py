@@ -77,15 +77,13 @@ class NikonDataReader(Reader):
         if deprecated_kwargs.pop('mode', None) is not None:
             raise DeprecationWarning("Input argument `mode` has been deprecated.\
                 Please use methods 'set_panel_roi()' to bin on the spatial domain \
-                and 'set_projections()' to slice on the anglura domain")
+                and 'set_projections()' to slice on the angular domain")
 
         if deprecated_kwargs.pop('fliplr', None) is not None:
             raise PendingDeprecationWarning("Input argument `fliplr` has been deprecated.")
             
         if deprecated_kwargs:
             logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
-
-        self._data_path = os.path.join(os.path.dirname(self.file_name), self.metadata['InputFolderName'])
 
 
     def _read_metadata(self):
@@ -117,6 +115,8 @@ class NikonDataReader(Reader):
             for param in params:
                 if line.startswith(param[0]):
                     self._metadata[param[0]] = param[1](line.split('=')[1])
+
+        self._data_path = os.path.join(os.path.dirname(self.file_name), self.metadata['InputFolderName'])
 
 
     def _create_geometry(self):
@@ -235,14 +235,14 @@ class NikonDataReader(Reader):
         if proj_slice is not None:
             roi = { 
                 'axis_0': (proj_slice.start, proj_slice.stop, proj_slice.step),
-                'axis_1': (self._slice_list[1].start, self._slice_list[1].stop),
-                'axis_2': (self._slice_list[2].start, self._slice_list[2].stop)
+                'axis_1': (self._panel_crop[0].start, self._panel_crop[0].stop),
+                'axis_2': (self._panel_crop[1].start, self._panel_crop[1].stop)
             }
         else:
             roi = { 
                     'axis_0': (0, self._acquisition_geometry.num_projections),
-                    'axis_1': (self._slice_list[1].start, self._slice_list[1].stop),
-                    'axis_2': (self._slice_list[2].start, self._slice_list[2].stop)
+                    'axis_1': (self._panel_crop[0].start, self._panel_crop[0].stop),
+                    'axis_2': (self._panel_crop[1].start, self._panel_crop[1].stop)
                 }
 
         data_reader = TIFFStackReader(self._data_path, roi=roi, mode='slice')

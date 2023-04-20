@@ -41,17 +41,15 @@ class Reader(ABC):
             raise TypeError('This reader can only process files with extensions: {0}. Got {1}'.format(self.supported_extensions, file_extension))
 
         self._file_name = file_name_abs
+        self._normalisation = False
 
-        # create the full geometry and cofigure the ROIs
+        # create the full geometry and configure the ROIs
         self._read_metadata()
 
         # These should only be called once but maybe init isn't the best place
         # should still be able to access the raw data?
         self._create_geometry()
-        self._create_normalisation_correction()
         self.reset()
-
-
 
     @property
     def metadata(self):
@@ -127,8 +125,8 @@ class Reader(ABC):
         """
         Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
         """
-        data_array -= self._normalisation[0][tuple(self._slice_list)]
-        data_array *= self._normalisation[1][tuple(self._slice_list)]
+        data_array -= self._normalisation[0][self._panel_crop]
+        data_array *= self._normalisation[1][self._panel_crop]
 
 
     @abstractmethod
@@ -137,32 +135,36 @@ class Reader(ABC):
         Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
         """
 
-        selection = self._slice_list.copy()
+        if proj_slice is None:
+            selection = (slice(None),*self._panel_crop)
+        else:
+            selection = (slice(*proj_slice),*self._panel_crop)
 
-        if proj_slice is not None:
-            selection[0] = slice(*proj_slice)
-
-        return datareader.read(path, source_sel=tuple(selection))
+        return datareader.read(path, source_sel=selection)
 
 
     def _get_normalised_data(self, shape_out, projs=None):
         """
         Method to read the data from disk, normalise and bin as requested. Returns an `numpy.ndarray`
+
+        projs is None, a range or a list
         """
+
+        # if normalisation images don't exist yet create them
+        if not self._normalisation:
+            self._create_normalisation_correction()
 
         # projection indices to iterate over
         if projs is None: 
             projs_indices = range(shape_out[0])
-        elif isinstance(projs, (list,np.ndarray)):
+        elif isinstance(projs, (list,np.ndarray,range)):
             projs_indices = projs
-        elif isinstance(projs, slice):
-            projs_indices = range(self._acquisition_geometry.num_projections)[projs]
         else:
             raise ValueError("Nope")            
         
         # if binning read and bin a projection at a time to reduce memory use, normalise and then and bin
         if self._bin:
-            binner = Binner(self._bin_roi)
+            binner = Binner(roi={'vertical':(None,None,self._bin_roi[0]),'horizontal':(None,None,self._bin_roi[1])})
 
             output_array = np.empty(shape_out, dtype=np.float32)
 
@@ -192,6 +194,37 @@ class Reader(ABC):
             return output_array
 
 
+    def _parse_crop_bin(self, arg, length):
+        """
+        Method to parse the input roi as a int or tuple (start, stop, step) perform checks and return values
+        """
+        crop = slice(None,None)
+        step = 1
+
+        if arg is not None:
+            if isinstance(arg,int):
+                crop = slice(arg, arg+1)
+                step = 1
+            elif isinstance(arg,tuple):
+                slice_obj = slice(*arg)
+                crop = slice(slice_obj.start, slice_obj.stop)
+
+                if slice_obj.step is None:
+                    step = 1
+                else:
+                    step = slice_obj.step
+            else:
+                raise TypeError("Expected input to be an int or tuple. Got {}".format(arg))
+        
+        
+        range_new = range(0, length)[crop]
+
+        if len(range_new)//step < 1:
+            raise ValueError("Invalid ROI selection. Cannot")  
+        
+        return crop, step
+
+
     def set_panel_roi(self, vertical=None, horizontal=None):
         """
         Method to configure the ROI of data to be returned as a CIL object.
@@ -201,45 +234,17 @@ class Reader(ABC):
 
         If step is greater than 1 pixels will be averaged together.
         """
-        self._bin = False
-        self._slice_list = [slice(None),slice(None),slice(None)]
 
-        step = 1
-        if vertical is not None:
-            if isinstance(vertical,int):
-                start = int(vertical)
-                self._slice_list[1] = slice(start,start+1,1)
-            elif isinstance(vertical,tuple):
-                slice_obj = slice(*vertical)
-                step = slice_obj.step
-                self._slice_list[1] = slice(slice_obj.start,slice_obj.stop, 1)
-            else:
-                raise ValueError("Nope")
+        crop_v, step_v = self._parse_crop_bin(vertical, self.geometry.pixel_num_v)
+        crop_h, step_h = self._parse_crop_bin(horizontal, self.geometry.pixel_num_h)
 
-        if step is not None and step > 1:
-            self._bin_roi['vertical'] = (None,None,step)
+        if step_v > 1 or step_h > 1:
             self._bin = True
         else:
-            self._bin_roi['vertical'] = (None,None,None)
-            
+            self._bin = False
 
-        step = 1
-        if horizontal is not None:
-            if isinstance(horizontal,int):
-                start = int(horizontal)
-                self._slice_list[2] = slice(start,start+1,1)
-            elif isinstance(horizontal,tuple):
-                slice_obj = slice(*horizontal)
-                step = slice_obj.step
-                self._slice_list[2] = slice(slice_obj.start,slice_obj.stop, 1)
-            else:
-                raise ValueError("Nope")
-
-        if step is not None and step > 1:
-            self._bin_roi['horizontal'] = (None,None,step)
-            self._bin = True
-        else:
-            self._bin_roi['horizontal'] = (None,None,None)
+        self._bin_roi = (step_v, step_h)
+        self._panel_crop = (crop_v, crop_h)
 
 
     def set_projections(self, angle_indices=None):
@@ -250,32 +255,43 @@ class Reader(ABC):
         or a list of indices.
 
         If step is greater than 1 pixels the data will be sliced. i.e. a step of 10 returns 1 in 10 projections.
-        """
+        """      
 
-        if angle_indices == None:
-            self._angle_indices = None
-
-        else:
-            if isinstance(angle_indices,int):
-                start = int(angle_indices)
-                self._angle_indices = slice(start,start+1,1)
-            elif isinstance(angle_indices,tuple):
-                self._angle_indices = slice(*angle_indices)
-                if self._angle_indices is None:
-                    self._angle_indices = slice(self._angle_indices.start, self._acquisition_geometry.num_projections, self._angle_indices.step)
+        if angle_indices is not None:
+            if isinstance(angle_indices,tuple):
+                angle_indices = slice(*angle_indices)
             elif isinstance(angle_indices,(list,np.ndarray)):
-                self._angle_indices = angle_indices
+                angle_indices = angle_indices
+            elif isinstance(angle_indices,int):
+                angle_indices = [angle_indices]
             else:
                 raise ValueError("Nope")
+        
+            # test that indices are valid
+            try:
+                angles = self.geometry.angles[(angle_indices)]
+            except IndexError:
+                raise ValueError("Out of range")
+            
+            if angles.size < 1:
+                raise ValueError(") projections selected. Please select at least 1 angle")
+        self._angle_indices = angle_indices
         
 
     def reset(self):
         """
         Resets the configured ROI and angular indices to the full dataset
         """
+        # range or list object for angles to process, defaults to None
         self._angle_indices = None
-        self._slice_list = [slice(None),slice(None),slice(None)]
-        self._bin_roi ={'horizontal':(None,None,None),'vertical':(None,None,None)}
+
+        # slice in each dimension, initialised to none
+        self._panel_crop = (slice(None),slice(None))
+
+        # number of pixels to bin in each dimension
+        self._bin_roi = (1,1)
+
+        # boolean if binned
         self._bin = False
 
 
@@ -349,8 +365,8 @@ class Reader(ABC):
             ag.config.angles.angle_data = np.take(ag.angles, list(self._angle_indices))
 
         #slice and bin geometry
-        roi = { 'horizontal':(self._slice_list[2].start, self._slice_list[2].stop, self._bin_roi['horizontal'][2]),
-                'vertical':(self._slice_list[1].start, self._slice_list[1].stop, self._bin_roi['vertical'][2]),
+        roi = { 'horizontal':(self._panel_crop[1].start, self._panel_crop[1].stop, self._bin_roi[1]),
+                'vertical':(self._panel_crop[0].start, self._panel_crop[0].stop, self._bin_roi[0]),
         }
 
         return Binner(roi)(ag)

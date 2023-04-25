@@ -137,7 +137,18 @@ class SIRT(Algorithm):
             self._remove_nan_or_inf(arr, replace_with=1.0)
 
     def _remove_nan_or_inf(self, datacontainer, replace_with=1.0):
-        """Replace nan and inf with a given value."""
+        """Replace nan and inf in datacontainer with a given value.
+        
+        Parameters:
+        -------------
+        
+        datacontainer: DataContainer, BlockDataContainer
+        
+        replace_with: float, default 1.0
+            Value to replace elements that evaluate to NaN or inf
+            
+            
+        In case the input datacontainer is a :code:`BlockDataContainer` the substitution is executed for each container in the :code:`BlockDataContainer`."""
         if isinstance(datacontainer, BlockDataContainer):
             for block in datacontainer.containers:
                 self._remove_nan_or_inf(block, replace_with=replace_with)

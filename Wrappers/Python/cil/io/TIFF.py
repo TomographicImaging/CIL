@@ -32,7 +32,7 @@ import re
 import numpy as np
 from cil.io import utilities
 import json
-
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -315,40 +315,22 @@ class TIFFStackReader(object):
             Requested type of the read image. If set to None it defaults to the type of the saved file.
                     
         '''
-        self.roi = roi
         self.transpose = transpose
-        self.mode = mode
         self.dtype = dtype
         
-        if file_name == None:
-            raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
-        
-        if self.roi is None:
-            self.roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1}
-            
         # check that PIL library is installed
         if (pilAvailable == False):
             raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
-        
-        # check labels        
-        for key in self.roi.keys():
-            if key not in ['axis_0', 'axis_1', 'axis_2']:
-                raise Exception("Wrong label. axis_0, axis_1 and axis_2 are expected")
-        
-        if self.mode not in ['bin', 'slice']:
-            raise ValueError("Wrong mode, bin or slice is expected.")
+
+        self.set_panel_roi(roi, mode)
+        self.set_filename(file_name)
+        self.set_projections(None)
             
-        self._roi = self.roi.copy()
-        
-        if 'axis_0' not in self._roi.keys():
-            self._roi['axis_0'] = -1
-        
-        if 'axis_1' not in self._roi.keys():
-            self._roi['axis_1'] = -1
-        
-        if 'axis_2' not in self._roi.keys():
-            self._roi['axis_2'] = -1
-        
+
+               
+    def set_filename(self, file_name=None):
+        if file_name == None:
+            raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
 
         if isinstance(file_name, list):
             self._tiff_files = file_name
@@ -366,17 +348,61 @@ class TIFFStackReader(object):
         else:
             raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))
 
-        
-        for fn in self._tiff_files:
+
+        for i, fn in enumerate(self._tiff_files):
             if '.tif' in fn:
                 if not(os.path.exists(fn)):
                     raise Exception('File \n {}\n does not exist.'.format(fn))
+                self._tiff_files[i] = os.path.abspath(fn)
             else:
                 raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))
 
-        
         self._tiff_files.sort(key=self.__natural_keys)
-               
+
+
+    def set_panel_roi(self, roi=None, mode='bin'):
+ 
+        self._roi = {'vertical': -1, 'horizontal': -1}
+        
+        if roi is not None:     
+            for key, value in roi.items():
+                if key in ['vertical', 'horizontal']:
+                    self._roi[key] = value
+                else:
+                    raise Exception("Wrong label. 'vertical', 'horizontal'. Got {}".format(key))
+        
+        if mode not in ['bin', 'slice']:
+            raise ValueError("Wrong mode, bin or slice is expected.")
+        
+        self.mode=mode
+
+    
+    def set_projections(self, angle_indices=None):
+        """
+        Method to configure the angular indices to be returned
+
+        angle_indices: takes an integer for a single projections, a tuple of (start, stop, step), 
+        or a list of indices.
+
+        If step is greater than 1 the data will be sliced. i.e. a step of 10 returns 1 in 10 projections.
+        """      
+        
+        angles = np.arange(len(self._tiff_files))
+
+
+        if isinstance(angle_indices,tuple):
+            angles = angles[slice(*angle_indices)]
+        elif isinstance(angle_indices,(int,list,np.ndarray)):
+            try:
+                angles = angles.take(angle_indices)
+            except IndexError:
+                raise ValueError("Index out of range")
+
+        if angles.size < 1:
+            raise ValueError(") projections selected. Please select at least 1 angle")
+        self._angle_indices = angles
+
+
     def _get_file_type(self, img): 
         mode = img.mode
         if mode == '1':
@@ -399,9 +425,7 @@ class TIFFStackReader(object):
         Reads images and return numpy array
         '''
         # load first image to find out dimensions and type
-        filename = os.path.abspath(self._tiff_files[0])
-        
-        with Image.open(filename) as img:
+        with Image.open(self._tiff_files[0]) as img:
             if self.dtype is None:
                 self.dtype = self._get_file_type(img)
             tmp = np.asarray(img, dtype = self.dtype)
@@ -411,11 +435,9 @@ class TIFFStackReader(object):
         roi_par = [[0, array_shape_0[0], 1], [0, array_shape_0[1], 1], [0, array_shape_0[2], 1]]
         
         for key in self._roi.keys():
-            if key == 'axis_0':
-                idx = 0
-            elif key == 'axis_1':
+            if key == 'vertical':
                 idx = 1
-            elif key == 'axis_2':
+            elif key == 'horizontal':
                 idx = 2
             if self._roi[key] != -1:
                 for i in range(2):
@@ -431,67 +453,51 @@ class TIFFStackReader(object):
                         else:
                             raise Exception("Negative step is not allowed")
         
+        num_to_read = len(self._angle_indices)
+
+        # calculate number of pixels
+
         if self.mode == 'bin':
-            # calculate number of pixels
             n_rows = (roi_par[1][1] - roi_par[1][0]) // roi_par[1][2]
             n_cols = (roi_par[2][1] - roi_par[2][0]) // roi_par[2][2]
-            num_to_read = (roi_par[0][1] - roi_par[0][0]) // roi_par[0][2]
-            
-            if not self.transpose:
-                im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)
-            else:
-                im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
-            
-            for i in range(0,num_to_read):
-
-                raw = np.zeros((array_shape_0[1], array_shape_0[2]), dtype=self.dtype)
-                for j in range(roi_par[0][2]):
-                
-                    index = int(roi_par[0][0] + i * roi_par[0][2] + j)
-                    filename = os.path.abspath(self._tiff_files[index])
-
-                    arr = Image.open(filename)
-                    raw += np.asarray(arr, dtype = self.dtype)
-                    
-                        
-                shape = (n_rows, roi_par[1][2], 
-                         n_cols, roi_par[2][2])
-                tmp = raw[roi_par[1][0]:(roi_par[1][0] + (((roi_par[1][1] - roi_par[1][0]) // roi_par[1][2]) * roi_par[1][2])), \
-                          roi_par[2][0]:(roi_par[2][0] + (((roi_par[2][1] - roi_par[2][0]) // roi_par[2][2]) * roi_par[2][2]))].reshape(shape).mean(-1).mean(1)
-                
-                if self.transpose:
-                    im[i, :, :] = np.transpose(tmp)
-                else:
-                    im[i, :, :] = tmp
-                    
+            crop_roi=(roi_par[2][0],roi_par[1][0],roi_par[2][0] + n_cols * roi_par[2][2],roi_par[1][0] + n_rows * roi_par[1][2])
+            shape = (n_rows, roi_par[1][2], n_cols, roi_par[2][2])
         else: # slice mode
-            # calculate number of pixels
             n_rows = int(np.ceil((roi_par[1][1] - roi_par[1][0]) / roi_par[1][2]))
-            n_cols = int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))
-            num_to_read = int(np.ceil((roi_par[0][1] - roi_par[0][0]) / roi_par[0][2]))
-            
-            if not self.transpose:
-                im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)
-            else:
-                im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
-                        
-            for i in range(roi_par[0][0], roi_par[0][1], roi_par[0][2]):
-                
-                filename = os.path.abspath(self._tiff_files[i])
-                #try:
-                raw = np.asarray(Image.open(filename), dtype = self.dtype)
-                #except:
-                #    print('Error reading\n {}\n file.'.format(filename))
-                #    raise
-                
-                tmp = raw[(slice(roi_par[1][0], roi_par[1][1], roi_par[1][2]), 
-                           slice(roi_par[2][0], roi_par[2][1], roi_par[2][2]))]
-                
-                if self.transpose:
-                    im[(i - roi_par[0][0]) // roi_par[0][2], :, :] = np.transpose(tmp)
-                else:
-                    im[(i - roi_par[0][0]) // roi_par[0][2], :, :] = tmp
+            n_cols = int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))    
+            crop_roi=(roi_par[2][0],roi_par[1][0],roi_par[2][0] + (n_cols-1) * roi_par[2][2] + 1,roi_par[1][0] + (n_rows-1) * roi_par[1][2] + 1)
+
+
+        if not self.transpose:
+            im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)
+        else:
+            im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
         
+        if roi_par[1][2] == 1 and roi_par[2][2] == 1:
+            mode = 'crop'
+        else:
+            mode = self.mode
+
+        crop_roi=(roi_par[2][0],roi_par[1][0],roi_par[2][1],roi_par[1][1])
+        count = 0
+        for i in self._angle_indices:
+                
+            #read roi from single projection
+            with Image.open(self._tiff_files[i], mode='r', formats=(['tiff'])) as img:
+                tmp = np.asarray(img.crop(crop_roi), dtype = self.dtype)
+
+            if mode == 'bin':
+                tmp = tmp.reshape(shape).mean(-1).mean(1)
+            
+            elif mode == 'slice':
+                tmp = tmp[(slice(None,None,roi_par[1][2]), slice(None,None,roi_par[2][2]))]
+
+            if self.transpose:
+                im[count, :, :] = np.transpose(tmp)
+            else:
+                im[count, :, :] = tmp
+
+            count +=1    
         return np.squeeze(im)
     
     def __atoi(self, text):

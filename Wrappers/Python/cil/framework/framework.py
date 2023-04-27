@@ -1721,7 +1721,7 @@ class Panel(object):
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
             raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
         else:
-            self._num_pixels = numpy.array(num_pixels_temp, dtype=numpy.int16)
+            self._num_pixels = numpy.array(num_pixels_temp, dtype=numpy.int64)
 
     @property
     def pixel_size(self):
@@ -1756,7 +1756,7 @@ class Panel(object):
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
-        self._pixel_size = numpy.array(pixel_size_temp)
+        self._pixel_size = numpy.array(pixel_size_temp, dtype=numpy.float64)
 
     @property
     def origin(self):
@@ -1830,7 +1830,7 @@ class Channels(object):
     @channel_labels.setter
     def channel_labels(self, val):      
         if val is None or len(val) == self._num_channels:
-            self._channel_labels = val  
+            self._channel_labels = int(val)  
         else:
             raise ValueError('labels expected to have length {0}. Got {1}'.format(self._num_channels, len(val)))
 

@@ -85,6 +85,9 @@ class NikonDataReader(Reader):
         if deprecated_kwargs:
             logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
 
+        #define the reader to use
+        self.data_reader = TIFFStackReader(self._data_path, dtype=np.float32)
+
 
     def _read_metadata(self):
         """
@@ -217,7 +220,7 @@ class NikonDataReader(Reader):
         in self._normalisation for future use by `_apply_normalisation`  
         """
 
-        self._normalisation = 1/np.float32(self.metadata['WhiteLevel'])
+        self._normalisation = 1/self.metadata['WhiteLevel']
 
 
     def _apply_normalisation(self, data_array):
@@ -232,19 +235,25 @@ class NikonDataReader(Reader):
         Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
         """
 
-        if proj_slice is not None:
-            roi = { 
-                'axis_0': (proj_slice.start, proj_slice.stop, proj_slice.step),
-                'axis_1': (self._panel_crop[0].start, self._panel_crop[0].stop),
-                'axis_2': (self._panel_crop[1].start, self._panel_crop[1].stop)
-            }
+        roi = { 
+            'vertical': (self._panel_crop[0].start, self._panel_crop[0].stop),
+            'horizontal': (self._panel_crop[1].start, self._panel_crop[1].stop)
+        }
+        index_list=None
+        
+        if proj_slice is None:
+            index_list=(0, self._acquisition_geometry.num_projections)
+        elif isinstance(proj_slice,(range,slice)):   
+            index_list=(proj_slice.start, proj_slice.stop, proj_slice.step)
+        elif isinstance(proj_slice,(list,np.ndarray)):
+            index_list = proj_slice
+        elif isinstance(proj_slice, int):
+            index_list = [proj_slice]
         else:
-            roi = { 
-                    'axis_0': (0, self._acquisition_geometry.num_projections),
-                    'axis_1': (self._panel_crop[0].start, self._panel_crop[0].stop),
-                    'axis_2': (self._panel_crop[1].start, self._panel_crop[1].stop)
-                }
+            raise ValueError("Nope")
 
-        data_reader = TIFFStackReader(self._data_path, roi=roi, mode='slice')
+        self.data_reader.set_panel_roi(roi=roi, mode='slice')
+        self.data_reader.set_projections(index_list)
 
-        return data_reader.read()
+        return self.data_reader.read()
+

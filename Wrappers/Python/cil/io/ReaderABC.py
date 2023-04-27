@@ -132,7 +132,9 @@ class Reader(ABC):
     @abstractmethod
     def _get_data(self, proj_slice=None):
         """
-        Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
+        Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions.
+
+        should handle proj as a slice, list or index
         """
 
         if proj_slice is None:
@@ -143,7 +145,7 @@ class Reader(ABC):
         return datareader.read(path, source_sel=selection)
 
 
-    def _get_normalised_data(self, shape_out, projs=None):
+    def _get_normalised_data(self, projs=None):
         """
         Method to read the data from disk, normalise and bin as requested. Returns an `numpy.ndarray`
 
@@ -153,45 +155,18 @@ class Reader(ABC):
         # if normalisation images don't exist yet create them
         if not self._normalisation:
             self._create_normalisation_correction()
+      
+        output_array = self._get_data(projs)
+        self._apply_normalisation(output_array)
 
-        # projection indices to iterate over
-        if projs is None: 
-            projs_indices = range(shape_out[0])
-        elif isinstance(projs, (list,np.ndarray,range)):
-            projs_indices = projs
-        else:
-            raise ValueError("Nope")            
-        
-        # if binning read and bin a projection at a time to reduce memory use, normalise and then and bin
         if self._bin:
             binner = Binner(roi={'vertical':(None,None,self._bin_roi[0]),'horizontal':(None,None,self._bin_roi[1])})
 
-            output_array = np.empty(shape_out, dtype=np.float32).ravel()
+            proj_unbinned=DataContainer(output_array,False,['angle','vertical','horizontal'])
+            binner.set_input(proj_unbinned) 
+            output_array = binner.get_output() 
 
-            for count, ind in enumerate(projs_indices):
-                arr = self._get_data(proj_slice=slice(ind,ind+1,None))
-                self._apply_normalisation(arr)
-
-                proj_unbinned=DataContainer(arr,False,['angle','vertical','horizontal'])
-                binner.set_input(proj_unbinned) 
-                proj_binned = binner.get_output() 
-
-                output_array[count * proj_binned.size : (count+1) * proj_binned.size]= proj_binned.array
-
-            return output_array
-        else:
-            # read a single projection at a time to output array
-            if isinstance(projs, (list,np.ndarray)):
-                output_array = np.empty(shape_out, dtype=np.float32)
-                for count, ind in enumerate(projs_indices):
-                    output_array[count:count+1,:,:] = self._get_data(slice(ind,ind+1,None))
-            # read all
-            else:
-                output_array = self._get_data(projs)
-            # normalise data
-            self._apply_normalisation(output_array)
-
-            return output_array
+        return output_array
 
 
     def _parse_crop_bin(self, arg, length):
@@ -234,6 +209,18 @@ class Reader(ABC):
 
         If step is greater than 1 pixels will be averaged together.
         """
+
+        if vertical == 'centre':
+            dim = self.geometry.dimension_labels.index('vertical')
+            
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(np.floor(centre_slice_pos))
+
+            w2 = centre_slice_pos - ind0
+            if w2 == 0:
+                vertical=(ind0, ind0+1, 1)
+            else:
+                vertical=(ind0, ind0+2, 2)
 
         crop_v, step_v = self._parse_crop_bin(vertical, self.geometry.pixel_num_v)
         crop_h, step_h = self._parse_crop_bin(horizontal, self.geometry.pixel_num_h)
@@ -341,7 +328,7 @@ class Reader(ABC):
 
         ag.set_angles([angles[idx_1], angles[idx_2]])
         
-        data = self._get_normalised_data(ag.shape, projs=[idx_1,idx_2])
+        data = self._get_normalised_data(projs=[idx_1,idx_2])
         show2D(data, slice_list=[0,1], title= [str(angles[idx_1])+ ag.config.angles.angle_unit, str(angles[idx_2]) +ag.config.angles.angle_unit],origin='upper-left')
 
 
@@ -385,5 +372,5 @@ class Reader(ABC):
         """
 
         geometry = self.get_geometry()
-        data = self._get_normalised_data(geometry.shape, projs=self._angle_indices)
+        data = self._get_normalised_data(projs=self._angle_indices)
         return AcquisitionData(data, False, geometry)

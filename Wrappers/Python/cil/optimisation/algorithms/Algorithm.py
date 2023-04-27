@@ -289,6 +289,7 @@ class Algorithm(object):
             if self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0: 
                 if callback!=None:
+                    print("ewfefwef")
                     callback()
             if verbose:
                 if (print_interval != 0 and self.iteration % print_interval == 0) or \

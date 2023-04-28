@@ -134,15 +134,33 @@ class Reader(ABC):
         """
         Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions.
 
-        should handle proj as a slice, list or index
+        should handle proj as a slice, range, list or index
         """
+
+        datareader = None
+        path = None
 
         if proj_slice is None:
             selection = (slice(None),*self._panel_crop)
-        else:
-            selection = (slice(*proj_slice),*self._panel_crop)
+            data = datareader.read(path, source_sel=selection)
 
-        return datareader.read(path, source_sel=selection)
+        elif isinstance(proj_slice,(range,slice)):   
+            selection = (slice(*proj_slice),*self._panel_crop)
+            data = datareader.read(path, source_sel=selection)
+        
+        elif isinstance(proj_slice, int):
+            selection = (slice(proj_slice, proj_slice+1),*self._panel_crop)
+            data = datareader.read(path, source_sel=selection)
+
+        elif isinstance(proj_slice,(list,np.ndarray)):
+            data = np.empty(shape=(len(proj_slice),len(self._panel_crop[0]),len(self._panel_crop[0]) ))
+            for i, proj in enumerate(proj_slice):
+                selection = (slice(i, i+1),*self._panel_crop)
+                data[i,:,:] = datareader.read(path, source_sel=selection)
+        else:
+            raise ValueError("Nope")
+
+        return data
 
 
     def _get_normalised_data(self, projs=None):
@@ -164,9 +182,9 @@ class Reader(ABC):
 
             proj_unbinned=DataContainer(output_array,False,['angle','vertical','horizontal'])
             binner.set_input(proj_unbinned) 
-            output_array = binner.get_output() 
+            output_array = binner.get_output().array
 
-        return output_array
+        return output_array.squeeze()
 
 
     def _parse_crop_bin(self, arg, length):

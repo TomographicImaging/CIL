@@ -85,9 +85,6 @@ class NikonDataReader(Reader):
         if deprecated_kwargs:
             logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
 
-        #define the reader to use
-        self.data_reader = TIFFStackReader(self._data_path, dtype=np.float32)
-
 
     def _read_metadata(self):
         """
@@ -229,16 +226,24 @@ class NikonDataReader(Reader):
         """
         data_array *= self._normalisation
 
+    def _set_data_reader(self):
+        """
+        create the data reader
+        """
+
+        if not hasattr(self,'_data_reader'):
+            self._data_reader = TIFFStackReader(self._data_path, dtype=np.float32)
+
 
     def _get_data(self, proj_slice=None):
         """
         Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
         """
 
-        roi = { 
-            'vertical': (self._panel_crop[0].start, self._panel_crop[0].stop),
-            'horizontal': (self._panel_crop[1].start, self._panel_crop[1].stop)
-        }
+
+        vertical= (self._panel_crop[0].start, self._panel_crop[0].stop)
+        horizontal=(self._panel_crop[1].start, self._panel_crop[1].stop)
+        
         index_list=None
         
         if proj_slice is None:
@@ -252,8 +257,10 @@ class NikonDataReader(Reader):
         else:
             raise ValueError("Nope")
 
-        self.data_reader.set_panel_roi(roi=roi, mode='slice')
-        self.data_reader.set_projections(index_list)
+        self._set_data_reader()
+        self._data_reader.set_image_roi(vertical=vertical, horizontal=horizontal, mode='slice')
+        self._data_reader.set_projections(index_list)
 
-        return self.data_reader.read()
+        return self._data_reader.read()
+
 

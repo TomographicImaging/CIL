@@ -200,17 +200,25 @@ class TIFFStackReader(object):
         file_name : str, abspath to folder, list
             Path to folder with tiff files, list of paths of tiffs, or single tiff file
                    
-        roi : dictionary, default `None`
+        transpose : bool, default False
+            Whether to transpose loaded images
+                    
+        dtype : numpy type, string, default np.float32
+            Requested type of the read image. If set to None it defaults to the type of the saved file.
+
+        deprecated_kwargs
+        -----------------
+        
+        roi : dictionary, default `None`, deprecated
             dictionary with roi to load: 
             ``{'axis_0': (start, end, step), 
                'axis_1': (start, end, step), 
                'axis_2': (start, end, step)}``
-            roi is specified for axes before transpose.
-            
-        transpose : bool, default False
-            Whether to transpose loaded images
-                    
-        mode : str, {'bin', 'slice'}, default 'bin'.
+            roi is specified for axes before transpose. Use `set_image_roi()` and `set_panel_roi()` instead.            
+
+        mode : str, {'bin', 'slice'}, default 'bin', deprecated
+            Use `set_image_roi()` to set the 'bin'/'slicing' behaviour.  
+
             Defines the 'step' in the roi parameter:
             
             In bin mode, 'step' number of pixels 
@@ -220,9 +228,6 @@ class TIFFStackReader(object):
 
             Note: in general output array size in bin mode != output array size in slice mode
         
-        dtype : numpy type, string, default np.float32
-            Requested type of the read image. If set to None it defaults to the type of the saved file.
-
 
         Notes:
         ------
@@ -263,21 +268,27 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', dtype=np.float32):    
-        self.file_name = file_name
+    def __init__(self, file_name=None, transpose=False, dtype=np.float32, **deprecated_kwargs):    
         
+        if deprecated_kwargs.get('mode', None) is not None:
+            logging.warning("Input argument `mode` has been deprecated. Please use method 'set_image_roi()' instead")
+
+        if deprecated_kwargs.get('roi', None) is not None:
+            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_image_roi()' and 'set_projections()' instead")
+
+        self.file_name = file_name
+
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
-                        roi = roi,
                         transpose = transpose,
-                        mode = mode, dtype=dtype)
+                        dtype=dtype,
+                        **deprecated_kwargs)
             
     def set_up(self, 
                file_name = None,
-               roi = None,
                transpose = False,
-               mode = 'bin', 
-               dtype = np.float32):
+               dtype = np.float32,
+               **deprecated_kwargs):
         ''' 
         Set up method for the TIFFStackReader class
         
@@ -287,46 +298,60 @@ class TIFFStackReader(object):
         file_name : str, abspath to folder, list
             Path to folder with tiff files, list of paths of tiffs, or single tiff file
                    
-        roi : dictionary, default `None`
-            dictionary with roi to load 
-            ``{'axis_0': (start, end, step), 'axis_1': (start, end, step), 'axis_2': (start, end, step)}``
-            Files are stacked along axis_0. axis_1 and axis_2 correspond
-            to row and column dimensions, respectively.
-            Files are stacked in alphabetic order. 
-            To skip files or to change number of files to load, 
-            adjust axis_0. For instance, 'axis_0': (100, 300)
-            will skip first 100 files and will load 200 files.
-            'axis_0': -1 is a shortcut to load all elements along axis.
-            Start and end can be specified as None which is equivalent 
-            to start = 0 and end = load everything to the end, respectively.
-            Start and end also can be negative.
-            Notes: roi is specified for axes before transpose.
-            
         transpose : bool, default False
             Whether to transpose loaded images
                     
-        mode : str, default 'bin'. Accepted values 'bin', 'slice'
-            Referring to the 'step' defined in the roi parameter, in bin mode, 'step' number of pixels 
-            are binned together, values of resulting binned pixels are calculated as average. 
-            In 'slice' mode 'step' defines standard numpy slicing. 
-            Note: in general output array size in bin mode != output array size in slice mode
-        
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
-                    
-        '''
-        self.transpose = transpose
-        self.dtype = dtype
+
+        deprecated_kwargs
+        -----------------
         
+        roi : dictionary, default `None`, deprecated
+            dictionary with roi to load: 
+            ``{'axis_0': (start, end, step), 
+               'axis_1': (start, end, step), 
+               'axis_2': (start, end, step)}``
+            roi is specified for axes before transpose. Use `set_image_roi()` and `set_panel_roi()` instead.            
+
+        mode : str, {'bin', 'slice'}, default 'bin', deprecated
+            Use `set_image_roi()` to set the 'bin'/'slicing' behaviour.  
+
+            Defines the 'step' in the roi parameter:
+            
+            In bin mode, 'step' number of pixels 
+            are binned together, values of resulting binned pixels are calculated as average.
+
+            In 'slice' mode 'step' defines standard numpy slicing.
+
+            Note: in general output array size in bin mode != output array size in slice mode
+        '''
         # check that PIL library is installed
         if (pilAvailable == False):
             raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
 
-        self.set_panel_roi(roi, mode)
+        self.transpose = transpose
+        self.dtype = dtype
         self.set_filename(file_name)
+        self.set_image_roi(horizontal=None, vertical=None, mode='bin')
         self.set_projections(None)
-            
 
+
+        # handle deprecated behaviour for backward compatibility
+        mode = 'bin'
+        if deprecated_kwargs.get('mode', None) is not None:
+            logging.warning("Input argument `mode` has been deprecated. Please define binning/slicing with method 'set_panel_roi()' instead")
+            mode = deprecated_kwargs.pop('mode')
+
+        if deprecated_kwargs.get('roi', None) is not None:
+            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_projections()' instead")
+            roi = deprecated_kwargs.pop('roi')
+            self.set_projections(roi.get('axis_0')) 
+            self.set_image_roi(vertical=roi.get('axis_1'), horizontal=roi.get('axis_2'), mode=mode)
+        
+        if deprecated_kwargs:
+            logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
+                      
                
     def set_filename(self, file_name=None):
         if file_name == None:
@@ -360,17 +385,16 @@ class TIFFStackReader(object):
         self._tiff_files.sort(key=self.__natural_keys)
 
 
-    def set_panel_roi(self, roi=None, mode='bin'):
+    def set_image_roi(self, vertical=None, horizontal=None, mode='bin'):
  
         self._roi = {'vertical': -1, 'horizontal': -1}
         
-        if roi is not None:     
-            for key, value in roi.items():
-                if key in ['vertical', 'horizontal']:
-                    self._roi[key] = value
-                else:
-                    raise Exception("Wrong label. 'vertical', 'horizontal'. Got {}".format(key))
-        
+        if vertical is not None:     
+            self._roi['vertical'] = vertical
+
+        if horizontal is not None:     
+            self._roi['horizontal'] = horizontal
+
         if mode not in ['bin', 'slice']:
             raise ValueError("Wrong mode, bin or slice is expected.")
         
@@ -386,20 +410,30 @@ class TIFFStackReader(object):
 
         If step is greater than 1 the data will be sliced. i.e. a step of 10 returns 1 in 10 projections.
         """      
-        
+
+        # for backward compatibility with old roi
+        if angle_indices == -1:
+            angle_indices = None
+          
         angles = np.arange(len(self._tiff_files))
 
 
         if isinstance(angle_indices,tuple):
             angles = angles[slice(*angle_indices)]
-        elif isinstance(angle_indices,(int,list,np.ndarray)):
+        elif isinstance(angle_indices,(list,np.ndarray)):
             try:
                 angles = angles.take(angle_indices)
             except IndexError:
                 raise ValueError("Index out of range")
+        elif isinstance(angle_indices,(int)):
+            try:
+                angles = np.asarray(angles.take(angle_indices))
+            except IndexError:
+                raise ValueError("Index out of range")    
 
         if angles.size < 1:
             raise ValueError(") projections selected. Please select at least 1 angle")
+        
         self._angle_indices = angles
 
 

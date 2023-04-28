@@ -168,7 +168,7 @@ class TestReaderBaseClass(unittest.TestCase):
 
     def test_get_normalised_data(self):
         reader = self.create_reader()
-        data = reader._get_normalised_data(shape_out=reader.geometry.shape, projs=None)
+        data = reader._get_normalised_data(projs=None)
 
         norm = reader.flat_field - reader.dark_field
         data_gold = (reader.data.astype(np.float32) - reader.dark_field.astype(np.float32)) / norm.astype(np.float32)
@@ -363,6 +363,7 @@ class TestNikonDataReader(unittest.TestCase):
         InputFolderName=directory
         """
 
+
         with patch('builtins.open', mock_open(read_data=mock_contents)):
             reader = NikonDataReader(self.mock_path)
         return reader
@@ -379,8 +380,7 @@ class TestNikonDataReader(unittest.TestCase):
         with self.assertRaises(TypeError):
             NikonDataReader('/path/to/non-existing/file.txt')
 
-
-    @patch('os.path.isfile')
+    @patch('os.path.isfile')    
     def test_setup_mocked(self, mock_isfile):
         mock_isfile.return_value = True
 
@@ -389,7 +389,7 @@ class TestNikonDataReader(unittest.TestCase):
 
         with patch.object(NikonDataReader, '_read_metadata', mock_read_metadata),\
              patch.object(NikonDataReader, '_create_geometry', mock_create_geometry):
- 
+
             reader = NikonDataReader(self.mock_path)
 
         # Assert that the mocked methods were called by the constructor call

@@ -1830,7 +1830,7 @@ class Channels(object):
     @channel_labels.setter
     def channel_labels(self, val):      
         if val is None or len(val) == self._num_channels:
-            self._channel_labels = int(val)  
+            self._channel_labels = val
         else:
             raise ValueError('labels expected to have length {0}. Got {1}'.format(self._num_channels, len(val)))
 

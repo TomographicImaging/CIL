@@ -1,3 +1,6 @@
+* x.x.x
+  - Add norm for CompositionOperator.
+
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.
 

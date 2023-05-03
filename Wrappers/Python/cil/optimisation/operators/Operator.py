@@ -547,5 +547,8 @@ class CompositionOperator(Operator):
         return self.linear_flag             
             
 
-
-
+    def norm(self):
+        norm = 1.
+        for operator in self.operators:
+                norm *= operator.norm()
+        return norm

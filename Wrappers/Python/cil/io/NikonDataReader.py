@@ -226,6 +226,7 @@ class NikonDataReader(Reader):
         """
         data_array *= self._normalisation
 
+
     def _set_data_reader(self):
         """
         create the data reader
@@ -235,7 +236,7 @@ class NikonDataReader(Reader):
             self._data_reader = TIFFStackReader(self._data_path, dtype=np.float32)
 
 
-    def _get_data(self, proj_slice=None):
+    def _get_data_roi(self, proj_slice=None):
         """
         Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
         """

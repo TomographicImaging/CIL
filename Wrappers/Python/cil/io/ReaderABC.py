@@ -18,7 +18,7 @@ class Reader(ABC):
     def get_data_array(self)
     def _create_normalisation_correction(self)
     def _apply_normalisation(self, data_array)
-    def _get_data(self, proj_slice=None)
+    def _get_data_roi(self, proj_slice=None)
 
     """
 
@@ -130,7 +130,7 @@ class Reader(ABC):
 
 
     @abstractmethod
-    def _get_data(self, proj_slice=None):
+    def _get_data_roi(self, proj_slice=None):
         """
         Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions.
 
@@ -163,7 +163,7 @@ class Reader(ABC):
         return data
 
 
-    def _get_normalised_data(self, projs=None):
+    def _get_data(self, projs=None, normalise=True):
         """
         Method to read the data from disk, normalise and bin as requested. Returns an `numpy.ndarray`
 
@@ -171,11 +171,13 @@ class Reader(ABC):
         """
 
         # if normalisation images don't exist yet create them
-        if not self._normalisation:
+        if normalise and not self._normalisation:
             self._create_normalisation_correction()
       
-        output_array = self._get_data(projs)
-        self._apply_normalisation(output_array)
+        output_array = self._get_data_roi(projs)
+
+        if normalise:
+            self._apply_normalisation(output_array)
 
         if self._bin:
             binner = Binner(roi={'vertical':(None,None,self._bin_roi[0]),'horizontal':(None,None,self._bin_roi[1])})
@@ -185,6 +187,7 @@ class Reader(ABC):
             output_array = binner.get_output().array
 
         return output_array.squeeze()
+
 
 
     def _parse_crop_bin(self, arg, length):
@@ -300,7 +303,7 @@ class Reader(ABC):
         self._bin = False
 
 
-    def preview(self, initial_angle=0):
+    def preview(self, initial_angle=0, normalise=True):
         """
         Displays two normalised projections approximately 90 degrees apart.
 
@@ -346,7 +349,7 @@ class Reader(ABC):
 
         ag.set_angles([angles[idx_1], angles[idx_2]])
         
-        data = self._get_normalised_data(projs=[idx_1,idx_2])
+        data = self._get_data(projs=[idx_1,idx_2], normalise=normalise)
         show2D(data, slice_list=[0,1], title= [str(angles[idx_1])+ ag.config.angles.angle_unit, str(angles[idx_2]) +ag.config.angles.angle_unit],origin='upper-left')
 
 
@@ -377,7 +380,7 @@ class Reader(ABC):
         return Binner(roi)(ag)
 
 
-    def read(self):
+    def read(self, normalise=True):
         """
         Method to retrieve the data .
 
@@ -390,5 +393,5 @@ class Reader(ABC):
         """
 
         geometry = self.get_geometry()
-        data = self._get_normalised_data(projs=self._angle_indices)
+        data = self._get_data(projs=self._angle_indices, normalise=normalise)
         return AcquisitionData(data, False, geometry)

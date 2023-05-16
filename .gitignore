@@ -1,0 +1,13 @@
+Wrappers/Python/build/*
+*.pyc
+Wrappers/Python/cil/version.py
+experiment/recon_cgls_8_idx_0000.tiff
+experiment/recon_cgls_16_idx_0000.tiff
+experiment/recon_cgls_32_idx_0000.tiff
+experiment/scaleoffset.json
+experiment/split.py
+experiment/test_tiff.py
+Wrappers/Python/cil.egg-info/dependency_links.txt
+Wrappers/Python/cil.egg-info/PKG-INFO
+Wrappers/Python/cil.egg-info/SOURCES.txt
+Wrappers/Python/cil.egg-info/top_level.txt

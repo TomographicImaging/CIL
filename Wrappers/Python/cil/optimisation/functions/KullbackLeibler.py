@@ -1,32 +1,242 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import numpy
 from cil.optimisation.functions import Function
 from numbers import Number
-import functools
 import scipy.special
+import logging
+
 try:
-    import numba
     from numba import jit, prange
     has_numba = True
-    '''Some parallelisation of KL calls'''
+except ImportError as ie:
+    has_numba = False
 
-    @jit(nopython=True)
+class KullbackLeibler(Function):
+
+    r""" Kullback Leibler
+            
+    .. math:: F(u, v)
+            = \begin{cases} 
+            u \log(\frac{u}{v}) - u + v & \mbox{ if } u > 0, v > 0\\
+            v & \mbox{ if } u = 0, v \ge 0 \\
+            \infty, & \mbox{otherwise}
+            \end{cases}  
+
+    where the :math:`0\log0 := 0` convention is used.  
+
+    Parameters
+    ----------    
+
+    b : DataContainer, non-negative      
+        Translates the function at point `b`.  
+    eta : DataContainer, default = 0
+        Background noise        
+    mask : DataContainer, default = None
+        Mask for the data `b`
+    backend : {'numba','numpy'}, optional
+        Backend for the KullbackLeibler methods. Numba is the default backend.       
+
+                                             
+    
+    Note
+    ----
+    The Kullback-Leibler function is used in practice as a fidelity term in minimisation problems where the
+    acquired data follow Poisson distribution. If we denote the acquired data with :code:`b`
+    then, we write
+    
+    .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
+    
+    where, :math:`\eta` is an additional noise. 
+    
+    In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
+    scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
+    fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
+    :math:`\mathcal{A}` is the projection operator. This is related to `PoissonLogLikelihoodWithLinearModelForMean <http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html>`_ ,
+    definition that is used in PET reconstruction in the `SIRF <https://github.com/SyneRBI/SIRF>`_ software.
+    
+       
+    Note
+    ----
+    The default implementation uses the build-in function `kl_div <https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html>`_ from scipy.
+    The methods of the :class:`.KullbackLeibler` are accelerated provided that `numba <https://numba.pydata.org/>`_ library is installed.
+           
+    Examples
+    --------
+    >>> from cil.optimisation.functions import KullbackLeibler 
+    >>> from cil.framework import ImageGeometry   
+    >>> ig = ImageGeometry(3,4)
+    >>> data = ig.allocate('random')
+    >>> F = KullbackLeibler(b = data)
+                        
+    """     
+
+    def __new__(cls, b, eta = None, mask = None, backend = 'numba'):
+
+        # default backend numba
+        cls.backend = backend
+        
+        if cls.backend == 'numba':
+
+            if not has_numba:                
+                raise ValueError("Numba is not installed.")
+            else:          
+                logging.info("Numba backend is used.")      
+                return super(KullbackLeibler, cls).__new__(KullbackLeibler_numba)
+        else:
+            logging.info("Numpy backend is used.") 
+            return super(KullbackLeibler, cls).__new__(KullbackLeibler_numpy)
+
+    def __init__(self, b, eta = None, mask = None, backend = 'numba'):
+
+        self.b = b
+        self.eta = eta
+        self.mask = mask
+
+        if self.eta is None:
+            self.eta = self.b * 0.0
+
+        if numpy.any(self.b.as_array() < 0):            
+            raise ValueError("Input data should be non-negative.")         
+
+        if KullbackLeibler.backend == 'numba':
+
+            self.b_np = self.b.as_array()
+            self.eta_np = self.eta.as_array()
+
+            if mask is not None:
+                self.mask = mask.as_array()
+                        
+        super(KullbackLeibler, self).__init__(L = None) 
+
+class KullbackLeibler_numpy(KullbackLeibler):
+       
+    def __call__(self, x):
+
+        r"""Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.
+
+        Note
+        ----
+        To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
+        """
+
+        tmp_sum = (x + self.eta).as_array()
+        ind = tmp_sum >= 0
+        tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])             
+        return numpy.sum(tmp) 
+
+    def gradient(self, x, out = None):
+
+        r"""Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.                
+        
+        :math:`F'(b, x + \eta) = 1 - \frac{b}{x+\eta}`
+        
+        Note
+        ----
+        To avoid inf values, we :math:`x+\eta>0` is required. 
+        
+        """         
+
+        should_return=False
+        if out is None:
+            out = x.add(self.eta)
+            should_return=True
+        else:
+            x.add(self.eta,out=out)
+
+        arr = out.as_array()
+        arr[arr>0] = 1 - self.b.as_array()[arr>0]/arr[arr>0]
+
+        out.fill(arr)
+
+        if should_return:
+            return out        
+
+    def convex_conjugate(self, x):
+
+        r"""Returns the value of the convex conjugate of the KullbackLeibler function at :math:`(b, x + \eta)`.                
+        
+        :math:`F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta>`
+        
+        """          
+
+        tmp = 1 - x.as_array()
+        ind = tmp>0
+        xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])
+        return numpy.sum(xlogy) - self.eta.dot(x)
+
+    def proximal(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.
+        
+        :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
+                            
+        """        
+        
+        if out is None:        
+            return 0.5 *( (x - self.eta - tau) + \
+                ( (x + self.eta - tau).power(2) + 4*tau*self.b   ) .sqrt() \
+                    )        
+        else:                      
+            x.add(self.eta, out=out)
+            out -= tau
+            out *= out
+            out.add(self.b * (4 * tau), out=out)
+            out.sqrt(out=out)  
+            out.subtract(tau, out=out)
+            out.subtract(self.eta, out=out)
+            out.add(x, out=out)         
+            out *= 0.5             
+
+
+    def proximal_conjugate(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the convex conjugate of KullbackLeibler at :math:`(b, x + \eta)`.
+           
+        :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
+        """        
+        
+        if out is None:
+            z = x + tau * self.eta
+            return 0.5*((z + 1) - ((z-1).power(2) + 4 * tau * self.b).sqrt())
+        else:            
+            tmp = tau * self.eta
+            tmp += x
+            tmp -= 1
+            
+            self.b.multiply(4*tau, out=out)    
+            
+            out.add(tmp.power(2), out=out)
+            out.sqrt(out=out)
+            out *= -1
+            tmp += 2
+            out += tmp
+            out *= 0.5
+
+####################################
+## KullbackLeibler numba routines ##
+####################################
+
+if has_numba:
+    
+    @jit(parallel=True, nopython=True)
     def kl_proximal(x,b, tau, out, eta):
         for i in prange(x.size):
             X = x.flat[i]
@@ -37,7 +247,7 @@ try:
                     (4. * tau * b.flat[i]) 
                 )
             )
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_arr(x,b, tau, out, eta):
         for i in prange(x.size):
             t = tau.flat[i]
@@ -49,7 +259,7 @@ try:
                     (4. * t * b.flat[i]) 
                 )
             )
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_mask(x,b, tau, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
@@ -61,7 +271,7 @@ try:
                         (4. * tau * b.flat[i]) 
                     )
                 )
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_arr_mask(x,b, tau, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
@@ -75,7 +285,7 @@ try:
                     )
                 )
     # proximal conjugate
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_conjugate_arr(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -86,7 +296,7 @@ try:
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
                 )
         
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_conjugate(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -96,7 +306,7 @@ try:
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                 )
 
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_conjugate_arr_mask(x, b, eta, tau, out, mask):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -108,7 +318,7 @@ try:
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
                     )
         
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_proximal_conjugate_mask(x, b, eta, tau, out, mask):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -119,18 +329,18 @@ try:
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                     )
     # gradient
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_gradient(x, b, out, eta):
         for i in prange(x.size):
             out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_gradient_mask(x, b, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
                 out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
     
     # KL divergence
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_div(x, y, eta):
         accumulator = 0.
         for i in prange(x.size):
@@ -146,7 +356,7 @@ try:
                 # out.flat[i] = numpy.inf
                 return numpy.inf
         return accumulator
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_div_mask(x, y, eta, mask):
         accumulator = 0.
         for i in prange(x.size):
@@ -165,7 +375,7 @@ try:
         return accumulator
 
     # convex conjugate
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_convex_conjugate(x, b, eta):
         accumulator = 0.
         for i in prange(x.size):
@@ -179,7 +389,7 @@ try:
                 # else xlogy is 0 so it doesn't add to the accumulator
                 accumulator += eta.flat[i] * x_f
         return - accumulator
-    @jit(nopython=True)
+    @jit(parallel=True, nopython=True)
     def kl_convex_conjugate_mask(x, b, eta, mask):
         accumulator = 0.
         j = 0
@@ -197,310 +407,124 @@ try:
                     accumulator += eta.flat[i] * x_f
         return - accumulator
     
-    # force a jit
-    def force_jit():
-        print ("forcing jit in KL")
-        x = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
-        b = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
-        eta = numpy.zeros_like(x)
-        out = numpy.empty_like(x)
-        mask = x > 0.3
-        tau = 1.
-        tauarr = numpy.ones_like(x)
-        kl_div(b, x, eta)
-        kl_div_mask(b, x, eta, mask)
+    
+class KullbackLeibler_numba(KullbackLeibler):
 
-        kl_gradient(x, b, out, eta)
-        kl_gradient_mask(x, b, out, eta, mask)
-        
-        kl_proximal(x, b, tau, out, eta)
-        kl_proximal_arr(x, b, tauarr, out, eta)
-        kl_proximal_mask(x, b, tau, out, eta, mask)
-        kl_proximal_arr_mask(x, b, tauarr, out, eta, mask)
-        
-        kl_proximal_conjugate(x, b, eta, tau, out)
-        kl_proximal_conjugate_arr(x, b, eta, tauarr, out)
-        kl_proximal_conjugate_mask(x, b, eta, tau, out, mask)
-        kl_proximal_conjugate_arr_mask(x, b, eta, tauarr, out, mask)
-        
-        kl_convex_conjugate(x, b, eta)
-        kl_convex_conjugate_mask(x, b, eta, mask)
-    
-    # force_jit()
-
-except ImportError as ie:
-    has_numba = False
-
-class KullbackLeibler(Function):
-    
-    r""" Kullback Leibler divergence function is defined as:
-            
-    .. math:: F(u, v)
-            = \begin{cases} 
-            u \log(\frac{u}{v}) - u + v & \mbox{ if } u > 0, v > 0\\
-            v & \mbox{ if } u = 0, v \ge 0 \\
-            \infty, & \mbox{otherwise}
-            \end{cases}  
-            
-    where we use the :math:`0\log0 := 0` convention. 
-
-    At the moment, we use build-in implemention of scipy, see
-    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html
-    
-    The Kullback-Leibler function is used as a fidelity term in minimisation problems where the
-    acquired data follow Poisson distribution. If we denote the acquired data with :math:`b`
-    then, we write
-    
-     .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
-     
-     where, :math:`\eta` is an additional noise. 
-     
-     Example: In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
-     scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
-     fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
-     :math:`\mathcal{A}` is the projection operator.
-     
-     This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction
-     in the PET-MR software , see https://github.com/CCPPETMR and for more details in
-    
-    http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html
-                        
-    """            
-    
-    
-    def __init__(self,  **kwargs):
-        
-        super(KullbackLeibler, self).__init__(L = None)          
-        self.b = kwargs.get('b', None)
-        
-        if self.b is None:
-            raise ValueError('Please define data, as b = ...')
-            
-        if (self.b.as_array() < 0).any():            
-            raise ValueError('Data should be larger or equal to 0')              
-         
-        self.eta = kwargs.get('eta',self.b * 0.0)
-        self.use_numba = kwargs.get('use_numba', True)
-        if self.use_numba and has_numba:
-            self.b_np = self.b.as_array()
-            self.eta_np = self.eta.as_array()
-        mask = kwargs.get('mask', None)
-        if hasattr (mask, 'as_array'):
-            self.mask = mask.as_array()
-        else:
-            self.mask = mask
-
-        if self.mask is not None and not ( self.use_numba and has_numba) :
-            print ('Cannot make use of mask without numba')
-        
-                                                    
     def __call__(self, x):
-        
 
         r"""Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.
+        Note
+        ----
         To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
-        """
-        if self.use_numba and has_numba:
-            # tmp = numpy.empty_like(x.as_array())
-            if self.mask is not None:
-                return kl_div_mask(self.b_np, x.as_array(), self.eta_np, self.mask)
-            return kl_div(self.b_np, x.as_array(), self.eta_np)
-        else: 
-            tmp_sum = (x + self.eta).as_array()
-            ind = tmp_sum >= 0
-            tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])             
-            return numpy.sum(tmp)         
-        
-    def log(self, datacontainer):
-        '''calculates the in-place log of the datacontainer'''
-        if not functools.reduce(lambda x,y: x and y>0, datacontainer.as_array().ravel(), True):
-            raise ValueError('KullbackLeibler. Cannot calculate log of negative number')
-        datacontainer.fill( numpy.log(datacontainer.as_array()) )
+        """        
 
-        
-    def gradient(self, x, out=None):
-        
-        r"""Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.                
-        
-        .. math:: F'(b, x + \eta) = 1 - \frac{b}{x+\eta}
-        
-        We require the :math:`x+\eta>0` otherwise we have inf values.
-        
-        """     
-        if self.use_numba and has_numba:
-            if out is None:
-                out = (x * 0.)
-                out_np = out.as_array()
-                if self.mask is not None:
-                    kl_gradient_mask(x.as_array(), self.b.as_array(), out_np, self.eta.as_array(), self.mask)
-                kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
-                # out.fill(out_np)
-                return out
-            else:
-                out_np = out.as_array()
-                kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
-                # out.fill(out_np)
-        else:                           
-            tmp_sum_array = (x + self.eta).as_array()
-            if out is None:   
-                tmp_out = x.geometry.allocate() 
-                tmp_out.as_array()[tmp_sum_array>0] = \
-                    1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
-                return tmp_out
-            else:
-                x.add(self.eta, out=out)
-                out.as_array()[tmp_sum_array>0] = \
-                    1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
+        if self.mask is not None:
+            return kl_div_mask(self.b_np, x.as_array(), self.eta_np, self.mask)
+        return kl_div(self.b_np, x.as_array(), self.eta_np)
 
-            
     def convex_conjugate(self, x):
-        
+
         r"""Returns the value of the convex conjugate of the KullbackLeibler function at :math:`(b, x + \eta)`.                
         
-        .. math:: F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta> 
+        :math:`F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta>`
         
-        """  
-        if self.use_numba and has_numba:
-            if self.mask is not None:
-                return kl_convex_conjugate_mask(x.as_array(), self.b_np, self.eta_np, self.mask)
-            return kl_convex_conjugate(x.as_array(), self.b_np, self.eta_np)
-        else:
-            tmp = 1 - x.as_array()
-            ind = tmp>0
-            xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])  
-            return numpy.sum(xlogy) - self.eta.dot(x)
-            
-    def proximal(self, x, tau, out=None):
+        """          
+
+        if self.mask is not None:
+            return kl_convex_conjugate_mask(x.as_array(), self.b_np, self.eta_np, self.mask)
+        return kl_convex_conjugate(x.as_array(), self.b_np, self.eta_np)
+
+    def gradient(self, x, out = None):
+
+        r"""Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.                
         
+        :math:`F'(b, x + \eta) = 1 - \frac{b}{x+\eta}`
+        
+        Note
+        ----
+        To avoid inf values, we :math:`x+\eta>0` is required. 
+        
+        """     
+
+        should_return = False
+        if out is None:
+            out = x * 0 
+            should_return = True
+
+        out_np = out.as_array() 
+
+        if self.mask is not None:
+            kl_gradient_mask(x.as_array(), self.b.as_array(), out_np, self.eta.as_array(), self.mask)         
+        kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())            
+        out.fill(out_np)
+
+        if should_return:
+            return out        
+        
+    def proximal(self, x, tau, out = None):
+
         r"""Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.
         
-        .. math:: \mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)
-        
-        The proximal for the convex conjugate of :math:`F` is 
-        
-        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})
-        
-        where :math:`z = x + \tau \eta`
-                    
-        """
-        if self.use_numba and has_numba:
-            if out is None:
-                out = (x * 0.)
-                # out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)
-                out_np = out.as_array()
-                if isinstance(tau, Number):
-                    if self.mask is not None:
-                        kl_proximal_mask(x.as_array(), self.b_np, tau, out_np, \
-                            self.eta_np, self.mask)
-                    else:
-                        kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
-                else:
-                    # it should be a DataContainer
-                    if self.mask is not None:
-                        kl_proximal_arr_mask(x.as_array(), self.b_np, tau.as_array(), \
-                            out_np, self.eta_np)
-                    else:
-                        kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), \
-                            out_np, self.eta_np)
-                out.fill(out_np)
-                return out
-            else:
-                out_np = out.as_array()
-                if isinstance(tau, Number):
-                    if self.mask is not None:
-                        kl_proximal_mask(x.as_array(), self.b_np, tau, out_np, \
-                            self.eta_np, self.mask)
-                    else:
-                        kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
-                else:
-                    # it should be a DataContainer
-                    if self.mask is not None:
-                        kl_proximal_arr_mask(x.as_array(), self.b_np, tau.as_array(), \
-                            out_np, self.eta_np, self.mask)
-                    else:
-                        kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), out_np, \
-                            self.eta_np)
-                out.fill(out_np)                    
-        else:
-            if out is None:        
-                return 0.5 *( (x - self.eta - tau) + \
-                    ( (x + self.eta - tau).power(2) + 4*tau*self.b   ) .sqrt() \
-                        )        
-            else:                      
-                x.add(self.eta, out=out)
-                out -= tau
-                out *= out
-                out.add(self.b * (4 * tau), out=out)
-                out.sqrt(out=out)  
-                out.subtract(tau, out=out)
-                out.subtract(self.eta, out=out)
-                out.add(x, out=out)         
-                out *= 0.5            
-        
+        :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
                             
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
-           
-           .. math::     prox_{\tau * f^{*}}(x)
-        '''
+        """      
 
-        if self.use_numba and has_numba:
-            if out is None:
-                out = (x * 0.)
-                # out_np = numpy.empty(out.shape, dtype=numpy.float64)
-                out_np = out.as_array()
-                if isinstance(tau, Number):
-                    if self.mask is not None:
-                        kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
-                            tau, out_np, self.mask)
-                    else:
-                        kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, \
-                            tau, out_np)
-                else:
-                    if self.mask is not None:
-                        kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
-                            tau.as_array(), out_np, self.mask)
-                    else:
-                        kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
-                            tau.as_array(), out_np)
-                out.fill(out_np)
-                return out
+        should_return = False
+        if out is None:
+            out = x * 0 
+            should_return = True
+
+        out_np = out.as_array() 
+
+        if isinstance(tau, Number):
+            if self.mask is not None:
+                kl_proximal_mask(x.as_array(), self.b_np, tau, out_np, \
+                    self.eta_np, self.mask)
             else:
-                out_np = out.as_array()
-                if isinstance(tau, Number):
-                    if self.mask is not None:
-                        kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
-                            tau, out_np, self.mask)
-                    else:
-                        kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, \
-                            out_np)
-                else:
-                    if self.mask is not None:
-                        kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
-                            tau.as_array(), out_np, self.mask)
-                    else:
-                        kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
-                            tau.as_array(), out_np)
-                out.fill(out_np)
+                kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
         else:
-            if out is None:
-                z = x + tau * self.eta
-                return 0.5*((z + 1) - ((z-1).power(2) + 4 * tau * self.b).sqrt())
-            else:            
-                tmp = tau * self.eta
-                tmp += x
-                tmp -= 1
-                
-                self.b.multiply(4*tau, out=out)    
-                
-                out.add(tmp.power(2), out=out)
-                out.sqrt(out=out)
-                out *= -1
-                tmp += 2
-                out += tmp
-                out *= 0.5
+            # it should be a DataContainer
+            if self.mask is not None:
+                kl_proximal_arr_mask(x.as_array(), self.b_np, tau.as_array(), \
+                    out_np, self.eta_np)
+            else:
+                kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), \
+                    out_np, self.eta_np)  
+
+        out.fill(out_np)
+        if should_return:
+            return out                                    
 
 
+    def proximal_conjugate(self, x, tau, out = None):
 
+        r"""Returns the value of the proximal operator of the convex conjugate of KullbackLeibler at :math:`(b, x + \eta)`.
+           
+        :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
+        """        
 
+        should_return = False
+        if out is None:
+            out = x * 0 
+            should_return = True
+
+        out_np = out.as_array()              
+
+        if isinstance(tau, Number):
+            if self.mask is not None:
+                kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
+                    tau, out_np, self.mask)
+            else:
+                kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, \
+                    tau, out_np)
+        else:
+            if self.mask is not None:
+                kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
+                    tau.as_array(), out_np, self.mask)
+            else:
+                kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
+                    tau.as_array(), out_np) 
+
+        out.fill(out_np)
+        if should_return:
+            return out 

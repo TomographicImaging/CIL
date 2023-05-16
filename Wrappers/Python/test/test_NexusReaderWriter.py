@@ -1,33 +1,35 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import unittest
+from utils import initialise_tests
 import os
 from cil.io import NEXUSDataReader
 from cil.io import NEXUSDataWriter
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy
 import shutil
-    
+
+initialise_tests()
 
 class TestNexusReaderWriter(unittest.TestCase):
     
     def setUp(self):
-
         self.data_dir = os.path.join(os.getcwd(), 'test_nxs')
         if not os.path.exists(self.data_dir):
             os.mkdir(self.data_dir)
@@ -40,16 +42,17 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.ad2d = self.ag2d.allocate('random_int')
 
-
         self.ag3d = AcquisitionGeometry.create_Cone3D([0.1,-500,2], [3,600,-1], [0,1,0],[0,0,-1],[0.2,-0.1,0.5],[-0.1,0.2,0.9])\
                                     .set_angles([0, 90, 180])\
                                     .set_panel([5,10],[0.1,0.3])\
 
         self.ad3d = self.ag3d.allocate('random_int')
 
+
     def tearDown(self):
         shutil.rmtree(self.data_dir)
-    
+
+
     def test_writeImageData(self):
         im_size = 5
         ig = ImageGeometry(voxel_num_x = im_size,
@@ -60,7 +63,8 @@ class TestNexusReaderWriter(unittest.TestCase):
                       data = im)
         writer.write()
         self.readImageDataAndTest()
-    
+
+
     def test_writeAcquisitionData(self):
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
@@ -74,6 +78,7 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readAcquisitionDataAndTest()
 
+
     def test_writeImageData_compressed(self):
         im_size = 5
         ig = ImageGeometry(voxel_num_x = im_size,
@@ -81,7 +86,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         im = ig.allocate('random',seed=9)
 
         writer = NEXUSDataWriter()
-        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'),
+        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
                       data = im, compression=16)
         writer.write()
 
@@ -90,8 +95,30 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readImageDataAndTest(atol=1e-4)
 
-    def readImageDataAndTest(self,atol=0):
-        
+    def test_write_throws_when_data_is_none(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(file_name='test_file_name.nxs')
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Data to write out must be set.')
+
+    def test_write_throws_when_file_is_none(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(data=self.ad2d)
+            writer.write()
+        self.assertEqual(str(cm.exception), 'Path to nexus file to write to is required.')
+
+    def test_write_throws_when_file_is_not_path_like(self):
+        with self.assertRaises(TypeError) as cm:
+            writer = NEXUSDataWriter(file_name=self.ad2d , data=self.ad2d)
+            writer.write()
+
+    def test_write_throws_when_file_path_not_possible(self):
+        with self.assertRaises(OSError):
+            writer = NEXUSDataWriter(file_name="_/_/_" , data=self.ad2d)
+            writer.write()
+
+
+    def readImageDataAndTest(self,atol=0):        
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
                                 voxel_num_y = im_size)
@@ -107,8 +134,8 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ig.voxel_num_x, ig_test.voxel_num_x, 'ImageGeometry is not correct')
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
+
     def readAcquisitionDataAndTest(self):
-        
         reader2d = NEXUSDataReader()
         reader2d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'))
         ad2d = reader2d.read()
@@ -137,11 +164,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.pixel_size_h, self.ag3d.pixel_size_h, 'AcquisitionGeometry.pixel_size_h is not correct')
         self.assertEqual(ag3d.pixel_num_v, self.ag3d.pixel_num_v, 'AcquisitionGeometry.pixel_num_v is not correct')
         self.assertEqual(ag3d.pixel_size_v, self.ag3d.pixel_size_v, 'AcquisitionGeometry.pixel_size_v is not correct')
-        self.assertEqual(ag3d.dist_source_center, self.ag3d.dist_source_center, 'AcquisitionGeometry.dist_source_center is not correct')
-        self.assertEqual(ag3d.dist_center_detector, self.ag3d.dist_center_detector, 'AcquisitionGeometry.dist_center_detector is not correct')
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d
-        
-if __name__ == '__main__':
-    unittest.main()
+

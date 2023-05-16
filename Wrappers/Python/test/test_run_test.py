@@ -1,44 +1,38 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 import numpy
 import numpy as np
-from cil.framework import DataContainer
 from cil.framework import ImageData
-from cil.framework import AcquisitionData, VectorData
-from cil.framework import ImageGeometry,VectorGeometry
-from cil.framework import AcquisitionGeometry
-from cil.optimisation.algorithms import FISTA
-from cil.optimisation.functions import LeastSquares
-from cil.optimisation.functions import ZeroFunction
-from cil.optimisation.functions import L1Norm
-
-from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.operators import LinearOperator
+from cil.framework import ImageGeometry
 
 import numpy.testing
 
-try:
-    from cvxpy import *
-    cvx_not_installable = False
-except ImportError:
-    cvx_not_installable = True
+from testclass import CCPiTestClass
 
+from utils import has_cvxpy, initialise_tests
+
+initialise_tests()
+
+if has_cvxpy:
+    import cvxpy
 
 def aid(x):
     # This function returns the memory
@@ -50,38 +44,9 @@ def dt(steps):
     return steps[-1] - steps[-2]
 
 
-
-
-class TestAlgorithms(unittest.TestCase):
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
+class TestFunction(CCPiTestClass):
     
-class TestFunction(unittest.TestCase):
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
+        
     def create_simple_ImageData(self):
         N = 64
         ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
@@ -97,14 +62,10 @@ class TestFunction(unittest.TestCase):
         return (ig, Phantom)
 
     def _test_Norm2(self):
-        print("test Norm2")
-        opt = {'memopt': True}
         ig, Phantom = self.create_simple_ImageData()
         x = Phantom.as_array()
-        print(Phantom)
-        print(Phantom.as_array())
-
-        norm2 = Norm2()
+        
+        norm2 = cvxpy.Norm2()
         v1 = norm2(x)
         v2 = norm2(Phantom)
         self.assertEqual(v1, v2)

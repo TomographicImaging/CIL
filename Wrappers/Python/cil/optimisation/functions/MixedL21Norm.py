@@ -1,24 +1,86 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.functions import Function
 from cil.framework import BlockDataContainer
 import numpy as np
+from numbers import Number
+has_numba = True
+try:
+    import numba
+    @numba.jit(parallel=True, nopython=True)
+    def _proximal_step_numba(arr, abstau):
+        '''Numba implementation of a step in the calculation of the proximal of MixedL21Norm
+        
+        Parameters:
+        -----------
+        arr : numpy array, best if contiguous memory. 
+        abstau: float >= 0
 
+        Returns:
+        --------
+        Stores the output in the input array.
+
+        Note:
+        -----
+        
+        Input arr should be contiguous for best performance'''
+        tmp = arr.ravel()
+        for i in numba.prange(tmp.size):
+            if tmp[i] == 0:
+                continue
+            a = tmp[i] / abstau
+            el = a - 1
+            if el <= 0.0:
+                el = 0.
+            
+            tmp[i] = el / a 
+        return 0
+except ImportError:
+    has_numba = False
+    
+
+
+def _proximal_step_numpy(tmp, tau):
+    '''Numpy implementation of a step in the calculation of the proximal of MixedL21Norm
+    
+    Parameters:
+    -----------
+    tmp : DataContainer/ numpy array, best if contiguous memory. 
+    tau: float or DataContainer
+
+    Returns:
+    --------
+
+    A DataContainer where we have substituted nan with 0.
+    '''
+    # Note: we divide x by tau so the cases of tau both scalar and 
+    # DataContainers run
+    tmp /= np.abs(tau, dtype=np.float32)
+    res = tmp - 1
+    res.maximum(0.0, out=res)
+    res /= tmp
+
+    resarray = res.as_array()
+    resarray[np.isnan(resarray)] = 0
+    res.fill(resarray)
+    return res
 
 class MixedL21Norm(Function):
     
@@ -83,48 +145,31 @@ class MixedL21Norm(Function):
         where the convention 0 · (0/0) = 0 is used.
         
         """
-
-        # Note: we divide x/tau so the cases of both scalar and 
-        # datacontainers of tau to be able to run
-        
+                
+        tmp = x.pnorm(2)
+        if has_numba and isinstance(tau, Number):
+            try: 
+                # may involve a copy if the data is not contiguous
+                tmparr = np.asarray(tmp.as_array(), order='C', dtype=tmp.dtype)
+                if _proximal_step_numba(tmparr, np.abs(tau)) != 0:
+                    # if numba silently crashes
+                    raise RuntimeError('MixedL21Norm.proximal: numba silently crashed.')
+                
+                res = tmp
+                res.fill(tmparr)
+            except:
+                res = _proximal_step_numpy(tmp, tau)
+        else:
+            res = _proximal_step_numpy(tmp, tau)
         
         if out is None:
-            tmp = (x/tau).pnorm(2)
-            res = (tmp - 1).maximum(0.0) * x/tmp
-
-            # TODO avoid using numpy, add operation in the framework
-            # This will be useful when we add cupy 
-                                 
-            for el in res.containers:
-
-                elarray = el.as_array()
-                elarray[np.isnan(elarray)]=0
-                el.fill(elarray)
-
-            return res
-            
+            res = x.multiply(res)
         else:
-            
-            try:
-                x.divide(tau,out=x)
-                tmp = x.pnorm(2)
-                x.multiply(tau,out=x)
-            except TypeError:
-                x_scaled = x.divide(tau)
-                tmp = x_scaled.pnorm(2)
- 
-            tmp_ig = 0.0 * tmp
-            (tmp - 1).maximum(0.0, out = tmp_ig)
-            tmp_ig.multiply(x, out = out)
-            out.divide(tmp, out = out)
-            
-            for el in out.containers:
-                
-                elarray = el.as_array()
-                elarray[np.isnan(elarray)]=0
-                el.fill(elarray)  
+            x.multiply(res, out = out)
+            res = out
 
-            out.fill(out)
+        if out is None:
+            return res
 
 class SmoothMixedL21Norm(Function):
     

@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
 from cil.framework import BlockGeometry
-import warnings
+import logging
 from cil.utilities.multiprocessing import NUM_THREADS
 from cil.framework import ImageGeometry
 import numpy as np
@@ -32,107 +34,154 @@ CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class GradientOperator(LinearOperator):
 
+    r"""
+    Gradient Operator: Computes first-order forward/backward differences on
+    2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
 
-    r'''Gradient Operator: Computes first-order forward/backward differences on 
-        2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
-    
-    :param gm_domain: Set up the domain of the function
-    :type gm_domain: `ImageGeometry`
-    :param bnd_cond: Set the boundary conditions to use 'Neumann' or 'Periodic', defaults to 'Neumann'
-    :type bnd_cond: str, optional    
-    :return: returns a BlockDataContainer containing images of the derivatives order given by `dimension_labels`\
+    Parameters
+    ----------
+    domain_geometry: ImageGeometry
+        Set up the domain of the function
+    method: str, default 'forward'
+        Accepts: 'forward', 'backward', 'centered', note C++ optimised routine only works with 'forward'
+    bnd_cond: str, default,  'Neumann'
+        Set the boundary conditions to use 'Neumann' or 'Periodic'
+    **kwargs:
+        correlation: str, default 'Space'
+            'Space' will compute the gradient on only the spatial dimensions, 'SpaceChannels' will include the channel dimension direction
+        backend: str, default 'c'
+            'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
+        num_threads: int
+            If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
+        split: boolean
+            If 'True', and backend 'c' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
+
+    Returns
+    -------
+    BlockDataContainer
+        a BlockDataContainer containing images of the derivatives order given by `dimension_labels`
         i.e. ['horizontal_y','horizontal_x'] will return [d('horizontal_y'), d('horizontal_x')]
-    :rtype: BlockDataContainer
-    
-    :param \**kwargs:
-        See below
 
-    :Keyword Arguments:
-        * *correlation* (``str``) --
-          'Space' or 'SpaceChannels', defaults to 'Space'
-        * *backend* (``str``) --
-          'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
-        * *num_threads* (``int``) --
-          If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
-        * *split* (``boolean``) --
-          If 'True', and backend 'C' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
-                               
-        Example (2D): 
-        .. math::
-        
-          \nabla : X -> Y \\
-          u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u] \\
-          u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
-            
 
-    '''
+    Example
+    -------
 
-    #kept here for backwards compatability
+    2D example
+
+    .. math::
+       :nowrap:
+
+        \begin{eqnarray}
+        \nabla : X \rightarrow Y\\
+        u \in X, \nabla(u) &=& [\partial_{y} u, \partial_{x} u]\\
+        u^{*} \in Y, \nabla^{*}(u^{*}) &=& \partial_{y} v1 + \partial_{x} v2
+        \end{eqnarray}
+
+
+    """
+
+    #kept here for backwards compatbility
     CORRELATION_SPACE = CORRELATION_SPACE
     CORRELATION_SPACECHANNEL = CORRELATION_SPACECHANNEL
 
     def __init__(self, domain_geometry, method = 'forward', bnd_cond = 'Neumann', **kwargs):
-        """Constructor method
-        """        
-        
         # Default backend = C
         backend = kwargs.get('backend',C)
 
         # Default correlation for the gradient coupling
-        correlation = kwargs.get('correlation',CORRELATION_SPACE)
+        self.correlation = kwargs.get('correlation',CORRELATION_SPACE)
 
-        # Add attributes for SIRF data where there is no CIL geometry
-        if not isinstance(domain_geometry, ImageGeometry):
+        # Add assumed attributes if there is no CIL geometry (i.e. SIRF objects)
+        if not hasattr(domain_geometry, 'channels'):
             domain_geometry.channels = 1
-            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)        
-                       
-        # Space correlation on multichannel data call numpy backend
-        if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
-            #numpy implementation only for now
-            backend = NUMPY
-            warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
 
-        # Complex data will use numpy backend
-        if domain_geometry.dtype in [np.complex, np.complex64]:
-            backend = NUMPY
-            warnings.warn("Warning: Complex geometries will use `numpy` backend")
-        
-        if method != 'forward':
-            backend = NUMPY
-            warnings.warn("Warning: method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
-            
+        if not hasattr(domain_geometry, 'dimension_labels'):
+            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)
+
+        if backend == C:
+            if self.correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
+                backend = NUMPY
+                logging.warning("C backend cannot use correlation='Space' on multi-channel dataset - defaulting to `numpy` backend")
+            elif domain_geometry.dtype != np.float32:
+                backend = NUMPY
+                logging.warning("C backend is only for arrays of datatype float32 - defaulting to `numpy` backend")
+            elif method != 'forward':
+                backend = NUMPY
+                logging.warning("C backend is only implemented for forward differences - defaulting to `numpy` backend")
         if backend == NUMPY:
             self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
         else:
             self.operator = Gradient_C(domain_geometry, bnd_cond=bnd_cond, **kwargs)
-        
-        super(GradientOperator, self).__init__(domain_geometry=domain_geometry, 
-                                       range_geometry=self.operator.range_geometry()) 
+
+        super(GradientOperator, self).__init__(domain_geometry=domain_geometry,
+                                       range_geometry=self.operator.range_geometry())
+
 
     def direct(self, x, out=None):
-        """Computes the first-order forward differences
+        """
+        Computes the first-order forward differences
 
-        :param x: Image data
-        :type x: `ImageData`
-        :param out: pre-allocated output memory to store result
-        :type out: `BlockDataContainer`, optional        
-        :return: result data if not passed as parameter
-        :rtype: `BlockDataContainer`
-        """        
+        Parameters
+        ----------
+        x : ImageData
+        out : BlockDataContainer, optional
+            pre-allocated output memory to store result
+
+        Returns
+        -------
+        BlockDataContainer
+            result data if `out` not specified
+        """
         return self.operator.direct(x, out=out)
-        
-        
-    def adjoint(self, x, out=None):
-        """Computes the first-order backward differences
 
-        :param x: Gradient images for each dimension in ImageGeometry domain
-        :type x: `BlockDataContainer`
-        :param out: pre-allocated output memory to store result
-        :type out: `ImageData`, optional      
-        :return: result data if not passed as parameter
-        :rtype: `ImageData`
-        """            
+
+    def adjoint(self, x, out=None):
+        """
+        Computes the first-order backward differences
+
+        Parameters
+        ----------
+        x : BlockDataContainer
+            Gradient images for each dimension in ImageGeometry domain
+        out : ImageData, optional
+            pre-allocated output memory to store result
+
+        Returns
+        -------
+        ImageData
+            result data if `out` not specified
+        """
+
         return self.operator.adjoint(x, out=out)
+
+
+    def calculate_norm(self):
+
+        r""" 
+        Returns the analytical norm of the GradientOperator.
+            
+        .. math::
+
+            (\partial_{z}, \partial_{y}, \partial_{x}) &= \sqrt{\|\partial_{z}\|^{2} + \|\partial_{y}\|^{2} + \|\partial_{x}\|^{2} } \\
+            &=  \sqrt{ \frac{4}{h_{z}^{2}} + \frac{4}{h_{y}^{2}} + \frac{4}{h_{x}^{2}}}
+
+
+        Where the voxel sizes in each dimension are equal to 1 this simplifies to:
+
+          - 2D geometries :math:`norm = \sqrt{8}`
+          - 3D geometries :math:`norm = \sqrt{12}`
+        
+        """
+
+        if self.correlation==CORRELATION_SPACE and self._domain_geometry.channels > 1:
+            norm = np.array(self.operator.voxel_size_order[1::])
+        else:
+            norm = np.array(self.operator.voxel_size_order)
+
+        norm = 4 / (norm * norm)
+
+        return np.sqrt(norm.sum())
+
 
 class Gradient_numpy(LinearOperator):
     
@@ -150,8 +199,8 @@ class Gradient_numpy(LinearOperator):
         # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
         domain_shape = []
         self.ind = []
-        for i, size in enumerate(list(domain_geometry.shape) ):
-            if size!=1:
+        for i, size in enumerate(list(domain_geometry.shape)):
+            if size > 1:
                 domain_shape.append(size)
                 self.ind.append(i)
      
@@ -181,7 +230,7 @@ class Gradient_numpy(LinearOperator):
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry, 
                                              range_geometry = range_geometry) 
         
-        print("Initialised GradientOperator with numpy backend")               
+        logging.info("Initialised GradientOperator with numpy backend")               
         
     def direct(self, x, out=None): 
          if out is not None:  
@@ -242,10 +291,10 @@ cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_long,
-                       ctypes.c_long,
-                       ctypes.c_long,
-                       ctypes.c_long,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
@@ -254,9 +303,9 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_long,
-                       ctypes.c_long,
-                       ctypes.c_long,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
@@ -264,8 +313,8 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_long,
-                       ctypes.c_long,
+                       ctypes.c_size_t,
+                       ctypes.c_size_t,
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
@@ -288,7 +337,6 @@ class Gradient_C(LinearOperator):
         self.split = kwargs.get('split',False)
         
         # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
-        self.is2D = False
         self.domain_shape = []
         self.ind = []
         self.voxel_size_order = []
@@ -297,7 +345,6 @@ class Gradient_C(LinearOperator):
                 self.domain_shape.append(size)
                 self.ind.append(i)
                 self.voxel_size_order.append(domain_geometry.spacing[i])
-                self.is2D = True
         
         # Dimension of domain geometry
         self.ndim = len(self.domain_shape)
@@ -326,7 +373,7 @@ class Gradient_C(LinearOperator):
         
         super(Gradient_C, self).__init__(domain_geometry=domain_geometry, 
                                          range_geometry=range_geometry) 
-        print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
+        logging.info("Initialised GradientOperator with C backend running with {} threads".format(cilacc.openMPtest(self.num_threads)))
 
     @staticmethod 
     def datacontainer_as_c_pointer(x):
@@ -416,4 +463,9 @@ class Gradient_C(LinearOperator):
                 
         if return_val is True:
             return out        
+    
+
+
+
+      
 

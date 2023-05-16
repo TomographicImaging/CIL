@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import numpy as np
 from cil.framework import ImageData
@@ -90,13 +92,13 @@ class ChannelwiseOperator(LinearOperator):
             output = self.range_geometry().allocate()
             cury = self.op.range_geometry().allocate()
             for k in range(self.channels):
-                self.op.direct(x.subset(channel=k),cury)
+                self.op.direct(x.get_slice(channel=k),cury)
                 output.fill(cury.as_array(),channel=k)
             return output
         else:
             cury = self.op.range_geometry().allocate()
             for k in range(self.channels):
-                self.op.direct(x.subset(channel=k),cury)
+                self.op.direct(x.get_slice(channel=k),cury)
                 out.fill(cury.as_array(),channel=k)
     
     def adjoint(self,x, out=None):
@@ -109,13 +111,13 @@ class ChannelwiseOperator(LinearOperator):
             output = self.domain_geometry().allocate()
             cury = self.op.domain_geometry().allocate()
             for k in range(self.channels):
-                self.op.adjoint(x.subset(channel=k),cury)
+                self.op.adjoint(x.get_slice(channel=k),cury)
                 output.fill(cury.as_array(),channel=k)
             return output
         else:
             cury = self.op.domain_geometry().allocate()
             for k in range(self.channels):
-                self.op.adjoint(x.subset(channel=k),cury)
+                self.op.adjoint(x.get_slice(channel=k),cury)
                 out.fill(cury.as_array(),channel=k)
         
     def calculate_norm(self, **kwargs):

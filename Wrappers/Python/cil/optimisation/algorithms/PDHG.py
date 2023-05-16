@@ -1,25 +1,28 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataContainer, BlockDataContainer
 from cil.optimisation.algorithms import Algorithm
 import warnings
 import numpy as np
 from numbers import Number
+import logging
 
 
 
@@ -41,8 +44,6 @@ class PDHG(Algorithm):
         Step size for the primal problem.
     initial : DataContainer, optional, default=None
         Initial point for the PDHG algorithm.
-    use_axbpy: :obj:`bool`, optional, default=True
-        Computes a*x + b*y in C.
     gamma_g : positive :obj:`float`, optional, default=None
         Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
     gamma_fconj : positive :obj:`float`, optional, default=None
@@ -216,28 +217,13 @@ class PDHG(Algorithm):
     
 
     .. todo:: Implement acceleration of PDHG when both functions are strongly convex.
-                      
-
-    References
-    ----------
-
-    .. bibliography::    
-            
+                                  
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, use_axpby=True, **kwargs):
+    def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, **kwargs):
 
         super(PDHG, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
-        self._use_axpby = use_axpby
 
         self._tau = None
         self._sigma = None 
@@ -333,7 +319,7 @@ class PDHG(Algorithm):
             Initial point for the PDHG algorithm.
         theta : Relaxation parameter, Number, default 1.0
         """
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         # Triplet (f, g, K)
         self.f = f
@@ -365,19 +351,19 @@ class PDHG(Algorithm):
             warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
         
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
 
 
-    def update_previous_solution(self):
-        # swap the pointers to current and previous solution
+    def _update_previous_solution(self):
+        """ Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
+        """  
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
 
 
     def get_output(self):
-        '''Returns the solution found'''
-        # returns the current solution
+        " Returns the current solution. "
         return self.x_old
 
 
@@ -386,32 +372,19 @@ class PDHG(Algorithm):
         """
 
         #calculate x-bar and store in self.x_tmp
-        if self._use_axpby:
-            self.x_old.axpby((self.theta + 1.0), -self.theta , self.x, out=self.x_tmp) 
-        else:
-            self.x_old.subtract(self.x, out=self.x_tmp)
-            self.x_tmp *= self.theta
-            self.x_tmp += self.x_old
+        self.x_old.sapyb((self.theta + 1.0), self.x, -self.theta, out=self.x_tmp) 
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.x_tmp, out=self.y_tmp)
-        
-        if self._use_axpby:
-            self.y_tmp.axpby(self.sigma, 1.0 , self.y, out=self.y_tmp)
-        else:
-            self.y_tmp *= self.sigma
-            self.y_tmp += self.y
+
+        self.y_tmp.sapyb(self.sigma, self.y, 1.0 , out=self.y_tmp)
 
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
 
         # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
 
-        if self._use_axpby:
-            self.x_tmp.axpby(-self.tau, 1.0 , self.x_old, self.x_tmp)
-        else:
-            self.x_tmp *= -1.0*self.tau
-            self.x_tmp += self.x_old
+        self.x_tmp.sapyb(-self.tau, self.x_old, 1.0 , self.x_tmp)
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 

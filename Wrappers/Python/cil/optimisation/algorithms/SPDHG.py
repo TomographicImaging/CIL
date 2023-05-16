@@ -1,112 +1,139 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Claire Delplancke (University of Bath)
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
+import logging
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
-    
+
     Problem: 
     
     .. math::
     
       \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
         
-    :param operator: BlockOperator of Linear Operators
-    :param f: BlockFunction, each function with "simple" proximal of its conjugate 
-    :param g: Convex function with "simple" proximal 
-    :param sigma=(sigma_i): List of Step size parameters for Dual problem
-    :param tau: Step size parameter for Primal problem
-    :param initial: Initial guess ( Default initial = 0)
-    :param prob: List of probabilities
-        
-    Remark: Convergence is guaranted provided that [2, eq. (12)]:
-        
+    Parameters
+    ----------
+    f : BlockFunction
+        Each must be a convex function with a "simple" proximal method of its conjugate
+    g : Function
+        A convex function with a "simple" proximal
+    operator : BlockOperator   
+        BlockOperator must contain Linear Operators    
+    tau : positive float, optional, default=None
+        Step size parameter for Primal problem
+    sigma : list of positive float, optional, default=None
+        List of Step size parameters for Dual problem
+    initial : DataContainer, optional, default=None
+        Initial point for the SPDHG algorithm
+    prob : list of floats, optional, default=None
+        List of probabilities. If None each subset will have probability = 1/number of subsets
+    gamma : float
+        parameter controlling the trade-off between the primal and dual step sizes
+
+    **kwargs:
+    norms : list of floats
+        precalculated list of norms of the operators
+
+    Example 
+    -------
+
+    Example of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
+
+
+    Note
+    ----
+    
+    Convergence is guaranteed provided that [2, eq. (12)]:
+    
     .. math:: 
     
-      \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
-      
-    Remark: Notation for primal and dual step-sizes are reversed with comparison
-            to PDGH.py
-            
-    Remark: this code implements serial sampling only, as presented in [2]
-            (to be extended to more general case of [1] as future work)             
-            
-    References:
-        
-        [1]"Stochastic primal-dual hybrid gradient algorithm with arbitrary 
-        sampling and imaging applications",
-        Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,
-        SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   
-         
-        [2]"Faster PET reconstruction with non-smooth priors by randomization and preconditioning",
-        Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
-        Physics in Medicine & Biology, Volume 64, Number 22, 2019.
+    \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
     
-    Example of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
-        
-    '''
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 initial=None, prob=None, gamma=1., use_axpby=True, 
-                 norms=None, **kwargs):
-        '''SPDHG algorithm creator
+    Note
+    ----
+    
+    Notation for primal and dual step-sizes are reversed with comparison
+        to PDHG.py
 
-        Parameters
-        :param operator: BlockOperator of Linear Operators
-        :param f: BlockFunction, each function with "simple" proximal of its conjugate 
-        :param g: Convex function with "simple" proximal 
-        :param sigma=(sigma_i): List of Step size parameters for Dual problem
-        :param tau: Step size parameter for Primal problem
-        :param initial: Initial guess ( Default initial = 0)
-        :param prob: List of probabilities
-        :param gamma: parameter controlling the trade-off between the primal and dual step sizes
-        :param use_axpby: whether to use axpby or not
-        :param norms: norms of the operators in operator
-        :type norms: list, default None
-        '''
+    Note
+    ----
+
+    this code implements serial sampling only, as presented in [2]
+        (to be extended to more general case of [1] as future work)             
+        
+    References
+    ----------
+    
+    [1]"Stochastic primal-dual hybrid gradient algorithm with arbitrary 
+    sampling and imaging applications",
+    Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,
+    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   
+        
+    [2]"Faster PET reconstruction with non-smooth priors by randomization and preconditioning",
+    Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
+    Physics in Medicine & Biology, Volume 64, Number 22, 2019.
+    '''
+    
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
+                 initial=None, prob=None, gamma=1.,**kwargs):
+
         super(SPDHG, self).__init__(**kwargs)
 
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
-                    
-        self._use_axpby = use_axpby
+
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        initial=initial, prob=prob, gamma=gamma, norms=norms)
+                        initial=initial, prob=prob, gamma=gamma, norms=kwargs.get('norms', None))
     
+
     def set_up(self, f, g, operator, tau=None, sigma=None, \
                initial=None, prob=None, gamma=1., norms=None):
-        '''initialisation of the algorithm
+        
+        '''set-up of the algorithm
+        Parameters
+        ----------
+        f : BlockFunction
+            Each must be a convex function with a "simple" proximal method of its conjugate
+        g : Function
+            A convex function with a "simple" proximal
+        operator : BlockOperator   
+            BlockOperator must contain Linear Operators    
+        tau : positive float, optional, default=None
+            Step size parameter for Primal problem
+        sigma : list of positive float, optional, default=None
+            List of Step size parameters for Dual problem
+        initial : DataContainer, optional, default=None
+            Initial point for the SPDHG algorithm
+        prob : list of floats, optional, default=None
+            List of probabilities. If None each subset will have probability = 1/number of subsets
+        gamma : float
+            parameter controlling the trade-off between the primal and dual step sizes
 
-        :param operator: BlockOperator of Linear Operators
-        :param f: BlockFunction, each function with "simple" proximal of its conjugate.
-        :param g: Convex function with "simple" proximal 
-        :param sigma: list of Step size parameters for dual problem
-        :param tau: Step size parameter for primal problem
-        :param initial: Initial guess ( Default initial = 0)
-        :param prob: List of probabilities'''
-        print("{} setting up".format(self.__class__.__name__, ))
+        **kwargs:
+        norms : list of floats
+            precalculated list of norms of the operators
+        '''
+        logging.info("{} setting up".format(self.__class__.__name__, ))
                     
         # algorithmic parameters
         self.f = f
@@ -150,16 +177,12 @@ class SPDHG(Algorithm):
         # relaxation parameter
         self.theta = 1
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
         
     def update(self):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        if self._use_axpby:
-            self.x.axpby(1., -self.tau, self.zbar, out=self.x_tmp)
-        else:
-            self.zbar.multiply(self.tau, out=self.x_tmp)
-            self.x.subtract(self.x_tmp, out=self.x_tmp)
+        self.x.sapyb(1., self.zbar,  -self.tau, out=self.x_tmp)
             
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
         
@@ -169,11 +192,8 @@ class SPDHG(Algorithm):
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
         y_k = self.operator[i].direct(self.x)
-        if self._use_axpby:
-            y_k.axpby(self.sigma[i], 1., self.y_old[i], out=y_k)
-        else:
-            y_k.multiply(self.sigma[i], out=y_k)
-            y_k.add(self.y_old[i], out=y_k)
+
+        y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
             
         y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
         
@@ -188,12 +208,9 @@ class SPDHG(Algorithm):
         # z = z + x_tmp
         self.z.add(self.x_tmp, out =self.z)
         # zbar = z + (theta/p[i]) * x_tmp
-        if self._use_axpby:
-            self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
-        else:
-            self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
-            self.z.add(self.x_tmp, out=self.zbar)
-        
+
+        self.z.sapyb(1., self.x_tmp, self.theta / self.prob[i], out = self.zbar)
+
         # save previous iteration
         self.save_previous_iteration(i, y_k)
         

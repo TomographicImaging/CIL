@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import time, functools
 from numbers import Integral, Number
@@ -26,14 +28,14 @@ class Algorithm(object):
       provides the minimal infrastructure.
 
       Algorithms are iterables so can be easily run in a for loop. They will
-      stop as soon as the stop cryterion is met.
+      stop as soon as the stop criterion is met.
       The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and
       and :code:`update_objective` methods
       
       A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
       a :code:`callback` function that receives the current iteration number and the actual objective
       value and can be used to trigger print to screens and other user interactions. The :code:`run`
-      method will stop when the stopping cryterion is met. 
+      method will stop when the stopping criterion is met. 
    '''
 
     def __init__(self, **kwargs):
@@ -44,7 +46,7 @@ class Algorithm(object):
         
         :param max_iteration: maximum number of iterations
         :type max_iteration: int, optional, default 0
-        :param update_objectice_interval: the interval every which we would save the current\
+        :param update_objective_interval: the interval every which we would save the current\
                                        objective. 1 means every iteration, 2 every 2 iteration\
                                        and so forth. This is by default 1 and should be increased\
                                        when evaluating the objective is computationally expensive.
@@ -73,10 +75,10 @@ class Algorithm(object):
         raise NotImplementedError()
     
     def should_stop(self):
-        '''default stopping cryterion: number of iterations
+        '''default stopping criterion: number of iterations
         
-        The user can change this in concrete implementatition of iterative algorithms.'''
-        return self.max_iteration_stop_cryterion()
+        The user can change this in concrete implementation of iterative algorithms.'''
+        return self.max_iteration_stop_criterion()
     
     def __set_up_logger(self, fname):
         """Set up the logger if desired"""
@@ -87,9 +89,10 @@ class Algorithm(object):
             self.logger.setLevel(logging.INFO)
             self.logger.addHandler(handler)
     
-    def max_iteration_stop_cryterion(self):
-        '''default stop cryterion for iterative algorithm: max_iteration reached'''
+    def max_iteration_stop_criterion(self):
+        '''default stop criterion for iterative algorithm: max_iteration reached'''
         return self.iteration > self.max_iteration
+
     def __iter__(self):
         '''Algorithm is an iterable'''
         return self
@@ -118,7 +121,7 @@ class Algorithm(object):
             self.timing.append( time.time() - time0 )
             self.iteration += 1
             
-            self.update_previous_solution()
+            self._update_previous_solution()
             
             if self.iteration >= 0 and self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0:
@@ -127,21 +130,35 @@ class Algorithm(object):
                 self.update_objective()
             
 
-    def update_previous_solution(self):
-        '''Update the previous solution with the current one
+    def _update_previous_solution(self):
+        """ Update the previous solution with the current one
         
         The concrete algorithm calls update_previous_solution. Normally this would 
         entail the swapping of pointers:
 
-        tmp = self.x_old
-        self.x_old = self.x
-        self.x = tmp 
-        '''
+        .. highlight:: python
+        .. code-block:: python
+
+            tmp = self.x_old
+            self.x_old = self.x
+            self.x = tmp 
+        
+
+        """
         pass
         
     def get_output(self):
-        '''Returns the solution found'''
+        " Returns the current solution. "
         return self.x
+
+    
+    def _provable_convergence_condition(self):
+        raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
+
+    def is_provably_convergent(self):
+        """ Check if the algorithm is convergent based on the provable convergence criterion.
+        """
+        return self._provable_convergence_condition()
     
     @property
     def solution(self):
@@ -231,28 +248,23 @@ class Algorithm(object):
                                screen. Notice that printing will not evaluate the objective function
                                and so the print might be out of sync wrt the calculation of the objective.
                                In such cases nan will be printed.
-        :param very_verbose: deprecated bool, useful for algorithms with primal and dual objectives (PDHG), 
-                            prints to screen both primal and dual
         '''
         print_interval = kwargs.get('print_interval', self.update_objective_interval)
         if print_interval > self.update_objective_interval:
             print_interval = self.update_objective_interval
-        if isinstance(verbose, bool):
-            very_verbose = kwargs.get('very_verbose', False)
+        if verbose == 0:
+            verbose = False
+            very_verbose = False
+        elif verbose == 1:
+            verbose = True
+            very_verbose = False
+        elif verbose == 2:
+            verbose = True
+            very_verbose = True
         else:
-            if verbose == 0:
-                verbose = False
-                very_verbose = False
-            elif verbose == 1:
-                verbose = True
-                very_verbose = False
-            elif verbose == 2:
-                verbose = True
-                very_verbose = True
-            else:
-                raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
+            raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
-            print ("Stop cryterion has been reached.")
+            print ("Stop criterion has been reached.")
         if iterations is None :
             iterations = self.max_iteration
 
@@ -274,7 +286,8 @@ class Algorithm(object):
                 if callback is not None:
                     callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
-                if (self.iteration % print_interval == 0) or self.iteration % self.update_objective_interval == 0:
+                if (print_interval != 0 and self.iteration % print_interval == 0) or \
+                        ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):
                     print (self.verbose_output(very_verbose))
 
         if verbose:

@@ -1,30 +1,36 @@
 # -*- coding: utf-8 -*-
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+import unittest
+from utils import initialise_tests
 import numpy as np
 from numpy.linalg import norm
 import os
 import shutil
-import unittest
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
-from cil.optimisation.functions import TotalVariation, L2NormSquared
+from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
 from cil.optimisation.algorithms import FISTA
+
+from testclass import CCPiTestClass
+
+initialise_tests()
 
 try:
     import sirf.STIR as pet
@@ -33,6 +39,82 @@ try:
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
+
+class KullbackLeiblerSIRF(object):
+
+    def setUp(self):
+
+        if has_sirf:
+            self.image1 = pet.ImageData(os.path.join(
+                examples_data_path('PET'),'thorax_single_slice','emission.hv')
+                )
+
+            self.eta = self.image1.get_uniform_copy(0.1)
+            self.x = self.image1.get_uniform_copy(0.4)                    
+
+        self.f_np = KullbackLeibler(b = self.image1, backend='numpy')  
+        self.f1_np = KullbackLeibler(b = self.image1, eta = self.eta,  backend='numpy') 
+        self.out_np = self.image1.get_uniform_copy(0.)
+        self.out_nb = self.image1.get_uniform_copy(0.)
+
+        self.f_nb = KullbackLeibler(b = self.image1, backend='numba')  
+        self.f1_nb = KullbackLeibler(b = self.image1, eta = self.eta,  backend='numba')         
+        self.out1_np = self.image1.get_uniform_copy(0.)
+        self.out1_nb = self.image1.get_uniform_copy(0.)
+
+        self.tau = 400.4      
+
+    def tearDown(self):
+        pass
+    
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_KullbackLeibler_call(self):
+        np.testing.assert_almost_equal(self.f_np(self.x), self.f_nb(self.x), decimal = 2)
+        np.testing.assert_almost_equal(self.f1_np(self.x), self.f1_nb(self.x), decimal = 2)
+
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_KullbackLeibler_gradient(self):
+
+        self.f_np.gradient(self.x, out = self.out_np)
+        self.f_nb.gradient(self.x, out = self.out_nb)
+        self.f1_np.gradient(self.x, out = self.out1_np)
+        self.f1_nb.gradient(self.x, out = self.out1_nb)        
+
+        np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
+        np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
+
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_KullbackLeibler_convex_conjugate(self):
+       
+        np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)        
+        np.testing.assert_almost_equal(self.f1_np.convex_conjugate(self.x), self.f1_nb.convex_conjugate(self.x), decimal = 2)
+
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_KullbackLeibler_proximal(self):
+
+        self.f_np.proximal(self.x, self.tau, out = self.out_np)
+        self.f_nb.proximal(self.x, self.tau, out = self.out_nb)
+        self.f1_np.proximal(self.x, self.tau, out = self.out1_np)
+        self.f1_nb.proximal(self.x, self.tau, out = self.out1_nb)  
+
+        np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
+        np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
+
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_KullbackLeibler_proximal_conjugate(self):
+
+        self.f_np.proximal_conjugate(self.x, self.tau, out = self.out_np)
+        self.f_nb.proximal_conjugate(self.x, self.tau, out = self.out_nb)
+        self.f1_np.proximal_conjugate(self.x, self.tau, out = self.out1_np)
+        self.f1_nb.proximal_conjugate(self.x, self.tau, out = self.out1_nb)  
+
+        np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
+        np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
+
 
 class GradientSIRF(object):
     
@@ -175,10 +257,9 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
   
 
     
-class TestSIRFCILIntegration(unittest.TestCase):
+class TestSIRFCILIntegration(CCPiTestClass):
     
     def setUp(self):
-
         if has_sirf:
             os.chdir(examples_data_path('PET'))
             # Copy files to a working folder and change directory to where these files are.
@@ -194,6 +275,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
     def tearDown(self):
         if has_sirf:
             shutil.rmtree(self.cwd)
+
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_divide(self):
@@ -215,6 +297,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_multiply(self):
         os.chdir(self.cwd)
@@ -235,6 +318,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
     
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_add(self):
         os.chdir(self.cwd)
@@ -258,6 +342,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_subtract(self):
         os.chdir(self.cwd)
@@ -277,18 +362,8 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if hasattr(container1.get_item(col), 'as_array'):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-    def assertNumpyArrayEqual(self, first, second):
-        np.testing.assert_array_equal(first, second)
+
+
+
+
+

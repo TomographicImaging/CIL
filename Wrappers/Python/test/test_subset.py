@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-import sys
 import unittest
+from utils import initialise_tests
 import numpy
 from cil.framework import DataContainer
 from cil.framework import ImageData
@@ -24,6 +26,8 @@ from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
+
+initialise_tests()
 
 class Test_reorder(unittest.TestCase):
     def test_DataContainer(self):
@@ -236,7 +240,7 @@ class TestSubset(unittest.TestCase):
         ImageGeometry.VERTICAL]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        sub = data.subset(horizontal_y = 1)
+        sub = data.get_slice(horizontal_y = 1)
         self.assertTrue( sub.shape == (2,5,4))
 
     def test_ImageDataSubset2a(self):
@@ -244,7 +248,7 @@ class TestSubset(unittest.TestCase):
         ImageGeometry.VERTICAL]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        sub = data.subset(horizontal_x = 1)
+        sub = data.get_slice(horizontal_x = 1)
         self.assertTrue( sub.shape == (5,3,4))
 
     def test_ImageDataSubset3a(self):
@@ -252,7 +256,7 @@ class TestSubset(unittest.TestCase):
         ImageGeometry.VERTICAL]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        sub = data.subset(channel = 1)
+        sub = data.get_slice(channel = 1)
         self.assertTrue( sub.shape == (2,3,4))
 
     def test_ImageDataSubset4a(self):
@@ -260,14 +264,14 @@ class TestSubset(unittest.TestCase):
         ImageGeometry.VERTICAL]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        sub = data.subset(vertical = 1)
+        sub = data.get_slice(vertical = 1)
         self.assertTrue( sub.shape == (2,5,3))
 
     def test_ImageDataSubset5a(self):
         non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        sub = data.subset(horizontal_y = 1)
+        sub = data.get_slice(horizontal_y = 1)
         self.assertTrue( sub.shape == (2,))
 
     def test_ImageDataSubset1b(self):
@@ -276,12 +280,12 @@ class TestSubset(unittest.TestCase):
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         new_dimension_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_X]
-        sub = data.subset(dimensions=new_dimension_labels)
-        self.assertTrue( sub.shape == (3,5,4,2))
+        data.reorder(new_dimension_labels)
+        self.assertTrue( data.shape == (3,5,4,2))
 
     def test_ImageDataSubset1c(self):
         data = self.ig.allocate()
-        sub = data.subset(channel=0,horizontal_x=0,horizontal_y=0)
+        sub = data.get_slice(channel=0,horizontal_x=0,horizontal_y=0)
         self.assertTrue( sub.shape == (4,))
 
 
@@ -318,7 +322,7 @@ class TestSubset(unittest.TestCase):
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
-        sub = data.subset(vertical = 0)
+        sub = data.get_slice(vertical = 0)
         self.assertTrue( sub.shape == (4,20,3))
     
     def test_AcquisitionDataSubset1b(self):
@@ -327,7 +331,7 @@ class TestSubset(unittest.TestCase):
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
-        sub = data.subset(channel = 0)
+        sub = data.get_slice(channel = 0)
         self.assertTrue( sub.shape == (20,2,3))
     def test_AcquisitionDataSubset1c(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
@@ -335,7 +339,7 @@ class TestSubset(unittest.TestCase):
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
-        sub = data.subset(horizontal = 0, force=True)
+        sub = data.get_slice(horizontal = 0, force=True)
         self.assertTrue( sub.shape == (4,2,3))
     def test_AcquisitionDataSubset1d(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
@@ -344,7 +348,7 @@ class TestSubset(unittest.TestCase):
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sliceme = 1
-        sub = data.subset(angle = sliceme)
+        sub = data.get_slice(angle = sliceme)
         #print (sub.shape  , sub.dimension_labels)
         self.assertTrue( sub.shape == (4,20,2) )
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
@@ -355,42 +359,42 @@ class TestSubset(unittest.TestCase):
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sliceme = 1
-        sub = data.subset(angle = sliceme)
+        sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
     def test_AcquisitionDataSubset1f(self):
         
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sliceme = 1
-        sub = data.subset(angle = sliceme)
+        sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
         
     def test_AcquisitionDataSubset1g(self):
         
         data = self.ag_cone.allocate()
         sliceme = 1
-        sub = data.subset(angle = sliceme)
+        sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])       
 
     def test_AcquisitionDataSubset1h(self):
         
         data = self.ag_cone.allocate()
-        sub = data.subset(vertical = 'centre')
+        sub = data.get_slice(vertical = 'centre')
         self.assertTrue( sub.geometry.shape == (4,3,20))       
 
     def test_AcquisitionDataSubset1i(self):
         
         data = self.ag_cone.allocate()
         sliceme = 1
-        sub = data.subset(vertical = sliceme, force=True)
+        sub = data.get_slice(vertical = sliceme, force=True)
         self.assertTrue( sub.shape == (4, 3, 20))
 
     def test_AcquisitionDataSubset1j(self):
 
         data = self.ag.allocate()
-        sub = data.subset(angle = 0)
-        sub = sub.subset(vertical = 0)
-        sub = sub.subset(horizontal = 0, force=True)
+        sub = data.get_slice(angle = 0)
+        sub = sub.get_slice(vertical = 0)
+        sub = sub.get_slice(horizontal = 0, force=True)
 
         self.assertTrue( sub.shape == (4,))
 

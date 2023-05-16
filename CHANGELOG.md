@@ -1,5 +1,107 @@
-* 2x.x.x
-  - added sapyb and deprecated axpby
+* 23.0.1
+  - Fix bug with NikonReader requiring ROI to be set in constructor.
+
+* 23.0.0
+  - Partitioner is now able to create batches even if angle is not the outer dimension
+  - Renamed `max_iteration_stop_cryterion` method in the Algorithm class to `max_iteration_stop_criterion`
+  - Removed (previously deprecated) `very_verbose` parameter in `Algorithm`'s run method.
+  - Removed (previously deprecated) `axpby` method in DataContainer.
+  - Deprecate use of integer compression in NEXUSDataWriter.
+  - Improved and tidied up documentation for all readers and writers, including hiding special members.
+  - Use arguments instead of kwargs in all readers and writers with multiple kwargs, making documentation easier.
+  - Update Apache2 License Headers.
+
+* 22.2.0
+  - BlockGeometry is iterable
+  - Added `partition` to `AcquisitionData` to partition the data with 3 methods: `sequential`, `staggered` and `random_permutation`
+  - TIGRE and ASTRA `ProjectionOperator` now support `BlockGeometry` as `acquisition_geometry` parameter, returning a `BlockOperator`
+  - Added pre-set filters for `recon.FBP` and `recon.FDK`. Filters now include ram-lak, hamming, hann, cosine, shepp-logan.
+  - Added RAWFileWriter to export data containers to raw files
+  - Extended IndicatorBox to behave as IndicatorBoxPixelwise by passing masks in lower and upper bounds
+  - Implemented IndicatorBox in numba and numpy
+  - Dropped support for Python 3.6 and NumPy 1.15
+  - Jenkins PR tests on Python 3.8 and NumPy 1.20
+  - added yml file to create test environment
+  - LeastSquares fixed docstring and unified gradient code when out is passed or not.
+  - Add compression to 8bit and 16bit to TIFFWriter
+  - Added convenience centre of rotation methods to `AcquisitionGeometry` class.
+    - `get_centre_of_rotation()` calculates the centre of rotation of the system
+    - `set_centre_of_rotation()` sets the system centre of rotation with an offset and angle
+    - `set_centre_of_rotation_by_slice()` sets the system centre of rotation with offsets from two slices
+  - Binner processor reworked:
+    - Significant speed increase available via the C++ backend
+    - Returned geometry is correctly offset where binning/cropping moves the origin
+  - Slicer refactoring
+    - Returned geometry is correctly offset where slicing/cropping moves the origin
+  - Padder refactoring
+    - Returned geometry is correctly offset where padding moves the origin
+  - Github Actions:
+    - update test python and numpy versions to 3.9 and 1.22
+    - Update conda build action to v1.4.4
+    - Fixes actions to run on ubuntu-20.04
+    - Update version of upload_artifact github action to version 3.1.1
+    - Update version of download_artifact github action to version 3.0.1
+    - Update version of checkout github action to version 3.1.0
+    - Update build-sphinx action to version 0.1.3
+  - `io.utilities.HDF5_utilities` Added utility functions to browse hdf5 files and read datasets into numpy array
+  - Implemented the analytical norm for GradientOperator
+  - Added `ImageData.apply_circular_mask` method to mask out detector edge artefacts on reconstructed volumes
+  - ROI selection, aspect ratio toggle and Play widget added to islicer
+  - Add show1D display utility
+
+* 22.1.0
+  - use assert_allclose in test_DataContainer
+  - added multiple colormaps to show2D
+  - Fix segfault in GradientOperator due to parameter overflows on windows systems
+  - Fix angle display precision and matplotlib warning for sinograms with show2D
+
+* 22.0.0
+  - Strongly convex functionality in TotalVariation and FGP_TV Functions
+  - Refactored KullbackLeibler function class. Fix bug on gradient method for SIRF objects
+  - Numba added as a CIL requirement
+  - Simplify initialisation of `CentreOfRotation.ImageSharpness` with new parameter `backend`
+  - Added ISTA algorithm. Improve inheritance of proximal gradient algorithms
+  - Updated interface to `plugins.tigre`/`plugins.astra` `FBP` and `ProjectionOperator` classes
+  - Update NikonDataReader to parse and set up geometry with: `ObjectTilt` `CentreOfRotationTop` and `CentreOfRotationBottom`
+  - Cleaned up unit test structure and output
+  - Removal of deprecated code:
+    - AcquisitionGeometry `__init__` no longer returns a configured geometry, use factory `create` methods instead
+    - `subset` method removed, use `get_slice` or `reorder` methods
+    - NikonDataReader `normalize` kwarg removed, use `normalise`
+    - Algorithms initialisation `x_init` kwarg removed, use `initial`
+    - Removed deprecated numpy calls
+  - DataProcessors use weak-reference to input data
+  - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
+    - Modules not moved should be considered deprecated
+    - CIL remains licensed as APACHE-2.0
+    - Minor bug fixes to the CPU 2D Parallel-beam FBP
+  - Add ndim property for DataContainer class
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality
+  - Raise exception if filename or data haven't been set in NexusDataWriter
+  - Fixes error when update_objective_interval is set to 0 in an algorithm run
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
+  - GitHub Actions:
+    - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master
+    
+* 21.4.1
+ - Removed prints from unittests and cleanup of unittest code.
+ - CMake: 
+   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+ - TIFF writer uses logging
+ - Added unittests for TIFF functionality
+
+* 21.4.0
+  - PEP 440 compliant version
+  - CMake fix due to use of pip install. 
+  - Recon.FBP allows 'astra' backend 
+  - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
+  - CofR image_sharpness improved for large datasets
+  - Geometry alignmentment fix for 2D datasets
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
+  - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
+  - Allow use of square brackets in file paths to TIFF and Nikon datasets
 
 * 21.3.1
   - Added matplotlib version dependency to conda recipe

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
 import warnings
@@ -29,7 +31,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
     :type white_level: float, optional
     :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level
     :type min_intensity: float, optional
-    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
+    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if 'out' is passed
     :rtype: AcquisitionData, ImageData or DataContainer
     
     Processor first divides by white_level (default=1) and then take negative logarithm. 
@@ -37,8 +39,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
     '''
 
     def __init__(self,
-                 min_intensity = 0,
-                 white_level = 1
+                 min_intensity = 0.0,
+                 white_level = 1.0
                  ):
 
         kwargs = {'min_intensity': min_intensity,
@@ -52,29 +54,39 @@ class TransmissionAbsorptionConverter(DataProcessor):
             raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n' +
                             ' - DataContainer')
+
+        if data.min() <= 0 and self.min_intensity <= 0:
+            raise ValueError('Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.')
+
         return True 
 
     def process(self, out=None):
 
         data = self.get_input()
 
-        white_level = numpy.float32(self.white_level)
-
+        return_val = False
         if out is None:
-            out = data.divide(white_level)
-        else:
-            data.divide(white_level, out=out)
+            out = data.geometry.allocate(None)
+            return_val = True
 
-        arr = out.as_array()
-        threshold = numpy.float32(self.min_intensity)
-        threshold_indices = arr < threshold
-        arr[threshold_indices] = threshold
-        out.fill(arr)
+        arr_in = data.as_array()
+        arr_out = out.as_array()
 
-        try:
-            out.log(out=out)
-        except RuntimeWarning:
-            raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
-                
-        out.multiply(-1.0,out=out)
-        return out
+        #whitelevel
+        if self.white_level != 1:
+            numpy.divide(arr_in, self.white_level, out=arr_out)
+            arr_in = arr_out
+
+        #threshold
+        if self.min_intensity > 0:
+            numpy.clip(arr_in, self.min_intensity, None, out=arr_out)
+            arr_in = arr_out
+
+        #beer-lambert
+        numpy.log(arr_in,out=arr_out)
+        numpy.negative(arr_out,out=arr_out)
+        
+        out.fill(arr_out)
+
+        if return_val:
+            return out

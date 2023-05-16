@@ -1,3 +1,24 @@
+// -*- coding: utf-8 -*-
+//  Copyright 2019 United Kingdom Research and Innovation
+//  Copyright 2019 The University of Manchester
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+// Authors:
+// CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+// Sam Tygier (UKRI-STFC)
+
+
 #include "FiniteDifferenceLibrary.h"
 
 DLL_EXPORT int openMPtest(int nThreads)
@@ -15,32 +36,33 @@ DLL_EXPORT int openMPtest(int nThreads)
 	return nThreads_running;
 }
 
-int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	const float *inimage = inimagefull;
 	float *outimageX = outimageXfull;
 	float *outimageY = outimageYfull;
 	float *outimageZ = outimageZfull;
 
-	int offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
-	int offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
+	const size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
+	const size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
 
-	long c;
+	// For openMP in MSVC loop variables must be signed
+	long long c;
 	
-	int z_dim = nz > 1 ? 1: 0;
+	const bool z_dim = nz > 1;
 
 	for (c = 0; c < nc; c++)
 	{
 #pragma omp parallel
 		{
-			long ind, k, j, i;
+			long long ind, k, j, i;
 			float pix0;
 			//run over all and then fix boundaries
 
 #pragma omp for nowait
-			for (ind = 0; ind < nx * ny * (nz - 1); ind++)
+			for (ind = 0; ind < offset1; ind++)
 			{
 				pix0 = -inimage[ind];
 				outimageX[ind] = pix0 + inimage[ind + 1];
@@ -100,7 +122,7 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 0; c < nc - 1; c++)
 		{
@@ -123,29 +145,31 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 
 	return 0;
 }
-int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	const float *inimage = inimagefull;
 	float *outimageX = outimageXfull;
 	float *outimageY = outimageYfull;
 	float *outimageZ = outimageZfull;
 
-	int offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
-	int offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
+	const size_t offset1 = (nz - 1) * nx * ny;	  //ind to beginning of last slice
+	const size_t offset2 = offset1 + (ny - 1) * nx; //ind to beginning of last row
 
-	long c;
+	const bool z_dim = nz > 1;
+
+	long long c;
 	for (c = 0; c < nc; c++)
 	{
 
 #pragma omp parallel
 		{
-			long ind, k;
+			long long ind, k;
 			float pix0;
 			//run over all and then fix boundaries
 #pragma omp for nowait
-			for (ind = 0; ind < nx * ny * (nz - 1); ind++)
+			for (ind = 0; ind < offset1; ind++)
 			{
 				pix0 = -inimage[ind];
 
@@ -177,8 +201,8 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					int ind1 = (k * ny * nx);
-					int ind2 = ind1 + (ny - 1) * nx;
+					size_t ind1 = (k * ny * nx);
+					size_t ind2 = ind1 + (ny - 1) * nx;
 
 					outimageY[ind2 + i] = -inimage[ind2 + i] + inimage[ind1 + i];
 				}
@@ -189,14 +213,14 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 			{
 				for (int j = 0; j < ny; j++)
 				{
-					int ind1 = k * ny * nx + j * nx;
-					int ind2 = ind1 + nx - 1;
+					size_t ind1 = k * ny * nx + j * nx;
+					size_t ind2 = ind1 + nx - 1;
 
 					outimageX[ind2] = -inimage[ind2] + inimage[ind1];
 				}
 			}
 
-			if (nz > 1)
+			if (z_dim)
 			{
 #pragma omp for nowait
 				for (ind = 0; ind < ny * nx; ind++)
@@ -215,7 +239,7 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 0; c < nc - 1; c++)
 		{
@@ -238,13 +262,13 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 
 	return 0;
 }
-int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
 	//runs over full data in x, y, z. then corrects elements for bounday conditions and sums
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
-	int z_dim = nz - 1;
+	const bool z_dim = nz > 1;
 
 	float *outimage = outimagefull;
 	const float *inimageX = inimageXfull;
@@ -260,20 +284,20 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 		tempZ = (float *)malloc(volume * sizeof(float));
 	}
 
-	long c;
+	long long c;
 	for (c = 0; c < nc; c++) //just calculating x, y and z in each channel here
 	{
 #pragma omp parallel
 		{
-			long ind, k;
+			long long ind, k;
 
 #pragma omp for
-			for (ind = 1; ind < nx * ny * nz; ind++)
+			for (ind = 1; ind < volume; ind++)
 			{
 				tempX[ind] = -inimageX[ind] + inimageX[ind - 1];
 			}
 #pragma omp for
-			for (ind = nx; ind < nx * ny * nz; ind++)
+			for (ind = nx; ind < volume; ind++)
 			{
 				tempY[ind] = -inimageY[ind] + inimageY[ind - nx];
 			}
@@ -282,7 +306,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int j = 0; j < ny; j++)
+				for (long long j = 0; j < ny; j++)
 				{
 					tempX[k * ny * nx + j * nx] = -inimageX[k * ny * nx + j * nx];
 					tempX[k * ny * nx + j * nx + nx - 1] = inimageX[k * ny * nx + j * nx + nx - 2];
@@ -291,7 +315,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (long long i = 0; i < nx; i++)
 				{
 					tempY[(k * ny * nx) + i] = -inimageY[(k * ny * nx) + i];
 					tempY[(k * ny * nx) + nx * (ny - 1) + i] = inimageY[(k * ny * nx) + nx * (ny - 2) + i];
@@ -301,7 +325,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 			if (z_dim)
 			{
 #pragma omp for
-				for (ind = nx * ny; ind < nx * ny * nz; ind++)
+				for (ind = nx * ny; ind < volume; ind++)
 				{
 					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
 				}
@@ -341,7 +365,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 	//	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 1; c < nc - 1; c++)
 		{
@@ -363,13 +387,13 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 
 	return 0;
 }
-int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
+int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, size_t nx, size_t ny, size_t nz, size_t nc)
 {
 	//runs over full data in x, y, z. then correctects elements for bounday conditions and sums
-	size_t volume = nx * ny * nz;
+	const size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
-	int z_dim = nz - 1;
+	const bool z_dim = nz > 1;
 
 	float *outimage = outimagefull;
 	const float *inimageX = inimageXfull;
@@ -385,12 +409,12 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 		tempZ = (float *)malloc(volume * sizeof(float));
 	}
 
-	long c;
+	long long c;
 	for (c = 0; c < nc; c++) //just calculating x, y and z in each channel here
 	{
 #pragma omp parallel
 		{
-			long ind, k;
+			long long ind, k;
 
 			//run over all and then fix boundaries
 #pragma omp for
@@ -408,7 +432,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (long long i = 0; i < nx; i++)
 				{
 					tempY[(k * ny * nx) + i] = -inimageY[(k * ny * nx) + i] + inimageY[(k * ny * nx) + nx * (ny - 1) + i];
 				}
@@ -416,7 +440,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 #pragma omp for
 			for (k = 0; k < nz; k++)
 			{
-				for (int j = 0; j < ny; j++)
+				for (long long j = 0; j < ny; j++)
 				{
 					tempX[k * ny * nx + j * nx] = -inimageX[k * ny * nx + j * nx] + inimageX[k * ny * nx + j * nx + nx - 1];
 				}
@@ -426,7 +450,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 			{
 
 #pragma omp for
-				for (ind = nx * ny; ind < nx * ny * nz; ind++)
+				for (ind = nx * ny; ind < volume; ind++)
 				{
 					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
 				}
@@ -466,7 +490,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	//now the rest of the channels
 	if (nc > 1)
 	{
-		long ind;
+		long long ind;
 
 		for (c = 1; c < nc; c++)
 		{
@@ -488,7 +512,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	return 0;
 }
 
-DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, long nc, long nz, long ny, long nx, int boundary, int direction, int nThreads)
+DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nc, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -511,7 +535,7 @@ DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, flo
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads)
+DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -534,7 +558,7 @@ DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, flo
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, long ny, long nx, int boundary, int direction, int nThreads)
+DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);

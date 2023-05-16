@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 try:
     from ccpi.filters import regularisers
@@ -33,22 +35,32 @@ from numbers import Number
 
 class RegulariserFunction(Function):
     def proximal(self, x, tau, out=None):
-        '''Generic proximal method for a RegulariserFunction
+ 
+        r""" Generic proximal method for a RegulariserFunction
+
+        .. math:: \mathrm{prox}_{\tau f}(x) := \argmin_{z} f(x) + \frac{1}{2}\|z - x \|^{2}
         
-        :param x: image to be regularised
-        :type x: an ImageData
-        :param tau: 
-        :type tau: Number
-        :param out: a placeholder for the result
-        :type out: same as x: ImageData
+        Parameters
+        ----------
+
+        x : DataContainer
+            Input of the proximal operator
+        tau : Number
+            Positive parameter of the proximal operator
+        out : DataContainer
+            Output :class:`Datacontainer` in which the result is placed.
+
+        Note
+        ----    
         
-        If the ImageData contains complex data, rather than the default float32, the regularisation
-        is run indipendently on the real and imaginary part.
-        '''
+        If the :class:`ImageData` contains complex data, rather than the default `float32`, the regularisation
+        is run independently on the real and imaginary part.
+
+        """
 
         self.check_input(x)
         arr = x.as_array()
-        if arr.dtype in [np.complex, np.complex64]:
+        if np.iscomplexobj(arr):
             # do real and imag part indep
             in_arr = np.asarray(arr.real, dtype=np.float32, order='C')
             res, info = self.proximal_numpy(in_arr, tau)
@@ -80,33 +92,121 @@ class RegulariserFunction(Function):
         pass
 
 class TV_Base(RegulariserFunction):
+
+    r""" Total Variation regulariser
+
+    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1}
+
+    Parameters
+    ----------
+    
+    strong_convexity_constant : Number 
+                              Positive parameter that allows Total variation regulariser to be strongly convex. Default = 0.
+
+    Note
+    ----
+
+    By definition, Total variation is a convex function. However,
+    adding a strongly convex term makes it a strongly convex function.
+    Then, we say that `TV` is a :math:`\gamma>0` strongly convex function i.e., 
+
+    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2}
+
+    """
+
+    def __init__(self, strong_convexity_constant = 0):
+
+        self.strong_convexity_constant = strong_convexity_constant
+
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
         EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
-        return 0.5*EnergyValTV[0]
+        if self.strong_convexity_constant>0:
+            return 0.5*EnergyValTV[0] + (self.strong_convexity_constant/2)*x.squared_norm()
+        else:
+            return 0.5*EnergyValTV[0]
 
     def convex_conjugate(self,x):     
         return 0.0
 
 
 class FGP_TV(TV_Base):
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu'):
-        '''Creator of FGP_TV Function
+
+    r""" Fast Gradient Projection Total Variation (FGP_TV)
+
+        The :class:`FGP_TV` computes the proximal operator of the Total variation regulariser
+
+        .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .
+        
+        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm 
+        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
 
-        :param alpha: regularisation parameter
-        :type alpha: number, default 1
-        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm
-        :type isotropic: boolean, default True, can range between 1 and 2
-        :param nonnegativity: Whether to add the non-negativity constraint
-        :type nonnegativity: boolean, default True
-        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
-        :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
-        :type tolerance: float, default 0
-        :param device: determines if the code runs on CPU or GPU
-        :type device: string, default 'cpu', can be 'gpu' if GPU is installed
-        '''
+        Parameters
+        ----------
+
+        alpha : :obj:`Number` (positive), default = 1.0 .
+                Total variation regularisation parameter. 
+
+        max_iteration : :obj:`int`. Default = 100 .
+                Maximum number of iterations for the Fast Gradient Projection algorithm.
+
+        isotropic : :obj:`boolean`. Default = True .
+                    Isotropic or Anisotropic definition of the Total variation regulariser.
+
+                    .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})
+
+                    .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
+
+        nonnegativity : :obj:`boolean`. Default = True .
+                        Non-negativity constraint for the solution of the FGP algorithm.
+
+        tolerance : :obj:`float`, Default = 0 .
+                    Stopping criterion for the FGP algorithm.
+                    
+                    .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
+
+        device : :obj:`str`, Default = 'cpu' .
+                FGP_TV algorithm runs on `cpu` or `gpu`.
+
+        strong_convexity_constant : :obj:`float`, default = 0
+                A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
+                Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
+
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
+
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+
+
+        Examples
+        --------
+
+        .. math:: \underset{u\qeq0}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha TV(u)
+
+
+        >>> G = alpha * FGP_TV(max_iteration=100, device='gpu')
+        >>> sol = G.proximal(b)
+
+        Note
+        ----
+
+        The :class:`FGP_TV` regularisation does not incorparate information on the :class:`ImageGeometry`, i.e., pixel/voxel size.
+        Therefore a rescaled parameter should be used to match the same solution computed using :class:`~cil.optimisation.functions.TotalVariation`.
+
+        >>> G1 = (alpha/ig.voxel_size_x) * FGP_TV(max_iteration=100, device='gpu')
+        >>> G2 = alpha * TotalVariation(max_iteration=100, lower=0.)
+        
+        
+        See Also
+        --------
+        :class:`~cil.optimisation.functions.TotalVariation`
+
+
+        """
+
+
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
+        
         if isotropic == True:
             self.methodTV = 0
         else:
@@ -121,9 +221,17 @@ class FGP_TV(TV_Base):
         self.max_iteration = max_iteration
         self.tolerance = tolerance
         self.nonnegativity = nonnegativity
-        self.device = device # string for 'cpu' or 'gpu'
+        self.device = device 
 
-    def proximal_numpy(self, in_arr, tau):
+        super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
+
+    def _fista_on_dual_rof(self, in_arr, tau):
+        
+        r""" Implements the Fast Gradient Projection algorithm on the dual problem 
+        of the Total Variation Denoising problem (ROF).
+
+        """    
+
         res , info = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\
@@ -132,8 +240,25 @@ class FGP_TV(TV_Base):
               self.methodTV,\
               self.nonnegativity,\
               self.device)
+
         return res, info
-    
+
+    def proximal_numpy(self, in_arr, tau):
+
+        if self.strong_convexity_constant>0:
+
+            strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
+            in_arr /= strongly_convex_factor
+            tau /= strongly_convex_factor
+        
+        solution = self._fista_on_dual_rof(in_arr, tau)
+
+        if self.strong_convexity_constant>0:
+            in_arr *= strongly_convex_factor
+            tau *= strongly_convex_factor
+
+        return solution
+                
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar
         
@@ -359,3 +484,4 @@ class TNV(RegulariserFunction):
         if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
             raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         
+

@@ -1,62 +1,110 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-from cil.framework import Processor, AcquisitionData
-from cil.processors.Binner import Binner
+from cil.framework import Processor, AcquisitionData, DataOrder
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
 import inspect
 import logging
 import math
+import importlib
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class CofR_image_sharpness(Processor):
 
-    r'''CofR_image_sharpness processor maximises the sharpness of a reconstructed slice.
+    """This creates a CentreOfRotationCorrector processor.
+    
+    The processor will find the centre offset by maximising the sharpness of a reconstructed slice.
 
-    The centre-of-rotation offset is fitted using a reconstruction of edge-enhanced data. Auto-correlation is used to assess sharpness of the reconstructed slice. 
+    Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.
 
-    For use on data-sets that can be reconstructed with FBP.
+    Parameters
+    ----------
 
-    :param slice_index: An integer defining the vertical slice to run the algorithm on.
-    :type slice_index: int, str='centre', optional
-    :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
-    :type FBP: class
-    :param tolerance: The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
-    :type tolerance: float, default = 0.001    
-    :param search_range: The range in pixels to search either side of the panel centre. If `None` the width of the panel/4 is used. 
-    :type search_range: int
-    :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
-    :type initial_binning: int
-    :return: returns an AcquisitionData object with an updated AcquisitionGeometry
-    :rtype: AcquisitionData
-    '''
+    slice_index : int, str, default='centre'
+        An integer defining the vertical slice to run the algorithm on. The special case slice 'centre' is the default.
 
-    def __init__(self, slice_index='centre', FBP=None, tolerance=0.005, search_range=None, initial_binning=None):
+    backend : {'tigre', 'astra'}
+        The backend to use for the reconstruction
+
+    tolerance : float, default=0.005
+        The tolerance of the fit in pixels, the default is 1/200 of a pixel. This is a stopping criteria, not a statement of accuracy of the algorithm.
+
+    search_range : int
+        The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  
+
+    initial_binning : int
+        The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
+
+    Other Parameters
+    ----------------
+    **kwargs : dict
+        FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
+
+
+    Example
+    -------
+    from cil.processors import CentreOfRotationCorrector
+
+    processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
+    processor.set_input(data)
+    data_centred = processor.get_output()
+
+
+    Example
+    -------
+    from cil.processors import CentreOfRotationCorrector
+
+    processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
+    processor.set_input(data)
+    processor.get_output(out=data)
+
+
+    Note
+    ----
+    For best results data should be 360deg which leads to blurring with incorrect geometry.
+    This method is unreliable on half-scan data with 'tuning-fork' style artifacts.
+
+    """
+    _supported_backends = ['astra', 'tigre']
+
+    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
         
-        if not inspect.isclass(FBP):
-            raise ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
+
+        FBP = kwargs.get('FBP', None)
+        if  FBP is not None:
+            logging.warning("Instantiation with an FBP class has been deprecated and will be removed in future versions.\
+                            Please pass backend='astra' or 'tigre'")
+
+            if inspect.isclass(FBP):
+                if 'astra' in str(inspect.getmodule(FBP)):
+                    backend = 'astra'
+
+        FBP = self._configure_FBP(backend)
+
 
         kwargs = {
                     'slice_index': slice_index,
                     'FBP': FBP,
+                    'backend' : backend,
                     'tolerance': tolerance,
                     'search_range': search_range,
                     'initial_binning': initial_binning
@@ -72,8 +120,11 @@ class CofR_image_sharpness(Processor):
             raise Exception('Geometry is not defined.')
 
         if data.geometry.geom_type == 'cone' and self.slice_index != 'centre':
-            raise ValueError("Only the centre slice is supported with this alogrithm")
+            raise ValueError("Only the centre slice is supported with this algorithm")
 
+        if data.geometry.system_description not in ['simple','offset']:
+            raise NotImplementedError("Not implemented for rotated system geometries")
+            
         if data.geometry.channels > 1:
             raise ValueError("Only single channel data is supported with this algorithm")
 
@@ -86,7 +137,36 @@ class CofR_image_sharpness(Processor):
             if self.slice_index < 0 or self.slice_index >= data.get_dimension_size('vertical'):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
+        #check order for single slice data
+        if data.geometry.dimension == '3D':
+            test_geom = data.geometry.get_slice(vertical='centre')
+        else:
+            test_geom = data.geometry
+
+        if not DataOrder.check_order_for_engine(self.backend, test_geom):
+            raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
+
         return True
+
+
+    def _configure_FBP(self, backend='tigre'):
+        """
+        Configures the processor for the right engine. Checks the data order.
+        """        
+        if backend not in self._supported_backends:
+            raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))
+
+        #set FBPOperator class from backend
+        try:
+            module = importlib.import_module('cil.plugins.'+backend)
+        except ImportError:
+            if backend == 'tigre':
+                raise ImportError("Cannot import the {} plugin module. Please install TIGRE or select a different backend".format(self.backend))
+            if backend == 'astra':
+                raise ImportError("Cannot import the {} plugin module. Please install ASTRA-TOOLBOX or select a different backend".format(self.backend))
+
+        return module.FBP
+
 
     def gss(self, data, ig, search_range, tolerance, binning):
         '''Golden section search'''
@@ -197,8 +277,7 @@ class CofR_image_sharpness(Processor):
         else:
             data = data_full
 
-        data.geometry.config.system.update_reference_frame()
-
+        data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]
 
         #initial grid search
@@ -217,24 +296,31 @@ class CofR_image_sharpness(Processor):
         data_filtered.fill(scipy.ndimage.sobel(data.as_array(), axis=1, mode='reflect', cval=0.0))
 
         if self.initial_binning > 1:
-            #padding to keep centre when binning
-            temp = (width)/self.initial_binning
-            pad = int((np.ceil(temp) * self.initial_binning - width)/2)
-            logger.debug("padding by %d", pad)
+
+            #gaussian filter data
+            data_temp = data_filtered.copy()
+            data_temp.fill(scipy.ndimage.gaussian_filter(data_filtered.as_array(), [0,self.initial_binning//2]))
+
+            #bin data whilst preserving centres
+            num_pix_new = np.ceil(width/self.initial_binning)
+
+            new_half_panel = (num_pix_new - 1)/2
+            half_panel = (width - 1)/2
+
+            sampling_points = np.mgrid[-self.initial_binning*new_half_panel:self.initial_binning*new_half_panel+1:self.initial_binning]
+            initial_coordinates = np.mgrid[-half_panel:half_panel+1:1]
 
             new_geom = data.geometry.copy()
-            new_geom.config.panel.num_pixels[0] +=2*pad
-            data_padded = new_geom.allocate()
-            data_padded.fill(np.pad(data.array,((0,0),(pad,pad)),'edge'))
-            
-            #bin
-            data_temp = data_padded.copy()
-            data_temp.fill(scipy.ndimage.gaussian_filter(data_padded.as_array(), [0,self.initial_binning//2]))
-            data_temp = Binner({'horizontal':(None,None,self.initial_binning)})(data_temp)
-                
+            new_geom.config.panel.num_pixels[0] = num_pix_new
+            new_geom.config.panel.pixel_size[0] *= self.initial_binning
+            data_binned = new_geom.allocate()
+
+            for i in range(data.shape[0]):
+                data_binned.fill(np.interp(sampling_points, initial_coordinates, data.array[i,:]),angle=i)
+
             #filter 
-            data_binned_filtered = data_temp.copy()
-            data_binned_filtered.fill(scipy.ndimage.sobel(data_temp.as_array(), axis=1, mode='reflect', cval=0.0))
+            data_binned_filtered = data_binned.copy()
+            data_binned_filtered.fill(scipy.ndimage.sobel(data_binned.as_array(), axis=1, mode='reflect', cval=0.0))
             data_processed = data_binned_filtered
         else:
             data_processed = data_filtered
@@ -277,9 +363,8 @@ class CofR_image_sharpness(Processor):
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
         
-        voxel_offset = centre/ig.voxel_size_x
-
         logger.info("Centre of rotation correction found using image_sharpness")
+        logger.info("backend FBP/FDK {}".format(self.backend))
         logger.info("Calculated from slice: %s", str(self.slice_index))
         logger.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
         logger.info("Centre of rotation shift = %f units at the object", centre)

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from scipy.fftpack import fftshift, ifftshift, fft, ifft
 import numpy as np
@@ -92,7 +94,7 @@ class RingRemover(Processor):
             if 'vertical' in geom.dimension_labels:
                                 
                 for i in range(vertical):
-                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i, force=True).as_array(), decNum, wname, sigma) 
+                    tmp_corrected = self.xRemoveStripesVertical(data.get_slice(vertical=i, force=True).as_array(), decNum, wname, sigma) 
                     out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
@@ -108,11 +110,11 @@ class RingRemover(Processor):
                 
                 for i in range(channels):
                     
-                    out_ch_i = out.subset(channel=i)
-                    data_ch_i = data.subset(channel=i)
+                    out_ch_i = out.get_slice(channel=i)
+                    data_ch_i = data.get_slice(channel=i)
                     
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j, force=True).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.get_slice(vertical=j, force=True).as_array(), decNum, wname, sigma)
                         out_ch_i.fill(tmp_corrected, vertical = j)
                         
                     out.fill(out_ch_i.as_array(), channel=i) 
@@ -123,7 +125,7 @@ class RingRemover(Processor):
             # for 2D data                        
             else:
                 for i in range(channels):
-                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self.xRemoveStripesVertical(data.get_slice(channel=i).as_array(), decNum, wname, sigma)
                         out.fill(tmp_corrected, channel = i)
                         if info:
                             print("Finish channel {}".format(i))

@@ -1,3 +1,22 @@
+# -*- coding: utf-8 -*-
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 option (BUILD_PYTHON_WRAPPER "Build Python Wrapper" ON)
 
 if (BUILD_PYTHON_WRAPPER)
@@ -59,54 +78,18 @@ if (BUILD_PYTHON_WRAPPER)
       # as a hack I remove ${OUTPUT}. This should trigger the new build.
       file( REMOVE ${OUTPUT} )
       
+      add_custom_target(pythonsetup ALL
+          COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} -m pip install . -t ${PYTHON_DEST} --upgrade
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+          COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
+          DEPENDS cilacc)
       
-      if (CONDA_BUILD)
-        add_custom_target(pythonsetup ALL
-                        COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} ${SETUP_PY} -vv install
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-                        DEPENDS cilacc)
-
-      else()
-        if (WIN32)
-          add_custom_target(pythonsetup ALL
-                        COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
-                                                 LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
-                                                 LIBRARY_LIB=${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-                                                 ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-                        DEPENDS cilacc)
-
-          install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
-                DESTINATION ${PYTHON_DEST} )
-                
-        else()
-          add_custom_target(pythonsetup ALL  
-                        COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
-                                                 LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
-                                                 LIBRARY_LIB=${CMAKE_BINARY_DIR}/
-                                                 ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py --verbose --build-lib=${CMAKE_CURRENT_BINARY_DIR}/build/lib
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        
-                        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-                        DEPENDS cilacc 
-                        )
-        endif()
-        #set (PYTHON_DEST ${CMAKE_INSTALL_PREFIX}/python/)
-
-        if (NOT WIN32)
-          install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil
-                DESTINATION ${PYTHON_DEST} )
-
-        endif()
+      # install the data if not a conda build. With conda the data is in the dependency package cil-data
+      if (NOT CONDA_BUILD)
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
-        #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)
-        
       endif()
+          
       
-      
-      #add_custom_target(PythonWrapper ALL DEPENDS ${OUTPUT})
       add_custom_target(PythonWrapper ALL DEPENDS pythonsetup)
        
   endif()

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
@@ -56,7 +58,7 @@ class TIGREGeometry(Geometry):
 
         ag_in = ag.copy()
         system = ag_in.config.system
-        system.align_reference_frame()
+        system.align_reference_frame('tigre')
 
 
         #TIGRE's interpolation fp must have the detector outside the reconstruction volume otherwise the ray is clipped 
@@ -145,11 +147,10 @@ class TIGREGeometry(Geometry):
                 self.offOrigin = np.array( [0,0,0] )
                 self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
 
-            #shift origin to match image geometry
-            #this is in CIL reference frames as the TIGRE geometry rotates the reconstrcution volume to match our definitions
+            #shift origin z to match image geometry
+            #this is in CIL reference frames as the TIGRE geometry rotates the reconstruction volume to match our definitions
             self.offOrigin[0] += ig.center_z
-            self.offOrigin[1] += ig.center_y
-            self.offOrigin[2] += ig.center_x
+
 
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip
@@ -159,11 +160,17 @@ class TIGREGeometry(Geometry):
             pitch = np.arcsin(V[2])
             yaw = np.arctan2(-U[2],U[1])
 
+        #shift origin to match image geometry
+        self.offOrigin[1] += ig.center_y
+        self.offOrigin[2] += ig.center_x
+
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin
-        if 'right' in panel_origin:
+        if 'right' in panel_origin and 'top' in panel_origin:
+            roll += np.pi
+        elif 'right' in panel_origin:
             yaw += np.pi
-        if 'top' in panel_origin:
+        elif 'top' in panel_origin:
             pitch += np.pi
 
         self.rotDetector = np.array((roll, pitch, yaw)) 

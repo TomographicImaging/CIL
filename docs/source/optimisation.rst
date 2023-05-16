@@ -1,3 +1,22 @@
+..     -*- coding: utf-8 -*-
+      Copyright 2019 United Kingdom Research and Innovation
+      Copyright 2019 The University of Manchester
+    
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+    
+          http://www.apache.org/licenses/LICENSE-2.0
+    
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    
+     Authors:
+     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 Optimisation framework
 **********************
 This package allows rapid prototyping of optimisation-based reconstruction problems, i.e. defining and solving different optimization problems to enforce different properties on the reconstructed image.
@@ -8,23 +27,24 @@ Further, it provides a number of high-level generic implementations of optimisat
 
 The fundamental components are:
 
-+ :code:`Operator`: A class specifying a (currently linear) operator
++ :code:`Operator`: A class specifying a (currently linear) operator.
 + :code:`Function`: A class specifying mathematical functions such as a least squares data fidelity.
 + :code:`Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted.
 
 
 
-Algorithm
-=========
+Algorithms
+==========
 
 A number of generic algorithm implementations are provided including 
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
-Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
+Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of 
-:code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
-the generic optimisation problem to be solved.
+instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to 
+define a specific instance of the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop. 
 The user can provide a stopping criterion different than the default max_iteration.
 
@@ -49,29 +69,68 @@ The :code:`Algorithm` provides the infrastructure to continue iteration, to acce
 objective function in subsequent iterations, the time for each iteration, and to provide a nice 
 print to screen of the status of the optimisation.
 
+Base class
+----------
 .. autoclass:: cil.optimisation.algorithms.Algorithm
    :members:
    :private-members:
    :special-members:
+
+GD
+--
 .. autoclass:: cil.optimisation.algorithms.GD
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+CGLS
+----
 .. autoclass:: cil.optimisation.algorithms.CGLS
-   :members:
+   :members: 
+   :inherited-members: run, update_objective_interval, max_iteration
+
+SIRT
+----
 .. autoclass:: cil.optimisation.algorithms.SIRT
+   :members: update, update_objective
+   :inherited-members: run, update_objective_interval, max_iteration
+
+ISTA
+----
+.. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
+   :special-members:
+   :inherited-members: run, update_objective_interval, max_iteration
+   
+FISTA
+-----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+PDHG
+----
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
+   :inherited-members: run, update_objective_interval, max_iteration
+
+LADMM
+-----
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+SPDHG
+-----
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
-Operator
-========
+
+
+Operators
+=========
 The two most important methods are :code:`direct` and :code:`adjoint` 
 methods that describe the result of applying the operator, and its 
 adjoint respectively, onto a compatible :code:`DataContainer` input. 
@@ -136,23 +195,18 @@ Trivial operators are the following.
 GradientOperator 
 -----------------
 
-In the following the required classes for the implementation of the :code:`GradientOperator` operator.
-
 .. autoclass:: cil.optimisation.operators.GradientOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.FiniteDifferenceOperator
    :members:
-   :special-members:
 
 .. autoclass:: cil.optimisation.operators.SparseFiniteDifferenceOperator
    :members:
-   :special-members:
 
 .. autoclass:: cil.optimisation.operators.SymmetrisedGradientOperator
    :members:
-   :special-members:
 
 
 
@@ -160,8 +214,8 @@ In the following the required classes for the implementation of the :code:`Gradi
 
 
 
-Function
-========
+Functions
+=========
 
 A :code:`Function` represents a mathematical function of one or more inputs 
 and is intended to accept :code:`DataContainers` as input as well as any 
@@ -297,6 +351,13 @@ Smooth Mixed L21 norm
    :members:
    :special-members:   
 
+Mixed L11 norm
+---------------------
+
+.. autoclass:: cil.optimisation.functions.MixedL11Norm
+   :members:
+   :special-members:      
+
 Total variation
 ---------------
 
@@ -322,6 +383,45 @@ The block framework consists of:
 
 
 
+
+The block framework allows writing more advanced `optimisation problems`_. Consider the typical 
+`Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
+
+.. math:: 
+
+  \underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2
+
+where,
+
+* :math:`A` is the projection operator
+* :math:`b` is the acquired data
+* :math:`u` is the unknown image to be solved for
+* :math:`\alpha` is the regularisation parameter
+* :math:`L` is a regularisation operator
+
+The first term measures the fidelity of the solution to the data. The second term measures the 
+fidelity to the prior knowledge we have imposed on the system, operator :math:`L`.  
+
+This can be re-written equivalently in the block matrix form:
+
+.. math::
+  \underset{u}{\mathrm{argmin}}\begin{Vmatrix}\binom{A}{\alpha L} u - \binom{b}{0}\end{Vmatrix}^2_2
+
+With the definitions:
+
+* :math:`\tilde{A} = \binom{A}{\alpha L}`
+* :math:`\tilde{b} = \binom{b}{0}`
+
+this can now be recognised as a least squares problem which can be solved by any algorithm in the :code:`cil.optimisation`
+which can solve least squares problem, e.g. CGLS.
+
+.. math:: 
+
+  \underset{u}{\mathrm{argmin}}\begin{Vmatrix}\tilde{A} u - \tilde{b}\end{Vmatrix}^2_2
+
+To be able to express our optimisation problems in the matrix form above, we developed the so-called, 
+Block Framework comprising 4 main actors: :code:`BlockGeometry`, :code:`BlockDataContainer`, 
+:code:`BlockFunction` and :code:`BlockOperator`.
 
 
 
@@ -462,3 +562,9 @@ Which in Python would be like
 .. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
 .. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
 .. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+
+
+References
+----------
+
+.. bibliography::    

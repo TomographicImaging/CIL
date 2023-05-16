@@ -1,24 +1,28 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 import numpy as np
 import os
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 from cil.version import version
 import datetime
+from cil.io import utilities
 
 h5pyAvailable = True
 try:
@@ -28,69 +32,69 @@ except:
 
 
 class NEXUSDataWriter(object):
+    ''' Create a writer for NEXUS files.
     
-    def __init__(self,
-                 **kwargs):
+    Parameters
+    ----------
+    data: AcquisitionData, ImageData, 
+        The dataset to write to file
+    file_name: os.path or string, default None
+        The file name to write
+    compression: str, {'uint8', 'uint16', None}, default None
+        The lossy compression to apply, default None will not compress data.
+        uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.
+    '''
+    
+    def __init__(self, data=None, file_name=None, compression=None):
 
-        '''
-        Constructor 
+        self.data = data
+        self.file_name = file_name
 
-        :param data: The dataset to write to file
-        :type data: AcquisitionData, ImageData
-        :param file_name: file name to write
-        :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
-        :type compression: int, default 0
-        '''
-
-        self.data = kwargs.get('data', None)
-        self.file_name = kwargs.get('file_name', None)
-        self.compression = kwargs.get('compression', 0)
-
-        if ((self.data is not None) and (self.file_name is not None)):
-            self.set_up(data = self.data,
-                        file_name = self.file_name, compression=self.compression)
+        if ((data is not None) and (file_name is not None)):
+            self.set_up(data = data, file_name = file_name, compression=compression)
         
     def set_up(self,
                data = None,
                file_name = None,
-               compression = 0):
+               compression = None):
 
         '''
-        set up writer
+        Set up the writer
 
-        :param data: The dataset to write to file
-        :type data: AcquisitionData, ImageData
-        :param file_name: file name to write
-        :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
-        :type compression: int, default 0
-        '''        
+        data: AcquisitionData, ImageData, 
+            The dataset to write to file
+        file_name: os.path or string, default None
+            The file name to write
+        compression: int, default 0
+            The lossy compression to apply, default 0 will not compress data.
+            8 or 16 will compress to 8 and 16 bit dtypes respectively.
+        '''
         self.data = data
+        self.file_name = file_name
+        
+        if self.file_name is None:
+            raise Exception('Path to write file is required.')
+        else:
+            self.file_name = os.path.abspath(file_name)
 
-        if not file_name.endswith('nxs') and not file_name.endswith('nex'):
-            file_name+='.nxs'
+        if self.data is None:
+            raise Exception('Data to write is required.')
 
-        self.file_name = os.path.abspath(file_name)
-        self.compression = compression
+        if not self.file_name.endswith('nxs') and not self.file_name.endswith('nex'):
+            self.file_name+='.nxs'
+        
+        # Deal with compression
+        self.compress           = utilities.get_compress(compression)
+        self.dtype              = utilities.get_compressed_dtype(data, compression)
+        self.compression        = compression
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
 
-        if self.compression == 0:
-            self.dtype = data.dtype
-            self.compress = False
-        elif self.compression == 8:
-            self.dtype = np.uint8
-            self.compress = True
-        elif self.compression == 16:
-            self.dtype = np.uint16
-            self.compress = True
-        else:
-            raise Exception('Compression bits not valid. Got {0} expected value in {1}'.format(self.compression, [0,8,16]))
-
+        
+        
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot write NEXUS files.')
@@ -100,22 +104,18 @@ class NEXUSDataWriter(object):
         '''
         write dataset to disk
         '''   
+        # check filename and data have been set:
+        if self.file_name is None:
+            raise TypeError('Path to nexus file to write to is required.')
+        if self.data is None:
+            raise TypeError('Data to write out must be set.')
+        
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))
 
         if self.compress is True:
-            save_range = np.iinfo(self.dtype).max
-
-            data_min = self.data.min()
-            data_range = self.data.max() - data_min
-
-            if data_range > 0:
-                scale = save_range / data_range
-                offset = - data_min * scale
-            else:
-                scale = 1.0
-                offset = 0.0
+            scale, offset = utilities.get_compression_scale_offset(self.data, self.compression)
                 
         # create the file
         with h5py.File(self.file_name, 'w') as f:

@@ -1,33 +1,31 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+import unittest
 from cil.framework import ImageGeometry, AcquisitionGeometry
 import numpy as np
-import unittest
-try:
-    import tomophantom
+from utils import has_tomophantom, initialise_tests
+
+initialise_tests()
+
+if has_tomophantom:
     from cil.plugins import TomoPhantom
-    has_tomophantom = True
-except ImportError as ie:
-    # raise ImportError(ie + "\n\n" + 
-    #                   "This plugin requires the additional package ccpi-regularisation\n" +
-    #                   "Please install it via conda as ccpi-regularisation from the ccpi channel\n"+
-    #                   "Minimal version is 20.04")
-    has_tomophantom = False
 
 
 class TestTomoPhantom2D(unittest.TestCase):
@@ -81,14 +79,16 @@ class TestTomoPhantom2D(unittest.TestCase):
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_MC2D(self):
         model = 100
-        self.ag.set_channels(3)
+        self.ig.channels =3
         phantom = TomoPhantom.get_ImageData(model, self.ig)
         assert phantom.geometry.channels == self.ig.channels
         assert phantom.shape == self.ig.shape
+
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_is_model_temporal(self):
         model = 100
         assert TomoPhantom.is_model_temporal(model, num_dims=2)
+
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_get_model_num_channels(self):
         model = 100

@@ -1,34 +1,43 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from numbers import Number
 import numpy
 import functools
+import warnings
 
 class Operator(object):
-    '''Operator that maps from a space X -> Y'''
-    def __init__(self, domain_geometry, **kwargs):
-        r'''
-        Creator
+    """
+    Operator that maps from a space X -> Y
 
-        :param domain_geometry: domain of the operator
-        :param range_geometry: range of the operator
-        :type range_geometry: optional, default None
-        '''
+    Parameters
+    ----------
+
+    domain_geometry : ImageGeometry or AcquisitionGeometry
+        domain of the operator
+
+    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
+        range of the operator 
+    """
+
+    def __init__(self, domain_geometry, **kwargs):
+
         self._norm = None
         self._domain_geometry = domain_geometry
         self._range_geometry = kwargs.get('range_geometry', None)
@@ -39,29 +48,32 @@ class Operator(object):
     def direct(self,x, out=None):
         '''Returns the application of the Operator on x'''
         raise NotImplementedError
-    def norm(self, **kwargs):
-        '''Returns the norm of the Operator
-        
-        Calling norm triggers the calculation of the norm of the operator. Normally this
-        is a computationally expensive task, therefore we store the result of norm into 
-        a member of the class. If the calculation has already run, following calls to 
-        norm just return the saved member. 
-        It is possible to force recalculation by setting the optional force parameter. Notice that
-        norm doesn't take notice of how many iterations or of the initialisation of the PowerMethod, 
-        so in case you want to recalculate by setting a higher number of iterations or changing the
-        starting point or both you need to set :code:`force=True`
 
-        :param iterations: number of iterations to run
-        :type iterations: int, optional, default = 25
-        :param x_init: starting point for the iteration in the operator domain
-        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, default None
-        :parameter force: forces the recalculation of the norm
-        :type force: boolean, default :code:`False`
+
+    def norm(self, **kwargs):
+        '''Returns the norm of the Operator. On first call the norm will be calculated using the operator's calculate_norm
+        method. Subsequent calls will return the cached norm.
+
+        Returns
+        -------
+        norm: positive:`float`
         '''
-        if self._norm is None or kwargs.get('force', False):
-            self._norm = self.calculate_norm(**kwargs)
+
+        if len(kwargs) != 0:
+            warnings.warn('norm: the norm method does not use any parameters.\n\
+                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it')
+
+        if self._norm is None:
+            self._norm = self.calculate_norm()
+
         return self._norm
-    def calculate_norm(self, **kwargs):
+
+    def set_norm(self,norm=None):
+        '''Sets the norm of the operator to a custom value.
+        '''
+        self._norm = norm
+
+    def calculate_norm(self):
         '''Calculates the norm of the Operator'''
         raise NotImplementedError
     def range_geometry(self):
@@ -105,7 +117,18 @@ class Operator(object):
 
 
 class LinearOperator(Operator):
-    '''A Linear Operator that maps from a space X <-> Y'''
+    """
+    Linear operator that maps from a space X <-> Y
+
+    Parameters
+    ----------
+
+    domain_geometry : ImageGeometry or AcquisitionGeometry
+        domain of the operator
+
+    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
+        range of the operator 
+    """
     def __init__(self, domain_geometry, **kwargs):
         super(LinearOperator, self).__init__(domain_geometry, **kwargs)
     def is_linear(self):
@@ -118,53 +141,117 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, iterations, x_init=None):
-        '''Power method to calculate iteratively the Lipschitz constant
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  return_all=False):
+
+        r"""Power method or Power iteration algorithm 
         
-        :param operator: input operator
-        :type operator: :code:`LinearOperator`
-        :param iterations: number of iterations to run
-        :type iteration: int
-        :param x_init: starting point for the iteration in the operator domain
-        :returns: tuple with: L, list of L at each iteration, the data the iteration worked on.
-        '''
-        
-        # Initialise random
-        if x_init is None:
+        The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
+        absolute value in the real case and module in the complex case.        
+        For the non-square case, the power method is applied for the matrix :math: A^{T}*A.
+
+        Parameters
+        ----------
+
+        operator: LinearOperator
+        max_iteration: positive:`int`, default=10
+            Number of iterations for the Power method algorithm.
+        initial: DataContainer, default = None
+            Starting point for the Power method.
+        tolerance: positive:`float`, default = 1e-5
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
+        return_all: boolean, default = False
+            Toggles the verbosity of the return
+    
+
+        Returns
+        -------
+        dominant eigenvalue: positive:`float`
+        number of iterations: positive:`int`
+            Number of iterations run. Only returned if return_all is True.
+        eigenvector: DataContainer
+            Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
+        list of eigenvalues: :obj:`list`
+            List of eigenvalues. Only returned if return_all is True.
+
+        Examples
+        --------    
+
+        >>> M = np.array([[1.,0],[1.,2.]])
+        >>> Mop = MatrixOperator(M)
+        >>> Mop_norm = Mop.PowerMethod(Mop)
+        >>> Mop_norm
+        2.0000654846240296
+
+        `PowerMethod` is called when we compute the norm of a matrix or a `LinearOperator`.
+
+        >>> Mop_norm = Mop.norm()
+        2.0005647295658866
+
+        """
+
+        # Default case: non-symmetric
+        symmetric = False
+        try:
+            if operator.domain_geometry()==operator.range_geometry():
+                symmetric = True
+        except AssertionError:
+            # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
+            pass
+
+        if initial is None:
             x0 = operator.domain_geometry().allocate('random')
         else:
-            x0 = x_init.copy()
-            
-        x1 = operator.domain_geometry().allocate()
-        y_tmp = operator.range_geometry().allocate()
-        s = numpy.zeros(iterations)
-        # Loop
-        for it in numpy.arange(iterations):
-            operator.direct(x0,out=y_tmp)
-            operator.adjoint(y_tmp,out=x1)
-            x1norm = x1.norm()
-            if hasattr(x0, 'squared_norm'):
-                s[it] = x1.dot(x0) / x0.squared_norm()
-            else:
-                x0norm = x0.norm()
-                s[it] = x1.dot(x0) / (x0norm * x0norm) 
-            x1.multiply((1.0/x1norm), out=x0)
-        return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
+            x0 = initial.copy()
 
-    def calculate_norm(self, **kwargs):
-        '''Returns the norm of the LinearOperator as calculated by the PowerMethod
+        y_tmp = operator.range_geometry().allocate()
+
+        # Normalize first eigenvector
+        x0_norm = x0.norm()
+        x0 /= x0_norm
+
+        # initial guess for dominant eigenvalue
+        eig_old = 1.
+
+        eig_list = []
+        diff = numpy.finfo('d').max
+        i = 0
+        while (i < max_iteration and diff > tolerance):
+            i+=1
+            
+            operator.direct(x0, out = y_tmp)
+
+            if symmetric:                
+                #swap datacontainer references
+                tmp = x0
+                x0 = y_tmp
+                y_tmp = tmp
+            else:
+                operator.adjoint(y_tmp,out=x0)
+            
+            # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
+            x0_norm = x0.norm()
+            x0 /= x0_norm
+
+            eig_new =  numpy.abs(x0_norm)
+            if not symmetric:
+                eig_new = numpy.sqrt(eig_new)
+
+            diff = numpy.abs(eig_new - eig_old)
+            eig_list.append(eig_new)   
+            eig_old = eig_new       
+
+        if return_all:
+            return eig_new, i, x0, eig_list
+        else:
+            return eig_new
+            
+
+    def calculate_norm(self):
         
-        :param iterations: number of iterations to run
-        :type iterations: int, optional, default = 25
-        :param x_init: starting point for the iteration in the operator domain
-        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, None
-        :parameter force: forces the recalculation of the norm
-        :type force: boolean, default :code:`False`
-        '''
-        x0 = kwargs.get('x_init', None)
-        iterations = kwargs.get('iterations', 25)
-        s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
-        return s1
+        r""" Returns the norm of the LinearOperator calculated by the PowerMethod with default values.
+                """
+        return LinearOperator.PowerMethod(self)
+
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):
@@ -317,7 +404,6 @@ class SumOperator(Operator):
         if out is None:
             return self.operator1.direct(x) + self.operator2.direct(x)
         else:
-            #TODO check if allcating with tmp is faster            
             self.operator1.direct(x, out=out)
             out.add(self.operator2.direct(x), out=out)     
 
@@ -327,7 +413,6 @@ class SumOperator(Operator):
             if out is None:
                 return self.operator1.adjoint(x) + self.operator2.adjoint(x)
             else:
-                #TODO check if allcating with tmp is faster            
                 self.operator1.adjoint(x, out=out)
                 out.add(self.operator2.adjoint(x), out=out) 
         else:
@@ -336,9 +421,11 @@ class SumOperator(Operator):
     def is_linear(self):
         return self.linear_flag 
     
-    def calculate_norm(self, **kwargs):
+    def calculate_norm(self):
         if self.is_linear():
-            return LinearOperator.calculate_norm(self, **kwargs)
+            return LinearOperator.calculate_norm(self)
+
+        return super().calculate_norm(self)
 
 ###############################################################################
 ################   Composition  ###########################################
@@ -459,13 +546,6 @@ class CompositionOperator(Operator):
     def is_linear(self):
         return self.linear_flag             
             
-    def calculate_norm(self, **kwargs):
-        if self.is_linear():
-            #return LinearOperator.calculate_norm(self, **kwargs)
-            x0 = kwargs.get('x_init', None)
-            iterations = kwargs.get('iterations', 25)
-            s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
-            return s1
 
 
 

@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.algorithms import Algorithm
 import warnings
+import logging
 
 class LADMM(Algorithm):
         
@@ -56,15 +59,6 @@ class LADMM(Algorithm):
         :param initial: Initial guess ( Default initial_guess = 0)'''        
         
         super(LADMM, self).__init__(**kwargs)
-        if kwargs.get('x_init', None) is not None:
-            if initial is None:
-                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-                   DeprecationWarning, stacklevel=4)
-                initial = kwargs.get('x_init', None)
-            else:
-                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
-        self._use_axpby = kwargs.get('use_axpby', True)
 
         self.set_up(f = f, g = g, operator = operator, tau = tau,\
              sigma = sigma, initial=initial)        
@@ -72,7 +66,7 @@ class LADMM(Algorithm):
     def set_up(self, f, g, operator, tau = None, sigma=1., \
         initial=None):
 
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         if sigma is None and tau is None:
             raise ValueError('Need tau <= sigma / ||K||^2')
@@ -102,7 +96,7 @@ class LADMM(Algorithm):
 
         self.configured = True  
         
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
         
     def update(self):
 
@@ -110,11 +104,8 @@ class LADMM(Algorithm):
         self.tmp_dir -= self.z
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
         
-        if self._use_axpby:
-            self.x.axpby(1,-(self.tau/self.sigma), self.tmp_adj, out=self.x)
-        else:
-            self.tmp_adj *= -(self.tau/self.sigma)
-            self.x += self.tmp_adj
+        self.x.sapyb(1, self.tmp_adj, -(self.tau/self.sigma), out=self.x)
+
         # apply proximal of f
         tmp = self.f.proximal(self.x, self.tau)
         self.operator.direct(tmp, out=self.tmp_dir)

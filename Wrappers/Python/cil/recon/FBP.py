@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry
 from cil.recon import Reconstructor
 from scipy.fft import fftfreq
-from cil.plugins.tigre import ProjectionOperator
 
 import numpy as np
 import ctypes
@@ -67,12 +69,10 @@ class GenericFilteredBackProjection(Reconstructor):
     def fft_order(self):
         return self._fft_order
 
-    
-    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-
+    def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
 
         #call parent initialiser
-        super().__init__(input, image_geometry)
+        super().__init__(input, image_geometry, backend)
                 
         if has_ipp == False:
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
@@ -96,13 +96,13 @@ class GenericFilteredBackProjection(Reconstructor):
 
         Parameters
         ----------
-        inplace: boolian
+        inplace: boolean
             Sets the inplace filtering of projections
         """
         if type(inplace) is bool:
             self._filter_inplace= inplace
         else:
-            raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
+            raise TypeError("set_filter_inplace expected a boolean. Got {}".format(type(inplace)))
 
 
     def _default_fft_order(self):
@@ -151,15 +151,23 @@ class GenericFilteredBackProjection(Reconstructor):
                 #create default filter type of new length
                 self.set_filter(self._filter)
         
+    @property
+    def preset_filters(self):
+        return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
  
-    def set_filter(self, filter='ram-lak'):
+    def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
-        Set the filter used by the reconstruction. 
+        Set the filter used by the reconstruction.
+
+        Pre-set filters are constructed in the frequency domain.        
+        Pre-set filters are: 'ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'
         
         Parameters
         ----------
-        filter: string, numpy.ndarray, default='ram-lak'
-            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+        filter : string, numpy.ndarray, default='ram-lak'
+            Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.
+        cutoff : float, default = 1
+            The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)
 
         Notes
         -----
@@ -172,13 +180,11 @@ class GenericFilteredBackProjection(Reconstructor):
         - [N/2:N-1] negative frequencies
         """
 
-        if type(filter)==str and filter in ['ram-lak']:
-            self._filter = filter
 
-            if filter == 'ram-lak':
-                filter_length = 2**self.fft_order
-                freq = fftfreq(filter_length)
-                self._filter_array = np.asarray( [ np.abs(2*el) for el in freq ] ,dtype=np.float32)
+        if type(filter)==str and filter in self.preset_filters:
+            self._filter = filter
+            self._filter_cutoff = cutoff
+            self._filter_array = None
 
         elif type(filter)==np.ndarray:
             try:
@@ -193,7 +199,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
     def get_filter_array(self):
         """
-        Returns the filter in used in the frequency domain. 
+        Returns the filter array in the frequency domain. 
         
         Returns
         -------
@@ -211,9 +217,43 @@ class GenericFilteredBackProjection(Reconstructor):
         - [N/2:N-1] negative frequencies
 
         The array can be modified and passed back using set_filter()
+
+
+        Notes
+        -----
+
+        Filter reference in frequency domain:
+        Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.
+
+        Plantagie, L. Algebraic filters for filtered backprojection, 2017
+        https://hdl.handle.net/1887/48289
         """
 
-        return self._filter_array
+        if self._filter == 'custom':
+            return self._filter_array
+
+        filter_length = 2**self.fft_order
+
+        # frequency bins in cycles/pixel
+        freq = fftfreq(filter_length)
+        # in pi rad/pixel
+        freq*=2
+
+        ramp = abs(freq)
+        ramp[ramp>self._filter_cutoff]=0
+
+        if self._filter == 'ram-lak':
+            filter_array = ramp
+        if self._filter == 'shepp-logan':
+            filter_array = ramp * np.sinc(freq/2)
+        elif self._filter == 'cosine':
+            filter_array = ramp * np.cos(freq*np.pi/2)
+        elif self._filter == 'hamming':
+            filter_array = ramp * (0.54 + 0.46 * np.cos(freq*np.pi))
+        elif self._filter == 'hann':
+            filter_array = ramp * (0.5 + 0.5 * np.cos(freq*np.pi))
+
+        return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order) 
         
     def _calculate_weights(self):
         return NotImplementedError
@@ -252,12 +292,14 @@ class GenericFilteredBackProjection(Reconstructor):
         ag = acquistion_data.geometry
         if ag.dimension_labels == ('angle','vertical','horizontal'):   
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
+        elif ag.dimension_labels == ('vertical','angle','horizontal'):   
+            cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
         elif ag.dimension_labels == ('angle','horizontal'): 
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
         elif ag.dimension_labels == ('vertical','horizontal'): 
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
         else:
-            raise ValueError ("The data is not in a compatible order. Try reordering the data with data.reorder({})".format(self.backend))
+            raise ValueError ("Could not determine correct function call from dimension labels")
 
 
     def reset(self):
@@ -266,7 +308,6 @@ class GenericFilteredBackProjection(Reconstructor):
         """
         self.set_filter()
         self.set_fft_order()
-        self.set_backend()
         self.set_filter_inplace()
         self.set_image_geometry()
         self._weights = None
@@ -279,7 +320,7 @@ class GenericFilteredBackProjection(Reconstructor):
 class FDK(GenericFilteredBackProjection):
 
     """
-    Creates an FDK reconstructor based on your cone-beam acquisition data.
+    Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.
 
     Parameters
     ----------
@@ -294,6 +335,9 @@ class FDK(GenericFilteredBackProjection):
 
     Example
     -------
+    >>> from cil.utilities.dataexample import SIMULATED_CONE_BEAM_DATA
+    >>> from cil.recon import FDK
+    >>> data = SIMULATED_CONE_BEAM_DATA.get()
     >>> fdk = FDK(data)
     >>> out = fdk.run()
 
@@ -301,10 +345,11 @@ class FDK(GenericFilteredBackProjection):
     -----
     The reconstructor can be futher customised using additional 'set' methods provided.
     """
-    
+    supported_backends = ['tigre']
+
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
         #call parent initialiser
-        super().__init__(input, image_geometry, filter)
+        super().__init__(input, image_geometry, filter, backend='tigre')
 
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
@@ -317,20 +362,20 @@ class FDK(GenericFilteredBackProjection):
         (yy, xx) = np.meshgrid(xv, yv)
 
         principal_ray_length = ag.dist_source_center + ag.dist_center_detector
-        scaling =  ag.magnification * (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
+        scaling = 0.25 * ag.magnification * (2 * np.pi/ ag.num_projections) / ag.pixel_size_h
         self._weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
 
 
     def run(self, out=None, verbose=1):
         """
-        Runs the configured FDK recon and returns the reconstruction
+        Runs the configured FDK recon and returns the reconstruction.
 
         Parameters
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
         verbose : int, default=1
-           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
         -------
@@ -347,7 +392,7 @@ class FDK(GenericFilteredBackProjection):
             proj_filtered = self.input
 
         self._pre_filtering(proj_filtered)
-        operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
+        operator = self._PO_class(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
         
         if out is None:
             return operator.adjoint(proj_filtered)
@@ -363,7 +408,9 @@ class FDK(GenericFilteredBackProjection):
 
         repres += "\nReconstruction Options:\n"    
         repres += "\tBackend: {}\n".format(self._backend)        
-        repres += "\tFilter: {}\n".format(self._filter)        
+        repres += "\tFilter: {}\n".format(self._filter)
+        if self._filter != 'custom':
+            repres += "\tFilter cut-off frequency: {}\n".format(self._filter_cutoff)
         repres += "\tFFT order: {}\n".format(self._fft_order)        
         repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
 
@@ -385,24 +432,32 @@ class FBP(GenericFilteredBackProjection):
     filter : string, numpy.ndarray, default='ram-lak'
         The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
 
+    backend : string
+        The backend to use, can be 'astra' or 'tigre'. Data must be in the correct order for requested backend.
+
     Example
     -------
+    >>> from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA
+    >>> from cil.recon import FBP
+    >>> data = SIMULATED_PARALLEL_BEAM_DATA.get()
     >>> fbp = FBP(data)
     >>> out = fbp.run()
 
     Notes
     -----
-    The reconstructor can be futher customised using additional 'set' methods provided.
+    The reconstructor can be further customised using additional 'set' methods provided.
     """
+
+    supported_backends = ['tigre', 'astra']
 
     @property
     def slices_per_chunk(self):
         return self._slices_per_chunk
 
 
-    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
+    def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
       
-        super().__init__(input, image_geometry, filter)
+        super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 
         if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
@@ -440,9 +495,11 @@ class FBP(GenericFilteredBackProjection):
     def _calculate_weights(self, acquisition_geometry):
 
         ag = acquisition_geometry
-        weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
- 
-        self._weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
+        scaling = 0.25 * (2 * np.pi/ ag.num_projections) / ag.pixel_size_h
+
+        if self.backend=='astra':
+            scaling /=  ag.pixel_size_v
+        self._weights = np.full((ag.pixel_num_v,ag.pixel_num_h),scaling,dtype=np.float32)
 
 
     def _setup_PO_for_chunks(self, num_slices):
@@ -455,7 +512,7 @@ class FBP(GenericFilteredBackProjection):
                 
         ig_slice = ag_slice.get_ImageGeometry()
         self.data_slice = ag_slice.allocate()
-        self.operator = ProjectionOperator(ig_slice,ag_slice)
+        self.operator = self._PO_class(ig_slice,ag_slice)
 
     def _process_chunk(self, i, step,  out):
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
@@ -474,7 +531,7 @@ class FBP(GenericFilteredBackProjection):
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
 
         verbose : int, default=1
-           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
         -------
@@ -539,7 +596,7 @@ class FBP(GenericFilteredBackProjection):
 
             self._pre_filtering(proj_filtered)
 
-            operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry)
+            operator = self._PO_class(self.image_geometry,self.acquisition_geometry)
 
             if out is None:
                 return operator.adjoint(proj_filtered)
@@ -563,7 +620,9 @@ class FBP(GenericFilteredBackProjection):
 
         repres += "\nReconstruction Options:\n"    
         repres += "\tBackend: {}\n".format(self._backend)        
-        repres += "\tFilter: {}\n".format(self._filter)        
+        repres += "\tFilter: {}\n".format(self._filter)
+        if self._filter != 'custom':
+            repres += "\tFilter cut-off frequency: {}\n".format(self._filter_cutoff)
         repres += "\tFFT order: {}\n".format(self._fft_order)        
         repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
         repres += "\tSplit processing: {}\n".format(self._slices_per_chunk) 

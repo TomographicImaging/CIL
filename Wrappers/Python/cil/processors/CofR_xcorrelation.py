@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
 import numpy as np
-from scipy import signal
 
 import logging
-import math
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class CofR_xcorrelation(Processor):
 
@@ -116,9 +115,9 @@ class CofR_xcorrelation(Processor):
         if abs(ang_diff-180) > self.ang_tol:
             raise ValueError('Method requires projections at 180 +/- {0} degrees interval, got {1}.\nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, ang_diff))
 
-        #cross correlate single slice with the 180deg one reveresed
-        data1 = data.subset(angle=0).as_array()
-        data2 = np.flip(data.subset(angle=ind).as_array())
+        #cross correlate single slice with the 180deg one reversed
+        data1 = data.get_slice(angle=0).as_array()
+        data2 = np.flip(data.get_slice(angle=ind).as_array())
 
     
         border = int(data1.size * 0.05)

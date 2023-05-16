@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataProcessor, ImageData
 from cil.framework import DataOrder
 from cil.plugins.tigre import CIL2TIGREGeometry
-
+import logging
 import numpy as np
 
 try:
@@ -30,38 +32,64 @@ except ModuleNotFoundError:
 class FBP(DataProcessor):
 
     '''FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
-    It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.
+    It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.
 
     This uses the ram-lak filter
     This is provided for simple and offset parallel-beam geometries only
    
-    Input: Volume Geometry
-           Sinogram Geometry
-                             
-    Example:  fbp = FBP(ig, ag, device)
-              fbp.set_input(data)
-              reconstruction = fbp.get_ouput()
-                           
-    Output: ImageData                             
-
-        '''
+    acquisition_geometry : AcquisitionGeometry
+        A description of the acquisition data
     
-    def __init__(self, volume_geometry, sinogram_geometry): 
+    image_geometry : ImageGeometry, default used if None
+        A description of the area/volume to reconstruct
+                             
+    Example
+    -------
+    >>> from cil.plugins.tigre import FBP
+    >>> fbp = FBP(image_geometry, data.geometry)
+    >>> fbp.set_input(data)
+    >>> reconstruction = fbp.get_ouput()                       
+
+    '''
+    
+    def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs): 
         
-        DataOrder.check_order_for_engine('tigre', volume_geometry)
-        DataOrder.check_order_for_engine('tigre', sinogram_geometry) 
 
-        tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(volume_geometry,sinogram_geometry)
+        sinogram_geometry = kwargs.get('sinogram_geometry', None)
+        volume_geometry = kwargs.get('volume_geometry', None)
 
-        super(FBP, self).__init__(  volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry,\
+        if sinogram_geometry is not None:
+            acquisition_geometry = sinogram_geometry
+            logging.warning("sinogram_geometry has been deprecated. Please use acquisition_geometry instead.")
+
+        if acquisition_geometry is None:
+            raise TypeError("Please specify an acquisition_geometry to configure this processor")
+
+        if volume_geometry is not None:
+            image_geometry = volume_geometry
+            logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
+
+        if image_geometry is None:
+            image_geometry = acquisition_geometry.get_ImageGeometry()
+
+        device = kwargs.get('device', 'gpu')
+        if device != 'gpu':
+            raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
+
+        DataOrder.check_order_for_engine('tigre', image_geometry)
+        DataOrder.check_order_for_engine('tigre', acquisition_geometry) 
+
+        tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
+
+        super(FBP, self).__init__(  image_geometry = image_geometry, acquisition_geometry = acquisition_geometry,\
                                     tigre_geom=tigre_geom, tigre_angles=tigre_angles)
 
 
     def check_input(self, dataset):
         
-        if self.sinogram_geometry.channels != 1:
+        if self.acquisition_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
-                 .format(self.sinogram_geometry.channels))  
+                 .format(self.acquisition_geometry.channels))  
 
         DataOrder.check_order_for_engine('tigre', dataset.geometry)
         return True
@@ -71,19 +99,19 @@ class FBP(DataProcessor):
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 
-            if self.sinogram_geometry.geom_type == 'cone':
+            if self.acquisition_geometry.geom_type == 'cone':
                 arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             else:
                 arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            if self.sinogram_geometry.geom_type == 'cone':
+            if self.acquisition_geometry.geom_type == 'cone':
                 arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
             else:
                 arr_out = fbp(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
 
         if out is None:
-            out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)
+            out = ImageData(arr_out, deep_copy=False, geometry=self.image_geometry.copy(), suppress_warning=True)
             return out
         else:
             out.fill(arr_out)

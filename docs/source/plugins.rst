@@ -1,3 +1,22 @@
+..     -*- coding: utf-8 -*-
+      Copyright 2019 United Kingdom Research and Innovation
+      Copyright 2019 The University of Manchester
+    
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+    
+          http://www.apache.org/licenses/LICENSE-2.0
+    
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    
+     Authors:
+     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 CIL Plugins
 ************
 
@@ -14,8 +33,7 @@ Total variation
 ---------------
  
 .. autoclass:: cil.plugins.ccpi_regularisation.functions.FGP_TV
-   :members:
-   :special-members:
+
 
 Other regularisation functions
 ------------------------------
@@ -65,13 +83,14 @@ Projection Operator
 
 .. autoclass:: cil.plugins.tigre.ProjectionOperator
    :members:
-   :special-members:
+   
+
 
 ASTRA
 =====
 This plugin allows the use of `ASTRA-toolbox
 <https://github.com/astra-toolbox/astra-toolbox>`_ 
-(`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_ 
+(`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_) 
 for forward and back projections and filter back projection reconstruction. 
 
 
@@ -90,6 +109,5 @@ Projection Operator
 
 .. autoclass:: cil.plugins.astra.ProjectionOperator
    :members:
-   :special-members:
 
 :ref:`Return Home <mastertoc>`

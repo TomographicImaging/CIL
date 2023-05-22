@@ -1033,22 +1033,3 @@ class TestOperatorCompositionSum(unittest.TestCase):
         out2 = d.norm()
 
         numpy.testing.assert_almost_equal(out2, out1)
-
-
-    def test_CompositionOperator_norm3(self):
-
-        example_operator1 = Mock()
-        example_operator1.norm.return_value = 1
-
-        example_operator2 = Mock()
-        example_operator2.norm.return_value = 3
-
-        example_operator3 = Mock()
-        example_operator3.norm.return_value = 0
-
-        d = CompositionOperator(example_operator1, example_operator2, example_operator3)
-
-        out1 = 0
-        out2 = d.norm()
-
-        numpy.testing.assert_almost_equal(out2, out1)

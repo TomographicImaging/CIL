@@ -1003,14 +1003,14 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_norm1(self):
 
         example_operator1 = Mock()
-        example_operator1.norm.return_value = 2
+        example_operator1.norm.return_value = 2.6
 
         example_operator2 = Mock()
-        example_operator2.norm.return_value = 3
+        example_operator2.norm.return_value = 3.4
 
         d = CompositionOperator(example_operator1, example_operator2)
 
-        out1 = 6
+        out1 = 8.84
         out2 = d.norm()
 
         numpy.testing.assert_almost_equal(out2, out1)
@@ -1019,17 +1019,17 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_norm2(self):
 
         example_operator1 = Mock()
-        example_operator1.norm.return_value = 2
+        example_operator1.norm.return_value = 2.6
 
         example_operator2 = Mock()
-        example_operator2.norm.return_value = 3
+        example_operator2.norm.return_value = 3.4
 
         example_operator3 = Mock()
-        example_operator3.norm.return_value = 5
+        example_operator3.norm.return_value = 5.0
 
         d = CompositionOperator(example_operator1, example_operator2, example_operator3)
 
-        out1 = 30
+        out1 = 44.2
         out2 = d.norm()
 
         numpy.testing.assert_almost_equal(out2, out1)

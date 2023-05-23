@@ -5,10 +5,7 @@ from cil.processors import Binner
 import numpy as np
 from cil.utilities.display import show2D
 from cil.processors import Normaliser
-from itertools import groupby
-from operator import itemgetter
-
-
+from copy import deepcopy
 
 class ReaderSimpleABC(ABC): 
     """
@@ -31,7 +28,7 @@ class ReaderSimpleABC(ABC):
     def get_raw_flatfield(self):
     def get_raw_darkfield(self)
         
-    You may need to redefine `_set_up_normaliser` if you don;'t have the default single correction
+    You may need to redefine `_set_up_normaliser` if you don't have the default single correction
     """
 
     
@@ -135,10 +132,7 @@ class ReaderSimpleABC(ABC):
         """
         Set up the Normaliser
         """
-        flat_field = self.get_raw_flatfield()
-        dark_field = self.get_raw_darkfield()
-
-        self._normaliser = Normaliser(flat_field, dark_field, method='default')
+        self._normaliser = Normaliser(self.get_raw_flatfield(), self.get_raw_darkfield(), method='default')
 
 
     def set_normalisation(self, normalise=True):
@@ -194,46 +188,31 @@ class ReaderSimpleABC(ABC):
 
 class ReaderExtendedABC(ReaderSimpleABC): 
     """
-    This is an abstract base class for a data with extended functionality.
+    This is an abstract base class for a data reader with extended functionality.
+
+    If you derive from this class you can build a reader that returns a CIL AcquisitionData object, as well as slicing and binning the data on input.
+
+    All abstract methods from ReaderSimpleABC and ReaderExtendedABC must be defined.
 
     Abstract methods to be defined in child classes:
     def _supported_extensions
     def _read_metadata(self)
     def _create_geometry(self)
-    def get_flatfield_array(self)
-    def get_darkfield_array(self):
-    def get_data_array(self)
-    def _create_normalisation_correction(self)
-    def _apply_normalisation(self, data_array)
-    def _get_data_roi(self, proj_slice=None)
 
+    def get_raw_data(self)
+    def get_raw_flatfield(self):
+    def get_raw_darkfield(self)
+        
+    You may need to redefine `_set_up_normaliser` if you don't have the default single correction
+
+    for extended functionality:
+    _get_data_chunk(self)
     """
 
     def __init__(self, file_name):
 
         super().__init__(file_name)
-
         self.reset()
-
-
-    def _set_up_normaliser(self):
-        """
-        Set up the Normaliser
-        """
-        flat_field = self.get_raw_flatfield()[self._panel_crop]
-        dark_field = self.get_raw_darkfield()[self._panel_crop]
-
-        #needs to crop the normalisation images to match the cropped data.... what's the best way?
-        self._normaliser = Normaliser(flat_field, dark_field, method='default')
-
-
-    def _apply_normalisation(self, data_array):
-        """
-        Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
-
-        Can be overwritten if normaliser doesn't have functionality needed
-        """
-        self._normaliser(data_array, out = data_array)
 
 
     @abstractmethod
@@ -248,6 +227,17 @@ class ReaderExtendedABC(ReaderSimpleABC):
         return data
 
 
+    def _set_normaliser_roi(self):
+        self._normaliser_roi = deepcopy(self._normaliser)
+
+        # this is going to break if dimensions aren't 3
+        if isinstance(self._normaliser_roi._scale, np.ndarray):
+            self._normaliser_roi._scale = self._normaliser_roi._scale[self._panel_roi]
+
+        if isinstance(self._normaliser_roi._offset, np.ndarray):
+            self._normaliser_roi._offset = self._normaliser_roi._offset[self._panel_roi]
+
+
     def _get_data(self, projection_indices=None):
         """
         Method to read the data from disk, normalise and bin as requested. Returns an `numpy.ndarray`
@@ -255,11 +245,16 @@ class ReaderExtendedABC(ReaderSimpleABC):
         if projection_indices is None will use based on set_angles
         """
 
-        # if normaliser doesn't exist yet create it... needs to be for new roi
-        if self._normalise and not self._normaliser:
-            self._set_up_normaliser()
+        # if normaliser doesn't exist yet create it
+        if self._normalise:
+            if not self._normaliser:
+                self._set_up_normaliser()
 
-        # overide default (this is used by preview)
+            # update normaliser for new roi
+            self._set_normaliser_roi()
+
+
+        # override default (this is used by preview)
         if projection_indices is None:
             indices = self._indices
         else:

@@ -60,7 +60,6 @@ class NikonDataReader(ReaderExtendedABC):
     def __init__(self, file_name = None, **deprecated_kwargs):
 
         super().__init__(file_name)
-        #care about order of inteface inheritance?
 
 
         if deprecated_kwargs.get('roi', None) is not None:
@@ -211,23 +210,12 @@ class NikonDataReader(ReaderExtendedABC):
         return self.metadata['WhiteLevel']
 
 
-
     def _set_up_normaliser(self):
         """
         Set up the Normaliser
         """
         flat_field = self.get_raw_flatfield()
-        #needs to crop the normalisation images to match the cropped data.... what's the best way?
         self._normaliser = Normaliser(flat_field, None, method='default')
-
-
-    def _apply_normalisation(self, data_array):
-        """
-        Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
-
-        Can be overwritten if normaliser doesn't have functionality needed
-        """
-        self._normaliser(data_array, out = data_array)
 
 
     def _set_data_reader(self):

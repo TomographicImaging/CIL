@@ -65,7 +65,13 @@ class Normaliser(Processor):
                   }
 
         super(Normaliser, self).__init__(**kwargs)
-            
+
+        if isinstance(flat_field, np.ndarray):
+            flat_field = np.asarray(flat_field,dtype=np.float32)
+
+        if isinstance(dark_field, np.ndarray):
+            dark_field = np.asarray(dark_field,dtype=np.float32)
+
         if dark_field is not None:
 
             if method == 'default':

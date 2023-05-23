@@ -19,12 +19,13 @@
 
 from cil.framework import AcquisitionGeometry
 from cil.io.TIFF import TIFFStackReader
-from cil.io.ReaderABC import Reader
+from cil.io.ReaderABC import ReaderExtendedABC
+from cil.processors import Normaliser
 import numpy as np
 import os
 import logging
 
-class NikonDataReader(Reader):
+class NikonDataReader(ReaderExtendedABC):
 
     '''Reader for xtekct files
 
@@ -56,17 +57,17 @@ class NikonDataReader(Reader):
 
     '''
     
-    supported_extensions=['xtekct']
-
     def __init__(self, file_name = None, **deprecated_kwargs):
 
         super().__init__(file_name)
+        #care about order of inteface inheritance?
+
 
         if deprecated_kwargs.get('roi', None) is not None:
-            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_projections()' instead")
+            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_angles()' instead")
             
             roi = deprecated_kwargs.pop('roi')
-            self.set_projections(roi.get('angle')) 
+            self.set_angles(roi.get('angle')) 
             self.set_panel_roi(vertical=roi.get('vertical'), horizontal=roi.get('horizontal'))
 
         if deprecated_kwargs.pop('normalise', None) is not None:
@@ -77,7 +78,7 @@ class NikonDataReader(Reader):
         if deprecated_kwargs.pop('mode', None) is not None:
             raise DeprecationWarning("Input argument `mode` has been deprecated.\
                 Please use methods 'set_panel_roi()' to bin on the spatial domain \
-                and 'set_projections()' to slice on the angular domain")
+                and 'set_angles()' to slice on the angular domain")
 
         if deprecated_kwargs.pop('fliplr', None) is not None:
             raise PendingDeprecationWarning("Input argument `fliplr` has been deprecated.")
@@ -85,6 +86,12 @@ class NikonDataReader(Reader):
         if deprecated_kwargs:
             logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
 
+
+    @property
+    def _supported_extensions(self):
+        """A list of file extensions supported by this reader"""
+        return ['xtekct']
+     
 
     def _read_metadata(self):
         """
@@ -119,7 +126,7 @@ class NikonDataReader(Reader):
         self._data_path = os.path.join(os.path.dirname(self.file_name), self.metadata['InputFolderName'])
 
 
-    def _create_geometry(self):
+    def _create_full_geometry(self):
         """
         Create the `AcquisitionGeometry` `self._acquisition_geometry` that describes the full dataset
         """
@@ -189,20 +196,6 @@ class NikonDataReader(Reader):
             self._acquisition_geometry.set_labels(labels=['angle', 'vertical', 'horizontal'])
 
 
-    def get_raw_flatfield(self):
-        """
-        Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
-        """
-        return None
-
-
-    def get_raw_darkfield(self):
-        """
-        Returns a `numpy.ndarray` with the raw dark-field images in the format they are stored.
-        """
-        return None
-
-
     def get_raw_data(self):
         """
         Returns a `numpy.ndarray` with the raw data in the format they are stored.
@@ -211,20 +204,30 @@ class NikonDataReader(Reader):
         return data_reader.read()
 
 
-    def _create_normalisation_correction(self):
+    def get_raw_flatfield(self):
         """
-        Process the normalisation images as required and store the full scale versions 
-        in self._normalisation for future use by `_apply_normalisation`  
+        Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
         """
+        return self.metadata['WhiteLevel']
 
-        self._normalisation = 1/self.metadata['WhiteLevel']
+
+
+    def _set_up_normaliser(self):
+        """
+        Set up the Normaliser
+        """
+        flat_field = self.get_raw_flatfield()
+        #needs to crop the normalisation images to match the cropped data.... what's the best way?
+        self._normaliser = Normaliser(flat_field, None, method='default')
 
 
     def _apply_normalisation(self, data_array):
         """
         Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
+
+        Can be overwritten if normaliser doesn't have functionality needed
         """
-        data_array *= self._normalisation
+        self._normaliser(data_array, out = data_array)
 
 
     def _set_data_reader(self):
@@ -236,31 +239,20 @@ class NikonDataReader(Reader):
             self._data_reader = TIFFStackReader(self._data_path, dtype=np.float32)
 
 
-    def _get_data_roi(self, proj_slice=None):
+    def _get_data_chunk(self, selection):
         """
-        Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions
+        Method to read an roi of the data from disk and return an `numpy.ndarray`.
+
+        selection is a tuple of slice objects for each dimension
         """
-
-
-        vertical= (self._panel_crop[0].start, self._panel_crop[0].stop)
-        horizontal=(self._panel_crop[1].start, self._panel_crop[1].stop)
         
-        index_list=None
+        angles = (selection[0].start, selection[0].stop, selection[0].step)
+        vertical= (selection[1].start, selection[1].stop, selection[1].step)
+        horizontal=(selection[2].start, selection[2].stop, selection[2].step)
         
-        if proj_slice is None:
-            index_list=(0, self._acquisition_geometry.num_projections)
-        elif isinstance(proj_slice,(range,slice)):   
-            index_list=(proj_slice.start, proj_slice.stop, proj_slice.step)
-        elif isinstance(proj_slice,(list,np.ndarray)):
-            index_list = proj_slice
-        elif isinstance(proj_slice, int):
-            index_list = [proj_slice]
-        else:
-            raise ValueError("Nope")
-
         self._set_data_reader()
         self._data_reader.set_image_roi(vertical=vertical, horizontal=horizontal, mode='slice')
-        self._data_reader.set_projections(index_list)
+        self._data_reader.set_image_indices(angles)
 
         return self._data_reader.read()
 

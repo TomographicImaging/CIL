@@ -4,13 +4,200 @@ from abc import ABC, abstractmethod
 from cil.processors import Binner
 import numpy as np
 from cil.utilities.display import show2D
+from cil.processors import Normaliser
+from itertools import groupby
+from operator import itemgetter
 
-class Reader(ABC): 
+
+
+class ReaderSimpleABC(ABC): 
     """
-    This is an abstract base class for a data reader.
+    This is an abstract base class for a basic data reader.
+
+    If you derive from this class you can build a reader that returns a CIL AcquisitionData object.
+
+    If you want a reader with all the bells and whistles then derive from the ReaderExtendedABC.
+
+    All abstract methods must be defined.
 
     Abstract methods to be defined in child classes:
-    supported_extensions=[]
+
+
+    def _supported_extensions
+    def _read_metadata(self)
+    def _create_geometry(self)
+
+    def get_raw_data(self)
+    def get_raw_flatfield(self):
+    def get_raw_darkfield(self)
+        
+    You may need to redefine `_set_up_normaliser` if you don;'t have the default single correction
+    """
+
+    
+    def __init__(self, file_name):
+
+        self.file_name = file_name
+        self._normalise = True
+
+
+    @property
+    def file_name(self):
+        return self._file_name
+    
+
+    @file_name.setter
+    def file_name(self, val):
+        file_name_abs = os.path.abspath(val)
+        
+        if not(os.path.isfile(file_name_abs)):
+            raise FileNotFoundError('{}'.format(file_name_abs))
+        
+        file_extension = os.path.basename(file_name_abs).split('.')[-1].lower()
+        if file_extension not in self._supported_extensions:
+            raise TypeError('This reader can only process files with extensions: {0}. Got {1}'.format(self._supported_extensions, file_extension))
+
+        self._file_name = val
+
+        #if filename changes then reset the file dependent members
+        self._acquisition_geometry = False
+        self._normaliser = False
+        self._metadata = False
+
+
+    @property
+    def full_geometry(self):
+        if not self._acquisition_geometry:
+            self._create_full_geometry()
+        return self._acquisition_geometry
+
+
+    @property
+    def metadata(self):
+        if not self._metadata:
+            self._read_metadata()
+        return self._metadata
+    
+
+    @property
+    @abstractmethod
+    def _supported_extensions(self):
+        """A list of file extensions supported by this reader"""
+        return []
+
+    
+    @abstractmethod
+    def _read_metadata(self):
+        """
+        Constructs a dictionary `self._metadata` of the values used from the dataset meta data. 
+        """
+        self._metadata = {}
+        self._metadata['fieldA'] = 'example'
+
+
+    @abstractmethod
+    def _create_full_geometry(self):
+        """
+        Create the `AcquisitionGeometry` `self._acquisition_geometry` that describes the full dataset.
+
+        This should use the values from `self._metadata` where possible.
+        """
+        self._acquisition_geometry = AcquisitionGeometry.create_Parallel3D()
+        self._acquisition_geometry.set_angles(self._metadata['angles'])
+        self._acquisition_geometry.set_panel([1,1])
+        self._acquisition_geometry.set_channels(1)
+        self._acquisition_geometry.set_labels(labels='cil')
+
+
+    @abstractmethod
+    def get_raw_data(self):
+        """
+        Returns a `numpy.ndarray` with the raw data in the format they are stored.
+        """
+        return None
+
+
+    def get_raw_flatfield(self):
+        """
+        Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
+        """
+        return None
+
+
+    def get_raw_darkfield(self):
+        """
+        Returns a `numpy.ndarray` with the raw dark-field images in the format they are stored.
+        """
+        return None
+
+
+    def _set_up_normaliser(self):
+        """
+        Set up the Normaliser
+        """
+        flat_field = self.get_raw_flatfield()
+        dark_field = self.get_raw_darkfield()
+
+        self._normaliser = Normaliser(flat_field, dark_field, method='default')
+
+
+    def set_normalisation(self, normalise=True):
+        """
+        Toggle return of normalised/un-normalised data
+        """
+        self._normalise = normalise
+
+
+    def _apply_normalisation(self, data_array):
+        """
+        Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
+
+        Can be overwritten if normaliser doesn't have functionality needed
+        """
+        self._normaliser(data_array, out = data_array)
+
+
+    def _get_data(self):
+        """
+        Method to read the data from disk, normalise as requested. Returns an `numpy.ndarray`
+        """
+
+        # if normaliser doesn't exist yet create it
+        if self._normalise and not self._normaliser:
+            self._create_normalisation_correction()
+      
+        output_array = np.asarray(self.get_raw_data(), np.float32)
+
+        if self._normalise:
+            self._apply_normalisation(output_array)
+
+        return output_array.squeeze()
+
+
+    def read(self):
+        """
+        Method to retrieve the data .
+
+        This respects the configured ROI and angular indices.
+
+        Returns
+        -------
+        AcquisitionData
+            Returns an AcquisitionData containing your data and AcquisitionGeometry.
+        """
+
+        data = self._get_data()
+        return AcquisitionData(data, False, self.full_geometry)
+
+
+
+
+class ReaderExtendedABC(ReaderSimpleABC): 
+    """
+    This is an abstract base class for a data with extended functionality.
+
+    Abstract methods to be defined in child classes:
+    def _supported_extensions
     def _read_metadata(self)
     def _create_geometry(self)
     def get_flatfield_array(self)
@@ -22,172 +209,107 @@ class Reader(ABC):
 
     """
 
-    supported_extensions=[]
-
-    @property
-    def file_name(self):
-        return self._file_name
-
     def __init__(self, file_name):
 
-        # check file
-        file_name_abs = os.path.abspath(file_name)
-        
-        if not(os.path.isfile(file_name_abs)):
-            raise FileNotFoundError('{}'.format(file_name_abs))
-        
-        file_extension = os.path.basename(file_name_abs).split('.')[-1].lower()
-        if file_extension not in self.supported_extensions:
-            raise TypeError('This reader can only process files with extensions: {0}. Got {1}'.format(self.supported_extensions, file_extension))
+        super().__init__(file_name)
 
-        self._file_name = file_name_abs
-        self._normalisation = False
-
-        # create the full geometry and configure the ROIs
-        self._read_metadata()
-
-        # These should only be called once but maybe init isn't the best place
-        # should still be able to access the raw data?
-        self._create_geometry()
         self.reset()
 
-    @property
-    def metadata(self):
-        return self._metadata
 
-    @property
-    def geometry(self):
-        return self._acquisition_geometry
-
-
-    @abstractmethod
-    def _read_metadata(self):
+    def _set_up_normaliser(self):
         """
-        Constructs a dictionary `self._metadata` of the values used from the metadata. 
+        Set up the Normaliser
         """
-        self._metadata = {}
-        self._metadata['fieldA'] = 'example'
+        flat_field = self.get_raw_flatfield()[self._panel_crop]
+        dark_field = self.get_raw_darkfield()[self._panel_crop]
+
+        #needs to crop the normalisation images to match the cropped data.... what's the best way?
+        self._normaliser = Normaliser(flat_field, dark_field, method='default')
 
 
-    @abstractmethod
-    def _create_geometry(self):
-        """
-        Create the `AcquisitionGeometry` `self._acquisition_geometry` that describes the full dataset
-        """
-        self._acquisition_geometry = AcquisitionGeometry.create_Parallel3D()
-        self._acquisition_geometry.set_angles([0])
-        self._acquisition_geometry.set_panel([1,1])
-        self._acquisition_geometry.set_channels(1)
-        self._acquisition_geometry.set_labels(labels='cil')
-
-
-    @abstractmethod
-    def get_raw_flatfield(self):
-        """
-        Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
-        """
-        return None
-
-
-    @abstractmethod
-    def get_raw_darkfield(self):
-        """
-        Returns a `numpy.ndarray` with the raw dark-field images in the format they are stored.
-        """
-        return None
-
-
-    @abstractmethod
-    def get_raw_data(self):
-        """
-        Returns a `numpy.ndarray` with the raw data in the format they are stored.
-        """
-        return None
-
-
-    @abstractmethod
-    def _create_normalisation_correction(self):
-        """
-        Process the normalisation images as required and store the full scale versions 
-        in self._normalisation for future use by `_apply_normalisation`  
-        """
-        darkfield = self.get_raw_darkfield()
-        darkfield = np.mean(darkfield, axis=0)
-
-        flatfield = self.get_raw_flatfield()
-        flatfield = np.mean(flatfield, axis=0)
-
-        self._normalisation = (darkfield, 1/(flatfield-darkfield))
-
-
-    @abstractmethod
     def _apply_normalisation(self, data_array):
         """
         Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
+
+        Can be overwritten if normaliser doesn't have functionality needed
         """
-        data_array -= self._normalisation[0][self._panel_crop]
-        data_array *= self._normalisation[1][self._panel_crop]
+        self._normaliser(data_array, out = data_array)
 
 
     @abstractmethod
-    def _get_data_roi(self, proj_slice=None):
+    def _get_data_chunk(self, selection):
         """
-        Method to read the data from disk and return an `numpy.ndarray` of the cropped image dimensions.
+        Method to read an roi of the data from disk and return an `numpy.ndarray`.
 
-        should handle proj as a slice, range, list or index
+        selection is a tuple of slice objects for each dimension
         """
 
-        datareader = None
-        path = None
-
-        if proj_slice is None:
-            selection = (slice(None),*self._panel_crop)
-            data = datareader.read(path, source_sel=selection)
-
-        elif isinstance(proj_slice,(range,slice)):   
-            selection = (slice(*proj_slice),*self._panel_crop)
-            data = datareader.read(path, source_sel=selection)
-        
-        elif isinstance(proj_slice, int):
-            selection = (slice(proj_slice, proj_slice+1),*self._panel_crop)
-            data = datareader.read(path, source_sel=selection)
-
-        elif isinstance(proj_slice,(list,np.ndarray)):
-            data = np.empty(shape=(len(proj_slice),len(self._panel_crop[0]),len(self._panel_crop[0]) ))
-            for i, proj in enumerate(proj_slice):
-                selection = (slice(i, i+1),*self._panel_crop)
-                data[i,:,:] = datareader.read(path, source_sel=selection)
-        else:
-            raise ValueError("Nope")
-
+        data = data_reader(selection)
         return data
 
 
-    def _get_data(self, projs=None, normalise=True):
+    def _get_data(self, projection_indices=None):
         """
         Method to read the data from disk, normalise and bin as requested. Returns an `numpy.ndarray`
 
-        projs is None, a range or a list
+        if projection_indices is None will use based on set_angles
         """
 
-        # if normalisation images don't exist yet create them
-        if normalise and not self._normalisation:
-            self._create_normalisation_correction()
-      
-        output_array = self._get_data_roi(projs)
+        # if normaliser doesn't exist yet create it... needs to be for new roi
+        if self._normalise and not self._normaliser:
+            self._set_up_normaliser()
 
-        if normalise:
-            self._apply_normalisation(output_array)
+        # overide default (this is used by preview)
+        if projection_indices is None:
+            indices = self._indices
+        else:
+            indices = projection_indices
+
+        if indices is None: 
+            selection = (slice(0, self.full_geometry.num_projections), *self._panel_crop)
+            output_array = np.asarray(self._get_data_chunk(selection), np.float32)
+
+        elif isinstance(indices,(range,slice)):   
+            selection = (slice(indices.start, indices.stop, indices.step),*self._panel_crop)
+            output_array = np.asarray(self._get_data_chunk(selection), np.float32)
+
+        elif isinstance(indices, int):
+            selection = (slice(indices, indices+1),*self._panel_crop)
+            output_array = np.asarray(self._get_data_chunk(selection), np.float32)
+
+        elif isinstance(indices,(list,np.ndarray)):
+
+            # need to make this shape robust
+            output_array = np.empty((len(indices), *self.full_geometry.shape[1::]), dtype=np.float32)
+
+            i = 0
+            while i < len(indices):
+
+                ind_start = i
+                while ((i+1) < len(indices)) and (indices[i] + 1 == indices[i+1]):
+                    i+= 1
+
+                i+=1
+                selection = (slice(indices[ind_start], indices[ind_start] + i-ind_start),*self._panel_crop)
+                output_array[ind_start:ind_start+i-ind_start,:,:] = np.asarray(self._get_data_chunk(selection), np.float32)
+
+
+        else:
+            raise ValueError("Nope")
+
+
+        #what if sliced and reduced dimensions?
+        proj_unbinned = DataContainer(output_array,False, self.full_geometry.dimension_labels)
+
+        if self._normalise:
+            self._apply_normalisation(proj_unbinned)
 
         if self._bin:
             binner = Binner(roi={'vertical':(None,None,self._bin_roi[0]),'horizontal':(None,None,self._bin_roi[1])})
-
-            proj_unbinned=DataContainer(output_array,False,['angle','vertical','horizontal'])
             binner.set_input(proj_unbinned) 
             output_array = binner.get_output().array
 
         return output_array.squeeze()
-
 
 
     def _parse_crop_bin(self, arg, length):
@@ -232,9 +354,9 @@ class Reader(ABC):
         """
 
         if vertical == 'centre':
-            dim = self.geometry.dimension_labels.index('vertical')
+            dim = self.full_geometry.dimension_labels.index('vertical')
             
-            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            centre_slice_pos = (self.full_geometry.shape[dim]-1) / 2.
             ind0 = int(np.floor(centre_slice_pos))
 
             w2 = centre_slice_pos - ind0
@@ -243,8 +365,8 @@ class Reader(ABC):
             else:
                 vertical=(ind0, ind0+2, 2)
 
-        crop_v, step_v = self._parse_crop_bin(vertical, self.geometry.pixel_num_v)
-        crop_h, step_h = self._parse_crop_bin(horizontal, self.geometry.pixel_num_h)
+        crop_v, step_v = self._parse_crop_bin(vertical, self.full_geometry.pixel_num_v)
+        crop_h, step_h = self._parse_crop_bin(horizontal, self.full_geometry.pixel_num_h)
 
         if step_v > 1 or step_h > 1:
             self._bin = True
@@ -255,35 +377,35 @@ class Reader(ABC):
         self._panel_crop = (crop_v, crop_h)
 
 
-    def set_projections(self, angle_indices=None):
+    def set_angles(self, indices=None):
         """
         Method to configure the angular indices to be returned as a CIL object.
 
-        angle_indices: takes an integer for a single projections, a tuple of (start, stop, step), 
+        indices: takes an integer for a single projections, a tuple of (start, stop, step), 
         or a list of indices.
 
         If step is greater than 1 pixels the data will be sliced. i.e. a step of 10 returns 1 in 10 projections.
         """      
 
-        if angle_indices is not None:
-            if isinstance(angle_indices,tuple):
-                angle_indices = slice(*angle_indices)
-            elif isinstance(angle_indices,(list,np.ndarray)):
-                angle_indices = angle_indices
-            elif isinstance(angle_indices,int):
-                angle_indices = [angle_indices]
+        if indices is not None:
+            if isinstance(indices,tuple):
+                indices = slice(*indices)
+            elif isinstance(indices,(list,np.ndarray)):
+                indices = indices
+            elif isinstance(indices,int):
+                indices = [indices]
             else:
                 raise ValueError("Nope")
         
             try:
-                angles = self.geometry.angles[(angle_indices)]
+                angles = self.full_geometry.angles[(indices)]
 
             except IndexError:
                 raise ValueError("Out of range")
             
             if angles.size < 1:
                 raise ValueError(") projections selected. Please select at least 1 angle")
-        self._angle_indices = angle_indices
+        self._indices = indices
         
 
     def reset(self):
@@ -291,7 +413,7 @@ class Reader(ABC):
         Resets the configured ROI and angular indices to the full dataset
         """
         # range or list object for angles to process, defaults to None
-        self._angle_indices = None
+        self._indices = None
 
         # slice in each dimension, initialised to none
         self._panel_crop = (slice(None),slice(None))
@@ -349,7 +471,8 @@ class Reader(ABC):
 
         ag.set_angles([angles[idx_1], angles[idx_2]])
         
-        data = self._get_data(projs=[idx_1,idx_2], normalise=normalise)
+        # overide projectsions to be read
+        data = self._get_data(projection_indices=[idx_1,idx_2])
         show2D(data, slice_list=[0,1], title= [str(angles[idx_1])+ ag.config.angles.angle_unit, str(angles[idx_2]) +ag.config.angles.angle_unit],origin='upper-left')
 
 
@@ -365,12 +488,12 @@ class Reader(ABC):
             Returns an AcquisitionGeometry describing your system.
         """
 
-        ag = self._acquisition_geometry.copy()
+        ag = self.full_geometry.copy()
 
-        if isinstance(self._angle_indices,slice):
-            ag.config.angles.angle_data = ag.angles[(self._angle_indices)]
-        elif isinstance(self._angle_indices,list):
-            ag.config.angles.angle_data = np.take(ag.angles, list(self._angle_indices))
+        if isinstance(self._indices,slice):
+            ag.config.angles.angle_data = ag.angles[(self._indices)]
+        elif isinstance(self._indices,list):
+            ag.config.angles.angle_data = np.take(ag.angles, list(self._indices))
 
         #slice and bin geometry
         roi = { 'horizontal':(self._panel_crop[1].start, self._panel_crop[1].stop, self._bin_roi[1]),
@@ -393,5 +516,5 @@ class Reader(ABC):
         """
 
         geometry = self.get_geometry()
-        data = self._get_data(projs=self._angle_indices, normalise=normalise)
+        data = self._get_data()
         return AcquisitionData(data, False, geometry)

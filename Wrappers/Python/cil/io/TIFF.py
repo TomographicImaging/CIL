@@ -274,7 +274,7 @@ class TIFFStackReader(object):
             logging.warning("Input argument `mode` has been deprecated. Please use method 'set_image_roi()' instead")
 
         if deprecated_kwargs.get('roi', None) is not None:
-            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_image_roi()' and 'set_projections()' instead")
+            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_image_roi()' and 'set_image_indices()' instead")
 
         self.file_name = file_name
 
@@ -334,7 +334,7 @@ class TIFFStackReader(object):
         self.dtype = dtype
         self.set_filename(file_name)
         self.set_image_roi(horizontal=None, vertical=None, mode='bin')
-        self.set_projections(None)
+        self.set_image_indices(None)
 
 
         # handle deprecated behaviour for backward compatibility
@@ -344,9 +344,9 @@ class TIFFStackReader(object):
             mode = deprecated_kwargs.pop('mode')
 
         if deprecated_kwargs.get('roi', None) is not None:
-            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_projections()' instead")
+            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_image_indices()' instead")
             roi = deprecated_kwargs.pop('roi')
-            self.set_projections(roi.get('axis_0')) 
+            self.set_image_indices(roi.get('axis_0')) 
             self.set_image_roi(vertical=roi.get('axis_1'), horizontal=roi.get('axis_2'), mode=mode)
         
         if deprecated_kwargs:
@@ -401,7 +401,7 @@ class TIFFStackReader(object):
         self.mode=mode
 
     
-    def set_projections(self, angle_indices=None):
+    def set_image_indices(self, angle_indices=None):
         """
         Method to configure the angular indices to be returned
 

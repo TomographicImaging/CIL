@@ -7,7 +7,7 @@ from cil.utilities.display import show2D
 from cil.processors import Normaliser
 from copy import deepcopy
 import weakref
-import importlib
+
 
 class ReaderABC(ABC): 
     """
@@ -172,7 +172,7 @@ class ReaderABC(ABC):
         """
         Method to read the data in. Can use a CIL reader or another library custom version.
 
-        Should be able to read in an roi of the data.        
+        Should be able to read in an roi of the data.
         """
         if not hasattr(self,'_data_reader'):
             self._data_reader = TIFFStackReader(file_name=self._data_path)
@@ -203,13 +203,6 @@ class ReaderABC(ABC):
         self._normaliser = Normaliser(self.get_raw_flatfield(), self.get_raw_darkfield(), method='default')
 
 
-    def set_normalisation(self, normalise=True):
-        """
-        Toggle return of normalised/un-normalised data
-        """
-        self._normalise = normalise
-
-
     def _apply_normalisation(self, data_array):
         """
         Method to apply the normalisation accessed from self._normalisation to the cropped data as a `numpy.ndarray`
@@ -219,28 +212,19 @@ class ReaderABC(ABC):
         self._normaliser(data_array, out = data_array)
 
 
+
+    def set_normalisation(self, normalise=True):
+        """
+        Toggle return of normalised/un-normalised data
+        """
+        self._normalise = normalise
+
+
     def get_raw_data(self):
         """
         Get the raw data array if not already in memory
         """
         return self._data_handle.get_data(dtype=None, roi=None, normalise=False)
-
-
-    def read(self):
-        """
-        Method to retrieve the data .
-
-        This respects the configured ROI and angular indices.
-
-        Returns
-        -------
-        AcquisitionData
-            Returns an AcquisitionData containing your data and AcquisitionGeometry.
-        """
-
-        data = self._get_data()
-        return AcquisitionData(data, False, self.full_geometry)
-
 
 
     def _get_data_array(self, selection):

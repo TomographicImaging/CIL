@@ -168,25 +168,31 @@ class Normaliser(Processor):
         if out is None:
             flag = False
             if self._offset:
-                data = projections.subtract(self._offset)
+                data = np.subtract(projections,self._offset,out=data)
                 flag = True
 
             if self._scale:
                 if flag:
-                    data.multiply(self._scale, out = data)
+                    data *= self._scale
                 else:
-                    data = projections.multiply(self._scale)  
+                    data = projections * self._scale 
             
             return data
 
         else:
             flag = False
             if self._offset:
-                projections.subtract(self._offset, out = out)
+                if id(out) == id(projections):
+                    projections -= self._offset
+                else:
+                    out.fill(projections - self._offset)
                 flag = True
                     
             if self._scale:
                 if flag:
-                    out.multiply(self._scale, out = out)
+                    out *= self._scale
                 else:
-                    projections.multiply(self._scale, out = out)
+                    if id(out) == id(projections):
+                        projections *= self._scale
+                    else:
+                        out.fill(projections*self._scale)

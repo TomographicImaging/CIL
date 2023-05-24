@@ -19,13 +19,13 @@
 
 from cil.framework import AcquisitionGeometry
 from cil.io.TIFF import TIFFStackReader
-from cil.io.ReaderABC import ReaderExtendedABC
+from cil.io.ReaderABC import ReaderABC
 from cil.processors import Normaliser
 import numpy as np
 import os
 import logging
 
-class NikonDataReader(ReaderExtendedABC):
+class NikonDataReader(ReaderABC):
 
     '''Reader for xtekct files
 
@@ -69,10 +69,9 @@ class NikonDataReader(ReaderExtendedABC):
             self.set_angles(roi.get('angle')) 
             self.set_panel_roi(vertical=roi.get('vertical'), horizontal=roi.get('horizontal'))
 
-        if deprecated_kwargs.pop('normalise', None) is not None:
-            raise DeprecationWarning("Input argument `normalise` has been deprecated.\
-                The 'read' method will return the normalised data.\
-                The 'get_data_array' method will return the data array without processing")
+        if deprecated_kwargs.get('normalise', None) is not None:
+            logging.warning("Input argument `normalise` has been deprecated. Please use methods 'set_normalisation()' instead")
+            self._normalise = deprecated_kwargs.pop('normalise')
 
         if deprecated_kwargs.pop('mode', None) is not None:
             raise DeprecationWarning("Input argument `mode` has been deprecated.\
@@ -83,7 +82,7 @@ class NikonDataReader(ReaderExtendedABC):
             raise PendingDeprecationWarning("Input argument `fliplr` has been deprecated.")
             
         if deprecated_kwargs:
-            logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
+            logging.warning("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
 
 
     @property
@@ -195,12 +194,14 @@ class NikonDataReader(ReaderExtendedABC):
             self._acquisition_geometry.set_labels(labels=['angle', 'vertical', 'horizontal'])
 
 
-    def get_raw_data(self):
-        """
-        Returns a `numpy.ndarray` with the raw data in the format they are stored.
-        """
-        data_reader = TIFFStackReader(file_name = self._data_path, dtype=None)
-        return data_reader.read()
+    def read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
+
+        if not hasattr(self,'_data_reader'):
+            self._data_reader = TIFFStackReader(file_name=self._data_path)
+
+        self._data_reader.dtype = dtype
+        self._data_reader.set_roi(roi)
+        return self._data_reader.read()
 
 
     def get_raw_flatfield(self):

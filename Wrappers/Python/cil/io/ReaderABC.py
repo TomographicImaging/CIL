@@ -6,36 +6,96 @@ import numpy as np
 from cil.utilities.display import show2D
 from cil.processors import Normaliser
 from copy import deepcopy
+import weakref
+import importlib
 
-class ReaderSimpleABC(ABC): 
+class ReaderABC(ABC): 
     """
-    This is an abstract base class for a basic data reader.
+    This is an abstract base class for a data reader that reads data, metadata and returns a CIL AcquisitionData.
 
     If you derive from this class you can build a reader that returns a CIL AcquisitionData object.
-
-    If you want a reader with all the bells and whistles then derive from the ReaderExtendedABC.
 
     All abstract methods must be defined.
 
     Abstract methods to be defined in child classes:
 
+    def _supported_extensions(self):
+    def _read_metadata(self):
+    def _create_full_geometry(self):
+    def read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
 
-    def _supported_extensions
-    def _read_metadata(self)
-    def _create_geometry(self)
-
-    def get_raw_data(self)
+    Methods that may be reimplemented in a child. These return a default that may not be suitable for all use cases:
     def get_raw_flatfield(self):
-    def get_raw_darkfield(self)
-        
-    You may need to redefine `_set_up_normaliser` if you don't have the default single correction
+    def get_raw_darkfield(self):
+    def _set_up_normaliser(self):
     """
 
-    
+    class data_handler(object):
+        """
+        This class controls the reading, casting, normalising and caching of the dataset.
+        It should not need modification as long as it is configured with 'read_data_method' and 
+        'apply_normalisation_method'.
+        """
+
+        def __init__(self, read_data_method, apply_normalisation_method):
+            self.read_data = read_data_method
+            self.apply_normalisation = apply_normalisation_method
+
+            self._array = None
+            self.dtype = None
+            self.roi = None
+            self.normalised = False
+
+
+        @property
+        def array(self):
+            if self._array is None:
+                return None
+            else:
+                return self._array()
+        
+        @array.setter
+        def array(self, val):
+            self._array = weakref.ref(val)
+
+
+        def get_data(self, dtype=np.float32, roi=None, normalise=True):
+            """
+            Caches the previous read when possible
+            """
+            # cached must be same roi, but can be not normalised and castable dtype
+            if self.array is not None and ((normalise == self.normalised) or normalise)  and \
+                self.roi==roi and np.can_cast(self.dtype,dtype,casting='safe'):
+
+                self.array.astype(dtype, casting='safe',copy=False)
+                self.dtype = self.array.dtype
+
+                if not self.normalised and normalise:
+                    self.apply_normalisation(self.array)
+                    self.normalised = True
+
+                array = self.array
+
+            else:
+                array = self.read_data(dtype, roi)
+                array = np.asarray(array, dtype=dtype)
+                self.array = array
+                self.dtype = array.dtype
+                self.roi = roi
+                self.normalised = normalise
+
+                if normalise:
+                    self.apply_normalisation(self.array)
+
+            return array
+
+
     def __init__(self, file_name):
 
+        self._data_handle = self.data_handler(self.read_data, self._apply_normalisation)
         self.file_name = file_name
         self._normalise = True
+        self.reset()
 
 
     @property
@@ -60,6 +120,7 @@ class ReaderSimpleABC(ABC):
         self._acquisition_geometry = False
         self._normaliser = False
         self._metadata = False
+        self._data_handle._array = None
 
 
     @property
@@ -107,13 +168,20 @@ class ReaderSimpleABC(ABC):
 
 
     @abstractmethod
-    def get_raw_data(self):
+    def read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
         """
-        Returns a `numpy.ndarray` with the raw data in the format they are stored.
+        Method to read the data in. Can use a CIL reader or another library custom version.
+
+        Should be able to read in an roi of the data.        
         """
-        return None
+        if not hasattr(self,'_data_reader'):
+            self._data_reader = TIFFStackReader(file_name=self._data_path)
 
-
+        self._data_reader.dtype = dtype
+        self._data_reader.set_roi(roi)
+        return self._data_reader.read()
+        
+  
     def get_raw_flatfield(self):
         """
         Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
@@ -151,21 +219,11 @@ class ReaderSimpleABC(ABC):
         self._normaliser(data_array, out = data_array)
 
 
-    def _get_data(self):
+    def get_raw_data(self):
         """
-        Method to read the data from disk, normalise as requested. Returns an `numpy.ndarray`
+        Get the raw data array if not already in memory
         """
-
-        # if normaliser doesn't exist yet create it
-        if self._normalise and not self._normaliser:
-            self._create_normalisation_correction()
-      
-        output_array = np.asarray(self.get_raw_data(), np.float32)
-
-        if self._normalise:
-            self._apply_normalisation(output_array)
-
-        return output_array.squeeze()
+        return self._data_handle.get_data(dtype=None, roi=None, normalise=False)
 
 
     def read(self):
@@ -185,46 +243,13 @@ class ReaderSimpleABC(ABC):
 
 
 
-
-class ReaderExtendedABC(ReaderSimpleABC): 
-    """
-    This is an abstract base class for a data reader with extended functionality.
-
-    If you derive from this class you can build a reader that returns a CIL AcquisitionData object, as well as slicing and binning the data on input.
-
-    All abstract methods from ReaderSimpleABC and ReaderExtendedABC must be defined.
-
-    Abstract methods to be defined in child classes:
-    def _supported_extensions
-    def _read_metadata(self)
-    def _create_geometry(self)
-
-    def get_raw_data(self)
-    def get_raw_flatfield(self):
-    def get_raw_darkfield(self)
-        
-    You may need to redefine `_set_up_normaliser` if you don't have the default single correction
-
-    for extended functionality:
-    _get_data_chunk(self)
-    """
-
-    def __init__(self, file_name):
-
-        super().__init__(file_name)
-        self.reset()
-
-
-    @abstractmethod
-    def _get_data_chunk(self, selection):
+    def _get_data_array(self, selection):
         """
         Method to read an roi of the data from disk and return an `numpy.ndarray`.
 
         selection is a tuple of slice objects for each dimension
         """
-
-        data = data_reader(selection)
-        return data
+        return self._data_handle.get_data(dtype=np.float32, roi=selection, normalise=self._normalise)
 
 
     def _set_normaliser_roi(self):
@@ -232,10 +257,10 @@ class ReaderExtendedABC(ReaderSimpleABC):
 
         # this is going to break if dimensions aren't 3
         if isinstance(self._normaliser_roi._scale, np.ndarray):
-            self._normaliser_roi._scale = self._normaliser_roi._scale[self._panel_roi]
+            self._normaliser_roi._scale = self._normaliser_roi._scale[self._panel_crop]
 
         if isinstance(self._normaliser_roi._offset, np.ndarray):
-            self._normaliser_roi._offset = self._normaliser_roi._offset[self._panel_roi]
+            self._normaliser_roi._offset = self._normaliser_roi._offset[self._panel_crop]
 
 
     def _get_data(self, projection_indices=None):
@@ -253,8 +278,7 @@ class ReaderExtendedABC(ReaderSimpleABC):
             # update normaliser for new roi
             self._set_normaliser_roi()
 
-
-        # override default (this is used by preview)
+        # if override default (this is used by preview)
         if projection_indices is None:
             indices = self._indices
         else:
@@ -262,15 +286,15 @@ class ReaderExtendedABC(ReaderSimpleABC):
 
         if indices is None: 
             selection = (slice(0, self.full_geometry.num_projections), *self._panel_crop)
-            output_array = np.asarray(self._get_data_chunk(selection), np.float32)
+            output_array = self._get_data_array(selection)
 
         elif isinstance(indices,(range,slice)):   
             selection = (slice(indices.start, indices.stop, indices.step),*self._panel_crop)
-            output_array = np.asarray(self._get_data_chunk(selection), np.float32)
+            output_array = self._get_data_array(selection)
 
         elif isinstance(indices, int):
             selection = (slice(indices, indices+1),*self._panel_crop)
-            output_array = np.asarray(self._get_data_chunk(selection), np.float32)
+            output_array = self._get_data_array(selection)
 
         elif isinstance(indices,(list,np.ndarray)):
 
@@ -286,18 +310,14 @@ class ReaderExtendedABC(ReaderSimpleABC):
 
                 i+=1
                 selection = (slice(indices[ind_start], indices[ind_start] + i-ind_start),*self._panel_crop)
-                output_array[ind_start:ind_start+i-ind_start,:,:] = np.asarray(self._get_data_chunk(selection), np.float32)
+                output_array[ind_start:ind_start+i-ind_start,:,:] = self._get_data_array(selection)
 
 
         else:
             raise ValueError("Nope")
 
-
         #what if sliced and reduced dimensions?
         proj_unbinned = DataContainer(output_array,False, self.full_geometry.dimension_labels)
-
-        if self._normalise:
-            self._apply_normalisation(proj_unbinned)
 
         if self._bin:
             binner = Binner(roi={'vertical':(None,None,self._bin_roi[0]),'horizontal':(None,None,self._bin_roi[1])})
@@ -420,7 +440,7 @@ class ReaderExtendedABC(ReaderSimpleABC):
         self._bin = False
 
 
-    def preview(self, initial_angle=0, normalise=True):
+    def preview(self, initial_angle=0):
         """
         Displays two normalised projections approximately 90 degrees apart.
 
@@ -498,7 +518,7 @@ class ReaderExtendedABC(ReaderSimpleABC):
         return Binner(roi)(ag)
 
 
-    def read(self, normalise=True):
+    def read(self):
         """
         Method to retrieve the data .
 

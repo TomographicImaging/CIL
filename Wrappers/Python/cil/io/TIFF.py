@@ -384,12 +384,37 @@ class TIFFStackReader(object):
 
         self._tiff_files.sort(key=self.__natural_keys)
 
+        # load first image to find out dimensions and type
+        with Image.open(self._tiff_files[0]) as img:
+            self._imag_dtype = self._get_file_type(img)
+            w, h = img.size
+            self._imag_dim = [h,w]
 
+
+
+    def set_roi(self, roi):
+
+        if roi == None:
+            roi = (None, None, None)
+            
+        self.set_image_roi(vertical=roi[1], horizontal=roi[2])
+        self.set_image_indices(indices=roi[0])
+
+
+        
     def set_image_roi(self, vertical=None, horizontal=None, mode='bin'):
  
         self._roi = {'vertical': -1, 'horizontal': -1}
-        
-        if vertical is not None:     
+
+        if isinstance(vertical,slice):
+            vertical_range = range(0,self._imag_dim[0])[vertical]
+            vertical = (vertical_range.start, vertical_range.stop, vertical_range.step)
+
+        if isinstance(horizontal,slice):
+            horizontal_range = range(0,self._imag_dim[1])[horizontal]
+            horizontal = (horizontal_range.start, horizontal_range.stop, horizontal_range.step)
+
+        if vertical is not None:
             self._roi['vertical'] = vertical
 
         if horizontal is not None:     
@@ -401,7 +426,7 @@ class TIFFStackReader(object):
         self.mode=mode
 
     
-    def set_image_indices(self, angle_indices=None):
+    def set_image_indices(self, indices=None):
         """
         Method to configure the angular indices to be returned
 
@@ -412,22 +437,24 @@ class TIFFStackReader(object):
         """      
 
         # for backward compatibility with old roi
-        if angle_indices == -1:
-            angle_indices = None
+        if indices == -1:
+            indices = None
           
         angles = np.arange(len(self._tiff_files))
 
 
-        if isinstance(angle_indices,tuple):
-            angles = angles[slice(*angle_indices)]
-        elif isinstance(angle_indices,(list,np.ndarray)):
+        if isinstance(indices,tuple):
+            angles = angles[slice(*indices)]
+        elif isinstance(indices,slice):
+            angles = angles[indices]
+        elif isinstance(indices,(list,np.ndarray)):
             try:
-                angles = angles.take(angle_indices)
+                angles = angles.take(indices)
             except IndexError:
                 raise ValueError("Index out of range")
-        elif isinstance(angle_indices,(int)):
+        elif isinstance(indices,(int)):
             try:
-                angles = np.asarray(angles.take(angle_indices))
+                angles = np.asarray(angles.take(indices))
             except IndexError:
                 raise ValueError("Index out of range")    
 
@@ -458,14 +485,11 @@ class TIFFStackReader(object):
         '''
         Reads images and return numpy array
         '''
-        # load first image to find out dimensions and type
-        with Image.open(self._tiff_files[0]) as img:
-            if self.dtype is None:
-                self.dtype = self._get_file_type(img)
-            tmp = np.asarray(img, dtype = self.dtype)
         
-        array_shape_0 = (len(self._tiff_files), tmp.shape[0], tmp.shape[1])
+        if self.dtype is None:
+            self.dtype = self._imag_dtype
 
+        array_shape_0 = (len(self._tiff_files), self._imag_dim[0], self._imag_dim[0])
         roi_par = [[0, array_shape_0[0], 1], [0, array_shape_0[1], 1], [0, array_shape_0[2], 1]]
         
         for key in self._roi.keys():

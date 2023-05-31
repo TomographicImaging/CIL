@@ -20,7 +20,6 @@
 from cil.framework import AcquisitionGeometry
 from cil.io.TIFF import TIFFStackReader
 from cil.io.ReaderABC import ReaderABC
-from cil.processors import Normaliser
 import numpy as np
 import os
 import logging
@@ -194,14 +193,12 @@ class NikonDataReader(ReaderABC):
             self._acquisition_geometry.set_labels(labels=['angle', 'vertical', 'horizontal'])
 
 
-    def read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
+    def _read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
 
         if not hasattr(self,'_data_reader'):
             self._data_reader = TIFFStackReader(file_name=self._data_path)
-
         self._data_reader.dtype = dtype
-        self._data_reader.set_roi(roi)
-        return self._data_reader.read()
+        return self._data_reader[roi]
 
 
     def get_raw_flatfield(self):
@@ -209,40 +206,4 @@ class NikonDataReader(ReaderABC):
         Returns a `numpy.ndarray` with the raw flat-field images in the format they are stored.
         """
         return self.metadata['WhiteLevel']
-
-
-    def _set_up_normaliser(self):
-        """
-        Set up the Normaliser
-        """
-        flat_field = self.get_raw_flatfield()
-        self._normaliser = Normaliser(flat_field, None, method='default')
-
-
-    def _set_data_reader(self):
-        """
-        create the data reader
-        """
-
-        if not hasattr(self,'_data_reader'):
-            self._data_reader = TIFFStackReader(self._data_path, dtype=np.float32)
-
-
-    def _get_data_chunk(self, selection):
-        """
-        Method to read an roi of the data from disk and return an `numpy.ndarray`.
-
-        selection is a tuple of slice objects for each dimension
-        """
-        
-        angles = (selection[0].start, selection[0].stop, selection[0].step)
-        vertical= (selection[1].start, selection[1].stop, selection[1].step)
-        horizontal=(selection[2].start, selection[2].stop, selection[2].step)
-        
-        self._set_data_reader()
-        self._data_reader.set_image_roi(vertical=vertical, horizontal=horizontal, mode='slice')
-        self._data_reader.set_image_indices(angles)
-
-        return self._data_reader.read()
-
 

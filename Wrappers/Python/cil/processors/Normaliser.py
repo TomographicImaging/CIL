@@ -204,11 +204,11 @@ class Normaliser(Processor):
         shape_orig = arr_in.shape
 
         if isinstance(flat, np.ndarray):
-            num_chunks = arr_in.size / flat.size
+            num_chunks = arr_in.size // flat.size
             arr_in.shape = (num_chunks, *flat.shape)
 
         elif isinstance(dark, np.ndarray):
-            num_chunks = arr_in.size / dark.size
+            num_chunks = arr_in.size // dark.size
             arr_in.shape = (num_chunks, *dark.shape)
 
         elif arr_in.ndim == 4:
@@ -225,7 +225,7 @@ class Normaliser(Processor):
             numba_apply_normalisation_default_inplace(arr_in, dark, scale_img, num_chunks)
         else:
             arr_out.shape = arr_in.shape
-            numba_apply_normalisation_default_inplace(arr_in, arr_out, dark, scale_img, num_chunks)
+            numba_apply_normalisation_default(arr_in, arr_out, dark, scale_img, num_chunks)
             arr_out.shape = shape_orig
 
         #reset shape

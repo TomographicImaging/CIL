@@ -17,11 +17,28 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, DataContainer, AcquisitionData,\
- AcquisitionGeometry, ImageGeometry, ImageData
+from cil.framework import Processor, DataContainer
 import numpy as np
 import weakref
 import logging
+from numba import jit, prange
+
+
+
+@jit(parallel=True, nopython=True)
+def numba_apply_normalisation_default(arr_in, arr_out, offset, scale, num_proj):
+    #numba supports operations on multidimensional arrays of the same size so offset and scale can be float or images
+    for i in prange(num_proj):
+        arr_out[i] = (arr_in[i] - offset) * scale
+
+
+@jit(parallel=True, nopython=True)
+def numba_apply_normalisation_default_inplace(arr_in, offset, scale, num_proj):
+    #numba supports operations on multidimensional arrays of the same size so offset and scale can be float or images
+    for i in prange(num_proj):
+        arr_in[i] -= offset 
+        arr_in[i] *= scale
+
 
 class Normaliser(Processor):
 
@@ -59,13 +76,17 @@ class Normaliser(Processor):
             logging.warning("No normalisation images/values provided")
 
         kwargs = {
-                  '_offset'  : False,
-                  '_scale'  : False,
-                  '_method' : method
+                  '_darkfield'  : 0.0,
+                  '_flatfield'  : 1.0,
+                  '_method' : method,
+                  '_tolerance' : tolerance
+
                   }
 
         super(Normaliser, self).__init__(**kwargs)
 
+
+        #set up
         if isinstance(flat_field, np.ndarray):
             flat_field = np.asarray(flat_field,dtype=np.float32)
 
@@ -85,13 +106,13 @@ class Normaliser(Processor):
                     except TypeError:
                         raise TypeError("'default' mode normalisation requires a single value or image only")
                 
-                self._offset = dark_field
+                self._darkfield = dark_field
 
-            elif method == 'mean':
-                self._offset =  np.mean(dark_field, axis=0)
 
+            if method == 'mean':
+                self._darkfield =  np.mean(dark_field, axis=0)
             else:
-                self._offset =  dark_field
+                self._darkfield =  dark_field
 
 
         if flat_field is not None:
@@ -106,20 +127,11 @@ class Normaliser(Processor):
                     except TypeError:
                         raise TypeError("'default' mode normalisation requires a single value or image only")
 
-            elif method == 'mean':
-                self._flatfield =  np.mean(flat_field, axis=0)
 
+            if method == 'mean':
+                self._flatfield =  np.mean(flat_field, axis=0)
             else:
                 self._flatfield =  flat_field
-
-            if self._offset:
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    self._scale = 1.0 /(flat_field - self._offset)
-            else:
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    self._scale = 1.0 / flat_field
-
-            np.nan_to_num(self._scale,posinf=tolerance, neginf=tolerance)
 
 
     def set_input(self, dataset):
@@ -164,35 +176,62 @@ class Normaliser(Processor):
     def process(self, out=None):
 
         projections = self.get_input()
+        return_flag = False
 
         if out is None:
-            flag = False
-            if self._offset:
-                data = np.subtract(projections,self._offset,out=data)
-                flag = True
-
-            if self._scale:
-                if flag:
-                    data *= self._scale
-                else:
-                    data = projections * self._scale 
-            
-            return data
-
+            return_flag = True
+            out = projections.geometry.allocate(None)
         else:
-            flag = False
-            if self._offset:
-                if id(out) == id(projections):
-                    projections -= self._offset
-                else:
-                    out.fill(projections - self._offset)
-                flag = True
-                    
-            if self._scale:
-                if flag:
-                    out *= self._scale
-                else:
-                    if id(out) == id(projections):
-                        projections *= self._scale
-                    else:
-                        out.fill(projections*self._scale)
+            if out.shape != projections.shape or out.dtype != projections.dtype:
+                raise AttributeError("out not compatible with input data")
+            
+        if self._method == 'default' or self._method=='mean':
+                self.apply_normalisation_default(projections.array, out.array, self._darkfield, self._flatfield)
+        else:
+            raise NotImplementedError("stack not implemented yet")
+
+
+        if return_flag:
+            return out
+            
+
+
+    @staticmethod
+    def apply_normalisation_default(arr_in, arr_out, dark, flat):
+        """
+        Applies the default normalisation on numpy arrays      
+        """
+        shape_orig = arr_in.shape
+
+        if isinstance(flat, np.ndarray):
+            num_chunks = arr_in.size / flat.size
+            arr_in.shape = (num_chunks, *flat.shape)
+
+        elif isinstance(dark, np.ndarray):
+            num_chunks = arr_in.size / dark.size
+            arr_in.shape = (num_chunks, *dark.shape)
+
+        elif arr_in.ndim == 4:
+                num_chunks = arr_in[0] * arr_in[1]
+                arr_in.shape = (num_chunks, *arr_in.shape[2::])
+        else:
+            num_chunks = arr_in.shape[0]
+
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            scale_img = 1 / (flat - dark)
+
+        if id(arr_in) == id(arr_out):
+            numba_apply_normalisation_default_inplace(arr_in, dark, scale_img, num_chunks)
+        else:
+            arr_out.shape = arr_in.shape
+            numba_apply_normalisation_default_inplace(arr_in, arr_out, dark, scale_img, num_chunks)
+            arr_out.shape = shape_orig
+
+        #reset shape
+        arr_in.shape = shape_orig
+
+
+
+
+

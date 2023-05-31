@@ -295,7 +295,7 @@ class TIFFStackReader(object):
             raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
 
         if file_name is not None:
-            self.set_up(file_name = self.file_name,
+            self.set_up(file_name = file_name,
                         dtype=dtype,
                         **deprecated_kwargs)
 
@@ -457,7 +457,7 @@ class TIFFStackReader(object):
 
         tmp_roi_crop = self._roi_crop.copy()
         tmp_shape_downsample = self._shape_downsample.copy()
-        tmp_method_downsample = self._method_downsample.copy()
+        tmp_method_downsample = self._method_downsample
         tmp_frame_indices = self._frame_indices.copy()
 
         if self._num_images > 1:

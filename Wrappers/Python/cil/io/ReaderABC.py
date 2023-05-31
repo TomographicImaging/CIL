@@ -38,7 +38,7 @@ class ReaderABC(ABC):
         """
 
         def __init__(self, read_data_method, apply_normalisation_method):
-            self.read_data = read_data_method
+            self._read_data = read_data_method
             self.apply_normalisation = apply_normalisation_method
 
             self._array = None
@@ -77,7 +77,7 @@ class ReaderABC(ABC):
                 array = self.array
 
             else:
-                array = self.read_data(dtype, roi)
+                array = self._read_data(dtype, roi)
                 array = np.asarray(array, dtype=dtype)
                 self.array = array
                 self.dtype = array.dtype
@@ -92,7 +92,7 @@ class ReaderABC(ABC):
 
     def __init__(self, file_name):
 
-        self._data_handle = self.data_handler(self.read_data, self._apply_normalisation)
+        self._data_handle = self.data_handler(self._read_data, self._apply_normalisation)
         self.file_name = file_name
         self._normalise = True
         self.reset()
@@ -168,7 +168,7 @@ class ReaderABC(ABC):
 
 
     @abstractmethod
-    def read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
+    def _read_data(self, dtype=np.float32, roi=(slice(None),slice(None),slice(None))):
         """
         Method to read the data in. Can use a CIL reader or another library custom version.
 
@@ -198,10 +198,14 @@ class ReaderABC(ABC):
 
     def _set_up_normaliser(self):
         """
-        Set up the Normaliser
+        Set up the Normaliser, should use roi
         """
+
         self._normaliser = Normaliser(self.get_raw_flatfield(), self.get_raw_darkfield(), method='default')
 
+        # this will be averaged/converted in to the right array type to apply
+        self._flatfield_full = self._normaliser._flatfield
+        self._darkfield_full = self._normaliser._darkfield
 
     def _apply_normalisation(self, data_array):
         """
@@ -209,8 +213,20 @@ class ReaderABC(ABC):
 
         Can be overwritten if normaliser doesn't have functionality needed
         """
-        self._normaliser(data_array, out = data_array)
 
+        # need to crop the normalisation images ro match the panel roi
+        if isinstance(self._flatfield_full, np.ndarray):
+            flatfield = self._flatfield_full[self._panel_crop]
+        else:
+            flatfield = self._flatfield_full
+
+        if isinstance(self._darkfield_full, np.ndarray):
+            darkfield = self._darkfield_full[self._panel_crop]
+        else:
+            darkfield = self._darkfield_full
+
+        # doesn't use the processor process() method as running on numpy arrays not CIL objects
+        self._normaliser.apply_normalisation_default(data_array,data_array,darkfield, flatfield)
 
 
     def set_normalisation(self, normalise=True):
@@ -236,16 +252,6 @@ class ReaderABC(ABC):
         return self._data_handle.get_data(dtype=np.float32, roi=selection, normalise=self._normalise)
 
 
-    def _set_normaliser_roi(self):
-        self._normaliser_roi = deepcopy(self._normaliser)
-
-        # this is going to break if dimensions aren't 3
-        if isinstance(self._normaliser_roi._scale, np.ndarray):
-            self._normaliser_roi._scale = self._normaliser_roi._scale[self._panel_crop]
-
-        if isinstance(self._normaliser_roi._offset, np.ndarray):
-            self._normaliser_roi._offset = self._normaliser_roi._offset[self._panel_crop]
-
 
     def _get_data(self, projection_indices=None):
         """
@@ -256,11 +262,7 @@ class ReaderABC(ABC):
 
         # if normaliser doesn't exist yet create it
         if self._normalise:
-            if not self._normaliser:
-                self._set_up_normaliser()
-
-            # update normaliser for new roi
-            self._set_normaliser_roi()
+            self._set_up_normaliser()
 
         # if override default (this is used by preview)
         if projection_indices is None:

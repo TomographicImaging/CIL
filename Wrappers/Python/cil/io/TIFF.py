@@ -268,92 +268,56 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, file_name=None, transpose=False, dtype=np.float32, **deprecated_kwargs):    
+    def _deprecated_kwargs(self, deprecated_kwargs):
+        # handle deprecated behaviour for backward compatibility
+        mode = 'bin'
+        if deprecated_kwargs.get('mode', False):
+            logging.warning("Input argument `mode` has been deprecated. Please define binning/slicing with method 'set_image_roi()' instead")
+            mode = deprecated_kwargs.pop('mode')
+
+        if deprecated_kwargs.get('roi', False):
+            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_image_roi()' and 'set_frame_indices()' instead")
+            roi = deprecated_kwargs.pop('roi')
+            self.set_frame_indices(roi.get('axis_0')) 
+            self.set_image_roi(roi.get('axis_1'), roi.get('axis_2'), mode) 
+
+        if deprecated_kwargs.pop('transpose', None) is not None:
+            logging.warning("Input argument `transpose` has been deprecated. Please define your geometry accordingly")
+
+        if deprecated_kwargs:
+            logging.warning("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
+
+
+    def __init__(self, file_name=None, dtype=np.float32, **deprecated_kwargs):    
         
-        if deprecated_kwargs.get('mode', None) is not None:
-            logging.warning("Input argument `mode` has been deprecated. Please use method 'set_image_roi()' instead")
-
-        if deprecated_kwargs.get('roi', None) is not None:
-            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_image_roi()' and 'set_image_indices()' instead")
-
-        self.file_name = file_name
-
-        if self.file_name is not None:
-            self.set_up(file_name = self.file_name,
-                        transpose = transpose,
-                        dtype=dtype,
-                        **deprecated_kwargs)
-            
-    def set_up(self, 
-               file_name = None,
-               transpose = False,
-               dtype = np.float32,
-               **deprecated_kwargs):
-        ''' 
-        Set up method for the TIFFStackReader class
-        
-        Parameters
-        ----------
-            
-        file_name : str, abspath to folder, list
-            Path to folder with tiff files, list of paths of tiffs, or single tiff file
-                   
-        transpose : bool, default False
-            Whether to transpose loaded images
-                    
-        dtype : numpy type, string, default np.float32
-            Requested type of the read image. If set to None it defaults to the type of the saved file.
-
-        deprecated_kwargs
-        -----------------
-        
-        roi : dictionary, default `None`, deprecated
-            dictionary with roi to load: 
-            ``{'axis_0': (start, end, step), 
-               'axis_1': (start, end, step), 
-               'axis_2': (start, end, step)}``
-            roi is specified for axes before transpose. Use `set_image_roi()` and `set_panel_roi()` instead.            
-
-        mode : str, {'bin', 'slice'}, default 'bin', deprecated
-            Use `set_image_roi()` to set the 'bin'/'slicing' behaviour.  
-
-            Defines the 'step' in the roi parameter:
-            
-            In bin mode, 'step' number of pixels 
-            are binned together, values of resulting binned pixels are calculated as average.
-
-            In 'slice' mode 'step' defines standard numpy slicing.
-
-            Note: in general output array size in bin mode != output array size in slice mode
-        '''
         # check that PIL library is installed
         if (pilAvailable == False):
             raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
 
-        self.transpose = transpose
-        self.dtype = dtype
-        self.set_filename(file_name)
-        self.set_image_roi(horizontal=None, vertical=None, mode='bin')
-        self.set_image_indices(None)
+        if file_name is not None:
+            self.set_up(file_name = self.file_name,
+                        dtype=dtype,
+                        **deprecated_kwargs)
 
 
-        # handle deprecated behaviour for backward compatibility
-        mode = 'bin'
-        if deprecated_kwargs.get('mode', None) is not None:
-            logging.warning("Input argument `mode` has been deprecated. Please define binning/slicing with method 'set_panel_roi()' instead")
-            mode = deprecated_kwargs.pop('mode')
-
-        if deprecated_kwargs.get('roi', None) is not None:
-            logging.warning("Input argument `roi` has been deprecated. Please use methods 'set_panel_roi()' and 'set_image_indices()' instead")
-            roi = deprecated_kwargs.pop('roi')
-            self.set_image_indices(roi.get('axis_0')) 
-            self.set_image_roi(vertical=roi.get('axis_1'), horizontal=roi.get('axis_2'), mode=mode)
+    def set_up(self, 
+               file_name = None,
+               dtype = np.float32,
+               **deprecated_kwargs):
         
-        if deprecated_kwargs:
-            logging.warning("Additional keyworded arguments passed but not used: {}".format(deprecated_kwargs))
-                      
-               
-    def set_filename(self, file_name=None):
+
+        self._deprecated_kwargs(deprecated_kwargs)
+     
+        self.set_file_name(file_name)
+        self.dtype = dtype
+
+    @property
+    def file_name(self):
+        return self._file_name
+    
+
+    def set_file_name(self, file_name):
+
         if file_name == None:
             raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
 
@@ -384,85 +348,168 @@ class TIFFStackReader(object):
 
         self._tiff_files.sort(key=self.__natural_keys)
 
+        #reconfigure with new path
+        self._configure()
+
+
+    def _configure(self):
+        """
+        initialises the shape and dtype based on the TIFFs at the path
+        """
+    
         # load first image to find out dimensions and type
         with Image.open(self._tiff_files[0]) as img:
             self._imag_dtype = self._get_file_type(img)
             w, h = img.size
-            self._imag_dim = [h,w]
+
+        self._image_shape = [h,w]
+        self._num_images = len(self._tiff_files)
+        self._roi_full = ((0,self._num_images,1), (0,h,1), (0,w,1))
+        self.reset_roi()
 
 
+    def reset_roi(self):
+        """
+        members that store the requested downsizing
+        """
+        self._roi_crop = [(0,self._image_shape[0]), (0,self._image_shape[1])]
+        self._shape_downsample = [*self._image_shape]
+        self._method_downsample = 'slice'
+        self._frame_indices = np.arange(*(0,self._num_images,1))
 
-    def set_roi(self, roi):
 
-        if roi == None:
-            roi = (None, None, None)
-            
-        self.set_image_roi(vertical=roi[1], horizontal=roi[2])
-        self.set_image_indices(indices=roi[0])
-
-
-        
-    def set_image_roi(self, vertical=None, horizontal=None, mode='bin'):
- 
-        self._roi = {'vertical': -1, 'horizontal': -1}
-
-        if isinstance(vertical,slice):
-            vertical_range = range(0,self._imag_dim[0])[vertical]
-            vertical = (vertical_range.start, vertical_range.stop, vertical_range.step)
-
-        if isinstance(horizontal,slice):
-            horizontal_range = range(0,self._imag_dim[1])[horizontal]
-            horizontal = (horizontal_range.start, horizontal_range.stop, horizontal_range.step)
-
-        if vertical is not None:
-            self._roi['vertical'] = vertical
-
-        if horizontal is not None:     
-            self._roi['horizontal'] = horizontal
+    def set_image_roi(self, roi_height=None, roi_width=None,  mode='slice'):
+        """
+        roi as int, slice,
+        mode 'slice', 'bin'
+        """
 
         if mode not in ['bin', 'slice']:
             raise ValueError("Wrong mode, bin or slice is expected.")
-        
-        self.mode=mode
 
-    
-    def set_image_indices(self, indices=None):
+        for ind, roi in enumerate([roi_height, roi_width]):
+
+            if roi == -1 or roi is None:
+                roi_slice = slice(None)
+            elif isinstance(roi,tuple):
+                roi_slice = slice(*roi)
+            elif isinstance(roi, int):
+                roi_slice = slice(int(roi),int(roi)+1,1)
+            elif isinstance(roi ,slice):
+                roi_slice = roi
+            else:
+                raise ValueError("roi not understood")
+                    
+            axis_range = range(*self._roi_full[ind+1])[roi_slice]
+
+            if mode == 'slice':                
+                axis_length = int(np.ceil((axis_range.stop - axis_range.start) / axis_range.step))
+            else:
+                axis_length = (axis_range.stop - axis_range.start) // axis_range.step
+            
+            self._roi_crop[ind] = (axis_range.start, axis_range.start + axis_length * axis_range.step)
+            self._shape_downsample[ind] = axis_length
+
+        self._method_downsample = mode
+
+
+    def set_frame_indices(self, indices=None):
         """
         Method to configure the angular indices to be returned
 
-        angle_indices: takes an integer for a single projections, a tuple of (start, stop, step), 
-        or a list of indices.
+        angle_indices: takes an integer for a single frame, a tuple of (start, stop, step), 
+        or a list of frame indices.
 
-        If step is greater than 1 the data will be sliced. i.e. a step of 10 returns 1 in 10 projections.
+        'slice' mode only 
         """      
 
-        # for backward compatibility with old roi
-        if indices == -1:
-            indices = None
-          
-        angles = np.arange(len(self._tiff_files))
-
-
-        if isinstance(indices,tuple):
-            angles = angles[slice(*indices)]
-        elif isinstance(indices,slice):
-            angles = angles[indices]
-        elif isinstance(indices,(list,np.ndarray)):
+        if isinstance(indices, (list, np.ndarray)):
             try:
-                angles = angles.take(indices)
+                indices = np.arange(*self._roi_full[0]).take(indices)
             except IndexError:
-                raise ValueError("Index out of range")
-        elif isinstance(indices,(int)):
-            try:
-                angles = np.asarray(angles.take(indices))
-            except IndexError:
-                raise ValueError("Index out of range")    
+                raise ValueError("Index out of range")   
 
-        if angles.size < 1:
-            raise ValueError(") projections selected. Please select at least 1 angle")
+        else:
+            if indices == -1 or indices is None:
+                index_slice = slice(None)
+            elif isinstance(indices, int):
+                index_slice = slice(int(indices),int(indices)+1)
+            elif isinstance(indices,tuple):
+                index_slice = slice(*indices)
+            elif isinstance(indices ,slice):
+                index_slice = indices
+
+            indices = np.arange(*self._roi_full[0])[index_slice]
+
+            if indices.size < 1:
+                raise ValueError("No frames selected. Please select at least 1 frame")
+            
+        self._frame_indices = indices
+
+
+    def __getitem__(self, val):
+        """
+        pass slice object and return data chunk
+        """
+
+        if val == None:
+            val = (slice(None),slice(None),slice(None))
+
+        tmp_roi_crop = self._roi_crop.copy()
+        tmp_shape_downsample = self._shape_downsample.copy()
+        tmp_method_downsample = self._method_downsample.copy()
+        tmp_frame_indices = self._frame_indices.copy()
+
+        if self._num_images > 1:
+            self.set_frame_indices(val[0])
+            self.set_image_roi(val[1],val[2],'slice')
+            array = self.read()
+        else:
+            self.set_frame_indices(0)
+            self.set_image_roi(val[0],val[1],'slice')
+            array = self.read()
+
+        self._roi_crop = tmp_roi_crop
+        self._shape_downsample = tmp_shape_downsample
+        self._method_downsample = tmp_method_downsample
+        self._frame_indices = tmp_frame_indices
+
+        return array
+
+
+    def read(self):
         
-        self._angle_indices = angles
+        '''
+        Reads images and return numpy array
+        '''
+        if self.dtype is None:
+            self.dtype = self._imag_dtype
 
+
+        # single frame crop size, left, top, right, bottom
+        crop_box = (self._roi_crop[1][0],self._roi_crop[0][0],self._roi_crop[1][1],self._roi_crop[0][1])
+
+        # create empty data container for downsized array
+        array = np.empty((len(self._frame_indices),*self._shape_downsample), dtype=self.dtype)
+
+        count = 0
+        for i in self._frame_indices:
+                
+            #read roi from single projection
+            with Image.open(self._tiff_files[i], mode='r', formats=(['tiff'])) as img:
+                img = img.crop(crop_box)
+
+                if self._method_downsample == 'slice':
+                    img = img.resize((self._shape_downsample[1],self._shape_downsample[0]), Image.NEAREST)
+                else:
+                    img = img.resize((self._shape_downsample[1],self._shape_downsample[0]), Image.BILINEAR)
+
+                frame_out = np.asarray(img, dtype=self.dtype)
+
+                array[count] = frame_out
+            count+=1
+        return np.squeeze(array)
+        
 
     def _get_file_type(self, img): 
         mode = img.mode
@@ -480,83 +527,6 @@ class TIFFStackReader(object):
             raise ValueError("Unsupported type {}. Expected any of 1 L I I;16 F.".format(mode))
         return dtype
 
-    def read(self):
-        
-        '''
-        Reads images and return numpy array
-        '''
-        
-        if self.dtype is None:
-            self.dtype = self._imag_dtype
-
-        array_shape_0 = (len(self._tiff_files), self._imag_dim[0], self._imag_dim[0])
-        roi_par = [[0, array_shape_0[0], 1], [0, array_shape_0[1], 1], [0, array_shape_0[2], 1]]
-        
-        for key in self._roi.keys():
-            if key == 'vertical':
-                idx = 1
-            elif key == 'horizontal':
-                idx = 2
-            if self._roi[key] != -1:
-                for i in range(2):
-                    if self._roi[key][i] != None:
-                        if self._roi[key][i] >= 0:
-                            roi_par[idx][i] = self._roi[key][i]
-                        else:
-                            roi_par[idx][i] = roi_par[idx][1]+self._roi[key][i]
-                if len(self._roi[key]) > 2:
-                    if self._roi[key][2] != None:
-                        if self._roi[key][2] > 0:
-                            roi_par[idx][2] = self._roi[key][2] 
-                        else:
-                            raise Exception("Negative step is not allowed")
-        
-        num_to_read = len(self._angle_indices)
-
-        # calculate number of pixels
-
-        if self.mode == 'bin':
-            n_rows = (roi_par[1][1] - roi_par[1][0]) // roi_par[1][2]
-            n_cols = (roi_par[2][1] - roi_par[2][0]) // roi_par[2][2]
-            crop_roi=(roi_par[2][0],roi_par[1][0],roi_par[2][0] + n_cols * roi_par[2][2],roi_par[1][0] + n_rows * roi_par[1][2])
-            shape = (n_rows, roi_par[1][2], n_cols, roi_par[2][2])
-        else: # slice mode
-            n_rows = int(np.ceil((roi_par[1][1] - roi_par[1][0]) / roi_par[1][2]))
-            n_cols = int(np.ceil((roi_par[2][1] - roi_par[2][0]) / roi_par[2][2]))    
-            crop_roi=(roi_par[2][0],roi_par[1][0],roi_par[2][0] + (n_cols-1) * roi_par[2][2] + 1,roi_par[1][0] + (n_rows-1) * roi_par[1][2] + 1)
-
-
-        if not self.transpose:
-            im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)
-        else:
-            im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
-        
-        if roi_par[1][2] == 1 and roi_par[2][2] == 1:
-            mode = 'crop'
-        else:
-            mode = self.mode
-
-        crop_roi=(roi_par[2][0],roi_par[1][0],roi_par[2][1],roi_par[1][1])
-        count = 0
-        for i in self._angle_indices:
-                
-            #read roi from single projection
-            with Image.open(self._tiff_files[i], mode='r', formats=(['tiff'])) as img:
-                tmp = np.asarray(img.crop(crop_roi), dtype = self.dtype)
-
-            if mode == 'bin':
-                tmp = tmp.reshape(shape).mean(-1).mean(1)
-            
-            elif mode == 'slice':
-                tmp = tmp[(slice(None,None,roi_par[1][2]), slice(None,None,roi_par[2][2]))]
-
-            if self.transpose:
-                im[count, :, :] = np.transpose(tmp)
-            else:
-                im[count, :, :] = tmp
-
-            count +=1    
-        return np.squeeze(im)
     
     def __atoi(self, text):
         return int(text) if text.isdigit() else text
@@ -571,41 +541,37 @@ class TIFFStackReader(object):
         return [self.__atoi(c) for c in re.split(r'(\d+)', text) ]
 
     def _read_as(self, geometry):
-        '''reads the TIFF stack as an ImageData with the provided geometry'''
+        '''reads the data as an ImageData or AcquisitionData with the provided geometry'''
+
         data = self.read()
-        if len(geometry.shape) == 4:
-            gsize = functools.reduce(lambda x,y: x*y, geometry.shape, 1)
-            dsize = functools.reduce(lambda x,y: x*y, data.shape, 1)
-            if gsize != dsize:
-                added_dims = len(geometry.shape) - len(data.shape)
-                if data.shape[0] != functools.reduce(lambda x,y: x*y, geometry.shape[:1+added_dims], 1):
-                    raise ValueError("Cannot reshape read data {} to the requested shape {}.\n"\
-                        .format(data.shape, geometry.shape) +
-                                    "Geometry requests first dimension of data to be {} but it is {}"\
-                            .format(geometry.shape[0]*geometry.shape[1], data.shape[0] ))
-                raise ValueError('data {} and requested {} shapes are not compatible: data size does not match! Expected {}, got {}'\
-                    .format(data.shape, geometry.shape, dsize, gsize))
-            if len(data.shape) != 3:
-                raise ValueError("Data should have 3 dimensions, got {}".format(len(data.shape)))
-            
-            
-            reshaped = np.reshape(data, geometry.shape)
-            return self._return_appropriate_data(reshaped, geometry)
+        
+
+        try:
+            data.shape = geometry.shape
+        except AssertionError:
+            raise ValueError('data {} and requested {} shapes are not compatible'\
+                    .format(data.shape, geometry.shape))
 
         if data.shape != geometry.shape:
             raise ValueError('Requested {} shape is incompatible with data. Expected {}, got {}'\
                 .format(geometry.__class__.__name__, data.shape, geometry.shape))
-        
-        return self._return_appropriate_data(data, geometry)
+
+        if self.dimension_labels != geometry.dimension_labels:
+            raise ValueError('Requested geometry is ordered differently to dataset. Expected {}, got {}'\
+                .format(self.dimension_labels, geometry.shape))            
+
+        return self._return_appropriate_data(data, geometry.dimension_labels)
     
+
     def _return_appropriate_data(self, data, geometry):
         if isinstance (geometry, ImageGeometry):
-            return ImageData(data, deep=True, geometry=geometry.copy(), suppress_warning=True)
+            return ImageData(data, deep=False, geometry=geometry.copy(), suppress_warning=True)
         elif isinstance (geometry, AcquisitionGeometry):
-            return AcquisitionData(data, deep=True, geometry=geometry.copy(), suppress_warning=True)
+            return AcquisitionData(data, deep=False, geometry=geometry.copy(), suppress_warning=True)
         else:
             raise TypeError("Unsupported Geometry type. Expected ImageGeometry or AcquisitionGeometry, got {}"\
                 .format(type(geometry)))
+
 
     def read_as_ImageData(self, image_geometry):
         '''reads the TIFF stack as an ImageData with the provided geometry

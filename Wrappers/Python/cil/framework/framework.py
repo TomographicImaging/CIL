@@ -26,6 +26,7 @@ import weakref
 import logging
 
 from cil.utilities.multiprocessing import NUM_THREADS
+from cil.optimisation.utilities import RandomSampling, SequentialSampling
 # check for the extension
 
 if platform.system() == 'Linux':
@@ -3357,17 +3358,26 @@ class AcquisitionData(DataContainer):
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
 
 
-    def split_to_chunks(self, method):
+    def split_to_subsets(self, num_subsets=None, method=None, info=False):
 
-        """ Returns a list of AcquisitionData. AcquisitionData is partitioned into smaller chunks
+        """ Returns a list of AcquisitionData. AcquisitionData is partitioned into smaller subsets/projections
         in the :code:`angle` axis, determined from the :code:`method`. 
 
         Example
         -------
-        method = RandomSampling(len(data.geometry.angles), batch_size=20, replace=False, seed=20)
-        list_ad = data.split_to_chunks(method)
+        method = RandomSampling(len(data.geometry.angles), num_batches=20, replace=False, seed=20)
+        list_ad = data.split_to_subsets(method)
 
-        """        
+        """   
+
+        if num_subsets is not None:  
+            if isinstance(method, str):
+                if method == "random":
+                    method = RandomSampling(len(self.geometry.angles), num_subsets, replace=False, seed=10)    
+                elif method == "ordered":
+                    method = SequentialSampling(len(self.geometry.angles), num_subsets)
+                else:
+                    raise ValueError('Only random and ordered splitting methods are implemented by default. Use SequentialSampling and RandomSampling for advanced splitting methods')
 
         split_data = []
         
@@ -3389,9 +3399,12 @@ class AcquisitionData(DataContainer):
             tmp_data.fill(self.as_array().take(indices=i, axis=axis).squeeze())
             
             # append to list
-            split_data.append(tmp_data) 
+            split_data.append(tmp_data)
 
-        return split_data 
+        if info:
+            return split_data, method 
+        else:
+            return split_data 
 
 class Processor(object):
 

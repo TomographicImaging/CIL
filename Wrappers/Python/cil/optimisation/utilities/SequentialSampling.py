@@ -133,6 +133,10 @@ class SequentialSampling:
         else: 
             self.partition_list = [self.list_of_indices[i:i + self.batch_size] for i in range(0, self.num_indices, self.batch_size)] # list of lists
 
+    @staticmethod    
+    def ordered(num_indices, num_batches, step_size=None):
+        return SequentialSampling(num_indices, num_batches=num_batches, step_size=step_size)            
+
     def show_epochs(self, epochs):
         
         total_its = epochs * self.num_indices
@@ -178,6 +182,13 @@ class SequentialBatch(SequentialIndex):
                                                
         return tmp_list        
 
+
+if __name__=="__main__":
+
+    sq = SequentialSampling(10,num_batches=1)
+    for i in range(10):
+        next(sq)
+    print(sq.indices_used)
         
                 
                                         
@@ -185,4 +196,3 @@ class SequentialBatch(SequentialIndex):
 
 
 
-    

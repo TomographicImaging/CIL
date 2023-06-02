@@ -161,7 +161,8 @@ class SPDHG(Algorithm):
             self.tau = min( [ pi / ( si * ni**2 ) for pi, ni, si in zip(self.prob, norms, self.sigma)] ) 
             self.tau *= (self.rho / self.gamma)
 
-        self.selection = RandomSampling(len(self.sigma), prob=self.prob)               
+        if self.selection is None:
+            self.selection = RandomSampling(len(self.sigma), prob=self.prob)            
 
         # initialize primal variable 
         if initial is None:

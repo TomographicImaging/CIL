@@ -18,6 +18,7 @@ from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
 import logging
+from cil.optimisation.utilities import RandomSampling
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
@@ -92,7 +93,7 @@ class SPDHG(Algorithm):
     '''
     
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 initial=None, prob=None, gamma=1.,**kwargs):
+                 initial=None, prob=None, gamma=1., selection=None, **kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
 
@@ -104,11 +105,11 @@ class SPDHG(Algorithm):
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        initial=initial, prob=prob, gamma=gamma, norms=kwargs.get('norms', None))
+                        initial=initial, prob=prob, gamma=gamma, selection=None, norms=kwargs.get('norms', None))
     
 
     def set_up(self, f, g, operator, tau=None, sigma=None, \
-               initial=None, prob=None, gamma=1., norms=None):
+               initial=None, prob=None, gamma=1., selection = None, norms=None):
         
         '''set-up of the algorithm
         Parameters
@@ -149,8 +150,7 @@ class SPDHG(Algorithm):
         
         if self.prob is None:
             self.prob = [1/self.ndual_subsets] * self.ndual_subsets
-
-        
+                
         if self.sigma is None:
             if norms is None:
                 # Compute norm of each sub-operator       
@@ -161,6 +161,8 @@ class SPDHG(Algorithm):
             self.tau = min( [ pi / ( si * ni**2 ) for pi, ni, si in zip(self.prob, norms, self.sigma)] ) 
             self.tau *= (self.rho / self.gamma)
 
+        self.selection = RandomSampling(len(self.sigma), prob=self.prob)               
+
         # initialize primal variable 
         if initial is None:
             self.x = self.operator.domain_geometry().allocate(0)
@@ -168,6 +170,8 @@ class SPDHG(Algorithm):
             self.x = initial.copy()
         
         self.x_tmp = self.operator.domain_geometry().allocate(0)
+
+
         
         # initialize dual variable to 0
         self.y_old = operator.range_geometry().allocate(0)
@@ -188,7 +192,8 @@ class SPDHG(Algorithm):
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
         
         # Choose subset
-        i = int(np.random.choice(len(self.sigma), 1, p=self.prob))
+        i = next(self.selection)
+        # i = int(np.random.choice(len(self.sigma), 1, p=self.prob))
         
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
@@ -242,3 +247,12 @@ class SPDHG(Algorithm):
         return [x[2] for x in self.loss]
     def save_previous_iteration(self, index, y_current):
         self.y_old[index].fill(y_current)
+
+
+if __name__=="__main__":
+
+    dd = RandomSampling(10, shuffle=False)
+    for i in range(100):
+    
+        z = next(dd)
+        print(z)

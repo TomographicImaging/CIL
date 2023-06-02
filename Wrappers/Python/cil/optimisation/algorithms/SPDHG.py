@@ -147,6 +147,7 @@ class SPDHG(Algorithm):
         self.ndual_subsets = len(self.operator)
         self.gamma = gamma
         self.rho = .99
+        self.selection = selection
         
         if self.prob is None:
             self.prob = [1/self.ndual_subsets] * self.ndual_subsets

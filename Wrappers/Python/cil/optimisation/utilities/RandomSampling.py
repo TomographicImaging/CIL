@@ -224,6 +224,12 @@ class RandomIndex(RandomSampling):
 
         return index_num  
 
-     
+if __name__=="__main__":
+
+    sq = RandomSampling(10,num_batches=10)
+    for i in range(10):
+        z = next(sq)
+        print(z)
+    # print(sq.indices_used)     
         
    

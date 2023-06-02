@@ -183,12 +183,6 @@ class SequentialBatch(SequentialIndex):
         return tmp_list        
 
 
-if __name__=="__main__":
-
-    sq = SequentialSampling(10,num_batches=1)
-    for i in range(10):
-        next(sq)
-    print(sq.indices_used)
         
                 
                                         

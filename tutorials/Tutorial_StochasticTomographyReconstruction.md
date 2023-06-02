@@ -288,11 +288,11 @@ plt.show()
 ```
 
 
-![png](Tutorial_StochasticTomographyReconstruction_files/Tutorial_StochasticTomographyReconstruction_13_0.png)
+![png](imgs/Tutorial_StochasticTomographyReconstruction_13_0.png)
 
 
 
-![png](Tutorial_StochasticTomographyReconstruction_files/Tutorial_StochasticTomographyReconstruction_13_1.png)
+![png](imgs/Tutorial_StochasticTomographyReconstruction_13_1.png)
 
 
 

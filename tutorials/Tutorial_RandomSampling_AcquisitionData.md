@@ -132,7 +132,7 @@ plt.show()
 
 
 
-![png](Tutorial_RandomSampling_AcquisitionData_files/Tutorial_RandomSampling_AcquisitionData_5_2.png)
+![png](imgs/Tutorial_RandomSampling_AcquisitionData_5_2.png)
 
 
 ### Number of projection angles = 91, divisors =1, 7, 13, and 91
@@ -233,5 +233,5 @@ plt.show()
 
 
 
-![png](Tutorial_RandomSampling_AcquisitionData_files/Tutorial_RandomSampling_AcquisitionData_7_2.png)
+![png](imgs/Tutorial_RandomSampling_AcquisitionData_7_2.png)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,13 +13,17 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from utils import initialise_tests
-import numpy
+import numpy as np
 import math
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry
 from cil.framework.framework import SystemConfiguration
+from cil.framework import Partitioner
 
 initialise_tests()
 
@@ -28,10 +32,10 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         #default
         AG = AcquisitionGeometry.create_Parallel2D()
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.ray.direction, [0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
         #values
         ray_direction = [0.1, 3.0]
@@ -41,27 +45,27 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position)
 
-        ray_direction = numpy.asarray(ray_direction)
-        detector_direction_x = numpy.asarray(detector_direction_x)
+        ray_direction = np.asarray(ray_direction)
+        detector_direction_x = np.asarray(detector_direction_x)
 
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        detector_direction_x /= numpy.sqrt((detector_direction_x**2).sum())
+        ray_direction /= np.sqrt((ray_direction**2).sum())
+        detector_direction_x /= np.sqrt((detector_direction_x**2).sum())
 
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, ray_direction, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.ray.direction, ray_direction, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
     
     def test_create_Parallel3D(self):
 
         #default
         AG = AcquisitionGeometry.create_Parallel3D()
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.ray.direction, [0,1,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
         #values
         ray_direction = [0.1, 3.0, 0.2]
@@ -73,22 +77,22 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Parallel3D(ray_direction, detector_position, detector_direction_x,detector_direction_y, rotation_axis_position,rotation_axis_direction)
 
-        ray_direction = numpy.asarray(ray_direction)
-        detector_direction_x = numpy.asarray(detector_direction_x)
-        detector_direction_y = numpy.asarray(detector_direction_y)
-        rotation_axis_direction = numpy.asarray(rotation_axis_direction)
+        ray_direction = np.asarray(ray_direction)
+        detector_direction_x = np.asarray(detector_direction_x)
+        detector_direction_y = np.asarray(detector_direction_y)
+        rotation_axis_direction = np.asarray(rotation_axis_direction)
 
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        detector_direction_x /= numpy.sqrt((detector_direction_x**2).sum())
-        detector_direction_y /= numpy.sqrt((detector_direction_y**2).sum())
-        rotation_axis_direction /= numpy.sqrt((rotation_axis_direction**2).sum())
+        ray_direction /= np.sqrt((ray_direction**2).sum())
+        detector_direction_x /= np.sqrt((detector_direction_x**2).sum())
+        detector_direction_y /= np.sqrt((detector_direction_y**2).sum())
+        rotation_axis_direction /= np.sqrt((rotation_axis_direction**2).sum())
 
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, ray_direction, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, detector_direction_y, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.ray.direction, ray_direction, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_y, detector_direction_y, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
 
 
     def test_create_Cone2D(self):
@@ -97,10 +101,10 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         detector_position = [-1.3,1000.0]
 
         AG = AcquisitionGeometry.create_Cone2D(source_position, detector_position)
-        numpy.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
         #values
         detector_direction_x = [1,0.2]
@@ -108,13 +112,13 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
 
-        detector_direction_x = numpy.asarray(detector_direction_x)
-        detector_direction_x /= numpy.sqrt((detector_direction_x**2).sum())
+        detector_direction_x = np.asarray(detector_direction_x)
+        detector_direction_x /= np.sqrt((detector_direction_x**2).sum())
 
-        numpy.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
     
     def test_create_Cone3D(self):
 
@@ -123,12 +127,12 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         detector_position = [-1.3,1000.0, -1.0]
 
         AG = AcquisitionGeometry.create_Cone3D(source_position, detector_position)
-        numpy.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
         #values
         detector_direction_x = [1,0.2, 0]
@@ -138,20 +142,20 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Cone3D(source_position, detector_position, detector_direction_x,detector_direction_y, rotation_axis_position,rotation_axis_direction)
 
-        detector_direction_x = numpy.asarray(detector_direction_x)
-        detector_direction_y = numpy.asarray(detector_direction_y)
-        rotation_axis_direction = numpy.asarray(rotation_axis_direction)
+        detector_direction_x = np.asarray(detector_direction_x)
+        detector_direction_y = np.asarray(detector_direction_y)
+        rotation_axis_direction = np.asarray(rotation_axis_direction)
 
-        detector_direction_x /= numpy.sqrt((detector_direction_x**2).sum())
-        detector_direction_y /= numpy.sqrt((detector_direction_y**2).sum())
-        rotation_axis_direction /= numpy.sqrt((rotation_axis_direction**2).sum())
+        detector_direction_x /= np.sqrt((detector_direction_x**2).sum())
+        detector_direction_y /= np.sqrt((detector_direction_y**2).sum())
+        rotation_axis_direction /= np.sqrt((rotation_axis_direction**2).sum())
 
-        numpy.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, detector_direction_y, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, source_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, detector_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, detector_direction_x, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_y, detector_direction_y, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
 
     def test_SystemConfiguration(self):
         
@@ -169,17 +173,17 @@ class Test_AcquisitionGeometry(unittest.TestCase):
     def test_set_angles(self):
 
         AG = AcquisitionGeometry.create_Parallel2D()
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
 
         #default
         AG.set_angles(angles)
-        numpy.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
         self.assertEqual(AG.config.angles.initial_angle, 0.0)
         self.assertEqual(AG.config.angles.angle_unit, 'degree')
 
         #values        
         AG.set_angles(angles, 0.1, 'radian')
-        numpy.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
+        np.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
         self.assertEqual(AG.config.angles.initial_angle, 0.1)
         self.assertEqual(AG.config.angles.angle_unit, 'radian')
 
@@ -188,13 +192,13 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         #default
         AG.set_panel([1000,2000])
-        numpy.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
-        numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [1,1])
+        np.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
+        np.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [1,1])
 
         #values
         AG.set_panel([1000,2000],[0.1,0.2])
-        numpy.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
-        numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [0.1,0.2])
+        np.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
+        np.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [0.1,0.2])
 
         #set 2D panel with 3D geometry
         with self.assertRaises(ValueError):
@@ -428,7 +432,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         AG.set_labels(('horizontal','angle','vertical','channel'))
 
         test = AG.allocate()
-        test2 = numpy.ndarray([2,5,3,4])
+        test2 = np.ndarray([2,5,3,4])
         self.assertEqual(test.shape, test2.shape)
 
     def test_get_ImageGeometry(self):
@@ -483,93 +487,93 @@ class AlignGeometries(unittest.TestCase):
     def test_rotation_vec_to_y(self):
 
         M = SystemConfiguration.rotation_vec_to_y([0,1])
-        a = numpy.array([[1, 0],[0, 1]])
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0],[0, 1]])
+        np.testing.assert_allclose(M,a, atol=1e-6)
         
         M = SystemConfiguration.rotation_vec_to_y([0,-1])
-        a = numpy.array([[-1, 0],[0, -1]])
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[-1, 0],[0, -1]])
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,1])
-        a = numpy.array([[0.70710678, -0.70710678],[0.70710678, 0.70710678]])
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[0.70710678, -0.70710678],[0.70710678, 0.70710678]])
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,-1])
-        a = numpy.array([[-0.70710678, -0.70710678],[0.70710678, -0.70710678]])
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[-0.70710678, -0.70710678],[0.70710678, -0.70710678]])
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,1,0])
-        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])        
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])        
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,-1,0])
-        a = numpy.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,1,1])
-        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])     
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])     
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,-1,1])
-        a = numpy.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,1,0])
-        a = numpy.array([[0.70710678, -0.70710678, 0],[0.70710678, 0.70710678, 0],[0, 0, 1]])       
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[0.70710678, -0.70710678, 0],[0.70710678, 0.70710678, 0],[0, 0, 1]])       
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,-1,0])
-        a = numpy.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])               
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])               
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,-1,1])
-        a = numpy.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])       
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])       
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
 
     def test_rotation_vec_z(self):
 
         M = SystemConfiguration.rotation_vec_to_z([0,0,1])
-        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])   
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])   
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,0,-1])
-        a = numpy.array([[1, 0, 0],[0, -1, 0],[0, 0, -1]])           
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0, 0],[0, -1, 0],[0, 0, -1]])           
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([1,0,0])
-        a = numpy.array([[0, 0, -1],[0, 1, 0],[1, 0, 0]])           
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[0, 0, -1],[0, 1, 0],[1, 0, 0]])           
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([-1,0,0])
-        a = numpy.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]])           
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]])           
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,1,0])
-        a = numpy.array([[1, 0, 0],[0, 0, -1],[0, 1, 0]])           
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0, 0],[0, 0, -1],[0, 1, 0]])           
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,-1,0])
-        a = numpy.array([[1, 0, 0],[0, 0, 1],[0, -1, 0]])  
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[1, 0, 0],[0, 0, 1],[0, -1, 0]])  
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([1,-1,0])
-        a = numpy.array([[0.5, 0.5, -0.70710678],[0.5, 0.5, 0.70710678],[0.70710678, -0.70710678, 0]])          
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[0.5, 0.5, -0.70710678],[0.5, 0.5, 0.70710678],[0.70710678, -0.70710678, 0]])          
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([1,0,1])
-        a = numpy.array([[0.70710678, 0, -0.70710678],[0,1,0],[0.70710678, 0, 0.70710678]])          
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        a = np.array([[0.70710678, 0, -0.70710678],[0,1,0],[0.70710678, 0, 0.70710678]])          
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,1,-1])
-        a = numpy.array([[1,0,0],[0, -0.70710678, -0.70710678],[0, 0.70710678, -0.70710678]])          
+        a = np.array([[1,0,0],[0, -0.70710678, -0.70710678],[0, 0.70710678, -0.70710678]])          
 
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([-1,-1,-1])
-        a = numpy.array([[0.21132491, -0.78867509, 0.57735025],[ -0.78867509, 0.21132491, 0.57735025],[-0.57735025, -0.57735025, -0.57735025]])          
+        a = np.array([[0.21132491, -0.78867509, 0.57735025],[ -0.78867509, 0.21132491, 0.57735025],[-0.57735025, -0.57735025, -0.57735025]])          
 
-        numpy.testing.assert_allclose(M,a, atol=1e-6)
+        np.testing.assert_allclose(M,a, atol=1e-6)
 
 
 class Test_Parallel2D(unittest.TestCase):
@@ -580,10 +584,10 @@ class Test_Parallel2D(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel2D(ray_direction=[0,-1], detector_position=[0.,-100.], rotation_axis_position=[10.,5.])
         ag.config.system.align_reference_frame('cil')
 
-        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.position, [10,105], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [-1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.ray.direction, [0,1], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.position, [10,105], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.direction_x, [-1,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
 
     def test_align_reference_frame_tigre(self):
@@ -591,10 +595,10 @@ class Test_Parallel2D(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel2D(ray_direction=[0,-1], detector_position=[0.,-100.], rotation_axis_position=[10.,5.])
         ag.config.system.align_reference_frame('tigre')
 
-        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.position, [10,105], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [-1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.ray.direction, [0,1], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.position, [10,105], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.direction_x, [-1,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
 
     def test_system_description(self):
@@ -627,30 +631,30 @@ class Test_Parallel2D(unittest.TestCase):
         out = AG.config.system.calculate_centre_of_rotation()
         gold = {'offset':(0,'units')}
         gold = (0,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed basic")
+        np.testing.assert_allclose(out, gold, err_msg="Failed basic")
 
 
         AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[0.5,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[-0.5,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-0.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[0.5,0.], detector_direction_x=[-1,0])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-0.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed detector direction")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed detector direction")        
 
         theta = math.pi/4 #detector angle
         distance = 0.5 / math.cos(theta)
         AG = AcquisitionGeometry.create_Parallel2D(detector_direction_x=[0.5,0.5],rotation_axis_position=[0.5,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (distance,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed with rotated detector")
+        np.testing.assert_allclose(out, gold, err_msg="Failed with rotated detector")
 
     def test_set_centre_of_rotation(self):
         AG = AcquisitionGeometry.create_Parallel2D()
@@ -658,17 +662,17 @@ class Test_Parallel2D(unittest.TestCase):
         gold = (1.5, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         gold = (-1.5, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         gold = (0, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset",atol=1e-10)
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset",atol=1e-10)
 
         AG = AcquisitionGeometry.create_Parallel2D(detector_direction_x=[-1,0])
 
@@ -676,35 +680,35 @@ class Test_Parallel2D(unittest.TestCase):
         gold = (1.5, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         gold = (-1.5, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         gold = (0, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg= "Failed reset offset",atol=1e-10)
+        np.testing.assert_allclose(out, gold, err_msg= "Failed reset offset",atol=1e-10)
 
 
         AG = AcquisitionGeometry.create_Parallel2D(detector_direction_x=[0.5,0.5],rotation_axis_position=[0.5,0.])
         gold = (1.5, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         gold = (-1.5, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         offset_in = 0
         gold = (0, 0)
         AG.config.system.set_centre_of_rotation(gold[0])
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset",atol=1e-10)
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset",atol=1e-10)
 
 
 class Test_Parallel3D(unittest.TestCase):
@@ -714,12 +718,12 @@ class Test_Parallel3D(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel3D(ray_direction=[0,-1,0], detector_position=[0.,-100.,0], rotation_axis_position=[10.,5.,0], rotation_axis_direction=[0,0,-1])
         ag.config.system.align_reference_frame('cil')
 
-        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1, 0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.position, [-10,105,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.ray.direction, [0,1, 0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.position, [-10,105,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
 
     def test_align_reference_frame_tigre(self):
@@ -727,12 +731,12 @@ class Test_Parallel3D(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel3D(ray_direction=[0,-1,0], detector_position=[0.,-100.,0], rotation_axis_position=[10.,5.,0], rotation_axis_direction=[0,0,-1])
         ag.config.system.align_reference_frame('tigre')
 
-        numpy.testing.assert_allclose(ag.config.system.ray.direction, [0,1, 0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.position, [-10,105,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(ag.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.ray.direction, [0,1, 0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.position, [-10,105,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
 
     def test_system_description(self):
@@ -781,33 +785,33 @@ class Test_Parallel3D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Parallel3D()
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed basic")
+        np.testing.assert_allclose(out, gold, err_msg="Failed basic")
 
         angle = math.pi/4
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0.5,angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[-0.5,0.,0.], rotation_axis_direction=[-0.5,0,0.5])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-0.5,-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_x=[-1,0,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-0.5,-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed detector direction_x")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed detector direction_x")        
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_y=[0,0,-1])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0.5,math.pi-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed detector direction_y")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed detector direction_y")        
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[-0.5,0,-0.5], detector_direction_y=[0,0,-1])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0.5,-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis")        
 
 
         theta = math.pi/4 #detector angle
@@ -816,12 +820,12 @@ class Test_Parallel3D(unittest.TestCase):
         out = AG.config.system.calculate_centre_of_rotation()
         gold = {'offset':(distance,'units')}
         gold = (distance,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rotated detector")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rotated detector")
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_y=[0.0,-0.5,0.5],rotation_axis_position=[0.5,0.,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector")
+        np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector")
 
 
     def test_set_centre_of_rotation(self):
@@ -830,43 +834,43 @@ class Test_Parallel3D(unittest.TestCase):
         gold = (1.5, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
 
         gold = (-1.5, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         gold = (0, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset")
 
         gold = (0.0, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive angle")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive angle")
 
         gold = (0.0, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative angle")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative angle")
 
         gold = (0, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset angle")
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset angle")
 
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed combination A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed combination A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed combination B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed combination B")
 
 
 
@@ -875,12 +879,12 @@ class Test_Parallel3D(unittest.TestCase):
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector x B")
 
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_direction=[0,0,-1])
@@ -888,58 +892,58 @@ class Test_Parallel3D(unittest.TestCase):
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis B")
 
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_y=[0,0,-1])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[-0.5,0,-0.5], detector_direction_y=[0,0,-1])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x B")
 
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_x=[0.5,0.5,0],rotation_axis_position=[0.5,0.,0])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x B")
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_y=[0.0,-0.5,0.5],rotation_axis_position=[0.5,0.,0.])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
 
 class Test_Cone2D(unittest.TestCase):
     
@@ -950,10 +954,10 @@ class Test_Cone2D(unittest.TestCase):
 
         AG.config.system.align_reference_frame('cil')
 
-        numpy.testing.assert_allclose(AG.config.system.source.position, [5,-48], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [5,102], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [-1,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, [5,-48], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, [5,102], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [-1,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
 
     def test_align_reference_frame_tigre(self):
@@ -964,8 +968,8 @@ class Test_Cone2D(unittest.TestCase):
         ag_align = ag.copy()
         ag_align.config.system.align_reference_frame('tigre')
 
-        numpy.testing.assert_allclose(ag_align.config.system.source.position, [0,-ag.dist_source_center], atol=1E-6)
-        numpy.testing.assert_allclose(ag_align.config.system.rotation_axis.position, [0,0], rtol=1E-6)
+        np.testing.assert_allclose(ag_align.config.system.source.position, [0,-ag.dist_source_center], atol=1E-6)
+        np.testing.assert_allclose(ag_align.config.system.rotation_axis.position, [0,0], rtol=1E-6)
         
         cos_theta = abs(ag.config.system.source.position[1]-ag.config.system.rotation_axis.position[1])/ ag.dist_source_center
         sin_theta = math.sin(math.acos(cos_theta))
@@ -973,13 +977,13 @@ class Test_Cone2D(unittest.TestCase):
         vec = ag.config.system.detector.position-ag.config.system.source.position
         tmp = abs(vec[1])*cos_theta
         det_y = tmp - ag.dist_source_center
-        det_x =numpy.sqrt(vec[1] ** 2 - tmp **2)
+        det_x =np.sqrt(vec[1] ** 2 - tmp **2)
         
-        numpy.testing.assert_allclose(ag_align.config.system.detector.position, [det_x, det_y], rtol=1E-6)
+        np.testing.assert_allclose(ag_align.config.system.detector.position, [det_x, det_y], rtol=1E-6)
 
         dir_x = -ag.config.system.detector.direction_x[0] * cos_theta
         dir_y = ag.config.system.detector.direction_x[0] * sin_theta
-        numpy.testing.assert_allclose(ag_align.config.system.detector.direction_x, [dir_x, dir_y], rtol=1E-6)
+        np.testing.assert_allclose(ag_align.config.system.detector.direction_x, [dir_x, dir_y], rtol=1E-6)
         
 
     def test_system_description(self):
@@ -1005,22 +1009,22 @@ class Test_Cone2D(unittest.TestCase):
     def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
         out = AG.config.system.calculate_magnification()
-        numpy.testing.assert_almost_equal(out, [500, 1000, 3]) 
+        np.testing.assert_almost_equal(out, [500, 1000, 3]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.,250.])
         out = AG.config.system.calculate_magnification()
-        numpy.testing.assert_almost_equal(out, [750, 750, 2]) 
+        np.testing.assert_almost_equal(out, [750, 750, 2]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,0.])
         out = AG.config.system.calculate_magnification()
-        source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
+        source_to_object = np.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
-        numpy.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
+        np.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,0.],detector_direction_x=[math.sqrt(5),math.sqrt(5)])
         out = AG.config.system.calculate_magnification()
-        source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
+        source_to_object = np.sqrt(5.0**2 + 500.0**2)
 
         ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position)/source_to_object
 
@@ -1033,28 +1037,28 @@ class Test_Cone2D(unittest.TestCase):
 
         source_to_detector = 1500 / (ab[1]  - ab[0])
 
-        numpy.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
+        np.testing.assert_almost_equal(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
     def test_calculate_centre_of_rotation(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed basic")
+        np.testing.assert_allclose(out, gold, err_msg="Failed basic")
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.5,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (1.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[-0.5,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-1.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.5,0.], detector_direction_x=[-1,0])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-1.5,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed detector direction")
+        np.testing.assert_allclose(out, gold, err_msg="Failed detector direction")
 
         #offset * mag = 1
         theta = math.pi/4 #detector angle
@@ -1068,7 +1072,7 @@ class Test_Cone2D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,500.], detector_direction_x=[0.5,0.5],rotation_axis_position=[0.5,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (distance,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed with rotated detector")
+        np.testing.assert_allclose(out, gold, err_msg="Failed with rotated detector")
 
     def test_set_centre_of_rotation(self):
 
@@ -1078,19 +1082,19 @@ class Test_Cone2D(unittest.TestCase):
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         offset_in = -1.5
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         offset_in = 0
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset", atol=1e-10)
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset", atol=1e-10)
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], detector_direction_x=[-1,0])
 
@@ -1098,19 +1102,19 @@ class Test_Cone2D(unittest.TestCase):
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg= "Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg= "Failed positive offset")
 
         offset_in = -1.5
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         offset_in = 0
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset", atol=1e-10)
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset", atol=1e-10)
 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,500.], detector_direction_x=[0.5,0.5],rotation_axis_position=[0.5,0.])
@@ -1118,19 +1122,19 @@ class Test_Cone2D(unittest.TestCase):
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         offset_in = -1.5
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         offset_in = 0
         AG.config.system.set_centre_of_rotation(offset_in)
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (offset_in,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset", atol=1e-10)
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset", atol=1e-10)
 
 
 class Test_Cone3D(unittest.TestCase):
@@ -1139,24 +1143,24 @@ class Test_Cone3D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Cone3D(source_position=[5,500,0],detector_position=[5.,-1000.,0], rotation_axis_position=[5,0,0], rotation_axis_direction=[0,0,-1])
         AG.config.system.align_reference_frame('cil')
 
-        numpy.testing.assert_allclose(AG.config.system.source.position, [0,-500, 0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,1000,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, [0,-500, 0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, [0,1000,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
 
     def test_align_reference_frame_tigre(self):
         AG = AcquisitionGeometry.create_Cone3D(source_position=[5,500,0],detector_position=[5.,-1000.,0], rotation_axis_position=[5,0,0], rotation_axis_direction=[0,0,-1])
         AG.config.system.align_reference_frame('tigre')
 
-        numpy.testing.assert_allclose(AG.config.system.source.position, [0,-500, 0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,1000,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.source.position, [0,-500, 0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.position, [0,1000,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_x, [1,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.detector.direction_y, [0,0,-1], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
+        np.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
 
     def test_system_description(self):
@@ -1208,14 +1212,14 @@ class Test_Cone3D(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[5.,0.,0])
         out = AG.config.system.calculate_magnification()
-        source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
+        source_to_object = np.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,5.])
         out = AG.config.system.calculate_magnification()
-        source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
+        source_to_object = np.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
@@ -1230,9 +1234,9 @@ class Test_Cone3D(unittest.TestCase):
         
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[5.,0.,0],detector_direction_x=[math.sqrt(5),math.sqrt(5),0])
         out = AG.config.system.calculate_magnification()
-        source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
+        source_to_object = np.sqrt(5.0**2 + 500.0**2)
 
-        ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position).astype(numpy.float64)/source_to_object
+        ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position).astype(np.float64)/source_to_object
 
         #source_position + d * ab = detector_position + t * detector_direction_x
         #x: d *  ab[0] =  t * detector_direction_x[0]
@@ -1248,38 +1252,38 @@ class Test_Cone3D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (0,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed basic")
+        np.testing.assert_allclose(out, gold, err_msg="Failed basic")
 
         angle = math.pi/4 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (1.5,angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[-0.5,0.,0.], rotation_axis_direction=[-0.5,0,0.5])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-1.5,-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_x=[-1,0,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (-1.5,-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed detector direction_x")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed detector direction_x")        
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0.5,0,0.5], detector_direction_y=[0,0,-1])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (1.5,math.pi-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed detector direction_y")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed detector direction_y")        
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[-0.5,0,-0.5], detector_direction_y=[0,0,-1])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (1.5,-angle)
-        numpy.testing.assert_allclose(out, gold, err_msg= "Failed invert rotate axis")        
+        np.testing.assert_allclose(out, gold, err_msg= "Failed invert rotate axis")        
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[0,0,-1])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (1.5,math.pi)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis")        
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis")        
 
         #offset * mag = 1
         theta = math.pi/4 #detector angle
@@ -1293,7 +1297,7 @@ class Test_Cone3D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0], detector_direction_x=[0.5,0.5,0],rotation_axis_position=[0.5,0.,0])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (distance,0)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed with rotated detector")
+        np.testing.assert_allclose(out, gold, err_msg="Failed with rotated detector")
 
 
         #offset * mag = 1
@@ -1309,7 +1313,7 @@ class Test_Cone3D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0], detector_direction_y=[0.0,-0.5,0.5],rotation_axis_position=[0.5,0.,0.])
         out = AG.config.system.calculate_centre_of_rotation()
         gold = (1.0,angle)
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector")
+        np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector")
 
     def test_set_centre_of_rotation(self):
 
@@ -1318,42 +1322,42 @@ class Test_Cone3D(unittest.TestCase):
         gold = (1.5, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive offset")
 
         gold = (-1.5, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative offset")
 
         gold = (0, 0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset offset")
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset offset")
 
         gold = (0.0, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed positive angle")
+        np.testing.assert_allclose(out, gold, err_msg="Failed positive angle")
 
         gold = (0.0, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed negative angle")
+        np.testing.assert_allclose(out, gold, err_msg="Failed negative angle")
 
         gold = (0.0, 0.0)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed reset angle")
+        np.testing.assert_allclose(out, gold, err_msg="Failed reset angle")
 
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed combination A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed combination A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed combination A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed combination A")
 
 
 
@@ -1361,12 +1365,12 @@ class Test_Cone3D(unittest.TestCase):
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector x B")
 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_direction=[0,0,-1])
@@ -1374,55 +1378,157 @@ class Test_Cone3D(unittest.TestCase):
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert rotate axis B")
 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], detector_direction_y=[0,0,-1])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed invert detector y A")
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.5,0.,0.], rotation_axis_direction=[-0.5,0,-0.5], detector_direction_y=[0,0,-1])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rolled and inverted detector x A")
 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0], detector_direction_x=[0.5,0.5,0],rotation_axis_position=[0.5,0.,0])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed rotated detector x B")
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0], detector_direction_y=[0.0,-0.5,0.5],rotation_axis_position=[0.5,0.,0.])
         gold = (-1.5, -0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x A")
+        np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x A")
 
         gold = (1.5, 0.2)
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
-        numpy.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
+        np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
+
+class TestSubset(unittest.TestCase):
+    def setUp(self) -> None:
+        return super().setUp()
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def test_partition_indices_int(self):
+        par = Partitioner()
+
+        num_batches = 4
+        indices = 9
+        ret = par._partition_indices(num_batches, indices, stagger=False)
+        gold = [[0, 1, 2], [3, 4] ,[5, 6], [7, 8]]
+
+        self.assertListEqual(ret, gold)
+
+        ret = par._partition_indices(num_batches, indices, stagger=True)
+        gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+
+        self.assertListEqual(ret, gold)
+
+    def test_partition_indices_list(self):
+        par = Partitioner()
+
+        num_batches = 4
+        num_indices = 9
+        indices = list(range(num_indices))
+        ret = par._partition_indices(num_batches, indices, stagger=False)
+        gold = [[0, 1, 2], [3, 4] ,[5, 6], [7, 8]]
+
+        self.assertListEqual(ret, gold)
+
+        ret = par._partition_indices(num_batches, indices, stagger=True)
+        gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+
+        self.assertListEqual(ret, gold)
+
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer(self):
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer_2D_order1(self):
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))\
+            .set_labels(['angle','horizontal'])
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+    
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer_2D_order2(self):
+        
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))\
+            .set_labels(['horizontal', 'angle'])
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+
+    def AcquisitionGeometry_split_to_BlockGeometry(self, data, method, seed):
+        num_batches = 4
+        np.random.seed(seed)
+        datasplit = data.partition(num_batches, method)
+        bg = datasplit.geometry
+        ag = data.geometry
+        num_indices = ag.num_projections
+
+        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
+        if method == Partitioner.SEQUENTIAL:
+            gold = [[0, 1, 2], [3, 4], [5, 6], [7, 8]]
+            
+        elif method == Partitioner.STAGGERED:
+            gold = [[0, 4, 8], [1, 5], [2, 6], [3, 7]]
+            
+        elif method == Partitioner.RANDOM_PERMUTATION:
+            # with seed==1 
+            gold = [[8, 2, 6], [7, 1], [0, 4], [3, 5]]
+            
+
+        for i, geo in enumerate(bg):
+            np.testing.assert_allclose(geo.angles, np.asarray(gold[i]))

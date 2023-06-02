@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,11 +13,15 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 from scipy.fft  import fft, ifft
+from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
 from utils import has_tigre, has_ipp, has_astra, has_nvidia, initialise_tests
 
@@ -209,6 +213,17 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter("unsupported_filter")
 
+        # test all supported filters are set
+        for x in reconstructor.preset_filters:
+            reconstructor.set_filter(x)
+            self.assertEqual(reconstructor.filter, x, msg='Mismatch on test: Filter {0}'.format(x))
+            self.assertEqual(reconstructor._filter_cutoff, 1.0, msg='Mismatch on test: Filter {0}'.format(x))
+
+        # test filter cut-off is set
+        reconstructor.set_filter('ram-lak', 0.5)
+        self.assertEqual(reconstructor._filter_cutoff, 0.5,msg='Filter cut-off frequency mismatch')
+
+        # test custom array is set
         filter = reconstructor.get_filter_array()
         filter_new =filter *0.5
         reconstructor.set_filter(filter_new)
@@ -218,6 +233,37 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_get_filter_array(self):
+
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
+
+        #filters constructed in different domains but at higher orders this bias is negligible
+        order = 20
+        reconstructor.set_fft_order(order)
+
+        reconstructor.set_filter(filter='ram-lak', cutoff=1.0)
+        arr = reconstructor.get_filter_array()
+        response = skimage_get_fourier_filter(2**order, 'ramp')
+        np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter 'ram-lak'")
+
+        reconstructor.set_filter(filter='ram-lak', cutoff=1.0)
+        arr = reconstructor.get_filter_array()
+        response = skimage_get_fourier_filter(2**order, 'ramp')
+        response[response>1.0]=0
+        np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter 'ram-lak' and cut-off frequency")
+
+        filters = ['shepp-logan', 'cosine', 'hamming', 'hann']
+
+        for filter in filters:
+            reconstructor.set_fft_order(order)
+            reconstructor.set_filter(filter=filter, cutoff=1.0)
+            arr = reconstructor.get_filter_array()
+
+            response = skimage_get_fourier_filter(2**order, filter)
+            np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter {}".format(filter))
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
@@ -287,6 +333,9 @@ class Test_FDK(unittest.TestCase):
         reconstructor.set_fft_order(10)
         with self.assertRaises(ValueError):
             reconstructor._pre_filtering(self.ad3D)
+
+        with self.assertRaises(ValueError):
+            reconstructor.set_filter(filter[1:-1])
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "Prerequisites not met")
@@ -392,6 +441,8 @@ class Test_FBP(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor._pre_filtering(self.ad3D)
 
+        with self.assertRaises(ValueError):
+            reconstructor.set_filter(filter[1:-1])
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_split_processing(self):

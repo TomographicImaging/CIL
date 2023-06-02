@@ -1,27 +1,62 @@
 CCPi Core Imaging Library (CIL).
-Copyright 2017-2022 United Kingdom Research and Innovation
-Copyright 2017-2022 University of Manchester
+Copyright 2017 United Kingdom Research and Innovation
+Copyright 2017 The University of Manchester
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 
 This software product is developed for the Collaborative Computational 
 Project in Tomographic Imaging CCPi (http://www.ccpi.ac.uk/) with
 substantial contributions by UKRI-STFC and The University of Manchester.
 and other contributing institutions.
 
-Main contributors in alphabetical order:
-Evelina Ametova (UoM)
-Gemma Fardell (STFC)
-Jakob Jorgensen (DTU)
-Laura Murgatroyd (STFC)
-Evangelos Papoutsellis (STFC)
-Edoardo Pasca (STFC)
+Institutions Key:
+1 - United Kingdom Research and Innovation - Science & Technology Facilities Council (UKRI-STFC)
+2 - Technical University of Denmark (DTU)
+3 - The University of Manchester
+4 - Finden
+5 - University College London (UCL)
+6 - Karlsruhe Institute of Technology (KIT)
+7 - University of Bath
+8 - UES Inc.
+9 - Swansea University
+10 - University of Warwick
 
-Other contributors:
-Claire Delplancke (UoB)
-Daniil Kazantsev (Diamond Light Source)
-Tomas Kulhanek (STFC)
-Srikanth Nagella (STFC)
-Andrew Sharits (UES Inc.)
-Kris Thielemans (UCL)
-Sam Tygier (STFC)
-Ryan Warr (UoM)
+CIL Developers in date order:
+Edoardo Pasca (2017 – present) - 1 
+Jakob Sauer Jørgensen (2017 - present) - 2, 3
+Evangelos Papoutsellis (2018 – 2020) - 3, (2020-2022) - 1, (2022-present) - 4
+Gemma Fardell (2019 - present) - 1
+Kris Thielemans (2020 - present) - 5
+Laura Murgatroyd (2021 - present) - 1
+Evelina Ametova (2018-2020) - 3, (2020-2021) - 6 
 
+CIL Contributors:
+Srikanth Nagella (2017-2018) - 1
+Daniil Kazantsev (2018) - 3
+Ryan Warr (2019) - 3
+Tomas Kulhanek (2019) - 1
+Claire Delplancke (2019 - 2022) - 7
+Matthias Ehrhardt (2019 - 2023) - 7
+Richard Brown (2020-2021) - 5
+Sam Tygier (2022) - 1
+Andrew Sharits (2022) - 8
+Kyle Pidgeon (2023) - 1
+
+CIL Advisory Board:
+Llion Evans - 9
+William Lionheart - 3
+Kris Thielemans - 5
+Martin Turner - 3
+Jay Warnett - 10
+Philip Withers - 3

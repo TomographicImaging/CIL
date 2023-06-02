@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,12 +13,17 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from cil.framework import AcquisitionGeometry
 from cil.framework.framework import ImageGeometry
 import numpy as np
 from cil.utilities.display import show2D
+from cil.utilities import dataexample
+from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 
 from utils import has_tigre, has_nvidia, initialise_tests
 
@@ -312,4 +317,20 @@ class TestMechanics(unittest.TestCase):
         diff = (fp1 - fp2).abs().sum()
         self.assertGreater(diff,0.1)
 
+class TestTIGREBlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBlockOperator):
+    def setUp(self):
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data = data.get_slice(vertical='centre')
+        ig = self.data.geometry.get_ImageGeometry()
+        self.datasplit = self.data.partition(10, 'sequential')
+        
 
+        K = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.datasplit.geometry)
+        A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
+        self.projectionOperator = (A, K)
+
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE and a GPU")
+    def test_partition(self):
+        self.partition_test()
+
+    

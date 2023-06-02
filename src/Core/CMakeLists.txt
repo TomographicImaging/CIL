@@ -1,3 +1,21 @@
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Richard Brown (UCL)
 
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -47,12 +65,16 @@ endif()
 if (UNIX)
   find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
   find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
+  find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
+  find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
 elseif(WIN32)
   find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
   find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
+  find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
+  find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
 endif()
 
-if(IPP_CORE AND IPP_S)
+if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
   set(USE_IPP TRUE)
   message("IPP libraries found")
 else()
@@ -64,9 +86,11 @@ if(USE_IPP)
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
 
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S})
+
+  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
   include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 else()
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp

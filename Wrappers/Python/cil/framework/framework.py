@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software 
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 import copy
 import numpy
 import warnings
@@ -40,6 +43,189 @@ else:
     raise ValueError('Not supported platform, ', platform.system())
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
+
+from cil.framework.BlockGeometry import BlockGeometry
+
+class Partitioner(object):
+    '''Interface for AcquisitionData to be able to partition itself in a number of batches.
+    
+    This class, by multiple inheritance with AcquisitionData, allows the user to partition the data, 
+    by using the method ``partition``. 
+    The partitioning will generate a ``BlockDataContainer`` with appropriate ``AcquisitionData``.
+
+    '''
+    # modes of partitioning
+    SEQUENTIAL = 'sequential'
+    STAGGERED = 'staggered'
+    RANDOM_PERMUTATION = 'random_permutation'
+
+    def _partition_indices(self, num_batches, indices, stagger=False):
+        """Partition a list of indices into num_batches of indices.
+        
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the indices into.
+        indices : list of int, int
+            The indices to partition. If passed a list, this list will be partitioned in ``num_batches``
+            partitions. If passed an int the indices will be generated automatically using ``range(indices)``.
+        stagger : bool, default False
+            If True, the indices will be staggered across the batches.
+
+        Returns
+        --------
+        list of list of int
+            A list of batches of indices.
+        """
+
+        # Partition the indices into batches.
+        if isinstance(indices, int):
+            indices = list(range(indices))
+
+        num_indices = len(indices)
+        # sanity check
+        if num_indices < num_batches:
+            raise ValueError(
+                'The number of batches must be less than or equal to the number of indices.'
+            )
+
+        if stagger:
+            batches = [indices[i::num_batches] for i in range(num_batches)]
+
+        else:
+            # we split the indices with floor(N/M)+1 indices in N%M groups
+            # and floor(N/M) indices in the remaining M - N%M groups.
+
+            # rename num_indices to N for brevity
+            N = num_indices
+            # rename num_batches to M for brevity
+            M = num_batches
+            batches = [
+                indices[j:j + math.floor(N / M) + 1] for j in range(N % M)
+            ]
+            offset = N % M * (math.floor(N / M) + 1)
+            for i in range(M - N % M):
+                start = offset + i * math.floor(N / M)
+                end = start + math.floor(N / M)
+                batches.append(indices[start:end])
+
+        return batches
+
+    def _construct_BlockGeometry_from_indices(self, indices):
+        '''Convert a list of boolean masks to a list of BlockGeometry.
+        
+        Parameters
+        ----------
+          indices : list of lists of indices
+            
+        Returns
+        -------
+            BlockGeometry
+        '''
+        ags = []
+        for mask in indices:
+            ag = self.geometry.copy()
+            ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
+            ags.append(ag)
+        
+        return BlockGeometry(*ags)
+
+    def partition(self, num_batches, mode, seed=None):
+        '''Partition the data into ``num_batches`` batches using the specified ``mode``.
+        
+
+        The modes are
+        
+        1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.
+        
+        2. ``staggered`` - The data will be partitioned into ``num_batches`` batches of sequential indices, with stride equal to ``num_batches``.
+        
+        3. ``random_permutation`` - The data will be partitioned into ``num_batches`` batches of random indices.
+
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the data into.
+        mode : str
+            The mode to use for partitioning. Must be one of ``sequential``, ``staggered`` or ``random_permutation``.
+        seed : int, optional
+            The seed to use for the random permutation. If not specified, the random number
+            generator will not be seeded.
+
+
+        Returns
+        -------
+        BlockDataContainer
+            Block of `AcquisitionData` objects containing the data requested in each batch
+
+        Example
+        -------
+        
+        Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:
+    
+        1. [[0, 1, 2], [3, 4], [5, 6], [7, 8]] with ``sequential``
+        2. [[0, 4, 8], [1, 5], [2, 6], [3, 7]] with ``staggered``
+        3. [[8, 2, 6], [7, 1], [0, 4], [3, 5]] with ``random_permutation`` and seed 1
+
+        '''
+        if mode == Partitioner.SEQUENTIAL:
+            return self._partition_deterministic(num_batches, stagger=False)
+        elif mode == Partitioner.STAGGERED:
+            return self._partition_deterministic(num_batches, stagger=True)
+        elif mode == Partitioner.RANDOM_PERMUTATION:
+            return self._partition_random_permutation(num_batches, seed=seed)
+        else:
+            raise ValueError('Unknown partition mode {}'.format(mode))
+
+    def _partition_deterministic(self, num_batches, stagger=False, indices=None):
+        '''Partition the data into ``num_batches`` batches.
+        
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the data into.
+        stagger : bool, optional
+            If ``True``, the batches will be staggered. Default is ``False``.
+        indices : list of int, optional
+            The indices to partition. If not specified, the indices will be generated from the number of projections.
+        '''
+        if indices is None:
+            indices = self.geometry.num_projections
+        partition_indices = self._partition_indices(num_batches, indices, stagger)
+        blk_geo = self._construct_BlockGeometry_from_indices(partition_indices)
+        
+        # copy data
+        out = blk_geo.allocate(None)
+        out.geometry = blk_geo
+        axis = self.dimension_labels.index('angle')
+            
+        for i in range(num_batches):
+            out[i].fill(
+                numpy.take(self.array, partition_indices[i], axis=axis)
+            )
+        return out
+         
+    def _partition_random_permutation(self, num_batches, seed=None):
+        '''Partition the data into ``num_batches`` batches using a random permutation.
+
+        Parameters
+        ----------
+        num_batches : int
+            The number of batches to partition the data into.
+        seed : int, optional
+            The seed to use for the random permutation. If not specified, the random number generator
+            will not be seeded.
+
+        '''
+        if seed is not None:
+            numpy.random.seed(seed)
+        
+        indices = numpy.arange(self.geometry.num_projections)
+        numpy.random.shuffle(indices)
+
+        indices = list(indices)            
+        
+        return self._partition_deterministic(num_batches, stagger=False, indices=indices)
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -99,11 +285,15 @@ class ImageGeometry(object):
         return len(self.dimension_labels)
 
     @property
+    def ndim(self):
+        return len(self.dimension_labels)
+
+    @property
     def dimension_labels(self):
         
         labels_default = DataOrder.CIL_IG_LABELS
 
-        shape_default = [   self.channels - 1, #channels default is 1
+        shape_default = [   self.channels,
                             self.voxel_num_z,
                             self.voxel_num_y,
                             self.voxel_num_x]
@@ -114,7 +304,7 @@ class ImageGeometry(object):
             labels = labels_default.copy()
 
         for i, x in enumerate(shape_default):
-            if x == 0:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1826,9 +2016,9 @@ class AcquisitionGeometry(object):
 
     `AcquisitionGeometry.create_Parallel2D()`
 
-    `AcquisitionGeometry.create_Cone3D()`
+    `AcquisitionGeometry.create_Cone2D()`
 
-    `AcquisitionGeometry.create_Parallel2D()`
+    `AcquisitionGeometry.create_Parallel3D()`
 
     `AcquisitionGeometry.create_Cone3D()`
     """
@@ -1929,7 +2119,6 @@ class AcquisitionGeometry(object):
 
         return tuple(shape)
 
-
     @property
     def dimension_labels(self):
         labels_default = DataOrder.CIL_AG_LABELS
@@ -1948,7 +2137,7 @@ class AcquisitionGeometry(object):
         #remove from list labels where len == 1
         #
         for i, x in enumerate(shape_default):
-            if x == 1:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -1969,6 +2158,9 @@ class AcquisitionGeometry(object):
                     
             self._dimension_labels = tuple(val)
 
+    @property
+    def ndim(self):
+        return len(self.dimension_labels)
 
     @property
     def system_description(self):
@@ -2372,7 +2564,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
         
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
@@ -2425,7 +2617,7 @@ class AcquisitionGeometry(object):
                 raise ValueError('Value {} unknown'.format(value))
         
         return out
-    
+
 class DataContainer(object):
     '''Generic class to hold data
     
@@ -2481,9 +2673,7 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the dtype of the data array. 
-           If geometry exists, the dtype of the geometry = dtype of the array'''                          
-        self.geometry.dtype = self.array.dtype       
+        '''Returns the dtype of the data array.'''
         return self.array.dtype
 
     @property
@@ -2826,8 +3016,13 @@ class DataContainer(object):
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: out {} x2 {} expected {}".format( out.shape,x2.shape ,self.shape)))
         elif issubclass(type(out), DataContainer) and \
-             isinstance(x2, Number):
+             isinstance(x2, (Number, numpy.ndarray)):
             if self.check_dimensions(out):
+                if isinstance(x2, numpy.ndarray) and\
+                    not (x2.shape == self.shape and x2.dtype == self.dtype):
+                    raise ValueError(message(type(self),
+                        "Wrong size for data memory: out {} x2 {} expected {}"\
+                            .format( out.shape,x2.shape ,self.shape)))
                 kwargs['out']=out.as_array()
                 pwop(self.as_array(), x2, *args, **kwargs )
                 return out
@@ -2931,14 +3126,6 @@ class DataContainer(object):
         
         if ret_out:
             return out
-
-
-    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
-        '''Deprecated. Alias of _axpby'''
-        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
-              DeprecationWarning)
-        self._axpby(a,b,y,out, dtype, num_threads)
-
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
@@ -3205,10 +3392,6 @@ class ImageData(DataContainer):
                  geometry=None, 
                  **kwargs):
 
-        if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
-              DeprecationWarning)
-
         dtype = kwargs.get('dtype', numpy.float32)
     
 
@@ -3270,7 +3453,90 @@ class ImageData(DataContainer):
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)                            
 
-class AcquisitionData(DataContainer):
+
+    def apply_circular_mask(self, radius=0.99, in_place=True):
+        """
+
+        Apply a circular mask to the horizontal_x and horizontal_y slices. Values outside this mask will be set to zero.
+
+        This will most commonly be used to mask edge artefacts from standard CT reconstructions with FBP.
+
+        Parameters
+        ----------
+        radius : float, default 0.99
+            radius of mask by percentage of size of horizontal_x or horizontal_y, whichever is greater
+
+        in_place : boolean, default True
+            If `True` masks the current data, if `False` returns a new `ImageData` object.
+            
+
+        Returns
+        -------
+        ImageData
+            If `in_place = False` returns a new ImageData object with the masked data
+
+        """
+        ig = self.geometry
+
+        # grid
+        y_range = (ig.voxel_num_y-1)/2
+        x_range = (ig.voxel_num_x-1)/2
+
+        Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
+        
+        # use centre from geometry in units distance to account for aspect ratio of pixels
+        dist_from_center = numpy.sqrt((X*ig.voxel_size_x+ ig.center_x)**2 + (Y*ig.voxel_size_y+ig.center_y)**2)
+
+        size_x = ig.voxel_num_x * ig.voxel_size_x
+        size_y = ig.voxel_num_y * ig.voxel_size_y
+
+        if size_x > size_y:
+            radius_applied =radius * size_x/2
+        else:
+            radius_applied =radius * size_y/2
+
+        # approximate the voxel as a circle and get the radius
+        # ie voxel area = 1, circle of area=1 has r = 0.56
+        r=((ig.voxel_size_x * ig.voxel_size_y )/numpy.pi)**(1/2)
+
+        # we have the voxel centre distance to mask. voxels with distance greater than |r| are fully inside or outside.
+        # values on the border region between -r and r are preserved
+        mask =(radius_applied-dist_from_center).clip(-r,r)
+
+        #  rescale to -pi/2->+pi/2
+        mask *= (0.5*numpy.pi)/r
+
+        # the sin of the linear distance gives us an approximation of area of the circle to include in the mask
+        numpy.sin(mask, out = mask)
+
+        # rescale the data 0 - 1
+        mask = 0.5 + mask * 0.5
+
+        # reorder dataset so 'horizontal_y' and 'horizontal_x' are the final dimensions
+        labels_orig = self.dimension_labels
+        labels = list(labels_orig)
+
+        labels.remove('horizontal_y')
+        labels.remove('horizontal_x')
+        labels.append('horizontal_y')
+        labels.append('horizontal_x')
+
+
+        if in_place == True:
+            self.reorder(labels)
+            numpy.multiply(self.array, mask, out=self.array)
+            self.reorder(labels_orig)
+
+        else:
+            image_data_out = self.copy()
+            image_data_out.reorder(labels)
+            numpy.multiply(image_data_out.array, mask, out=image_data_out.array)
+            image_data_out.reorder(labels_orig)
+
+            return image_data_out
+
+
+class AcquisitionData(DataContainer, Partitioner):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
 
@@ -3296,9 +3562,6 @@ class AcquisitionData(DataContainer):
                  deep_copy=True, 
                  geometry = None,
                  **kwargs):
-        if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
-              DeprecationWarning)
 
         dtype = kwargs.get('dtype', numpy.float32)
 
@@ -3719,7 +3982,7 @@ class VectorData(DataContainer):
         deep_copy = True
         # need to pass the geometry, othewise None
         super(VectorData, self).__init__(out, deep_copy, self.geometry.dimension_labels, geometry = self.geometry)
-    
+
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -3737,7 +4000,7 @@ class VectorGeometry(object):
     def __init__(self, 
                  length, **kwargs):
         
-        self.length = length
+        self.length = int(length)
         self.shape = (length, )
         self.dtype = kwargs.get('dtype', numpy.float32)
         self.dimension_labels = kwargs.get('dimension_labels', None)
@@ -3760,6 +4023,14 @@ class VectorGeometry(object):
             and self.dimension_labels == other.dimension_labels:
             return True
         return False
+
+    def __str__ (self):
+        repres = ""
+        repres += "Length: {0}\n".format(self.length)
+        repres += "Shape: {0}\n".format(self.shape)
+        repres += "Dimension_labels: {0}\n".format(self.dimension_labels)
+
+        return repres
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance
@@ -3848,3 +4119,5 @@ class DataOrder():
                  .format(order_requested, list(geometry.dimension_labels), engine))
 
 
+
+        

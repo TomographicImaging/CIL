@@ -1,3 +1,22 @@
+..     -*- coding: utf-8 -*-
+      Copyright 2021 United Kingdom Research and Innovation
+      Copyright 2021 The University of Manchester
+    
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+    
+          http://www.apache.org/licenses/LICENSE-2.0
+    
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    
+     Authors:
+     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 Processors
 **********
 
@@ -64,7 +83,7 @@ Centre Of Rotation Corrector
 ----------------------------
 
 In the ideal alignment of a CT instrument, the projection of the axis of rotation onto the 
-detector coincides with the vertical midline of the detector. In prtactise this is hard to acheive 
+detector coincides with the vertical midline of the detector. In practice this is hard to achieve 
 due to misalignments and/or kinematic errors in positioning of CT instrument components. 
 A slight offset of the center of rotation with respect to the theoretical position will contribute 
 to the loss of resolution; in more severe cases, it will cause severe artifacts in the reconstructed 

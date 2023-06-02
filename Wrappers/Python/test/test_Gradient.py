@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from utils import initialise_tests
@@ -119,15 +122,14 @@ class TestGradientOperator(unittest.TestCase):
                                         norm = numpy.sqrt(
                                             (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-
+                                        norm = numpy.sqrt((2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                 else:
 
                                     if geom.length ==3:
                                         norm = numpy.sqrt(
-                                            4 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                            (2/geom.channel_spacing)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                        norm = numpy.sqrt((2/geom.channel_spacing)**2 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
 
 
                             Grad = GradientOperator(geom,
@@ -135,7 +137,7 @@ class TestGradientOperator(unittest.TestCase):
                                                     backend = backend,
                                                     correlation= corr, method=method)
                             try:
-                                numpy.testing.assert_approx_equal(Grad.norm(), norm, significant = 1)
+                                self.assertAlmostEqual(Grad.norm(), norm, 6)
                             except AssertionError:
                                 self.print_assertion_info(geom, bnd,backend,corr,method,None) 
                                 raise

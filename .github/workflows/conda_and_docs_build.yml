@@ -12,7 +12,7 @@ on:
 
 jobs:
   conda_build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:
@@ -31,7 +31,7 @@ jobs:
         path: recipe/linux-64/cil*
   docs_build:
     needs: conda_build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
       with:
@@ -46,7 +46,7 @@ jobs:
         path: 'conda_package'
     - uses: conda-incubator/setup-miniconda@v2
       with:
-        python-version: 3.7
+        python-version: 3.9
     - uses: lauramurgatroyd/build-sphinx-action@v0.1.3
       with:
         DOCS_PATH: 'docs'
@@ -58,7 +58,7 @@ jobs:
         BUILD_SUBDIR_NAME: 'nightly'
   docs_publish:
     needs: docs_build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact of the html output.

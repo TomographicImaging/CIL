@@ -481,7 +481,7 @@ class TNV(RegulariserFunction):
 
     def check_input(self, input):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
-        if issubclass(input, DataContainer):
+        if isinstance(input, DataContainer):
             DataOrder.check_order_for_engine('cil', input.geometry)
             if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))

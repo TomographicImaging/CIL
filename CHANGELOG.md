@@ -1,3 +1,6 @@
+* 23.x.x
+  - allow CCPi Regulariser functions for not CIL object
+
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.
 

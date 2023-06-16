@@ -28,6 +28,7 @@ except ImportError as ie:
 
 
 from cil.framework import DataOrder
+from cil.framework import DataContainer
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
@@ -269,7 +270,7 @@ class FGP_TV(TV_Base):
             self.alpha *= scalar
             return self
     def check_input(self, input):
-        if input.geometry.length > 3:
+        if len(input.shape) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
         
 class TGV(RegulariserFunction):
@@ -350,9 +351,9 @@ class TGV(RegulariserFunction):
         # f = alpha * f
 
     def check_input(self, input):
-        if len(input.dimension_labels) == 2:
+        if len(input.shape) == 2:
             self.LipshitzConstant = 12
-        elif len(input.dimension_labels) == 3:
+        elif len(input.shape) == 3:
             self.LipshitzConstant = 16 # Vaggelis to confirm
         else:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
@@ -430,7 +431,7 @@ class FGP_dTV(RegulariserFunction):
             return self
 
     def check_input(self, input):
-        if input.geometry.length > 3:
+        if len(input.shape) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
 
 class TNV(RegulariserFunction):
@@ -480,8 +481,13 @@ class TNV(RegulariserFunction):
 
     def check_input(self, input):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
-        DataOrder.check_order_for_engine('cil', input.geometry)
-        if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
-            raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
+        if issubclass(input, DataContainer):
+            DataOrder.check_order_for_engine('cil', input.geometry)
+            if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
+                raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
+        else:
+            # if it is not a CIL DataContainer we assume that the data is passed in the correct order
+            if len(input.shape) != 3 or input.shape[0] > 1 or  1 in input.shape:
+                raise ValueError('TNV requires 3D data (with channel as first axis). Got {}'.format(input.shape))
         
 

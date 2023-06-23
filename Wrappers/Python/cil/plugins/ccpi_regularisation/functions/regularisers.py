@@ -456,9 +456,10 @@ class TNV(RegulariserFunction):
         return np.nan
     
     def proximal_numpy(self, in_arr, tau):
-        if in_arr.ndim != 3:
-            # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/413c6001003c6f1272aeb43152654baaf0c8a423/src/Python/src/cpu_regularisers.pyx#L584-L588
-            raise ValueError('Only 3D data is supported. Passed data has {} dimensions'.format(in_arr.ndim))
+        # remove any dimension of size 1
+        new_shape = [ i for i in input.shape if i!=1]
+        in_arr.shape = tuple(new_shape)
+            
         res = regularisers.TNV(in_arr, 
               self.alpha * tau,
               self.max_iteration,
@@ -487,7 +488,8 @@ class TNV(RegulariserFunction):
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         else:
             # if it is not a CIL DataContainer we assume that the data is passed in the correct order
-            if len(input.shape) != 3 or input.shape[0] > 1 or  1 in input.shape:
+            new_shape = [ i for i in input.shape if i!=1]
+            if len(input.shape) != 3:
                 raise ValueError('TNV requires 3D data (with channel as first axis). Got {}'.format(input.shape))
         
 

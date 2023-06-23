@@ -457,7 +457,7 @@ class TNV(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
-        new_shape = [ i for i in input.shape if i!=1]
+        new_shape = [ i for i in in_arr.shape if i!=1]
         in_arr.shape = tuple(new_shape)
             
         res = regularisers.TNV(in_arr, 

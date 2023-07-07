@@ -848,6 +848,59 @@ class TestFunction(CCPiTestClass):
         f4 = -2 * f2
         assert f4.L == 2 * f2.L
 
+    def test_proximal_conjugate(self):
+        from cil.framework import AcquisitionGeometry, BlockGeometry
+        ag = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
+
+        #default
+        ag.set_angles(angles)
+        ag.set_panel(5)
+
+        ig = ag.get_ImageGeometry()
+        bg = BlockGeometry(ig, ig)
+
+        #operator for least squares
+        A = IdentityOperator(ag, ig)
+        #  LeastSquares(A, b=b),  # requires operator and doesn't have proximal defined.
+
+        b = ag.allocate('random', seed=2)
+        functions = [IndicatorBox(), KullbackLeibler(b=b), L1Norm(), L2NormSquared(), 
+                    #  LeastSquares# does not have proximal defined
+                     MixedL21Norm(), # requires block geometry
+                    # OperatorCompositionFunction(IndicatorBox(), A),  # requires operator and doesn't have proximal defined.
+                    # TotalVariation(backend='c'), # fails on edo's windows machine?
+                    TotalVariation(backend='numpy')
+                    ]
+        geometries = [ag, ag, ag, ag, 
+        bg,
+        # ig, # for TotalVariation, backend c
+        ig
+        ]
+        
+        for func, geom in zip (functions, geometries):
+            self.proximal_conjugate_test(func, geom)
+
+    def proximal_conjugate_test(self, function, geom):
+        x = geom.allocate('random', seed=1)
+        tau = 1.0
+        f = Function()
+        f.proximal = function.proximal
+
+        a = function.proximal_conjugate(x, tau)
+        b = f.proximal_conjugate(x, tau)
+
+        # handle the case of MixedL21Norm
+        if isinstance(a, BlockDataContainer):
+            for xa,xb in zip(a,b):
+                # xa = a.get_item(i)
+                # xb = b.get_item(i)
+                np.testing.assert_allclose(xa.as_array(), xb.as_array(),
+                                    rtol=1e-5, atol=1e-5)
+        else:
+            np.testing.assert_allclose(a.as_array(), b.as_array(),
+                                    rtol=1e-5, atol=1e-5)
+
 
 class TestTotalVariation(unittest.TestCase):
 

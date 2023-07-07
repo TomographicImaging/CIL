@@ -869,12 +869,12 @@ class TestFunction(CCPiTestClass):
                     #  LeastSquares# does not have proximal defined
                      MixedL21Norm(), # requires block geometry
                     # OperatorCompositionFunction(IndicatorBox(), A),  # requires operator and doesn't have proximal defined.
-                    # TotalVariation(backend='c'), # fails on edo's windows machine?
+                    TotalVariation(backend='c'), # fails on edo's windows machine?
                     TotalVariation(backend='numpy')
                     ]
         geometries = [ag, ag, ag, ag, 
         bg,
-        # ig, # for TotalVariation, backend c
+        ig, # for TotalVariation, backend c
         ig
         ]
         

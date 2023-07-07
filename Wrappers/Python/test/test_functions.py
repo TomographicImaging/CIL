@@ -893,8 +893,6 @@ class TestFunction(CCPiTestClass):
         # handle the case of MixedL21Norm
         if isinstance(a, BlockDataContainer):
             for xa,xb in zip(a,b):
-                # xa = a.get_item(i)
-                # xb = b.get_item(i)
                 np.testing.assert_allclose(xa.as_array(), xb.as_array(),
                                     rtol=1e-5, atol=1e-5)
         else:

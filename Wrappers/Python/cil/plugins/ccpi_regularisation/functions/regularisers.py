@@ -488,8 +488,9 @@ class TNV(RegulariserFunction):
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         else:
             # if it is not a CIL DataContainer we assume that the data is passed in the correct order
+            # discard any dimension of size 1
             new_shape = [ i for i in input.shape if i!=1]
-            if len(input.shape) != 3:
+            if len(new_shape) != 3:
                 raise ValueError('TNV requires 3D data (with channel as first axis). Got {}'.format(input.shape))
         
 

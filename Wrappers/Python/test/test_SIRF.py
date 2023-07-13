@@ -462,7 +462,7 @@ class TestPETRegularisation(CCPiRegularisationWithSIRFTests):
         
 class TestRegRegularisation(CCPiRegularisationWithSIRFTests):
     def setUp(self):
-        self.image1 = = reg.ImageData(os.path.join(examples_data_path('Registration'),'test2.nii.gz'))
+        self.image1 = reg.ImageData(os.path.join(examples_data_path('Registration'),'test2.nii.gz'))
         self.image2 = self.image1 * 0.5
 
 class TestMRRegularisation(CCPiRegularisationWithSIRFTests):

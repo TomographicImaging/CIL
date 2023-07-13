@@ -443,15 +443,19 @@ class CCPiRegularisationWithSIRFTests():
 
     @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
     def test_TNV_call_works(self):
-        regulariser = self.setUpTNV()
-        output_number = regulariser(self.image1)
-        self.assertTrue(True)
+        new_shape = [ i for i in self.image1.shape if i!=1]
+        if len(new_shape) == 3:
+            regulariser = self.setUpTNV()
+            output_number = regulariser(self.image1)
+            self.assertTrue(True)
 
     @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
-    def test_TGV_proximal_works(self):
-        regulariser = self.setUpTNV()
-        solution = regulariser.proximal(x=self.image1, tau=1.)
-        self.assertTrue(True)
+    def test_TNV_proximal_works(self):
+        new_shape = [ i for i in self.image1.shape if i!=1]
+        if len(new_shape) == 3:
+            regulariser = self.setUpTNV()
+            solution = regulariser.proximal(x=self.image1, tau=1.)
+            self.assertTrue(True)
 
 class TestPETRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     skip_TNV_on_2D = True

@@ -385,7 +385,7 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
 
 
-class CCPiRegularisationWithSIRFTests(CCPiTestClass):
+class CCPiRegularisationWithSIRFTests():
     
     def setUpFGP_TV(self, max_iteration=100, alpha=1.):
         return alpha*FGP_TV(max_iteration=max_iteration)
@@ -453,7 +453,7 @@ class CCPiRegularisationWithSIRFTests(CCPiTestClass):
         solution = regulariser.proximal(x=self.image1, tau=1.)
         self.assertTrue(True)
 
-class TestPETRegularisation(CCPiRegularisationWithSIRFTests):
+class TestPETRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     skip_TNV_on_2D = True
     def setUp(self):
         self.image1 = pet.ImageData(os.path.join(
@@ -469,12 +469,12 @@ class TestPETRegularisation(CCPiRegularisationWithSIRFTests):
     def test_TNV_proximal_works(self):
         super().test_TNV_proximal_works()
         
-class TestRegRegularisation(CCPiRegularisationWithSIRFTests):
+class TestRegRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     def setUp(self):
         self.image1 = reg.ImageData(os.path.join(examples_data_path('Registration'),'test2.nii.gz'))
         self.image2 = self.image1 * 0.5
 
-class TestMRRegularisation(CCPiRegularisationWithSIRFTests):
+class TestMRRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     def setUp(self):
         acq_data = mr.AcquisitionData(os.path.join(examples_data_path('MR'),'simulated_MR_2D_cartesian.h5'))
         preprocessed_data = mr.preprocess_acquisition_data(acq_data)

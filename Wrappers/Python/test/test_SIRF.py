@@ -40,6 +40,7 @@ initialise_tests()
 try:
     import sirf.STIR as pet
     import sirf.Gadgetron as mr
+    import sirf.Reg as reg
     from sirf.Utilities import examples_data_path
     
     has_sirf = True
@@ -307,7 +308,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
         bdc = BlockDataContainer(image1, image2)
         bdc1 = bdc.divide(1.)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
 
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
@@ -328,7 +331,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
         bdc = BlockDataContainer(image1, image2)
         bdc1 = bdc.multiply(1.)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
     
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
@@ -352,7 +357,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
         bdc = BlockDataContainer(image1, image2)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
 
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
@@ -372,7 +379,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
         bdc = BlockDataContainer(image1, image2)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
 
 
 

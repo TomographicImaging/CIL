@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL 23.0.0 documentation</title>
+    <title>Optimisation framework &#8212; CIL 23.0.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -1000,17 +1000,21 @@ the following problem</p>
 \[A x = b\]</div>
 <p>The SIRT algorithm is</p>
 <div class="math notranslate nohighlight">
-\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),\]</div>
-<p>where <span class="math notranslate nohighlight">\(M = \frac{1}{A*\mathbb{1}}\)</span>, <span class="math notranslate nohighlight">\(D = \frac{1}{A^{T}\mathbb{1}}\)</span>, <span class="math notranslate nohighlight">\(\mathbb{1}\)</span> is a <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> of ones
-and <span class="math notranslate nohighlight">\(\mathrm{prox}_{C}\)</span> is the projection over a set <span class="math notranslate nohighlight">\(C\)</span>.</p>
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) ),\]</div>
+<p>where,
+<span class="math notranslate nohighlight">\(M = \frac{1}{A*\mathbb{1}}\)</span>,
+<span class="math notranslate nohighlight">\(D = \frac{1}{A^{T}\mathbb{1}}\)</span>,
+<span class="math notranslate nohighlight">\(\mathbb{1}\)</span> is a <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> of ones,
+<span class="math notranslate nohighlight">\(\mathrm{prox}_{C}\)</span> is the projection over a set <span class="math notranslate nohighlight">\(C\)</span>,
+and <span class="math notranslate nohighlight">\(\omega\)</span> is the relaxation parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Starting point of the algorithm, default value = Zero DataContainer</p></li>
 <li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – The operator A.</p></li>
 <li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The data b.</p></li>
-<li><p><strong>lower</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Lower bound constraint, default value = <code class="code docutils literal notranslate"><span class="pre">-inf</span></code>.</p></li>
-<li><p><strong>upper</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Upper bound constraint, default value = <code class="code docutils literal notranslate"><span class="pre">-inf</span></code>.</p></li>
+<li><p><strong>lower</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Lower bound constraint</p></li>
+<li><p><strong>upper</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Upper bound constraint</p></li>
 <li><p><strong>constraint</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a><em>, </em><em>default = None</em>) – A function with <code class="code docutils literal notranslate"><span class="pre">proximal</span></code> method, e.g., <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a> function and <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox.proximal" title="cil.optimisation.functions.IndicatorBox.proximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">IndicatorBox.proximal()</span></code></a>,
 or <a class="reference internal" href="#cil.optimisation.functions.TotalVariation" title="cil.optimisation.functions.TotalVariation"><code class="xref py py-class docutils literal notranslate"><span class="pre">TotalVariation</span></code></a> function and <a class="reference internal" href="#cil.optimisation.functions.TotalVariation.proximal" title="cil.optimisation.functions.TotalVariation.proximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TotalVariation.proximal()</span></code></a>.</p></li>
 <li><p><strong>kwargs</strong> – Keyword arguments used from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
@@ -1019,8 +1023,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If <code class="code docutils literal notranslate"><span class="pre">constraint</span></code> is not passed, then <code class="code docutils literal notranslate"><span class="pre">lower</span></code> and <code class="code docutils literal notranslate"><span class="pre">upper</span></code> are looked at and an <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a>
-function is created.</p>
+<p>If <code class="code docutils literal notranslate"><span class="pre">constraint</span></code> is not passed, <code class="code docutils literal notranslate"><span class="pre">lower</span></code> and <code class="code docutils literal notranslate"><span class="pre">upper</span></code> are used to create an <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a> and apply its <code class="code docutils literal notranslate"><span class="pre">proximal</span></code>.</p>
 <p>If <code class="code docutils literal notranslate"><span class="pre">constraint</span></code> is passed, <code class="code docutils literal notranslate"><span class="pre">proximal</span></code> method is required to be implemented.</p>
 </div>
 <div class="admonition note">
@@ -1030,8 +1033,6 @@ function is created.</p>
 \[M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}\]</div>
 <div class="math notranslate nohighlight">
 \[D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}\]</div>
-<p>In case of division errors above, <a class="reference internal" href="#cil.optimisation.algorithms.SIRT.fix_weights" title="cil.optimisation.algorithms.SIRT.fix_weights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fix_weights()</span></code></a> can be used, where <code class="code docutils literal notranslate"><span class="pre">np.nan</span></code>, <code class="code docutils literal notranslate"><span class="pre">+np.inf</span></code> and <code class="code docutils literal notranslate"><span class="pre">-np.inf</span></code> values
-are replaced with 1.0.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1046,10 +1047,14 @@ are replaced with 1.0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.SIRT.fix_weights">
-<code class="sig-name descname"><span class="pre">fix_weights</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT.fix_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.fix_weights" title="Permalink to this definition">#</a></dt>
-<dd><p>In case of division error when the preconditioning arrays <code class="code docutils literal notranslate"><span class="pre">M</span></code> and <code class="code docutils literal notranslate"><span class="pre">D</span></code>
-are defined, the <code class="code docutils literal notranslate"><span class="pre">np.nan</span></code>, <code class="code docutils literal notranslate"><span class="pre">+np.inf</span></code> and <code class="code docutils literal notranslate"><span class="pre">-np.inf</span></code> values are replaced with one.</p>
+<dt id="cil.optimisation.algorithms.SIRT.set_relaxation_parameter">
+<code class="sig-name descname"><span class="pre">set_relaxation_parameter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT.set_relaxation_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.set_relaxation_parameter" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the relaxation parameter <span class="math notranslate nohighlight">\(\omega\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – The relaxation parameter to be applied to the update. Must be between 0 and 2 to guarantee asymptotic convergence.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1057,7 +1062,7 @@ are defined, the <code class="code docutils literal notranslate"><span class="pr
 <code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update" title="Permalink to this definition">#</a></dt>
 <dd><p>Performs a single iteration of the SIRT algorithm</p>
 <div class="math notranslate nohighlight">
-\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) )\]</div>
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )\]</div>
 </dd></dl>
 
 <dl class="py method">

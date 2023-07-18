@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.SIRT &#8212; CIL 23.0.0 documentation</title>
+    <title>cil.optimisation.algorithms.SIRT &#8212; CIL 23.0.1 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -213,9 +213,9 @@
 
 <span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">Algorithm</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">IndicatorBox</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockDataContainer</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">inf</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <div class="viewcode-block" id="SIRT"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT">[docs]</a><span class="k">class</span> <span class="nc">SIRT</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>    
@@ -229,36 +229,38 @@
 
 <span class="sd">    The SIRT algorithm is </span>
 
-<span class="sd">    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),</span>
+<span class="sd">    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) ),</span>
 
-<span class="sd">    where :math:`M = \frac{1}{A*\mathbb{1}}`, :math:`D = \frac{1}{A^{T}\mathbb{1}}`, :math:`\mathbb{1}` is a :code:`DataContainer` of ones</span>
-<span class="sd">    and :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`.</span>
+<span class="sd">    where,</span>
+<span class="sd">    :math:`M = \frac{1}{A*\mathbb{1}}`,</span>
+<span class="sd">    :math:`D = \frac{1}{A^{T}\mathbb{1}}`,</span>
+<span class="sd">    :math:`\mathbb{1}` is a :code:`DataContainer` of ones,</span>
+<span class="sd">    :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,</span>
+<span class="sd">    and :math:`\omega` is the relaxation parameter.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
 <span class="sd">    initial : DataContainer, default = None</span>
-<span class="sd">              Starting point of the algorithm, default value = Zero DataContainer </span>
+<span class="sd">        Starting point of the algorithm, default value = Zero DataContainer </span>
 <span class="sd">    operator : LinearOperator</span>
-<span class="sd">              The operator A.</span>
+<span class="sd">        The operator A.</span>
 <span class="sd">    data : DataContainer</span>
-<span class="sd">           The data b.</span>
+<span class="sd">        The data b.</span>
 <span class="sd">    lower : :obj:`float`, default = None</span>
-<span class="sd">            Lower bound constraint, default value = :code:`-inf`.</span>
+<span class="sd">        Lower bound constraint </span>
 <span class="sd">    upper : :obj:`float`, default = None</span>
-<span class="sd">            Upper bound constraint, default value = :code:`-inf`.</span>
+<span class="sd">        Upper bound constraint</span>
 <span class="sd">    constraint : Function, default = None</span>
-<span class="sd">                A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,</span>
-<span class="sd">                or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.</span>
+<span class="sd">        A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`, </span>
+<span class="sd">        or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.</span>
 
 <span class="sd">    kwargs:</span>
 <span class="sd">        Keyword arguments used from the base class :class:`.Algorithm`.    </span>
 
 <span class="sd">    Note </span>
 <span class="sd">    ----</span>
-<span class="sd">    </span>
-<span class="sd">    If :code:`constraint` is not passed, then :code:`lower` and :code:`upper` are looked at and an :class:`.IndicatorBox`</span>
-<span class="sd">    function is created.</span>
+<span class="sd">    If :code:`constraint` is not passed, :code:`lower` and :code:`upper` are used to create an :class:`.IndicatorBox` and apply its :code:`proximal`.</span>
 
 <span class="sd">    If :code:`constraint` is passed, :code:`proximal` method is required to be implemented.</span>
 
@@ -270,9 +272,6 @@
 <span class="sd">    .. math:: M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}</span>
 
 <span class="sd">    .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}</span>
-
-<span class="sd">    In case of division errors above, :meth:`.fix_weights` can be used, where :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values</span>
-<span class="sd">    are replaced with 1.0.</span>
 
 
 <span class="sd">    Examples</span>
@@ -299,57 +298,104 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> setting up&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">relax_par</span> <span class="o">=</span> <span class="mf">1.0</span>
-        
         <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span> <span class="o">=</span> <span class="n">constraint</span>
         <span class="k">if</span> <span class="n">constraint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">upper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">lower</span><span class="o">=-</span><span class="n">inf</span>
-                <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">upper</span><span class="o">=</span><span class="n">inf</span>
+                <span class="c1"># IndicatorBox accepts None for lower and/or upper</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="o">=</span><span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">)</span>
-                
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span> <span class="o">=</span> <span class="mi">1</span>
+
         <span class="c1"># Set up scaling matrices D and M.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>                
-        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_weights</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> configured&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span></div>
 
-<div class="viewcode-block" id="SIRT.fix_weights"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.fix_weights">[docs]</a>    <span class="k">def</span> <span class="nf">fix_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; In case of division error when the preconditioning arrays :code:`M` and :code:`D`</span>
-<span class="sd">        are defined, the :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values are replaced with one.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">relaxation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span>
         
-        <span class="c1"># fix for possible +inf, -inf, nan values </span>
-        <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">]:</span>  
- 
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-            <span class="n">arr_replace</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-            <span class="n">tmp</span><span class="p">[</span><span class="o">~</span><span class="n">arr_replace</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>     
-            <span class="n">arr</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>                     </div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span>
+
+<div class="viewcode-block" id="SIRT.set_relaxation_parameter"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.set_relaxation_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_relaxation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the relaxation parameter :math:`\omega`</span>
+<span class="sd">       </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : float</span>
+<span class="sd">            The relaxation parameter to be applied to the update. Must be between 0 and 2 to guarantee asymptotic convergence.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected relaxation parameter to be in range 0-2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_weights</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_up_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>                
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
+        
+        <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span><span class="p">]:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_nan_or_inf</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">replace_with</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_remove_nan_or_inf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datacontainer</span><span class="p">,</span> <span class="n">replace_with</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace nan and inf in datacontainer with a given value.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters:</span>
+<span class="sd">        -------------</span>
+<span class="sd">        </span>
+<span class="sd">        datacontainer: DataContainer, BlockDataContainer</span>
+<span class="sd">        </span>
+<span class="sd">        replace_with: float, default 1.0</span>
+<span class="sd">            Value to replace elements that evaluate to NaN or inf</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
+<span class="sd">        In case the input datacontainer is a :code:`BlockDataContainer` the substitution is executed for each container in the :code:`BlockDataContainer`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datacontainer</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">datacontainer</span><span class="o">.</span><span class="n">containers</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove_nan_or_inf</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">replace_with</span><span class="o">=</span><span class="n">replace_with</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">datacontainer</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="n">replace_with</span><span class="p">,</span> <span class="n">posinf</span><span class="o">=</span><span class="n">replace_with</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="n">replace_with</span><span class="p">)</span>
+        <span class="n">datacontainer</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="SIRT.update"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Performs a single iteration of the SIRT algorithm</span>
 
-<span class="sd">        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) )</span>
+<span class="sd">        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># self.r = self.data - self.operator.direct(self.x)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_par</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">))</span>
-        
+        <span class="c1"># self.D is prescaled by _relaxation_parameter (default 1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+            <span class="c1"># IndicatorBox allows inplace operation for proximal</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SIRT.update_objective"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.SIRT.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the objective </span>
@@ -358,11 +404,6 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">())</span></div></div>
-
-
-
-
-
 </pre></div>
 
               </div>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from unittest.mock import patch
@@ -21,7 +24,7 @@ from cil.framework import AcquisitionGeometry
 import numpy as np
 import os
 from cil.framework import ImageGeometry
-from cil.io import TXRMDataReader, NEXUSDataReader
+from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
@@ -519,3 +522,37 @@ class Test_HDF5_utilities(unittest.TestCase):
 
         HDF5_utilities.read_to(self.path, self.dset_path, data_partial, source_sel=subset, dest_sel=subset)
         np.testing.assert_allclose(data_partial_by_hand,data_partial)
+
+
+class TestNikonReader(unittest.TestCase):
+
+    def test_setup(self):
+
+        reader = NikonDataReader()
+        self.assertEqual(reader.file_name, None)
+        self.assertEqual(reader.roi, None)
+        self.assertTrue(reader.normalise)
+        self.assertEqual(reader.mode, 'bin')
+        self.assertFalse(reader.fliplr)
+
+        roi = {'vertical':(1,-1),'horizontal':(1,-1),'angle':(1,-1)}
+        reader = NikonDataReader(file_name=None, roi=roi, normalise=False, mode='slice', fliplr=True)
+        self.assertEqual(reader.file_name, None)
+        self.assertEqual(reader.roi, roi)
+        self.assertFalse(reader.normalise)
+        self.assertEqual(reader.mode, 'slice')
+        self.assertTrue(reader.fliplr)
+
+        with self.assertRaises(FileNotFoundError):
+            reader = NikonDataReader(file_name='no-file')
+        
+
+class TestZeissReader(unittest.TestCase):
+
+    def test_setup(self):
+
+        reader = ZEISSDataReader()
+        self.assertEqual(reader.file_name, None)
+
+        with self.assertRaises(FileNotFoundError):
+            reader = ZEISSDataReader(file_name='no-file')

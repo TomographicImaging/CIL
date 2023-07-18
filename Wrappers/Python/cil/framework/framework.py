@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software 
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 import copy
 import numpy
 import warnings
@@ -2012,9 +2015,9 @@ class AcquisitionGeometry(object):
 
     `AcquisitionGeometry.create_Parallel2D()`
 
-    `AcquisitionGeometry.create_Cone3D()`
+    `AcquisitionGeometry.create_Cone2D()`
 
-    `AcquisitionGeometry.create_Parallel2D()`
+    `AcquisitionGeometry.create_Parallel3D()`
 
     `AcquisitionGeometry.create_Cone3D()`
     """
@@ -3123,14 +3126,6 @@ class DataContainer(object):
         if ret_out:
             return out
 
-
-    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
-        '''Deprecated. Alias of _axpby'''
-        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
-              DeprecationWarning)
-        self._axpby(a,b,y,out, dtype, num_threads)
-
-
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
         
@@ -3396,10 +3391,6 @@ class ImageData(DataContainer):
                  geometry=None, 
                  **kwargs):
 
-        if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
-              DeprecationWarning)
-
         dtype = kwargs.get('dtype', numpy.float32)
     
 
@@ -3570,9 +3561,6 @@ class AcquisitionData(DataContainer, Partitioner):
                  deep_copy=True, 
                  geometry = None,
                  **kwargs):
-        if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
-              DeprecationWarning)
 
         dtype = kwargs.get('dtype', numpy.float32)
 

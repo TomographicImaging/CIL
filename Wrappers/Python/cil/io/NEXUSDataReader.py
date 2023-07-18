@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Kyle Pidgeon (UKRI-STFC)
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 import numpy as np
 import os
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
@@ -32,14 +36,13 @@ class NEXUSDataReader(object):
 
     Parameters
     ----------
-    **kwargs : dict, optional
-        Arguments to the constructor. One of these should be `file_name`.
+    file_name: str
+        the full path to the NeXus file to read.
     """
 
-    def __init__(self,
-                 **kwargs):
-        
-        self.file_name = kwargs.get('file_name', None)
+    def __init__(self, file_name=None):
+
+        self.file_name = file_name
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name)
@@ -284,7 +287,7 @@ class NEXUSDataReader(object):
             self.get_geometry()
 
         #allocate data container as requested type
-        output = self._geometry.allocate(None,dtype=dtype)
+        output = self._geometry.allocate(None, dtype=dtype)
 
         with h5py.File(self.file_name,'r') as dfile:
 

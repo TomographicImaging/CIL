@@ -1,3 +1,23 @@
+..     -*- coding: utf-8 -*-
+      Copyright 2019 United Kingdom Research and Innovation
+      Copyright 2019 The University of Manchester
+    
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+    
+          http://www.apache.org/licenses/LICENSE-2.0
+    
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    
+     Authors:
+     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+     Kyle Pidgeon (UKRI-STFC)
+
 Read/ write AcquisitionData and ImageData
 *****************************************
 
@@ -15,17 +35,17 @@ as NeXuS files.
 
   # initialise NEXUS Writer
   writer = NEXUSDataWriter()
-  writer.set_up(file_name='tmp_nexus.nxs',
-              data_container=my_data)
+  writer.set_up(data=my_data,
+              file_name='tmp_nexus.nxs')
   # write data
-  writer.write_file()
+  writer.write()
 
   # read data
   # initialize NEXUS reader
   reader = NEXUSDataReader()
-  reader.set_up(nexus_file='tmp_nexus.nxs')
+  reader.set_up(file_name='tmp_nexus.nxs')
   # load data
-  ad1 = reader.load_data()
+  ad1 = reader.read()
   # get AcquisitionGeometry
   ag1 = reader.get_geometry()
 
@@ -34,21 +54,20 @@ as NeXuS files.
    :inherited-members:
 .. autoclass:: cil.io.NEXUSDataWriter
    :members:
-   :special-members:
+   :inherited-members:
 |
 
 Nikon
 =====
 .. autoclass:: cil.io.NikonDataReader
    :members:
-   :special-members:
+   :inherited-members:
 
 ZEISS
 =====
-
-.. autoclass:: cil.io.TXRMDataReader
+.. autoclass:: cil.io.ZEISSDataReader
    :members:
-   :special-members:
+   :inherited-members:
 
 TIFF Reader/Writer
 ==================

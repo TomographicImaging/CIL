@@ -41,18 +41,18 @@ class SIRT(Algorithm):
     ----------
 
     initial : DataContainer, default = None
-              Starting point of the algorithm, default value = Zero DataContainer 
+        Starting point of the algorithm, default value = Zero DataContainer 
     operator : LinearOperator
-              The operator A.
+        The operator A.
     data : DataContainer
-           The data b.
+        The data b.
     lower : :obj:`float`, default = None
-            Lower bound constraint, default value = :code:`-inf`.
+        Lower bound constraint, default value = :code:`-inf`.
     upper : :obj:`float`, default = None
-            Upper bound constraint, default value = :code:`-inf`.
+        Upper bound constraint, default value = :code:`-inf`.
     constraint : Function, default = None
-                A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,
-                or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
+        A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`, 
+        or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
 
     kwargs:
         Keyword arguments used from the base class :class:`.Algorithm`.    
@@ -73,9 +73,6 @@ class SIRT(Algorithm):
     .. math:: M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}
 
     .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
-
-    In case of division errors above, :meth:`.fix_weights` can be used, where :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values
-    are replaced with 1.0.
 
 
     Examples
@@ -108,33 +105,53 @@ class SIRT(Algorithm):
         
         self.r = data.copy()
         
-        # relaxation parameter was set to 1.0 and not exposed to the user: removed
-        
         self.constraint = constraint
         if constraint is None:
             if lower is not None or upper is not None:
                 # IndicatorBox accepts None for lower and/or upper
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
-                
+        
+        self._relaxation_parameter = 1
+
         # Set up scaling matrices D and M.
-        self._set_up_scaling_matrices()
+        self._set_up_weights()
 
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
-    def _set_up_scaling_matrices(self):
-        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
-        self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
-    def fix_weights(self):
-
-        r""" In case of division error when the preconditioning arrays :code:`M` and :code:`D`
-        are defined, the :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values are replaced with one.
-        """
+    @property
+    def relaxation_parameter(self):
+        return self._relaxation_parameter
         
-        # fix for possible +inf, -inf, nan values 
-        for arr in [self.M, self.D]:  
+    @property
+    def D(self):
+        return self._Dscaled / self._relaxation_parameter
+
+    def set_relaxation_parameter(self, value=1.0):
+        """Set the relaxation parameter
+       
+        Parameters
+        ----------
+        value : float
+            The relaxation parameter to be applied to the update. Must be between 0 and 2 to guarantee asymptotic convergence.
+
+        """
+        if value <= 0 or value >= 2:
+            raise ValueError("Expected relaxation parameter to be in range 0-2. Got {}".format(value))
+
+        self._relaxation_parameter = value
+        self._set_up_weights()
+        self._Dscaled *= self._relaxation_parameter
+
+
+    def _set_up_weights(self):
+        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
+        self._Dscaled = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+        
+        for arr in [self.M, self._Dscaled]:  
             self._remove_nan_or_inf(arr, replace_with=1.0)
+
 
     def _remove_nan_or_inf(self, datacontainer, replace_with=1.0):
         """Replace nan and inf in datacontainer with a given value.
@@ -148,15 +165,16 @@ class SIRT(Algorithm):
             Value to replace elements that evaluate to NaN or inf
             
             
-        In case the input datacontainer is a :code:`BlockDataContainer` the substitution is executed for each container in the :code:`BlockDataContainer`."""
+        In case the input datacontainer is a :code:`BlockDataContainer` the substitution is executed for each container in the :code:`BlockDataContainer`.
+        """
         if isinstance(datacontainer, BlockDataContainer):
             for block in datacontainer.containers:
                 self._remove_nan_or_inf(block, replace_with=replace_with)
             return
         tmp = datacontainer.as_array()
-        arr_replace = numpy.isfinite(tmp)
-        tmp[~arr_replace] = replace_with     
+        numpy.nan_to_num(tmp, copy=False, nan=replace_with, posinf=replace_with, neginf=replace_with)
         datacontainer.fill(tmp)
+
 
     def update(self):
 
@@ -170,12 +188,12 @@ class SIRT(Algorithm):
         self.operator.direct(self.x, out=self.r)
         self.r.sapyb(-1, self.data, 1.0, out=self.r)
         
-        # self.x += self.relax_par * (self.D*self.operator.adjoint(self.M*self.r))
+        # self.D is prescaled by _relaxation_parameter (default 1)
         self.r *= self.M
         self.operator.adjoint(self.r, out=self.tmp_x)
-        self.x.sapyb(1.0, self.tmp_x, self.D, out=self.x)
+        self.x.sapyb(1.0, self.tmp_x, self._Dscaled, out=self.x)
 
-        
+
         if self.constraint is not None:
             # IndicatorBox allows inplace operation for proximal
             self.constraint.proximal(self.x, tau=1, out=self.x)

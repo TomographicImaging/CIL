@@ -457,8 +457,7 @@ class TNV(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
-        new_shape = [ i for i in in_arr.shape if i!=1]
-        in_arr.shape = tuple(new_shape)
+        in_arr = np.squeeze(in_arr)
             
         res = regularisers.TNV(in_arr, 
               self.alpha * tau,
@@ -489,8 +488,7 @@ class TNV(RegulariserFunction):
         else:
             # if it is not a CIL DataContainer we assume that the data is passed in the correct order
             # discard any dimension of size 1
-            new_shape = [ i for i in input.shape if i!=1]
-            if len(new_shape) != 3:
+            if sum(1 for i in input.shape if i!=1) != 3:
                 raise ValueError('TNV requires 3D data (with channel as first axis). Got {}'.format(input.shape))
         
 

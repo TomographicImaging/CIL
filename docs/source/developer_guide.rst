@@ -1,4 +1,24 @@
-Developer's guide
+..     -*- coding: utf-8 -*-
+      Copyright 2020 United Kingdom Research and Innovation
+      Copyright 2020 The University of Manchester
+    
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+    
+          http://www.apache.org/licenses/LICENSE-2.0
+    
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    
+     Authors:
+     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+     Kyle Pidgeon (UKRI-STFC)
+
+Developers' Guide
 *****************
 
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with 
@@ -22,7 +42,7 @@ Creator
 
 To create an instance of a class, the creator of a class should require the **essential** and **often-configured** parameters as named parameters. 
 
-It should not accept positional arguments `*args` or keyworded arguments `**kwargs` so that the user can clearly understand what parameters are necessary to 
+It should not accept positional arguments `*args` or key-worded arguments `**kwargs` so that the user can clearly understand what parameters are necessary to 
 create the instance.
 
 Setter methods and properties

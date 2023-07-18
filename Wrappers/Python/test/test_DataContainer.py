@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from utils import initialise_tests
@@ -802,116 +805,6 @@ class TestDataContainer(CCPiTestClass):
         u.multiply(2, out=u)
         c = b * 2
         numpy.testing.assert_allclose(u.as_array(), c)
-
-
-    def test_axpby(self):
-        ig = ImageGeometry(10,10)                                               
-        d1 = ig.allocate(1)                                                     
-        d2 = ig.allocate(2)                                                     
-        out = ig.allocate(None)
-        a = 2                                                 
-        b = 1                                            
-        # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(a,b,d2,out)
-        res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_allclose(res, out.as_array())
-    
-    
-    def test_axpby2(self):
-        N = 100
-        ig = ImageGeometry(N,2*N,N*10)                                               
-        d1 = ig.allocate(1)                                                     
-        d2 = ig.allocate(2)                                                     
-        out = ig.allocate(None)   
-        a = 2                                                 
-        b = 1        
-        # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(a,b,d2,out, num_threads=4)
-        res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_allclose(res, out.as_array())
-    
-    
-    def test_axpby3(self):
-        #a vec, b float
-        ig = ImageGeometry(10,10)                                               
-        d1 = ig.allocate(1)                                                     
-        d2 = ig.allocate(2)     
-        a = ig.allocate(2)                                                  
-        b = 1                                               
-        out = ig.allocate(None)                                                 
-        # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(a,b,d2,out)
-        res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_allclose(res, out.as_array())
-    
-    
-    def test_axpby4(self):
-        #a float, b vec
-        ig = ImageGeometry(10,10)                                               
-        d1 = ig.allocate(1)                                                     
-        d2 = ig.allocate(2)     
-        a = 2                                                  
-        b = ig.allocate(1)                                                 
-        out = ig.allocate(None)                                                 
-        # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(a,b,d2,out)
-        res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_allclose(res, out.as_array())
-    
-    
-    def test_axpby5(self):
-        #a vec, b vec
-        ig = ImageGeometry(10,10)                                               
-        d1 = ig.allocate(1)                                                     
-        d2 = ig.allocate(2)   
-        a = ig.allocate(2)                                                  
-        b = ig.allocate(1)                                                  
-        out = ig.allocate(None)                                                 
-        # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(a,b,d2,out)
-        res = numpy.ones_like(d1.as_array()) * 4.
-        numpy.testing.assert_allclose(res, out.as_array())
-    
-    
-    def test_axpby6(self):
-        #a vec, b vec
-        ig = ImageGeometry(10,10)                                               
-        d1 = ig.allocate()                                                     
-        d2 = ig.allocate()   
-        a = ig.allocate()                                                  
-        b = ig.allocate()         
-
-        d1.fill(numpy.arange(1,101).reshape(10,10))
-        d2.fill(numpy.arange(1,101).reshape(10,10))
-        a.fill(1.0/d1.as_array())                                                  
-        b.fill(-1.0/d2.as_array())   
-
-        out = ig.allocate(None)                                                 
-        # equals to 1 + -1 = 0
-        d1.axpby(a,b,d2,out)
-        res = numpy.zeros_like(d1.as_array())
-        numpy.testing.assert_allclose(res, out.as_array())
-    
-    
-    def test_axpby7(self):
-        #a vec, b vec
-        #daxpby
-        ig = ImageGeometry(10,10)                                               
-        d1 = ig.allocate()                                                     
-        d2 = ig.allocate()   
-        a = ig.allocate()                                                  
-        b = ig.allocate()         
-
-        d1.fill(numpy.arange(1,101).reshape(10,10))
-        d2.fill(numpy.arange(1,101).reshape(10,10))
-        a.fill(1.0/d1.as_array())                                                  
-        b.fill(-1.0/d2.as_array())   
-
-        out = ig.allocate(dtype=numpy.float64)                                                 
-        # equals to 1 + -1 = 0
-        d1.axpby(a,b,d2,out, dtype=numpy.float64)
-        res = numpy.zeros_like(d1.as_array())
-        numpy.testing.assert_allclose(res, out.as_array())
 
 
     def test_sapyb_datacontainer_f(self):

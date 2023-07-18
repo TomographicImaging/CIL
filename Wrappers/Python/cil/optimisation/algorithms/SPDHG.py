@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Claire Delplancke (University of Bath)
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
@@ -60,7 +64,7 @@ class SPDHG(Algorithm):
     Note
     ----
     
-    Convergence is guaranted provided that [2, eq. (12)]:
+    Convergence is guaranteed provided that [2, eq. (12)]:
     
     .. math:: 
     
@@ -70,7 +74,7 @@ class SPDHG(Algorithm):
     ----
     
     Notation for primal and dual step-sizes are reversed with comparison
-        to PDGH.py
+        to PDHG.py
 
     Note
     ----
@@ -95,11 +99,6 @@ class SPDHG(Algorithm):
                  initial=None, prob=None, gamma=1.,**kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
-
-
-        if kwargs.get('use_axpby', None) is not None:
-                warnings.warn('The use of the "use_axpby" parameter is deprecated and will not be used by this algorithm',
-                   DeprecationWarning, stacklevel=4)
 
 
         if f is not None and operator is not None and g is not None:

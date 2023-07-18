@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry
 from cil.recon import Reconstructor
@@ -93,13 +96,13 @@ class GenericFilteredBackProjection(Reconstructor):
 
         Parameters
         ----------
-        inplace: boolian
+        inplace: boolean
             Sets the inplace filtering of projections
         """
         if type(inplace) is bool:
             self._filter_inplace= inplace
         else:
-            raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
+            raise TypeError("set_filter_inplace expected a boolean. Got {}".format(type(inplace)))
 
 
     def _default_fft_order(self):
@@ -372,7 +375,7 @@ class FDK(GenericFilteredBackProjection):
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
         verbose : int, default=1
-           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
         -------
@@ -442,7 +445,7 @@ class FBP(GenericFilteredBackProjection):
 
     Notes
     -----
-    The reconstructor can be futher customised using additional 'set' methods provided.
+    The reconstructor can be further customised using additional 'set' methods provided.
     """
 
     supported_backends = ['tigre', 'astra']
@@ -528,7 +531,7 @@ class FBP(GenericFilteredBackProjection):
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
 
         verbose : int, default=1
-           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
         -------

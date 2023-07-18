@@ -32,10 +32,14 @@ class SIRT(Algorithm):
 
     The SIRT algorithm is 
 
-    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),
+    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) ),
 
-    where :math:`M = \frac{1}{A*\mathbb{1}}`, :math:`D = \frac{1}{A^{T}\mathbb{1}}`, :math:`\mathbb{1}` is a :code:`DataContainer` of ones
-    and :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`.
+    where,
+    :math:`M = \frac{1}{A*\mathbb{1}}`,
+    :math:`D = \frac{1}{A^{T}\mathbb{1}}`,
+    :math:`\mathbb{1}` is a :code:`DataContainer` of ones,
+    :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,
+    and :math:`\omega` is the relaxation parameter.
 
     Parameters
     ----------
@@ -47,9 +51,9 @@ class SIRT(Algorithm):
     data : DataContainer
         The data b.
     lower : :obj:`float`, default = None
-        Lower bound constraint, default value = :code:`-inf`.
+        Lower bound constraint 
     upper : :obj:`float`, default = None
-        Upper bound constraint, default value = :code:`-inf`.
+        Upper bound constraint
     constraint : Function, default = None
         A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`, 
         or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
@@ -59,9 +63,7 @@ class SIRT(Algorithm):
 
     Note 
     ----
-    
-    If :code:`constraint` is not passed, then :code:`lower` and :code:`upper` are looked at and an :class:`.IndicatorBox`
-    function is created.
+    If :code:`constraint` is not passed, :code:`lower` and :code:`upper` are used to create an :class:`.IndicatorBox` and apply its :code:`proximal`.
 
     If :code:`constraint` is passed, :code:`proximal` method is required to be implemented.
 
@@ -129,7 +131,7 @@ class SIRT(Algorithm):
         return self._Dscaled / self._relaxation_parameter
 
     def set_relaxation_parameter(self, value=1.0):
-        """Set the relaxation parameter
+        """Set the relaxation parameter :math:`\omega`
        
         Parameters
         ----------
@@ -180,7 +182,7 @@ class SIRT(Algorithm):
 
         r""" Performs a single iteration of the SIRT algorithm
 
-        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) )
+        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )
 
         """
         

@@ -1,5 +1,6 @@
 * x.x.x
   - fix bug in IndicatorBox proximal_conjugate
+  - Add norm for CompositionOperator.
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
 

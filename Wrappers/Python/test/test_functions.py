@@ -860,25 +860,19 @@ class TestFunction(CCPiTestClass):
         ig = ag.get_ImageGeometry()
         bg = BlockGeometry(ig, ig)
 
-        #operator for least squares
-        A = IdentityOperator(ag, ig)
-        #  LeastSquares(A, b=b),  # requires operator and doesn't have proximal defined.
-
         b = ag.allocate('random', seed=2)
-        functions = [IndicatorBox(), KullbackLeibler(b=b), L1Norm(), L2NormSquared(), 
-                    #  LeastSquares# does not have proximal defined
-                     MixedL21Norm(), # requires block geometry
-                    # OperatorCompositionFunction(IndicatorBox(), A),  # requires operator and doesn't have proximal defined.
-                    TotalVariation(backend='c'), # fails on edo's windows machine?
-                    TotalVariation(backend='numpy')
-                    ]
-        geometries = [ag, ag, ag, ag, 
-        bg,
-        ig, # for TotalVariation, backend c
-        ig
+
+        func_geom_test_list = [
+            (IndicatorBox(), ag),
+            (KullbackLeibler(b=b), ag),
+            (L1Norm(), ag),
+            (L2NormSquared(), ag),
+            (MixedL21Norm(), bg),
+            (TotalVariation(backend='c'), ig),
+            (TotalVariation(backend='numpy'), ig),
         ]
         
-        for func, geom in zip (functions, geometries):
+        for func, geom in func_geom_test_list:
             self.proximal_conjugate_test(func, geom)
 
     def proximal_conjugate_test(self, function, geom):

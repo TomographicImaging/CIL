@@ -1,4 +1,5 @@
 * x.x.x
+  - Add norm for CompositionOperator.
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
 

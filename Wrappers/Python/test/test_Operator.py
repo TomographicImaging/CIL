@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+from unittest.mock import Mock
 from utils import initialise_tests
 from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer
 from cil.optimisation.operators import BlockOperator,\
@@ -997,3 +998,51 @@ class TestOperatorCompositionSum(unittest.TestCase):
                                                 2 * out2.as_array())
         numpy.testing.assert_array_almost_equal(d_out.as_array(),
                                                 2 * out2.as_array())
+
+
+    def test_CompositionOperator_norm1(self):
+
+        example_operator1 = Mock()
+        example_operator1.norm.return_value = 2.6
+
+        example_operator2 = Mock()
+        example_operator2.norm.return_value = 3.4
+
+        d = CompositionOperator(example_operator1, example_operator2)
+
+        out1 = 8.84
+        out2 = d.norm()
+
+        numpy.testing.assert_almost_equal(out2, out1)
+
+
+    def test_CompositionOperator_norm2(self):
+
+        example_operator1 = Mock()
+        example_operator1.norm.return_value = 2.6
+
+        example_operator2 = Mock()
+        example_operator2.norm.return_value = 3.4
+
+        example_operator3 = Mock()
+        example_operator3.norm.return_value = 5.0
+
+        d = CompositionOperator(example_operator1, example_operator2, example_operator3)
+
+        out1 = 44.2
+        out2 = d.norm()
+
+        numpy.testing.assert_almost_equal(out2, out1)
+
+
+    def test_CompositionOperator_norm3(self):
+
+        example_operator1 = Mock()
+        example_operator1.norm.return_value = 2.6
+
+        d = CompositionOperator(example_operator1)
+
+        out1 = 2.6
+        out2 = d.norm()
+
+        numpy.testing.assert_almost_equal(out2, out1)

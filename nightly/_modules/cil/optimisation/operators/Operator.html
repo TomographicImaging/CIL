@@ -738,11 +738,16 @@
             
 
 <div class="viewcode-block" id="CompositionOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span>             </div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span>             </div>
             
 
-
-
+<div class="viewcode-block" id="CompositionOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the CompositionOperator, that is the product of the norms</span>
+<span class="sd">        of its operators.&#39;&#39;&#39;</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="k">for</span> <span class="n">operator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">:</span>
+                <span class="n">norm</span> <span class="o">*=</span> <span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">norm</span></div></div>
 </pre></div>
 
               </div>

@@ -548,6 +548,8 @@ class CompositionOperator(Operator):
             
 
     def calculate_norm(self):
+        '''Returns the norm of the CompositionOperator, that is the product of the norms
+        of its operators.'''
         norm = 1.
         for operator in self.operators:
                 norm *= operator.norm()

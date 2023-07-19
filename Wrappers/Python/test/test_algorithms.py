@@ -28,9 +28,10 @@ from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
+from cil.framework import BlockGeometry
 
 from cil.optimisation.operators import IdentityOperator
-from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator, MatrixOperator
+from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
 from cil.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, OperatorCompositionFunction
@@ -46,9 +47,10 @@ from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
 
+
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
-import os, sys, time
+import time
 import warnings
 from cil.optimisation.functions import Rosenbrock
 from cil.framework import VectorData, VectorGeometry
@@ -690,7 +692,28 @@ class TestSIRT(unittest.TestCase):
         alg.run(verbose=0)
         np.testing.assert_almost_equal(alg.solution.max(), 0.3)  
         np.testing.assert_almost_equal(alg.solution.min(), 0.1) 
+
+
+    def test_SIRT_relaxation_parameter(self):
+        tmp_initial = self.ig.allocate()
+        alg = SIRT(initial = tmp_initial, operator=self.Aop, data=self.bop, max_iteration=5)  
         
+        with self.assertRaises(ValueError):
+            alg.set_relaxation_parameter(0)
+
+        with self.assertRaises(ValueError):
+            alg.set_relaxation_parameter(2)
+
+
+        alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2,max_iteration=20)
+        alg.set_relaxation_parameter(0.5)
+
+        self.assertEqual(alg.relaxation_parameter, 0.5)
+
+        alg.run(verbose=0)
+        np.testing.assert_array_almost_equal(alg.x.array, self.b2.array)            
+
+        np.testing.assert_almost_equal(0.5 *alg.D.array, alg._Dscaled.array)
 
 
     def test_SIRT_nan_inf_values(self):
@@ -700,15 +723,35 @@ class TestSIRT(unittest.TestCase):
 
         tmp_initial = self.ig.allocate()
         sirt = SIRT(initial = tmp_initial, operator=Aop_nan_inf, data=self.bop, max_iteration=5)  
-        sirt.fix_weights()
         
         self.assertFalse(np.any(sirt.M == inf))
         self.assertFalse(np.any(sirt.D == inf))   
-                                             
+
+
+    def test_SIRT_remove_nan_or_inf_with_BlockDataContainer(self):
+        np.random.seed(10)
+        # set up matrix, vectordata
+        n, m = 50, 50
+
+        A = np.random.uniform(0, 1,(m, n)).astype('float32')
+        b = A.dot(np.random.randn(n))
+
+        A[0:10,:] = 0.
+        A[:,10:20] = 0.
+        Aop = BlockOperator( MatrixOperator(A*1), MatrixOperator(A*2) )
+        bop = BlockDataContainer( VectorData(b*1), VectorData(b*2) )  
         
+        ig = BlockGeometry(self.ig.copy(), self.ig.copy())
+        tmp_initial = ig.allocate()
+
+        sirt = SIRT(initial = tmp_initial, operator=Aop, data=bop, max_iteration=5)
+        for el in sirt.M.containers:
+            self.assertFalse(np.any(el == inf))
+        
+        self.assertFalse(np.any(sirt.D == inf))
+
 
 class TestSPDHG(unittest.TestCase):
-
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):        

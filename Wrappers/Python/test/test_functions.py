@@ -865,16 +865,20 @@ class TestFunction(CCPiTestClass):
         #  LeastSquares(A, b=b),  # requires operator and doesn't have proximal defined.
 
         b = ag.allocate('random', seed=2)
-        functions = [IndicatorBox(), KullbackLeibler(b=b), L1Norm(), L2NormSquared(), 
+        functions = [IndicatorBox(), 
+                     KullbackLeibler(b=b, backend='numpy'), KullbackLeibler(b=b, backend='c'),
+                     L1Norm(), L2NormSquared(), 
                     #  LeastSquares# does not have proximal defined
                      MixedL21Norm(), # requires block geometry
                     # OperatorCompositionFunction(IndicatorBox(), A),  # requires operator and doesn't have proximal defined.
-                    # TotalVariation(backend='c'), # fails on edo's windows machine?
+                    TotalVariation(backend='c'),
                     TotalVariation(backend='numpy')
                     ]
-        geometries = [ag, ag, ag, ag, 
+        geometries = [ag, 
+        ag, ag, 
+        ag, ag,
         bg,
-        # ig, # for TotalVariation, backend c
+        ig, # for TotalVariation, backend c
         ig
         ]
         

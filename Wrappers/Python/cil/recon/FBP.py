@@ -514,11 +514,12 @@ class FBP(GenericFilteredBackProjection):
         self.data_slice = ag_slice.allocate()
         self.operator = self._PO_class(ig_slice,ag_slice)
 
-    def _process_chunk(self, i, step,  out):
+    def _process_chunk(self, i, step):
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
         if not self.filter_inplace:
             self._pre_filtering(self.data_slice)
-        out.array[i:i+step,:,:] = self.operator.adjoint(self.data_slice).array[:]
+
+        return self.operator.adjoint(self.data_slice).array
 
 
     def run(self, out=None, verbose=1):
@@ -569,15 +570,32 @@ class FBP(GenericFilteredBackProjection):
             #process dataset by requested chunk size
             self._setup_PO_for_chunks(self.slices_per_chunk)
             for i in range(0, tot_slices-remainder, self.slices_per_chunk):
-                self._process_chunk(i, self.slices_per_chunk, ret)
+
+                if 'bottom' in self.acquisition_geometry.config.panel.origin:
+                    start = i
+                    end = i + self.slices_per_chunk
+                else:
+                    start = tot_slices -i - self.slices_per_chunk
+                    end = tot_slices - i 
+
+                ret.array[start:end,:,:] = self._process_chunk(i, self.slices_per_chunk)
+
                 if verbose:
                     pbar.update(1)
 
             #process excess rows
             if remainder:
-                i = tot_slices-remainder
                 self._setup_PO_for_chunks(remainder)
-                self._process_chunk(i, remainder, ret)
+
+                if 'bottom' in self.acquisition_geometry.config.panel.origin:
+                    start = tot_slices-remainder
+                    end = tot_slices
+                else:
+                    start = 0
+                    end = remainder
+                
+                ret.array[start:end,:,:] = self._process_chunk(i, remainder)
+
                 if verbose:
                     pbar.update(1)
 

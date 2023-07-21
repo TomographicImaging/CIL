@@ -1359,6 +1359,9 @@ class TestPaddder(unittest.TestCase):
         self.ag_pad_width = {'channel':(1,2),'vertical':(3,4),'horizontal':(5,6)}
         self.ag_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.05, 0., -0.15]).set_angles([0,90,180,270]).set_panel([27,23],[0.1,0.1]).set_channels(7)
 
+        self.ag2 = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,270]).set_panel([16,16],[0.1,0.1],origin='top-right').set_channels(4)
+        self.ag2_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.15, 0., -0.25]).set_angles([0,90,180,270]).set_panel([27,23],[0.1,0.1],origin='top-right').set_channels(7)
+
         self.ig = ImageGeometry(5,4,3,center_x=0.5,center_y=1,center_z=-0.5,channels=2)
         self.ig_pad_width = {'channel':(1,2),'vertical':(3,2),'horizontal_x':(2,1), 'horizontal_y':(2,3)}
         self.ig_padded = ImageGeometry(8,9,8,center_x=0,center_y=1.5,center_z=-1, channels=5)
@@ -1487,6 +1490,17 @@ class TestPaddder(unittest.TestCase):
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
+    def test_process_acquisition_geometry_origin(self):
+        geometry = self.ag2
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
+        proc.set_input(geometry)
+        geometry_padded = proc._process_acquisition_geometry()
+
+        self.assertEquals(geometry_padded, self.ag2_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
+
+    
     def test_process_image_geometry(self):
 
         geometry = self.ig
@@ -1816,6 +1830,22 @@ class TestPaddder(unittest.TestCase):
 
         data.log(out=data)
         data *=-1
+
+        recon_orig = FBP(data).run(verbose=0)
+        recon_orig.apply_circular_mask()
+
+        proc = Padder('constant',pad_width=(5,40),pad_values=0.0)
+        proc.set_input(data)
+        data_padded = proc.get_output()
+
+        recon_new = FBP(data_padded, recon_orig.geometry).run(verbose=0)
+        recon_new.apply_circular_mask()
+
+        numpy.testing.assert_allclose(recon_orig.array, recon_new.array, atol=1e-4)
+
+
+        # switch panel origin
+        data.geometry.config.panel.origin='top-right'
 
         recon_orig = FBP(data).run(verbose=0)
         recon_orig.apply_circular_mask()

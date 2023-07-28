@@ -483,7 +483,7 @@ class TNV(RegulariserFunction):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
         if isinstance(input, DataContainer):
             DataOrder.check_order_for_engine('cil', input.geometry)
-            if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
+            if ( input.geometry.channels == 1 ) or ( not input.geometry.ndim == 3) :
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         else:
             # if it is not a CIL DataContainer we assume that the data is passed in the correct order

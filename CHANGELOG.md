@@ -1,5 +1,9 @@
-* 23.x.x
+
+* x.x.x
   - allow CCPi Regulariser functions for not CIL object
+  - Add norm for CompositionOperator.
+  - Refactor SIRT algorithm to make it more computationally and memory efficient
+  - Optimisation in L2NormSquared
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

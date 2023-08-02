@@ -848,6 +848,52 @@ class TestFunction(CCPiTestClass):
         f4 = -2 * f2
         assert f4.L == 2 * f2.L
 
+    def test_proximal_conjugate(self):
+        from cil.framework import AcquisitionGeometry, BlockGeometry
+        ag = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
+
+        #default
+        ag.set_angles(angles)
+        ag.set_panel(5)
+
+        ig = ag.get_ImageGeometry()
+        bg = BlockGeometry(ig, ig)
+
+        b = ag.allocate('random', seed=2)
+
+        func_geom_test_list = [
+            (IndicatorBox(), ag),
+            (KullbackLeibler(b=b, backend='numba'), ag),
+            (KullbackLeibler(b=b, backend='numpy'), ag),
+            (L1Norm(), ag),
+            (L2NormSquared(), ag),
+            (MixedL21Norm(), bg),
+            (TotalVariation(backend='c'), ig),
+            (TotalVariation(backend='numpy'), ig),
+        ]
+        
+        for func, geom in func_geom_test_list:
+            self.proximal_conjugate_test(func, geom)
+
+    def proximal_conjugate_test(self, function, geom):
+        x = geom.allocate('random', seed=1)
+        tau = 1.0
+        f = Function()
+        f.proximal = function.proximal
+
+        a = function.proximal_conjugate(x, tau)
+        b = f.proximal_conjugate(x, tau)
+
+        # handle the case of MixedL21Norm
+        if isinstance(a, BlockDataContainer):
+            for xa,xb in zip(a,b):
+                np.testing.assert_allclose(xa.as_array(), xb.as_array(),
+                                    rtol=1e-5, atol=1e-5)
+        else:
+            np.testing.assert_allclose(a.as_array(), b.as_array(),
+                                    rtol=1e-5, atol=1e-5)
+
 
 class TestTotalVariation(unittest.TestCase):
 

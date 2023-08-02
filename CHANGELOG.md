@@ -2,6 +2,7 @@
   - Add norm for CompositionOperator.
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
+  - Fix for show_geometry bug for 2D data
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

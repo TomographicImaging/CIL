@@ -3859,23 +3859,6 @@ function.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.proximal_conjugate">
-<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.proximal_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Proximal operator of the convex conjugate of IndicatorBox at x:</p>
-<div class="math notranslate nohighlight">
-\[prox_{\tau * f^{*}}(x)\]</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Input to the proximal operator</p></li>
-<li><p><strong>tau</strong> (<em>float</em>) – Step size. Notice it is ignored in IndicatorBox, see <code class="docutils literal notranslate"><span class="pre">proximal</span></code> for details</p></li>
-<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Output of the proximal operator. If not provided, a new DataContainer is created.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.IndicatorBox.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Proximal operator of IndicatorBox at x</p>

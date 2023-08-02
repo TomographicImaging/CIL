@@ -336,36 +336,6 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="mf">0.0</span></div>
 
-<div class="viewcode-block" id="IndicatorBox.proximal_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.proximal_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of the convex conjugate of IndicatorBox at x:</span>
-
-<span class="sd">          .. math:: prox_{\tau * f^{*}}(x)</span>
-
-<span class="sd">          Parameters</span>
-<span class="sd">          ----------</span>
-<span class="sd">          x : DataContainer</span>
-<span class="sd">              Input to the proximal operator</span>
-<span class="sd">          tau : float</span>
-<span class="sd">              Step size. Notice it is ignored in IndicatorBox, see ``proximal`` for details</span>
-<span class="sd">          out : DataContainer, optional</span>
-<span class="sd">              Output of the proximal operator. If not provided, a new DataContainer is created.</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="c1"># x - tau * self.proximal(x/tau, tau)</span>
-        <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
-            <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-
-        <span class="n">out</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span></div>
-
 <div class="viewcode-block" id="IndicatorBox.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.IndicatorBox.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of IndicatorBox at x</span>
 

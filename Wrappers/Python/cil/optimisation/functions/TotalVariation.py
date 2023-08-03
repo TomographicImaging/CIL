@@ -16,7 +16,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Claire Delplancke (University of Bath)
+#  Margaret Duff, Claire Delplancke (University of Bath)
 
 from cil.optimisation.functions import Function, IndicatorBox, MixedL21Norm, MixedL11Norm
 from cil.optimisation.operators import GradientOperator
@@ -91,6 +91,11 @@ class TotalVariation(Function):
 
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
 
+    warmstart : :obj`boolean`, default = False
+        If set to true, the FGP aglorithm to calculate the TV proximal is initiated by the final value from the previous iteration and not at zero. 
+        This allows the max_iteration value to be reduced to 5-10 iterations. 
+
+
     Note
     ----
 
@@ -111,7 +116,7 @@ class TotalVariation(Function):
 
     >>> alpha = 2.0
     >>> TV = TotalVariation()
-    >>> sol = TV.proxima(b, tau = alpha)
+    >>> sol = TV.proximal(b, tau = alpha)
 
     Examples
     --------
@@ -122,7 +127,7 @@ class TotalVariation(Function):
 
     >>> alpha = 2.0
     >>> TV = TotalVariation(isotropic=False, lower=1.0, upper=2.0)
-    >>> sol = TV.proxima(b, tau = alpha)    
+    >>> sol = TV.proximal(b, tau = alpha)    
 
 
     Examples
@@ -133,7 +138,7 @@ class TotalVariation(Function):
     >>> alpha = 2.0
     >>> gamma = 1e-3
     >>> TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)
-    >>> sol = TV.proxima(b, tau = 1.0)    
+    >>> sol = TV.proximal(b, tau = 1.0)    
 
     """   
 
@@ -148,7 +153,8 @@ class TotalVariation(Function):
                  isotropic = True,
                  split = False,
                  info = False, 
-                 strong_convexity_constant = 0):
+                 strong_convexity_constant = 0,
+                 warmstart=False):
 
         
         super(TotalVariation, self).__init__(L = None)
@@ -189,6 +195,11 @@ class TotalVariation(Function):
 
         # splitting Gradient
         self.split = split
+
+        # warm-start
+        self.warmstart  = warmstart
+        if self.warmstart:
+            self.hasstarted = False
 
         # Strong convexity for TV
         self.strong_convexity_constant = strong_convexity_constant
@@ -234,7 +245,7 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out = None):
 
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""        
-
+        self.tau=tau #Introduced for testing 
 
         if self.strong_convexity_constant>0:
 
@@ -274,11 +285,19 @@ class TotalVariation(Function):
             self.calculate_Lipschitz()            
         
         # initialise
-        t = 1        
+        t = 1        # line 2 
 
-        p1 = self.gradient.range_geometry().allocate(0)
-        p2 = self.gradient.range_geometry().allocate(0)  
-        tmp_q = self.gradient.range_geometry().allocate(0)
+        p1 = self.gradient.range_geometry().allocate(0) # dua variable - value alloacated here is not used -  is overwritten during iterations 
+        if not self.warmstart:
+            self.p2 = self.gradient.range_geometry().allocate(0)  # previous dual variable - needs loading for warm start! 
+            tmp_q = self.gradient.range_geometry().allocate(0) # should be equal to self.p2 - i.e. needs loading for warm start 
+        else:
+            if not self.hasstarted:
+                self.p2 = self.gradient.range_geometry().allocate(0)  # previous dual variable - needs loading for warm start! 
+                self.hasstarted = True
+            tmp_q = self.p2.copy() # should be equal to self.p2 - i.e. needs loading for warm start 
+
+
 
         # multiply tau by -1 * regularisation_parameter here so it's not recomputed every iteration
         # when tau is an array this is done inplace so reverted at the end
@@ -294,24 +313,24 @@ class TotalVariation(Function):
             out = self.gradient.domain_geometry().allocate(0)   
 
         should_break = False
-        for k in range(self.iterations):
+        for k in range(self.iterations): # line 3 in alogirhtm one of "Multicontrast MRI Reconstruction with Structure-Guided Total Variation", Ehrhardt, Betcke, 2016.
                                                                                    
             t0 = t
-            self.gradient.adjoint(tmp_q, out = out)
-            out.sapyb(tau_reg_neg, x, 1.0, out=out)
-            self.projection_C(out, tau=None, out = out)
+            self.gradient.adjoint(tmp_q, out = out) # line 4
+            out.sapyb(tau_reg_neg, x, 1.0, out=out)# line 4
+            self.projection_C(out, tau=None, out = out)# line 4 
 
             if should_break:
                 break
 
-            self.gradient.direct(out, out=p1)
+            self.gradient.direct(out, out=p1) # line 4
 
-            multip = (-self.L)/tau_reg_neg
-            p1.multiply(multip,out=p1)
+            multip = (-self.L)/tau_reg_neg# line 4
+            p1.multiply(multip,out=p1) #line 4/5 
             
-            tmp_q += p1
+            tmp_q += p1 # line 5
 
-            if self.tolerance is not None and k%5==0:
+            if self.tolerance is not None and k%5==0: # testing convergence criterion 
                 error = p1.norm()
                 error /= tmp_q.norm()
                 if error <= self.tolerance:                           
@@ -319,18 +338,18 @@ class TotalVariation(Function):
 
             # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixedL21Norm (isotropic case),
             # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.
-            self.func.proximal_conjugate(tmp_q, 1.0, out=p1)
+            self.func.proximal_conjugate(tmp_q, 1.0, out=p1) # line 5
                        
-            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
+            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2 # line 6
             
-            p1.subtract(p2, out=tmp_q)
-            tmp_q *= (t0-1)/t
-            tmp_q += p1
+            p1.subtract(self.p2, out=tmp_q) # line 7 
+            tmp_q *= (t0-1)/t # line 7 
+            tmp_q += p1 # line 7 
 
-            #switch p1 and p2 references
+            #switch p1 and self.p2 references
             tmp = p1
-            p1 = p2
-            p2 = tmp
+            p1 = self.p2
+            self.p2 = tmp
 
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:

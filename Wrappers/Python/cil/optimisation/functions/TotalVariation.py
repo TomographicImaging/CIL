@@ -16,7 +16,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-#  Margaret Duff, Claire Delplancke (University of Bath)
+# Claire Delplancke (University of Bath)
+
 
 from cil.optimisation.functions import Function, IndicatorBox, MixedL21Norm, MixedL11Norm
 from cil.optimisation.operators import GradientOperator

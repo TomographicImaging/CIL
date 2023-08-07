@@ -95,6 +95,8 @@ class TotalVariation(Function):
     warmstart : :obj`boolean`, default = False
         If set to true, the FGP aglorithm to calculate the TV proximal is initiated by the final value from the previous iteration and not at zero. 
         This allows the max_iteration value to be reduced to 5-10 iterations. 
+        With warmstart this function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. 
+        However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated. 
 
 
     Note
@@ -197,10 +199,9 @@ class TotalVariation(Function):
         # splitting Gradient
         self.split = split
 
-        # warm-start
-        self.warmstart  = warmstart
-        if self.warmstart:
-            self.hasstarted = False
+        #For the warmstart functionality
+        self.warmstart=warmstart
+        self._p2=None
 
         # Strong convexity for TV
         self.strong_convexity_constant = strong_convexity_constant
@@ -210,6 +211,24 @@ class TotalVariation(Function):
             self.func = MixedL21Norm()
         else:
             self.func = MixedL11Norm()
+
+     # setting the dual value for the proximal calculation - important for warmstart
+    @property
+    def p2(self):
+        if self._p2 is not None:
+            return self._p2
+        else:
+            p2 = self.gradient.range_geometry().allocate(0)
+            if self.warmstart:
+                self.p2 = p2
+            return p2
+
+    @p2.setter
+    def p2(self, value):
+        if isinstance(value, type(self.gradient.range_geometry().allocate(0))):
+            self._p2 = value
+        else:
+            raise TypeError('p2 should be in the range of the gradient of the image')
 
     @property
     def regularisation_parameter(self):
@@ -288,16 +307,11 @@ class TotalVariation(Function):
         # initialise
         t = 1        # line 2 
 
-        p1 = self.gradient.range_geometry().allocate(0) # dua variable - value alloacated here is not used -  is overwritten during iterations 
-        if not self.warmstart:
-            self.p2 = self.gradient.range_geometry().allocate(0)  # previous dual variable - needs loading for warm start! 
-            tmp_q = self.gradient.range_geometry().allocate(0) # should be equal to self.p2 - i.e. needs loading for warm start 
-        else:
-            if not self.hasstarted:
-                self.p2 = self.gradient.range_geometry().allocate(0)  # previous dual variable - needs loading for warm start! 
-                self.hasstarted = True
-            tmp_q = self.p2.copy() # should be equal to self.p2 - i.e. needs loading for warm start 
-
+        # dual variable - its content is overwritten during iterations 
+        p1 = self.gradient.range_geometry().allocate(None)
+        p2 = self.p2 # sets p2 to be of size self.gradient.range_geometry() initialised at zero unless warmstart=True
+        # temp_q should be equal to p2 
+        tmp_q = p2.copy()  
 
 
         # multiply tau by -1 * regularisation_parameter here so it's not recomputed every iteration
@@ -343,14 +357,16 @@ class TotalVariation(Function):
                        
             t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2 # line 6
             
-            p1.subtract(self.p2, out=tmp_q) # line 7 
+            p1.subtract(p2, out=tmp_q) # line 7 
             tmp_q *= (t0-1)/t # line 7 
             tmp_q += p1 # line 7 
 
-            #switch p1 and self.p2 references
+            #switch p1 and p2 references
             tmp = p1
-            p1 = self.p2
-            self.p2 = tmp
+            p1 = p2
+            p2 = tmp
+            if self.warmstart:
+                self.p2=p2
 
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:

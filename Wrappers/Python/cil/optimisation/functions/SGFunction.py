@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import ApproximateGradientSumFunction
+from ApproximateGradientSumFunction import ApproximateGradientSumFunction
 
 class SGFunction(ApproximateGradientSumFunction):
 

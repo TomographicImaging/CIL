@@ -200,8 +200,8 @@ class TotalVariation(Function):
         self.split = split
 
         #For the warmstart functionality
-        self.warmstart=warmstart
-        self._p2=None
+        self.warmstart = warmstart
+        self._p2 = None
 
         # Strong convexity for TV
         self.strong_convexity_constant = strong_convexity_constant

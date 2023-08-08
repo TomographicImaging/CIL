@@ -51,23 +51,24 @@ class ApproximateGradientSumFunction(SumFunction):
     >>> f = ApproximateGradientSumFunction(list_of_functions) 
 
     >>> list_of_functions = [LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets)) 
-    >>> selection = RandomSampling.random_shuffle(len(list_of_functions))
-    >>> f = ApproximateGradientSumFunction(list_of_functions, selection=selection)   
+    >>> sampler = RandomSampling.random_shuffle(len(list_of_functions))
+    >>> f = ApproximateGradientSumFunction(list_of_functions, sampler=sampler)   
   
 
     """
     
     def __init__(self, functions, sampler=None, data_passes=None, initial=None, dask=False):    
                         
-        if selection is None:
-            self.selection = RandomSampling.uniform(len(functions))
+        if sampler is None:
+            raise NotImplementedError
         else:
-            self.selection = selection
+            self.sampler = sampler
 
         self.functions_used = [] 
         self.data_passes = data_passes
         self.initial = initial
         self._dask = dask
+        self.num_functions=len(functions)
 
         try:
             import dask
@@ -121,7 +122,7 @@ class ApproximateGradientSumFunction(SumFunction):
             return self._gradient_parallel(x, out=out)            
         else:
             r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
-        return super(ApproximateGradientSumFunction, self).gradient(x, out=out)                              
+            return super(ApproximateGradientSumFunction, self).gradient(x, out=out)                              
        
         
     def approximate_gradient(self, function_num, x,  out=None):
@@ -142,8 +143,8 @@ class ApproximateGradientSumFunction(SumFunction):
                
     def next_function(self):
         
-        """ Selects the next function or the next batch of functions from the list of :code:`functions` using the :code:`selection`."""        
-        self.function_num = next(self.selection)
+        """ Selects the next function or the next batch of functions from the list of :code:`functions` using the :code:`sampler`."""        
+        self.function_num = self.sampler.next()
         
         # append each function used at this iteration
         self.functions_used.append(self.function_num)

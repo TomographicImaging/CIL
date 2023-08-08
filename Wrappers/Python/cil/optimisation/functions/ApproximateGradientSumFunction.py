@@ -133,7 +133,7 @@ class ApproximateGradientSumFunction(SumFunction):
     def gradient(self, x, out=None):
 
         """ Computes the gradient for each selected function at :code:`x`."""   
-        self.next_function()
+        self.next_function() 
 
         # single function 
         if isinstance(self.function_num, numbers.Number):         

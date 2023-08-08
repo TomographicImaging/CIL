@@ -24,7 +24,7 @@ class SGFunction(ApproximateGradientSumFunction):
 
         Parameters:
         ----------
-        functions: list
+        functions: list 
             A list of functions.
         sampler: callable or None, optional
             A callable object that selects the function or batch of functions to compute the gradient. If None, a random function will be selected.

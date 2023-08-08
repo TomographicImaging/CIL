@@ -212,9 +212,11 @@ class TotalVariation(Function):
         else:
             self.func = MixedL11Norm()
 
-     # setting the dual value for the proximal calculation - important for warmstart
+     
     @property
     def p2(self):
+        r"""The initial value for the dual in the proximal calculation - allocated to zero in the case of warmstart=False
+          or initialised as the last iterate seen in the proximal calculation in the case warmstart=True ."""
         if self._p2 is not None:
             return self._p2
         else:
@@ -225,6 +227,7 @@ class TotalVariation(Function):
 
     @p2.setter
     def p2(self, value):
+        r""" Setter for the dual value in the proximal calculation."""
         if len(value.geometry.geometries) != len(self.gradient.range_geometry().geometries):
             self._p2 = value
         else:

@@ -19,7 +19,9 @@
 import numpy as np
 import math 
 class Sampling():
-
+    
+    r"""Takes an integer number of subsets and a sampling type and returns a class object with a next function. On each call of next, an integer value between 0 and the number of subsets is returned, the next sample."""
+    
     def __init__(self, num_subsets, sampling_type='sequential', prob=None, seed=99):
         self.type=sampling_type
         self.num_subsets=num_subsets

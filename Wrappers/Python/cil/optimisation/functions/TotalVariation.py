@@ -225,7 +225,7 @@ class TotalVariation(Function):
 
     @p2.setter
     def p2(self, value):
-        if isinstance(value, type(self.gradient.range_geometry().allocate(0))):
+        if len(value.geometry.geometries) != len(self.gradient.range_geometry().geometries):
             self._p2 = value
         else:
             raise TypeError('p2 should be in the range of the gradient of the image')

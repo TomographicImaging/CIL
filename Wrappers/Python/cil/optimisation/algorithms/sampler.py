@@ -18,31 +18,58 @@
 
 import numpy as np
 import math 
-class Sampling():
+import time 
+class Sampler():
     
     r"""Takes an integer number of subsets and a sampling type and returns a class object with a next function. On each call of next, an integer value between 0 and the number of subsets is returned, the next sample."""
     
-    def __init__(self, num_subsets, sampling_type='sequential', prob=None, seed=99):
+
+    @staticmethod
+    def hermanMeyer(num_subsets):
+        order=_herman_meyer_order(self.num_subsets)
+        sampler=Sampler(num_subsets, sampling_type='herman_meyer', order=order)
+        return sampler 
+
+    @staticmethod
+    def sequential(num_subsets):
+        order=range(self.num_subsets)
+        sampler=Sampler(num_subsets, sampling_type='sequential', order=order)
+        return sampler 
+
+    @staticmethod
+    def randomWithReplacement(num_subsets, prob=None, seed=None):
+        if prob==None:
+                prob = [1/self.num_subsets] * self.num_subsets
+            else:
+                prob=prob
+        sampler=Sampler(num_subsets, sampling_type='random_with_replacement', prob=prob, seed=seed)
+        return sampler 
+    
+    @staticmethod
+    def randomWithoutReplacement(num_subsets, seed=None):
+        order=range(self.num_subsets)
+        sampler=Sampler(num_subsets, sampling_type='random_without_replacement', order=order, shuffle=True, seed=seed)
+        return sampler 
+
+
+    def __init__(self, num_subsets, sampling_type, shuffle=False, order=None, prob=None, seed=None):
         self.type=sampling_type
         self.num_subsets=num_subsets
-        self.seed=seed
-        
-        self.last_subset=-1
-        if self.type=='sequential':
-            pass
-        elif self.type=='random':
-            if prob==None:
-                self.prob = [1/self.num_subsets] * self.num_subsets
-            else:
-                self.prob=prob
-        elif self.type=='herman_meyer':
-            
-            self.order=self.herman_meyer_order(self.num_subsets)
+        if seed !=None:
+            self.seed=seed
         else:
-            raise NameError('Please choose from sequential, random, herman_meyer')
-
+            self.seed=int(time.time())
+        self.order=order
+        if order!=None:
+            self.iterator=self._next_order
+        self.prob=prob
+        if prob!=None:
+            self.iterator=self._next_prob
+        self.shuffle=shuffle
+        self.last_subset=self.num_subsets-1
+        
     
-    def herman_meyer_order(self, n):
+    def _herman_meyer_order(self, n):
     # Assuming that the subsets are in geometrical order
         n_variable = n
         i = 2
@@ -75,29 +102,25 @@ class Sampling():
                 order[element] = order[element] + math.prod(factors[factor_n+1:]) * mapping
         return order
 
+    
+    def _next_order(self)
+        if shuffle=True & self.last_subset==self.numsubsets-1:
+                    self.order=np.random.perumatation(self.order)
+                self.last_subset= (self.last_subset+1)%self.num_subsets
+                return(self.order[self.last_subset])
+    
+    def _next_prob(self):
+        return int(np.random.choice(self.num_subsets, 1, p=self.prob))
+
     def next(self):
-        if self.type=='sequential':
-            self.last_subset= (self.last_subset+1)%self.num_subsets
-            return self.last_subset
-        elif self.type=='random':
-            if self.last_subset==-1:
-                np.random.seed(self.seed)
-                self.last_subset=0
-            return int(np.random.choice(self.num_subsets, 1, p=self.prob))
-        elif self.type=='herman_meyer':
-            self.last_subset= (self.last_subset+1)%self.num_subsets
-            return(self.order[self.last_subset])
+        return (self.iterator())
 
 
     def show_epochs(self, num_epochs=2):
-        if self.type=='sequential':
-            for i in range(num_epochs):
-                print('Epoch {}: '.format(i), [j for j in range(self.num_subsets)])
-        elif self.type=='random':
-            np.random.seed(self.seed)
-            for i in range(num_epochs):
-                print('Epoch {}: '.format(i), np.random.choice(self.num_subsets, self.num_subsets, p=self.prob))
-        elif self.type=='herman_meyer':
-            for i in range(num_epochs):
-                print('Epoch {}: '.format(i), self.order)
+        current_state=np.random.get_state()
+        np.random.seed(self.seed)
+        for i in range(num_epochs):
+            rint('Epoch {}: '.format(i), [next() for _ in range(self.num_subsets)])
+        np.random.set_state(current_state)
+        
    

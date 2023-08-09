@@ -6,6 +6,7 @@
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
   - Fix for show_geometry bug for 2D data
+  - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

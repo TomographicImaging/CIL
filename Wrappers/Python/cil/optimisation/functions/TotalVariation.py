@@ -327,8 +327,6 @@ class TotalVariation(Function):
             out.sapyb(tau_reg_neg, x, 1.0, out=out)# line 4
             self.projection_C(out, tau=None, out = out)# line 4 
 
-            if should_break:
-                break
 
             self.gradient.direct(out, out=p1) # line 4
 

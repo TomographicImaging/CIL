@@ -59,9 +59,11 @@ class TotalVariation(Function):
     ----------
 
     max_iteration : :obj:`int`, default = 100
-        Maximum number of iterations for the FGP algorithm.
+        Maximum number of iterations for the FGP algorithm to solve to solve the dual problem 
+        of the Total Variation Denoising problem (ROF).
     tolerance : :obj:`float`, default = None
-        Stopping criterion for the FGP algorithm.
+        Stopping criterion for the FGP algorithm used to to solve the dual problem 
+        of the Total Variation Denoising problem (ROF)
         
         .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
 
@@ -84,7 +86,8 @@ class TotalVariation(Function):
         Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.
 
     info : :obj:`boolean`, default = False
-        Information is printed for the stopping criterion of the FGP algorithm
+        Information is printed for the stopping criterion of the FGP algorithm  used to solve the dual problem 
+        of the Total Variation Denoising problem (ROF).
 
     strong_convexity_constant : :obj:`float`, default = 0
         A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
@@ -95,7 +98,7 @@ class TotalVariation(Function):
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
 
     warmstart : :obj`boolean`, default = False
-        If set to true, the FGP aglorithm to calculate the TV proximal is initiated by the final value from the previous iteration and not at zero. 
+        If set to true, the FGP aglorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. 
         This allows the max_iteration value to be reduced to 5-10 iterations. 
         With warmstart this function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. 
         However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated. 
@@ -167,10 +170,10 @@ class TotalVariation(Function):
         # Regularising parameter = alpha
         self.regularisation_parameter = 1.
         
-        # Iterations for FGP_TV
+        # Iterations for FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.iterations = max_iteration
         
-        # Tolerance for FGP_TV
+        # Tolerance for FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.tolerance = tolerance
         
         # Total variation correlation (isotropic=Default)
@@ -193,7 +196,7 @@ class TotalVariation(Function):
         self._gradient = None
         self._domain = None
         
-        # Print stopping information (iterations and tolerance error) of FGP_TV  
+        # Print stopping information (iterations and tolerance error) of FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.info = info
         if self.info:
             warnings.warn(" `info` is deprecate. Please use logging instead.")
@@ -282,7 +285,7 @@ class TotalVariation(Function):
 
     def _fista_on_dual_rof(self, x, tau, out = None):
         
-        r""" Implements the Fast Gradient Projection algorithm on the dual problem 
+        r""" Implements the Fast Gradient Projection (FGP) algorithm to solve the dual problem 
         of the Total Variation Denoising problem (ROF).
 
         .. math: \max_{\|y\|_{\infty}<=1.} \frac{1}{2}\|\nabla^{*} y + x \|^{2} - \frac{1}{2}\|x\|^{2}
@@ -359,7 +362,7 @@ class TotalVariation(Function):
         if self.warmstart:
             self._p2 = p2
 
-        # Print stopping information (iterations and tolerance error) of FGP_TV     
+        # Print stopping information (iterations and tolerance error) of  FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)   
         if self.info:
             if self.tolerance is not None:
                 logging.info("Stop at {} iterations with tolerance {} .".format(k, error))

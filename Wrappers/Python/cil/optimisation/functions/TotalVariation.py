@@ -338,8 +338,8 @@ class TotalVariation(Function):
             if self.tolerance is not None and k%5==0: # testing convergence criterion 
                 error = p1.norm()
                 error /= tmp_q.norm()
-                if error <= self.tolerance:                           
-                    should_break = True
+                if error < self.tolerance:                           
+                    break
 
             # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixedL21Norm (isotropic case),
             # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.

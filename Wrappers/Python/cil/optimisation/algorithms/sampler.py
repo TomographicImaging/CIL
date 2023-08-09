@@ -23,31 +23,66 @@ class Sampler():
     
     r"""Takes an integer number of subsets and a sampling type and returns a class object with a next function. On each call of next, an integer value between 0 and the number of subsets is returned, the next sample."""
     
+        
 
     @staticmethod
     def hermanMeyer(num_subsets):
-        order=_herman_meyer_order(self.num_subsets)
+        @staticmethod
+        def _herman_meyer_order(n):
+            # Assuming that the subsets are in geometrical order
+            n_variable = n
+            i = 2
+            factors = []
+            while i * i <= n_variable:
+                if n_variable % i:
+                    i += 1
+                else:
+                    n_variable //= i
+                    factors.append(i)
+            if n_variable > 1:
+                factors.append(n_variable)
+            n_factors = len(factors)
+            order =  [0 for _ in range(n)]
+            value = 0
+            for factor_n in range(n_factors):
+                n_rep_value = 0
+                if factor_n == 0:
+                    n_change_value = 1
+                else:
+                    n_change_value = math.prod(factors[:factor_n])
+                for element in range(n):
+                    mapping = value
+                    n_rep_value += 1
+                    if n_rep_value >= n_change_value:
+                        value = value + 1
+                        n_rep_value = 0
+                    if value == factors[factor_n]:
+                        value = 0
+                    order[element] = order[element] + math.prod(factors[factor_n+1:]) * mapping
+            return order
+
+        order=_herman_meyer_order(num_subsets)
         sampler=Sampler(num_subsets, sampling_type='herman_meyer', order=order)
         return sampler 
 
     @staticmethod
     def sequential(num_subsets):
-        order=range(self.num_subsets)
+        order=list(range(num_subsets))
         sampler=Sampler(num_subsets, sampling_type='sequential', order=order)
         return sampler 
 
     @staticmethod
     def randomWithReplacement(num_subsets, prob=None, seed=None):
         if prob==None:
-                prob = [1/self.num_subsets] * self.num_subsets
-            else:
-                prob=prob
+            prob = [1/num_subsets] *num_subsets
+        else:   
+            prob=prob
         sampler=Sampler(num_subsets, sampling_type='random_with_replacement', prob=prob, seed=seed)
         return sampler 
     
     @staticmethod
     def randomWithoutReplacement(num_subsets, seed=None):
-        order=range(self.num_subsets)
+        order=list(range(num_subsets))
         sampler=Sampler(num_subsets, sampling_type='random_without_replacement', order=order, shuffle=True, seed=seed)
         return sampler 
 
@@ -59,7 +94,9 @@ class Sampler():
             self.seed=seed
         else:
             self.seed=int(time.time())
+        self.generator=np.random.RandomState(self.seed)
         self.order=order
+        self.initial_order=order
         if order!=None:
             self.iterator=self._next_order
         self.prob=prob
@@ -68,59 +105,31 @@ class Sampler():
         self.shuffle=shuffle
         self.last_subset=self.num_subsets-1
         
-    
-    def _herman_meyer_order(self, n):
-    # Assuming that the subsets are in geometrical order
-        n_variable = n
-        i = 2
-        factors = []
-        while i * i <= n_variable:
-            if n_variable % i:
-                i += 1
-            else:
-                n_variable //= i
-                factors.append(i)
-        if n_variable > 1:
-            factors.append(n_variable)
-        n_factors = len(factors)
-        order =  [0 for _ in range(n)]
-        value = 0
-        for factor_n in range(n_factors):
-            n_rep_value = 0
-            if factor_n == 0:
-                n_change_value = 1
-            else:
-                n_change_value = math.prod(factors[:factor_n])
-            for element in range(n):
-                mapping = value
-                n_rep_value += 1
-                if n_rep_value >= n_change_value:
-                    value = value + 1
-                    n_rep_value = 0
-                if value == factors[factor_n]:
-                    value = 0
-                order[element] = order[element] + math.prod(factors[factor_n+1:]) * mapping
-        return order
+
 
     
-    def _next_order(self)
-        if shuffle=True & self.last_subset==self.numsubsets-1:
-                    self.order=np.random.perumatation(self.order)
-                self.last_subset= (self.last_subset+1)%self.num_subsets
-                return(self.order[self.last_subset])
+    def _next_order(self):
+      #  print(self.last_subset)
+        if self.shuffle==True and self.last_subset==self.num_subsets-1:
+                self.order=self.generator.permutation(self.order)
+                print(self.order)
+        self.last_subset= (self.last_subset+1)%self.num_subsets
+        return(self.order[self.last_subset])
     
     def _next_prob(self):
-        return int(np.random.choice(self.num_subsets, 1, p=self.prob))
+        return int(self.generator.choice(self.num_subsets, 1, p=self.prob))
 
     def next(self):
         return (self.iterator())
 
 
     def show_epochs(self, num_epochs=2):
-        current_state=np.random.get_state()
-        np.random.seed(self.seed)
+        save_generator=self.generator
+        save_order=self.order
+        self.order=self.initial_order
+        self.generator=np.random.RandomState(self.seed)
         for i in range(num_epochs):
-            rint('Epoch {}: '.format(i), [next() for _ in range(self.num_subsets)])
-        np.random.set_state(current_state)
-        
+            print('Epoch {}: '.format(i), [self.next() for _ in range(self.num_subsets)])
+        self.generator=save_generator
+        self.order=save_order
    

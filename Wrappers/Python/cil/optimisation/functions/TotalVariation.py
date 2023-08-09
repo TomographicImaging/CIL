@@ -52,6 +52,8 @@ class TotalVariation(Function):
     The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
     applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, :cite:`Zhu2010`.
 
+    See also "Multicontrast MRI Reconstruction with Structure-Guided Total Variation", Ehrhardt, Betcke, 2016.
+
 
     Parameters
     ----------
@@ -320,20 +322,20 @@ class TotalVariation(Function):
             out = self.gradient.domain_geometry().allocate(0)   
 
         should_break = False
-        for k in range(self.iterations): # line 3 in alogirhtm one of "Multicontrast MRI Reconstruction with Structure-Guided Total Variation", Ehrhardt, Betcke, 2016.
+        for k in range(self.iterations): 
                                                                                    
             t0 = t
-            self.gradient.adjoint(tmp_q, out = out) # line 4
-            out.sapyb(tau_reg_neg, x, 1.0, out=out)# line 4
-            self.projection_C(out, tau=None, out = out)# line 4 
+            self.gradient.adjoint(tmp_q, out = out) 
+            out.sapyb(tau_reg_neg, x, 1.0, out=out)
+            self.projection_C(out, tau=None, out = out)
 
 
-            self.gradient.direct(out, out=p1) # line 4
+            self.gradient.direct(out, out=p1) 
 
-            multip = (-self.L)/tau_reg_neg# line 4
-            p1.multiply(multip,out=p1) #line 4/5 
+            multip = (-self.L)/tau_reg_neg
+            p1.multiply(multip,out=p1) 
             
-            tmp_q += p1 # line 5
+            tmp_q += p1 
 
             if self.tolerance is not None and k%5==0: # testing convergence criterion 
                 error = p1.norm()
@@ -343,13 +345,12 @@ class TotalVariation(Function):
 
             # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixedL21Norm (isotropic case),
             # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.
-            self.func.proximal_conjugate(tmp_q, 1.0, out=p1) # line 5
+            self.func.proximal_conjugate(tmp_q, 1.0, out=p1) 
                        
-            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2 # line 6
-            
-            p1.subtract(p2, out=tmp_q) # line 7 
-            tmp_q *= (t0-1)/t # line 7 
-            tmp_q += p1 # line 7 
+            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2 
+            p1.subtract(p2, out=tmp_q) 
+            tmp_q *= (t0-1)/t 
+            tmp_q += p1
 
             #switch p1 and p2 references
             tmp = p1

@@ -368,8 +368,8 @@ class TotalVariation(Function):
             tmp = p1
             p1 = p2
             p2 = tmp
-            if self.warmstart:
-                self.p2=p2
+        if self.warmstart:
+            self._p2 = p2
 
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:

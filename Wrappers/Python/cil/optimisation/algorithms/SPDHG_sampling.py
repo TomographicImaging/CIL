@@ -22,7 +22,7 @@ from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
 import logging
-from sampling import Sampling 
+from sampler import Sampler
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
 
@@ -50,7 +50,7 @@ class SPDHG(Algorithm):
         List of probabilities. If None each subset will have probability = 1/number of subsets
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-    sampler: instnace of the Sampling class
+    sampler: instnace of the Sampler class
         Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets
     **kwargs:
     norms : list of floats
@@ -144,20 +144,18 @@ class SPDHG(Algorithm):
         self.tau = tau
         self.sigma = sigma
         self.prob = prob
-        self.ndual_subsets = len(self.operator)
+        self.ndual_subsets = len(self.f)
         self.gamma = gamma
         self.rho = .99
         self.sampler=sampler
 
         if self.sampler==None:
-            if self.prob != None:
-                self.sampler=Sampling(self.ndual_subsets, 'random', prob=self.prob)
-            else:
-                self.prob = [1/self.ndual_subsets] * self.ndual_subsets
-                self.sampler=Sampling(self.ndual_subsets, 'random', prob=self.prob)
+            if self.prob == None:
+                        self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+            self.sampler=Sampler.randomWithReplacement(self.ndual_subsets,  prob=self.prob)
         else:
             if self.prob==None:
-                if self.sampler.type=='random':
+                if self.sampler.prob!=None:
                     self.prob=self.sampler.prob
                 else:
                     self.prob = [1/self.ndual_subsets] * self.ndual_subsets

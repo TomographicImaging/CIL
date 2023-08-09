@@ -222,14 +222,6 @@ class TotalVariation(Function):
         else:
             return self._p2
 
-    @p2.setter
-    def p2(self, value):
-        r""" Setter for the dual value in the proximal calculation."""
-        if len(value) == len(self.gradient.range_geometry().geometries):
-            self._p2 = value
-        else:
-            raise TypeError('p2 should be in the range of the gradient of the image')
-
     @property
     def regularisation_parameter(self):
         return self._regularisation_parameter

@@ -336,12 +336,11 @@ class TotalVariation(Function):
             self.gradient.direct(out, out=p1) 
 
             multip = (-self.L)/tau_reg_neg
-            p1.multiply(multip,out=p1) 
-            
-            tmp_q += p1 
 
+            tmp_q.sapyb(1., p1, multip, out=tmp_q)
+            
             if self.tolerance is not None and k%5==0: # testing convergence criterion 
-                error = p1.norm()
+                error = p1.norm()*multip
                 error /= tmp_q.norm()
                 if error < self.tolerance:                           
                     break

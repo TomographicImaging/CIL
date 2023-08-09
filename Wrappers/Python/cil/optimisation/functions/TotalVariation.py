@@ -301,7 +301,7 @@ class TotalVariation(Function):
 
         # dual variable - its content is overwritten during iterations 
         p1 = self.gradient.range_geometry().allocate(None)
-        p2 = self.p2 # sets p2 to be of size self.gradient.range_geometry() initialised at zero unless warmstart=True
+        p2 = self._get_p2()
         # temp_q should be equal to p2 
         tmp_q = p2.copy()  
 

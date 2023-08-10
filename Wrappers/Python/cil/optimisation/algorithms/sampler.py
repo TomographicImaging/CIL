@@ -112,7 +112,7 @@ class Sampler():
       #  print(self.last_subset)
         if self.shuffle==True and self.last_subset==self.num_subsets-1:
                 self.order=self.generator.permutation(self.order)
-                print(self.order)
+                #print(self.order)
         self.last_subset= (self.last_subset+1)%self.num_subsets
         return(self.order[self.last_subset])
     
@@ -125,6 +125,8 @@ class Sampler():
 
     def show_epochs(self, num_epochs=2):
         save_generator=self.generator
+        save_last_subset=self.last_subset
+        self.last_subset=self.num_subsets-1
         save_order=self.order
         self.order=self.initial_order
         self.generator=np.random.RandomState(self.seed)
@@ -132,4 +134,5 @@ class Sampler():
             print('Epoch {}: '.format(i), [self.next() for _ in range(self.num_subsets)])
         self.generator=save_generator
         self.order=save_order
-   
+        self.last_subset=save_last_subset
+

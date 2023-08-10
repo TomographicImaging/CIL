@@ -340,7 +340,8 @@ class TotalVariation(Function):
             tmp_q.sapyb(1., p1, multip, out=tmp_q)
             
             if self.tolerance is not None and k%5==0: # testing convergence criterion 
-                error = p1.norm()*multip
+                p1 *= multip
+                error = p1.norm()
                 error /= tmp_q.norm()
                 if error < self.tolerance:                           
                     break

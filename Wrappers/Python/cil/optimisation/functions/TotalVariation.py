@@ -58,9 +58,10 @@ class TotalVariation(Function):
     Parameters
     ----------
 
-    max_iteration : :obj:`int`, default = 100
+    max_iteration : :obj:`int`, default = 5
         Maximum number of iterations for the FGP algorithm to solve to solve the dual problem 
-        of the Total Variation Denoising problem (ROF).
+        of the Total Variation Denoising problem (ROF). If warmstart=False, this should be around 100,
+        or larger with a set tolerance. 
     tolerance : :obj:`float`, default = None
         Stopping criterion for the FGP algorithm used to to solve the dual problem 
         of the Total Variation Denoising problem (ROF)
@@ -97,7 +98,7 @@ class TotalVariation(Function):
 
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
 
-    warmstart : :obj`boolean`, default = False
+    warmstart : :obj`boolean`, default = True
         If set to true, the FGP aglorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. 
         This allows the max_iteration value to be reduced to 5-10 iterations. 
         With warmstart this function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. 
@@ -152,7 +153,7 @@ class TotalVariation(Function):
 
 
     def __init__(self,
-                 max_iteration=100, 
+                 max_iteration=5, 
                  tolerance = None, 
                  correlation = "Space",
                  backend = "c",
@@ -162,7 +163,7 @@ class TotalVariation(Function):
                  split = False,
                  info = False, 
                  strong_convexity_constant = 0,
-                 warmstart=False):
+                 warmstart=True):
 
         
         super(TotalVariation, self).__init__(L = None)
@@ -262,7 +263,6 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out = None):
 
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""        
-        self.tau=tau #Introduced for testing 
 
         if self.strong_convexity_constant>0:
 

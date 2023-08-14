@@ -1180,7 +1180,7 @@ class TestTotalVariation(unittest.TestCase):
         if isinstance(tv._get_p2(), BlockDataContainer):
             for xa,xb in zip(tv._get_p2(),tv.gradient.range_geometry().allocate(0)):
                 np.testing.assert_allclose(xa.as_array(), xb.as_array(),
-                                    rtol=1e-5, atol=1e-5)
+                                    rtol=1e-8, atol=1e-8)
        
     def test_get_p2_after_prox_iteration_has_changed(self):
         data = dataexample.SHAPES.get(size=(64, 64))
@@ -1199,7 +1199,7 @@ class TestTotalVariation(unittest.TestCase):
         if isinstance(tv._get_p2(), BlockDataContainer):
             for xa,xb in zip(tv._get_p2(),tv.gradient.range_geometry().allocate(0)):
                 np.testing.assert_allclose(xa.as_array(), xb.as_array(),
-                                    rtol=1e-5, atol=1e-5)
+                                    rtol=1e-8, atol=1e-8)
 
 class TestLeastSquares(unittest.TestCase):
 

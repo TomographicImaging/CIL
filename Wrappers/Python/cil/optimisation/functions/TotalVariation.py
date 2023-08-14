@@ -153,7 +153,7 @@ class TotalVariation(Function):
 
 
     def __init__(self,
-                 max_iteration=5, 
+                 max_iteration=10, 
                  tolerance = None, 
                  correlation = "Space",
                  backend = "c",

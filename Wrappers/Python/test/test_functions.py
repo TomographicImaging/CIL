@@ -869,8 +869,8 @@ class TestFunction(CCPiTestClass):
             (L1Norm(), ag),
             (L2NormSquared(), ag),
             (MixedL21Norm(), bg),
-            (TotalVariation(backend='c'), ig),
-            (TotalVariation(backend='numpy'), ig),
+            (TotalVariation(backend='c', warmstart=False, max_iteration=100), ig),
+            (TotalVariation(backend='numpy', warmstart=False, max_iteration=100), ig),
         ]
         
         for func, geom in func_geom_test_list:
@@ -907,6 +907,42 @@ class TestTotalVariation(unittest.TestCase):
         self.grad = GradientOperator(self.ig_real)
         self.alpha_arr = self.ig_real.allocate(0.15)
 
+    def test_configure_tv_defaults(self):
+        self.assertEquals(self.tv.warmstart, True)
+        self.assertEquals(self.tv.iterations, 10)
+        self.assertEquals(self.tv.correlation, "Space")
+        self.assertEquals(self.tv.backend, "c")
+        self.assertEquals(self.tv.lower, -np.inf)
+        self.assertEquals(self.tv.upper, np.inf)
+        self.assertEquals(self.tv.isotropic, True)
+        self.assertEquals(self.tv.split, False)
+        self.assertEquals(self.tv.info, False)
+        self.assertEquals(self.tv.strong_convexity_constant, 0)
+        self.assertEquals(self.tv.tolerance, None)
+
+    def test_configure_tv_not_defaults(self):
+        tv=TotalVariation( max_iteration=100, 
+                 tolerance = 1e-5, 
+                 correlation = "SpaceChannels",
+                 backend = "numpy",
+                 lower = 0.,
+                 upper = 1.,
+                 isotropic = False,
+                 split = True,
+                 info = True, 
+                 strong_convexity_constant = 1.,
+                 warmstart=False)
+        self.assertEquals(tv.warmstart, False)
+        self.assertEquals(tv.iterations, 100)
+        self.assertEquals(tv.correlation, "SpaceChannels")
+        self.assertEquals(tv.backend, "numpy")
+        self.assertEquals(tv.lower, 0.)
+        self.assertEquals(tv.upper, 1.)
+        self.assertEquals(tv.isotropic, False)
+        self.assertEquals(tv.split, True)
+        self.assertEquals(tv.info, True)
+        self.assertEquals(tv.strong_convexity_constant, 1.)
+        self.assertEquals(tv.tolerance, 1e-5)
     def test_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
 

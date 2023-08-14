@@ -1172,17 +1172,34 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
 
-    def test_get_p2(self):
-        self.assertEquals(self.tv._p2, None)
+    def test_get_p2_default(self):
         data = dataexample.SHAPES.get(size=(64, 64))
         tv=TotalVariation()
+        self.assertEquals(tv._p2, None)
         tv(data)
-        a=tv.gradient.range_geometry().allocate(0)
-        b=tv._get_p2()
-        np.testing.assert_allclose(tv._get_p2()[0].array, tv.gradient.range_geometry().allocate(0)[0].array)
-        np.testing.assert_allclose(tv._get_p2()[1].array, tv.gradient.range_geometry().allocate(0)[1].array)  
-
-
+        if isinstance(tv._get_p2(), BlockDataContainer):
+            for xa,xb in zip(tv._get_p2(),tv.gradient.range_geometry().allocate(0)):
+                np.testing.assert_allclose(xa.as_array(), xb.as_array(),
+                                    rtol=1e-5, atol=1e-5)
+       
+    def test_get_p2_after_prox_iteration_has_changed(self):
+        data = dataexample.SHAPES.get(size=(64, 64))
+        tv=TotalVariation()
+        self.assertEquals(tv._p2, None)
+        tv.proximal(data, 1.)
+        if isinstance(tv._get_p2(), BlockDataContainer):
+            for xa,xb in zip(tv._get_p2(),tv.gradient.range_geometry().allocate(0)):
+                np.testing.assert_equal(np.any(np.not_equal(xa.as_array(), xb.as_array())), True)
+                
+    def test_get_p2_after_prox_iteration_has_not_changed(self):
+        data = dataexample.SHAPES.get(size=(64, 64))
+        tv=TotalVariation(warmstart=False)
+        self.assertEquals(tv._p2, None)
+        tv.proximal(data, 1.)
+        if isinstance(tv._get_p2(), BlockDataContainer):
+            for xa,xb in zip(tv._get_p2(),tv.gradient.range_geometry().allocate(0)):
+                np.testing.assert_allclose(xa.as_array(), xb.as_array(),
+                                    rtol=1e-5, atol=1e-5)
 
 class TestLeastSquares(unittest.TestCase):
 

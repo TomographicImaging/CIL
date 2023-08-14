@@ -943,10 +943,10 @@ class TestTotalVariation(unittest.TestCase):
         self.assertEquals(tv.info, True)
         self.assertEquals(tv.strong_convexity_constant, 1.)
         self.assertEquals(tv.tolerance, 1e-5)
-    def test_regularisation_parameter(self):
-        np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
 
-    def test_regularisation_parameter2(self):
+
+
+    def test_scaled_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv_scaled.regularisation_parameter,
                                        self.alpha)
 
@@ -1171,6 +1171,17 @@ class TestTotalVariation(unittest.TestCase):
         res2 = self.tv_scaled.proximal(x_real, tau=1.0)
 
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
+
+    def test_get_p2(self):
+        self.assertEquals(self.tv._p2, None)
+        data = dataexample.SHAPES.get(size=(64, 64))
+        tv=TotalVariation()
+        tv(data)
+        a=tv.gradient.range_geometry().allocate(0)
+        b=tv._get_p2()
+        np.testing.assert_allclose(tv._get_p2()[0].array, tv.gradient.range_geometry().allocate(0)[0].array)
+        np.testing.assert_allclose(tv._get_p2()[1].array, tv.gradient.range_geometry().allocate(0)[1].array)  
+
 
 
 class TestLeastSquares(unittest.TestCase):

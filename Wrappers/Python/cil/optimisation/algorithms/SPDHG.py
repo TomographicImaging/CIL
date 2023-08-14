@@ -22,7 +22,7 @@ from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
 import logging
-
+from cil.framework import Sampler
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
 
@@ -50,7 +50,8 @@ class SPDHG(Algorithm):
         List of probabilities. If None each subset will have probability = 1/number of subsets
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-
+    sampler: instnace of the Sampler class
+        Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets
     **kwargs:
     norms : list of floats
         precalculated list of norms of the operators
@@ -95,19 +96,20 @@ class SPDHG(Algorithm):
     Physics in Medicine & Biology, Volume 64, Number 22, 2019.
     '''
     
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 initial=None, prob=None, gamma=1.,**kwargs):
+    def __init__(self, f=None, g=None,  operator=None, tau=None, sigma=None,
+                 initial=None, prob=None, gamma=1.,sampler=None,**kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
-
+        
+            
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        initial=initial, prob=prob, gamma=gamma, norms=kwargs.get('norms', None))
+                        initial=initial, prob=prob, gamma=gamma,sampler=sampler, norms=kwargs.get('norms', None))
     
 
     def set_up(self, f, g, operator, tau=None, sigma=None, \
-               initial=None, prob=None, gamma=1., norms=None):
+               initial=None, prob=None, gamma=1.,sampler=None, norms=None):
         
         '''set-up of the algorithm
         Parameters
@@ -142,14 +144,26 @@ class SPDHG(Algorithm):
         self.tau = tau
         self.sigma = sigma
         self.prob = prob
-        self.ndual_subsets = len(self.operator)
+        self.ndual_subsets = self.operator.shape[0]
         self.gamma = gamma
         self.rho = .99
-        
-        if self.prob is None:
-            self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+        self.sampler=sampler
 
-        
+        if self.sampler==None:
+            if self.prob == None:
+                        self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+            self.sampler=Sampler.randomWithReplacement(self.ndual_subsets,  prob=self.prob)
+        else:
+            if self.prob==None:
+                if self.sampler.prob!=None:
+                    self.prob=self.sampler.prob
+                else:
+                    self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+            else:
+                warnings.warn('You supplied both probabilites and a sampler. The sampler will be used for sampling and the probabilites for calculationg step sizes, if not explicitly set.')
+
+
+
         if self.sigma is None:
             if norms is None:
                 # Compute norm of each sub-operator       
@@ -187,7 +201,7 @@ class SPDHG(Algorithm):
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
         
         # Choose subset
-        i = int(np.random.choice(len(self.sigma), 1, p=self.prob))
+        i = int(self.sampler.next())
         
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x

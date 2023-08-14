@@ -264,9 +264,28 @@ class Sampler():
         return (self.iterator())
 
     def __next__(self):
+        """ Allows the user to call next(sampler), to get the same result as sampler.next()"""
         return(self.next())
 
     def show_epochs(self, num_epochs=2):
+        """
+        Function that takes an integer, num_epochs, and prints the first num_epochs epochs. Calling this function will not interrupt the random number generation, if applicable. 
+
+        num_epochs: int, default=2
+            The number of epochs to print. 
+
+        Example
+        -------
+
+        >>> sampler=Sampler.randomWithoutReplacement(11)
+        >>> sampler.show_epochs(5)
+        Epoch 0:  [9, 7, 2, 8, 0, 10, 1, 5, 3, 6, 4]
+        Epoch 1:  [6, 2, 0, 10, 5, 1, 9, 8, 7, 4, 3]
+        Epoch 2:  [5, 10, 0, 6, 1, 4, 3, 7, 2, 8, 9]
+        Epoch 3:  [4, 8, 3, 7, 1, 10, 5, 6, 2, 9, 0]
+        Epoch 4:  [0, 7, 2, 6, 9, 10, 8, 3, 1, 4, 5]
+
+        """
         save_generator=self.generator
         save_last_subset=self.last_subset
         self.last_subset=self.num_subsets-1
@@ -280,6 +299,20 @@ class Sampler():
         self.last_subset=save_last_subset
 
     def get_epochs(self, num_epochs=2):
+        """
+        Function that takes an integer, num_epochs, and returns the first num_epochs epochs in the form of a list of lists. Calling this function will not interrupt the random number generation, if applicable. 
+
+        num_epochs: int, default=2
+            The number of epochs to return. 
+
+        Example
+        -------
+
+        >>> sampler=Sampler.randomWithReplacement(5)
+        >>> print(sampler.get_epochs())
+        [[3, 2, 2, 4, 4], [0, 1, 2, 4, 4]]
+
+        """
         save_generator=self.generator
         save_last_subset=self.last_subset
         self.last_subset=self.num_subsets-1

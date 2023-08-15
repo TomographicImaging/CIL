@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from ApproximateGradientSumFunction import ApproximateGradientSumFunction
+from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 
 class SGFunction(ApproximateGradientSumFunction):
 
@@ -27,7 +27,7 @@ class SGFunction(ApproximateGradientSumFunction):
         functions: list 
             A list of functions.
         sampler: callable or None, optional
-            A callable object that selects the function or batch of functions to compute the gradient. If None, a random function will be selected.
+            A callable object that selects the function or batch of functions to compute the gradient. TODO: If None, a random function will be selected.
             
      """
   

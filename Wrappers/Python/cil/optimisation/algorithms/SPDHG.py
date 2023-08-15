@@ -50,7 +50,7 @@ class SPDHG(Algorithm):
         List of probabilities. If None each subset will have probability = 1/number of subsets
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-    sampler: instnace of the Sampler class
+    sampler: instance of the Sampler class
         Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets
     **kwargs:
     norms : list of floats
@@ -77,11 +77,7 @@ class SPDHG(Algorithm):
     Notation for primal and dual step-sizes are reversed with comparison
         to PDHG.py
 
-    Note
-    ----
-
-    this code implements serial sampling only, as presented in [2]
-        (to be extended to more general case of [1] as future work)             
+              
         
     References
     ----------
@@ -126,11 +122,11 @@ class SPDHG(Algorithm):
             List of Step size parameters for Dual problem
         initial : DataContainer, optional, default=None
             Initial point for the SPDHG algorithm
-        prob : list of floats, optional, default=None
-            List of probabilities. If None each subset will have probability = 1/number of subsets
+
         gamma : float
             parameter controlling the trade-off between the primal and dual step sizes
-
+        sampler: instance of the Sampler class
+            Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets. 
         **kwargs:
         norms : list of floats
             precalculated list of norms of the operators
@@ -154,13 +150,12 @@ class SPDHG(Algorithm):
                         self.prob = [1/self.ndual_subsets] * self.ndual_subsets
             self.sampler=Sampler.randomWithReplacement(self.ndual_subsets,  prob=self.prob)
         else:
-            if self.prob==None:
-                if self.sampler.prob!=None:
-                    self.prob=self.sampler.prob
-                else:
-                    self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+            if self.sampler.prob!=None:
+                self.prob=self.sampler.prob
             else:
-                warnings.warn('You supplied both probabilites and a sampler. The sampler will be used for sampling and the probabilites for calculationg step sizes, if not explicitly set.')
+                self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+            if self.prob!=None: 
+                warnings.warn('You supplied both probabilities and a sampler. The given probabilities will be ignored.')
 
 
 

@@ -304,8 +304,8 @@ class Sampler():
             prob=prob
         if len(prob)!=num_subsets:
             raise ValueError("Length of the list of probabilities should equal the number of subsets")
-        if sum(prob)!=1.:
-            raise ValueError("Probabilites should sum to 1.")
+        if sum(prob)-1.>=1e-5:
+            raise ValueError("Probabilities should sum to 1. Your probabilities sum to {}".format(sum(prob)))
         sampler=Sampler(num_subsets, sampling_type='random_with_replacement', prob=prob, seed=seed)
         return sampler 
     

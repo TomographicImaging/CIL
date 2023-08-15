@@ -47,7 +47,7 @@ class Sampler():
         For random sampling with replacement, this is the probability for each integer to be called by next. 
 
     seed:int, default=None
-        Random seed for the methods that use a random number generator.  
+        Random seed for the methods that use a random number generator.  If set to None, the seed will be set using the current time.  
     
 
 
@@ -151,6 +151,19 @@ class Sampler():
 
         customlist: list of integers
             The list that will be sampled from in order. 
+
+        Example
+        --------
+
+        >>> sampler=Sampler.customOrder([1,4,6,7,8,9,11])
+        >>> sampler.show_epochs(5)
+
+        Epoch 0:  [1, 4, 6, 7, 8, 9, 11]
+        Epoch 1:  [1, 4, 6, 7, 8, 9, 11]
+        Epoch 2:  [1, 4, 6, 7, 8, 9, 11]
+        Epoch 3:  [1, 4, 6, 7, 8, 9, 11]
+        Epoch 4:  [1, 4, 6, 7, 8, 9, 11]
+
         """
         num_subsets=len(customlist)
         sampler=Sampler(num_subsets, sampling_type='custom_order', order=customlist)
@@ -158,7 +171,27 @@ class Sampler():
 
     @staticmethod
     def hermanMeyer(num_subsets):
+        """
+        Function that takes a number of subsets and returns a sampler which outputs a Herman Meyer order 
+
+        num_subsets: int
+            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
+
+        Reference
+        ----------
+        Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
         
+        Example
+        -------
+        >>> sampler=Sampler.hermanMeyer(12)
+        >>> sampler.show_epochs(5)
+        
+        Epoch 0:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
+        Epoch 1:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
+        Epoch 2:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
+        Epoch 3:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
+        Epoch 4:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
+        """
         def _herman_meyer_order(n):
             # Assuming that the subsets are in geometrical order
             n_variable = n
@@ -198,11 +231,32 @@ class Sampler():
 
     @staticmethod
     def staggered(num_subsets, offset):
+
+        """
+        Function that takes a number of subsets and returns a sampler which outputs in a staggered order. 
+
+        num_subsets: int
+            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
+
+        offset: int
+            The sampler will output in the order {0, a, 2a, 3a, ...., 1, 1+a, 1+2a, 1+3a,...., 2, 2+a, 2+2a, 2+3a,...} where a=offset. 
+
+        
+        Example
+        -------
+        >>> sampler=Sampler.staggered(20,4)
+        >>> sampler.show_epochs(5)
+        
+        Epoch 0:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
+        Epoch 1:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
+        Epoch 2:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
+        Epoch 3:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
+        Epoch 4:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
+        """
+          
         indices=list(range(num_subsets))
         order=[]
-        [order.extend(indices[i::offset]) for i in range(offset)]
-       # order=[indices[i::offset] for i in range(offset)]
-        print(order)
+        [order.extend(indices[i::offset]) for i in range(offset)]      
         sampler=Sampler(num_subsets, sampling_type='staggered', order=order)
         return sampler 
     
@@ -210,6 +264,40 @@ class Sampler():
 
     @staticmethod
     def randomWithReplacement(num_subsets, prob=None, seed=None):
+        """
+        Function that takes a number of subsets and returns a sampler which outputs from a list of integers {0, 1, …, S-1} with S=num_subsets with given probability and with replacement. 
+
+        num_subsets: int
+            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
+
+        prob: list of floats of length num_subsets that sum to 1. default=None
+            This is the probability for each integer to be called by next. If None, then the integers will be sampled uniformly. 
+
+        seed:int, default=None
+            Random seed for the random number generator.  If set to None, the seed will be set using the current time.
+
+        
+        Example
+        -------
+    
+
+        >>> sampler=Sampler.randomWithReplacement(5)
+        >>> print(sampler.get_epochs())
+        [[3, 2, 2, 4, 4], [0, 1, 2, 4, 4]]
+
+        Example
+        ------- 
+
+        >>> sampler=Sampler.randomWithReplacement(4, [0.7,0.1,0.1,0.1])
+        >>> sampler.show_epochs(5)
+
+        Epoch 0:  [1, 0, 0, 0]
+        Epoch 1:  [0, 0, 0, 0]
+        Epoch 2:  [0, 0, 2, 2]
+        Epoch 3:  [0, 0, 3, 0]
+        Epoch 4:  [3, 2, 0, 0]
+        """
+          
         if prob==None:
             prob = [1/num_subsets] *num_subsets
         else:   
@@ -223,12 +311,58 @@ class Sampler():
     
     @staticmethod
     def randomWithoutReplacement(num_subsets, seed=None):
+        
+        """
+        Function that takes a number of subsets and returns a sampler which outputs from a list of integers {0, 1, …, S-1} with S=num_subsets uniformly randomly without replacement.
+        Each epoch is a different perturbation and in each epoch each integer is outputted exactly once. 
+
+        num_subsets: int
+            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
+
+        seed:int, default=None
+            Random seed for the  random number generator.  If set to None, the seed will be set using the current time. 
+
+        
+        Example
+        -------
+        >>> sampler=Sampler.randomWithoutReplacement(11)
+        >>> sampler.show_epochs(5)
+        Epoch 0:  [10, 4, 3, 0, 2, 9, 6, 8, 7, 5, 1]
+        Epoch 1:  [6, 0, 2, 4, 5, 7, 3, 10, 9, 8, 1]
+        Epoch 2:  [1, 2, 7, 4, 9, 5, 6, 3, 0, 8, 10]
+        Epoch 3:  [3, 10, 2, 9, 5, 6, 1, 7, 0, 8, 4]
+        Epoch 4:  [6, 10, 1, 4, 0, 3, 9, 8, 2, 5, 7]
+        """
+
         order=list(range(num_subsets))
         sampler=Sampler(num_subsets, sampling_type='random_without_replacement', order=order, shuffle=True, seed=seed)
         return sampler 
 
 
     def __init__(self, num_subsets, sampling_type, shuffle=False, order=None, prob=None, seed=None):
+        """
+        This method is the internal init for the sampler method. Most users should call the static methods e.g. Sampler.sequential or Sampler.staggered. 
+
+        Parameters
+        ----------
+        num_subsets: int
+            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
+        
+        sampling_type:str
+            The sampling type used. 
+
+        order: list of integers
+            The list of integers the method selects from using next. 
+        
+        shuffle= bool, default=False
+            If True, after each epoch (num_subsets calls of next), the sampling order is shuffled randomly. 
+
+        prob: list of floats of length num_subsets that sum to 1. 
+            For random sampling with replacement, this is the probability for each integer to be called by next. 
+
+        seed:int, default=None
+            Random seed for the methods that use a random number generator. If set to None, the seed will be set using the current time.  
+        """
         self.type=sampling_type
         self.num_subsets=num_subsets
         if seed !=None:
@@ -250,6 +384,14 @@ class Sampler():
 
     
     def _next_order(self):
+        """ 
+        The user should call sampler.next() or next(sampler) rather than use this function. 
+
+        A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling.
+
+        This function us used by samplers that output a permutation of an list in each epoch. 
+         
+        """
       #  print(self.last_subset)
         if self.shuffle==True and self.last_subset==self.num_subsets-1:
                 self.order=self.generator.permutation(self.order)
@@ -258,13 +400,26 @@ class Sampler():
         return(self.order[self.last_subset])
     
     def _next_prob(self):
+        """ 
+        The user should call sampler.next() or next(sampler) rather than use this function. 
+
+        A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling.
+
+        This function us used by samplers that select from a list of integers {0, 1, …, S-1}, with S=num_subsets, randomly with replacement. 
+         
+        """
         return int(self.generator.choice(self.num_subsets, 1, p=self.prob))
 
     def next(self):
+        """ A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling. """
+
         return (self.iterator())
 
     def __next__(self):
-        """ Allows the user to call next(sampler), to get the same result as sampler.next()"""
+        """ 
+        A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling. 
+
+        Allows the user to call next(sampler), to get the same result as sampler.next()"""
         return(self.next())
 
     def show_epochs(self, num_epochs=2):

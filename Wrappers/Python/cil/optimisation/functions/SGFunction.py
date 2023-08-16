@@ -52,10 +52,10 @@ class SGFunction(ApproximateGradientSumFunction):
             self.functions[function_num].gradient(x, out = out) 
 
         # scale wrt number of functions 
-        out*=self.num_functions # Is this the scaling that we need? 
+        out*=self.num_functions # FIXME: Is this the scaling that we need? 
 
         # update data passes
-        self.data_passes.append(round(self.data_passes[-1] + 1./self.num_functions,4)) # What is this used for?
+        self.data_passes.append(round(self.data_passes[-1] + 1./self.num_functions,4)) # FIXME: What is this used for?
         
         if should_return:
             return out         

@@ -973,7 +973,7 @@ class TestTotalVariation(unittest.TestCase):
 
         res1 = self.tv_iso(x_real)
         res2 = self.grad.direct(x_real).pnorm(2).sum()
-        np.testing.assert_equal(res1, res2, err_msg="Error with isotrpopic TV calculation")
+        np.testing.assert_equal(res1, res2, err_msg="Error with isotropic TV calculation")
 
     def test_call_real_anisotropic(self):
         x_real = self.ig_real.allocate('random', seed=4)

@@ -28,6 +28,7 @@ import math
 import weakref
 import logging
 
+
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
 
@@ -126,7 +127,7 @@ class Partitioner(object):
             ag = self.geometry.copy()
             ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
             ags.append(ag)
-        
+        #
         return BlockGeometry(*ags)
 
     def partition(self, num_batches, mode, seed=None):
@@ -199,9 +200,8 @@ class Partitioner(object):
         axis = self.dimension_labels.index('angle')
             
         for i in range(num_batches):
-            out[i].fill(
-                numpy.take(self.array, partition_indices[i], axis=axis)
-            )
+            out[i].fill(numpy.squeeze(numpy.take(self.array, partition_indices[i], axis=axis)))
+ 
         return out
          
     def _partition_random_permutation(self, num_batches, seed=None):
@@ -2111,7 +2111,6 @@ class AcquisitionGeometry(object):
                      AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
                      AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
                      AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
-
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -2136,11 +2135,11 @@ class AcquisitionGeometry(object):
         #remove from list labels where len == 1
         #
         for i, x in enumerate(shape_default):
-            if x == 0 or x==1:
-                try:
-                    labels.remove(labels_default[i])
-                except ValueError:
-                    pass #if not in custom list carry on
+                if x == 0 or x==1:
+                    try:
+                        labels.remove(labels_default[i])
+                    except ValueError:
+                        pass #if not in custom list carry on
 
         return tuple(labels)
       

@@ -55,8 +55,8 @@ class Sampler():
     -------
 
     >>> sampler=Sampler.sequential(10)
-    >>> sampler.show_epochs(5)
-    >>> for _ in range(11):
+    >>> sampler.show_samples(5)
+    >>> for _ in range(55):
             print(sampler.next())
 
     Epoch 0:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -82,25 +82,22 @@ class Sampler():
     >>> sampler=Sampler.randomWithReplacement(11)
     >>> for _ in range(12):
     >>>     print(next(sampler))
-    >>> sampler.show_epochs(5)
+    >>> sampler.show_samples(54)
     
-    10
-    5
-    10
-    1
-    6
-    7
-    10
-    0
     0
     2
-    5
     3
-    Epoch 0:  [10, 5, 10, 1, 6, 7, 10, 0, 0, 2, 5]
-    Epoch 1:  [3, 10, 7, 7, 8, 7, 4, 7, 8, 4, 9]
-    Epoch 2:  [0, 0, 0, 1, 3, 8, 6, 5, 7, 7, 0]
-    Epoch 3:  [8, 8, 6, 4, 0, 2, 7, 2, 8, 3, 8]
-    Epoch 4:  [10, 9, 3, 6, 6, 9, 5, 2, 8, 4, 0]
+    3
+    2
+    0
+    3
+    3
+    1
+    2
+    1
+    1
+    The first 54 samples:  [0, 2, 3, 3, 2, 0, 3, 3, 1, 2, 1, 1, 2, 3, 3, 1, 3, 2, 4, 0, 0, 0, 1, 1, 3, 0, 4, 3, 3, 3, 0, 0, 0, 2, 4, 0, 1, 2, 3, 4, 0, 4, 4, 1, 4, 1, 4, 3, 0, 2, 3, 0, 1, 4]
+
 
 
 
@@ -118,7 +115,7 @@ class Sampler():
         -------
 
         >>> sampler=Sampler.sequential(10)
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(49)
         >>> for _ in range(11):
                 print(sampler.next())
 
@@ -126,7 +123,7 @@ class Sampler():
         Epoch 1:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         Epoch 2:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         Epoch 3:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        Epoch 4:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        Epoch 4:  [0, 1, 2, 3, 4, 5, 6, 7, 8]
         0
         1
         2
@@ -156,13 +153,10 @@ class Sampler():
         --------
 
         >>> sampler=Sampler.customOrder([1,4,6,7,8,9,11])
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(11)
 
         Epoch 0:  [1, 4, 6, 7, 8, 9, 11]
-        Epoch 1:  [1, 4, 6, 7, 8, 9, 11]
-        Epoch 2:  [1, 4, 6, 7, 8, 9, 11]
-        Epoch 3:  [1, 4, 6, 7, 8, 9, 11]
-        Epoch 4:  [1, 4, 6, 7, 8, 9, 11]
+        Epoch 1:  [1, 4, 6, 7]
 
         """
         num_subsets=len(customlist)
@@ -175,7 +169,7 @@ class Sampler():
         Function that takes a number of subsets and returns a sampler which outputs a Herman Meyer order 
 
         num_subsets: int
-            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
+            The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. For Herman-Meyer sampling this number should not be prime. 
 
         Reference
         ----------
@@ -184,7 +178,7 @@ class Sampler():
         Example
         -------
         >>> sampler=Sampler.hermanMeyer(12)
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(60)
         
         Epoch 0:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
         Epoch 1:  [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11]
@@ -206,6 +200,8 @@ class Sampler():
             if n_variable > 1:
                 factors.append(n_variable)
             n_factors = len(factors)
+            if n_factors==0:
+                raise ValueError('Herman Meyer sampling defaults to sequential ordering if the number of subsets is prime. Please use an alternative sampling method or change the number of subsets. ')
             order =  [0 for _ in range(n)]
             value = 0
             for factor_n in range(n_factors):
@@ -240,12 +236,12 @@ class Sampler():
 
         offset: int
             The sampler will output in the order {0, a, 2a, 3a, ...., 1, 1+a, 1+2a, 1+3a,...., 2, 2+a, 2+2a, 2+3a,...} where a=offset. 
-
+            The offset should be less than the num_subsets
         
         Example
         -------
         >>> sampler=Sampler.staggered(20,4)
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(100)
         
         Epoch 0:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
         Epoch 1:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
@@ -253,7 +249,8 @@ class Sampler():
         Epoch 3:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
         Epoch 4:  [0, 4, 8, 12, 16, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
         """
-          
+        if offset>=num_subsets:
+            raise(ValueError('The offset should be less than the number of subsets'))
         indices=list(range(num_subsets))
         order=[]
         [order.extend(indices[i::offset]) for i in range(offset)]      
@@ -282,35 +279,26 @@ class Sampler():
     
 
         >>> sampler=Sampler.randomWithReplacement(5)
-        >>> print(sampler.get_epochs())
-        [[3, 2, 2, 4, 4], [0, 1, 2, 4, 4]]
+        >>> print(sampler.get_samples(10))
+
+        The first 10 samples:  [2, 1, 2, 3, 2, 1, 2, 2, 1, 2]
 
         Example
         ------- 
 
         >>> sampler=Sampler.randomWithReplacement(4, [0.7,0.1,0.1,0.1])
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(21)
 
-        Epoch 0:  [1, 0, 0, 0]
-        Epoch 1:  [0, 0, 0, 0]
-        Epoch 2:  [0, 0, 2, 2]
-        Epoch 3:  [0, 0, 3, 0]
-        Epoch 4:  [3, 2, 0, 0]
+        The first 21 samples:  [3, 2, 0, 2, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 2, 0, 0, 0, 1, 2, 0]
         """
           
         if prob==None:
             prob = [1/num_subsets] *num_subsets
-        else:   
-            prob=prob
-        if len(prob)!=num_subsets:
-            raise ValueError("Length of the list of probabilities should equal the number of subsets")
-        if sum(prob)-1.>=1e-5:
-            raise ValueError("Probabilities should sum to 1. Your probabilities sum to {}".format(sum(prob)))
         sampler=Sampler(num_subsets, sampling_type='random_with_replacement', prob=prob, seed=seed)
         return sampler 
     
     @staticmethod
-    def randomWithoutReplacement(num_subsets, seed=None):
+    def randomWithoutReplacement(num_subsets, seed=None, shuffle=True):
         
         """
         Function that takes a number of subsets and returns a sampler which outputs from a list of integers {0, 1, …, S-1} with S=num_subsets uniformly randomly without replacement.
@@ -322,11 +310,12 @@ class Sampler():
         seed:int, default=None
             Random seed for the  random number generator.  If set to None, the seed will be set using the current time. 
 
-        
+        shuffle:boolean, default=True
+            If True, there is a random shuffle between each epoch, if false the same random order as the first epoch is repeated for all future epochs. 
         Example
         -------
         >>> sampler=Sampler.randomWithoutReplacement(11)
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(55)
         Epoch 0:  [10, 4, 3, 0, 2, 9, 6, 8, 7, 5, 1]
         Epoch 1:  [6, 0, 2, 4, 5, 7, 3, 10, 9, 8, 1]
         Epoch 2:  [1, 2, 7, 4, 9, 5, 6, 3, 0, 8, 10]
@@ -335,7 +324,7 @@ class Sampler():
         """
 
         order=list(range(num_subsets))
-        sampler=Sampler(num_subsets, sampling_type='random_without_replacement', order=order, shuffle=True, seed=seed)
+        sampler=Sampler(num_subsets, sampling_type='random_without_replacement', order=order, shuffle=shuffle, seed=seed)
         return sampler 
 
 
@@ -422,23 +411,23 @@ class Sampler():
         Allows the user to call next(sampler), to get the same result as sampler.next()"""
         return(self.next())
 
-    def show_epochs(self, num_epochs=2):
+    def show_samples(self, num_samples=20):
         """
-        Function that takes an integer, num_epochs, and prints the first num_epochs epochs. Calling this function will not interrupt the random number generation, if applicable. 
+        Function that takes an integer, num_samples, and prints the first num_samples, organised into epochs where appropriate. Calling this function will not interrupt the random number generation, if applicable. 
 
-        num_epochs: int, default=2
-            The number of epochs to print. 
+        num_samples: int, default=20
+            The number of samples to print. 
 
         Example
         -------
 
         >>> sampler=Sampler.randomWithoutReplacement(11)
-        >>> sampler.show_epochs(5)
+        >>> sampler.show_samples(50)
         Epoch 0:  [9, 7, 2, 8, 0, 10, 1, 5, 3, 6, 4]
         Epoch 1:  [6, 2, 0, 10, 5, 1, 9, 8, 7, 4, 3]
         Epoch 2:  [5, 10, 0, 6, 1, 4, 3, 7, 2, 8, 9]
         Epoch 3:  [4, 8, 3, 7, 1, 10, 5, 6, 2, 9, 0]
-        Epoch 4:  [0, 7, 2, 6, 9, 10, 8, 3, 1, 4, 5]
+        Epoch 4:  [0, 7, 2, 6, 9, 10]
 
         """
         save_generator=self.generator
@@ -447,25 +436,29 @@ class Sampler():
         save_order=self.order
         self.order=self.initial_order
         self.generator=np.random.RandomState(self.seed)
-        for i in range(num_epochs):
-            print('Epoch {}: '.format(i), [self.next() for _ in range(self.num_subsets)])
+        if self.prob==None:
+            for i in range(num_samples//self.num_subsets):
+                print('Epoch {}: '.format(i), [self.next() for _ in range(self.num_subsets)])
+            print('Epoch {}: '.format(num_samples//self.num_subsets), [self.next() for _ in range(num_samples%self.num_subsets)])
+        else:
+            print('The first {} samples: '.format(num_samples), [self.next() for _ in range(num_samples)])
         self.generator=save_generator
         self.order=save_order
         self.last_subset=save_last_subset
 
-    def get_epochs(self, num_epochs=2):
+    def get_samples(self,  num_samples=20):
         """
-        Function that takes an integer, num_epochs, and returns the first num_epochs epochs in the form of a list of lists. Calling this function will not interrupt the random number generation, if applicable. 
+        Function that takes an integer, num_samples, and returns the first num_samples, organised into epochs where appropriate, as a list of lists.  Calling this function will not interrupt the random number generation, if applicable. 
 
-        num_epochs: int, default=2
-            The number of epochs to return. 
+        num_samples: int, default=20
+            The number of samples to return. 
 
         Example
         -------
 
         >>> sampler=Sampler.randomWithReplacement(5)
-        >>> print(sampler.get_epochs())
-        [[3, 2, 2, 4, 4], [0, 1, 2, 4, 4]]
+        >>> print(sampler.get_samples())
+        [[2, 4, 2, 4, 1, 3, 2, 2, 1, 2, 4, 4, 2, 3, 2, 1, 0, 4, 2, 3]]
 
         """
         save_generator=self.generator
@@ -475,8 +468,12 @@ class Sampler():
         self.order=self.initial_order
         self.generator=np.random.RandomState(self.seed)
         output=[]
-        for i in range(num_epochs):
-            output.append( [self.next() for _ in range(self.num_subsets)])
+        if self.prob==None:
+            for i in range(num_samples//self.num_subsets):
+                output.append( [self.next() for _ in range(self.num_subsets)])
+            output.append([self.next() for _ in range(num_samples%self.num_subsets)])
+        else:
+            output.append( [self.next() for _ in range(num_samples)])
         self.generator=save_generator
         self.order=save_order
         self.last_subset=save_last_subset

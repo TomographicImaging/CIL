@@ -1045,7 +1045,7 @@ class TestTotalVariation(unittest.TestCase):
     @unittest.skipUnless(has_ccpi_regularisation,
                          "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
-        data = dataexample.SHAPES.get(size=(32, 32))
+        data = dataexample.SHAPES.get(size=(16, 16))
         ig = data.geometry
         ag = ig
 
@@ -1113,12 +1113,24 @@ class TestTotalVariation(unittest.TestCase):
                                              res2.as_array(),
                                              decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with tolerance')
 
+        # CIL_FGP_TV with warmstart
+        iters=10
+        g_CIL = alpha * TotalVariation(iters, lower=0., warmstart=True)
+        t0 = timer()
+        for i in range(6):
+            res1 = g_CIL.proximal(noisy_data, 1.)
+        t1 = timer()
+        np.testing.assert_array_almost_equal(res1.as_array(),
+                                             res2.as_array(),
+                                             decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with warmstart')
+
+        # print(t1-t0)
     @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation,
                          "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
         # print ("Building 3D phantom using TomoPhantom software")
         model = 13  # select a model number from the library
-        N_size = 32  # Define phantom dimensions using a scalar value (cubic phantom)
+        N_size =    16  # Define phantom dimensions using a scalar value (cubic phantom)
         #This will generate a N_size x N_size x N_size phantom (3D)
 
         ig = ImageGeometry(N_size, N_size, N_size)
@@ -1158,7 +1170,20 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_allclose(res1.as_array(),
                                    res2.as_array(),
-                                   atol=7.5e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with tolerance')
+                                   atol=5e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance without warmstart')
+
+        #with warm start 
+        iters=10
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warmstart=True)
+        # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+        t0 = timer()
+        for i in range(4):
+            res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+        t1 = timer()
+        np.testing.assert_allclose(res1.as_array(),
+                                   res2.as_array(),
+                                   atol=4e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance with warmstart')
+
 
     def test_non_scalar_tau_cil_tv(self):
 
@@ -1174,22 +1199,21 @@ class TestTotalVariation(unittest.TestCase):
 
     def test_get_p2_with_warmstart(self):
         data = dataexample.SHAPES.get(size=(16, 16))
-        tv=TotalVariation(warmstart=True)
+        tv=TotalVariation(warmstart=True, max_iteration=10)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
-        tv.proximal(data, 1.)
+        test=tv.proximal(data, 1.)
+        print(test)
+        a=np.sum(np.linalg.norm(test))
+        print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
-                
-       #TODO: compare with some known values 
+        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.337265, err_msg="Incorrect value of the proximal")
  
-    def test_p2_convergence(self):
-
-        #TODO:
-        pass               
+                
     def test_get_p2_without_warmstart(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warmstart=False)

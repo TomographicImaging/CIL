@@ -2,6 +2,7 @@
   - Add norm for CompositionOperator.
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
+  - Added support for partitioner, when partitions have size 1
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

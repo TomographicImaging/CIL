@@ -150,12 +150,13 @@ class SPDHG(Algorithm):
                         self.prob = [1/self.ndual_subsets] * self.ndual_subsets
             self.sampler=Sampler.randomWithReplacement(self.ndual_subsets,  prob=self.prob)
         else:
+            if self.prob!=None: 
+                warnings.warn('You supplied both probabilities and a sampler. The given probabilities will be ignored.')
             if self.sampler.prob!=None:
                 self.prob=self.sampler.prob
             else:
                 self.prob = [1/self.ndual_subsets] * self.ndual_subsets
-            if self.prob!=None: 
-                warnings.warn('You supplied both probabilities and a sampler. The given probabilities will be ignored.')
+            
 
 
 

@@ -755,7 +755,8 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):        
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        t1=time.time()
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(32,32))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -798,13 +799,13 @@ class TestSPDHG(unittest.TestCase):
         sigma_tmp = 1.
         tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
         sigma = tau_tmp / operator.direct(sigma_tmp * operator.domain_geometry().allocate(1.))
-    
+        t2=time.time()
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
                     max_iteration = 1000,
                     update_objective_interval = 500)
         pdhg.run(verbose=0)
-           
+        t3=time.time()
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
         # take angles and create uniform subsets in uniform+sequential setting
@@ -831,10 +832,12 @@ class TestSPDHG(unittest.TestCase):
         G = alpha * TotalVariation(50, 1e-4, lower=0) 
     
         prob = [1/len(A)]*len(A)
+        t4=time.time()
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, verbose=0)
+        t5=time.time()
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())

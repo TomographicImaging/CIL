@@ -141,17 +141,16 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, symmetric=False):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False):
 
         r"""Power method or Power iteration algorithm 
         
         The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
-        absolute value in the real case and module in the complex case.        
-        Since we cannot estimate if the operator is diagonisable, the power method is applied on the diagonizable operator
-        :math:`A^{T}*A`.
-        
-        If the operator :math:`A` is diagonizable, the user can pass the flag `symmetric=True`.
+        absolute value in the real case and modulus in the complex case.        
 
+        If the matrix is not square. The algorithm computes the largest (dominant) eigenvalue of :math:  A^{T}*A, returning the square root of this value. 
+        
+        
         Parameters
         ----------
 
@@ -164,8 +163,8 @@ class LinearOperator(Operator):
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         return_all: boolean, default = False
             Toggles the verbosity of the return
-        symmetric: boolean, default False
-             Set this to True if the operator is symmetric
+        square: boolean, default False
+             Set this to True if the operator is square
     
 
         Returns
@@ -193,6 +192,13 @@ class LinearOperator(Operator):
         2.0005647295658866
 
         """
+        square = False
+        try:
+            if operator.domain_geometry()==operator.range_geometry():
+                square = True
+        except AssertionError:
+            # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
+            pass
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')
         else:
@@ -212,10 +218,15 @@ class LinearOperator(Operator):
         i = 0
         while (i < max_iteration and diff > tolerance):
             i+=1
-            
+            if i==max_iteration:
+                warnings.warn('In {} iterations, the difference in eigenvalue between the last two iterations was {} over the tolerance of {}. \n \
+                First try a larger iteration number and then a different initial vector. If that does not work consider the operator. For convergence, \n \
+                 we need the operator to have an eigenvalue that is strictly greater in magnitude than the magnitude of its other eigenvalues'.format(i, diff, tolerance))
+
             operator.direct(x0, out = y_tmp)
 
-            if symmetric:                
+            
+            if square:                
                 #swap datacontainer references
                 tmp = x0
                 x0 = y_tmp
@@ -223,17 +234,18 @@ class LinearOperator(Operator):
             else:
                 operator.adjoint(y_tmp,out=x0)
             
+           
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
-            x0_norm = x0.norm()
+            x0_norm=x0.norm()
             x0 /= x0_norm
 
             eig_new =  numpy.abs(x0_norm)
-            if not symmetric:
+            if not square:
                 eig_new = numpy.sqrt(eig_new)
-
             diff = numpy.abs(eig_new - eig_old)
             eig_list.append(eig_new)   
-            eig_old = eig_new       
+            eig_old = eig_new
+
 
         if return_all:
             return eig_new, i, x0, eig_list

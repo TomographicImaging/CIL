@@ -33,6 +33,7 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
+import numpy as np
 
 initialise_tests()
 

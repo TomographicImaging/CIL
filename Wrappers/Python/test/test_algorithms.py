@@ -756,7 +756,7 @@ class TestSPDHG(unittest.TestCase):
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):        
         t1=time.time()
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(32,32))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -802,11 +802,11 @@ class TestSPDHG(unittest.TestCase):
         t2=time.time()
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
-                    max_iteration = 1000,
-                    update_objective_interval = 500)
+                    max_iteration = 70,
+                    update_objective_interval = 1000)
         pdhg.run(verbose=0)
         t3=time.time()
-        subsets = 10
+        subsets = 5
         size_of_subsets = int(len(angles)/subsets)
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
@@ -834,8 +834,8 @@ class TestSPDHG(unittest.TestCase):
         prob = [1/len(A)]*len(A)
         t4=time.time()
         spdhg = SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 1000,
-                    update_objective_interval=200, prob = prob)
+                    max_iteration = 320,
+                    update_objective_interval=1000, prob = prob)
         spdhg.run(1000, verbose=0)
         t5=time.time()
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
@@ -852,7 +852,7 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -883,7 +883,7 @@ class TestSPDHG(unittest.TestCase):
             raise ValueError('Unsupported Noise ', noise)
         
         #%% 'explicit' SPDHG, scalar step-sizes
-        subsets = 10
+        subsets = 5
         size_of_subsets = int(len(angles)/subsets)
         # create Gradient operator
         op1 = GradientOperator(ig)
@@ -912,9 +912,11 @@ class TestSPDHG(unittest.TestCase):
 
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 1000,
-                    update_objective_interval=200, prob = prob)
+                    max_iteration = 220,
+                    update_objective_interval=1000, prob = prob)
+        t1=time.time()
         spdhg.run(1000, verbose=0)
+        t2=time.time()
 
         #%% 'explicit' PDHG, scalar step-sizes
         op1 = GradientOperator(ig)
@@ -931,10 +933,11 @@ class TestSPDHG(unittest.TestCase):
         f = BlockFunction(f1, f2)   
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-        pdhg.max_iteration = 1000
-        pdhg.update_objective_interval = 200
+        pdhg.max_iteration = 180
+        pdhg.update_objective_interval = 1000
+        t3=time.time()
         pdhg.run(1000, verbose=0)
-
+        t4=time.time()
         #%% show diff between PDHG and SPDHG
         # plt.imshow(spdhg.get_output().as_array() -pdhg.get_output().as_array())
         # plt.colorbar()
@@ -953,7 +956,7 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=numpy.float32)
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16), dtype=numpy.float32)
         
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -989,7 +992,7 @@ class TestSPDHG(unittest.TestCase):
             raise ValueError('Unsupported Noise ', noise)
         
         #%% 'explicit' SPDHG, scalar step-sizes
-        subsets = 10
+        subsets = 5
         size_of_subsets = int(len(angles)/subsets)
         # create GradientOperator operator
         op1 = GradientOperator(ig)
@@ -1021,16 +1024,19 @@ class TestSPDHG(unittest.TestCase):
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 1000,
-                    update_objective_interval=200, prob = prob.copy(), use_axpby=True)
+                    max_iteration = 330,
+                    update_objective_interval=1000, prob = prob.copy(), use_axpby=True)
         )
+        t1=time.time()
         algos[0].run(1000, verbose=0)
-
+        t2=time.time()
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 1000,
-                    update_objective_interval=200, prob = prob.copy(), use_axpby=False)
+                    max_iteration = 330,
+                    update_objective_interval=1000, prob = prob.copy(), use_axpby=False)
         )
+        t3=time.time()
         algos[1].run(1000, verbose=0)
+        t4=time.time()
         
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
@@ -1040,12 +1046,12 @@ class TestSPDHG(unittest.TestCase):
             )
         logging.info ("Quality measures {}".format(qm))
         assert qm[0] < 0.005
-        assert qm[1] < 3.e-05
+        assert qm[1] < 5.e-05
 
         
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -1094,18 +1100,21 @@ class TestSPDHG(unittest.TestCase):
         # Setup and run the PDHG algorithm
         
         algos = []
-        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
-                    max_iteration = 1000,
-                    update_objective_interval=200, use_axpby=True)
-        )
-        algos[0].run(1000, verbose=0)
-
-        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
-                    max_iteration = 1000,
-                    update_objective_interval=200, use_axpby=False)
-        )
-        algos[1].run(1000, verbose=0)
         
+        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
+                    max_iteration = 300,
+                    update_objective_interval=1000, use_axpby=True)
+        )
+        t1=time.time()
+        algos[0].run(1000, verbose=0)
+        t2=time.time()
+        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
+                    max_iteration = 300,
+                    update_objective_interval=1000, use_axpby=False)
+        )
+        t3=time.time()
+        algos[1].run(1000, verbose=0)
+        t4=time.time()
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())

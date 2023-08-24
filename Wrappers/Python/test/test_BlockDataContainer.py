@@ -882,41 +882,40 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         # split in num_batches
         num_batches = 4
 
+        #Testing sequential partitioning 
         data = self.data.partition(num_batches, 'sequential')
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
-        
-        # ig = data.get_ImageGeometry()
         assert len(data.containers) == num_batches
         self.assertDataIsTheSame(data, idxs)
 
+        #Testing staggered partitioning 
         data = self.data.partition(num_batches, Partitioner.STAGGERED)
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=True)
-        
-        # ig = data.get_ImageGeometry()
         assert len(data.containers) == num_batches
         self.assertDataIsTheSame(data, idxs)
 
     def test_partition_diff_num_batches(self):
+
+        #Check what happens when the number of batches is equal to the number of projection angles 
         num_batches=9
         data = self.data.partition(num_batches, 'sequential')
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
-        
-        # ig = data.get_ImageGeometry()
         assert len(data.containers) == num_batches
         self.assertDataIsTheSame(data, idxs, msg='Failed when num_batches=number of projections')
 
+        #Check what happens when the number of batches is one, the whole set of projection angles 
         num_batches=1
         data = self.data.partition(num_batches, 'sequential')
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
-        
-        # ig = data.get_ImageGeometry()
         assert len(data.containers) == num_batches
         self.assertDataIsTheSame(data, idxs, msg="Failed when num_batches=1")
 
+        #Check what happens when the number of batches is zero
         num_batches=0
         with self.assertRaises(ZeroDivisionError):
             data = self.data.partition(num_batches, 'sequential')
        
+       #Check what happens when the number of batches is greater than the number of projection angles
         num_batches=10
         with self.assertRaises(ValueError):
             data = self.data.partition(num_batches, 'sequential')

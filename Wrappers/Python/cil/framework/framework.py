@@ -2135,11 +2135,11 @@ class AcquisitionGeometry(object):
         #remove from list labels where len == 1
         #
         for i, x in enumerate(shape_default):
-                if x == 0 or x==1:
-                    try:
-                        labels.remove(labels_default[i])
-                    except ValueError:
-                        pass #if not in custom list carry on
+            if x == 0 or x==1:
+                try:
+                    labels.remove(labels_default[i])
+                except ValueError:
+                    pass #if not in custom list carry on
 
         return tuple(labels)
       

@@ -312,7 +312,7 @@ class TestOperator(CCPiTestClass):
             M1op = MatrixOperator(M1)
             res1 = M1op.PowerMethod(M1op,5)
             
-        # 2x2 nil
+        # 2x2 matrix, max absolute eigenvalue is not unique and initial vector chosen for non-convergence
         with self.assertWarns(Warning):
             M1=numpy.array([[2.,1.], [0.,-2.]])
             M1op = MatrixOperator(M1)

@@ -219,9 +219,9 @@ class LinearOperator(Operator):
         while (i < max_iteration and diff > tolerance):
             i+=1
             if i==max_iteration:
-                warnings.warn('In {} iterations, the difference in eigenvalue between the last two iterations was {} over the tolerance of {}. \n \
+                warnings.warn('In {} iterations, the difference in eigenvalue between the last two iterations was {} larger than the tolerance of {}. \n \
                 First try a larger iteration number and then a different initial vector. If that does not work consider the operator. For convergence, \n \
-                 we need the operator to have an eigenvalue that is strictly greater in magnitude than the magnitude of its other eigenvalues'.format(i, diff, tolerance))
+                we need the operator to have an eigenvalue that is strictly greater in magnitude than the magnitude of its other eigenvalues'.format(i, diff, tolerance))
 
             operator.direct(x0, out = y_tmp)
 
@@ -237,6 +237,8 @@ class LinearOperator(Operator):
            
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm=x0.norm()
+            if x0_norm<tolerance:
+                raise ValueError('The operator has at least one zero eigenvector and is likely to be nilpotent')
             x0 /= x0_norm
 
             eig_new =  numpy.abs(x0_norm)

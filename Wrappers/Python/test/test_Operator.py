@@ -33,7 +33,7 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
-import numpy as np
+
 
 initialise_tests()
 
@@ -303,7 +303,22 @@ class TestOperator(CCPiTestClass):
         M1 = numpy.array([[2,0,0],[1,2j,1j],[3, 3-1j,3]])
         M1op = MatrixOperator(M1)
         res1 = M1op.PowerMethod(M1op,100)
-        numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=4)                
+        numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=4) 
+
+        # 2x2 non-diagonalisable nilpotent matrix
+        with self.assertRaises(ValueError):
+            
+            M1=numpy.array([[0.,1.], [0.,0.]])
+            M1op = MatrixOperator(M1)
+            res1 = M1op.PowerMethod(M1op,5)
+            
+        # 2x2 nil
+        with self.assertWarns(Warning):
+            M1=numpy.array([[2.,1.], [0.,-2.]])
+            M1op = MatrixOperator(M1)
+            res1 = M1op.PowerMethod(M1op,100, initial=DataContainer(numpy.array([1.,1.])))
+
+            
 
         # Gradient Operator (float)
         ig = ImageGeometry(30,30)

@@ -755,7 +755,7 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):        
-        t1=time.time()
+        
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
 
         ig = data.geometry
@@ -799,13 +799,13 @@ class TestSPDHG(unittest.TestCase):
         sigma_tmp = 1.
         tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
         sigma = tau_tmp / operator.direct(sigma_tmp * operator.domain_geometry().allocate(1.))
-        t2=time.time()
+        
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
                     max_iteration = 70,
                     update_objective_interval = 1000)
         pdhg.run(verbose=0)
-        t3=time.time()
+        
         subsets = 5
         size_of_subsets = int(len(angles)/subsets)
         # take angles and create uniform subsets in uniform+sequential setting
@@ -832,12 +832,12 @@ class TestSPDHG(unittest.TestCase):
         G = alpha * TotalVariation(50, 1e-4, lower=0) 
     
         prob = [1/len(A)]*len(A)
-        t4=time.time()
+        
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 320,
                     update_objective_interval=1000, prob = prob)
         spdhg.run(1000, verbose=0)
-        t5=time.time()
+        
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -913,10 +913,10 @@ class TestSPDHG(unittest.TestCase):
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 220,
-                    update_objective_interval=1000, prob = prob)
-        t1=time.time()
+                    update_objective_interval=220, prob = prob)
+        
         spdhg.run(1000, verbose=0)
-        t2=time.time()
+        
 
         #%% 'explicit' PDHG, scalar step-sizes
         op1 = GradientOperator(ig)
@@ -934,10 +934,10 @@ class TestSPDHG(unittest.TestCase):
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
         pdhg.max_iteration = 180
-        pdhg.update_objective_interval = 1000
-        t3=time.time()
+        pdhg.update_objective_interval =180
+        
         pdhg.run(1000, verbose=0)
-        t4=time.time()
+       
         #%% show diff between PDHG and SPDHG
         # plt.imshow(spdhg.get_output().as_array() -pdhg.get_output().as_array())
         # plt.colorbar()
@@ -1025,18 +1025,18 @@ class TestSPDHG(unittest.TestCase):
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 330,
-                    update_objective_interval=1000, prob = prob.copy(), use_axpby=True)
+                    update_objective_interval=330, prob = prob.copy(), use_axpby=True)
         )
-        t1=time.time()
+      
         algos[0].run(1000, verbose=0)
-        t2=time.time()
+      
         algos.append( SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 330,
-                    update_objective_interval=1000, prob = prob.copy(), use_axpby=False)
+                    update_objective_interval=330, prob = prob.copy(), use_axpby=False)
         )
-        t3=time.time()
+        
         algos[1].run(1000, verbose=0)
-        t4=time.time()
+        
         
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
@@ -1105,16 +1105,16 @@ class TestSPDHG(unittest.TestCase):
                     max_iteration = 300,
                     update_objective_interval=1000, use_axpby=True)
         )
-        t1=time.time()
+   
         algos[0].run(1000, verbose=0)
-        t2=time.time()
+
         algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
                     max_iteration = 300,
                     update_objective_interval=1000, use_axpby=False)
         )
-        t3=time.time()
+        
         algos[1].run(1000, verbose=0)
-        t4=time.time()
+     
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())

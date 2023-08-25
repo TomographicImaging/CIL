@@ -318,6 +318,12 @@ class TestOperator(CCPiTestClass):
             M1op = MatrixOperator(M1)
             res1 = M1op.PowerMethod(M1op,100, initial=DataContainer(numpy.array([1.,1.])))
 
+        # 2x2 matrix, max absolute eigenvalue is not unique and initial vector chosen for convergence
+        
+        M1=numpy.array([[2.,1.,0.],[0.,1.,1.], [0.,0.,1.]])
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,100)
+        numpy.testing.assert_almost_equal(res1,2., decimal=4) 
             
 
         # Gradient Operator (float)

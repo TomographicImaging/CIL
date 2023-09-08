@@ -29,7 +29,6 @@ from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLe
 from cil.optimisation.algorithms import FISTA
 
 import os
-from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, TNV, FGP_dTV
 from cil.utilities.display import show2D  
 
 from testclass import CCPiTestClass

@@ -156,7 +156,7 @@ class TestAlgorithms(CCPiTestClass):
         vg = VectorGeometry(2)
         x = vg.allocate('random_int', seed=2)
         # x = vg.allocate('random', seed=1) 
-        x.fill(numpy.asarray([10.,-3.]))
+        x.fill(numpy.asarray([10.,-3.], dtype=numpy.float32))
         
         max_iter = 10000
         update_interval = 1000
@@ -199,7 +199,7 @@ class TestAlgorithms(CCPiTestClass):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(numpy.asarray(numpy.random.random(initial.shape), dtype=numpy.float32))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
@@ -306,7 +306,7 @@ class TestAlgorithms(CCPiTestClass):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers  
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(numpy.asarray(numpy.random.random(initial.shape), dtype=numpy.float32))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
@@ -334,12 +334,12 @@ class TestAlgorithms(CCPiTestClass):
         
         def setup(data, dnoise):
             if dnoise == 's&p':
-                n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+                n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10, dtype=ig.dtype)
             elif dnoise == 'poisson':
                 scale = 5
-                n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+                n1 = applynoise.poisson( data.as_array()/scale, seed = 10, dtype=ig.dtype) * scale
             elif dnoise == 'gaussian':
-                n1 = applynoise.gaussian(data.as_array(), seed = 10)
+                n1 = applynoise.gaussian(data.as_array(), seed = 10, dtype=ig.dtype)
             else:
                 raise ValueError('Unsupported Noise ', noise)
             noisy_data = ig.allocate()
@@ -615,21 +615,103 @@ class TestAlgorithms(CCPiTestClass):
 
 
 
-                        
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
+    def test_exception_initial_SIRT(self):
+        if debug_print:
+            print ("Test CGLS")
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        initial = ig.allocate(0.)
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        
+        try:
+            alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_CGLS(self):
+        if debug_print:
+            print ("Test CGLS")
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        initial = ig.allocate(0.)
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        
+        try:
+            alg = CGLS(initial=initial, operator=identity, data=b, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_FISTA(self):
+        if debug_print:
+            print ("Test FISTA")
+        ig = ImageGeometry(127,139,149)
+        initial = ig.allocate()
+        b = initial.copy()
+        # fill with random numbers
+        b.fill(numpy.asarray(numpy.random.random(initial.shape), dtype=numpy.float32))
+        initial = ig.allocate(ImageGeometry.RANDOM)
+        identity = IdentityOperator(ig)
+        
+        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
+        opt = {'tol': 1e-4, 'memopt':False}
+        if debug_print:
+            print ("initial objective", norm2sq(initial))
+        try:
+            alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_GD(self):
+        if debug_print:
+            print ("Test FISTA")
+        ig = ImageGeometry(127,139,149)
+        initial = ig.allocate()
+        b = initial.copy()
+        # fill with random numbers
+        b.fill(numpy.asarray(
+            numpy.random.random(initial.shape), 
+            dtype=numpy.float32)
+            )
+        initial = ig.allocate(ImageGeometry.RANDOM)
+        identity = IdentityOperator(ig)
+        
+        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
+        opt = {'tol': 1e-4, 'memopt':False}
+        if debug_print:
+            print ("initial objective", norm2sq(initial))
+        try:
+            alg = GD(initial=initial, objective_function=norm2sq, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_LADMM(self):
+        ig = ImageGeometry(10,10)
+        # K = Identity(ig)
+        # b = ig.allocate(0)
+        # f = LeastSquares(K, b)
+        # g = IndicatorBox(lower=0)
+        initial = ig.allocate(1)
+        try:
+            algo = LADMM(initial = initial, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_PDHG(self):
+        initial = 1
+        try:
+            algo = PDHG(initial = initial, x_init=initial, f=None, g=None, operator=None)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_SPDHG(self):
+        initial = 1
+        try:
+            algo = SPDHG(initial = initial, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
 class TestSIRT(unittest.TestCase):
 
 

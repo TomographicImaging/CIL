@@ -340,9 +340,11 @@ class TestFunction(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(res_gradient1.as_array(),
                                          res_gradient2.as_array())
         self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
-
-        mat = np.random.randn(M, N)
-        operator = MatrixOperator(mat)
+       
+        
+        print('Check call with MatrixOperator... OK\n')  
+        mat = numpy.asarray(np.random.randn(M, N), dtype=numpy.float32)
+        operator = MatrixOperator(mat)   
         vg = VectorGeometry(N)
         b = vg.allocate('random')
         u = vg.allocate('random')

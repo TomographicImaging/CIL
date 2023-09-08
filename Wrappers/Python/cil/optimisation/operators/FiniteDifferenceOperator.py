@@ -91,7 +91,7 @@ class FiniteDifferenceOperator(LinearOperator):
         outnone = False
         if out is None:
             outnone = True
-            ret = self.domain_geometry().allocate()
+            ret = self.domain_geometry().allocate(backend=x.backend)
             outa = ret.as_array()
         else:
             outa = out.as_array()
@@ -233,7 +233,7 @@ class FiniteDifferenceOperator(LinearOperator):
         outnone = False 
         if out is None:
             outnone = True
-            ret = self.range_geometry().allocate()
+            ret = self.range_geometry().allocate(backend=x.backend)
             outa = ret.as_array()
         else:
             outa = out.as_array()        

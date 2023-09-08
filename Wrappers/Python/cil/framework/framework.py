@@ -29,6 +29,7 @@ import weakref
 import logging
 
 from cil.utilities.multiprocessing import NUM_THREADS
+import cupy as cp
 # check for the extension
 
 if platform.system() == 'Linux':
@@ -465,7 +466,7 @@ class ImageGeometry(object):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
-    def allocate(self, value=0, **kwargs):
+    def allocate(self, value=0, dtype=numpy.float32, backend='numpy', **kwargs):
         '''allocates an ImageData according to the size expressed in the instance
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
@@ -480,12 +481,13 @@ class ImageGeometry(object):
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
         out = ImageData(geometry=self.copy(), 
-                            dtype=dtype, 
+                            dtype=dtype,
+                            backend=backend,
                             suppress_warning=True)
 
         if isinstance(value, Number):
             # it's created empty, so we make it 0
-            out.array.fill(value)
+            out.fill(value)
         else:
             if value == ImageGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
@@ -495,7 +497,7 @@ class ImageGeometry(object):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else: 
-                    out.fill(numpy.random.random_sample(self.shape))
+                    out.fill(numpy.asarray(numpy.random.random_sample(self.shape), dtype=dtype))
             elif value == ImageGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -2602,7 +2604,7 @@ class AcquisitionGeometry(object):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else:
-                    out.fill(numpy.random.random_sample(self.shape))
+                    out.fill(numpy.asarray(numpy.random.random_sample(self.shape),dtype=dtype))
             elif value == AcquisitionGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -2651,6 +2653,7 @@ class DataContainer(object):
         else:
             raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
+
     @property
     def shape(self):
         '''Returns the shape of the DataContainer'''
@@ -2665,34 +2668,39 @@ class DataContainer(object):
     def shape(self, val):
         print("Deprecated - shape will be set automatically")
 
+
     @property
     def number_of_dimensions(self):
         '''Returns the shape of the  of the DataContainer'''
         return len(self.array.shape)
+
 
     @property
     def dtype(self):
         '''Returns the dtype of the data array.'''
         return self.array.dtype
 
+
     @property
     def size(self):
         '''Returns the number of elements of the DataContainer'''
         return self.array.size
 
+
+    @property
+    def backend(self):
+        return self._backend
+
+
     __container_priority__ = 1
-    def __init__ (self, array, deep_copy=True, dimension_labels=None, 
+    def __init__ (self, array, deep_copy=True, dimension_labels=None, backend='numpy',
                   **kwargs):
         '''Holds the data'''
         
-        if type(array) == numpy.ndarray:
-            if deep_copy:
-                self.array = array.copy()
-            else:
-                self.array = array    
+        if deep_copy:
+            self.array = array.copy()
         else:
-            raise TypeError('Array must be NumpyArray, passed {0}'\
-                            .format(type(array)))
+            self.array = array    
 
         #Don't set for derived classes
         if type(self) is DataContainer:
@@ -2704,8 +2712,11 @@ class DataContainer(object):
             try:
                 self.geometry.dtype = self.dtype            
             except:
-                pass    
+                pass
+
+        self._backend = backend
         
+
     def get_dimension_size(self, dimension_label):
 
         if dimension_label in self.dimension_labels:
@@ -2810,31 +2821,46 @@ class DataContainer(object):
         '''
         if id(array) == id(self.array):
             return
+        
+        
         if dimension == {}:
-            if isinstance(array, numpy.ndarray):
-                if array.shape != self.shape:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
-                numpy.copyto(self.array, array)
-            elif isinstance(array, Number):
-                self.array.fill(array) 
-            elif issubclass(array.__class__ , DataContainer):
-                
-                try:
-                    if self.dimension_labels != array.dimension_labels:
-                        raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
-                except AttributeError:
-                    pass
-
-                if self.array.shape == array.shape:
-                    numpy.copyto(self.array, array.array)
-                else:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
+            if isinstance(array, Number):
+                self.array.fill(array)
             else:
-                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+                # If the type is different we need to crash
+                if array.dtype != self.dtype:
+                    # arr = numpy.array(array.get(), dtype=self.dtype)
+                    raise ValueError("Cannot fill with the given data: wrong type. Expecting {}, got {}".format(self.dtype, array.dtype))
+                if isinstance(array, numpy.ndarray) or isinstance(array, cp.ndarray):
+                    if array.shape != self.shape:
+                        raise ValueError('Cannot fill with the provided array.' + \
+                                        'Expecting {0} got {1}'.format(
+                                        self.shape,array.shape))
+                    if self.backend == 'cupy':
+                        self.array = cp.array(array)
+                    elif self.backend == 'numpy':
+                        numpy.copyto(self.array, array)
+                    else:
+                        raise ValueError('Unsupported backend {}'.format(self.backend))
+                
+                elif issubclass(array.__class__ , DataContainer):
+                    if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
+                        if self.geometry != array.geometry:
+                            
+                            if self.backend == 'cupy':
+                                self.array = cp.array(array)
+                            elif self.backend == 'numpy':
+                                numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
+                            else:
+                                raise ValueError('Unsupported backend {}'.format(self.backend))
+                            return
+                    
+                    if self.backend == 'cupy':
+                        self.array = cp.array(array.as_array())
+                    elif self.backend == 'numpy':
+                        numpy.copyto(self.array, array.as_array())
+                else:
+                    raise TypeError('Can fill only with number, numpy array, cupy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
             
             axis = [':']* self.number_of_dimensions
@@ -2851,7 +2877,7 @@ class DataContainer(object):
                 command += str(el)
                 i+=1
             
-            if isinstance(array, numpy.ndarray):
+            if isinstance(array, numpy.ndarray) or isinstance(array, cp.ndarray):
                 command = command + "] = array[:]" 
             elif issubclass(array.__class__, DataContainer):
                 command = command + "] = array.as_array()[:]" 
@@ -3000,7 +3026,8 @@ class DataContainer(object):
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
                    geometry= None if self.geometry is None else self.geometry.copy(), 
-                   suppress_warning=True)
+                   suppress_warning=True,
+                   backend=self.backend)
             
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
@@ -3103,6 +3130,7 @@ class DataContainer(object):
             out = self * 0.
             ret_out = True
 
+        
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
             try:
@@ -3114,6 +3142,8 @@ class DataContainer(object):
                 warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
             except TypeError as te:
                 warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+            except AttributeError as ae:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(ae))
             finally:
                 pass
         
@@ -3237,7 +3267,8 @@ class DataContainer(object):
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry, 
-                       suppress_warning=True)
+                       suppress_warning=True,
+                       backend=self.backend)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
@@ -3388,7 +3419,11 @@ class ImageData(DataContainer):
     def __init__(self, 
                  array = None, 
                  deep_copy=False, 
-                 geometry=None, 
+                 geometry=None,
+                 dtype=numpy.float32,
+                 suppress_warning=False,
+                 backend='numpy', 
+                 dimension_labels=None,
                  **kwargs):
 
         dtype = kwargs.get('dtype', numpy.float32)
@@ -3398,15 +3433,23 @@ class ImageData(DataContainer):
             raise AttributeError("ImageData requires a geometry")
             
 
-        labels = kwargs.get('dimension_labels', None)
+        labels = dimension_labels
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        if array is None:                                   
-            array = numpy.empty(geometry.shape, dtype=dtype)
+        # self._backend = backend
+
+        if array is None:
+            if backend == 'numpy':
+                bknd = numpy
+            elif backend == 'cupy':
+                bknd = cp
+            array = bknd.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
+            pass
+        elif issubclass(type(array), cp.ndarray):
             pass
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
@@ -3450,7 +3493,17 @@ class ImageData(DataContainer):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)                            
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)  
+
+    def copy(self, backend=None):
+        if backend is None:
+            backend = self.backend
+        elif backend in ['cupy', 'numpy']:
+            pass
+        else:
+            raise ValueError('Unsupported backend. Expected cupy or numpy, got {}'.format(backend))
+        return ImageData(array=self.array.copy(), deep_copy=False, geometry=self.geometry,\
+             dtype=self.dtype, suppress_warning=True, backend=backend)                          
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):
@@ -4005,7 +4058,7 @@ class VectorGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed) 
-                out.fill(numpy.random.random_sample(self.shape))
+                out.fill(numpy.asarray(numpy.random.random_sample(self.shape), dtype=dtype))
             elif value == VectorGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:

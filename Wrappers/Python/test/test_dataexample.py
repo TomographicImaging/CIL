@@ -33,7 +33,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 class TestTestData(CCPiTestClass):
     def test_noise_gaussian(self):
-        camera = dataexample.CAMERA.get()
+        camera = dataexample.CAMERA.get(dtype=np.float32)
         noisy_camera = noise.gaussian(camera, seed=1)
         norm = (camera - noisy_camera).norm()
         decimal = 4

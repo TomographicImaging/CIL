@@ -52,7 +52,7 @@ class TestOperator(CCPiTestClass):
         
         vg = VectorGeometry(n)
         
-        Amat = numpy.random.randn(m, n)
+        Amat = numpy.asarray(numpy.random.randn(m, n), dtype=numpy.float32)
         A = MatrixOperator(Amat)
         
         b = vg.allocate('random')
@@ -199,28 +199,35 @@ class TestOperator(CCPiTestClass):
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
-
-    def test_FiniteDifference(self):
+    def test_FiniteDifferenceNumpy(self):
+        self._FiniteDifference('numpy')
+    def test_FiniteDifferenceCupy(self):
+        self._FiniteDifference('cupy')
+    def _FiniteDifference(self, backend):
+        print ("test FiniteDifference")
+        ##
         N, M = 2, 3
         numpy.random.seed(1)
         ig = ImageGeometry(N, M)
         Id = IdentityOperator(ig)
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
-        u = FD.domain_geometry().allocate('random')       
+        u = FD.domain_geometry().allocate('random', backend=backend)
         
-        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM)
+        
+        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM, backend=backend)
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
-        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
-        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM)
+        self.assertArrayEqual(res, w)
+        
+        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM, backend=backend)
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
-        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
-        self.assertNumpyArrayEqual(u.as_array(), w.as_array())
+        self.assertArrayEqual(res, w)
+        self.assertArrayEqual(u, w)
 
         G = GradientOperator(ig)
 
@@ -229,7 +236,7 @@ class TestOperator(CCPiTestClass):
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
-        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        self.assertArrayEqual(res, w)
         
         u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
         res = G.range_geometry().allocate()

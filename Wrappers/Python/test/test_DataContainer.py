@@ -655,15 +655,11 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))              
 
         data1 = geometry.allocate(dtype=numpy.float32)
-        try:
+
+        with self.assertRaises(ValueError):
             data1.fill(r)
-            self.assertTrue(False)
-        except TypeError as err:
-            logging.info(str(err))
-            self.assertTrue(True)
 
-
-    def test_ImageGeometry_allocate_complex(self):
+def test_ImageGeometry_allocate_complex(self):
         ig = ImageGeometry(2,2)
         self.complex_allocate_geometry_test(ig)
 
@@ -786,7 +782,7 @@ class TestDataContainer(CCPiTestClass):
     def test_multiply_out(self):
         ig = ImageGeometry(10,11,12)
         u = ig.allocate()
-        a = numpy.ones(u.shape)
+        a = numpy.ones(u.shape, dtype=numpy.float32)
         
         u.fill(a)
         

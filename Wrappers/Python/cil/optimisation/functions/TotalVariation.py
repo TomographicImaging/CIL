@@ -167,7 +167,12 @@ class TotalVariation(Function):
         
         # correlation space or spacechannels
         self.correlation = correlation
-        self.backend = backend        
+        if backend == 'cupy':
+            self.backend = 'numpy'
+            self.tv_backend = 'cupy'
+        else:
+            self.backend = backend  
+            self.tv_backend = 'numpy'      
         
         # Define orthogonal projection onto the convex set C
         if lower is None:
@@ -273,13 +278,15 @@ class TotalVariation(Function):
         if self._L is None:
             self.calculate_Lipschitz()            
         
+        if x.backend == 'cupy':
+            pass
         # initialise
         t = 1        
-
-        p1 = self.gradient.range_geometry().allocate(0)
-        p2 = self.gradient.range_geometry().allocate(0)  
-        tmp_q = self.gradient.range_geometry().allocate(0)
-
+        tmp_p = self.gradient.range_geometry().allocate(0, backend=self.tv_backend)  
+        tmp_q = tmp_p.copy()
+        tmp_x = self.gradient.domain_geometry().allocate(0, backend=self.tv_backend)     
+        p1 = self.gradient.range_geometry().allocate(0, backend=self.tv_backend)
+        
         # multiply tau by -1 * regularisation_parameter here so it's not recomputed every iteration
         # when tau is an array this is done inplace so reverted at the end
         if isinstance(tau, Number):
@@ -287,11 +294,7 @@ class TotalVariation(Function):
         else:
             tau_reg_neg = tau
             tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
-
-        should_return = False
-        if out is None:
-            should_return = True
-            out = self.gradient.domain_geometry().allocate(0)   
+      
 
         should_break = False
         for k in range(self.iterations):
@@ -337,7 +340,55 @@ class TotalVariation(Function):
             if self.tolerance is not None:
                 logging.info("Stop at {} iterations with tolerance {} .".format(k, error))
             else:
-                logging.info("Stop at {} iterations.".format(k))                
+                print("Stop at {} iterations.".format(k))                
+            
+        if out is None:                        
+            self.gradient.adjoint(tmp_q, out=tmp_x)
+            tmp_x *= tau
+            tmp_x *= self.regularisation_parameter 
+            
+            if self.tv_backend == 'numpy':
+                x.subtract(tmp_x, out=tmp_x)
+                out = self.projection_C(tmp_x)
+                return out
+            else:
+                # need to create an ImageData from another one with different backend.
+                xx = x.copy(backend='cupy')
+                x.subtract(tmp_x, out=tmp_x)
+                out = self.projection_C(tmp_x)
+                outnp = out.geometry.allocate(backend='numpy')
+                outnp.fill(out.as_array().get())
+                return outnp
+        else:          
+            
+            if self.tv_backend == 'cupy':
+                tmp = self.gradient.adjoint(tmp_q)
+            else:
+                tmp = out
+                self.gradient.adjoint(tmp_q, out = tmp)
+            tmp*=tau
+            tmp*=self.regularisation_parameter
+            x.subtract(tmp, out=tmp)
+            self.projection_C(tmp, out=tmp)
+            if self.tv_backend == 'cupy':
+                out.fill(tmp.as_array().get())
+            
+                
+    
+    def convex_conjugate(self,x):        
+        return 0.0    
+    @property
+    def L(self):
+        if self._L is None:
+            self.calculate_Lipschitz()
+        return self._L
+    @L.setter
+    def L(self, value):
+        warnings.warn("You should set the Lipschitz constant with calculate_Lipschitz().")
+        if isinstance(value, (Number,)) and value >= 0:
+            self._L = value
+        else:
+            raise TypeError('The Lipschitz constant is a real positive number')
 
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):

@@ -347,7 +347,7 @@ class TotalVariation(Function):
 
             # Depending on the case, isotropic or anisotropic, the proximal conjugate of the MixedL21Norm (isotropic case),
             # or the proximal conjugate of the MixedL11Norm (anisotropic case) is computed.
-            self.func.proximal_conjugate(tmp_q, 1.0, out=p1) 
+            self.func.proximal_conjugate(tmp_q, 1.0, out=p1)
                        
             t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2 
             p1.subtract(p2, out=tmp_q) 

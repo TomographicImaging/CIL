@@ -324,7 +324,6 @@ class TotalVariation(Function):
             should_return = True
             out = self.gradient.domain_geometry().allocate(0)   
 
-        should_break = False
         for k in range(self.iterations): 
                                                                                    
             t0 = t

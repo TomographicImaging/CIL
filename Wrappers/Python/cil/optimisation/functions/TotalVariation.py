@@ -332,7 +332,7 @@ class TotalVariation(Function):
             self.projection_C(out, tau=None, out = out)
 
 
-            self.gradient.direct(out, out=p1) 
+            self.gradient.direct(out, out=p1)
 
             multip = (-self.L)/tau_reg_neg
 

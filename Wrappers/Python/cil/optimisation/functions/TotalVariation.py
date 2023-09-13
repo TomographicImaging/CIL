@@ -324,7 +324,7 @@ class TotalVariation(Function):
             should_return = True
             out = self.gradient.domain_geometry().allocate(0)   
 
-        for k in range(self.iterations): 
+        for k in range(self.iterations):
                                                                                    
             t0 = t
             self.gradient.adjoint(tmp_q, out = out)

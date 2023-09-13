@@ -87,7 +87,7 @@ class TotalVariation(Function):
         Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.
 
     info : :obj:`boolean`, default = False
-        Information is printed for the stopping criterion of the FGP algorithm  used to solve the dual problem 
+        Information is printed for the stopping criterion of the FGP algorithm  used to solve the dual problem
         of the Total Variation Denoising problem (ROF).
 
     strong_convexity_constant : :obj:`float`, default = 0

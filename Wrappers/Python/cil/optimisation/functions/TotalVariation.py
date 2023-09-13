@@ -98,7 +98,7 @@ class TotalVariation(Function):
 
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
 
-    warmstart : :obj`boolean`, default = True
+    warmstart : :obj:`boolean`, default = True
         If set to true, the FGP aglorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. 
         This allows the max_iteration value to be reduced to 5-10 iterations. 
         With warmstart this function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. 

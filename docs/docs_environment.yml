@@ -17,7 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-name: docs
+name: cil_testing
 channels:
   - conda-forge
   - intel

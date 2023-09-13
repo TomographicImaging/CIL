@@ -39,8 +39,8 @@ class TotalVariation(Function):
     Notes
     -----
 
-    The :code:`TotalVariation` (TV) :code:`Function` acts as a compositite function, i.e.,
-    the composition of the :class:`.MixedL21Norm` fuction and the :class:`.GradientOperator` operator,
+    The :code:`TotalVariation` (TV) :code:`Function` acts as a composite function, i.e.,
+    the composition of the :class:`.MixedL21Norm` function and the :class:`.GradientOperator` operator,
 
     .. math:: f(u) = \|u\|_{2,1}, \Rightarrow (f\circ\nabla)(u) = f(\nabla x) = \mathrm{TV}(u)
 
@@ -61,7 +61,7 @@ class TotalVariation(Function):
     max_iteration : :obj:`int`, default = 5
         Maximum number of iterations for the FGP algorithm to solve to solve the dual problem 
         of the Total Variation Denoising problem (ROF). If warmstart=False, this should be around 100,
-        or larger with a set tolerance. 
+        or larger, with a set tolerance. 
     tolerance : :obj:`float`, default = None
         Stopping criterion for the FGP algorithm used to to solve the dual problem 
         of the Total Variation Denoising problem (ROF)
@@ -87,7 +87,7 @@ class TotalVariation(Function):
         Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.
 
     info : :obj:`boolean`, default = False
-        Information is printed for the stopping criterion of the FGP algorithm  used to solve the dual problem
+        Information is printed for the stopping criterion of the FGP algorithm used to solve the dual problem
         of the Total Variation Denoising problem (ROF).
 
     strong_convexity_constant : :obj:`float`, default = 0
@@ -99,12 +99,16 @@ class TotalVariation(Function):
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
 
     warmstart : :obj:`boolean`, default = True
-        If set to true, the FGP aglorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. 
+        If set to true, the FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. 
         This allows the max_iteration value to be reduced to 5-10 iterations. 
-        With warmstart this function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. 
-        However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated. 
+        
 
+    Note
+    ----
 
+    With warmstart set to the default, True, the TV function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. This increases the memory requirements. 
+    However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated. 
+    
     Note
     ----
 

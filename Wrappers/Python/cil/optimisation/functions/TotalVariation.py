@@ -327,7 +327,7 @@ class TotalVariation(Function):
         for k in range(self.iterations): 
                                                                                    
             t0 = t
-            self.gradient.adjoint(tmp_q, out = out) 
+            self.gradient.adjoint(tmp_q, out = out)
             out.sapyb(tau_reg_neg, x, 1.0, out=out)
             self.projection_C(out, tau=None, out = out)
 

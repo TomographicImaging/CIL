@@ -199,7 +199,6 @@ class TotalVariation(Function):
         self._gradient = None
         self._domain = None
         
-        # Print stopping information (iterations and tolerance error) of FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.info = info
         if self.info:
             warnings.warn(" `info` is deprecate. Please use logging instead.")

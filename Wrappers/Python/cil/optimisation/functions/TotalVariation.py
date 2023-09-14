@@ -178,7 +178,6 @@ class TotalVariation(Function):
         # Iterations for FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.iterations = max_iteration
         
-        # Tolerance for FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.tolerance = tolerance
         
         # Total variation correlation (isotropic=Default)

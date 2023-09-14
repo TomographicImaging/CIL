@@ -1118,7 +1118,6 @@ class TestTotalVariation(unittest.TestCase):
         g_CIL = alpha * TotalVariation(iters, lower=0., warmstart=True)
         for i in range(6):
             res1 = g_CIL.proximal(noisy_data, 1.)
-        t1 = timer()
         np.testing.assert_array_almost_equal(res1.as_array(),
                                              res2.as_array(),
                                              decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with warmstart')

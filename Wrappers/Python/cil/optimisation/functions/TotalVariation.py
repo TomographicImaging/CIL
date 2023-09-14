@@ -175,7 +175,6 @@ class TotalVariation(Function):
         # Regularising parameter = alpha
         self.regularisation_parameter = 1.
         
-        # Iterations for FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)
         self.iterations = max_iteration
         
         self.tolerance = tolerance

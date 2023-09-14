@@ -869,8 +869,8 @@ class TestFunction(CCPiTestClass):
             (L1Norm(), ag),
             (L2NormSquared(), ag),
             (MixedL21Norm(), bg),
-            (TotalVariation(backend='c', warmstart=False, max_iteration=100), ig),
-            (TotalVariation(backend='numpy', warmstart=False, max_iteration=100), ig),
+            (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
+            (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
         ]
         
         for func, geom in func_geom_test_list:
@@ -908,7 +908,7 @@ class TestTotalVariation(unittest.TestCase):
         self.alpha_arr = self.ig_real.allocate(0.15)
 
     def test_configure_tv_defaults(self):
-        self.assertEquals(self.tv.warmstart, True)
+        self.assertEquals(self.tv.warm_start, True)
         self.assertEquals(self.tv.iterations, 10)
         self.assertEquals(self.tv.correlation, "Space")
         self.assertEquals(self.tv.backend, "c")
@@ -931,8 +931,8 @@ class TestTotalVariation(unittest.TestCase):
                  split = True,
                  info = True, 
                  strong_convexity_constant = 1.,
-                 warmstart=False)
-        self.assertEquals(tv.warmstart, False) 
+                 warm_start=False)
+        self.assertEquals(tv.warm_start, False) 
         self.assertEquals(tv.iterations, 100)
         self.assertEquals(tv.correlation, "SpaceChannels")
         self.assertEquals(tv.backend, "numpy")
@@ -1060,7 +1060,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(
-            iters, tolerance=None, lower=0, info=True, warmstart=False)
+            iters, tolerance=None, lower=0, info=True, warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1088,7 +1088,7 @@ class TestTotalVariation(unittest.TestCase):
         # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
         iters = 408
         # CIL_FGP_TV with tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower=0., warmstart=False)
+        g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower=0., warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1113,14 +1113,14 @@ class TestTotalVariation(unittest.TestCase):
                                              res2.as_array(),
                                              decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with tolerance')
 
-        # CIL_FGP_TV with warmstart
+        # CIL_FGP_TV with warm_start
         iters=10
-        g_CIL = alpha * TotalVariation(iters, lower=0., warmstart=True)
+        g_CIL = alpha * TotalVariation(iters, lower=0., warm_start=True)
         for i in range(6):
             res1 = g_CIL.proximal(noisy_data, 1.)
         np.testing.assert_array_almost_equal(res1.as_array(),
                                              res2.as_array(),
-                                             decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with warmstart')
+                                             decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with warm_start')
 
     @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation,
                          "Missing Tomophantom or Regularisation-Toolkit")
@@ -1140,7 +1140,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warmstart=False)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=False)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
@@ -1167,11 +1167,11 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_allclose(res1.as_array(),
                                    res2.as_array(),
-                                   atol=5e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance without warmstart')
+                                   atol=5e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance without warm_start')
 
         #with warm start 
         iters=10
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warmstart=True)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=True)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         for i in range(4):
@@ -1179,7 +1179,7 @@ class TestTotalVariation(unittest.TestCase):
         t1 = timer()
         np.testing.assert_allclose(res1.as_array(),
                                    res2.as_array(),
-                                   atol=4e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance with warmstart')
+                                   atol=4e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance with warm_start')
 
 
     def test_non_scalar_tau_cil_tv(self):
@@ -1194,9 +1194,9 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_allclose(res1.array, res2.array, atol=1e-3, err_msg="Testing non scalar tau in prox calculation")
 
-    def test_get_p2_with_warmstart(self):
+    def test_get_p2_with_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
-        tv=TotalVariation(warmstart=True, max_iteration=10)
+        tv=TotalVariation(warm_start=True, max_iteration=10)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient.range_geometry().allocate(0)
@@ -1211,9 +1211,9 @@ class TestTotalVariation(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.337265, err_msg="Incorrect value of the proximal")
  
                 
-    def test_get_p2_without_warmstart(self):
+    def test_get_p2_without_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
-        tv=TotalVariation(warmstart=False)
+        tv=TotalVariation(warm_start=False)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient.range_geometry().allocate(0)

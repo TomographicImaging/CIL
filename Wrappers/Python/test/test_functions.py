@@ -1116,7 +1116,6 @@ class TestTotalVariation(unittest.TestCase):
         # CIL_FGP_TV with warmstart
         iters=10
         g_CIL = alpha * TotalVariation(iters, lower=0., warmstart=True)
-        t0 = timer()
         for i in range(6):
             res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()

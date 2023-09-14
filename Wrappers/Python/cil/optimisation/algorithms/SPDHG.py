@@ -23,15 +23,17 @@ import numpy as np
 import warnings
 import logging
 from cil.framework import Sampler
+
+
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
 
     Problem: 
-    
+
     .. math::
-    
+
       \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
-        
+
     Parameters
     ----------
     f : BlockFunction
@@ -64,49 +66,100 @@ class SPDHG(Algorithm):
 
     Note
     ----
-    
+
     Convergence is guaranteed provided that [2, eq. (12)]:
-    
+
     .. math:: 
-    
+
     \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
-    
+
     Note
     ----
-    
+
     Notation for primal and dual step-sizes are reversed with comparison
         to PDHG.py
 
-              
-        
+
+
     References
     ----------
-    
+
     [1]"Stochastic primal-dual hybrid gradient algorithm with arbitrary 
     sampling and imaging applications",
     Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,
     SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   
-        
+
     [2]"Faster PET reconstruction with non-smooth priors by randomization and preconditioning",
     Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
     Physics in Medicine & Biology, Volume 64, Number 22, 2019.
     '''
-    
+
     def __init__(self, f=None, g=None,  operator=None, tau=None, sigma=None,
-                 initial=None, prob=None, gamma=1.,sampler=None,**kwargs):
+                 initial=None,  gamma=1., sampler=None, **kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
-        
-            
+
+        self._prob_weights = kwargs.get('prob', None)
+        if self._prob_weights is not None:
+            warnings.warn('prob is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob)".\
+                          If you have passed both prob and a sampler then prob will be')
 
         if f is not None and operator is not None and g is not None:
-            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        initial=initial, prob=prob, gamma=gamma,sampler=sampler, norms=kwargs.get('norms', None))
-    
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma,
+                        initial=initial,  gamma=gamma, sampler=sampler, norms=kwargs.get('norms', None))
 
-    def set_up(self, f, g, operator, tau=None, sigma=None, \
-               initial=None, prob=None, gamma=1.,sampler=None, norms=None):
-        
+    @property
+    def norms(self):
+        return self._norms
+
+    def set_norms(self, norms=None):
+        if norms is None:
+            # Compute norm of each sub-operator
+            norms = [self.operator.get_item(i, 0).norm()
+                     for i in range(self.ndual_subsets)]
+        self._norms = norms
+
+    @property
+    def sigma(self):
+        return self._sigma
+
+    def set_sigma(self, sigma=None, norms=None):
+        self.set_norms(norms)
+        if sigma is None:
+            self._sigma = [self.gamma * self.rho / ni for ni in self._norms]
+        else:
+            self._sigma = sigma
+
+    @property
+    def tau(self):
+        return self._tau
+
+    def set_tau(self, tau=None):
+        if tau is None:
+            self._tau = min([pi / (si * ni**2) for pi, ni,
+                            si in zip(self._prob_weights, self._norms, self._sigma)])
+            self._tau *= (self.rho / self.gamma)
+        else:
+            self._tau = tau
+
+    def set_step_sizes(self):
+        ''' If you update either the norms or the prob_weights run this to reset the default sigma and tau step-sizes'''
+        self.set_sigma()
+        self.set_tau()
+        #TODO: Look at the PDHG one?? 
+
+    @property
+    def prob_weights(self):
+        return self._prob_weights
+
+    def set_prob_weights(self, prob_weights=None):
+        if prob_weights is None:
+            self._prob_weights = [1/self.ndual_subsets] * self.ndual_subsets
+        else:
+            self._prob_weights = prob_weights
+
+    def set_up(self, f, g, operator, tau=None, sigma=None,
+               initial=None,  gamma=1., sampler=None, norms=None):
         '''set-up of the algorithm
         Parameters
         ----------
@@ -132,102 +185,85 @@ class SPDHG(Algorithm):
             precalculated list of norms of the operators
         '''
         logging.info("{} setting up".format(self.__class__.__name__, ))
-                    
+
         # algorithmic parameters
         self.f = f
         self.g = g
         self.operator = operator
-        self.tau = tau
-        self.sigma = sigma
-        self.prob = prob
-        self.ndual_subsets = self.operator.shape[0]
+        self.sampler = sampler
         self.gamma = gamma
+        self.ndual_subsets = self.operator.shape[0]
         self.rho = .99
-        self.sampler=sampler
 
-        if self.sampler==None:
-            if self.prob == None:
-                        self.prob = [1/self.ndual_subsets] * self.ndual_subsets
-            self.sampler=Sampler.randomWithReplacement(self.ndual_subsets,  prob=self.prob)
-        else:
-            if self.prob!=None: 
-                warnings.warn('You supplied both probabilities and a sampler. The given probabilities will be ignored.')
-            if self.sampler.prob!=None:
-                self.prob=self.sampler.prob
-            else:
-                self.prob = [1/self.ndual_subsets] * self.ndual_subsets
-            
+        # Remove this if statement once prob is deprecated
+        if self._prob_weights is None or sampler is not None:
+            self.set_prob_weights(sampler.prob)
+        if self.sampler is None:
+            self.sampler = Sampler.randomWithReplacement(
+                self.ndual_subsets,  prob=self._prob_weights)
+        self.set_norms(norms)
+        self.set_sigma(sigma)
+        self.set_tau(tau)
 
-
-
-        if self.sigma is None:
-            if norms is None:
-                # Compute norm of each sub-operator       
-                norms = [operator.get_item(i,0).norm() for i in range(self.ndual_subsets)]
-            self.norms = norms
-            self.sigma = [self.gamma * self.rho / ni for ni in norms] 
-        if self.tau is None:
-            self.tau = min( [ pi / ( si * ni**2 ) for pi, ni, si in zip(self.prob, norms, self.sigma)] ) 
-            self.tau *= (self.rho / self.gamma)
-
-        # initialize primal variable 
+        # initialize primal variable
         if initial is None:
             self.x = self.operator.domain_geometry().allocate(0)
         else:
             self.x = initial.copy()
-        
+
         self.x_tmp = self.operator.domain_geometry().allocate(0)
-        
+
         # initialize dual variable to 0
         self.y_old = operator.range_geometry().allocate(0)
-        
+
         # initialize variable z corresponding to back-projected dual variable
         self.z = operator.domain_geometry().allocate(0)
-        self.zbar= operator.domain_geometry().allocate(0)
+        self.zbar = operator.domain_geometry().allocate(0)
         # relaxation parameter
         self.theta = 1
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
-        
+
     def update(self):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self.x.sapyb(1., self.zbar,  -self.tau, out=self.x_tmp)
-            
-        self.g.proximal(self.x_tmp, self.tau, out=self.x)
-        
+        self.x.sapyb(1., self.zbar,  -self._tau, out=self.x_tmp)
+
+        self.g.proximal(self.x_tmp, self._tau, out=self.x)
+
         # Choose subset
-        i = int(self.sampler.next())
-        
+        i = self.sampler.next()
+
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
         y_k = self.operator[i].direct(self.x)
 
-        y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
-            
-        y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
-        
+        y_k.sapyb(self._sigma[i], self.y_old[i], 1., out=y_k)
+
+        y_k = self.f[i].proximal_conjugate(y_k, self._sigma[i])
+
         # Back-project
         # x_tmp = K[i]^*(y_k - y_old[i])
         y_k.subtract(self.y_old[i], out=self.y_old[i])
 
-        self.operator[i].adjoint(self.y_old[i], out = self.x_tmp)
+        self.operator[i].adjoint(self.y_old[i], out=self.x_tmp)
         # Update backprojected dual variable and extrapolate
         # zbar = z + (1 + theta/p[i]) x_tmp
 
         # z = z + x_tmp
-        self.z.add(self.x_tmp, out =self.z)
+        self.z.add(self.x_tmp, out=self.z)
         # zbar = z + (theta/p[i]) * x_tmp
 
-        self.z.sapyb(1., self.x_tmp, self.theta / self.prob[i], out = self.zbar)
+        self.z.sapyb(1., self.x_tmp, self.theta /
+                     self._prob_weights[i], out=self.zbar)
 
         # save previous iteration
         self.save_previous_iteration(i, y_k)
-        
+
     def update_objective(self):
         # p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
         p1 = 0.
-        for i,op in enumerate(self.operator.operators):
+        for i, op in enumerate(self.operator.operators):
             p1 += self.f[i](op.direct(self.x))
         p1 += self.g(self.x)
 
@@ -240,14 +276,16 @@ class SPDHG(Algorithm):
 
     @property
     def objective(self):
-         '''alias of loss'''
-         return [x[0] for x in self.loss]
+        '''alias of loss'''
+        return [x[0] for x in self.loss]
+
     @property
     def dual_objective(self):
         return [x[1] for x in self.loss]
-    
+
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+
     def save_previous_iteration(self, index, y_current):
         self.y_old[index].fill(y_current)

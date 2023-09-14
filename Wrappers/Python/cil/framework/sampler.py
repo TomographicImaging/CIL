@@ -327,9 +327,15 @@ class Sampler():
             If True, there is a random shuffle after all the integers have been seen once, if false the same random order each time the data is sampled is used.
         Example
         -------
-        >>> sampler=Sampler.randomWithoutReplacement(11)
-        >>> print(sampler.get_samples(12))
-        [ 1  7  6  3  2  8  9  5  4 10  0  4]
+        >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
+        >>> print(sampler.get_samples(16))
+        [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
+
+        Example
+        -------
+        >>> sampler=Sampler.randomWithoutReplacement(7, seed=1, shuffle=False)
+        >>> print(sampler.get_samples(16))
+        [6 2 1 0 4 3 5 6 2 1 0 4 3 5 6 2]
         """
 
         order = list(range(num_subsets))
@@ -374,12 +380,10 @@ class Sampler():
         self.shuffle = shuffle
         if self.type == 'random_without_replacement' and self.shuffle == False:
             self.order = self.generator.permutation(self.order)
-            print(self.order)
         self.initial_order = self.order
         self.prob = prob
         if prob is not None:
             self.iterator = self._next_prob
-        
         self.last_subset = self.num_subsets-1
 
     def _next_order(self):

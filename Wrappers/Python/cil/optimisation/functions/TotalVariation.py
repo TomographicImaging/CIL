@@ -286,7 +286,7 @@ class TotalVariation(Function):
 
     def _fista_on_dual_rof(self, x, tau, out = None):
         
-        r""" Implements the Fast Gradient Projection (FGP) algorithm to solve the dual problem 
+        r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem 
         of the Total Variation Denoising problem (ROF).
 
         .. math: \max_{\|y\|_{\infty}<=1.} \frac{1}{2}\|\nabla^{*} y + x \|^{2} - \frac{1}{2}\|x\|^{2}

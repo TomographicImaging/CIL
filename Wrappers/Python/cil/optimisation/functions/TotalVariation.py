@@ -360,7 +360,6 @@ class TotalVariation(Function):
         if self.warmstart:
             self._p2 = p2
 
-        # Print stopping information (iterations and tolerance error) of  FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF)   
         if self.info:
             if self.tolerance is not None:
                 logging.info("Stop at {} iterations with tolerance {} .".format(k, error))

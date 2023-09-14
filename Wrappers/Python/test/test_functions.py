@@ -1122,7 +1122,6 @@ class TestTotalVariation(unittest.TestCase):
                                              res2.as_array(),
                                              decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with warmstart')
 
-        # print(t1-t0)
     @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation,
                          "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi
+#   (Collaborative Computational Project in Tomographic Imaging), with
 #   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,27 +17,28 @@
 
 
 import numpy as np
-import math 
-import time 
+import math
+import time
+
 
 class Sampler():
-    
+
     r"""
     A class to select from a list of integers {0, 1, …, S-1}, with each integer representing the index of a subset
     The function next() outputs a single next index from the {0,1,…,S-1} subset list. Different orders possible incl with and without replacement. To be run again and again, depending on how many iterations.
-    
-    
+
+
     Parameters
     ----------
     num_subsets: int
         The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
-    
+
     sampling_type:str
         The sampling type used. 
 
     order: list of integers
         The list of integers the method selects from using next. 
-    
+
     shuffle= bool, default=False
         If True, after each num_subsets calls of next the sampling order is shuffled randomly. 
 
@@ -46,7 +47,7 @@ class Sampler():
 
     seed:int, default=None
         Random seed for the methods that use a random number generator.  If set to None, the seed will be set using the current time.  
-    
+
 
 
     Example
@@ -76,7 +77,7 @@ class Sampler():
     >>> for _ in range(12):
     >>>     print(next(sampler))
     >>> print(sampler.get_samples())
-    
+
     3
     4
     0
@@ -94,7 +95,7 @@ class Sampler():
 
 
     """
-    
+
     @staticmethod
     def sequential(num_subsets):
         """
@@ -124,12 +125,12 @@ class Sampler():
         9
         0
         """
-        order=list(range(num_subsets))
-        sampler=Sampler(num_subsets, sampling_type='sequential', order=order)
-        return sampler 
-    
+        order = list(range(num_subsets))
+        sampler = Sampler(num_subsets, sampling_type='sequential', order=order)
+        return sampler
+
     @staticmethod
-    def customOrder( customlist):
+    def customOrder(customlist):
         """
         Function that outputs a sampler that outputs from a list, one entry at a time before cycling back to the beginning. 
 
@@ -158,9 +159,10 @@ class Sampler():
         [1 4 6 7 8]
 
         """
-        num_subsets=len(customlist)
-        sampler=Sampler(num_subsets, sampling_type='custom_order', order=customlist)
-        return  sampler
+        num_subsets = len(customlist)
+        sampler = Sampler(
+            num_subsets, sampling_type='custom_order', order=customlist)
+        return sampler
 
     @staticmethod
     def hermanMeyer(num_subsets):
@@ -173,12 +175,12 @@ class Sampler():
         Reference
         ----------
         Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
-        
+
         Example
         -------
         >>> sampler=Sampler.hermanMeyer(12)
         >>> print(sampler.get_samples(16))
-        
+
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
 
         """
@@ -196,9 +198,10 @@ class Sampler():
             if n_variable > 1:
                 factors.append(n_variable)
             n_factors = len(factors)
-            if n_factors==0:
-                raise ValueError('Herman Meyer sampling defaults to sequential ordering if the number of subsets is prime. Please use an alternative sampling method or change the number of subsets. ')
-            order =  [0 for _ in range(n)]
+            if n_factors == 0:
+                raise ValueError(
+                    'Herman Meyer sampling defaults to sequential ordering if the number of subsets is prime. Please use an alternative sampling method or change the number of subsets. ')
+            order = [0 for _ in range(n)]
             value = 0
             for factor_n in range(n_factors):
                 n_rep_value = 0
@@ -214,16 +217,17 @@ class Sampler():
                         n_rep_value = 0
                     if value == factors[factor_n]:
                         value = 0
-                    order[element] = order[element] + math.prod(factors[factor_n+1:]) * mapping
+                    order[element] = order[element] + \
+                        math.prod(factors[factor_n+1:]) * mapping
             return order
 
-        order=_herman_meyer_order(num_subsets)
-        sampler=Sampler(num_subsets, sampling_type='herman_meyer', order=order)
-        return sampler 
+        order = _herman_meyer_order(num_subsets)
+        sampler = Sampler(
+            num_subsets, sampling_type='herman_meyer', order=order)
+        return sampler
 
     @staticmethod
     def staggered(num_subsets, offset):
-
         """
         Function that takes a number of subsets and returns a sampler which outputs in a staggered order. 
 
@@ -233,7 +237,7 @@ class Sampler():
         offset: int
             The sampler will output in the order {0, a, 2a, 3a, ...., 1, 1+a, 1+2a, 1+3a,...., 2, 2+a, 2+2a, 2+3a,...} where a=offset. 
             The offset should be less than the num_subsets
-        
+
         Example
         -------
         >>> sampler=Sampler.staggered(21,4)
@@ -241,7 +245,7 @@ class Sampler():
         >>> for _ in range(15):
         >>>    print(sampler.next())
         >>> print(sampler.get_samples(5))
-        
+
         [ 0  4  8 12 16]
         0
         4
@@ -260,15 +264,13 @@ class Sampler():
         14
         [ 0  4  8 12 16]
         """
-        if offset>=num_subsets:
-            raise(ValueError('The offset should be less than the number of subsets'))
-        indices=list(range(num_subsets))
-        order=[]
-        [order.extend(indices[i::offset]) for i in range(offset)]      
-        sampler=Sampler(num_subsets, sampling_type='staggered', order=order)
-        return sampler 
-    
-    
+        if offset >= num_subsets:
+            raise (ValueError('The offset should be less than the number of subsets'))
+        indices = list(range(num_subsets))
+        order = []
+        [order.extend(indices[i::offset]) for i in range(offset)]
+        sampler = Sampler(num_subsets, sampling_type='staggered', order=order)
+        return sampler
 
     @staticmethod
     def randomWithReplacement(num_subsets, prob=None, seed=None):
@@ -284,10 +286,10 @@ class Sampler():
         seed:int, default=None
             Random seed for the random number generator.  If set to None, the seed will be set using the current time.
 
-        
+
         Example
         -------
-    
+
 
         >>> sampler=Sampler.randomWithReplacement(5)
         >>> print(sampler.get_samples(10))
@@ -302,18 +304,18 @@ class Sampler():
 
         [0 1 3 0 0 3 0 0 0 0]
         """
-          
-        if prob==None:
-            prob = [1/num_subsets] *num_subsets
-        sampler=Sampler(num_subsets, sampling_type='random_with_replacement', prob=prob, seed=seed)
-        return sampler 
-    
+
+        if prob == None:
+            prob = [1/num_subsets] * num_subsets
+        sampler = Sampler(
+            num_subsets, sampling_type='random_with_replacement', prob=prob, seed=seed)
+        return sampler
+
     @staticmethod
     def randomWithoutReplacement(num_subsets, seed=None, shuffle=True):
-        
         """
         Function that takes a number of subsets and returns a sampler which outputs from a list of integers {0, 1, …, S-1} with S=num_subsets uniformly randomly without replacement.
-        
+
 
         num_subsets: int
             The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
@@ -329,11 +331,11 @@ class Sampler():
         >>> print(sampler.get_samples(12))
         [ 1  7  6  3  2  8  9  5  4 10  0  4]
         """
-        
-        order=list(range(num_subsets))
-        sampler=Sampler(num_subsets, sampling_type='random_without_replacement', order=order, shuffle=shuffle, seed=seed)
-        return sampler 
 
+        order = list(range(num_subsets))
+        sampler = Sampler(num_subsets, sampling_type='random_without_replacement',
+                          order=order, shuffle=shuffle, seed=seed)
+        return sampler
 
     def __init__(self, num_subsets, sampling_type, shuffle=False, order=None, prob=None, seed=None):
         """
@@ -343,13 +345,13 @@ class Sampler():
         ----------
         num_subsets: int
             The sampler will select from a list of integers {0, 1, …, S-1} with S=num_subsets. 
-        
+
         sampling_type:str
             The sampling type used. 
 
         order: list of integers
             The list of integers the method selects from using next. 
-        
+
         shuffle= bool, default=False
             If True, after each num_subsets calls of next, the sampling order is shuffled randomly. 
 
@@ -359,26 +361,27 @@ class Sampler():
         seed:int, default=None
             Random seed for the methods that use a random number generator. If set to None, the seed will be set using the current time.  
         """
-        self.type=sampling_type
-        self.num_subsets=num_subsets
-        if seed !=None:
-            self.seed=seed
+        self.type = sampling_type
+        self.num_subsets = num_subsets
+        if seed is not None:
+            self.seed = seed
         else:
-            self.seed=int(time.time())
-        self.generator=np.random.RandomState(self.seed)
-        self.order=order
-        self.initial_order=order
-        if order!=None:
-            self.iterator=self._next_order
-        self.prob=prob
-        if prob!=None:
-            self.iterator=self._next_prob
-        self.shuffle=shuffle
-        self.last_subset=self.num_subsets-1
+            self.seed = int(time.time())
+        self.generator = np.random.RandomState(self.seed)
+        self.order = order
+        if order is not None:
+            self.iterator = self._next_order
+        self.shuffle = shuffle
+        if self.type == 'random_without_replacement' and self.shuffle == False:
+            self.order = self.generator.permutation(self.order)
+            print(self.order)
+        self.initial_order = self.order
+        self.prob = prob
+        if prob is not None:
+            self.iterator = self._next_prob
         
+        self.last_subset = self.num_subsets-1
 
-
-    
     def _next_order(self):
         """ 
         The user should call sampler.next() or next(sampler) rather than use this function. 
@@ -386,15 +389,15 @@ class Sampler():
         A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling.
 
         This function is used by samplers that sample without replacement. 
-         
+
         """
       #  print(self.last_subset)
-        if self.shuffle==True and self.last_subset==self.num_subsets-1:
-                self.order=self.generator.permutation(self.order)
-                #print(self.order)
-        self.last_subset= (self.last_subset+1)%self.num_subsets
-        return(self.order[self.last_subset])
-    
+        if self.shuffle == True and self.last_subset == self.num_subsets-1:
+            self.order = self.generator.permutation(self.order)
+            # print(self.order)
+        self.last_subset = (self.last_subset+1) % self.num_subsets
+        return (self.order[self.last_subset])
+
     def _next_prob(self):
         """ 
         The user should call sampler.next() or next(sampler) rather than use this function. 
@@ -402,7 +405,7 @@ class Sampler():
         A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling.
 
         This function us used by samplers that select from a list of integers {0, 1, …, S-1}, with S=num_subsets, randomly with replacement. 
-         
+
         """
         return int(self.generator.choice(self.num_subsets, 1, p=self.prob))
 
@@ -416,9 +419,8 @@ class Sampler():
         A function of the sampler that selects from a list of integers {0, 1, …, S-1}, with S=num_subsets, the next sample according to the type of sampling. 
 
         Allows the user to call next(sampler), to get the same result as sampler.next()"""
-        return(self.next())
+        return (self.next())
 
-   
     def get_samples(self,  num_samples=20):
         """
         Function that takes an integer, num_samples, and returns the first num_samples as a numpy array.
@@ -434,15 +436,14 @@ class Sampler():
         [2 4 2 4 1 3 2 2 1 2 4 4 2 3 2 1 0 4 2 3]
 
         """
-        save_generator=self.generator
-        save_last_subset=self.last_subset
-        self.last_subset=self.num_subsets-1
-        save_order=self.order
-        self.order=self.initial_order
-        self.generator=np.random.RandomState(self.seed)
-        output=[self.next() for _ in range(num_samples)]
-        self.generator=save_generator
-        self.order=save_order
-        self.last_subset=save_last_subset
-        return(np.array(output))
-
+        save_generator = self.generator
+        save_last_subset = self.last_subset
+        self.last_subset = self.num_subsets-1
+        save_order = self.order
+        self.order = self.initial_order
+        self.generator = np.random.RandomState(self.seed)
+        output = [self.next() for _ in range(num_samples)]
+        self.generator = save_generator
+        self.order = save_order
+        self.last_subset = save_last_subset
+        return (np.array(output))

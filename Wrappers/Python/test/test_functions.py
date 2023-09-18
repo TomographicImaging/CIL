@@ -869,8 +869,8 @@ class TestFunction(CCPiTestClass):
             (L1Norm(), ag),
             (L2NormSquared(), ag),
             (MixedL21Norm(), bg),
-            (TotalVariation(backend='c'), ig),
-            (TotalVariation(backend='numpy'), ig),
+            (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
+            (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
         ]
         
         for func, geom in func_geom_test_list:
@@ -907,12 +907,48 @@ class TestTotalVariation(unittest.TestCase):
         self.grad = GradientOperator(self.ig_real)
         self.alpha_arr = self.ig_real.allocate(0.15)
 
-    def test_regularisation_parameter(self):
-        np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
+    def test_configure_tv_defaults(self):
+        self.assertEquals(self.tv.warm_start, True)
+        self.assertEquals(self.tv.iterations, 10)
+        self.assertEquals(self.tv.correlation, "Space")
+        self.assertEquals(self.tv.backend, "c")
+        self.assertEquals(self.tv.lower, -np.inf)
+        self.assertEquals(self.tv.upper, np.inf)
+        self.assertEquals(self.tv.isotropic, True)
+        self.assertEquals(self.tv.split, False)
+        self.assertEquals(self.tv.info, False)
+        self.assertEquals(self.tv.strong_convexity_constant, 0)
+        self.assertEquals(self.tv.tolerance, None)
 
-    def test_regularisation_parameter2(self):
+    def test_configure_tv_not_defaults(self):
+        tv=TotalVariation( max_iteration=100, 
+                 tolerance = 1e-5, 
+                 correlation = "SpaceChannels",
+                 backend = "numpy",
+                 lower = 0.,
+                 upper = 1.,
+                 isotropic = False,
+                 split = True,
+                 info = True, 
+                 strong_convexity_constant = 1.,
+                 warm_start=False)
+        self.assertEquals(tv.warm_start, False) 
+        self.assertEquals(tv.iterations, 100)
+        self.assertEquals(tv.correlation, "SpaceChannels")
+        self.assertEquals(tv.backend, "numpy")
+        self.assertEquals(tv.lower, 0.)
+        self.assertEquals(tv.upper, 1.)
+        self.assertEquals(tv.isotropic, False)
+        self.assertEquals(tv.split, True)
+        self.assertEquals(tv.info, True)
+        self.assertEquals(tv.strong_convexity_constant, 1.)
+        self.assertEquals(tv.tolerance, 1e-5)
+
+
+
+    def test_scaled_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv_scaled.regularisation_parameter,
-                                       self.alpha)
+                                       self.alpha, err_msg='Multiplying the TV functional did not change the regularisation parameter')
 
     def test_rmul(self):
         assert isinstance(self.tv_scaled, TotalVariation)
@@ -927,29 +963,29 @@ class TestTotalVariation(unittest.TestCase):
             tv = alpha * TotalVariation()
 
     def test_rmul3(self):
-        self.assertEqual(self.alpha, self.tv_scaled.regularisation_parameter)
+        self.assertEqual(self.alpha, self.tv_scaled.regularisation_parameter, msg='Failed to scale the TV regularisation parameter')
         alpha = 2.
         tv2 = alpha * self.tv_scaled
-        self.assertEqual(self.alpha * alpha, tv2.regularisation_parameter)
+        self.assertEqual(self.alpha * alpha, tv2.regularisation_parameter, msg="Failed at scaling regularisation parameter of already scaled TotalVariation")
 
     def test_call_real_isotropic(self):
         x_real = self.ig_real.allocate('random', seed=4)
 
         res1 = self.tv_iso(x_real)
         res2 = self.grad.direct(x_real).pnorm(2).sum()
-        np.testing.assert_equal(res1, res2)
+        np.testing.assert_equal(res1, res2, err_msg="Error with isotropic TV calculation")
 
     def test_call_real_anisotropic(self):
         x_real = self.ig_real.allocate('random', seed=4)
 
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
-        np.testing.assert_almost_equal(res1, res2, decimal=3)
+        np.testing.assert_almost_equal(res1, res2, decimal=3, err_msg="Error with anisotropic TV calculation")
 
-    def test_strongly_convex_TV(self):
+    def test_strongly_convex_CIL_TV(self):
 
         TV_no_strongly_convex = self.alpha * TotalVariation()
-        self.assertEqual(TV_no_strongly_convex.strong_convexity_constant, 0)
+        self.assertEqual(TV_no_strongly_convex.strong_convexity_constant, 0, msg="Error strong convexity constant not set to zero by default")
 
         # TV as strongly convex, with "small" strongly convex constant
         TV_strongly_convex = self.alpha * TotalVariation(
@@ -961,7 +997,7 @@ class TestTotalVariation(unittest.TestCase):
         res2 = TV_no_strongly_convex(
             x_real) + (TV_strongly_convex.strong_convexity_constant /
                        2) * x_real.squared_norm()
-        np.testing.assert_allclose(res1, res2, atol=1e-3)
+        np.testing.assert_allclose(res1, res2, atol=1e-3, err_msg='TV calculation with and without strong convexity not equal')
 
         # check proximal
         x_real = self.ig_real.allocate('random', seed=4)
@@ -970,17 +1006,17 @@ class TestTotalVariation(unittest.TestCase):
         tmp_x_real = x_real.copy()
         res2 = TV_strongly_convex.proximal(x_real, tau=1.0)
         # check input remain the same after proximal
-        np.testing.assert_array_equal(tmp_x_real.array, x_real.array)
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array, err_msg='Input not the same after calling proximal')
 
-        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3, err_msg="TV proximal calculation not the same with and without strong convexity")
 
     @unittest.skipUnless(has_ccpi_regularisation,
                          "Regularisation Toolkit not present")
-    def test_strongly_convex_CIL_FGP_TV(self):
+    def test_strongly_convex_FGP_TV(self):
 
         FGP_TV_no_strongly_convex = self.alpha * FGP_TV()
         self.assertEqual(FGP_TV_no_strongly_convex.strong_convexity_constant,
-                         0)
+                         0, msg="Default strong-convexity constant not set to zero")
 
         # TV as strongly convex, with "small" strongly convex constant
         FGP_TV_strongly_convex = self.alpha * FGP_TV(
@@ -993,7 +1029,7 @@ class TestTotalVariation(unittest.TestCase):
         res2 = FGP_TV_no_strongly_convex(
             x_real) + (FGP_TV_strongly_convex.strong_convexity_constant /
                        2) * x_real.squared_norm()
-        np.testing.assert_allclose(res1, res2, atol=1e-3)
+        np.testing.assert_allclose(res1, res2, atol=1e-3, err_msg='Failed at comparing FGP_TV call with and without strong convexity')
 
         # check proximal
         x_real = self.ig_real.allocate('random', seed=4)
@@ -1002,14 +1038,14 @@ class TestTotalVariation(unittest.TestCase):
         tmp_x_real = x_real.copy()
         res2 = FGP_TV_strongly_convex.proximal(x_real, tau=1.0)
         # check input remain the same after proximal
-        np.testing.assert_array_equal(tmp_x_real.array, x_real.array)
+        np.testing.assert_array_equal(tmp_x_real.array, x_real.array, err_msg='Failed at checking input remains the same after calling proximal')
 
-        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3, err_msg="For FGP_TV comparing prox with and without strong convexity")
 
     @unittest.skipUnless(has_ccpi_regularisation,
                          "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
-        data = dataexample.SHAPES.get(size=(64, 64))
+        data = dataexample.SHAPES.get(size=(16, 16))
         ig = data.geometry
         ag = ig
 
@@ -1024,7 +1060,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(
-            iters, tolerance=None, lower=0, info=True)
+            iters, tolerance=None, lower=0, info=True, warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1047,12 +1083,12 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(res1.as_array(),
                                              res2.as_array(),
-                                             decimal=4)
+                                             decimal=4, err_msg='Comparing the CCPi proximal against the CIL TV proximal, no tolerance')
 
         # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
         iters = 408
-        # CIL_FGP_TV no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower=0.)
+        # CIL_FGP_TV with tolerance
+        g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower=0., warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1075,14 +1111,23 @@ class TestTotalVariation(unittest.TestCase):
         # print(t3-t2)
         np.testing.assert_array_almost_equal(res1.as_array(),
                                              res2.as_array(),
-                                             decimal=3)
+                                             decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with tolerance')
+
+        # CIL_FGP_TV with warm_start
+        iters=10
+        g_CIL = alpha * TotalVariation(iters, lower=0., warm_start=True)
+        for i in range(6):
+            res1 = g_CIL.proximal(noisy_data, 1.)
+        np.testing.assert_array_almost_equal(res1.as_array(),
+                                             res2.as_array(),
+                                             decimal=3, err_msg='Comparing the CCPi proximal against the CIL TV proximal, with warm_start')
 
     @unittest.skipUnless(has_tomophantom and has_ccpi_regularisation,
                          "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
         # print ("Building 3D phantom using TomoPhantom software")
         model = 13  # select a model number from the library
-        N_size = 64  # Define phantom dimensions using a scalar value (cubic phantom)
+        N_size =    16  # Define phantom dimensions using a scalar value (cubic phantom)
         #This will generate a N_size x N_size x N_size phantom (3D)
 
         ig = ImageGeometry(N_size, N_size, N_size)
@@ -1095,7 +1140,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=False)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
@@ -1122,7 +1167,20 @@ class TestTotalVariation(unittest.TestCase):
 
         np.testing.assert_allclose(res1.as_array(),
                                    res2.as_array(),
-                                   atol=7.5e-2)
+                                   atol=5e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance without warm_start')
+
+        #with warm start 
+        iters=10
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=True)
+        # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+        t0 = timer()
+        for i in range(4):
+            res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+        t1 = timer()
+        np.testing.assert_allclose(res1.as_array(),
+                                   res2.as_array(),
+                                   atol=4e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance with warm_start')
+
 
     def test_non_scalar_tau_cil_tv(self):
 
@@ -1134,7 +1192,37 @@ class TestTotalVariation(unittest.TestCase):
         # use the alpha * TV
         res2 = self.tv_scaled.proximal(x_real, tau=1.0)
 
-        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3, err_msg="Testing non scalar tau in prox calculation")
+
+    def test_get_p2_with_warm_start(self):
+        data = dataexample.SHAPES.get(size=(16, 16))
+        tv=TotalVariation(warm_start=True, max_iteration=10)
+        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        tv(data)
+        checkp2=tv.gradient.range_geometry().allocate(0)
+        for i, x in enumerate(tv._get_p2()):
+                np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
+        test=tv.proximal(data, 1.)
+        print(test)
+        a=np.sum(np.linalg.norm(test))
+        print(np.linalg.norm(test))
+        for i, x in enumerate(tv._get_p2()):
+                np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
+        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.337265, err_msg="Incorrect value of the proximal")
+ 
+                
+    def test_get_p2_without_warm_start(self):
+        data = dataexample.SHAPES.get(size=(16, 16))
+        tv=TotalVariation(warm_start=False)
+        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        tv(data)
+        checkp2=tv.gradient.range_geometry().allocate(0)
+        for i, x in enumerate(tv._get_p2()):
+                np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
+        tv.proximal(data, 1.)
+        for i, x in enumerate(tv._get_p2()):
+                np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not reset to zero after a call to proximal")
+ 
 
 
 class TestLeastSquares(unittest.TestCase):

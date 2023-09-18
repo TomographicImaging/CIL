@@ -141,14 +141,14 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False,range_is_domain=None ):
 
         r"""Power method or Power iteration algorithm 
         
         The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
         absolute value in the real case and modulus in the complex case.        
 
-        If the matrix is not square. The algorithm computes the largest (dominant) eigenvalue of :math:  A^{T}*A, returning the square root of this value. 
+        If the matrix is not square. The algorithm computes the largest (dominant) eigenvalue of :math:  A^{T}*A :math:, returning the square root of this value. 
         
         
         Parameters
@@ -163,8 +163,9 @@ class LinearOperator(Operator):
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         return_all: boolean, default = False
             Toggles the verbosity of the return
-        square: boolean, default False
-             Set this to True if the operator is square
+        range_is_domain: `boolean`, default None
+             Set this to `True` to apply the power method directly on the operator, :math: A :math:, and `False` to apply the power method to :math:A^TA:math: before taking the square root of the result.
+             Leave as default `None` to determine this from domain and range geometry.  
     
 
         Returns
@@ -176,6 +177,8 @@ class LinearOperator(Operator):
             Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
         list of eigenvalues: :obj:`list`
             List of eigenvalues. Only returned if return_all is True.
+        Convergence: `boolean'
+            Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.
 
         Examples
         --------    
@@ -192,13 +195,18 @@ class LinearOperator(Operator):
         2.0005647295658866
 
         """
-        square = False
-        try:
-            if operator.domain_geometry()==operator.range_geometry():
-                square = True
-        except AssertionError:
-            # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
-            pass
+        convergence_check=True
+        if range_is_domain is None:
+            square = False
+            try:
+                if operator.domain_geometry()==operator.range_geometry():
+                    square = True
+            except AssertionError:
+                # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
+                pass
+        else:
+            square=range_is_domain
+            
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')
         else:
@@ -218,11 +226,7 @@ class LinearOperator(Operator):
         i = 0
         while (i < max_iteration and diff > tolerance):
             i+=1
-            if i==max_iteration:
-                warnings.warn('In {} iterations, the difference in eigenvalue between the last two iterations was {} larger than the tolerance of {}. \n \
-                First try a larger iteration number and then a different initial vector. If that does not work consider the operator. For convergence, \n \
-                we need the operator to have an eigenvalue that is strictly greater in magnitude than the magnitude of its other eigenvalues'.format(i, diff, tolerance))
-
+            
             operator.direct(x0, out = y_tmp)
 
             
@@ -238,7 +242,9 @@ class LinearOperator(Operator):
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm=x0.norm()
             if x0_norm<tolerance:
-                raise ValueError('The operator has at least one zero eigenvector and is likely to be nilpotent')
+                Warning('The operator has at least one zero eigenvector and is likely to be nilpotent')
+                eig_new=0
+                break
             x0 /= x0_norm
 
             eig_new =  numpy.abs(x0_norm)
@@ -247,10 +253,13 @@ class LinearOperator(Operator):
             diff = numpy.abs(eig_new - eig_old)
             eig_list.append(eig_new)   
             eig_old = eig_new
+            i+=1
 
-
+        if i==max_iteration:
+               convergence_check=False
+        
         if return_all:
-            return eig_new, i, x0, eig_list
+            return eig_new, i, x0, eig_list, convergence_check
         else:
             return eig_new
             

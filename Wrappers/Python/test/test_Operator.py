@@ -306,25 +306,32 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=4) 
 
         # 2x2 non-diagonalisable nilpotent matrix
-        with self.assertRaises(ValueError):
-            
-            M1=numpy.array([[0.,1.], [0.,0.]])
-            M1op = MatrixOperator(M1)
-            res1 = M1op.PowerMethod(M1op,5)
-            
+        M1=numpy.array([[0.,1.], [0.,0.]])
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,5)
+        numpy.testing.assert_almost_equal(res1,0, decimal=4) 
+
+        # 2x2 non-diagonalisable nilpotent matrix where range_is_domain is False
+        M1=numpy.array([[0.,1.], [0.,0.]])
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,5, range_is_domain=False)
+        numpy.testing.assert_almost_equal(res1,1, decimal=4) 
+
+
         # 2x2 matrix, max absolute eigenvalue is not unique and initial vector chosen for non-convergence
-        with self.assertWarns(Warning):
-            M1=numpy.array([[2.,1.], [0.,-2.]])
-            M1op = MatrixOperator(M1)
-            res1 = M1op.PowerMethod(M1op,100, initial=DataContainer(numpy.array([1.,1.])))
+        
+        M1=numpy.array([[2.,1.], [0.,-2.]])
+        M1op = MatrixOperator(M1)
+        _,_,_,_,convergence = M1op.PowerMethod(M1op,100, initial=DataContainer(numpy.array([1.,1.])), return_all=True)
+        numpy.testing.assert_equal(convergence,False) 
 
         # 2x2 matrix, max absolute eigenvalue is not unique and initial vector chosen for convergence
         
         M1=numpy.array([[2.,1.,0.],[0.,1.,1.], [0.,0.,1.]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,100)
+        res1,_,_,_,convergence = M1op.PowerMethod(M1op,100, return_all=True)
         numpy.testing.assert_almost_equal(res1,2., decimal=4) 
-            
+        numpy.testing.assert_equal(convergence,True)     
 
         # Gradient Operator (float)
         ig = ImageGeometry(30,30)

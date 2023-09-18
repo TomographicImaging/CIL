@@ -225,11 +225,9 @@ class LinearOperator(Operator):
         diff = numpy.finfo('d').max
         i = 0
         while (i < max_iteration and diff > tolerance):
-            i+=1
             
             operator.direct(x0, out = y_tmp)
-
-            
+           
             if square:                
                 #swap datacontainer references
                 tmp = x0

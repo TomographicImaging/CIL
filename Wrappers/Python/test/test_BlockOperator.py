@@ -187,9 +187,8 @@ class TestBlockOperator(unittest.TestCase):
         G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
         logging.info("{} {}".format(type(u), str(u.as_array())))    
         logging.info(str(G.direct(u).as_array()))
-        LinearOperator.PowerMethod(G, range_is_domain=False)
         # Gradient Operator norm, for one direction should be close to 2
-        numpy.testing.assert_allclose(LinearOperator.PowerMethod(G, range_is_domain=False), numpy.sqrt(4), atol=0.1)
+        numpy.testing.assert_allclose(G.norm(), numpy.sqrt(4), atol=0.1)
 
         M1, N1, K1 = 200, 300, 2
         ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)

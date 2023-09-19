@@ -23,7 +23,7 @@ import numpy as np
 import warnings
 import logging
 from cil.framework import Sampler
-
+from numbers import Number
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
@@ -113,6 +113,8 @@ class SPDHG(Algorithm):
         return self._norms
 
     def set_norms(self, norms=None):
+        #TODO: write some checks for setting norms 
+
         if norms is None:
             # Compute norm of each sub-operator
             norms = [self.operator.get_item(i, 0).norm()
@@ -124,6 +126,16 @@ class SPDHG(Algorithm):
         return self._sigma
 
     def set_sigma(self, sigma=None, norms=None):
+        #TODO: check if this is correct for PSDHG 
+        if sigma is not None:
+            if isinstance(sigma, Number):
+                if sigma <= 0:
+                    raise ValueError("The step-sizes of PDHG are positive, passed sigma = {}".format(sigma))                  
+            elif sigma.shape != self.operator.range_geometry().shape:  
+                raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(sigma.shape, self.operator.range_geometry().shape))
+
+
+
         self.set_norms(norms)
         if sigma is None:
             self._sigma = [self.gamma * self.rho / ni for ni in self._norms]
@@ -135,6 +147,16 @@ class SPDHG(Algorithm):
         return self._tau
 
     def set_tau(self, tau=None):
+        #TODO: check if this is correct for SPDHG
+        if tau is not None:          
+            if isinstance(tau, Number):
+                if tau <= 0:
+                    raise ValueError("The step-sizes of PDHG must be positive, passed tau = {}".format(tau))                  
+            elif tau.shape != self.operator.domain_geometry().shape:  
+                raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(tau.shape, self.operator.domain_geometry().shape))
+
+
+
         if tau is None:
             self._tau = min([pi / (si * ni**2) for pi, ni,
                             si in zip(self._prob_weights, self._norms, self._sigma)])
@@ -146,7 +168,25 @@ class SPDHG(Algorithm):
         ''' If you update either the norms or the prob_weights run this to reset the default sigma and tau step-sizes'''
         self.set_sigma()
         self.set_tau()
-        #TODO: Look at the PDHG one?? 
+        
+    def check_convergence(self):
+         #TODO: check if this is correct for SPDHG 
+        """  Check whether convergence criterion for SPDHG is satisfied with scalar values of tau and sigma
+
+        Returns
+        -------
+        Boolean
+            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
+        """    
+        if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
+            if self.sigma * self.tau * self.operator.norm()**2 > 1:
+                warnings.warn("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")
+                return False
+            return True
+        else:
+            warnings.warn("Convergence criterion can only be checked for scalar values of tau and sigma.")   
+            return False             
+
 
     @property
     def prob_weights(self):

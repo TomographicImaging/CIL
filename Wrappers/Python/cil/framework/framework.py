@@ -199,7 +199,11 @@ class Partitioner(object):
         axis = self.dimension_labels.index('angle')
             
         for i in range(num_batches):
-            out[i].fill(numpy.squeeze(numpy.take(self.array, partition_indices[i], axis=axis)))
+            out[i].fill(
+                numpy.squeeze(
+                    numpy.take(self.array, partition_indices[i], axis=axis)
+                )
+            )
  
         return out
          

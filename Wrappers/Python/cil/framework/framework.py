@@ -3320,11 +3320,26 @@ class DataContainer(object):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
     
-    def mean(self, *args, **kwargs):
-        '''Returns the mean pixel value of the DataContainer'''
+    def mean(self, direction=None, *args, **kwargs):
+        '''Returns the mean pixel value of the DataContainer
+        
+        direction: 
+        '''
         if kwargs.get('dtype', None) is None:
             kwargs['dtype'] = numpy.float64
-        return numpy.mean(self.as_array(), *args, **kwargs)
+            
+        if direction is None:
+            return numpy.mean(self.as_array(), *args, **kwargs)
+        else:
+            try:
+                axis_direction = self.dimension_labels.index(direction)
+            except ValueError:
+                raise ValueError ("Direction value doesn't exist in dimension_labels.")
+            if 'axis' in kwargs:
+                kwargs['axis'] = (axis_direction, kwargs['axis'])
+            else:
+                kwargs['axis'] = axis_direction
+            return numpy.mean(self.as_array(), *args, **kwargs)       
 
 
     # Logic operators between DataContainers and floats    

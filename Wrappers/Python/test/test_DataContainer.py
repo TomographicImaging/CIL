@@ -815,6 +815,9 @@ class TestDataContainer(CCPiTestClass):
         mean = data.mean(direction='horizontal_y', axis=(0,2))
         numpy.testing.assert_almost_equal(mean, expected)
 
+        mean = data.mean(direction='horizontal_y', axis=(0,1,2))
+        numpy.testing.assert_almost_equal(mean, expected)
+
         mean = data.mean(direction='horizontal_x')
         expected = [[numpy.float64(0+1)/2, numpy.float64(2+3)/numpy.float64(2)],[numpy.float64(4+5)/numpy.float64(2), numpy.float64(6+7)/numpy.float64(2)]]
         numpy.testing.assert_almost_equal(mean, expected)

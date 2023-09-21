@@ -28,7 +28,6 @@ import math
 import weakref
 import logging
 
-
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
 

@@ -126,7 +126,6 @@ class Partitioner(object):
             ag = self.geometry.copy()
             ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
             ags.append(ag)
-        #
         return BlockGeometry(*ags)
 
     def partition(self, num_batches, mode, seed=None):

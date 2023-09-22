@@ -882,30 +882,61 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         # split in num_batches
         num_batches = 4
 
+        #Testing sequential partitioning 
         data = self.data.partition(num_batches, 'sequential')
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
-        
-        # ig = data.get_ImageGeometry()
         assert len(data.containers) == num_batches
         self.assertDataIsTheSame(data, idxs)
 
+        #Testing staggered partitioning 
         data = self.data.partition(num_batches, Partitioner.STAGGERED)
         idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=True)
-        
-        # ig = data.get_ImageGeometry()
         assert len(data.containers) == num_batches
         self.assertDataIsTheSame(data, idxs)
 
+    def test_partition_diff_num_batches(self):
 
-    def assertDataIsTheSame(self, data, idxs):
+        #Check what happens when the number of batches is equal to the number of projection angles 
+        num_batches=9
+        data = self.data.partition(num_batches, 'sequential')
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs, msg='Failed when num_batches=number of projections')
+
+        #Check what happens when the number of batches is one, the whole set of projection angles 
+        num_batches=1
+        data = self.data.partition(num_batches, 'sequential')
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs, msg="Failed when num_batches=1")
+
+        #Check what happens when the number of batches is zero
+        num_batches=0
+        with self.assertRaises(ZeroDivisionError):
+            data = self.data.partition(num_batches, 'sequential')
+       
+       #Check what happens when the number of batches is greater than the number of projection angles
+        num_batches=10
+        with self.assertRaises(ValueError):
+            data = self.data.partition(num_batches, 'sequential')
+       
+        
+
+
+
+    def assertDataIsTheSame(self, data, idxs, msg=None):
         # let's check that the data is the same
         k = 0
         wrong = 0
         for i, el in enumerate(data):
-            for j in range(el.shape[0]):
+            if len(el.shape)>1:
+                j_range=el.shape[0]
+            else:
+                j_range=1
+            for j in range(j_range):
                 idx = idxs[i][j]
                 try:
-                    np.testing.assert_array_equal(el.as_array()[j], self.data.as_array()[idx])
+                    np.testing.assert_array_equal(el.as_array()[j], self.data.as_array()[idx], err_msg=msg)
                 except AssertionError:
                     wrong += 1
                 k += 1

@@ -5,6 +5,7 @@
   - Add norm for CompositionOperator
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
+  - Added support for partitioner, when partitions have size 1
   - Fix for show_geometry bug for 2D data
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
   - FBP split processing bug fix - now respects panel origin

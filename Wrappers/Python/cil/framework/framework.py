@@ -126,7 +126,6 @@ class Partitioner(object):
             ag = self.geometry.copy()
             ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
             ags.append(ag)
-        
         return BlockGeometry(*ags)
 
     def partition(self, num_batches, mode, seed=None):
@@ -200,8 +199,11 @@ class Partitioner(object):
             
         for i in range(num_batches):
             out[i].fill(
-                numpy.take(self.array, partition_indices[i], axis=axis)
+                numpy.squeeze(
+                    numpy.take(self.array, partition_indices[i], axis=axis)
+                )
             )
+ 
         return out
          
     def _partition_random_permutation(self, num_batches, seed=None):
@@ -2111,7 +2113,6 @@ class AcquisitionGeometry(object):
                      AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
                      AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
                      AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
-
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])

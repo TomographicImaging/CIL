@@ -751,11 +751,10 @@ class TestSIRT(unittest.TestCase):
 
 
 class TestSPDHG(CCPiTestClass):
-
-    def test_SPDHG_defaults_and_setters(self):
+    def setUp(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
 
-        subsets = 10
+        self.subsets = 10
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -771,48 +770,76 @@ class TestSPDHG(CCPiTestClass):
         Aop = ProjectionOperator(ig, ag, dev)
 
         sin = Aop.direct(data)
-        partitioned_data = sin.partition(subsets, 'sequential')
-        A = BlockOperator(
-            *[IdentityOperator(partitioned_data[i].geometry) for i in range(subsets)])
+        partitioned_data = sin.partition(self.subsets, 'sequential')
+        self.A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
 
         # block function
-        F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
-                          for i in range(subsets)])
+        self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                          for i in range(self.subsets)])
         alpha = 0.025
-        G = alpha * FGP_TV()
-        spdhg = SPDHG(f=F, g=G, operator=A)
+        self.G = alpha * FGP_TV()
+
+    def test_SPDHG_defaults_and_setters(self):
+        
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
         
         self.assertEqual(spdhg.gamma, 1.)
         self.assertEqual(spdhg.rho, .99)
-        self.assertListEqual(spdhg.norms, [A.get_item(i, 0).norm()
-                     for i in range(subsets)])
-        self.assertListEqual(spdhg.prob_weights, [1/subsets] * subsets)
+        self.assertListEqual(spdhg.norms, [self.A.get_item(i, 0).norm()
+                     for i in range(self.subsets)])
+        self.assertListEqual(spdhg.prob_weights, [1/self.subsets] * self.subsets)
         self.assertTrue(isinstance(spdhg.sampler, Sampler))
         self.assertListEqual(spdhg.sigma, [spdhg.gamma * spdhg.rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
                             si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(spdhg.rho / spdhg.gamma))
-        self.assertNumpyArrayEqual(spdhg.x.array, A.domain_geometry().allocate(0).array)
+        self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(0).array)
         self.assertEqual(spdhg.max_iteration, 0)
         self.assertEqual(spdhg.update_objective_interval, 1)
       
-        spdhg.set_norms([1]*subsets)
-        spdhg.set_sampler(Sampler.randomWithReplacement(10, list(range(1,11)/55)))
+        spdhg.set_norms([1]*self.subsets)
+        spdhg.set_sampler(Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)))
         spdhg.set_gamma(10)
-        spdhg.reset_default_step_sizes(self)
+        spdhg.reset_default_step_sizes()
 
-        #TODO: Test these changes 
-        spdhg.set_sigma([1]*subsets)
+        self.assertEqual(spdhg.gamma, 10)
+        self.assertEqual(spdhg.rho, .99)
+        self.assertListEqual(spdhg.norms, [1]*self.subsets)
+        self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
+        self.assertTrue(isinstance(spdhg.sampler, Sampler))
+        self.assertListEqual(spdhg.sigma, [spdhg.gamma * spdhg.rho / ni for ni in spdhg.norms])
+        self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
+                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(spdhg.rho / spdhg.gamma))
+        
+
+        spdhg.set_sigma([1]*self.subsets)
         spdhg.set_tau(100)
-        #TODO: Test again 
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, 100)
+        
 
     def test_spdhg_non_default_init(self):
-        #TODO:: Test again
-        pass
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, gamma=10, rho=.45, norms=[1]*self.subsets, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
+                      sigma=[1]*self.subsets, tau=100, initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )
+        self.assertEqual(spdhg.gamma, 10)
+        self.assertEqual(spdhg.rho, .45)
+        self.assertListEqual(spdhg.norms, [1]*self.subsets)
+        self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
+        self.assertTrue(isinstance(spdhg.sampler, Sampler))
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, 100)
+        self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(1).array)
+        self.assertEqual(spdhg.max_iteration, 1000)
+        self.assertEqual(spdhg.update_objective_interval, 10)
 
     def test_spdhg_check_convergence(self):
-          #TODO:checkconvergence
-          pass
-
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, gamma=10, rho=.45, norms=[1]*self.subsets, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
+                      sigma=[1]*self.subsets, tau=10, initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )
+        
+        self.assertFalse(spdhg.check_convergence())
+        spdhg.reset_default_step_sizes()
+        self.assertTrue(spdhg.check_convergence())
+        
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):

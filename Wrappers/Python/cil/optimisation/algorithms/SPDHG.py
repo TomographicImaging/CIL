@@ -49,8 +49,7 @@ class SPDHG(Algorithm):
         List of Step size parameters for Dual problem
     initial : DataContainer, optional, default=None
         Initial point for the SPDHG algorithm
-    prob : list of floats, optional, default=None
-        List of probabilities. If None each subset will have probability = 1/number of subsets
+    
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
     sampler: instance of the Sampler class
@@ -58,6 +57,9 @@ class SPDHG(Algorithm):
     **kwargs:
     norms : list of floats
         precalculated list of norms of the operators
+    prob : list of floats, optional, default=None
+        List of probabilities. If None each subset will have probability = 1/number of subsets
+    rho #TODO: - maybe in the set sigma and tau? 
 
     Example 
     -------
@@ -96,7 +98,7 @@ class SPDHG(Algorithm):
     '''
 
     def __init__(self, f=None, g=None,  operator=None, tau=None, sigma=None,
-                 initial=None,  gamma=1., sampler=None, **kwargs):
+                 initial=None,  gamma=1., sampler=None,  **kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
 
@@ -108,7 +110,7 @@ class SPDHG(Algorithm):
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma,
-                        initial=initial,  gamma=gamma, sampler=sampler, norms=kwargs.get('norms', None))
+                        initial=initial,  gamma=gamma, sampler=sampler, rho=kwargs.get('rho', .99),norms=kwargs.get('norms', None))
 
     @property
     def norms(self):
@@ -126,8 +128,8 @@ class SPDHG(Algorithm):
             norms = [self.operator.get_item(i, 0).norm()
                      for i in range(self.ndual_subsets)]
         else:
-            for i in range(len(norms)):
-                if isinstance(norms[i], Number):
+            for i in range(len(norms)): # TODO: length should be self.ndual_subsets
+                if isinstance(norms[i], Number): #TODO: shouldn't be passing if it is not a number 
                     if norms[i] <= 0:
                         raise ValueError(
                             "The norms of the operators should be positive, passed norm= {}".format(norms[i]))
@@ -141,7 +143,7 @@ class SPDHG(Algorithm):
     def prob_weights(self):
         return self._prob_weights
     
-    def set_sampler(self, sampler=None):
+    def set_sampler(self, sampler=None): #TODO: do want to keep this? THink about what should be reset based on this
         """ Sets the sampler for the SPDHG algorithm. 
 
         Parameters
@@ -249,7 +251,12 @@ class SPDHG(Algorithm):
                             si in zip(self._prob_weights, self._norms, self._sigma)])
             self._tau *= (self.rho / self.gamma)
 
-    def reset_default_step_sizes(self):
+    def set_step_sizes_from_ratio(gamma=1, rho=0.99): #TODO:
+        pass
+    def set_step_sizes_custom(sigma=None, tau=None): #TODO:
+        pass
+
+    def set_step_sizes_default(self): #TODO: Pass gamma, sigma, rho, tau to one function?
         """ Sets default sigma and tau step-sizes for the SPDHG algorithm. This should be re-run after changing the sampler, norms, gamma or prob_weights. 
 
         Note
@@ -266,6 +273,7 @@ class SPDHG(Algorithm):
 
     def check_convergence(self):
         # TODO: check this with someone else
+        #TODO: Don't think this is working just at the moment 
         """  Check whether convergence criterion for SPDHG is satisfied with scalar values of tau and sigma
 
         Returns
@@ -286,7 +294,7 @@ class SPDHG(Algorithm):
                 return False
 
     def set_up(self, f, g, operator, tau=None, sigma=None,
-               initial=None,  gamma=1., sampler=None, norms=None):
+               initial=None,  gamma=1., sampler=None, norms=None, rho=.99):
         '''set-up of the algorithm
         Parameters
         ----------
@@ -308,7 +316,11 @@ class SPDHG(Algorithm):
             Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets. 
         **kwargs:
         norms : list of floats
-            precalculated list of norms of the operators
+            precalculated list of norms of the operators #TODO: call it precalculated norms and add to argument list 
+        rho : list of floats #TODO: Add to sigma and tau 
+            
+
+
         '''
         logging.info("{} setting up".format(self.__class__.__name__, ))
 
@@ -317,13 +329,13 @@ class SPDHG(Algorithm):
         self.g = g
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
-        self.rho = .99
+        self.rho = rho
 
      
         self.set_sampler(sampler) 
         self.set_gamma(gamma)
-        self.set_norms(norms)
-        self.set_sigma(sigma)
+        self.set_norms(norms) #passed or calculated by constructor
+        self.set_sigma(sigma) #might not want to do this until it is called (if computationally expensive)
         self.set_tau(tau)
 
         # initialize primal variable

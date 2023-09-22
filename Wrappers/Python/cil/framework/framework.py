@@ -3087,15 +3087,16 @@ class DataContainer(object):
         It will try to use the CIL C library and default to numpy operations, in case the C library does
         not handle the types.
         
-        Example:
+        
+        Example
         -------
 
-        a = 2
-        b = 3
-        ig = ImageGeometry(10,11)
-        x = ig.allocate(1)
-        y = ig.allocate(2)
-        out = x.sapyb(a,y,b)
+        >>> a = 2
+        >>> b = 3
+        >>> ig = ImageGeometry(10,11)
+        >>> x = ig.allocate(1)
+        >>> y = ig.allocate(2)
+        >>> out = x.sapyb(a,y,b)
         '''
         ret_out = False
         

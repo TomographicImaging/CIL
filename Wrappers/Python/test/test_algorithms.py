@@ -781,65 +781,87 @@ class TestSPDHG(CCPiTestClass):
         self.G = alpha * FGP_TV()
 
     def test_SPDHG_defaults_and_setters(self):
-        
+        gamma=1.
+        rho=.99
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
         
-        self.assertEqual(spdhg.gamma, 1.)
-        self.assertEqual(spdhg.rho, .99)
+     
         self.assertListEqual(spdhg.norms, [self.A.get_item(i, 0).norm()
                      for i in range(self.subsets)])
         self.assertListEqual(spdhg.prob_weights, [1/self.subsets] * self.subsets)
         self.assertTrue(isinstance(spdhg.sampler, Sampler))
-        self.assertListEqual(spdhg.sigma, [spdhg.gamma * spdhg.rho / ni for ni in spdhg.norms])
+        self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
-                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(spdhg.rho / spdhg.gamma))
+                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
         self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(0).array)
         self.assertEqual(spdhg.max_iteration, 0)
         self.assertEqual(spdhg.update_objective_interval, 1)
       
-        spdhg.set_norms([1]*self.subsets)
-        spdhg.set_sampler(Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)))
-        spdhg.set_gamma(10)
-        spdhg.reset_default_step_sizes()
-
-        self.assertEqual(spdhg.gamma, 10)
-        self.assertEqual(spdhg.rho, .99)
-        self.assertListEqual(spdhg.norms, [1]*self.subsets)
-        self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
-        self.assertTrue(isinstance(spdhg.sampler, Sampler))
-        self.assertListEqual(spdhg.sigma, [spdhg.gamma * spdhg.rho / ni for ni in spdhg.norms])
-        self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
-                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(spdhg.rho / spdhg.gamma))
         
-
-        spdhg.set_sigma([1]*self.subsets)
-        spdhg.set_tau(100)
+        
+        gamma=3.7
+        rho=5.6
+        self.set_step_sizes_from_ratio(gamma,rho)
+        self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
+        self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
+                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
+        
+        
+        spdhg.set_step_sizes_custom()
+        self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
+        self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
+                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
+        
+        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=100)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, 100)
         
+        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=None)
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
+                            si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)]))
+
+        spdhg.set_step_sizes_custom(sigma=None, tau=100)
+        self.assertListEqual(spdhg.sigma, [gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg.norms, spdhg.prob_weights)] )
+        self.assertEqual(spdhg.tau, 100)
+
 
     def test_spdhg_non_default_init(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, gamma=10, rho=.45, norms=[1]*self.subsets, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
-                      sigma=[1]*self.subsets, tau=100, initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )
-        self.assertEqual(spdhg.gamma, 10)
-        self.assertEqual(spdhg.rho, .45)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
+                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10, precalculated_norms=[5]*self.subsets )
+
         self.assertListEqual(spdhg.norms, [1]*self.subsets)
         self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
         self.assertTrue(isinstance(spdhg.sampler, Sampler))
-        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, 100)
         self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(1).array)
         self.assertEqual(spdhg.max_iteration, 1000)
         self.assertEqual(spdhg.update_objective_interval, 10)
 
     def test_spdhg_check_convergence(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, gamma=10, rho=.45, norms=[1]*self.subsets, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
-                      sigma=[1]*self.subsets, tau=10, initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
         
-        self.assertFalse(spdhg.check_convergence())
-        spdhg.reset_default_step_sizes()
         self.assertTrue(spdhg.check_convergence())
         
+        gamma=3.7
+        rho=0.9
+        self.set_step_sizes_from_ratio(gamma,rho)
+        self.assertTrue(spdhg.check_convergence())
+        
+        gamma=3.7
+        rho=100
+        self.set_step_sizes_from_ratio(gamma,rho)
+        self.assertFalse(spdhg.check_convergence())
+
+       
+        
+        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=100)
+        self.assertFalse(spdhg.check_convergence())
+        
+        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=None)
+        self.assertTrue(spdhg.check_convergence())
+
+        spdhg.set_step_sizes_custom(sigma=None, tau=100)
+        self.assertTrue(spdhg.check_convergence())
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):

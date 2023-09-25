@@ -3342,8 +3342,10 @@ class DataContainer(object):
             if 'axis' in kwargs:
                 if isinstance(kwargs['axis'], tuple):
                     kwargs['axis'] = axis_direction + kwargs['axis']
+                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
                 elif isinstance(kwargs['axis'], str):
                     kwargs['axis'] = axis_direction + (kwargs['axis'],)
+                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
             else:
                 kwargs['axis'] = axis_direction
             return numpy.mean(self.as_array(), *args, **kwargs)  
@@ -3356,8 +3358,10 @@ class DataContainer(object):
             if 'axis' in kwargs:
                 if isinstance(kwargs['axis'], tuple):
                     kwargs['axis'] = (axis_direction,) + kwargs['axis']
+                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
                 elif isinstance(kwargs['axis'], str):
                     kwargs['axis'] = (axis_direction, kwargs['axis'])
+                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
             else:
                 kwargs['axis'] = axis_direction
             return numpy.mean(self.as_array(), *args, **kwargs)

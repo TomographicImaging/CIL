@@ -49,7 +49,7 @@ class SPDHG(Algorithm):
         List of Step size parameters for Dual problem
     initial : DataContainer, optional, default=None
         Initial point for the SPDHG algorithm
-    
+
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
     sampler: instance of the Sampler class
@@ -57,7 +57,7 @@ class SPDHG(Algorithm):
     precalculated_norms : list of floats
         precalculated list of norms of the operators
     **kwargs:
-    
+
     prob : list of floats, optional, default=None
         List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
     norms : list of floats
@@ -105,9 +105,10 @@ class SPDHG(Algorithm):
 
         self.prob_weights = kwargs.get('prob', None)
         if kwargs.get('norms', None) is not None:
-            warnings.warn('norms is being deprecated, pass instead precalculated_norms=your_custom_norms')
+            warnings.warn(
+                'norms is being deprecated, pass instead precalculated_norms=your_custom_norms')
             if precalculated_norms is None:
-                precalculated_norms=kwargs.get('norms', None)
+                precalculated_norms = kwargs.get('norms', None)
 
         if self.prob_weights is not None:
             warnings.warn('prob is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob)".\
@@ -115,21 +116,17 @@ class SPDHG(Algorithm):
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator,
-                        initial=initial,  sampler=sampler,precalculated_norms=precalculated_norms)
-
-
-
-    
+                        initial=initial,  sampler=sampler, precalculated_norms=precalculated_norms)
 
     @property
     def sigma(self):
         return self._sigma
-    
+
     @property
     def tau(self):
         return self._tau
- 
-    def set_step_sizes_from_ratio(self, gamma=1., rho=.99): 
+
+    def set_step_sizes_from_ratio(self, gamma=1., rho=.99):
         """ Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
 
         Parameters
@@ -144,7 +141,6 @@ class SPDHG(Algorithm):
                 raise ValueError(
                     "The step-sizes of SPDHG are positive, gamma should also be positive")
 
-            
         else:
             raise ValueError(
                 "We currently only support scalar values of gamma")
@@ -153,7 +149,6 @@ class SPDHG(Algorithm):
                 raise ValueError(
                     "The step-sizes of SPDHG are positive, gamma should also be positive")
 
-            
         else:
             raise ValueError(
                 "We currently only support scalar values of gamma")
@@ -161,13 +156,10 @@ class SPDHG(Algorithm):
         self._sigma = [gamma * rho / ni for ni in self.norms]
 
         self._tau = min([pi / (si * ni**2) for pi, ni,
-                            si in zip(self.prob_weights, self.norms, self._sigma)])
+                         si in zip(self.prob_weights, self.norms, self._sigma)])
         self._tau *= (rho / gamma)
-        
 
-    
-
-    def set_step_sizes_custom(self, sigma=None, tau=None): 
+    def set_step_sizes_custom(self, sigma=None, tau=None):
         """ Sets sigma step-sizes for the SPDHG algorithm. The step sizes can be either scalar or array-objects.
 
         Parameters
@@ -179,28 +171,29 @@ class SPDHG(Algorithm):
 
         The user can set these or default values are calculated, either sigma, tau, both or None can be passed. 
         """
-        gamma=1.
-        rho=.99
+        gamma = 1.
+        rho = .99
         if sigma is not None:
-            if len(sigma)==self.ndual_subsets:
+            if len(sigma) == self.ndual_subsets:
                 if all(isinstance(x, Number) for x in sigma):
                     if all(x > 0 for x in sigma):
                         pass
                     else:
-                         raise ValueError(
+                        raise ValueError(
                             "The values of sigma should be positive")
                 else:
                     raise ValueError(
-                            "The values of sigma should be a Number")
+                        "The values of sigma should be a Number")
             else:
                 raise ValueError(
-                            "Please pass a list of floats to sigma with the same number of entries as number of operators")
+                    "Please pass a list of floats to sigma with the same number of entries as number of operators")
             self._sigma = sigma
 
         elif tau is None:
             self._sigma = [gamma * rho / ni for ni in self.norms]
         else:
-            self._sigma= [gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self.norms, self.prob_weights)] 
+            self._sigma = [
+                gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self.norms, self.prob_weights)]
 
         if tau is None:
             self._tau = min([pi / (si * ni**2) for pi, ni,
@@ -213,20 +206,11 @@ class SPDHG(Algorithm):
                         "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
             else:
                 raise ValueError(
-                            "The value of tau should be a Number")
-            self._tau=tau
-
-    
-
-
-
-    
-
- 
+                    "The value of tau should be a Number")
+            self._tau = tau
 
     def check_convergence(self):
         # TODO: check this with someone else
-        #TODO: Don't think this is working just at the moment 
         """  Check whether convergence criterion for SPDHG is satisfied with scalar values of tau and sigma
 
         Returns
@@ -246,7 +230,7 @@ class SPDHG(Algorithm):
                     "Convergence criterion currently can only be checked for scalar values of tau.")
                 return False
 
-    def set_up(self, f, g, operator, 
+    def set_up(self, f, g, operator,
                initial=None,   sampler=None, precalculated_norms=None):
         '''set-up of the algorithm
         Parameters
@@ -269,12 +253,6 @@ class SPDHG(Algorithm):
             Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets. 
         precalculated_norms : list of floats
             precalculated list of norms of the operators 
-       
-        
-        
-            
-
-
         '''
         logging.info("{} setting up".format(self.__class__.__name__, ))
 
@@ -283,29 +261,26 @@ class SPDHG(Algorithm):
         self.g = g
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
-        
-
 
         if precalculated_norms is None:
             # Compute norm of each sub-operator
             self.norms = [self.operator.get_item(i, 0).norm()
-                     for i in range(self.ndual_subsets)]
+                          for i in range(self.ndual_subsets)]
         else:
-            if len(precalculated_norms)==self.ndual_subsets:
+            if len(precalculated_norms) == self.ndual_subsets:
                 if all(isinstance(x, Number) for x in precalculated_norms):
                     if all(x > 0 for x in precalculated_norms):
                         pass
                     else:
-                         raise ValueError(
+                        raise ValueError(
                             "The norms of the operators should be positive")
                 else:
                     raise ValueError(
-                            "The norms of the operators should be a Number")
+                        "The norms of the operators should be a Number")
             else:
                 raise ValueError(
-                            "Please pass a list of floats to the precalculated norms with the same number of entries as number of operators")
-            self.norms=precalculated_norms 
-
+                    "Please pass a list of floats to the precalculated norms with the same number of entries as number of operators")
+            self.norms = precalculated_norms
 
         if sampler is None:
             if self.prob_weights is None:
@@ -318,16 +293,12 @@ class SPDHG(Algorithm):
                     "The sampler should be an instance of the CIL Sampler class")
             self.sampler = sampler
             if sampler.prob is None:
-                self.prob_weights=[1/self.ndual_subsets] * self.ndual_subsets
+                self.prob_weights = [1/self.ndual_subsets] * self.ndual_subsets
             else:
-                self.prob_weights=sampler.prob
+                self.prob_weights = sampler.prob
 
-
-
-
-        
-        self.set_step_sizes_custom() #might not want to do this until it is called (if computationally expensive)
-        
+        # might not want to do this until it is called (if computationally expensive)
+        self.set_step_sizes_custom()
 
         # initialize primal variable
         if initial is None:

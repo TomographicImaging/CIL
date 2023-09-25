@@ -182,7 +182,7 @@ class SPDHG(Algorithm):
         gamma=1.
         rho=.99
         if sigma is not None:
-            if len(sigma==self.ndual_subsets):
+            if len(sigma)==self.ndual_subsets:
                 if all(isinstance(x, Number) for x in sigma):
                     if all(x > 0 for x in sigma):
                         pass
@@ -291,7 +291,7 @@ class SPDHG(Algorithm):
             self.norms = [self.operator.get_item(i, 0).norm()
                      for i in range(self.ndual_subsets)]
         else:
-            if len(precalculated_norms==self.ndual_subsets):
+            if len(precalculated_norms)==self.ndual_subsets:
                 if all(isinstance(x, Number) for x in precalculated_norms):
                     if all(x > 0 for x in precalculated_norms):
                         pass

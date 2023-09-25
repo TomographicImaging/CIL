@@ -799,14 +799,16 @@ class TestSPDHG(CCPiTestClass):
       
         
         
+        
         gamma=3.7
         rho=5.6
-        self.set_step_sizes_from_ratio(gamma,rho)
+        spdhg.set_step_sizes_from_ratio(gamma,rho)
         self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
                             si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
         
-        
+        gamma=1.
+        rho=.99
         spdhg.set_step_sizes_custom()
         self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
@@ -818,7 +820,7 @@ class TestSPDHG(CCPiTestClass):
         
         spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=None)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
+        self.assertEqual(spdhg.tau, min([(pi / (si * ni**2))*(rho / gamma) for pi, ni,
                             si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)]))
 
         spdhg.set_step_sizes_custom(sigma=None, tau=100)
@@ -828,7 +830,7 @@ class TestSPDHG(CCPiTestClass):
 
     def test_spdhg_non_default_init(self):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
-                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10, precalculated_norms=[5]*self.subsets )
+                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10, precalculated_norms=[1]*self.subsets )
 
         self.assertListEqual(spdhg.norms, [1]*self.subsets)
         self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
@@ -844,15 +846,13 @@ class TestSPDHG(CCPiTestClass):
         
         gamma=3.7
         rho=0.9
-        self.set_step_sizes_from_ratio(gamma,rho)
+        spdhg.set_step_sizes_from_ratio(gamma,rho)
         self.assertTrue(spdhg.check_convergence())
         
         gamma=3.7
         rho=100
-        self.set_step_sizes_from_ratio(gamma,rho)
+        spdhg.set_step_sizes_from_ratio(gamma,rho)
         self.assertFalse(spdhg.check_convergence())
-
-       
         
         spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=100)
         self.assertFalse(spdhg.check_convergence())

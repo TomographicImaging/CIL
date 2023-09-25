@@ -3312,9 +3312,34 @@ class DataContainer(object):
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
-    def min(self, *args, **kwargs):
-        '''Returns the min pixel value in the DataContainer'''
-        return numpy.min(self.as_array(), *args, **kwargs)
+    def min(self, direction=None, *args, **kwargs):
+        '''Returns the min pixel value in the DataContainer
+        :param direction: specify the axis or axes to calculate the minimum along using a dimension_label.
+        :type direction: string or tuple of strings 
+        '''
+        if isinstance(direction, str):
+            direction = (direction,)
+        if direction is None:
+            return numpy.min(self.as_array(), *args, **kwargs)
+        elif isinstance(direction, tuple):
+            try:
+                axis_direction = numpy.zeros(len(direction), dtype=int)
+                for i in range(len(direction)): 
+                    axis_direction[i] = numpy.int(self.dimension_labels.index(direction[i])) 
+                axis_direction = tuple(axis_direction)
+            except ValueError:
+                raise ValueError ("Direction value doesn't exist in dimension_labels.")
+            if 'axis' in kwargs:
+                if isinstance(kwargs['axis'], tuple):
+                    kwargs['axis'] = axis_direction + kwargs['axis']
+                else:
+                    kwargs['axis'] = axis_direction + (kwargs['axis'],)
+            else:
+                kwargs['axis'] = axis_direction
+            kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
+            return numpy.min(self.as_array(), *args, **kwargs)  
+        else:
+           raise TypeError ("Direction value must be a string or tuple.")
     
     def max(self, direction=None, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer

@@ -3083,9 +3083,7 @@ class DataContainer(object):
         out : return DataContainer, if None a new DataContainer is returned, default None. 
             out can be self or y.
         num_threads : number of threads to use during the calculation, using the CIL C library
-        
-        It will try to use the CIL C library and default to numpy operations, in case the C library does
-        not handle the types.
+            It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.
         
         
         Example

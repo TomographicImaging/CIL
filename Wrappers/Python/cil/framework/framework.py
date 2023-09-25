@@ -3322,9 +3322,7 @@ class DataContainer(object):
     
     def mean(self, direction=None, *args, **kwargs):
         '''Returns the mean pixel value of the DataContainer
-        :param direction: specify the axis to calculate the mean along using a dimension_label. If 
-        both direction and axis keywords are used, the direction values will be processed first and 
-        duplicate axis specifiers will be removed
+        :param direction: specify the axis to calculate the mean along using a dimension_label.
         :type direction: string or tuple of strings 
         '''
         if kwargs.get('dtype', None) is None:
@@ -3344,12 +3342,11 @@ class DataContainer(object):
             if 'axis' in kwargs:
                 if isinstance(kwargs['axis'], tuple):
                     kwargs['axis'] = axis_direction + kwargs['axis']
-                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
-                elif isinstance(kwargs['axis'], str):
+                else:
                     kwargs['axis'] = axis_direction + (kwargs['axis'],)
-                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
             else:
                 kwargs['axis'] = axis_direction
+            kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
             return numpy.mean(self.as_array(), *args, **kwargs)  
         
         elif isinstance(direction, str):
@@ -3360,10 +3357,9 @@ class DataContainer(object):
             if 'axis' in kwargs:
                 if isinstance(kwargs['axis'], tuple):
                     kwargs['axis'] = (axis_direction,) + kwargs['axis']
-                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
-                elif isinstance(kwargs['axis'], str):
+                else:
                     kwargs['axis'] = (axis_direction, kwargs['axis'])
-                    kwargs['axis'] = tuple(set(kwargs['axis'])) ## remove duplicate axis values
+                kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
             else:
                 kwargs['axis'] = axis_direction
             return numpy.mean(self.as_array(), *args, **kwargs)

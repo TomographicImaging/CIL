@@ -826,7 +826,7 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(mean, expected)
         # test duplicate axis specification in direction and axis
         mean = data.mean(direction='vertical', axis=0)
-        numpy.testing.assert_almost_equal(mean, expected)       
+        numpy.testing.assert_almost_equal(mean, expected)
 
     def test_multiply_out(self):
         ig = ImageGeometry(10,11,12)

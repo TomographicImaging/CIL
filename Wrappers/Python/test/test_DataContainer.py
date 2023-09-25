@@ -781,7 +781,7 @@ class TestDataContainer(CCPiTestClass):
         mean = data.mean()
         expected = numpy.float64(0+1+2+3)/numpy.float64(4)
         numpy.testing.assert_almost_equal(mean, expected)
-        
+
     def test_reduction_mean_direction(self):
         ig = ImageGeometry(2,2,2)
 

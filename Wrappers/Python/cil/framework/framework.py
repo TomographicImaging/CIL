@@ -3322,15 +3322,15 @@ class DataContainer(object):
     
     def mean(self, direction=None, *args, **kwargs):
         '''Returns the mean pixel value of the DataContainer
-        :param direction: specify the axis to calculate the mean along using a dimension_label.
+        :param direction: specify the axis or axes to calculate the mean along using a dimension_label.
         :type direction: string or tuple of strings 
         '''
         if kwargs.get('dtype', None) is None:
             kwargs['dtype'] = numpy.float64
-
+        if isinstance(direction, str):
+            direction = (direction,)
         if direction is None:
             return numpy.mean(self.as_array(), *args, **kwargs)
-        
         elif isinstance(direction, tuple):
             try:
                 axis_direction = numpy.zeros(len(direction), dtype=int)
@@ -3348,21 +3348,6 @@ class DataContainer(object):
                 kwargs['axis'] = axis_direction
             kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
             return numpy.mean(self.as_array(), *args, **kwargs)  
-        
-        elif isinstance(direction, str):
-            try:
-                axis_direction = numpy.int(self.dimension_labels.index(direction)) 
-            except ValueError:
-                raise ValueError ("Direction value doesn't exist in dimension_labels.")
-            if 'axis' in kwargs:
-                if isinstance(kwargs['axis'], tuple):
-                    kwargs['axis'] = (axis_direction,) + kwargs['axis']
-                else:
-                    kwargs['axis'] = (axis_direction, kwargs['axis'])
-                kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
-            else:
-                kwargs['axis'] = axis_direction
-            return numpy.mean(self.as_array(), *args, **kwargs)
         else:
            raise TypeError ("Direction value must be a string or tuple.")        
 

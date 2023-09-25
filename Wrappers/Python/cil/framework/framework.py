@@ -3317,9 +3317,34 @@ class DataContainer(object):
         return numpy.min(self.as_array(), *args, **kwargs)
     
     def max(self, *args, **kwargs):
-        '''Returns the max pixel value in the DataContainer'''
-        return numpy.max(self.as_array(), *args, **kwargs)
-    
+        '''Returns the max pixel value in the DataContainer
+        :param direction: specify the axis or axes to calculate the maximum along using a dimension_label.
+        :type direction: string or tuple of strings 
+        '''
+        if isinstance(direction, str):
+            direction = (direction,)
+        if direction is None:
+            return numpy.max(self.as_array(), *args, **kwargs)
+        elif isinstance(direction, tuple):
+            try:
+                axis_direction = numpy.zeros(len(direction), dtype=int)
+                for i in range(len(direction)): 
+                    axis_direction[i] = numpy.int(self.dimension_labels.index(direction[i])) 
+                axis_direction = tuple(axis_direction)
+            except ValueError:
+                raise ValueError ("Direction value doesn't exist in dimension_labels.")
+            if 'axis' in kwargs:
+                if isinstance(kwargs['axis'], tuple):
+                    kwargs['axis'] = axis_direction + kwargs['axis']
+                else:
+                    kwargs['axis'] = axis_direction + (kwargs['axis'],)
+            else:
+                kwargs['axis'] = axis_direction
+            kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
+            return numpy.max(self.as_array(), *args, **kwargs)  
+        else:
+           raise TypeError ("Direction value must be a string or tuple.")
+
     def mean(self, direction=None, *args, **kwargs):
         '''Returns the mean pixel value of the DataContainer
         :param direction: specify the axis or axes to calculate the mean along using a dimension_label.

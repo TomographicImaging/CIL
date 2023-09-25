@@ -33,7 +33,7 @@ class BlockDataContainer(object):
        will fail 
     2) algebra between `BlockDataContainer`s and `list` or `numpy array` will 
        work as long as the number of `rows` and element of the arrays match,
-       indipendently on the fact that the `BlockDataContainer` could be nested
+       independently on the fact that the `BlockDataContainer` could be nested
     3) algebra between `BlockDataContainer` and one `DataContainer` is possible.
        It will require all the `DataContainers` in the block to be
        compatible with the `DataContainer` we want to operate with. 
@@ -147,7 +147,7 @@ class BlockDataContainer(object):
         '''Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
         :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        :param: out (optional): provides a placeholder for the result.
         '''
         out = kwargs.get('out', None)
         if out is not None:
@@ -157,8 +157,8 @@ class BlockDataContainer(object):
     def multiply(self, other, *args, **kwargs):
         '''Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        :param: other (number, DataContainer or subclasses or BlockDataContainer)
+        :param: out (optional): provides a placeholder for the result.
         '''
         out = kwargs.get('out', None)
         if out is not None:
@@ -168,8 +168,8 @@ class BlockDataContainer(object):
     def divide(self, other, *args, **kwargs):
         '''Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        :param: other (number, DataContainer or subclasses or BlockDataContainer)
+        :param: out (optional): provides a placeholder for the result.
         '''
         out = kwargs.get('out', None)
         if out is not None:
@@ -180,7 +180,7 @@ class BlockDataContainer(object):
         '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
         :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        :param: out (optional): provides a placeholder for the result.
         '''
         out = kwargs.get('out', None)
         if out is not None:
@@ -190,8 +190,8 @@ class BlockDataContainer(object):
     def maximum(self, other, *args, **kwargs):
         '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        :param: other (number, DataContainer or subclasses or BlockDataContainer)
+        :param: out (optional): provides a placeholder for the result.
         '''
         out = kwargs.get('out', None)
         if out is not None:
@@ -201,8 +201,8 @@ class BlockDataContainer(object):
     def minimum(self, other, *args, **kwargs):
         '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        :param: other (number, DataContainer or subclasses or BlockDataContainer)
+        :param: out (optional): provides a placeholder for the result.
         '''
         out = kwargs.get('out', None)
         if out is not None:
@@ -224,14 +224,14 @@ class BlockDataContainer(object):
         Example:
         --------
 
-        a = 2
-        b = 3
-        ig = ImageGeometry(10,11)
-        x = ig.allocate(1)
-        y = ig.allocate(2)
-        bdc1 = BlockDataContainer(2*x, y)
-        bdc2 = BlockDataContainer(x, 2*y)
-        out = bdc1.sapyb(a,bdc2,b)
+        >>> a = 2
+        >>> b = 3
+        >>> ig = ImageGeometry(10,11)
+        >>> x = ig.allocate(1)
+        >>> y = ig.allocate(2)
+        >>> bdc1 = BlockDataContainer(2*x, y)
+        >>> bdc2 = BlockDataContainer(x, 2*y)
+        >>> out = bdc1.sapyb(a,bdc2,b)
         '''
         if out is None:
             raise ValueError("out container cannot be None")
@@ -249,7 +249,7 @@ class BlockDataContainer(object):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
         
         Provides commutativity with DataContainer and subclasses, i.e. this 
-        class's reverse algebric methods take precedence w.r.t. direct algebric
+        class's reverse algebraic methods take precedence w.r.t. direct algebraic
         methods of DataContainer and subclasses.
         
         This method is not to be used directly

@@ -2950,12 +2950,12 @@ class DataContainer(object):
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
         
-        if new_order is None returns the labels of the axes as a sorted-by-key list
-        if new_order is a list of length number_of_dimensions, returns a list
+        If new_order is None returns the labels of the axes as a sorted-by-key list.
+        If new_order is a list of length number_of_dimensions, returns a list
         with the indices of the axes in new_order with respect to those in 
         self.dimension_labels: i.e.
-          self.dimension_labels = {0:'horizontal',1:'vertical'}
-          new_order = ['vertical','horizontal']
+          >>> self.dimension_labels = {0:'horizontal',1:'vertical'}
+          >>> new_order = ['vertical','horizontal']
           returns [1,0]
         '''
         if new_order is None:
@@ -3285,11 +3285,8 @@ class DataContainer(object):
         return numpy.sqrt(self.squared_norm(**kwargs))
     
     def dot(self, other, *args, **kwargs):
-        '''return the inner product of 2 DataContainers viewed as vectors
-        
-        applies to real and complex data. In such case the dot method returns
-
-        a.dot(b.conjugate())
+        '''returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+          For complex data,  the dot method returns a.dot(b.conjugate())
         '''
         method = kwargs.get('method', 'numpy')
         if method not in ['numpy','reduce']:

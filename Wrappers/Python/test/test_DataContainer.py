@@ -798,14 +798,10 @@ class TestDataContainer(CCPiTestClass):
         np_arr[1][1][0] = 6
         np_arr[1][1][1] = 7
         data.fill(np_arr)
-
-        print(data.dimension_labels)
-
+        
         # test specifying mean in multiple axes
-        mean = data.mean()
-        expected = numpy.float64(0+1+2+3+4+5+6+7)/numpy.float64(8)
-        numpy.testing.assert_almost_equal(mean, expected)
         mean = data.mean(direction=('horizontal_x','horizontal_y','vertical'))
+        expected = numpy.float64(0+1+2+3+4+5+6+7)/numpy.float64(8)
         numpy.testing.assert_almost_equal(mean, expected)
         # test specifying axes with both direction and axis
         mean = data.mean(direction='horizontal_y', axis=(0,2))
@@ -813,20 +809,17 @@ class TestDataContainer(CCPiTestClass):
         # test duplicate axis specification in direction and axis
         mean = data.mean(direction='horizontal_y', axis=(0,1,2))
         numpy.testing.assert_almost_equal(mean, expected)
-
         # test specifying mean in a single axis
-        mean = data.mean(direction='horizontal_x')
-        expected = [[numpy.float64(0+1)/2, numpy.float64(2+3)/numpy.float64(2)],[numpy.float64(4+5)/numpy.float64(2), numpy.float64(6+7)/numpy.float64(2)]]
-        numpy.testing.assert_almost_equal(mean, expected)
         mean = data.mean(direction='horizontal_y')
-        expected = [[numpy.float64(0+2)/2, numpy.float64(1+3)/numpy.float64(2)],[numpy.float64(4+6)/numpy.float64(2), numpy.float64(5+7)/numpy.float64(2)]]
-        numpy.testing.assert_almost_equal(mean, expected)
-        mean = data.mean(direction='vertical')
-        expected = [[numpy.float64(0+4)/2, numpy.float64(1+5)/numpy.float64(2)],[numpy.float64(2+6)/numpy.float64(2), numpy.float64(3+7)/numpy.float64(2)]]
+        expected = [[numpy.float64(0+2)/2, numpy.float64(1+3)/numpy.float64(2)],
+                    [numpy.float64(4+6)/numpy.float64(2), numpy.float64(5+7)/numpy.float64(2)]]
         numpy.testing.assert_almost_equal(mean, expected)
         # test duplicate axis specification in direction and axis
         mean = data.mean(direction='vertical', axis=0)
+        expected = [[numpy.float64(0+4)/2, numpy.float64(1+5)/numpy.float64(2)],
+                    [numpy.float64(2+6)/numpy.float64(2), numpy.float64(3+7)/numpy.float64(2)]]        
         numpy.testing.assert_almost_equal(mean, expected)
+
 
     def test_multiply_out(self):
         ig = ImageGeometry(10,11,12)

@@ -3316,7 +3316,7 @@ class DataContainer(object):
         '''Returns the min pixel value in the DataContainer'''
         return numpy.min(self.as_array(), *args, **kwargs)
     
-    def max(self, *args, **kwargs):
+    def max(self, direction=None, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer
         :param direction: specify the axis or axes to calculate the maximum along using a dimension_label.
         :type direction: string or tuple of strings 

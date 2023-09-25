@@ -782,13 +782,11 @@ class TestDataContainer(CCPiTestClass):
         expected = numpy.float64(0+1+2+3)/numpy.float64(4)
         numpy.testing.assert_almost_equal(mean, expected)
 
+
     def test_reduction_mean_direction(self):
         ig = ImageGeometry(2,2,2)
-
-        # labels in geometry
         data = ig.allocate(0)
         np_arr = data.as_array()
-
         np_arr[0][0][0] = 0
         np_arr[0][0][1] = 1
         np_arr[0][1][0] = 2
@@ -1065,6 +1063,37 @@ class TestDataContainer(CCPiTestClass):
         d1.fill(a)                                                     
         self.assertAlmostEqual(d1.max(), 10.)
 
+
+    def test_max_direction(self):
+        ig = ImageGeometry(2,2,2)
+        data = ig.allocate(0)
+        np_arr = data.as_array()
+        np_arr[0][0][0] = 0
+        np_arr[0][0][1] = 1
+        np_arr[0][1][0] = 2
+        np_arr[0][1][1] = 3
+        np_arr[1][0][0] = 4
+        np_arr[1][0][1] = 5
+        np_arr[1][1][0] = 6
+        np_arr[1][1][1] = 7
+        data.fill(np_arr)               
+
+        max = data.max(axis=(0,1,2))
+        self.assertAlmostEqual(max, 7)  
+        max = data.max(direction=('vertical','horizontal_x','horizontal_y'))
+        self.assertAlmostEqual(max, 7) 
+        max = data.max(axis=0)
+        expected = [[numpy.float64(4), numpy.float64(5)],[numpy.float64(6), numpy.float64(7)]]          
+        numpy.testing.assert_almost_equal(max, expected)
+        max = data.max(direction='horizontal_x')
+        expected = [[numpy.float64(1), numpy.float64(3)],[numpy.float64(5), numpy.float64(7)]]          
+        numpy.testing.assert_almost_equal(max, expected)
+        max = data.max(direction='horizontal_x',axis=0)
+        expected = [numpy.float64(5), numpy.float64(7)]        
+        numpy.testing.assert_almost_equal(max, expected)
+        max = data.max(direction='vertical',axis=2)
+        numpy.testing.assert_almost_equal(max, expected)
+        
 
     def test_size(self):
         ig = ImageGeometry(10,10)     

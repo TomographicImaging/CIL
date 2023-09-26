@@ -142,36 +142,6 @@ class IndicatorBox(Function):
             return self.evaluate(x)
         return 0.0
 
-    def proximal_conjugate(self, x, tau, out=None):
-        r'''Proximal operator of the convex conjugate of IndicatorBox at x:
-
-          .. math:: prox_{\tau * f^{*}}(x)
-
-          Parameters
-          ----------
-          x : DataContainer
-              Input to the proximal operator
-          tau : float
-              Step size. Notice it is ignored in IndicatorBox, see ``proximal`` for details
-          out : DataContainer, optional
-              Output of the proximal operator. If not provided, a new DataContainer is created.
-
-        '''
-
-        # x - tau * self.proximal(x/tau, tau)
-        should_return = False
-
-        if out is None:
-            out = self.proximal(x, tau)
-            should_return = True
-        else:
-            self.proximal(x, tau, out=out)
-
-        out.sapyb(-1., x, 1., out=out)
-
-        if should_return:
-            return out
-
     def proximal(self, x, tau, out=None):
         r'''Proximal operator of IndicatorBox at x
 

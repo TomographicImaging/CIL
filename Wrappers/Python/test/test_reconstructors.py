@@ -652,7 +652,7 @@ class Test_FBP_results(unittest.TestCase):
     def test_results_3D_split(self):
 
         reconstructor = FBP(self.acq_data)
-        reconstructor.set_split_processing(1)
+        reconstructor.set_split_processing(8)
 
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
@@ -661,6 +661,27 @@ class Test_FBP_results(unittest.TestCase):
         reco2.fill(0)
         reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)   
+
+
+    @unittest.skipUnless(has_tigre and has_nvidia and has_ipp, "TIGRE or IPP not installed")
+    def test_results_3D_split_reverse(self):
+
+        acq_data = self.acq_data.copy()
+        acq_data.geometry.config.panel.origin = 'top-left'
+
+        reconstructor = FBP(acq_data)
+        reconstructor.set_split_processing(8)
+
+        expected_image = np.flip(self.img_data.as_array(),0)
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), expected_image,atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)   
+
 
 
     @unittest.skipUnless(has_tigre and has_nvidia and has_ipp, "TIGRE or IPP not installed")

@@ -150,13 +150,25 @@ class LinearOperator(Operator):
         raise NotImplementedError
 
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, range_is_domain=None):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, compose_with_adjoint=None):
         r"""Power method or Power iteration algorithm 
 
-        The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
-        absolute value in the real case and modulus in the complex case.        
+        Fpr an operator, :math:`A`, the power method computes the iterations 
+        .. math::
+          x_{k+1} = A (\frac{x_k}{\|x_{k}\|}) \; (*)
 
-        If the matrix is not square. The algorithm computes the largest (dominant) eigenvalue of :math:  A^{T}*A :math:, returning the square root of this value. 
+        initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. 
+
+        If the flag, `compose_with_adjoint` is set to `True`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` 
+          returning the square root of this value, i.e. the iterations:
+          .. math::
+          x_{k+1} = A^TA (\frac{x_k}{\|x_{k}\|})
+
+        and returning  :math:`\sqrt{\|x_k\|}`.
+
+        If the flag `compose_with_adjoint` is set to `False`, the iterates in equation :math:`*` are used. In the default case, `compose_with_adjoint=None`,
+        the code checks to see if the domain and range of the operator are equal and sets `compose_with_adjoint=True` in the case they aren't and
+          `compose_with_adjoint=False` if they are. 
 
 
         Parameters
@@ -171,8 +183,8 @@ class LinearOperator(Operator):
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         return_all: `boolean`, default = False
             Toggles the verbosity of the return
-        range_is_domain: `boolean`, default None
-             Set this to `True` to apply the power method directly on the operator, :math: A :math:, and `False` to apply the power method to :math:A^TA:math: before taking the square root of the result.
+        compose_with_adjoint: `boolean`, default None
+             Set this to `False` to apply the power method directly on the operator, :math: A :math:, and `True` to apply the power method to :math:A^TA:math: before taking the square root of the result.
              Leave as default `None` to determine this from domain and range geometry.  
 
 
@@ -185,7 +197,7 @@ class LinearOperator(Operator):
             Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
         list of eigenvalues: :obj:`list`
             List of eigenvalues. Only returned if return_all is True.
-        Convergence: `boolean'
+        convergence: `boolean'
             Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.
 
         Examples
@@ -204,16 +216,14 @@ class LinearOperator(Operator):
 
         """
         convergence_check = True
-        if range_is_domain is None:
-            square = False
+        if compose_with_adjoint is None:
             try:
                 if operator.domain_geometry() == operator.range_geometry():
-                    square = True
+                    compose_with_adjoint= False
             except AssertionError:
                 # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
-                pass
-        else:
-            square = range_is_domain
+                compose_with_adjoint=True
+
 
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')
@@ -235,7 +245,7 @@ class LinearOperator(Operator):
         while (i < max_iteration and diff > tolerance):
             operator.direct(x0, out=y_tmp)
 
-            if square:
+            if not compose_with_adjoint:
                 # swap datacontainer references
                 tmp = x0
                 x0 = y_tmp
@@ -253,7 +263,7 @@ class LinearOperator(Operator):
             x0 /= x0_norm
 
             eig_new = numpy.abs(x0_norm)
-            if not square:
+            if compose_with_adjoint:
                 eig_new = numpy.sqrt(eig_new)
             diff = numpy.abs(eig_new - eig_old)
             eig_list.append(eig_new)
@@ -271,7 +281,7 @@ class LinearOperator(Operator):
     def calculate_norm(self):
         r""" Returns the norm of the LinearOperator calculated by the PowerMethod with default values.
                 """
-        return LinearOperator.PowerMethod(self)
+        return LinearOperator.PowerMethod(self, compose_with_adjoint=True)
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):

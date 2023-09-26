@@ -3313,10 +3313,16 @@ class DataContainer(object):
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
     def min(self, direction=None, *args, **kwargs):
-        '''Returns the min pixel value in the DataContainer
-        :param direction: specify the axis or axes to calculate the minimum along using a dimension_label.
-        :type direction: string or tuple of strings 
-        '''
+        """"
+        Returns the min pixel value in the DataContainer
+        Parameters
+        ----------
+        direction : string or tuple of strings
+            specify the axis or axes to calculate the minimum along using a dimension_label.
+        Returns
+        -------
+        numpy.ndarray or scalar  
+        """
         if isinstance(direction, str):
             direction = (direction,)
         if direction is None:
@@ -3342,10 +3348,16 @@ class DataContainer(object):
            raise TypeError ("Direction value must be a string or tuple.")
     
     def max(self, direction=None, *args, **kwargs):
-        '''Returns the max pixel value in the DataContainer
-        :param direction: specify the axis or axes to calculate the maximum along using a dimension_label.
-        :type direction: string or tuple of strings 
-        '''
+        """"
+        Returns the max pixel value in the DataContainer
+        Parameters
+        ----------
+        direction : string or tuple of strings
+            specify the axis or axes to calculate the maximum along using a dimension_label.
+        Returns
+        -------
+        numpy.ndarray or scalar  
+        """
         if isinstance(direction, str):
             direction = (direction,)
         if direction is None:
@@ -3371,10 +3383,16 @@ class DataContainer(object):
            raise TypeError ("Direction value must be a string or tuple.")
 
     def mean(self, direction=None, *args, **kwargs):
-        '''Returns the mean pixel value of the DataContainer
-        :param direction: specify the axis or axes to calculate the mean along using a dimension_label.
-        :type direction: string or tuple of strings 
-        '''
+        """"
+        Returns the mean pixel value of the DataContainer
+        Parameters
+        ----------
+        direction : string or tuple of strings, optional
+            specify the axis or axes to calculate the mean along using a dimension_label.
+        Returns
+        -------
+        numpy.ndarray
+        """
         if kwargs.get('dtype', None) is None:
             kwargs['dtype'] = numpy.float64
         if isinstance(direction, str):

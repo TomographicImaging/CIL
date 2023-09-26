@@ -150,25 +150,26 @@ class LinearOperator(Operator):
         raise NotImplementedError
 
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, compose_with_adjoint=None):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
         r"""Power method or Power iteration algorithm 
 
-        Fpr an operator, :math:`A`, the power method computes the iterations 
+        The power method contains two different algorithms chosen by the `method` flag. 
+
+        In the case `method="direct_only"`, for operator, :math:`A`, the power method computes the iterations 
         .. math::
           x_{k+1} = A (\frac{x_k}{\|x_{k}\|}) \; (*)
 
         initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. 
 
-        If the flag, `compose_with_adjoint` is set to `True`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` 
+        In the case `method="composed_with_adjoint"`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` 
           returning the square root of this value, i.e. the iterations:
           .. math::
-          x_{k+1} = A^TA (\frac{x_k}{\|x_{k}\|})
+          x_{k+1} = A^*A (\frac{x_k}{\|x_{k}\|})
 
         and returning  :math:`\sqrt{\|x_k\|}`.
 
-        If the flag `compose_with_adjoint` is set to `False`, the iterates in equation :math:`*` are used. In the default case, `compose_with_adjoint=None`,
-        the code checks to see if the domain and range of the operator are equal and sets `compose_with_adjoint=True` in the case they aren't and
-          `compose_with_adjoint=False` if they are. 
+        The default flag is `method="auto"`, the algorithm checks to see if the `operator.domain_geometry() == operator.range_geometry()` and if so
+        uses the method "direct_only" and if not the method "composed_with_adjoint".
 
 
         Parameters
@@ -217,16 +218,19 @@ class LinearOperator(Operator):
         """
         convergence_check = True
         
-        if compose_with_adjoint is None:
+        if method not in ["auto","direct_only","composed_with_adjoint"]:
+            ValueError(" The flag 'method' should take one of 'auto','direct_only','composed_with_adjoint'")
+
+        if method=="auto":
             try:
                 if operator.domain_geometry() == operator.range_geometry():
-                    compose_with_adjoint= False
+                    method="direct_only"
                 else:
-                    compose_with_adjoint=True
+                    method="composed_with_adjoint"
             except AssertionError:
                 # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
-                compose_with_adjoint=True
-
+                method="composed_with_adjoint"
+        
 
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')
@@ -248,12 +252,12 @@ class LinearOperator(Operator):
         while (i < max_iteration and diff > tolerance):
             operator.direct(x0, out=y_tmp)
 
-            if not compose_with_adjoint:
+            if method=="direct_only":
                 # swap datacontainer references
                 tmp = x0
                 x0 = y_tmp
                 y_tmp = tmp
-            else:
+            elif method=="composed_with_adjoint":
                 operator.adjoint(y_tmp, out=x0)
 
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
@@ -266,7 +270,7 @@ class LinearOperator(Operator):
             x0 /= x0_norm
 
             eig_new = numpy.abs(x0_norm)
-            if compose_with_adjoint:
+            if method=="composed_with_adjoint":
                 eig_new = numpy.sqrt(eig_new)
             diff = numpy.abs(eig_new - eig_old)
             eig_list.append(eig_new)
@@ -284,7 +288,7 @@ class LinearOperator(Operator):
     def calculate_norm(self):
         r""" Returns the norm of the LinearOperator calculated by the PowerMethod with default values.
                 """
-        return LinearOperator.PowerMethod(self, compose_with_adjoint=True)
+        return LinearOperator.PowerMethod(self, method="composed_with_adjoint")
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):

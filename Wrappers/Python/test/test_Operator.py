@@ -285,7 +285,7 @@ class TestOperator(CCPiTestClass):
 
         # Test with the norm       
         res2 = M1op.norm()
-        res1 = M1op.PowerMethod(M1op,100, compose_with_adjoint=True)
+        res1 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint")
         numpy.testing.assert_almost_equal(res1,res2, decimal=4)
 
 
@@ -313,10 +313,10 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,5)
         numpy.testing.assert_almost_equal(res1,0, decimal=4) 
 
-        # 2x2 non-diagonalisable nilpotent matrix where compose_with_adjoint=True 
+        # 2x2 non-diagonalisable nilpotent matrix where method="composed_with_adjoint"
         M1=numpy.array([[0.,1.], [0.,0.]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,5, compose_with_adjoint=True)
+        res1 = M1op.PowerMethod(M1op,5, method="composed_with_adjoint")
         numpy.testing.assert_almost_equal(res1,1, decimal=4) 
 
 
@@ -350,7 +350,13 @@ class TestOperator(CCPiTestClass):
         # Identity Operator
         Id = IdentityOperator(ig)
         res1 = Id.PowerMethod(Id,100)
-        numpy.testing.assert_almost_equal(res1,1.0, decimal=4)                
+        numpy.testing.assert_almost_equal(res1,1.0, decimal=4)        
+
+        # Test errors produced if not a valid method
+        try:
+            res1 = Id.PowerMethod(Id,100, method='gobledigook')
+        except ValueError:
+            pass      
 
 
     def test_Norm(self):
@@ -376,6 +382,17 @@ class TestOperator(CCPiTestClass):
         G.set_norm(None)
         #recalculates norm
         self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
+
+         # 2x2 real matrix, dominant eigenvalue = 2. Check norm uses the right flag for power method 
+        M1 = numpy.array([[1,0],[1,2]], dtype=float)
+        M1op = MatrixOperator(M1)
+        res1 = M1op.norm()
+        res2 = M1op.PowerMethod(M1op,100)
+        res3 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint")
+        res4 = M1op.PowerMethod(M1op,100, method="direct_only")
+        numpy.testing.assert_almost_equal(res1,res3, decimal=4)
+        self.assertNotEqual(res1, res2)
+        self.assertNotEqual(res1,res4)
 
 
     def test_ProjectionMap(self):

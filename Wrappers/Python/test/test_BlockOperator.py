@@ -26,7 +26,6 @@ from cil.optimisation.operators import IdentityOperator
 from cil.framework import ImageGeometry, ImageData
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.optimisation.operators import LinearOperator
 initialise_tests()
 
 class TestBlockOperator(unittest.TestCase):

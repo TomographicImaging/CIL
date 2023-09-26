@@ -2716,11 +2716,21 @@ class DataContainer(object):
                              self.dimension_labels))
     def get_dimension_axis(self, dimension_label):
 
-        if dimension_label in self.dimension_labels:
-            return self.dimension_labels.index(dimension_label)
+        if isinstance(dimension_label,tuple):
+            dimension_indices = list(dimension_label)
+            for i in range(len(dimension_indices)):
+                if dimension_indices[i] in self.dimension_labels: 
+                    dimension_indices[i] = numpy.int(self.dimension_labels.index(dimension_indices[i]))
+                else:
+                    raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_indices[i],
+                                                                                              self.dimension_labels))
+            return tuple(dimension_indices)
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
-                             self.dimension_labels))
+            if dimension_label in self.dimension_labels:
+                return self.dimension_labels.index(dimension_label)
+            else:
+                raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
+                                self.dimension_labels))
                         
     def as_array(self):
         '''Returns the pointer to the array.
@@ -3395,30 +3405,11 @@ class DataContainer(object):
         """
         if kwargs.get('dtype', None) is None:
             kwargs['dtype'] = numpy.float64
-        if isinstance(direction, str):
-            direction = (direction,)
+
         if direction is None:
             return numpy.mean(self.as_array(), *args, **kwargs)
-        elif isinstance(direction, tuple):
-            try:
-                axis_direction = numpy.zeros(len(direction), dtype=int)
-                for i in range(len(direction)): 
-                    axis_direction[i] = numpy.int(self.dimension_labels.index(direction[i])) 
-                axis_direction = tuple(axis_direction)
-            except ValueError:
-                raise ValueError ("Direction value doesn't exist in dimension_labels.")
-            if 'axis' in kwargs:
-                if isinstance(kwargs['axis'], tuple):
-                    kwargs['axis'] = axis_direction + kwargs['axis']
-                else:
-                    kwargs['axis'] = axis_direction + (kwargs['axis'],)
-            else:
-                kwargs['axis'] = axis_direction
-            kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
-            return numpy.mean(self.as_array(), *args, **kwargs)  
         else:
-           raise TypeError ("Direction value must be a string or tuple.")        
-
+            return numpy.mean(self.as_array(), axis = self.get_dimension_axis(direction), *args, **kwargs)   
 
     # Logic operators between DataContainers and floats    
     def __le__(self, other):

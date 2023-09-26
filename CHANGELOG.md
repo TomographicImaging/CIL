@@ -9,7 +9,7 @@
   - Fix for show_geometry bug for 2D data
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
   - FBP split processing bug fix - now respects panel origin
-
+  - Bug fix in the LinearOperator norm with an additional flag for the algorithm linearOperator.PowerMethod
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

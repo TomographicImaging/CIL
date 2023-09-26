@@ -216,10 +216,13 @@ class LinearOperator(Operator):
 
         """
         convergence_check = True
+        
         if compose_with_adjoint is None:
             try:
                 if operator.domain_geometry() == operator.range_geometry():
                     compose_with_adjoint= False
+                else:
+                    compose_with_adjoint=True
             except AssertionError:
                 # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
                 compose_with_adjoint=True

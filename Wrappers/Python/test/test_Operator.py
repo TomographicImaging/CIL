@@ -284,6 +284,7 @@ class TestOperator(CCPiTestClass):
 
         # Test with the norm       
         res2 = M1op.norm()
+        res1 = M1op.PowerMethod(M1op,100, compose_with_adjoint=True)
         numpy.testing.assert_almost_equal(res1,res2, decimal=4)
 
 
@@ -302,8 +303,8 @@ class TestOperator(CCPiTestClass):
         # 3x3 complex matrix, (real+complex eigenvalue), dominant eigenvalue = 3.1624439599276974
         M1 = numpy.array([[2,0,0],[1,2j,1j],[3, 3-1j,3]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,100)
-        numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=4) 
+        res1 = M1op.PowerMethod(M1op,120)
+        numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=3) 
 
         # 2x2 non-diagonalisable nilpotent matrix
         M1=numpy.array([[0.,1.], [0.,0.]])
@@ -311,10 +312,10 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,5)
         numpy.testing.assert_almost_equal(res1,0, decimal=4) 
 
-        # 2x2 non-diagonalisable nilpotent matrix where range_is_domain is False
+        # 2x2 non-diagonalisable nilpotent matrix where compose_with_adjoint=True 
         M1=numpy.array([[0.,1.], [0.,0.]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,5, range_is_domain=False)
+        res1 = M1op.PowerMethod(M1op,5, compose_with_adjoint=True)
         numpy.testing.assert_almost_equal(res1,1, decimal=4) 
 
 

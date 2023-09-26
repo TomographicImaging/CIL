@@ -7,6 +7,7 @@
   - Optimisation in L2NormSquared
   - Fix for show_geometry bug for 2D data
   - FBP split processing bug fix - now respects panel origin
+  - Tidied up documentation in the framework folder
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

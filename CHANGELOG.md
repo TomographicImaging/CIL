@@ -9,6 +9,7 @@
   - Fix for show_geometry bug for 2D data
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
   - FBP split processing bug fix - now respects panel origin
+  - Tidied up documentation in the framework folder
 
 
 * 23.0.1

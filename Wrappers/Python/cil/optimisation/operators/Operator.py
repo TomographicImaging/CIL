@@ -155,7 +155,7 @@ class LinearOperator(Operator):
 
         The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
         absolute value in the real case and modulus in the complex case.        
-        
+
         Parameters
         ----------
 
@@ -168,9 +168,9 @@ class LinearOperator(Operator):
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         return_all: `boolean`, default = False
             Toggles the verbosity of the return
-        method: `string` one of `auto`, `composed_with_adjoint` and `direct_only`, default = `auto` 
-            The default `auto` lets the code choose the method, this can be specified with `direct_only` or `compose_with_adjoint`
-            
+        method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"` 
+            The default `auto` lets the code choose the method, this can be specified with `"direct_only"` or `"composed_with_adjoint"`
+
 
         Returns
         -------
@@ -183,8 +183,8 @@ class LinearOperator(Operator):
             List of eigenvalues. Only returned if return_all is True.
         convergence: `boolean'
             Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.
-        
-            
+
+
         Note
         -----
         The power method contains two different algorithms chosen by the `method` flag. 
@@ -220,27 +220,26 @@ class LinearOperator(Operator):
         2.0005647295658866
 
         """
-        
-        
-        allowed_methods = ["auto","direct_only","composed_with_adjoint"]
-        
-        if method not in allowed_methods:
-            raise ValueError("The argument 'method' can be set to one of {0} got {1}".format(allowed_methods, method))
 
-        apply_adjoint=True
+        allowed_methods = ["auto", "direct_only", "composed_with_adjoint"]
+
+        if method not in allowed_methods:
+            raise ValueError("The argument 'method' can be set to one of {0} got {1}".format(
+                allowed_methods, method))
+
+        apply_adjoint = True
         if method == "direct_only":
-            apply_adjoint=False
-        if method=="auto":
+            apply_adjoint = False
+        if method == "auto":
             try:
                 geometries_match = operator.domain_geometry() == operator.range_geometry()
 
             except AssertionError:
                 # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
-                    pass
+                pass
             else:
                 if geometries_match:
-                    apply_adjoint=False
-        
+                    apply_adjoint = False
 
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')
@@ -594,13 +593,12 @@ class CompositionOperator(Operator):
             raise ValueError('No adjoint operation with non-linear operators')
 
     def is_linear(self):
-        return self.linear_flag             
-            
+        return self.linear_flag
 
     def calculate_norm(self):
         '''Returns the norm of the CompositionOperator, that is the product of the norms
         of its operators.'''
         norm = 1.
         for operator in self.operators:
-                norm *= operator.norm()
+            norm *= operator.norm()
         return norm

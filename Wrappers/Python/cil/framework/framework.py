@@ -3282,8 +3282,12 @@ class DataContainer(object):
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     
     ## reductions
-    def sum(self, *args, **kwargs):
-        return self.as_array().sum(*args, **kwargs)
+    def sum(self, direction=None, *args, **kwargs):
+        if direction is None:
+            return self.as_array().sum(*args, **kwargs)
+        else:
+            return self.as_array().sum(axis = self.get_dimension_axis(direction), *args, **kwargs) 
+        
     def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
         #shape = self.shape
@@ -3333,29 +3337,10 @@ class DataContainer(object):
         -------
         numpy.ndarray or scalar  
         """
-        if isinstance(direction, str):
-            direction = (direction,)
         if direction is None:
             return numpy.min(self.as_array(), *args, **kwargs)
-        elif isinstance(direction, tuple):
-            try:
-                axis_direction = numpy.zeros(len(direction), dtype=int)
-                for i in range(len(direction)): 
-                    axis_direction[i] = numpy.int(self.dimension_labels.index(direction[i])) 
-                axis_direction = tuple(axis_direction)
-            except ValueError:
-                raise ValueError ("Direction value doesn't exist in dimension_labels.")
-            if 'axis' in kwargs:
-                if isinstance(kwargs['axis'], tuple):
-                    kwargs['axis'] = axis_direction + kwargs['axis']
-                else:
-                    kwargs['axis'] = axis_direction + (kwargs['axis'],)
-            else:
-                kwargs['axis'] = axis_direction
-            kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
-            return numpy.min(self.as_array(), *args, **kwargs)  
         else:
-           raise TypeError ("Direction value must be a string or tuple.")
+            return numpy.min(self.as_array(), axis = self.get_dimension_axis(direction), *args, **kwargs)  
     
     def max(self, direction=None, *args, **kwargs):
         """"
@@ -3368,29 +3353,10 @@ class DataContainer(object):
         -------
         numpy.ndarray or scalar  
         """
-        if isinstance(direction, str):
-            direction = (direction,)
         if direction is None:
             return numpy.max(self.as_array(), *args, **kwargs)
-        elif isinstance(direction, tuple):
-            try:
-                axis_direction = numpy.zeros(len(direction), dtype=int)
-                for i in range(len(direction)): 
-                    axis_direction[i] = numpy.int(self.dimension_labels.index(direction[i])) 
-                axis_direction = tuple(axis_direction)
-            except ValueError:
-                raise ValueError ("Direction value doesn't exist in dimension_labels.")
-            if 'axis' in kwargs:
-                if isinstance(kwargs['axis'], tuple):
-                    kwargs['axis'] = axis_direction + kwargs['axis']
-                else:
-                    kwargs['axis'] = axis_direction + (kwargs['axis'],)
-            else:
-                kwargs['axis'] = axis_direction
-            kwargs['axis'] = tuple(set(kwargs['axis'])) # remove duplicate axis values
-            return numpy.max(self.as_array(), *args, **kwargs)  
         else:
-           raise TypeError ("Direction value must be a string or tuple.")
+            return numpy.max(self.as_array(), *args, axis = self.get_dimension_axis(direction), **kwargs)  
 
     def mean(self, direction=None, *args, **kwargs):
         """"

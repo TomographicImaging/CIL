@@ -766,6 +766,8 @@ class TestDataContainer(CCPiTestClass):
         norm = dc.norm()
         self.assertEqual(sqnorm, 8.0)
         numpy.testing.assert_almost_equal(norm, numpy.sqrt(8.0), decimal=7)
+        sum = dc.sum(direction=('X','Z'))
+        numpy.testing.assert_almost_equal(sum, [4.0,4.0])
     
 
     def test_reduction_mean(self):
@@ -802,6 +804,8 @@ class TestDataContainer(CCPiTestClass):
         # test specifying mean in multiple axes
         mean = data.mean(direction=('horizontal_x','horizontal_y','vertical'))
         expected = numpy.float64(0+1+2+3+4+5+6+7)/numpy.float64(8)
+        numpy.testing.assert_almost_equal(mean, expected)
+        mean = data.mean(axis=(0,1,2))
         numpy.testing.assert_almost_equal(mean, expected)
         # test specifying mean in a single axis
         mean = data.mean(direction='horizontal_y')
@@ -1067,21 +1071,24 @@ class TestDataContainer(CCPiTestClass):
         np_arr[1][1][1] = 7
         data.fill(np_arr)               
 
+        # test specifying min in multiple axes
         min = data.min(axis=(0,1,2))
         self.assertAlmostEqual(min, 0)  
         min = data.min(direction=('vertical','horizontal_x','horizontal_y'))
         self.assertAlmostEqual(min, 0) 
+        # test specifying min in a single axis
         min = data.min(axis=0)
         expected = [[numpy.float64(0), numpy.float64(1)],[numpy.float64(2), numpy.float64(3)]]          
         numpy.testing.assert_almost_equal(min, expected)
         min = data.min(direction='horizontal_x')
         expected = [[numpy.float64(0), numpy.float64(2)],[numpy.float64(4), numpy.float64(6)]]          
         numpy.testing.assert_almost_equal(min, expected)
-        min = data.min(direction='horizontal_x',axis=0)
-        expected = [numpy.float64(0), numpy.float64(2)]        
-        numpy.testing.assert_almost_equal(min, expected)
-        min = data.min(direction='vertical',axis=2)
-        numpy.testing.assert_almost_equal(min, expected)
+        # test duplicate axis specification in direction and axis   
+        with numpy.testing.assert_raises(TypeError):
+            min = data.min(direction='vertical', axis=0)      
+        # test specifying direction with an int   
+        with numpy.testing.assert_raises(ValueError):
+            min = data.min(direction=0)  
 
 
     def test_max(self):
@@ -1105,23 +1112,26 @@ class TestDataContainer(CCPiTestClass):
         np_arr[1][0][1] = 5
         np_arr[1][1][0] = 6
         np_arr[1][1][1] = 7
-        data.fill(np_arr)               
+        data.fill(np_arr)            
 
+        # test specifying max in multiple axes
         max = data.max(axis=(0,1,2))
         self.assertAlmostEqual(max, 7)  
         max = data.max(direction=('vertical','horizontal_x','horizontal_y'))
         self.assertAlmostEqual(max, 7) 
+        # test specifying max in a single axis
         max = data.max(axis=0)
         expected = [[numpy.float64(4), numpy.float64(5)],[numpy.float64(6), numpy.float64(7)]]          
         numpy.testing.assert_almost_equal(max, expected)
         max = data.max(direction='horizontal_x')
-        expected = [[numpy.float64(1), numpy.float64(3)],[numpy.float64(5), numpy.float64(7)]]          
-        numpy.testing.assert_almost_equal(max, expected)
-        max = data.max(direction='horizontal_x',axis=0)
-        expected = [numpy.float64(5), numpy.float64(7)]        
-        numpy.testing.assert_almost_equal(max, expected)
-        max = data.max(direction='vertical',axis=2)
-        numpy.testing.assert_almost_equal(max, expected)
+        expected = [[numpy.float64(1), numpy.float64(3)],[numpy.float64(5), numpy.float64(7)]]
+        numpy.testing.assert_almost_equal(max, expected)          
+        # test duplicate axis specification in direction and axis   
+        with numpy.testing.assert_raises(TypeError):
+            max = data.max(direction='vertical', axis=0)      
+        # test specifying direction with an int   
+        with numpy.testing.assert_raises(ValueError):
+            max = data.max(direction=0)  
         
 
     def test_size(self):

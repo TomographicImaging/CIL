@@ -20,7 +20,7 @@
 from numbers import Number
 import numpy
 import functools
-import warnings
+import logging
 
 
 class Operator(object):
@@ -61,7 +61,7 @@ class Operator(object):
         '''
 
         if len(kwargs) != 0:
-            warnings.warn('norm: the norm method does not use any parameters.\n\
+            logging.warning('norm: the norm method does not use any parameters.\n\
                 For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it')
 
         if self._norm is None:
@@ -273,7 +273,7 @@ class LinearOperator(Operator):
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm = x0.norm()
             if x0_norm < tolerance:
-                Warning(
+                logging.warning(
                     'The operator has at least one zero eigenvector and is likely to be nilpotent')
                 eig_new = 0.
                 break

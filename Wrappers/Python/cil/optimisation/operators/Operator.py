@@ -153,6 +153,40 @@ class LinearOperator(Operator):
     def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
         r"""Power method or Power iteration algorithm 
 
+        The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
+        absolute value in the real case and modulus in the complex case.        
+        
+        Parameters
+        ----------
+
+        operator: LinearOperator
+        max_iteration: positive:`int`, default=10
+            Number of iterations for the Power method algorithm.
+        initial: DataContainer, default = None
+            Starting point for the Power method.
+        tolerance: positive:`float`, default = 1e-5
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
+        return_all: `boolean`, default = False
+            Toggles the verbosity of the return
+        method: `string` one of `auto`, `composed_with_adjoint` and `direct_only`, default = `auto` 
+            The default `auto` lets the code choose the method, this can be specified with `direct_only` or `compose_with_adjoint`
+            
+
+        Returns
+        -------
+        dominant eigenvalue: positive:`float`
+        number of iterations: positive:`int`
+            Number of iterations run. Only returned if return_all is True.
+        eigenvector: DataContainer
+            Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
+        list of eigenvalues: :obj:`list`
+            List of eigenvalues. Only returned if return_all is True.
+        convergence: `boolean'
+            Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.
+        
+            
+        Note
+        -----
         The power method contains two different algorithms chosen by the `method` flag. 
 
         In the case `method="direct_only"`, for operator, :math:`A`, the power method computes the iterations 
@@ -171,36 +205,6 @@ class LinearOperator(Operator):
         The default flag is `method="auto"`, the algorithm checks to see if the `operator.domain_geometry() == operator.range_geometry()` and if so
         uses the method "direct_only" and if not the method "composed_with_adjoint".
 
-
-        Parameters
-        ----------
-
-        operator: LinearOperator
-        max_iteration: positive:`int`, default=10
-            Number of iterations for the Power method algorithm.
-        initial: DataContainer, default = None
-            Starting point for the Power method.
-        tolerance: positive:`float`, default = 1e-5
-            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
-        return_all: `boolean`, default = False
-            Toggles the verbosity of the return
-        compose_with_adjoint: `boolean`, default None
-             Set this to `False` to apply the power method directly on the operator, :math: A :math:, and `True` to apply the power method to :math:A^TA:math: before taking the square root of the result.
-             Leave as default `None` to determine this from domain and range geometry.  
-
-
-        Returns
-        -------
-        dominant eigenvalue: positive:`float`
-        number of iterations: positive:`int`
-            Number of iterations run. Only returned if return_all is True.
-        eigenvector: DataContainer
-            Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
-        list of eigenvalues: :obj:`list`
-            List of eigenvalues. Only returned if return_all is True.
-        convergence: `boolean'
-            Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.
-
         Examples
         --------    
 
@@ -216,20 +220,26 @@ class LinearOperator(Operator):
         2.0005647295658866
 
         """
-        convergence_check = True
         
-        if method not in ["auto","direct_only","composed_with_adjoint"]:
-            ValueError(" The flag 'method' should take one of 'auto','direct_only','composed_with_adjoint'")
+        
+        allowed_methods = ["auto","direct_only","composed_with_adjoint"]
+        
+        if method not in allowed_methods:
+            raise ValueError("The argument 'method' can be set to one of {0} got {1}".format(allowed_methods, method))
 
+        apply_adjoint=True
+        if method == "direct_only":
+            apply_adjoint=False
         if method=="auto":
             try:
-                if operator.domain_geometry() == operator.range_geometry():
-                    method="direct_only"
-                else:
-                    method="composed_with_adjoint"
+                geometries_match = operator.domain_geometry() == operator.range_geometry()
+
             except AssertionError:
                 # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
-                method="composed_with_adjoint"
+                    pass
+            else:
+                if geometries_match:
+                    apply_adjoint=False
         
 
         if initial is None:
@@ -245,19 +255,20 @@ class LinearOperator(Operator):
 
         # initial guess for dominant eigenvalue
         eig_old = 1.
-
-        eig_list = []
+        if return_all:
+            eig_list = []
+            convergence_check = True
         diff = numpy.finfo('d').max
         i = 0
         while (i < max_iteration and diff > tolerance):
             operator.direct(x0, out=y_tmp)
 
-            if method=="direct_only":
+            if not apply_adjoint:
                 # swap datacontainer references
                 tmp = x0
                 x0 = y_tmp
                 y_tmp = tmp
-            elif method=="composed_with_adjoint":
+            else:
                 operator.adjoint(y_tmp, out=x0)
 
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
@@ -270,14 +281,15 @@ class LinearOperator(Operator):
             x0 /= x0_norm
 
             eig_new = numpy.abs(x0_norm)
-            if method=="composed_with_adjoint":
+            if apply_adjoint:
                 eig_new = numpy.sqrt(eig_new)
             diff = numpy.abs(eig_new - eig_old)
-            eig_list.append(eig_new)
+            if return_all:
+                eig_list.append(eig_new)
             eig_old = eig_new
             i += 1
 
-        if i == max_iteration:
+        if return_all and i == max_iteration:
             convergence_check = False
 
         if return_all:

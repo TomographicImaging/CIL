@@ -762,15 +762,15 @@ will copy the data in some_data into the data container.</p>
 <dt id="cil.framework.DataContainer.get_data_axes_order">
 <code class="sig-name descname"><span class="pre">get_data_axes_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.get_data_axes_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.get_data_axes_order" title="Permalink to this definition">#</a></dt>
 <dd><p>returns the axes label of self as a list</p>
-<p>if new_order is None returns the labels of the axes as a sorted-by-key list
-if new_order is a list of length number_of_dimensions, returns a list
+<p>If new_order is None returns the labels of the axes as a sorted-by-key list.
+If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<blockquote>
-<div><p>self.dimension_labels = {0:’horizontal’,1:’vertical’}
-new_order = [‘vertical’,’horizontal’]
-returns [1,0]</p>
-</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<span class="go">returns [1,0]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -796,24 +796,19 @@ returns [1,0]</p>
 <li><p><strong>y</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
 <li><p><strong>b</strong> (<em>multiplier for y</em><em>, </em><em>can be a number</em><em> or </em><em>a numpy array</em><em> or </em><em>a DataContainer</em>) – </p></li>
 <li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – out can be self or y.</p></li>
-<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – </p></li>
-<li><p><strong>will try to use the CIL C library and default to numpy operations</strong> (<em>It</em>) – </p></li>
-<li><p><strong>case the C library does</strong> (<em>in</em>) – </p></li>
-<li><p><strong>handle the types.</strong> (<em>not</em>) – </p></li>
-<li><p><strong>Example</strong> – </p></li>
-<li><p><strong>-------</strong> – </p></li>
-<li><p><strong>= 2</strong> (<em>a</em>) – </p></li>
-<li><p><strong>= 3</strong> (<em>b</em>) – </p></li>
-<li><p><strong>= ImageGeometry</strong><strong>(</strong><strong>10</strong> (<em>ig</em>) – </p></li>
-<li><p><strong>11</strong><strong>)</strong> – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>1</strong><strong>)</strong> (<em>x</em>) – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>2</strong><strong>)</strong> (<em>y</em>) – </p></li>
-<li><p><strong>= x.sapyb</strong><strong>(</strong><strong>a</strong> (<em>out</em>) – </p></li>
-<li><p><strong>y</strong> – </p></li>
-<li><p><strong>b</strong><strong>)</strong> – </p></li>
+<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -843,9 +838,8 @@ returns [1,0]</p>
 <dl class="py method">
 <dt id="cil.framework.DataContainer.dot">
 <code class="sig-name descname"><span class="pre">dot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.dot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.dot" title="Permalink to this definition">#</a></dt>
-<dd><p>return the inner product of 2 DataContainers viewed as vectors</p>
-<p>applies to real and complex data. In such case the dot method returns</p>
-<p>a.dot(b.conjugate())</p>
+<dd><p>returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+For complex data,  the dot method returns a.dot(b.conjugate())</p>
 </dd></dl>
 
 <dl class="py method">
@@ -902,9 +896,8 @@ returns [1,0]</p>
 <dl class="py method">
 <dt id="cil.framework.AcquisitionData.dot">
 <code class="sig-name descname"><span class="pre">dot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.dot" title="Permalink to this definition">#</a></dt>
-<dd><p>return the inner product of 2 DataContainers viewed as vectors</p>
-<p>applies to real and complex data. In such case the dot method returns</p>
-<p>a.dot(b.conjugate())</p>
+<dd><p>returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+For complex data,  the dot method returns a.dot(b.conjugate())</p>
 </dd></dl>
 
 <dl class="py method">
@@ -944,15 +937,15 @@ will copy the data in some_data into the data container.</p>
 <dt id="cil.framework.AcquisitionData.get_data_axes_order">
 <code class="sig-name descname"><span class="pre">get_data_axes_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.get_data_axes_order" title="Permalink to this definition">#</a></dt>
 <dd><p>returns the axes label of self as a list</p>
-<p>if new_order is None returns the labels of the axes as a sorted-by-key list
-if new_order is a list of length number_of_dimensions, returns a list
+<p>If new_order is None returns the labels of the axes as a sorted-by-key list.
+If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<blockquote>
-<div><p>self.dimension_labels = {0:’horizontal’,1:’vertical’}
-new_order = [‘vertical’,’horizontal’]
-returns [1,0]</p>
-</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<span class="go">returns [1,0]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1054,24 +1047,19 @@ generator will not be seeded.</p></li>
 <li><p><strong>y</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
 <li><p><strong>b</strong> (<em>multiplier for y</em><em>, </em><em>can be a number</em><em> or </em><em>a numpy array</em><em> or </em><em>a DataContainer</em>) – </p></li>
 <li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – out can be self or y.</p></li>
-<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – </p></li>
-<li><p><strong>will try to use the CIL C library and default to numpy operations</strong> (<em>It</em>) – </p></li>
-<li><p><strong>case the C library does</strong> (<em>in</em>) – </p></li>
-<li><p><strong>handle the types.</strong> (<em>not</em>) – </p></li>
-<li><p><strong>Example</strong> – </p></li>
-<li><p><strong>-------</strong> – </p></li>
-<li><p><strong>= 2</strong> (<em>a</em>) – </p></li>
-<li><p><strong>= 3</strong> (<em>b</em>) – </p></li>
-<li><p><strong>= ImageGeometry</strong><strong>(</strong><strong>10</strong> (<em>ig</em>) – </p></li>
-<li><p><strong>11</strong><strong>)</strong> – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>1</strong><strong>)</strong> (<em>x</em>) – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>2</strong><strong>)</strong> (<em>y</em>) – </p></li>
-<li><p><strong>= x.sapyb</strong><strong>(</strong><strong>a</strong> (<em>out</em>) – </p></li>
-<li><p><strong>y</strong> – </p></li>
-<li><p><strong>b</strong><strong>)</strong> – </p></li>
+<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1149,9 +1137,8 @@ generator will not be seeded.</p></li>
 <dl class="py method">
 <dt id="cil.framework.ImageData.dot">
 <code class="sig-name descname"><span class="pre">dot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.dot" title="Permalink to this definition">#</a></dt>
-<dd><p>return the inner product of 2 DataContainers viewed as vectors</p>
-<p>applies to real and complex data. In such case the dot method returns</p>
-<p>a.dot(b.conjugate())</p>
+<dd><p>returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+For complex data,  the dot method returns a.dot(b.conjugate())</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1191,15 +1178,15 @@ will copy the data in some_data into the data container.</p>
 <dt id="cil.framework.ImageData.get_data_axes_order">
 <code class="sig-name descname"><span class="pre">get_data_axes_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.get_data_axes_order" title="Permalink to this definition">#</a></dt>
 <dd><p>returns the axes label of self as a list</p>
-<p>if new_order is None returns the labels of the axes as a sorted-by-key list
-if new_order is a list of length number_of_dimensions, returns a list
+<p>If new_order is None returns the labels of the axes as a sorted-by-key list.
+If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<blockquote>
-<div><p>self.dimension_labels = {0:’horizontal’,1:’vertical’}
-new_order = [‘vertical’,’horizontal’]
-returns [1,0]</p>
-</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<span class="go">returns [1,0]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1266,24 +1253,19 @@ returns [1,0]</p>
 <li><p><strong>y</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
 <li><p><strong>b</strong> (<em>multiplier for y</em><em>, </em><em>can be a number</em><em> or </em><em>a numpy array</em><em> or </em><em>a DataContainer</em>) – </p></li>
 <li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – out can be self or y.</p></li>
-<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – </p></li>
-<li><p><strong>will try to use the CIL C library and default to numpy operations</strong> (<em>It</em>) – </p></li>
-<li><p><strong>case the C library does</strong> (<em>in</em>) – </p></li>
-<li><p><strong>handle the types.</strong> (<em>not</em>) – </p></li>
-<li><p><strong>Example</strong> – </p></li>
-<li><p><strong>-------</strong> – </p></li>
-<li><p><strong>= 2</strong> (<em>a</em>) – </p></li>
-<li><p><strong>= 3</strong> (<em>b</em>) – </p></li>
-<li><p><strong>= ImageGeometry</strong><strong>(</strong><strong>10</strong> (<em>ig</em>) – </p></li>
-<li><p><strong>11</strong><strong>)</strong> – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>1</strong><strong>)</strong> (<em>x</em>) – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>2</strong><strong>)</strong> (<em>y</em>) – </p></li>
-<li><p><strong>= x.sapyb</strong><strong>(</strong><strong>a</strong> (<em>out</em>) – </p></li>
-<li><p><strong>y</strong> – </p></li>
-<li><p><strong>b</strong><strong>)</strong> – </p></li>
+<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1334,9 +1316,8 @@ returns [1,0]</p>
 <dl class="py method">
 <dt id="cil.framework.VectorData.dot">
 <code class="sig-name descname"><span class="pre">dot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.dot" title="Permalink to this definition">#</a></dt>
-<dd><p>return the inner product of 2 DataContainers viewed as vectors</p>
-<p>applies to real and complex data. In such case the dot method returns</p>
-<p>a.dot(b.conjugate())</p>
+<dd><p>returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+For complex data,  the dot method returns a.dot(b.conjugate())</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1376,15 +1357,15 @@ will copy the data in some_data into the data container.</p>
 <dt id="cil.framework.VectorData.get_data_axes_order">
 <code class="sig-name descname"><span class="pre">get_data_axes_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.get_data_axes_order" title="Permalink to this definition">#</a></dt>
 <dd><p>returns the axes label of self as a list</p>
-<p>if new_order is None returns the labels of the axes as a sorted-by-key list
-if new_order is a list of length number_of_dimensions, returns a list
+<p>If new_order is None returns the labels of the axes as a sorted-by-key list.
+If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<blockquote>
-<div><p>self.dimension_labels = {0:’horizontal’,1:’vertical’}
-new_order = [‘vertical’,’horizontal’]
-returns [1,0]</p>
-</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<span class="go">returns [1,0]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1457,24 +1438,19 @@ returns [1,0]</p>
 <li><p><strong>y</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
 <li><p><strong>b</strong> (<em>multiplier for y</em><em>, </em><em>can be a number</em><em> or </em><em>a numpy array</em><em> or </em><em>a DataContainer</em>) – </p></li>
 <li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – out can be self or y.</p></li>
-<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – </p></li>
-<li><p><strong>will try to use the CIL C library and default to numpy operations</strong> (<em>It</em>) – </p></li>
-<li><p><strong>case the C library does</strong> (<em>in</em>) – </p></li>
-<li><p><strong>handle the types.</strong> (<em>not</em>) – </p></li>
-<li><p><strong>Example</strong> – </p></li>
-<li><p><strong>-------</strong> – </p></li>
-<li><p><strong>= 2</strong> (<em>a</em>) – </p></li>
-<li><p><strong>= 3</strong> (<em>b</em>) – </p></li>
-<li><p><strong>= ImageGeometry</strong><strong>(</strong><strong>10</strong> (<em>ig</em>) – </p></li>
-<li><p><strong>11</strong><strong>)</strong> – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>1</strong><strong>)</strong> (<em>x</em>) – </p></li>
-<li><p><strong>= ig.allocate</strong><strong>(</strong><strong>2</strong><strong>)</strong> (<em>y</em>) – </p></li>
-<li><p><strong>= x.sapyb</strong><strong>(</strong><strong>a</strong> (<em>out</em>) – </p></li>
-<li><p><strong>y</strong> – </p></li>
-<li><p><strong>b</strong><strong>)</strong> – </p></li>
+<li><p><strong>num_threads</strong> (<em>number of threads to use during the calculation</em><em>, </em><em>using the CIL C library</em>) – It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1518,7 +1494,7 @@ the shape of the 2 <a href="#id5"><span class="problematic" id="id6">`</span></a
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
-indipendently on the fact that the <cite>BlockDataContainer</cite> could be nested</p></li>
+independently on the fact that the <cite>BlockDataContainer</cite> could be nested</p></li>
 <li><p>algebra between <cite>BlockDataContainer</cite> and one <cite>DataContainer</cite> is possible.
 It will require all the <cite>DataContainers</cite> in the block to be
 compatible with the <cite>DataContainer</cite> we want to operate with.</p></li>
@@ -1562,7 +1538,7 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1573,10 +1549,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1587,10 +1563,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1604,7 +1580,7 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1615,10 +1591,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1629,10 +1605,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1652,14 +1628,16 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 </ul>
 </dd>
 </dl>
-<p>a = 2
-b = 3
-ig = ImageGeometry(10,11)
-x = ig.allocate(1)
-y = ig.allocate(2)
-bdc1 = BlockDataContainer(2*x, y)
-bdc2 = BlockDataContainer(x, 2*y)
-out = bdc1.sapyb(a,bdc2,b)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc1</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc2</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">bdc1</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">bdc2</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1673,7 +1651,7 @@ out = bdc1.sapyb(a,bdc2,b)</p>
 <code class="sig-name descname"><span class="pre">binary_operations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.binary_operations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.binary_operations" title="Permalink to this definition">#</a></dt>
 <dd><p>Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <p>Provides commutativity with DataContainer and subclasses, i.e. this
-class’s reverse algebric methods take precedence w.r.t. direct algebric
+class’s reverse algebraic methods take precedence w.r.t. direct algebraic
 methods of DataContainer and subclasses.</p>
 <p>This method is not to be used directly</p>
 </dd></dl>

@@ -4625,7 +4625,7 @@ the shape of the 2 <a href="#id19"><span class="problematic" id="id20">`</span><
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
-indipendently on the fact that the <cite>BlockDataContainer</cite> could be nested</p></li>
+independently on the fact that the <cite>BlockDataContainer</cite> could be nested</p></li>
 <li><p>algebra between <cite>BlockDataContainer</cite> and one <cite>DataContainer</cite> is possible.
 It will require all the <cite>DataContainers</cite> in the block to be
 compatible with the <cite>DataContainer</cite> we want to operate with.</p></li>
@@ -4675,7 +4675,7 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4686,10 +4686,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4700,10 +4700,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4717,7 +4717,7 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4728,10 +4728,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4742,10 +4742,10 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
+<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4765,14 +4765,16 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 </ul>
 </dd>
 </dl>
-<p>a = 2
-b = 3
-ig = ImageGeometry(10,11)
-x = ig.allocate(1)
-y = ig.allocate(2)
-bdc1 = BlockDataContainer(2*x, y)
-bdc2 = BlockDataContainer(x, 2*y)
-out = bdc1.sapyb(a,bdc2,b)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc1</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc2</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">bdc1</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">bdc2</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -4786,7 +4788,7 @@ out = bdc1.sapyb(a,bdc2,b)</p>
 <code class="sig-name descname"><span class="pre">binary_operations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.binary_operations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.binary_operations" title="Permalink to this definition">#</a></dt>
 <dd><p>Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <p>Provides commutativity with DataContainer and subclasses, i.e. this
-class’s reverse algebric methods take precedence w.r.t. direct algebric
+class’s reverse algebraic methods take precedence w.r.t. direct algebraic
 methods of DataContainer and subclasses.</p>
 <p>This method is not to be used directly</p>
 </dd></dl>

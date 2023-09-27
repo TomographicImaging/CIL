@@ -227,7 +227,7 @@
 <span class="sd">       will fail </span>
 <span class="sd">    2) algebra between `BlockDataContainer`s and `list` or `numpy array` will </span>
 <span class="sd">       work as long as the number of `rows` and element of the arrays match,</span>
-<span class="sd">       indipendently on the fact that the `BlockDataContainer` could be nested</span>
+<span class="sd">       independently on the fact that the `BlockDataContainer` could be nested</span>
 <span class="sd">    3) algebra between `BlockDataContainer` and one `DataContainer` is possible.</span>
 <span class="sd">       It will require all the `DataContainers` in the block to be</span>
 <span class="sd">       compatible with the `DataContainer` we want to operate with. </span>
@@ -341,7 +341,7 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -351,8 +351,8 @@
 <div class="viewcode-block" id="BlockDataContainer.multiply"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.multiply">[docs]</a>    <span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
+<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -362,8 +362,8 @@
 <div class="viewcode-block" id="BlockDataContainer.divide"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.divide">[docs]</a>    <span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
+<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -374,7 +374,7 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -384,8 +384,8 @@
 <div class="viewcode-block" id="BlockDataContainer.maximum"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.maximum">[docs]</a>    <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
+<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -395,8 +395,8 @@
 <div class="viewcode-block" id="BlockDataContainer.minimum"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.minimum">[docs]</a>    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
+<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -418,14 +418,14 @@
 <span class="sd">        Example:</span>
 <span class="sd">        --------</span>
 
-<span class="sd">        a = 2</span>
-<span class="sd">        b = 3</span>
-<span class="sd">        ig = ImageGeometry(10,11)</span>
-<span class="sd">        x = ig.allocate(1)</span>
-<span class="sd">        y = ig.allocate(2)</span>
-<span class="sd">        bdc1 = BlockDataContainer(2*x, y)</span>
-<span class="sd">        bdc2 = BlockDataContainer(x, 2*y)</span>
-<span class="sd">        out = bdc1.sapyb(a,bdc2,b)</span>
+<span class="sd">        &gt;&gt;&gt; a = 2</span>
+<span class="sd">        &gt;&gt;&gt; b = 3</span>
+<span class="sd">        &gt;&gt;&gt; ig = ImageGeometry(10,11)</span>
+<span class="sd">        &gt;&gt;&gt; x = ig.allocate(1)</span>
+<span class="sd">        &gt;&gt;&gt; y = ig.allocate(2)</span>
+<span class="sd">        &gt;&gt;&gt; bdc1 = BlockDataContainer(2*x, y)</span>
+<span class="sd">        &gt;&gt;&gt; bdc2 = BlockDataContainer(x, 2*y)</span>
+<span class="sd">        &gt;&gt;&gt; out = bdc1.sapyb(a,bdc2,b)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;out container cannot be None&quot;</span><span class="p">)</span>
@@ -443,7 +443,7 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 <span class="sd">        </span>
 <span class="sd">        Provides commutativity with DataContainer and subclasses, i.e. this </span>
-<span class="sd">        class&#39;s reverse algebric methods take precedence w.r.t. direct algebric</span>
+<span class="sd">        class&#39;s reverse algebraic methods take precedence w.r.t. direct algebraic</span>
 <span class="sd">        methods of DataContainer and subclasses.</span>
 <span class="sd">        </span>
 <span class="sd">        This method is not to be used directly</span>

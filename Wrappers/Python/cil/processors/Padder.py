@@ -555,7 +555,6 @@ class Padder(DataProcessor):
                 continue
 
             offset = (self._pad_width_param[i][0] -self._pad_width_param[i][1])*0.5
-            system_detector = geometry.config.system.detector
 
             if dim == 'channel':
                 geometry.set_channels(num_channels= geometry.config.channels.num_channels + \
@@ -563,7 +562,6 @@ class Padder(DataProcessor):
             elif dim == 'angle':
                 # extrapolate pre-values from a[1]-a[0]
                 # extrapolate post-values from a[-1]-a[-2]
-
                 a = self._geometry.angles
                 end_values = (
                     a[0]-(a[1]-a[0] )* self._pad_width_param[i][0],
@@ -574,19 +572,13 @@ class Padder(DataProcessor):
             elif dim == 'vertical':
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][0] 
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][1]
-
-                if 'bottom' in geometry.config.panel.origin:
-                    system_detector.position = system_detector.position - offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
-                else:
-                    system_detector.position = system_detector.position + offset * system_detector.direction_y * geometry.config.panel.pixel_size[1]
+                geometry.config.shift_detector_in_plane(offset, dim)
                     
             elif dim == 'horizontal':
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][0]
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][1]
-                if 'left' in geometry.config.panel.origin:
-                    system_detector.position = system_detector.position - offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
-                else:
-                    system_detector.position = system_detector.position + offset * system_detector.direction_x * geometry.config.panel.pixel_size[0]
+                geometry.config.shift_detector_in_plane(offset, dim)
+
         return geometry
 
     def _process_image_geometry(self):

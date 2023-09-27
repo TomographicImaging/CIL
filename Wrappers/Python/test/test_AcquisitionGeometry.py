@@ -157,6 +157,84 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         np.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
         np.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
 
+
+    def test_shift_detector_origin_bottom_left(self):
+        initial_position = np.array([2.5, -1.3, 10.2])
+        pixel_size = np.array([0.5, 0.7])
+        detector_direction_x=np.array([1/math.sqrt(2),0,1/math.sqrt(2)])
+        detector_direction_y=np.array([-1/math.sqrt(2),0,1/math.sqrt(2)])
+
+        geometry = AcquisitionGeometry.create_Parallel3D(detector_position=initial_position, detector_direction_x=detector_direction_x, detector_direction_y=detector_direction_y)\
+                                      .set_panel([10, 5], [0.5, 0.7], origin='bottom-left')\
+                                      .set_angles([0])
+        # Test horizontal shift to the left
+        shift = -1.5
+        geometry.config.shift_detector_in_plane(shift, 'horizontal')
+        updated_position = geometry.config.system.detector.position
+        expected_position = initial_position - detector_direction_x * pixel_size[0] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+        # Test horizontal shift to the right
+        shift = 3.0
+        geometry.config.shift_detector_in_plane(shift, 'horizontal')
+        updated_position = geometry.config.system.detector.position
+        expected_position = expected_position - detector_direction_x * pixel_size[0] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+        # Test vertical shift down
+        shift = -1.5
+        geometry.config.shift_detector_in_plane(shift, 'vertical')
+        updated_position = geometry.config.system.detector.position
+        expected_position = expected_position - detector_direction_y * pixel_size[1] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+        # Test vertical shift up
+        shift = 3.0
+        geometry.config.shift_detector_in_plane(shift, 'vertical')
+        updated_position = geometry.config.system.detector.position
+        expected_position = expected_position - detector_direction_y * pixel_size[1] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+
+    def test_shift_detector_origin_top_right(self):
+        initial_position = np.array([2.5, -1.3, 10.2])
+        detector_direction_x=np.array([1/math.sqrt(2),0,1/math.sqrt(2)])
+        detector_direction_y=np.array([-1/math.sqrt(2),0,1/math.sqrt(2)])
+
+        pixel_size = np.array([0.5, 0.7])
+        geometry = AcquisitionGeometry.create_Parallel3D(detector_position=initial_position, detector_direction_x=detector_direction_x, detector_direction_y=detector_direction_y)\
+                                      .set_panel([10, 5], [0.5, 0.7], origin='top-right')\
+                                      .set_angles([0])
+
+        # Test horizontal shift to the right
+        shift = -1.5
+        geometry.config.shift_detector_in_plane(shift, 'horizontal')
+        updated_position = geometry.config.system.detector.position
+        expected_position = initial_position + detector_direction_x * pixel_size[0] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+        # Test horizontal shift to the left
+        shift = 3.0
+        geometry.config.shift_detector_in_plane(shift, 'horizontal')
+        updated_position = geometry.config.system.detector.position
+        expected_position = expected_position + detector_direction_x * pixel_size[0] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+        # Test vertical shift up
+        shift = -1.5
+        geometry.config.shift_detector_in_plane(shift, 'vertical')
+        updated_position = geometry.config.system.detector.position
+        expected_position = expected_position + detector_direction_y * pixel_size[1] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+        # Test vertical shift down
+        shift = 3.0
+        geometry.config.shift_detector_in_plane(shift, 'vertical')
+        updated_position = geometry.config.system.detector.position
+        expected_position = expected_position +  detector_direction_y * pixel_size[1] * shift
+        np.testing.assert_array_almost_equal(updated_position, expected_position)
+
+
     def test_SystemConfiguration(self):
         
         #SystemConfiguration error handeling

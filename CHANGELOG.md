@@ -6,7 +6,8 @@
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
   - Fix for show_geometry bug for 2D data
-  - FBP split processing bug fix - now respects panel origin
+  - FBP split processing bug fix - now respects panel origin set in geometry
+  - Binner/Padder/Slicer bug fix - now respects panel origin set in geometry
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

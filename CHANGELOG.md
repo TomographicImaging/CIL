@@ -5,9 +5,12 @@
   - Add norm for CompositionOperator
   - Refactor SIRT algorithm to make it more computationally and memory efficient
   - Optimisation in L2NormSquared
+  - Added support for partitioner, when partitions have size 1
   - Fix for show_geometry bug for 2D data
   - FBP split processing bug fix - now respects panel origin set in geometry
   - Binner/Padder/Slicer bug fix - now respects panel origin set in geometry
+  - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
+  - Tidied up documentation in the framework folder
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

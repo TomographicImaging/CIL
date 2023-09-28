@@ -2000,12 +2000,12 @@ class Configuration(object):
         Notes:
         ------
         - If `direction` is 'horizontal':
-            - If the panel's origin is 'left', the detector's position is moved to the left.
-            - If the panel's origin is 'right', the detector's position is moved to the right.
+            - If the panel's origin is 'left', positive offsets translate the detector to the right.
+            - If the panel's origin is 'right', positive offsets translate the detector to the left.
 
         - If `direction` is 'vertical':
-            - If the panel's origin is 'bottom', the detector's position is moved downward.
-            - If the panel's origin is 'top', the detector's position is moved upward.
+            - If the panel's origin is 'bottom', positive offsets translate the detector upward.
+            - If the panel's origin is 'top', positive offsets translate the detector downward.
 
         Returns:
         --------

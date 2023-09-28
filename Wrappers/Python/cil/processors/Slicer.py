@@ -269,7 +269,6 @@ class Slicer(DataProcessor):
         Creates the new acquisition geometry
         """
         geometry_new = self._geometry.copy()
-        system_detector = geometry_new.config.system.detector
 
         processed_dims = self._processed_dims.copy()
 
@@ -283,7 +282,7 @@ class Slicer(DataProcessor):
                 if n_elements > 1:
                     # difference in end indices, minus differences in start indices, divided by 2
                     pixel_offset = ((self._shape_in[vert_ind] -1 - self._pixel_indices[vert_ind][1]) - self._pixel_indices[vert_ind][0])*0.5
-                    system_detector.position = system_detector.position - pixel_offset * system_detector.direction_y * geometry_new.config.panel.pixel_size[1]
+                    geometry_new.config.shift_detector_in_plane(pixel_offset, 'vertical')
                     geometry_new.config.panel.num_pixels[1] = n_elements
                 else:
                     try:
@@ -314,7 +313,8 @@ class Slicer(DataProcessor):
 
             elif axis == 'horizontal':
                 pixel_offset = ((self._shape_in[i] -1 - self._pixel_indices[i][1]) - self._pixel_indices[i][0])*0.5
-                system_detector.position = system_detector.position - pixel_offset * system_detector.direction_x * geometry_new.config.panel.pixel_size[0]
+
+                geometry_new.config.shift_detector_in_plane(pixel_offset, axis)
                 geometry_new.config.panel.num_pixels[0] = n_elements
                 geometry_new.config.panel.pixel_size[0] *= roi.step
 

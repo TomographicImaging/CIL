@@ -34,13 +34,13 @@ class ApproximateGradientSumFunction(SumFunction):
     -----------
     functions : list(functions) 
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method.
-    sampler: MORE HERE!!!!!!!!!!!
+    sampler: TODO:
 
     Note
     ----
         
     The :meth:`~ApproximateGradientSumFunction.gradient` computes the `gradient` of only one function of a batch of functions 
-    depending on the :code:`sampler` method. The selected function(s) is  the :meth:`~SubsetSumFunction.next_subset` method.
+    depending on the :code:`sampler` method. 
     
     Example
     -------
@@ -139,7 +139,7 @@ class ApproximateGradientSumFunction(SumFunction):
         if isinstance(self.function_num, numbers.Number):         
             return self.approximate_gradient(self.function_num, x, out=out)
         else:            
-            raise ValueError("Batch gradient is not implemented")
+            raise ValueError("Batch gradient is not yet implemented")
                
     def next_function(self):
         

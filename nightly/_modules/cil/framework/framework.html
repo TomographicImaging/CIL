@@ -715,7 +715,7 @@
     <span class="nd">@staticmethod</span>  
     <span class="k">def</span> <span class="nf">create_vector</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">vec</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t convert to numpy array&quot;</span><span class="p">)</span>
    
@@ -2177,6 +2177,48 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please configure the panel using the set_panel() method&quot;</span><span class="p">)</span>
             <span class="n">configured</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">configured</span>
+
+    <span class="k">def</span> <span class="nf">shift_detector_in_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                          <span class="n">pixel_offset</span><span class="p">,</span>
+                                          <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adjusts the position of the detector in a specified direction within the imaging plane.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        pixel_offset : float</span>
+<span class="sd">            The number of pixels to adjust the detector&#39;s position by.</span>
+<span class="sd">        direction : {&#39;horizontal&#39;, &#39;vertical&#39;}, optional</span>
+<span class="sd">            The direction in which to adjust the detector&#39;s position. Defaults to &#39;horizontal&#39;.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        ------</span>
+<span class="sd">        - If `direction` is &#39;horizontal&#39;:</span>
+<span class="sd">            - If the panel&#39;s origin is &#39;left&#39;, positive offsets translate the detector to the right.</span>
+<span class="sd">            - If the panel&#39;s origin is &#39;right&#39;, positive offsets translate the detector to the left.</span>
+
+<span class="sd">        - If `direction` is &#39;vertical&#39;:</span>
+<span class="sd">            - If the panel&#39;s origin is &#39;bottom&#39;, positive offsets translate the detector upward.</span>
+<span class="sd">            - If the panel&#39;s origin is &#39;top&#39;, positive offsets translate the detector downward.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span>
+            <span class="n">pixel_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">pixel_direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span>
+
+        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
+            <span class="n">pixel_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">pixel_direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span>
+
+        <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span> <span class="ow">or</span> <span class="s1">&#39;left&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">pixel_offset</span> <span class="o">*</span> <span class="n">pixel_direction</span> <span class="o">*</span> <span class="n">pixel_size</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">pixel_offset</span> <span class="o">*</span> <span class="n">pixel_direction</span> <span class="o">*</span> <span class="n">pixel_size</span>
+
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>

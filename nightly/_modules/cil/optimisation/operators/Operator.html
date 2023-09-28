@@ -214,7 +214,8 @@
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
 
 <div class="viewcode-block" id="Operator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator">[docs]</a><span class="k">class</span> <span class="nc">Operator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -239,10 +240,10 @@
 <div class="viewcode-block" id="Operator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns if the operator is linear&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="kc">False</span></div>
-<div class="viewcode-block" id="Operator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Operator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the application of the Operator on x&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-
 
 <div class="viewcode-block" id="Operator.norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the Operator. On first call the norm will be calculated using the operator&#39;s calculate_norm</span>
@@ -254,7 +255,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;norm: the norm method does not use any parameters.</span><span class="se">\n\</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;norm: the norm method does not use any parameters.</span><span class="se">\n\</span>
 <span class="s1">                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -262,7 +263,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span></div>
 
-<div class="viewcode-block" id="Operator.set_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.set_norm">[docs]</a>    <span class="k">def</span> <span class="nf">set_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Operator.set_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.set_norm">[docs]</a>    <span class="k">def</span> <span class="nf">set_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets the norm of the operator to a custom value.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="n">norm</span></div>
@@ -270,44 +271,49 @@
 <div class="viewcode-block" id="Operator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Calculates the norm of the Operator&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
 <div class="viewcode-block" id="Operator.range_geometry"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the range of the Operator: Y space&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_range_geometry</span></div>
+
 <div class="viewcode-block" id="Operator.domain_geometry"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the domain of the Operator: X space&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain_geometry</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+
 <div class="viewcode-block" id="Operator.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Defines the multiplication by a scalar on the left</span>
 
 <span class="sd">        returns a ScaledOperator&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">ScaledOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span></div>
-    
+
     <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># TODO: check equality of domain and range of operators        </span>
-        <span class="c1">#if self.operator2.range_geometry != self.operator1.domain_geometry:</span>
-        <span class="c1">#    raise ValueError(&#39;Cannot compose operators, check domain geometry of {} and range geometry of {}&#39;.format(self.operato1,self.operator2))    </span>
-        
-        <span class="k">return</span> <span class="n">CompositionOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> 
+        <span class="c1"># TODO: check equality of domain and range of operators</span>
+        <span class="c1"># if self.operator2.range_geometry != self.operator1.domain_geometry:</span>
+        <span class="c1">#    raise ValueError(&#39;Cannot compose operators, check domain geometry of {} and range geometry of {}&#39;.format(self.operato1,self.operator2))</span>
+
+        <span class="k">return</span> <span class="n">CompositionOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">SumOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rmul__</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span>    
-    
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rmul__</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span>
+
 <div class="viewcode-block" id="Operator.__neg__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.__neg__">[docs]</a>    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Return -self &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span>    </div>
-        
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span></div>
+
 <div class="viewcode-block" id="Operator.__sub__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.__sub__">[docs]</a>    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the subtraction of the operators.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span>   </div></div>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span></div></div>
 
 
 <div class="viewcode-block" id="LinearOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator">[docs]</a><span class="k">class</span> <span class="nc">LinearOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
@@ -323,25 +329,26 @@
 <span class="sd">    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None</span>
 <span class="sd">        range of the operator </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="LinearOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="LinearOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns if the operator is linear&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="kc">True</span></div>
-<div class="viewcode-block" id="LinearOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LinearOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the adjoint/inverse operation</span>
-<span class="sd">        </span>
+
 <span class="sd">        only available to linear operators&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-    
-<div class="viewcode-block" id="LinearOperator.PowerMethod"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.PowerMethod">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>  <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
+<div class="viewcode-block" id="LinearOperator.PowerMethod"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.PowerMethod">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>  <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Power method or Power iteration algorithm </span>
-<span class="sd">        </span>
-<span class="sd">        The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,</span>
-<span class="sd">        absolute value in the real case and module in the complex case.        </span>
-<span class="sd">        For the non-square case, the power method is applied for the matrix :math: A^{T}*A.</span>
+
+<span class="sd">        The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,</span>
+<span class="sd">        absolute value in the real case and modulus in the complex case.        </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -353,9 +360,11 @@
 <span class="sd">            Starting point for the Power method.</span>
 <span class="sd">        tolerance: positive:`float`, default = 1e-5</span>
 <span class="sd">            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    </span>
-<span class="sd">        return_all: boolean, default = False</span>
+<span class="sd">        return_all: `boolean`, default = False</span>
 <span class="sd">            Toggles the verbosity of the return</span>
-<span class="sd">    </span>
+<span class="sd">        method: `string` one of `&quot;auto&quot;`, `&quot;composed_with_adjoint&quot;` and `&quot;direct_only&quot;`, default = `&quot;auto&quot;` </span>
+<span class="sd">            The default `auto` lets the code choose the method, this can be specified with `&quot;direct_only&quot;` or `&quot;composed_with_adjoint&quot;`</span>
+
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -366,6 +375,23 @@
 <span class="sd">            Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.</span>
 <span class="sd">        list of eigenvalues: :obj:`list`</span>
 <span class="sd">            List of eigenvalues. Only returned if return_all is True.</span>
+<span class="sd">        convergence: `boolean`</span>
+<span class="sd">            Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.</span>
+
+
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        The power method contains two different algorithms chosen by the `method` flag. </span>
+
+<span class="sd">        In the case `method=&quot;direct_only&quot;`, for operator, :math:`A`, the power method computes the iterations </span>
+<span class="sd">        :math:`x_{k+1} = A (x_k/\|x_{k}\|)` initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. </span>
+
+<span class="sd">        In the case `method=&quot;composed_with_adjoint&quot;`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` </span>
+<span class="sd">        returning the square root of this value, i.e. the iterations:</span>
+<span class="sd">        :math:`x_{k+1} = A^TA (x_k/\|x_{k}\|)` and returning  :math:`\sqrt{\|x_k\|}`.</span>
+
+<span class="sd">        The default flag is `method=&quot;auto&quot;`, the algorithm checks to see if the `operator.domain_geometry() == operator.range_geometry()` and if so</span>
+<span class="sd">        uses the method &quot;direct_only&quot; and if not the method &quot;composed_with_adjoint&quot;.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------    </span>
@@ -383,14 +409,25 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Default case: non-symmetric</span>
-        <span class="n">symmetric</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">==</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">():</span>
-                <span class="n">symmetric</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
-            <span class="c1"># catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972</span>
-            <span class="k">pass</span>
+        <span class="n">allowed_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;direct_only&quot;</span><span class="p">,</span> <span class="s2">&quot;composed_with_adjoint&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The argument &#39;method&#39; can be set to one of </span><span class="si">{0}</span><span class="s2"> got </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">allowed_methods</span><span class="p">,</span> <span class="n">method</span><span class="p">))</span>
+
+        <span class="n">apply_adjoint</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;direct_only&quot;</span><span class="p">:</span>
+            <span class="n">apply_adjoint</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">geometries_match</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span> <span class="o">==</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+
+            <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                <span class="c1"># catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">geometries_match</span><span class="p">:</span>
+                    <span class="n">apply_adjoint</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">x0</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
@@ -405,58 +442,59 @@
 
         <span class="c1"># initial guess for dominant eigenvalue</span>
         <span class="n">eig_old</span> <span class="o">=</span> <span class="mf">1.</span>
-
-        <span class="n">eig_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">return_all</span><span class="p">:</span>
+            <span class="n">eig_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">convergence_check</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_iteration</span> <span class="ow">and</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">):</span>
-            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
-            
-            <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">y_tmp</span><span class="p">)</span>
+            <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">y_tmp</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>                
-                <span class="c1">#swap datacontainer references</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">apply_adjoint</span><span class="p">:</span>
+                <span class="c1"># swap datacontainer references</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">x0</span>
                 <span class="n">x0</span> <span class="o">=</span> <span class="n">y_tmp</span>
                 <span class="n">y_tmp</span> <span class="o">=</span> <span class="n">tmp</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">y_tmp</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-            
+                <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">y_tmp</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+
             <span class="c1"># Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization</span>
             <span class="n">x0_norm</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">x0_norm</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s1">&#39;The operator has at least one zero eigenvector and is likely to be nilpotent&#39;</span><span class="p">)</span>
+                <span class="n">eig_new</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="k">break</span>
             <span class="n">x0</span> <span class="o">/=</span> <span class="n">x0_norm</span>
 
-            <span class="n">eig_new</span> <span class="o">=</span>  <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x0_norm</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">symmetric</span><span class="p">:</span>
+            <span class="n">eig_new</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x0_norm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">apply_adjoint</span><span class="p">:</span>
                 <span class="n">eig_new</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eig_new</span><span class="p">)</span>
-
             <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eig_new</span> <span class="o">-</span> <span class="n">eig_old</span><span class="p">)</span>
-            <span class="n">eig_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eig_new</span><span class="p">)</span>   
-            <span class="n">eig_old</span> <span class="o">=</span> <span class="n">eig_new</span>       
+            <span class="k">if</span> <span class="n">return_all</span><span class="p">:</span>
+                <span class="n">eig_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eig_new</span><span class="p">)</span>
+            <span class="n">eig_old</span> <span class="o">=</span> <span class="n">eig_new</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">return_all</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="n">max_iteration</span><span class="p">:</span>
+            <span class="n">convergence_check</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">return_all</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">eig_new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">eig_list</span>
+            <span class="k">return</span> <span class="n">eig_new</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">eig_list</span><span class="p">,</span> <span class="n">convergence_check</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">eig_new</span></div>
-            
 
 <div class="viewcode-block" id="LinearOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the norm of the LinearOperator calculated by the PowerMethod with default values.</span>
 <span class="sd">                &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;composed_with_adjoint&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LinearOperator.dot_test"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.LinearOperator.dot_test">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">dot_test</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">domain_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">range_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Does a dot linearity test on the operator</span>
-<span class="sd">        </span>
 <span class="sd">        Evaluates if the following equivalence holds</span>
-<span class="sd">        </span>
 <span class="sd">        .. math::</span>
-<span class="sd">        </span>
 <span class="sd">          Ax\times y = y \times A^Tx</span>
-<span class="sd">        </span>
 <span class="sd">        :param operator: operator to test the dot_test</span>
 <span class="sd">        :param range_init: optional initialisation container in the operator range </span>
 <span class="sd">        :param domain_init: optional initialisation container in the operator domain </span>
@@ -464,53 +502,52 @@
 <span class="sd">        :type : int, default = 1</span>
 <span class="sd">        :param tolerance: Check if the following expression is below the tolerance</span>
 <span class="sd">        .. math:: </span>
-<span class="sd">        </span>
+
 <span class="sd">            |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) &lt; tolerance</span>
-<span class="sd">        </span>
+
 <span class="sd">        :type : float, default 1e-6</span>
 <span class="sd">        :returns: boolean, True if the test is passed.       </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">seed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    
+
         <span class="k">if</span> <span class="n">range_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">range_init</span>
         <span class="k">if</span> <span class="n">domain_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">domain_init</span>
-        
+
         <span class="n">fx</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">by</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">fx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">by</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
 
-        <span class="c1"># Check relative tolerance but normalised with respect to </span>
+        <span class="c1"># Check relative tolerance but normalised with respect to</span>
         <span class="c1"># operator, x and y norms and avoid zero division</span>
-        <span class="n">error</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span> <span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span>
-            
+        <span class="n">error</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">error</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Left hand side  </span><span class="si">{}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">Right hand side </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
-            <span class="k">return</span> <span class="kc">False</span>    </div></div>
-        
-        
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Left hand side  </span><span class="si">{}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">Right hand side </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
 <div class="viewcode-block" id="ScaledOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator">[docs]</a><span class="k">class</span> <span class="nc">ScaledOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;ScaledOperator</span>
 
 <span class="sd">    A class to represent the scalar multiplication of an Operator with a scalar.</span>
 <span class="sd">    It holds an operator and a scalar. Basically it returns the multiplication</span>
 <span class="sd">    of the result of direct and adjoint of the operator with the scalar.</span>
 <span class="sd">    For the rest it behaves like the operator it holds.</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param operator: a Operator or LinearOperator</span>
 <span class="sd">    :param scalar: a scalar multiplier</span>
-<span class="sd">    </span>
+
 <span class="sd">    Example:</span>
 <span class="sd">       The scaled operator behaves like the following:</span>
 
@@ -524,7 +561,7 @@
 <span class="sd">      sop.domain_geometry() = operator.domain_geometry()</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
 <div class="viewcode-block" id="ScaledOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
@@ -532,12 +569,13 @@
 <span class="sd">        :param scalar: a scalar multiplier</span>
 <span class="sd">        :type scalar: Number&#39;&#39;&#39;</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">ScaledOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span> 
+        <span class="nb">super</span><span class="p">(</span><span class="n">ScaledOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span>
                                              <span class="n">range_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;expected scalar: got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scalar</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">=</span> <span class="n">scalar</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span></div>
+
 <div class="viewcode-block" id="ScaledOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;direct method&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -547,6 +585,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span></div>
+
 <div class="viewcode-block" id="ScaledOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;adjoint method&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
@@ -559,62 +598,62 @@
                 <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Operator is not linear&#39;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="ScaledOperator.norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;norm of the operator&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ScaledOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns whether the operator is linear</span>
-<span class="sd">        </span>
+
 <span class="sd">        :returns: boolean &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">is_linear</span><span class="p">()</span></div></div>
 
 
 <span class="c1">###############################################################################</span>
 <span class="c1">################   SumOperator  ###########################################</span>
-<span class="c1">###############################################################################      </span>
-    
+<span class="c1">###############################################################################</span>
+
 <span class="k">class</span> <span class="nc">SumOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-    
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator1</span><span class="p">,</span> <span class="n">operator2</span><span class="p">):</span>
-                
+
         <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span> <span class="o">=</span> <span class="n">operator1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span> <span class="o">=</span> <span class="n">operator2</span>
-        
+
         <span class="c1"># if self.operator1.domain_geometry() != self.operator2.domain_geometry():</span>
-        <span class="c1">#     raise ValueError(&#39;Domain geometry of {} is not equal with domain geometry of {}&#39;.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    </span>
-                
+        <span class="c1">#     raise ValueError(&#39;Domain geometry of {} is not equal with domain geometry of {}&#39;.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))</span>
+
         <span class="c1"># if self.operator1.range_geometry() != self.operator2.range_geometry():</span>
-        <span class="c1">#     raise ValueError(&#39;Range geometry of {} is not equal with range geometry of {}&#39;.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    </span>
-            
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">is_linear</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">is_linear</span><span class="p">()</span>            
-        
+        <span class="c1">#     raise ValueError(&#39;Range geometry of {} is not equal with range geometry of {}&#39;.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">is_linear</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">is_linear</span><span class="p">()</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">SumOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span>
-                                          <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span> 
-                                  
+                                          <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
+
     <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>     
+            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>        
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span> 
+                <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No adjoint operation with non-linear operators&#39;</span><span class="p">)</span>
-                                        
+
     <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span> 
-    
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span>
+
     <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -623,43 +662,46 @@
 
 <span class="c1">###############################################################################</span>
 <span class="c1">################   Composition  ###########################################</span>
-<span class="c1">###############################################################################             </span>
+<span class="c1">###############################################################################</span>
+
 
 <div class="viewcode-block" id="CompositionOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator">[docs]</a><span class="k">class</span> <span class="nc">CompositionOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-    
+
 <div class="viewcode-block" id="CompositionOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">operators</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
+
         <span class="c1"># get a reference to the operators</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operators</span> <span class="o">=</span> <span class="n">operators</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">is_linear</span><span class="p">(),</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">is_linear</span><span class="p">(),</span>
                                             <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="c1"># self.preallocate = kwargs.get(&#39;preallocate&#39;, False)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+                               <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+                              <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
             <span class="c1"># pass</span>
-        
+
         <span class="c1"># TODO address the equality of geometries</span>
         <span class="c1"># if self.operator2.range_geometry() != self.operator1.domain_geometry():</span>
-        <span class="c1">#     raise ValueError(&#39;Domain geometry of {} is not equal with range geometry of {}&#39;.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    </span>
-                
+        <span class="c1">#     raise ValueError(&#39;Domain geometry of {} is not equal with range geometry of {}&#39;.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">CompositionOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">domain_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span>
-            <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span> </div>
-        
-<div class="viewcode-block" id="CompositionOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="CompositionOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1">#return self.operator1.direct(self.operator2.direct(x))</span>
-            <span class="c1"># return functools.reduce(lambda X,operator: operator.direct(X), </span>
+            <span class="c1"># return self.operator1.direct(self.operator2.direct(x))</span>
+            <span class="c1"># return functools.reduce(lambda X,operator: operator.direct(X),</span>
             <span class="c1">#                        self.operators[::-1][1:],</span>
             <span class="c1">#                        self.operators[-1].direct(x))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -670,83 +712,83 @@
             <span class="c1"># tmp = self.operator2.range_geometry().allocate()</span>
             <span class="c1"># self.operator2.direct(x, out = tmp)</span>
             <span class="c1"># self.operator1.direct(tmp, out = out)</span>
-            
+
             <span class="c1"># out.fill (</span>
-            <span class="c1">#     functools.reduce(lambda X,operator: operator.direct(X), </span>
+            <span class="c1">#     functools.reduce(lambda X,operator: operator.direct(X),</span>
             <span class="c1">#                        self.operators[::-1][1:],</span>
             <span class="c1">#                        self.operators[-1].direct(x))</span>
             <span class="c1"># )</span>
-            
+
             <span class="c1"># TODO this is a bit silly but will handle the pre allocation later</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span><span class="p">:</span>
 
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">step</span><span class="p">)</span></div>
 
-            
-    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span> 
-            
+    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
+
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># return self.operator2.adjoint(self.operator1.adjoint(x))</span>
-                <span class="c1"># return functools.reduce(lambda X,operator: operator.adjoint(X), </span>
+                <span class="c1"># return functools.reduce(lambda X,operator: operator.adjoint(X),</span>
                 <span class="c1">#                    self.operators[1:],</span>
                 <span class="c1">#                    self.operators[0].adjoint(x))</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                         <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                            <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                            <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                            <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="k">return</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
                     <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-                
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span><span class="p">:</span>
                     <span class="k">pass</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-                    
+
                     <span class="k">return</span> <span class="n">step</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No adjoint operation with non-linear operators&#39;</span><span class="p">)</span>
-            
 
 <div class="viewcode-block" id="CompositionOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span>             </div>
-            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div>
 
 <div class="viewcode-block" id="CompositionOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the CompositionOperator, that is the product of the norms</span>
 <span class="sd">        of its operators.&#39;&#39;&#39;</span>
         <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.</span>
         <span class="k">for</span> <span class="n">operator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">:</span>
-                <span class="n">norm</span> <span class="o">*=</span> <span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+            <span class="n">norm</span> <span class="o">*=</span> <span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">norm</span></div></div>
 </pre></div>
 

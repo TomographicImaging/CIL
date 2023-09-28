@@ -2659,11 +2659,10 @@ method. Subsequent calls will return the cached norm.</p>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.PowerMethod">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">#</a></dt>
 <dd><p>Power method or Power iteration algorithm</p>
-<p>The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
-absolute value in the real case and module in the complex case.
-For the non-square case, the power method is applied for the matrix :math: A^{T}*A.</p>
+<p>The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
+absolute value in the real case and modulus in the complex case.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2671,7 +2670,8 @@ For the non-square case, the power method is applied for the matrix :math: A^{T}
 <li><p><strong>max_iteration</strong> (positive:<cite>int</cite>, default=10) – Number of iterations for the Power method algorithm.</p></li>
 <li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Starting point for the Power method.</p></li>
 <li><p><strong>tolerance</strong> (positive:<cite>float</cite>, default = 1e-5) – Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.</p></li>
-<li><p><strong>return_all</strong> (<em>boolean</em><em>, </em><em>default = False</em>) – Toggles the verbosity of the return</p></li>
+<li><p><strong>return_all</strong> (<cite>boolean</cite>, default = False) – Toggles the verbosity of the return</p></li>
+<li><p><strong>method</strong> (<cite>string</cite> one of <cite>“auto”</cite>, <cite>“composed_with_adjoint”</cite> and <cite>“direct_only”</cite>, default = <cite>“auto”</cite>) – The default <cite>auto</cite> lets the code choose the method, this can be specified with <cite>“direct_only”</cite> or <cite>“composed_with_adjoint”</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2680,10 +2680,22 @@ For the non-square case, the power method is applied for the matrix :math: A^{T}
 <li><p><strong>number of iterations</strong> (positive:<cite>int</cite>) – Number of iterations run. Only returned if return_all is True.</p></li>
 <li><p><strong>eigenvector</strong> (<em>DataContainer</em>) – Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.</p></li>
 <li><p><strong>list of eigenvalues</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – List of eigenvalues. Only returned if return_all is True.</p></li>
+<li><p><strong>convergence</strong> (<cite>boolean</cite>) – Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.</p></li>
 </ul>
 </p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The power method contains two different algorithms chosen by the <cite>method</cite> flag.</p>
+<p>In the case <cite>method=”direct_only”</cite>, for operator, <span class="math notranslate nohighlight">\(A\)</span>, the power method computes the iterations
+<span class="math notranslate nohighlight">\(x_{k+1} = A (x_k/\|x_{k}\|)\)</span> initialised with a random vector <span class="math notranslate nohighlight">\(x_0\)</span> and returning the largest (dominant) eigenvalue in magnitude given by <span class="math notranslate nohighlight">\(\|x_k\|\)</span>.</p>
+<p>In the case <cite>method=”composed_with_adjoint”</cite>, the algorithm computes the largest (dominant) eigenvalue of <span class="math notranslate nohighlight">\(A^{T}A\)</span>
+returning the square root of this value, i.e. the iterations:
+<span class="math notranslate nohighlight">\(x_{k+1} = A^TA (x_k/\|x_{k}\|)\)</span> and returning  <span class="math notranslate nohighlight">\(\sqrt{\|x_k\|}\)</span>.</p>
+<p>The default flag is <cite>method=”auto”</cite>, the algorithm checks to see if the <cite>operator.domain_geometry() == operator.range_geometry()</cite> and if so
+uses the method “direct_only” and if not the method “composed_with_adjoint”.</p>
+</div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Mop</span> <span class="o">=</span> <span class="n">MatrixOperator</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
@@ -2708,10 +2720,12 @@ For the non-square case, the power method is applied for the matrix :math: A^{T}
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.dot_test">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">dot_test</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.dot_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.dot_test" title="Permalink to this definition">#</a></dt>
-<dd><p>Does a dot linearity test on the operator</p>
-<p>Evaluates if the following equivalence holds</p>
-<div class="math notranslate nohighlight">
-\[Ax\times y = y \times A^Tx\]</div>
+<dd><p>Does a dot linearity test on the operator
+Evaluates if the following equivalence holds
+.. math:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

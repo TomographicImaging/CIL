@@ -788,35 +788,27 @@ class TestDataContainer(CCPiTestClass):
     def test_reduction_mean_direction(self):
         ig = ImageGeometry(2,2,2)
         data = ig.allocate(0)
-        np_arr = data.as_array()
-        np_arr[0][0][0] = 0
-        np_arr[0][0][1] = 1
-        np_arr[0][1][0] = 2
-        np_arr[0][1][1] = 3
-        np_arr[1][0][0] = 4
-        np_arr[1][0][1] = 5
-        np_arr[1][1][0] = 6
-        np_arr[1][1][1] = 7
+        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         data.fill(np_arr)
 
-        print(data.dimension_labels)
-
-        # test specifying mean in multiple axes
-        mean = data.mean(direction=('horizontal_x','horizontal_y','vertical'))
+        # test specifying mean in 1 axis
+        mean = data.mean(direction='horizontal_y')
+        numpy.testing.assert_almost_equal(mean.as_array(), [[1.0, 2.0],[5.0, 6.0]])
+        numpy.testing.assert_equal(mean.dimension_labels,('vertical','horizontal_x'))
+        mean = data.mean(axis=1)
+        numpy.testing.assert_almost_equal(mean.as_array(), [[1.0, 2.0],[5.0, 6.0]])
+        numpy.testing.assert_equal(mean.dimension_labels,('vertical','horizontal_x'))
+        # test specifying mean in 2 axes
+        mean = data.mean(direction=('horizontal_y', 'vertical'))
+        numpy.testing.assert_almost_equal(mean.as_array(), [3.0, 4.0])
+        numpy.testing.assert_equal(mean.dimension_labels,('horizontal_x',))
+        # test specifying mean in 3 axes
         expected = numpy.float64(0+1+2+3+4+5+6+7)/numpy.float64(8)
+        mean = data.mean(direction=('horizontal_x','horizontal_y','vertical'))
         numpy.testing.assert_almost_equal(mean, expected)
         mean = data.mean(axis=(0,1,2))
         numpy.testing.assert_almost_equal(mean, expected)
-        # test specifying mean in a single axis
-        mean = data.mean(direction='horizontal_y')
-        expected = [[numpy.float64(0+2)/2, numpy.float64(1+3)/numpy.float64(2)],
-                    [numpy.float64(4+6)/numpy.float64(2), numpy.float64(5+7)/numpy.float64(2)]]
-        numpy.testing.assert_almost_equal(mean, expected)
-        mean = data.mean(axis=1)
-        numpy.testing.assert_almost_equal(mean, expected)
-        # test duplicate axis specification in direction and axis   
-        with numpy.testing.assert_raises(TypeError):
-            mean = data.mean(direction='vertical', axis=0)      
+   
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
             mean = data.mean(direction=0)      

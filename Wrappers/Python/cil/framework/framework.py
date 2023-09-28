@@ -3373,9 +3373,17 @@ class DataContainer(object):
             kwargs['dtype'] = numpy.float64
 
         if direction is None:
-            return numpy.mean(self.as_array(), *args, **kwargs)
+            mean = numpy.mean(self.as_array(), *args, **kwargs)
         else:
-            return numpy.mean(self.as_array(), axis = self.get_dimension_axis(direction), *args, **kwargs)   
+            kwargs['axis'] = self.get_dimension_axis(direction)
+            mean = numpy.mean(self.as_array(), *args, **kwargs) 
+        
+        if isinstance(mean, numpy.ndarray):
+            new_dimensions = numpy.array(self.dimension_labels)
+            new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
+            mean = DataContainer(mean, dimension_labels=(new_dimensions))
+
+        return mean   
 
     # Logic operators between DataContainers and floats    
     def __le__(self, other):

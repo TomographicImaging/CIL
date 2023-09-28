@@ -19,6 +19,7 @@
 
 import numpy
 import functools
+from numbers import Number
 from cil.framework import ImageData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import Operator, LinearOperator
 from cil.framework import BlockGeometry
@@ -135,26 +136,43 @@ class BlockOperator(Operator):
         index = row*self.shape[1]+col
         return self.operators[index]
     
-    def norm(self, **kwargs):
-        '''Returns the norm of the BlockOperator
-
-        if the operator in the block do not have method norm defined, i.e. they are SIRF
-        AcquisitionModel's we use PowerMethod if applicable, otherwise we raise an Error
+    def norm(self):
+        '''Returns the square root of the sum of the norms of the individual operators in the BlockOperators 
         '''
-        norm = []
-        for op in self.operators:
-            if hasattr(op, 'norm'):
-                norm.append(op.norm(**kwargs) ** 2.)
-            else:
-                # use Power method
-                if op.is_linear():
-                    norm.append(
-                            LinearOperator.PowerMethod(op, 20)[0]
-                            )
-                else:
-                    raise TypeError('Operator {} does not have a norm method and is not linear'.format(op))
-        return numpy.sqrt(sum(norm))    
+        return numpy.sqrt(numpy.sum(numpy.array(self.norms())**2))    
     
+    def norms(self, ):
+        '''Returns a list of the individual norms of the Operators in the BlockOperator
+        '''
+        norms= []
+        for op in self.operators:
+            try:
+                norms.append(op.norm())
+            except:
+                    raise TypeError('Operator {} does not have a norm method'.format(op))
+        return norms
+    
+    def set_norms(self, norms):
+        '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
+
+
+        '''
+        if len(norms)==len(self.operators):
+            if all(isinstance(i, Number) for i in norms):
+                if all( i>=0 for i in norms ):
+                    pass
+                else:
+                    raise ValueError("Each number in the list should be positive")
+            else: 
+                raise ValueError("Each element in the list of norms should be a number")
+        else:
+            raise ValueError("The length of the list of norms should be equal to the number of operators in the BlockOperator")
+        
+        for i,value in enumerate(norms):
+            self.operators[i].set_norm(value)
+        
+
+
     def direct(self, x, out=None):
         '''Direct operation for the BlockOperator
 

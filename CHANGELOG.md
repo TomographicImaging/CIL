@@ -10,6 +10,7 @@
   - FBP split processing bug fix - now respects panel origin set in geometry
   - Binner/Padder/Slicer bug fix - now respects panel origin set in geometry
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
+  - Bug fix in the LinearOperator norm with an additional flag for the algorithm linearOperator.PowerMethod
   - Tidied up documentation in the framework folder
 
 * 23.0.1

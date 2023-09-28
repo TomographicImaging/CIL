@@ -237,7 +237,8 @@ class TestBinner(unittest.TestCase):
 
     def test_process_acquisition_geometry_parallel3D(self):
 
-        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        angles_full = numpy.linspace(0,360,360,endpoint=False)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles_full).set_panel([128,64],[0.1,0.2], origin='bottom-left').set_channels(4)
 
         rois = [
                 # same as input
@@ -248,13 +249,21 @@ class TestBinner(unittest.TestCase):
                 
                 # bin to single dimension
                 {'vertical':(31,33,2)},
+
+        
+                # crop  asymmetrically
+                {'vertical':(10,None,None),'horizontal':(None,-20,None)}                
         ]
 
+        #calculate offsets for geometry4
+        ag4_offset_h = -ag.pixel_size_h*20/2
+        ag4_offset_v = ag.pixel_size_v*10/2
 
         ag_gold = [
                 ag.copy(),
-                AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
-                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+                AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([8,8],[1.6,1.6], origin='bottom-left').set_channels(1),
+                AcquisitionGeometry.create_Parallel2D().set_angles(angles_full).set_panel(128,[0.1,0.4], origin='bottom-left').set_channels(4),
+                AcquisitionGeometry.create_Parallel3D(detector_position=[ag4_offset_h, 0, ag4_offset_v]).set_angles(angles_full).set_panel([108,54],[0.1,0.2], origin='bottom-left').set_channels(4)
         ]
 
         for i, roi in enumerate(rois):
@@ -263,6 +272,48 @@ class TestBinner(unittest.TestCase):
             ag_out = proc._process_acquisition_geometry()
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
+
+
+    def test_process_acquisition_geometry_parallel3D_origin(self):
+
+        #tests the geometry output with a non-default origin choice
+
+        angles_full = numpy.linspace(0,360,360,endpoint=False)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles_full).set_panel([128,64],[0.1,0.2], origin='top-right').set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+
+                # bin all
+                {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
+                
+                # bin to single dimension
+                {'vertical':(31,33,2)},
+
+        
+                # crop  asymmetrically
+                {'vertical':(10,None,None),'horizontal':(None,-20,None)}                
+        ]
+
+        #calculate offsets for geometry4
+        ag4_offset_h = ag.pixel_size_h*20/2
+        ag4_offset_v = -ag.pixel_size_v*10/2
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([8,8],[1.6,1.6], origin='top-right').set_channels(1),
+                AcquisitionGeometry.create_Parallel2D().set_angles(angles_full).set_panel(128,[0.1,0.4], origin='top-right').set_channels(4),
+                AcquisitionGeometry.create_Parallel3D(detector_position=[ag4_offset_h, 0, ag4_offset_v]).set_angles(angles_full).set_panel([108,54],[0.1,0.2], origin='top-right').set_channels(4)
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Binner(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._process_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
+
 
 
     def test_process_acquisition_geometry_cone2D(self):
@@ -680,6 +731,41 @@ class TestBinner(unittest.TestCase):
         # not a very tight tolerance as binning and fp at lower res are not identical operations.
         numpy.testing.assert_allclose(fp_roi.array, fp_binned.array, atol=0.06)
 
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_aqdata_full_origin(self):
+        """
+        This test bins a sinogram. It then uses that geometry for the forward projection.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+        ag.set_labels(['vertical','angle','horizontal'])
+        ag.config.panel.origin='top-right'
+    
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = AstraProjectionOperator(phantom.geometry, ag)
+        fp_full = PO.direct(phantom)
+
+        roi = {'angle':(25,26),'vertical':(5,62,2),'horizontal':(-75,0,2)}
+        binner = Binner(roi)
+
+        binner.set_input(ag)
+        ag_roi = binner.get_output()
+
+        binner.set_input(fp_full)
+        fp_binned = binner.get_output()
+
+        self.assertEqual(ag_roi, fp_binned.geometry, msg="Binned geometries not equal")
+
+        PO = AstraProjectionOperator(phantom.geometry, ag_roi)
+        fp_roi = PO.direct(phantom)
+
+        # not a very tight tolerance as binning and fp at lower res are not identical operations.
+        numpy.testing.assert_allclose(fp_roi.array, fp_binned.array, atol=0.08)
+
+
     @unittest.skip
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_aqdata_full_tigre(self):
@@ -784,7 +870,8 @@ class TestSlicer(unittest.TestCase):
 
     def test_process_acquisition_geometry_parallel3D(self):
 
-        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        angles_full = numpy.linspace(0,360,360,endpoint=False)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles_full).set_panel([128,64],[0.1,0.2], origin='bottom-left').set_channels(4)
 
         rois = [
                 # same as input
@@ -795,22 +882,81 @@ class TestSlicer(unittest.TestCase):
                 
                 # slice to single dimension
                 {'vertical':(31,33,2)},
+        
+                # slice  asymmetrically
+                {'vertical':(10,None,None),'horizontal':(None,-20,None)}
         ]
 
+        #calculate offsets for geometry2
         pix_end_h1 = ag.pixel_num_h -1
         pix_start_h2 = 0
         pix_end_h2 = 7 * 16 # last pixel index sliced multiplied by step size
-        offset_h = ag.pixel_size_h*((pix_start_h2)-(pix_end_h1-pix_end_h2))/2
+        ag2_offset_h = ag.pixel_size_h*((pix_start_h2)-(pix_end_h1-pix_end_h2))/2
 
         pix_end_v1 = ag.pixel_num_v -1
         pix_start_v2 = 0
         pix_end_v2 = 7 * 8 # last pixel index sliced multiplied by step size
-        offset_v = ag.pixel_size_v*((pix_start_v2)-(pix_end_v1- pix_end_v2))/2
+        ag2_offset_v = ag.pixel_size_v*((pix_start_v2)-(pix_end_v1- pix_end_v2))/2
+
+        #calculate offsets for geometry4
+        ag4_offset_h = -ag.pixel_size_h*20/2
+        ag4_offset_v = ag.pixel_size_v*10/2
 
         ag_gold = [
                 ag.copy(),
-                AcquisitionGeometry.create_Parallel3D(detector_position=[offset_h, 0, offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
+                AcquisitionGeometry.create_Parallel3D(detector_position=[ag2_offset_h, 0, ag2_offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
                 AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+                AcquisitionGeometry.create_Parallel3D(detector_position=[ag4_offset_h, 0, ag4_offset_v]).set_angles(angles_full).set_panel([108,54],[0.1,0.2]).set_channels(4)
+        ]
+
+        for i, roi in enumerate(rois):
+            proc = Slicer(roi=roi)
+            proc.set_input(ag)
+            ag_out = proc._process_acquisition_geometry()
+
+            self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
+
+    def test_process_acquisition_geometry_parallel3D_origin(self):
+
+        #tests the geometry output with a non-default origin choice
+
+        angles_full = numpy.linspace(0,360,360,endpoint=False)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles_full).set_panel([128,64],[0.1,0.2], origin='top-right').set_channels(4)
+
+        rois = [
+                # same as input
+                {'channel':(None,None,None),'angle':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)},
+
+                # slice all
+                {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
+                
+                # slice to single dimension
+                {'vertical':(31,33,2)},
+        
+                # slice  asymmetrically
+                {'vertical':(10,None,None),'horizontal':(None,-20,None)}
+        ]
+
+        #calculate offsets for geometry2
+        pix_end_h1 = ag.pixel_num_h -1
+        pix_start_h2 = 0
+        pix_end_h2 = 7 * 16 # last pixel index sliced multiplied by step size
+        ag2_offset_h = -ag.pixel_size_h*((pix_start_h2)-(pix_end_h1-pix_end_h2))/2
+
+        pix_end_v1 = ag.pixel_num_v -1
+        pix_start_v2 = 0
+        pix_end_v2 = 7 * 8 # last pixel index sliced multiplied by step size
+        ag2_offset_v = -ag.pixel_size_v*((pix_start_v2)-(pix_end_v1- pix_end_v2))/2
+
+        #calculate offsets for geometry4
+        ag4_offset_h = ag.pixel_size_h*20/2
+        ag4_offset_v = -ag.pixel_size_v*10/2
+
+        ag_gold = [
+                ag.copy(),
+                AcquisitionGeometry.create_Parallel3D(detector_position=[ag2_offset_h, 0, ag2_offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6], origin='top-right').set_channels(1),
+                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4], origin='top-right').set_channels(4),        
+                AcquisitionGeometry.create_Parallel3D(detector_position=[ag4_offset_h, 0, ag4_offset_v]).set_angles(angles_full).set_panel([108,54],[0.1,0.2], origin='top-right').set_channels(4)
         ]
 
         for i, roi in enumerate(rois):
@@ -1119,6 +1265,42 @@ class TestSlicer(unittest.TestCase):
 
         numpy.testing.assert_allclose(fp_roi.array, fp_sliced.array, 1e-4)
 
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_aqdata_full_origin(self):
+        """
+        This test slices a sinogram. It then uses that geometry for the forward projection.
+
+        This ensures the offsets are correctly set and the same window of data is output in both cases.
+        """
+
+        ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
+        ag.set_labels(['vertical','angle','horizontal'])
+        ag.config.panel.origin='top-right'
+
+        phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        PO = AstraProjectionOperator(phantom.geometry, ag)
+        fp_full = PO.direct(phantom)
+
+        roi = {'angle':(25,30,2),'vertical':(5,50,2),'horizontal':(-50,0,2)}
+        slicer = Slicer(roi)
+
+        slicer.set_input(ag)
+        ag_roi = slicer.get_output()
+
+        slicer.set_input(fp_full)
+        fp_sliced = slicer.get_output()
+
+        numpy.testing.assert_allclose(fp_sliced.array, fp_full.array[5:50:2,25:30:2,-50::2])
+
+        self.assertEqual(ag_roi, fp_sliced.geometry, msg="Sliced geometries not equal")
+
+        PO = AstraProjectionOperator(phantom.geometry, ag_roi)
+        fp_roi = PO.direct(phantom)
+        numpy.testing.assert_allclose(fp_roi.array, fp_sliced.array, 1e-4)
+
+
     @unittest.skip
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_aqdata_full_tigre(self):
@@ -1359,6 +1541,9 @@ class TestPaddder(unittest.TestCase):
         self.ag_pad_width = {'channel':(1,2),'vertical':(3,4),'horizontal':(5,6)}
         self.ag_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.05, 0., -0.15]).set_angles([0,90,180,270]).set_panel([27,23],[0.1,0.1]).set_channels(7)
 
+        self.ag2 = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,270]).set_panel([16,16],[0.1,0.1],origin='top-right').set_channels(4)
+        self.ag2_padded = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.15, 0., -0.25]).set_angles([0,90,180,270]).set_panel([27,23],[0.1,0.1],origin='top-right').set_channels(7)
+
         self.ig = ImageGeometry(5,4,3,center_x=0.5,center_y=1,center_z=-0.5,channels=2)
         self.ig_pad_width = {'channel':(1,2),'vertical':(3,2),'horizontal_x':(2,1), 'horizontal_y':(2,3)}
         self.ig_padded = ImageGeometry(8,9,8,center_x=0,center_y=1.5,center_z=-1, channels=5)
@@ -1487,6 +1672,17 @@ class TestPaddder(unittest.TestCase):
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
+    def test_process_acquisition_geometry_origin(self):
+        geometry = self.ag2
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
+        proc.set_input(geometry)
+        geometry_padded = proc._process_acquisition_geometry()
+
+        self.assertEquals(geometry_padded, self.ag2_padded,
+        msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
+
+    
     def test_process_image_geometry(self):
 
         geometry = self.ig
@@ -1816,6 +2012,22 @@ class TestPaddder(unittest.TestCase):
 
         data.log(out=data)
         data *=-1
+
+        recon_orig = FBP(data).run(verbose=0)
+        recon_orig.apply_circular_mask()
+
+        proc = Padder('constant',pad_width=(5,40),pad_values=0.0)
+        proc.set_input(data)
+        data_padded = proc.get_output()
+
+        recon_new = FBP(data_padded, recon_orig.geometry).run(verbose=0)
+        recon_new.apply_circular_mask()
+
+        numpy.testing.assert_allclose(recon_orig.array, recon_new.array, atol=1e-4)
+
+
+        # switch panel origin
+        data.geometry.config.panel.origin='top-right'
 
         recon_orig = FBP(data).run(verbose=0)
         recon_orig.apply_circular_mask()

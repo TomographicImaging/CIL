@@ -190,17 +190,11 @@ class LinearOperator(Operator):
         The power method contains two different algorithms chosen by the `method` flag. 
 
         In the case `method="direct_only"`, for operator, :math:`A`, the power method computes the iterations 
-        .. math::
-          x_{k+1} = A (\frac{x_k}{\|x_{k}\|}) \; (*)
-
-        initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. 
+        :math:`x_{k+1} = A (x_k/\|x_{k}\|)` initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. 
 
         In the case `method="composed_with_adjoint"`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` 
-          returning the square root of this value, i.e. the iterations:
-          .. math::
-          x_{k+1} = A^*A (\frac{x_k}{\|x_{k}\|})
-
-        and returning  :math:`\sqrt{\|x_k\|}`.
+        returning the square root of this value, i.e. the iterations:
+        :math:`x_{k+1} = A^TA (x_k/\|x_{k}\|)` and returning  :math:`\sqrt{\|x_k\|}`.
 
         The default flag is `method="auto"`, the algorithm checks to see if the `operator.domain_geometry() == operator.range_geometry()` and if so
         uses the method "direct_only" and if not the method "composed_with_adjoint".

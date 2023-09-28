@@ -181,7 +181,7 @@ class LinearOperator(Operator):
             Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
         list of eigenvalues: :obj:`list`
             List of eigenvalues. Only returned if return_all is True.
-        convergence: `boolean'
+        convergence: `boolean`
             Check on wether the difference between the last two iterations is less than tolerance. Only returned if return_all is True.
 
 

@@ -3321,13 +3321,7 @@ class DataContainer(object):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     
-    ## reductions
-    def sum(self, direction=None, *args, **kwargs):
-        if direction is None:
-            return self.as_array().sum(*args, **kwargs)
-        else:
-            return self.as_array().sum(axis = self.get_dimension_axis(direction), *args, **kwargs) 
-        
+    ## reductions        
     def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
         #shape = self.shape
@@ -3378,7 +3372,23 @@ class DataContainer(object):
                 new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
                 out = DataContainer(out, dimension_labels=new_dimensions)
 
-            return out   
+            return out
+
+    def sum(self, direction=None, *args, **kwargs):
+        """
+        Returns the sum of values in the DataContainer
+        Parameters
+        ----------
+        direction : string or tuple of strings
+            specify the axis or axes to calculate the sum along using a dimension_label.
+        Returns
+        -------
+        numpy.ndarray or scalar  
+        """
+        if kwargs.get('dtype', None) is None:
+            kwargs['dtype'] = numpy.float64
+            
+        return self._directional_reduction_unary(numpy.sum, direction=direction, *args, **kwargs)
 
     def min(self, direction=None, *args, **kwargs):
         """

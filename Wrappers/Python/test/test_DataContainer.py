@@ -767,7 +767,10 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(sqnorm, 8.0)
         numpy.testing.assert_almost_equal(norm, numpy.sqrt(8.0), decimal=7)
         sum = dc.sum(direction=('X','Z'))
-        numpy.testing.assert_almost_equal(sum, [4.0,4.0])
+        numpy.testing.assert_almost_equal(sum.as_array(), [numpy.float64(4),numpy.float64(4)])
+        numpy.testing.assert_equal(sum.dimension_labels,('Y',))
+        sum = dc.sum()
+        numpy.testing.assert_almost_equal(sum, 8.0)
     
 
     def test_reduction_mean(self):

@@ -2714,23 +2714,21 @@ class DataContainer(object):
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels))
+    
     def get_dimension_axis(self, dimension_label):
+        
+        if isinstance(dimension_label,(tuple,list)):
+            temp = []
+            for x in dimension_label:
+                temp.append(self.get_dimension_axis(x))
+            return tuple(temp)
 
-        if isinstance(dimension_label,tuple):
-            dimension_indices = list(dimension_label)
-            for i in range(len(dimension_indices)):
-                if dimension_indices[i] in self.dimension_labels: 
-                    dimension_indices[i] = numpy.int(self.dimension_labels.index(dimension_indices[i]))
-                else:
-                    raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_indices[i],
-                                                                                              self.dimension_labels))
-            return tuple(dimension_indices)
+        if dimension_label in self.dimension_labels:
+            return self.dimension_labels.index(dimension_label)
         else:
-            if dimension_label in self.dimension_labels:
-                return self.dimension_labels.index(dimension_label)
-            else:
-                raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
-                                self.dimension_labels))
+            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
+                            self.dimension_labels))
+
                         
     def as_array(self):
         '''Returns the pointer to the array.
@@ -3326,8 +3324,25 @@ class DataContainer(object):
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
+    def _directional_reduction_unary(self, pwop, direction=None, *args, **kwargs):
+        if direction is None:
+            return  pwop(self.as_array(), *args, **kwargs)
+        else:
+            if kwargs.get('axis', None) is not None:
+                raise ValueError ("Incompatible arguments: specify either direction or axis")
+            else:
+                kwargs['axis'] = self.get_dimension_axis(direction)
+                out = pwop(self.as_array(), *args, **kwargs) 
+        
+            if isinstance(out, numpy.ndarray):
+                new_dimensions = numpy.array(self.dimension_labels)
+                new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
+                out = DataContainer(out, dimension_labels=new_dimensions)
+
+            return out   
+
     def min(self, direction=None, *args, **kwargs):
-        """"
+        """
         Returns the min pixel value in the DataContainer
         Parameters
         ----------
@@ -3337,13 +3352,10 @@ class DataContainer(object):
         -------
         numpy.ndarray or scalar  
         """
-        if direction is None:
-            return numpy.min(self.as_array(), *args, **kwargs)
-        else:
-            return numpy.min(self.as_array(), axis = self.get_dimension_axis(direction), *args, **kwargs)  
+        return self._directional_reduction_unary(numpy.min, direction=direction, *args, **kwargs)
     
     def max(self, direction=None, *args, **kwargs):
-        """"
+        """
         Returns the max pixel value in the DataContainer
         Parameters
         ----------
@@ -3353,18 +3365,17 @@ class DataContainer(object):
         -------
         numpy.ndarray or scalar  
         """
-        if direction is None:
-            return numpy.max(self.as_array(), *args, **kwargs)
-        else:
-            return numpy.max(self.as_array(), *args, axis = self.get_dimension_axis(direction), **kwargs)  
-
+        return self._directional_reduction_unary(numpy.max, direction=direction, *args, **kwargs)
+        
     def mean(self, direction=None, *args, **kwargs):
-        """"
+        """
         Returns the mean pixel value of the DataContainer
+
         Parameters
         ----------
         direction : string or tuple of strings, optional
             specify the axis or axes to calculate the mean along using a dimension_label.
+            
         Returns
         -------
         numpy.ndarray
@@ -3372,18 +3383,7 @@ class DataContainer(object):
         if kwargs.get('dtype', None) is None:
             kwargs['dtype'] = numpy.float64
 
-        if direction is None:
-            mean = numpy.mean(self.as_array(), *args, **kwargs)
-        else:
-            kwargs['axis'] = self.get_dimension_axis(direction)
-            mean = numpy.mean(self.as_array(), *args, **kwargs) 
-        
-        if isinstance(mean, numpy.ndarray):
-            new_dimensions = numpy.array(self.dimension_labels)
-            new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-            mean = DataContainer(mean, dimension_labels=(new_dimensions))
-
-        return mean   
+        return self._directional_reduction_unary(numpy.mean, direction=direction, *args, **kwargs)
 
     # Logic operators between DataContainers and floats    
     def __le__(self, other):

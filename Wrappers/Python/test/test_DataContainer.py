@@ -796,8 +796,7 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(mean.as_array(), [[1.0, 2.0],[5.0, 6.0]])
         numpy.testing.assert_equal(mean.dimension_labels,('vertical','horizontal_x'))
         mean = data.mean(axis=1)
-        numpy.testing.assert_almost_equal(mean.as_array(), [[1.0, 2.0],[5.0, 6.0]])
-        numpy.testing.assert_equal(mean.dimension_labels,('vertical','horizontal_x'))
+        numpy.testing.assert_almost_equal(mean, [[1.0, 2.0],[5.0, 6.0]])
         # test specifying mean in 2 axes
         mean = data.mean(direction=('horizontal_y', 'vertical'))
         numpy.testing.assert_almost_equal(mean.as_array(), [3.0, 4.0])
@@ -808,10 +807,10 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(mean, expected)
         mean = data.mean(axis=(0,1,2))
         numpy.testing.assert_almost_equal(mean, expected)
-   
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
-            mean = data.mean(direction=0)      
+            mean = data.mean(direction=0)  
+        # add a unit test to check the type is what you asked for
 
 
     def test_multiply_out(self):

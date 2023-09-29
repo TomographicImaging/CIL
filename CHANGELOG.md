@@ -1,5 +1,5 @@
 
-* x.x.x
+* 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object
   - Add norm for CompositionOperator

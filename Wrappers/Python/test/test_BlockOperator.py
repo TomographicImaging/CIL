@@ -48,7 +48,7 @@ class TestBlockOperator(unittest.TestCase):
         
 
         #sets_norm
-        A.set_norms([2,3]) #FIXME: ISSUE HERE!!! 
+        A.set_norms([2,3]) 
         #gets cached norm
         self.assertListEqual(A.norms(), [2,3], 2)
         self.assertEqual(A.norm(), numpy.sqrt(13))

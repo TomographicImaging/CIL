@@ -808,8 +808,6 @@ class TestDataContainer(CCPiTestClass):
         expected = numpy.float64(0+1+2+3+4+5+6+7)/numpy.float64(8)
         mean = data.mean(direction=('horizontal_x','horizontal_y','vertical'))
         numpy.testing.assert_almost_equal(mean, expected)
-        mean = data.mean(axis=(0,1,2))
-        numpy.testing.assert_almost_equal(mean, expected)
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
             mean = data.mean(direction=0)  
@@ -1054,32 +1052,24 @@ class TestDataContainer(CCPiTestClass):
     def test_min_direction(self):
         ig = ImageGeometry(2,2,2)
         data = ig.allocate(0)
-        np_arr = data.as_array()
-        np_arr[0][0][0] = 0
-        np_arr[0][0][1] = 1
-        np_arr[0][1][0] = 2
-        np_arr[0][1][1] = 3
-        np_arr[1][0][0] = 4
-        np_arr[1][0][1] = 5
-        np_arr[1][1][0] = 6
-        np_arr[1][1][1] = 7
+        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         data.fill(np_arr)               
 
-        # test specifying min in multiple axes
-        min = data.min(axis=(0,1,2))
-        self.assertAlmostEqual(min, 0)  
+        # test specifying min in 3 axes
         min = data.min(direction=('vertical','horizontal_x','horizontal_y'))
-        self.assertAlmostEqual(min, 0) 
-        # test specifying min in a single axis
-        min = data.min(axis=0)
-        expected = [[numpy.float64(0), numpy.float64(1)],[numpy.float64(2), numpy.float64(3)]]          
-        numpy.testing.assert_almost_equal(min, expected)
+        self.assertAlmostEqual(min, 0)
+        # test specifying min in 2 axes
+        min = data.min(direction=('horizontal_y', 'vertical'))
+        numpy.testing.assert_almost_equal(min.as_array(), [0.0, 1.0]) 
+        # test specifying min in 1 axis
         min = data.min(direction='horizontal_x')
         expected = [[numpy.float64(0), numpy.float64(2)],[numpy.float64(4), numpy.float64(6)]]          
-        numpy.testing.assert_almost_equal(min, expected)
-        # test duplicate axis specification in direction and axis   
-        with numpy.testing.assert_raises(TypeError):
-            min = data.min(direction='vertical', axis=0)      
+        numpy.testing.assert_almost_equal(min.as_array(), expected)
+        numpy.testing.assert_equal(min.dimension_labels,('vertical','horizontal_y'))
+        # test specifying min in 1 axis using numpy axis argument
+        min = data.min(axis=0)
+        expected = [[numpy.float64(0), numpy.float64(1)],[numpy.float64(2), numpy.float64(3)]]          
+        numpy.testing.assert_almost_equal(min, expected)      
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
             min = data.min(direction=0)  
@@ -1097,32 +1087,25 @@ class TestDataContainer(CCPiTestClass):
     def test_max_direction(self):
         ig = ImageGeometry(2,2,2)
         data = ig.allocate(0)
-        np_arr = data.as_array()
-        np_arr[0][0][0] = 0
-        np_arr[0][0][1] = 1
-        np_arr[0][1][0] = 2
-        np_arr[0][1][1] = 3
-        np_arr[1][0][0] = 4
-        np_arr[1][0][1] = 5
-        np_arr[1][1][0] = 6
-        np_arr[1][1][1] = 7
+        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         data.fill(np_arr)            
 
-        # test specifying max in multiple axes
-        max = data.max(axis=(0,1,2))
-        self.assertAlmostEqual(max, 7)  
+        # test specifying max in 3 axes 
         max = data.max(direction=('vertical','horizontal_x','horizontal_y'))
-        self.assertAlmostEqual(max, 7) 
-        # test specifying max in a single axis
-        max = data.max(axis=0)
-        expected = [[numpy.float64(4), numpy.float64(5)],[numpy.float64(6), numpy.float64(7)]]          
-        numpy.testing.assert_almost_equal(max, expected)
+        self.assertAlmostEqual(max, 7)
+        # test specifying max in 2 axes
+        max = data.max(direction=('horizontal_y', 'vertical'))
+        numpy.testing.assert_almost_equal(max.as_array(), [6.0, 7.0])
+        numpy.testing.assert_equal(max.dimension_labels,('horizontal_x',)) 
+        # test specifying max in 1 axis
         max = data.max(direction='horizontal_x')
         expected = [[numpy.float64(1), numpy.float64(3)],[numpy.float64(5), numpy.float64(7)]]
-        numpy.testing.assert_almost_equal(max, expected)          
-        # test duplicate axis specification in direction and axis   
-        with numpy.testing.assert_raises(TypeError):
-            max = data.max(direction='vertical', axis=0)      
+        numpy.testing.assert_almost_equal(max.as_array(), expected)
+        numpy.testing.assert_equal(max.dimension_labels,('vertical','horizontal_y'))
+        # test specifying max in 1 axis using numpy axis argument
+        max = data.max(axis=0)
+        expected = [[numpy.float64(4), numpy.float64(5)],[numpy.float64(6), numpy.float64(7)]]          
+        numpy.testing.assert_almost_equal(max, expected)            
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
             max = data.max(direction=0)  

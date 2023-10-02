@@ -158,18 +158,18 @@ class BlockOperator(Operator):
 
         '''
         if len(norms)==len(self.operators):
-            if all(isinstance(i, Number) for i in norms):
-                if all( i>=0 for i in norms ):
+            if all(isinstance(i, Number) or i is None for i in norms):
+                if all(  k is None or k>=0 for k in norms ):
                     pass
                 else:
                     raise ValueError("Each number in the list should be positive")
             else: 
-                raise ValueError("Each element in the list of norms should be a number")
+                raise ValueError("Each element in the list of norms should be a number or None")
         else:
             raise ValueError("The length of the list of norms should be equal to the number of operators in the BlockOperator")
         
-        for i,value in enumerate(norms):
-            self.operators[i].set_norm(value)
+        for j,value in enumerate(norms):
+            self.operators[j].set_norm(value)
         
 
 

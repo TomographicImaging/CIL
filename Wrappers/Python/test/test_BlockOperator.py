@@ -36,8 +36,9 @@ class TestBlockOperator(unittest.TestCase):
 
         ig = ImageGeometry(N, M)
         G = GradientOperator(ig)
+        G2 = GradientOperator(ig)
         G.norm()
-        A=BlockOperator(G,G)
+        A=BlockOperator(G,G2)
 
         
         #calculates norm
@@ -47,10 +48,9 @@ class TestBlockOperator(unittest.TestCase):
         
 
         #sets_norm
-        A.set_norms([2,3])
+        A.set_norms([2,3]) #FIXME: ISSUE HERE!!! 
         #gets cached norm
-        self.assertAlmostEqual(A.norms()[0], 2, 2)
-        self.assertAlmostEqual(A.norms()[1], 3, 2)
+        self.assertListEqual(A.norms(), [2,3], 2)
         self.assertEqual(A.norm(), numpy.sqrt(13))
         
 
@@ -66,18 +66,21 @@ class TestBlockOperator(unittest.TestCase):
         self.assertAlmostEqual(A.norms()[1], numpy.sqrt(8), 2)
 
         #Check the warnings on set_norms 
+        #Check the length of list that is passed
         try:
             A.set_norms([1])
         except ValueError:
             pass
         else:
             self.assertTrue(False)
+        #Check that elements in the list are numbers or None 
         try:
             A.set_norms(['Banana', 'Apple'])
         except ValueError:
             pass
         else:
             self.assertTrue(False)
+        #Check that numbers in the list are positive
         try:
             A.set_norms([-1,-3])
         except ValueError:

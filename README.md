@@ -16,16 +16,23 @@ The documentation for CIL can be accessed [here](https://tomographicimaging.gith
 
 # Installation of CIL
 
-Binary installation of CIL can be done with `conda`. Install a new environment using:
+Binary installation of CIL can be achieved with conda or mamba. mamba's environment solver provides faster environment resolution than conda's so we recommend this route, although in many cases the default conda will still work but may be very slow.
+
+`miniconda` is a minimal installer for `conda`. Installation instructions can be found [here](https://docs.conda.io/projects/miniconda/en/latest/).
+You can then force your `conda` installation to use `libmamba` instructions are [here](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community)
+
+Alternatively, `mamba` can be installed via `https://github.com/conda-forge/miniforge` which is a minimal installer for `conda` with support for `mamba`.
+
+Install a new environment using:
 
 ```bash
-conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0
+conda/mamba create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```bash
-conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
+conda/mamba create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
 ```
 where,
 

@@ -16,7 +16,7 @@ The documentation for CIL can be accessed [here](https://tomographicimaging.gith
 
 # Installation of CIL
 
-Binary installation of CIL can be achieved with `conda` or `mamba`. `mamba`'s environment solver (`libmamba`) provides faster environment resolution than conda's so we recommend this route, although in many cases the default conda will still work but may be very slow.
+Binary installation of CIL can be achieved with `conda` or `mamba`. `mamba`'s environment solver (`libmamba`) provides faster environment resolution so we recommend this route, although in many cases the default `conda` will still work but may be very slow.
 
 `miniconda` is a minimal installer for `conda`. Installation instructions can be found [here](https://docs.conda.io/projects/miniconda/en/latest/).
 You can then force your `conda` installation to use `libmamba` instructions are [here](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community).

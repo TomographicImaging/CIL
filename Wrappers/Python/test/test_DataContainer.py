@@ -811,7 +811,9 @@ class TestDataContainer(CCPiTestClass):
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
             mean = data.mean(direction=0)  
-        # add a unit test to check the type is what you asked for
+        # test to check the type matches request
+        mean = data.mean(direction=('horizontal_y','vertical'), dtype=numpy.float32)
+        numpy.testing.assert_equal(type(mean.as_array()[0]), numpy.float32)
 
 
     def test_multiply_out(self):

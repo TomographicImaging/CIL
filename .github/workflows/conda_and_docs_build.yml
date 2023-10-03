@@ -51,7 +51,7 @@ jobs:
       uses: paskino/conda-package-publish-action@v1.4.4
       with:
         subDir: recipe
-        channels: -c conda-forge -c intel -c astra-toolbox -c ccpi
+        channels: -c conda-forge -c intel -c ccpi
         convert_win: false
         convert_osx: false
         test_pyver: 3.9
@@ -84,7 +84,7 @@ jobs:
         ARTIFACT_NAME: DocumentationHTML
         PACKAGE_FOLDER_PATH: conda_package
         PACKAGE_NAME: cil
-        PACKAGE_CONDA_CHANNELS: conda-forge -c intel -c astra-toolbox -c ccpi
+        PACKAGE_CONDA_CHANNELS: conda-forge -c intel -c ccpi
         BUILD_SUBDIR_NAME: nightly
         python_version: 3.9
   docs_publish:

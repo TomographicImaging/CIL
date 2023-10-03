@@ -21,7 +21,7 @@ Binary installation of CIL can be achieved with `conda` or `mamba`. `mamba`'s en
 `miniconda` is a minimal installer for `conda`. Installation instructions can be found [here](https://docs.conda.io/projects/miniconda/en/latest/).
 You can then force your `conda` installation to use `libmamba` instructions are [here](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community).
 
-Alternatively, `mamba` can be installed via `https://github.com/conda-forge/miniforge` which is another minimal installer for `conda` with optional support for `mamba`. In this case replace `conda` with `mamba` in the below commands.
+Alternatively, `mamba` can be installed via [`miniforge`](https://github.com/conda-forge/miniforge) which is another minimal installer for `conda` with optional support for `mamba`. In this case replace `conda` with `mamba` in the below commands.
 
 Install a new environment using:
 

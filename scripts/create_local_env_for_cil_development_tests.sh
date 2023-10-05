@@ -3,7 +3,7 @@
 #! /bin/bash
 
 
-name=cil_23.1.0_round2
+name=cil
 python=3.8
 numpy=1.21
 

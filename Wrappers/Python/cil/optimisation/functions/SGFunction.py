@@ -24,7 +24,7 @@ class SGFunction(ApproximateGradientSumFunction):
 
         Parameters:
         ----------
-        functions: list 
+        functions: list #TODO: should this be a list of functions or a block function?? 
             A list of functions.
         sampler: callable or None, optional
             A callable object that selects the function or batch of functions to compute the gradient. TODO: If None, a random function will be selected.
@@ -33,7 +33,7 @@ class SGFunction(ApproximateGradientSumFunction):
   
     def __init__(self, functions, sampler=None):
 
-        super(SGFunction, self).__init__(functions, sampler, data_passes=[0.])    
+        super(SGFunction, self).__init__(functions, sampler)    
 
     def approximate_gradient(self, function_num, x, out=None):
         

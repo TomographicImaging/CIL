@@ -347,6 +347,13 @@ class TestOperator(CCPiTestClass):
         #recalculates norm
         self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
 
+  
+        #Check that the provided element is a number or None 
+        with self.assertRaises(TypeError):
+            G.set_norm['Banana']
+        #Check that the provided norm is positive 
+        with self.assertRaises(ValueError):
+            G.set_norm(-1)
 
     def test_ProjectionMap(self):
         # Check if direct is correct

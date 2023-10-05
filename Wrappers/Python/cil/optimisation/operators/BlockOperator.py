@@ -146,25 +146,14 @@ class BlockOperator(Operator):
         '''
         norms= []
         for op in self.operators:
-            try:
-                norms.append(op.norm())
-            except:
-                    raise TypeError('Operator {} does not have a norm method'.format(op))
+            norms.append(op.norm())
         return norms
     
     def set_norms(self, norms):
         '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
-
-
         '''
-        if len(norms)==len(self.operators):
-            if all(isinstance(i, Number) or i is None for i in norms):
-                if all(  k is None or k>=0 for k in norms ):
-                    pass
-                else:
-                    raise ValueError("Each number in the list should be positive")
-            else: 
-                raise ValueError("Each element in the list of norms should be a number or None")
+        if len(norms)==len(self):
+            pass
         else:
             raise ValueError("The length of the list of norms should be equal to the number of operators in the BlockOperator")
         

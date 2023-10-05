@@ -37,11 +37,13 @@ class TestBlockOperator(unittest.TestCase):
         ig = ImageGeometry(N, M)
         G = GradientOperator(ig)
         G2 = GradientOperator(ig)
-        G.norm()
+        
         A=BlockOperator(G,G2)
 
         
         #calculates norm
+        self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
+        self.assertAlmostEqual(G2.norm(), numpy.sqrt(8), 2)
         self.assertAlmostEqual(A.norm(), numpy.sqrt(16), 2)
         self.assertAlmostEqual(A.norms()[0], numpy.sqrt(8), 2)
         self.assertAlmostEqual(A.norms()[1], numpy.sqrt(8), 2)
@@ -67,26 +69,15 @@ class TestBlockOperator(unittest.TestCase):
 
         #Check the warnings on set_norms 
         #Check the length of list that is passed
-        try:
+        with self.assertRaises(ValueError):
             A.set_norms([1])
-        except ValueError:
-            pass
-        else:
-            self.assertTrue(False)
         #Check that elements in the list are numbers or None 
-        try:
+        with self.assertRaises(TypeError):
             A.set_norms(['Banana', 'Apple'])
-        except ValueError:
-            pass
-        else:
-            self.assertTrue(False)
         #Check that numbers in the list are positive
-        try:
+        with self.assertRaises(ValueError):
             A.set_norms([-1,-3])
-        except ValueError:
-            pass
-        else:
-            self.assertTrue(False)    
+
 
 
 

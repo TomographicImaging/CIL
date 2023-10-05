@@ -788,10 +788,50 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(mean, expected)
 
 
+    def directional_reduction_unary_test(self, data, test_func, expected_func):
+
+            # test specifying mean in 1 axis
+            result = test_func(direction='horizontal_y')
+            numpy.testing.assert_almost_equal(result.as_array(), expected_func(data, axis=1))
+            numpy.testing.assert_equal(result.dimension_labels,('vertical','horizontal_x'))
+            result = test_func(axis=1)
+            numpy.testing.assert_almost_equal(result, expected_func(data, axis=1))
+            # test specifying mean in 2 axes
+            result = test_func(direction=('horizontal_y', 'vertical'))
+            numpy.testing.assert_almost_equal(result.as_array(), expected_func(data, axis=(0,1)))
+            numpy.testing.assert_equal(result.dimension_labels,('horizontal_x',))
+            # test specifying mean in 3 axes
+            result = test_func(direction=('horizontal_x','horizontal_y','vertical'))
+            numpy.testing.assert_almost_equal(result, expected_func(data))
+            # test specifying direction with an int   
+            with numpy.testing.assert_raises(ValueError):
+                result = test_func(direction=0)  
+
+
+    def test_directional_reduction_unary(self):
+        
+        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
+        dc =  DataContainer(np_arr, dimension_labels=('vertical', 'horizontal_y', 'horizontal_x'))
+        ig = ImageGeometry(2,2,2)
+        id = ig.allocate(0)
+        id.fill(np_arr)
+        id_complex = ig.allocate(0, dtype=complex)
+        np_arr = numpy.empty((2,2,2), dtype=complex)
+        np_arr.real = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
+        np_arr.imag = numpy.array([[[7,6],[5,4]],[[3,2],[1,0]]])
+        id_complex.fill(np_arr) 
+        
+        data_classes = [dc, id, id_complex]
+        for data in data_classes:
+            test_funcs = [data.mean, data.sum, data.min, data.max]
+            expected_funcs = [numpy.mean, numpy.sum, numpy.min, numpy.max]
+            for i in numpy.arange(len(test_funcs)):
+                self.directional_reduction_unary_test(data, test_funcs[i], expected_funcs[i])
+
     def test_reduction_mean_direction(self):
+        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         ig = ImageGeometry(2,2,2)
         data = ig.allocate(0)
-        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         data.fill(np_arr)
 
         # test specifying mean in 1 axis
@@ -814,7 +854,15 @@ class TestDataContainer(CCPiTestClass):
         # test to check the type matches request
         mean = data.mean(direction=('horizontal_y','vertical'), dtype=numpy.float32)
         numpy.testing.assert_equal(type(mean.as_array()[0]), numpy.float32)
+        # test mean on VectorData
+        np_arr = numpy.array([0,1,2,3,4])
+        vg = VectorGeometry(5)
+        vd = vg.allocate(0)
+        vd.fill(np_arr)
+        vd.dimension_labels = 'x'
+        numpy.testing.assert_almost_equal(vd.mean(direction='x'), numpy.mean(vd))
 
+        
 
     def test_multiply_out(self):
         ig = ImageGeometry(10,11,12)
@@ -1050,6 +1098,7 @@ class TestDataContainer(CCPiTestClass):
         d1 = ig.allocate(1)                                                     
         d1.fill(a)                                                     
         self.assertAlmostEqual(d1.min(), -10.)
+
 
     def test_min_direction(self):
         ig = ImageGeometry(2,2,2)

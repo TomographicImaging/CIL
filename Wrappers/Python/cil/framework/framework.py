@@ -3430,7 +3430,10 @@ class DataContainer(object):
         numpy.ndarray
         """
         if kwargs.get('dtype', None) is None:
-            kwargs['dtype'] = numpy.float64
+            if numpy.isrealobj(self.array):
+                kwargs['dtype'] = numpy.float64
+            else:
+                kwargs['dtype'] = numpy.complex128
 
         return self._directional_reduction_unary(numpy.mean, direction=direction, *args, **kwargs)
 

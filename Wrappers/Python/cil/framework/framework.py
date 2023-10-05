@@ -3358,6 +3358,22 @@ class DataContainer(object):
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
     def _directional_reduction_unary(self, pwop, direction=None, *args, **kwargs):
+        """
+        Returns the result of a unary function, considering a direction argument to the function
+        
+        Parameters
+        ----------
+        pwop : function 
+            The function to be evaluated
+        direction : string or tuple of strings
+            Specify the axis or axes to calculate the sum along using a dimension_label. 
+            Default calculates the function over the whole array
+        
+        Returns
+        -------
+        scalar or ndarray
+            The result of the unary function
+        """
         if direction is None:
             return  pwop(self.as_array(), *args, **kwargs)
         else:
@@ -3377,13 +3393,17 @@ class DataContainer(object):
     def sum(self, direction=None, *args, **kwargs):
         """
         Returns the sum of values in the DataContainer
+        
         Parameters
         ----------
         direction : string or tuple of strings
-            specify the axis or axes to calculate the sum along using a dimension_label.
+            Specify the axis or axes to calculate the sum along using a dimension_label. 
+            Default calculates the sum of the whole array
+        
         Returns
         -------
-        numpy.ndarray or scalar  
+        scalar or DataContainer
+            The sum as a scalar or inside a DataContainer with reduced dimension_labels
         """
         if kwargs.get('dtype', None) is None:
             kwargs['dtype'] = numpy.float64
@@ -3393,26 +3413,34 @@ class DataContainer(object):
     def min(self, direction=None, *args, **kwargs):
         """
         Returns the min pixel value in the DataContainer
+        
         Parameters
         ----------
         direction : string or tuple of strings
-            specify the axis or axes to calculate the minimum along using a dimension_label.
+            Specify the axis or axes to calculate the minimum along using a dimension_label.
+            Default calculates the min of the whole array
+        
         Returns
         -------
-        numpy.ndarray or scalar  
+        scalar or DataContainer
+            The min as a scalar or inside a DataContainer with reduced dimension_labels
         """
         return self._directional_reduction_unary(numpy.min, direction=direction, *args, **kwargs)
     
     def max(self, direction=None, *args, **kwargs):
         """
         Returns the max pixel value in the DataContainer
+
         Parameters
         ----------
         direction : string or tuple of strings
-            specify the axis or axes to calculate the maximum along using a dimension_label.
+            Specify the axis or axes to calculate the maximum along using a dimension_label.
+            Default calculates the max of the whole array
+        
         Returns
         -------
-        numpy.ndarray or scalar  
+        scalar or DataContainer 
+            The max as a scalar or inside a DataContainer with reduced dimension_labels 
         """
         return self._directional_reduction_unary(numpy.max, direction=direction, *args, **kwargs)
         
@@ -3423,11 +3451,13 @@ class DataContainer(object):
         Parameters
         ----------
         direction : string or tuple of strings, optional
-            specify the axis or axes to calculate the mean along using a dimension_label.
+            Specify the axis or axes to calculate the mean along using a dimension_label.
+            Default calculates the mean of the whole array
             
         Returns
         -------
-        numpy.ndarray
+        scalar or DataContainer
+            The mean as a scalar or inside a DataContainer with reduced dimension_labels
         """
         if kwargs.get('dtype', None) is None:
             if numpy.isrealobj(self.array):

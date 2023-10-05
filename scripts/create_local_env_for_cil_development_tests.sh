@@ -5,7 +5,7 @@
 
 name=cil
 python=3.8
-numpy=1.20
+numpy=1.21
 
 while getopts h:n:p:e:v: option
  do
@@ -41,12 +41,12 @@ fi
 
 set -x 
 
-${conda_cmd} -c conda-forge -c intel  -c ccpi/label/dev -c ccpi -c astra-toolbox -c astra-toolbox/label/dev \
-        python=$python numpy=$numpy \
-        cil-data tigre=2.2 ccpi-regulariser=21.0.0 tomophantom=2.0.0  astra-toolbox'>=1.9.9.dev5,<2.1' \
+${conda_cmd} python=$python numpy=$numpy \
+        cil-data tigre=2.4 ccpi-regulariser=22.0.0 tomophantom=2.0.0  astra-toolbox'>=1.9.9.dev5,<2.1' \
         cvxpy python-wget scikit-image packaging \
         cmake'>=3.16' setuptools  \
         ipp-include ipp-devel ipp \
         ipywidgets scipy matplotlib \
         h5py pillow libgcc-ng dxchange olefile pywavelets numba tqdm \
+        -c conda-forge -c intel  -c ccpi/label/dev -c ccpi -c astra-toolbox -c astra-toolbox/label/dev \
         --override-channels

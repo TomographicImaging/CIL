@@ -103,5 +103,5 @@ jobs:
       with:
         message: Update documentation
         branch: gh-pages
-        dir: docs/build
+        dir: docs/build/nightly
         nojekyll: true

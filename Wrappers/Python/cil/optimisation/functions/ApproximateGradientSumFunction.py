@@ -65,7 +65,6 @@ class ApproximateGradientSumFunction(SumFunction):
         else:
             self.sampler = sampler
 
-        self.functions_used = []
         self.num_functions = len(functions)
 
         super(ApproximateGradientSumFunction, self).__init__(*functions)
@@ -96,5 +95,4 @@ class ApproximateGradientSumFunction(SumFunction):
         """ Selects the next subset from the list of :code:`functions` using the :code:`sampler`."""
         self.function_num = self.sampler.next()
 
-        # append each function used at this iteration
-        self.functions_used.append(self.function_num)
+        

@@ -98,7 +98,7 @@ jobs:
       with:
         name: DocumentationHTML
         path: docs/build
-    - name: redirect to to nightly
+    - name: redirect to nightly
       run: |
         cat <<EOF > docs/build/index.html
         <!DOCTYPE html>

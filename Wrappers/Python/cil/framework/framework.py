@@ -3374,6 +3374,14 @@ class DataContainer(object):
         scalar or ndarray
             The result of the unary function
         """
+        if kwargs.get('dtype', None) is None:
+            if numpy.isrealobj(self.array):
+                kwargs['dtype'] = numpy.float64
+            else:
+                kwargs['dtype'] = numpy.complex128
+        else:
+            raise ValueError ("dtype argument is not allowed, calculation is performed with float64 or complex128 precision")
+
         if direction is None:
             return  pwop(self.as_array(), *args, **kwargs)
         else:
@@ -3381,12 +3389,12 @@ class DataContainer(object):
                 raise ValueError ("Incompatible arguments: specify either direction or axis")
             else:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-                out = pwop(self.as_array(), *args, **kwargs) 
+                out = (pwop(self.as_array(), *args, **kwargs)).astype(self.dtype)
         
             if isinstance(out, numpy.ndarray):
                 new_dimensions = numpy.array(self.dimension_labels)
                 new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-                out = DataContainer(out, dimension_labels=new_dimensions)
+                out = DataContainer(out, dimension_labels=new_dimensions).astype(self.dtype)           
 
             return out
 
@@ -3404,10 +3412,7 @@ class DataContainer(object):
         -------
         scalar or DataContainer
             The sum as a scalar or inside a DataContainer with reduced dimension_labels
-        """
-        if kwargs.get('dtype', None) is None:
-            kwargs['dtype'] = numpy.float64
-            
+        """           
         return self._directional_reduction_unary(numpy.sum, direction=direction, *args, **kwargs)
 
     def min(self, direction=None, *args, **kwargs):
@@ -3459,11 +3464,7 @@ class DataContainer(object):
         scalar or DataContainer
             The mean as a scalar or inside a DataContainer with reduced dimension_labels
         """
-        if kwargs.get('dtype', None) is None:
-            if numpy.isrealobj(self.array):
-                kwargs['dtype'] = numpy.float64
-            else:
-                kwargs['dtype'] = numpy.complex128
+        
 
         return self._directional_reduction_unary(numpy.mean, direction=direction, *args, **kwargs)
 

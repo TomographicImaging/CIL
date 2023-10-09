@@ -331,7 +331,7 @@ class FDK(GenericFilteredBackProjection):
         A description of the area/volume to reconstruct
     
     filter : string, numpy.ndarray, default='ram-lak'
-        The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+        The filter to be applied. Can be a string from: {'ram-lak', `shepp-logan`, `cosine`, `hamming`, `hann`}, or a numpy array.
 
     Example
     -------
@@ -430,7 +430,7 @@ class FBP(GenericFilteredBackProjection):
         A description of the area/volume to reconstruct
         
     filter : string, numpy.ndarray, default='ram-lak'
-        The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+        The filter to be applied. Can be a string from: {'ram-lak', `shepp-logan`, `cosine`, `hamming`, `hann`}, or a numpy array.
 
     backend : string
         The backend to use, can be 'astra' or 'tigre'. Data must be in the correct order for requested backend.

@@ -521,7 +521,7 @@ class ComponentDescription(object):
     @staticmethod  
     def create_vector(val):
         try:
-            vec = numpy.asarray(val, dtype=numpy.float64).reshape(len(val))
+            vec = numpy.array(val, dtype=numpy.float64).reshape(len(val))
         except:
             raise ValueError("Can't convert to numpy array")
    
@@ -1983,6 +1983,48 @@ class Configuration(object):
             print("Please configure the panel using the set_panel() method")
             configured = False
         return configured
+
+    def shift_detector_in_plane(self,
+                                          pixel_offset,
+                                          direction='horizontal'):
+        """
+        Adjusts the position of the detector in a specified direction within the imaging plane.
+
+        Parameters:
+        -----------
+        pixel_offset : float
+            The number of pixels to adjust the detector's position by.
+        direction : {'horizontal', 'vertical'}, optional
+            The direction in which to adjust the detector's position. Defaults to 'horizontal'.
+
+        Notes:
+        ------
+        - If `direction` is 'horizontal':
+            - If the panel's origin is 'left', positive offsets translate the detector to the right.
+            - If the panel's origin is 'right', positive offsets translate the detector to the left.
+
+        - If `direction` is 'vertical':
+            - If the panel's origin is 'bottom', positive offsets translate the detector upward.
+            - If the panel's origin is 'top', positive offsets translate the detector downward.
+
+        Returns:
+        --------
+        None
+        """
+
+        if direction == 'horizontal':
+            pixel_size = self.panel.pixel_size[0]
+            pixel_direction = self.system.detector.direction_x
+
+        elif direction == 'vertical':
+            pixel_size = self.panel.pixel_size[1]
+            pixel_direction = self.system.detector.direction_y
+
+        if 'bottom' in self.panel.origin or 'left' in self.panel.origin:
+            self.system.detector.position -= pixel_offset * pixel_direction * pixel_size
+        else:
+            self.system.detector.position += pixel_offset * pixel_direction * pixel_size
+
 
     def __str__(self):
         repres = ""

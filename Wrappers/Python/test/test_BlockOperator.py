@@ -237,7 +237,6 @@ class TestBlockOperator(unittest.TestCase):
         G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
         logging.info("{} {}".format(type(u), str(u.as_array())))    
         logging.info(str(G.direct(u).as_array()))
-
         # Gradient Operator norm, for one direction should be close to 2
         numpy.testing.assert_allclose(G.norm(), numpy.sqrt(4), atol=0.1)
 

@@ -1,3 +1,6 @@
+* xx.x.x
+  - bugfix
+    - proximal of MixedL21Norm with numpy backend
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

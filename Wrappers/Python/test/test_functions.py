@@ -408,9 +408,52 @@ class TestFunction(CCPiTestClass):
         # check they are the same
         np.testing.assert_allclose(res1, res2.as_array(), atol=1e-5, rtol=1e-6)
 
-    def test_MixedL21Norm_proximal_numpy(self):
-        assert True
+    def test_MixedL21Norm_proximal_step_numpy_float(self):
+        from cil.optimisation.functions.MixedL21Norm import _proximal_step_numpy
+        from cil.framework import ImageGeometry
+
+        tau = 1.1
         
+        ig = ImageGeometry(2,3,4)
+        tmp = ig.allocate(1)
+        a = _proximal_step_numpy(tmp, tau)
+
+        b = _proximal_step_numpy(tmp, -tau)
+
+        np.testing.assert_allclose(a.as_array(), b.as_array())
+
+    def test_MixedL21Norm_proximal_step_numpy_dc(self):
+        from cil.optimisation.functions.MixedL21Norm import _proximal_step_numpy
+        from cil.framework import ImageGeometry
+
+        
+        ig = ImageGeometry(2,3,4)
+        tmp = ig.allocate(1)
+        tau = ig.allocate(2)
+        a = _proximal_step_numpy(tmp, tau)
+        
+        tau *= -1
+        b = _proximal_step_numpy(tmp, tau)
+
+        np.testing.assert_allclose(a.as_array(), b.as_array())
+    
+    def test_MixedL21Norm_proximal_step_numpy_ndarray(self):
+        from cil.optimisation.functions.MixedL21Norm import _proximal_step_numpy
+        from cil.framework import ImageGeometry
+
+        
+        ig = ImageGeometry(2,3,4)
+        tmp = ig.allocate(1)
+        tau = ig.allocate(2)
+        tauarr = tau.as_array()
+        a = _proximal_step_numpy(tmp, tauarr)
+        
+        tauarr *= -1
+        b = _proximal_step_numpy(tmp, tauarr)
+
+        np.testing.assert_allclose(a.as_array(), b.as_array())
+    
+    
     def test_smoothL21Norm(self):
         ig = ImageGeometry(4, 5)
         bg = BlockGeometry(ig, ig)

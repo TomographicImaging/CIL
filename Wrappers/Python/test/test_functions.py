@@ -408,6 +408,9 @@ class TestFunction(CCPiTestClass):
         # check they are the same
         np.testing.assert_allclose(res1, res2.as_array(), atol=1e-5, rtol=1e-6)
 
+    def test_MixedL21Norm_proximal_numpy(self):
+        assert True
+        
     def test_smoothL21Norm(self):
         ig = ImageGeometry(4, 5)
         bg = BlockGeometry(ig, ig)

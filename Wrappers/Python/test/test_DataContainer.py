@@ -789,7 +789,6 @@ class TestDataContainer(CCPiTestClass):
 
 
     def directional_reduction_unary_test(self, data, test_func, expected_func, out):
-        
         # test specifying mean in 1 axis
         result = test_func(direction=data.dimension_labels[1])
         numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=1))
@@ -806,42 +805,48 @@ class TestDataContainer(CCPiTestClass):
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
             result = test_func(direction=0)
-        # test providing an out DataContainer
-        out_array = expected_func(data.as_array(), axis = 0)
-        # out.fill(out_array)
+        # test providing a DataContainer to out
+        expected_array = expected_func(data.as_array(), axis = 0)
         test_func(axis=0, out=out)
-        numpy.testing.assert_almost_equal(out.as_array(), out_array)
+        numpy.testing.assert_almost_equal(out.as_array(), expected_array)
         numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]))
-        
+        test_func(direction=data.dimension_labels[0], out=out)
+        numpy.testing.assert_almost_equal(out.as_array(), expected_array)
+        numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]))
+        # test providing a numpy array to out
+        out_array = numpy.zeros((2,2), dtype=data.dtype)
+        test_func(axis=0, out=out_array)
+        numpy.testing.assert_almost_equal(out_array, expected_array)
 
     def test_directional_reduction_unary(self):
-        
+        # create DataContainer test class
         dc =  DataContainer(numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]]), dimension_labels=('vertical', 'horizontal_y', 'horizontal_x'))
+        dc_out = DataContainer(numpy.zeros((2,2)),dimension_labels=('horizontal_y', 'horizontal_x'))
+        # create ImageData test class
         id = ImageGeometry(2,2,2).allocate(0)
         id.fill(numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]]))
+        id_out = ImageGeometry(2,2).allocate(0)
+        # create complex ImageData test class
         id_complex = ImageGeometry(2,2,2).allocate(0, dtype=complex)
         np_arr = numpy.empty((2,2,2), dtype=complex)
         np_arr.real = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         np_arr.imag = numpy.array([[[7,6],[5,4]],[[3,2],[1,0]]])
         id_complex.fill(np_arr) 
+        id_complex_out = ImageGeometry(2,2).allocate(0, dtype=complex)
+        id_complex_out.fill(numpy.zeros((2,2), dtype=complex))
+        # create AcquisitionData test class
         ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=2)).set_panel((2,2))
         ad = ag.allocate()
         ad.fill(numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]]))
-        data_classes = [dc, id, id_complex]
-
-        dc = DataContainer(numpy.zeros((2,2)),dimension_labels=('horizontal_y', 'horizontal_x'))
-        id = ImageGeometry(2,2).allocate(0)
-        id_complex = ImageGeometry(2,2).allocate(0, dtype=complex)
-        id_complex.fill(numpy.zeros((2,2), dtype=complex))
         ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=0)).set_panel((2,2))
-        ad = ag.allocate()
-        ad.fill(numpy.zeros((2,2)))
-        out_classes = [dc,id,id_complex]
+        ad_out = ag.allocate()
+        ad_out.fill(numpy.zeros((2,2)))
 
+        data_classes = [dc, id, id_complex, ad]
+        out_classes = [dc_out,id_out,id_complex_out, ad_out]
         for j in numpy.arange(len(data_classes)):
             test_funcs = [data_classes[j].mean, data_classes[j].sum, data_classes[j].min, data_classes[j].max]
             expected_funcs = [numpy.mean, numpy.sum, numpy.min, numpy.max]
-            
             for i in numpy.arange(len(test_funcs)):
                 self.directional_reduction_unary_test(data_classes[j], test_funcs[i], expected_funcs[i], out_classes[j])
 

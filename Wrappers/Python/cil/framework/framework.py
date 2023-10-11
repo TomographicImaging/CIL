@@ -3379,7 +3379,6 @@ class DataContainer(object):
             raise ValueError ("Incompatible arguments: specify either direction or axis")
 
         out = kwargs.get('out', None)  
-        kwargs['out'] = None
         
         if out is None:
             if direction is None:
@@ -3395,11 +3394,12 @@ class DataContainer(object):
                 return result                      
                     
         elif issubclass(type(out), DataContainer):
+            kwargs['out'] = None
             if direction is None:
                 result = pwop(self.as_array(), *args, **kwargs)
             else:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-                result = (pwop(self.as_array(), *args, **kwargs))
+                result = pwop(self.as_array(), *args, **kwargs)
             
             new_dimensions = numpy.array(self.dimension_labels)
             new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
@@ -3409,17 +3409,10 @@ class DataContainer(object):
                 raise ValueError('Data mismatch: out.shape = {} result.shape = {}, out.dimension_labels = {} result.dimension_labels = {}'.format(out.shape, result.shape, out.dimension_labels, new_dimensions))   
 
         elif issubclass(type(out), numpy.ndarray):
-            if direction is None:
-                result = pwop(self.as_array(), *args, **kwargs)
-            else:
+            if direction is not None:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-                result = (pwop(self.as_array(), *args, **kwargs))
+            pwop(self.as_array(), *args, **kwargs)
 
-            if self.array.shape == out.shape:
-                out = result.astype(out.dtype) # convert to the type given in out
-            else:
-                raise ValueError('Data mismatch: out.shape = {} result.shape = {}'.format(out.shape, result.shape))   
-        
         else:
             raise ValueError (message(type(self),  "Incompatible class:" , pwop.__name__, type(out)))
 

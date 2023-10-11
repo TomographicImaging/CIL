@@ -3382,17 +3382,17 @@ class DataContainer(object):
         kwargs['out'] = None
         
         if out is None:
-                if direction is None:
-                    result = pwop(self.as_array(), *args, **kwargs)
-                    return result
-                else:
-                    kwargs['axis'] = self.get_dimension_axis(direction)
-                    result = (pwop(self.as_array(), *args, **kwargs))  
-                    if isinstance(result, numpy.ndarray):
-                        new_dimensions = numpy.array(self.dimension_labels)
-                        new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-                        result = DataContainer(result, dimension_labels=new_dimensions)
-                    return result                      
+            if direction is None:
+                result = pwop(self.as_array(), *args, **kwargs)
+                return result
+            else:
+                kwargs['axis'] = self.get_dimension_axis(direction)
+                result = (pwop(self.as_array(), *args, **kwargs))  
+                if isinstance(result, numpy.ndarray):
+                    new_dimensions = numpy.array(self.dimension_labels)
+                    new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
+                    result = DataContainer(result, dimension_labels=new_dimensions)
+                return result                      
                     
         elif issubclass(type(out), DataContainer):
             if direction is None:

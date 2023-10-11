@@ -788,45 +788,63 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(mean, expected)
 
 
-    def directional_reduction_unary_test(self, data, test_func, expected_func):
-
-            # test specifying mean in 1 axis
-            result = test_func(direction='horizontal_y')
-            numpy.testing.assert_almost_equal(result.as_array(), expected_func(data, axis=1))
-            numpy.testing.assert_equal(result.dimension_labels,('vertical','horizontal_x'))
-            result = test_func(axis=1)
-            numpy.testing.assert_almost_equal(result, expected_func(data, axis=1))
-            # test specifying mean in 2 axes
-            result = test_func(direction=('horizontal_y', 'vertical'))
-            numpy.testing.assert_almost_equal(result.as_array(), expected_func(data, axis=(0,1)))
-            numpy.testing.assert_equal(result.dimension_labels,('horizontal_x',))
-            # test specifying mean in 3 axes
-            result = test_func(direction=('horizontal_x','horizontal_y','vertical'))
-            numpy.testing.assert_almost_equal(result, expected_func(data))
-            # test specifying direction with an int   
-            with numpy.testing.assert_raises(ValueError):
-                result = test_func(direction=0)  
-
+    def directional_reduction_unary_test(self, data, test_func, expected_func, out):
+        
+        # test specifying mean in 1 axis
+        result = test_func(direction=data.dimension_labels[1])
+        numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=1))
+        numpy.testing.assert_equal(result.dimension_labels,(data.dimension_labels[0],data.dimension_labels[2]))
+        result = test_func(axis=1)
+        numpy.testing.assert_almost_equal(result, expected_func(data.as_array(), axis=1))
+        # test specifying mean in 2 axes
+        result = test_func(direction=(data.dimension_labels[0],data.dimension_labels[1]))
+        numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)))
+        numpy.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],))
+        # test specifying mean in 3 axes
+        result = test_func(direction=(data.dimension_labels[0],data.dimension_labels[1],data.dimension_labels[2]))
+        numpy.testing.assert_almost_equal(result, expected_func(data.as_array()))
+        # test specifying direction with an int   
+        with numpy.testing.assert_raises(ValueError):
+            result = test_func(direction=0)
+        # test providing an out DataContainer
+        out_array = expected_func(data.as_array(), axis = 0)
+        # out.fill(out_array)
+        test_func(axis=0, out=out)
+        numpy.testing.assert_almost_equal(out.as_array(), out_array)
+        numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]))
+        
 
     def test_directional_reduction_unary(self):
         
-        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
-        dc =  DataContainer(np_arr, dimension_labels=('vertical', 'horizontal_y', 'horizontal_x'))
-        ig = ImageGeometry(2,2,2)
-        id = ig.allocate(0)
-        id.fill(np_arr)
-        id_complex = ig.allocate(0, dtype=complex)
+        dc =  DataContainer(numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]]), dimension_labels=('vertical', 'horizontal_y', 'horizontal_x'))
+        id = ImageGeometry(2,2,2).allocate(0)
+        id.fill(numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]]))
+        id_complex = ImageGeometry(2,2,2).allocate(0, dtype=complex)
         np_arr = numpy.empty((2,2,2), dtype=complex)
         np_arr.real = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         np_arr.imag = numpy.array([[[7,6],[5,4]],[[3,2],[1,0]]])
         id_complex.fill(np_arr) 
-        
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=2)).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]]))
         data_classes = [dc, id, id_complex]
-        for data in data_classes:
-            test_funcs = [data.mean, data.sum, data.min, data.max]
+
+        dc = DataContainer(numpy.zeros((2,2)),dimension_labels=('horizontal_y', 'horizontal_x'))
+        id = ImageGeometry(2,2).allocate(0)
+        id_complex = ImageGeometry(2,2).allocate(0, dtype=complex)
+        id_complex.fill(numpy.zeros((2,2), dtype=complex))
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=0)).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(numpy.zeros((2,2)))
+        out_classes = [dc,id,id_complex]
+
+        for j in numpy.arange(len(data_classes)):
+            test_funcs = [data_classes[j].mean, data_classes[j].sum, data_classes[j].min, data_classes[j].max]
             expected_funcs = [numpy.mean, numpy.sum, numpy.min, numpy.max]
+            
             for i in numpy.arange(len(test_funcs)):
-                self.directional_reduction_unary_test(data, test_funcs[i], expected_funcs[i])
+                self.directional_reduction_unary_test(data_classes[j], test_funcs[i], expected_funcs[i], out_classes[j])
+
 
     def test_reduction_mean_direction(self):
         np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
@@ -850,18 +868,14 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_almost_equal(mean, expected)
         # test specifying direction with an int   
         with numpy.testing.assert_raises(ValueError):
-            mean = data.mean(direction=0)  
-        # test to check the type matches request
-        mean = data.mean(direction=('horizontal_y','vertical'), dtype=numpy.float32)
-        numpy.testing.assert_equal(type(mean.as_array()[0]), numpy.float32)
+            mean = data.mean(direction=0)
         # test mean on VectorData
         np_arr = numpy.array([0,1,2,3,4])
         vg = VectorGeometry(5)
         vd = vg.allocate(0)
         vd.fill(np_arr)
         vd.dimension_labels = 'x'
-        numpy.testing.assert_almost_equal(vd.mean(direction='x'), numpy.mean(vd))
-
+        numpy.testing.assert_almost_equal(vd.mean(direction='x'), numpy.mean(vd))     
         
 
     def test_multiply_out(self):

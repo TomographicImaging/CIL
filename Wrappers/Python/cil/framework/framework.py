@@ -3374,29 +3374,54 @@ class DataContainer(object):
         scalar or ndarray
             The result of the unary function
         """
-        if kwargs.get('dtype', None) is None:
-            if numpy.isrealobj(self.array):
-                kwargs['dtype'] = numpy.float64
-            else:
-                kwargs['dtype'] = numpy.complex128
-        else:
-            raise ValueError ("dtype argument is not allowed, calculation is performed with float64 or complex128 precision")
 
-        if direction is None:
-            return  pwop(self.as_array(), *args, **kwargs)
-        else:
-            if kwargs.get('axis', None) is not None:
-                raise ValueError ("Incompatible arguments: specify either direction or axis")
+        if kwargs.get('axis', None) is not None and kwargs.get('direction', None) is not None:
+            raise ValueError ("Incompatible arguments: specify either direction or axis")
+
+        out = kwargs.get('out', None)  
+        kwargs['out'] = None
+        
+        if out is None:
+                if direction is None:
+                    result = pwop(self.as_array(), *args, **kwargs)
+                    return result
+                else:
+                    kwargs['axis'] = self.get_dimension_axis(direction)
+                    result = (pwop(self.as_array(), *args, **kwargs))  
+                    if isinstance(result, numpy.ndarray):
+                        new_dimensions = numpy.array(self.dimension_labels)
+                        new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
+                        result = DataContainer(result, dimension_labels=new_dimensions)
+                    return result                      
+                    
+        elif issubclass(type(out), DataContainer):
+            if direction is None:
+                result = pwop(self.as_array(), *args, **kwargs)
             else:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-                out = (pwop(self.as_array(), *args, **kwargs)).astype(self.dtype)
-        
-            if isinstance(out, numpy.ndarray):
-                new_dimensions = numpy.array(self.dimension_labels)
-                new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-                out = DataContainer(out, dimension_labels=new_dimensions).astype(self.dtype)           
+                result = (pwop(self.as_array(), *args, **kwargs))
+            
+            new_dimensions = numpy.array(self.dimension_labels)
+            new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
+            if result.shape == out.shape and new_dimensions == out.dimension_labels:
+                out.fill(result.astype(out.dtype)) # convert to the type given in out
+            else:
+                raise ValueError('Data mismatch: out.shape = {} result.shape = {}, out.dimension_labels = {} result.dimension_labels = {}'.format(out.shape, result.shape, out.dimension_labels, new_dimensions))   
 
-            return out
+        elif issubclass(type(out), numpy.ndarray):
+            if direction is None:
+                result = pwop(self.as_array(), *args, **kwargs)
+            else:
+                kwargs['axis'] = self.get_dimension_axis(direction)
+                result = (pwop(self.as_array(), *args, **kwargs))
+
+            if self.array.shape == out.shape:
+                out = result.astype(out.dtype) # convert to the type given in out
+            else:
+                raise ValueError('Data mismatch: out.shape = {} result.shape = {}'.format(out.shape, result.shape))   
+        
+        else:
+            raise ValueError (message(type(self),  "Incompatible class:" , pwop.__name__, type(out)))
 
     def sum(self, direction=None, *args, **kwargs):
         """
@@ -3404,15 +3429,28 @@ class DataContainer(object):
         
         Parameters
         ----------
-        direction : string or tuple of strings
+        direction : string or tuple of strings, optional
             Specify the axis or axes to calculate the sum along using a dimension_label. 
-            Default calculates the sum of the whole array
+            Default is None, calculates the sum of the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            Default is None
         
         Returns
         -------
         scalar or DataContainer
             The sum as a scalar or inside a DataContainer with reduced dimension_labels
-        """           
+            Default is to accumulate and return data as float64 or complex128
+        """     
+        if kwargs.get('dtype', None) is not None:
+            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        
+        if numpy.isrealobj(self.array):
+            kwargs['dtype'] = numpy.float64
+        else:
+            kwargs['dtype'] = numpy.complex128
+
         return self._directional_reduction_unary(numpy.sum, direction=direction, *args, **kwargs)
 
     def min(self, direction=None, *args, **kwargs):
@@ -3421,9 +3459,13 @@ class DataContainer(object):
         
         Parameters
         ----------
-        direction : string or tuple of strings
+        direction : string or tuple of strings, optional
             Specify the axis or axes to calculate the minimum along using a dimension_label.
-            Default calculates the min of the whole array
+            Default is None, calculates the min of the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            Default is None
         
         Returns
         -------
@@ -3438,9 +3480,13 @@ class DataContainer(object):
 
         Parameters
         ----------
-        direction : string or tuple of strings
+        direction : string or tuple of strings, optional
             Specify the axis or axes to calculate the maximum along using a dimension_label.
-            Default calculates the max of the whole array
+            Default is None, calculates the max of the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            Default is None
         
         Returns
         -------
@@ -3457,15 +3503,27 @@ class DataContainer(object):
         ----------
         direction : string or tuple of strings, optional
             Specify the axis or axes to calculate the mean along using a dimension_label.
-            Default calculates the mean of the whole array
+            Default is none, calculates the mean of the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            Default is None
             
         Returns
         -------
         scalar or DataContainer
             The mean as a scalar or inside a DataContainer with reduced dimension_labels
+            Default is to accumulate and return data as float64 or complex128
         """
         
-
+        if kwargs.get('dtype', None) is not None:
+            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        
+        if numpy.isrealobj(self.array):
+            kwargs['dtype'] = numpy.float64
+        else:
+            kwargs['dtype'] = numpy.complex128
+        
         return self._directional_reduction_unary(numpy.mean, direction=direction, *args, **kwargs)
 
     # Logic operators between DataContainers and floats    

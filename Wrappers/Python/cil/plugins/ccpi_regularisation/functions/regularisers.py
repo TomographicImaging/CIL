@@ -28,6 +28,7 @@ except ImportError as ie:
 
 
 from cil.framework import DataOrder
+from cil.framework import DataContainer
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
@@ -269,7 +270,7 @@ class FGP_TV(TV_Base):
             self.alpha *= scalar
             return self
     def check_input(self, input):
-        if input.geometry.length > 3:
+        if len(input.shape) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
         
 class TGV(RegulariserFunction):
@@ -350,9 +351,9 @@ class TGV(RegulariserFunction):
         # f = alpha * f
 
     def check_input(self, input):
-        if len(input.dimension_labels) == 2:
+        if len(input.shape) == 2:
             self.LipshitzConstant = 12
-        elif len(input.dimension_labels) == 3:
+        elif len(input.shape) == 3:
             self.LipshitzConstant = 16 # Vaggelis to confirm
         else:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
@@ -430,7 +431,7 @@ class FGP_dTV(RegulariserFunction):
             return self
 
     def check_input(self, input):
-        if input.geometry.length > 3:
+        if len(input.shape) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
 
 class TNV(RegulariserFunction):
@@ -455,9 +456,9 @@ class TNV(RegulariserFunction):
         return np.nan
     
     def proximal_numpy(self, in_arr, tau):
-        if in_arr.ndim != 3:
-            # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/413c6001003c6f1272aeb43152654baaf0c8a423/src/Python/src/cpu_regularisers.pyx#L584-L588
-            raise ValueError('Only 3D data is supported. Passed data has {} dimensions'.format(in_arr.ndim))
+        # remove any dimension of size 1
+        in_arr = np.squeeze(in_arr)
+            
         res = regularisers.TNV(in_arr, 
               self.alpha * tau,
               self.max_iteration,
@@ -480,8 +481,14 @@ class TNV(RegulariserFunction):
 
     def check_input(self, input):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
-        DataOrder.check_order_for_engine('cil', input.geometry)
-        if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
-            raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
+        if isinstance(input, DataContainer):
+            DataOrder.check_order_for_engine('cil', input.geometry)
+            if ( input.geometry.channels == 1 ) or ( not input.geometry.ndim == 3) :
+                raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
+        else:
+            # if it is not a CIL DataContainer we assume that the data is passed in the correct order
+            # discard any dimension of size 1
+            if sum(1 for i in input.shape if i!=1) != 3:
+                raise ValueError('TNV requires 3D data (with channel as first axis). Got {}'.format(input.shape))
         
 

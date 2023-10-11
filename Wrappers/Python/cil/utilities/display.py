@@ -845,12 +845,12 @@ class _ShowGeometry(object):
 
         #mark data origin
         if 'right' in self.acquisition_geometry.config.panel.origin:
-            if 'bottom' in self.acquisition_geometry.config.panel.origin:
+            if self.ndim==2 or 'bottom' in self.acquisition_geometry.config.panel.origin:
                 pix0 = det[0]
             else:
                 pix0 = det[3]
         else:
-            if 'bottom' in self.acquisition_geometry.config.panel.origin:
+            if self.ndim==2 or 'bottom' in self.acquisition_geometry.config.panel.origin:
                 pix0 = det[1]
             else:
                 pix0 = det[2]

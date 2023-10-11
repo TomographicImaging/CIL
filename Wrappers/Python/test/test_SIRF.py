@@ -28,17 +28,29 @@ from cil.optimisation.operators import GradientOperator, LinearOperator
 from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
 from cil.optimisation.algorithms import FISTA
 
+import os
+from cil.utilities.display import show2D  
+
 from testclass import CCPiTestClass
+from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
 
 initialise_tests()
 
 try:
     import sirf.STIR as pet
     import sirf.Gadgetron as mr
+    import sirf.Reg as reg
     from sirf.Utilities import examples_data_path
+    
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
+
+if has_ccpi_regularisation:
+    from ccpi.filters import regularisers
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, FGP_dTV, TNV
+
+
 
 class KullbackLeiblerSIRF(object):
 
@@ -295,7 +307,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
         bdc = BlockDataContainer(image1, image2)
         bdc1 = bdc.divide(1.)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
 
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
@@ -316,7 +330,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
         bdc = BlockDataContainer(image1, image2)
         bdc1 = bdc.multiply(1.)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
     
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
@@ -340,7 +356,9 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
         bdc = BlockDataContainer(image1, image2)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
 
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
@@ -360,10 +378,111 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
         bdc = BlockDataContainer(image1, image2)
 
-        self.assertBlockDataContainerEqual(bdc , bdc1)
+        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        np.testing.assert_allclose(bdc.get_item(0).as_array(), bdc1.get_item(0).as_array())
+        np.testing.assert_allclose(bdc.get_item(1).as_array(), bdc1.get_item(1).as_array())
 
 
 
+class CCPiRegularisationWithSIRFTests():
+    
+    def setUpFGP_TV(self, max_iteration=100, alpha=1.):
+        return alpha*FGP_TV(max_iteration=max_iteration)
 
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_FGP_TV_call_works(self):
+        regulariser = self.setUpFGP_TV()
+        output_number = regulariser(self.image1)
+        self.assertTrue(True)
+        # TODO: test the actual value
+        # expected = 160600016.0
+        # np.testing.assert_allclose(output_number, expected, rtol=1e-5)
+    
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_FGP_TV_proximal_works(self):
+        regulariser = self.setUpFGP_TV()
+        solution = regulariser.proximal(x=self.image1, tau=1)
+        self.assertTrue(True)
 
+    # TGV
+    def setUpTGV(self, max_iteration=100, alpha=1.):
+        return alpha * TGV(max_iteration=max_iteration)
 
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_TGV_call_works(self):
+        regulariser = self.setUpTGV()
+        output_number = regulariser(self.image1)
+        self.assertTrue(True)
+
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_TGV_proximal_works(self):
+        regulariser = self.setUpTGV()
+        solution = regulariser.proximal(x=self.image1, tau=1)
+        self.assertTrue(True)
+        
+    # dTV
+    def setUpdTV(self, max_iteration=100, alpha=1.):
+        return alpha * FGP_dTV(reference=self.image2, max_iteration=max_iteration)
+
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_TGV_call_works(self):
+        regulariser = self.setUpTGV()
+        output_number = regulariser(self.image1)
+        self.assertTrue(True)
+
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_TGV_proximal_works(self):
+        regulariser = self.setUpTGV()
+        solution = regulariser.proximal(x=self.image1, tau=1)
+        self.assertTrue(True)
+
+    # TNV
+    def setUpTNV(self, max_iteration=100, alpha=1.):
+        return alpha * TNV(max_iteration=max_iteration)
+
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_TNV_call_works(self):
+        new_shape = [ i for i in self.image1.shape if i!=1]
+        if len(new_shape) == 3:
+            regulariser = self.setUpTNV()
+            output_number = regulariser(self.image1)
+            self.assertTrue(True)
+
+    @unittest.skipUnless(has_sirf and has_ccpi_regularisation, "Has SIRF and CCPi Regularisation")
+    def test_TNV_proximal_works(self):
+        new_shape = [ i for i in self.image1.shape if i!=1]
+        if len(new_shape) == 3:
+            regulariser = self.setUpTNV()
+            solution = regulariser.proximal(x=self.image1, tau=1.)
+            self.assertTrue(True)
+
+class TestPETRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
+    skip_TNV_on_2D = True
+    def setUp(self):
+        self.image1 = pet.ImageData(os.path.join(
+            examples_data_path('PET'),'thorax_single_slice','emission.hv'
+            ))
+        self.image2 = self.image1 * 0.5
+
+    @unittest.skipIf(skip_TNV_on_2D, "TNV not implemented for 2D")
+    def test_TNV_call_works(self):
+        super().test_TNV_call_works()
+    
+    @unittest.skipIf(skip_TNV_on_2D, "TNV not implemented for 2D")
+    def test_TNV_proximal_works(self):
+        super().test_TNV_proximal_works()
+        
+class TestRegRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
+    def setUp(self):
+        self.image1 = reg.ImageData(os.path.join(examples_data_path('Registration'),'test2.nii.gz'))
+        self.image2 = self.image1 * 0.5
+
+class TestMRRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
+    def setUp(self):
+        acq_data = mr.AcquisitionData(os.path.join(examples_data_path('MR'),'simulated_MR_2D_cartesian.h5'))
+        preprocessed_data = mr.preprocess_acquisition_data(acq_data)
+        recon = mr.FullySampledReconstructor()
+        recon.set_input(preprocessed_data)
+        recon.process()
+        self.image1 = recon.get_output()
+        self.image2 = self.image1 * 0.5

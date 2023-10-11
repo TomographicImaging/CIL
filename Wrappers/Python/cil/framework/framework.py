@@ -126,7 +126,6 @@ class Partitioner(object):
             ag = self.geometry.copy()
             ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
             ags.append(ag)
-        
         return BlockGeometry(*ags)
 
     def partition(self, num_batches, mode, seed=None):
@@ -200,8 +199,11 @@ class Partitioner(object):
             
         for i in range(num_batches):
             out[i].fill(
-                numpy.take(self.array, partition_indices[i], axis=axis)
+                numpy.squeeze(
+                    numpy.take(self.array, partition_indices[i], axis=axis)
+                )
             )
+ 
         return out
          
     def _partition_random_permutation(self, num_batches, seed=None):
@@ -519,7 +521,7 @@ class ComponentDescription(object):
     @staticmethod  
     def create_vector(val):
         try:
-            vec = numpy.asarray(val, dtype=numpy.float64).reshape(len(val))
+            vec = numpy.array(val, dtype=numpy.float64).reshape(len(val))
         except:
             raise ValueError("Can't convert to numpy array")
    
@@ -1982,6 +1984,48 @@ class Configuration(object):
             configured = False
         return configured
 
+    def shift_detector_in_plane(self,
+                                          pixel_offset,
+                                          direction='horizontal'):
+        """
+        Adjusts the position of the detector in a specified direction within the imaging plane.
+
+        Parameters:
+        -----------
+        pixel_offset : float
+            The number of pixels to adjust the detector's position by.
+        direction : {'horizontal', 'vertical'}, optional
+            The direction in which to adjust the detector's position. Defaults to 'horizontal'.
+
+        Notes:
+        ------
+        - If `direction` is 'horizontal':
+            - If the panel's origin is 'left', positive offsets translate the detector to the right.
+            - If the panel's origin is 'right', positive offsets translate the detector to the left.
+
+        - If `direction` is 'vertical':
+            - If the panel's origin is 'bottom', positive offsets translate the detector upward.
+            - If the panel's origin is 'top', positive offsets translate the detector downward.
+
+        Returns:
+        --------
+        None
+        """
+
+        if direction == 'horizontal':
+            pixel_size = self.panel.pixel_size[0]
+            pixel_direction = self.system.detector.direction_x
+
+        elif direction == 'vertical':
+            pixel_size = self.panel.pixel_size[1]
+            pixel_direction = self.system.detector.direction_y
+
+        if 'bottom' in self.panel.origin or 'left' in self.panel.origin:
+            self.system.detector.position -= pixel_offset * pixel_direction * pixel_size
+        else:
+            self.system.detector.position += pixel_offset * pixel_direction * pixel_size
+
+
     def __str__(self):
         repres = ""
         if self.configured:
@@ -2111,7 +2155,6 @@ class AcquisitionGeometry(object):
                      AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
                      AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
                      AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
-
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -2950,12 +2993,12 @@ class DataContainer(object):
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
         
-        if new_order is None returns the labels of the axes as a sorted-by-key list
-        if new_order is a list of length number_of_dimensions, returns a list
+        If new_order is None returns the labels of the axes as a sorted-by-key list.
+        If new_order is a list of length number_of_dimensions, returns a list
         with the indices of the axes in new_order with respect to those in 
         self.dimension_labels: i.e.
-          self.dimension_labels = {0:'horizontal',1:'vertical'}
-          new_order = ['vertical','horizontal']
+          >>> self.dimension_labels = {0:'horizontal',1:'vertical'}
+          >>> new_order = ['vertical','horizontal']
           returns [1,0]
         '''
         if new_order is None:
@@ -3083,19 +3126,18 @@ class DataContainer(object):
         out : return DataContainer, if None a new DataContainer is returned, default None. 
             out can be self or y.
         num_threads : number of threads to use during the calculation, using the CIL C library
+            It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.
         
-        It will try to use the CIL C library and default to numpy operations, in case the C library does
-        not handle the types.
         
-        Example:
+        Example
         -------
 
-        a = 2
-        b = 3
-        ig = ImageGeometry(10,11)
-        x = ig.allocate(1)
-        y = ig.allocate(2)
-        out = x.sapyb(a,y,b)
+        >>> a = 2
+        >>> b = 3
+        >>> ig = ImageGeometry(10,11)
+        >>> x = ig.allocate(1)
+        >>> y = ig.allocate(2)
+        >>> out = x.sapyb(a,y,b)
         '''
         ret_out = False
         
@@ -3286,11 +3328,8 @@ class DataContainer(object):
         return numpy.sqrt(self.squared_norm(**kwargs))
     
     def dot(self, other, *args, **kwargs):
-        '''return the inner product of 2 DataContainers viewed as vectors
-        
-        applies to real and complex data. In such case the dot method returns
-
-        a.dot(b.conjugate())
+        '''returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+          For complex data,  the dot method returns a.dot(b.conjugate())
         '''
         method = kwargs.get('method', 'numpy')
         if method not in ['numpy','reduce']:

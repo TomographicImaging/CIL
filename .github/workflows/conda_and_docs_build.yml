@@ -1,29 +1,27 @@
 #  -*- coding: utf-8 -*-
 # Copyright 2021 United Kingdom Research and Innovation
 # Copyright 2021 The University of Manchester
-    
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-    
+
 #     http://www.apache.org/licenses/LICENSE-2.0
-    
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-    
+
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
 name: conda_and_docs_build
-
 on:
   release:
     types: [published]
   push:
-    branches: [ master ]
+    branches: [master]
     tags:
       - '**'
     paths-ignore:
@@ -33,9 +31,8 @@ on:
     - 'scripts/**'
     - 'NOTICE.txt'
     - 'README.md'
-
   pull_request:
-    branches: [ master ]
+    branches: [master]
     paths-ignore:
     - 'CHANGELOG.md'
     - 'CITATION.cff'
@@ -43,25 +40,24 @@ on:
     - 'scripts/**'
     - 'NOTICE.txt'
     - 'README.md'
-
 jobs:
   conda_build:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: conda-build
       uses: paskino/conda-package-publish-action@v1.4.4
       with:
-        subDir: 'recipe'
-        channels: '-c conda-forge -c intel -c astra-toolbox -c ccpi'
+        subDir: recipe
+        channels: -c conda-forge -c intel -c ccpi
         convert_win: false
         convert_osx: false
         test_pyver: 3.9
         test_npver: 1.22
     - name: Upload artifact of the conda package.
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3
       with:
         name: cil-package
         path: recipe/linux-64/cil*
@@ -69,56 +65,48 @@ jobs:
     needs: conda_build
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: change directory
-      run: |
-        ls
+    - run: ls
     - name: Download artifact of the conda package.
-      uses: actions/download-artifact@v3.0.1
+      uses: actions/download-artifact@v3
       with:
-        name: 'cil-package'
+        name: cil-package
         path: 'conda_package'
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.9
     - uses: lauramurgatroyd/build-sphinx-action@v0.1.4
       with:
-        DOCS_PATH: 'docs'
-        CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'
-        ARTIFACT_NAME: 'DocumentationHTML'
-        PACKAGE_FOLDER_PATH: 'conda_package'
-        PACKAGE_NAME: 'cil'
-        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox -c ccpi'
-        BUILD_SUBDIR_NAME: 'nightly'
+        DOCS_PATH: docs
+        CONDA_BUILD_ENV_FILEPATH: docs/docs_environment.yml
+        ARTIFACT_NAME: DocumentationHTML
+        PACKAGE_FOLDER_PATH: conda_package
+        PACKAGE_NAME: cil
+        PACKAGE_CONDA_CHANNELS: conda-forge -c intel -c ccpi
+        BUILD_SUBDIR_NAME: nightly
         python_version: 3.9
   docs_publish:
     needs: docs_build
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
     - name: Download artifact of the html output.
-      uses: actions/download-artifact@v3.0.1
+      uses: actions/download-artifact@v3
       with:
         name: DocumentationHTML
         path: docs/build
-    - name: Commit documentation changes
-      run: |
-        git clone https://github.com/TomographicImaging/CIL.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/build/* gh-pages/
-        cd gh-pages
-        touch .nojekyll
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add .
-        git commit -m "Update documentation" -a || true
-        # The above command will fail if no changes were present, so we ignore
-        # that.
+    - name: redirect to nightly
+      run: >
+        sed 's#DESTINATION#https://tomographicimaging.github.io/CIL/nightly/#g'
+        docs/.redirect-template.html
+        > docs/build/index.html
     - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
+      uses: casperdcl/push-dir@v1
       with:
+        message: Update documentation
         branch: gh-pages
-        directory: gh-pages
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-
+        dir: docs/build
+        nojekyll: true

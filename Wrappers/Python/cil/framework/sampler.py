@@ -92,7 +92,15 @@ class Sampler():
     4
     [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
 
+    Note
+    -----
+    The optimal choice of sampler depends on the data and the number of calls to the sampler. 
 
+    For random sampling with replacement, there is the possibility, with a small number of calls to the sampler that some indices will not have been selected. For the case of uniform probabilities, the default, the number of
+    iterations required such that the probability that all indices have been selected at least once is greater than :math:`p` grows as :math:`nlog(n/p)` where `n` is `num_subsets`. 
+    For example, to be 99% certain that you have seen all indices, for `n=20` you should take at least 152 samples, `n=50` at least 426 samples. To be more likely than not, for `n=20` you should take 78 samples and `n=50` you should take 228 samples. 
+    In general, we note that for a large number of samples (e.g. `>20*num_subsets`), the density of the outputted samples looks more and more uniform. For a small number of samples (e.g. `<5*num_subsets`) the user may wish to consider
+    another sampling method e.g. random without replacement, which, when calling `num_subsets` samples is guaranteed to see each index exactly once.  
 
     """
 

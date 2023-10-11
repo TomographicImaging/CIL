@@ -58,12 +58,9 @@ class ApproximateGradientSumFunction(SumFunction):
 
     """
 
-    def __init__(self, functions, sampler=None, initial=None):
+    def __init__(self, functions, sampler, initial=None):
 
-        if sampler is None:
-            raise NotImplementedError
-        else:
-            self.sampler = sampler
+        self.sampler = sampler
 
         self.num_functions = len(functions)
 

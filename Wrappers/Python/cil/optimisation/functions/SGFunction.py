@@ -16,6 +16,7 @@
 #   limitations under the License.
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
+import BlockFunction
 
 class SGFunction(ApproximateGradientSumFunction):
 
@@ -24,16 +25,22 @@ class SGFunction(ApproximateGradientSumFunction):
 
         Parameters:
         ----------
-        functions: list #TODO: should this be a list of functions or a block function?? 
+        functions: list or BlockFunction 
             A list of functions.
         sampler: callable or None, optional
-            A callable object that selects the function or batch of functions to compute the gradient. TODO: If None, a random function will be selected.
+            A callable object that selects the function or batch of functions to compute the gradient. 
             
      """
   
-    def __init__(self, functions, sampler=None):
-
-        super(SGFunction, self).__init__(functions, sampler)    
+    def __init__(self, functions, sampler):
+        if isinstance(functions, list):
+            super(SGFunction, self).__init__(functions, sampler)    
+        elif isinstance(functions, BlockFunction):
+            super(SGFunction, self).__init__(functions.operators(), sampler)
+        else:
+            raise TypeError("Input to functions should be a list of functions or a BlockFunction")
+    
+    
 
     def approximate_gradient(self, function_num, x, out=None):
         

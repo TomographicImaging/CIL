@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
-import BlockFunction
+from .BlockFunction import BlockFunction
 
 class SGFunction(ApproximateGradientSumFunction):
 
@@ -36,7 +36,7 @@ class SGFunction(ApproximateGradientSumFunction):
         if isinstance(functions, list):
             super(SGFunction, self).__init__(functions, sampler)    
         elif isinstance(functions, BlockFunction):
-            super(SGFunction, self).__init__(functions.operators(), sampler)
+            super(SGFunction, self).__init__(*functions.functions, sampler)
         else:
             raise TypeError("Input to functions should be a list of functions or a BlockFunction")
     

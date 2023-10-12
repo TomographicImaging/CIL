@@ -2521,11 +2521,20 @@ class TestMasker(unittest.TestCase):
         self.mask_manual = DataContainer(mask_manual, dimension_labels=self.data.dimension_labels) 
         self.mask_generated = MaskGenerator.special_values()(self.data)
 
+        # make a copy of mask_manual with 1s and 0s instead of bools:
+        mask_int_manual = mask_manual.astype(numpy.int32)
+        self.mask_int_manual = DataContainer(mask_int_manual, dimension_labels=self.data.dimension_labels)
+
+
     def test_Masker_Manual(self):
         self.Masker_check(self.mask_manual, self.data, self.data_init)
 
     def test_Masker_generated(self):
         self.Masker_check(self.mask_generated, self.data, self.data_init)
+
+    def test_Masker_doesnt_accept_integer_masks(self):
+        with self.assertRaises(TypeError):
+            self.Masker_check(mask=self.mask_int_manual)
 
     def Masker_check(self, mask, data, data_init): 
 

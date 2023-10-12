@@ -153,11 +153,11 @@ class Masker(DataProcessor):
         except:
             mask_arr = self.mask
 
-        try:
-            mask_invert = ~mask_arr
-        except TypeError:
+        if mask_arr.dtype != bool:
             raise TypeError("Mask expected to be a boolean array got {}".format(mask_arr.dtype))
-
+        
+        mask_invert = ~mask_arr
+            
         try:
             axis_index = data.dimension_labels.index(self.axis)             
         except:

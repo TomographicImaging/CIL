@@ -22,7 +22,7 @@ from cil.optimisation.algorithms import Algorithm
 import numpy as np
 import warnings
 import logging
-from sampler import Sampler
+from cil.optimisation.algorithms import Sampler
 from numbers import Number
 
 

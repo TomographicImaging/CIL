@@ -67,7 +67,7 @@ class ApproximateGradientSumFunction(SumFunction):
         super(ApproximateGradientSumFunction, self).__init__(*functions)
 
     def __call__(self, x):
-        r""" TODO: """
+        r""" Computes the full sum at :code:`x`. It is the sum of the outputs for each function.  """
         return super(ApproximateGradientSumFunction, self).__call__(x)
 
     def full_gradient(self, x, out=None):
@@ -79,8 +79,8 @@ class ApproximateGradientSumFunction(SumFunction):
         raise NotImplemented
 
     def gradient(self, x, out=None):
-        """ Computes the gradient for each selected function at :code:`x`."""
-        self.next_function()
+        """ Selects a random function and uses this to calculate the approximate gradient at :code:`x`."""
+        self.function_num = next(self.sampler)
 
         # single function
         if isinstance(self.function_num, numbers.Number):
@@ -88,8 +88,5 @@ class ApproximateGradientSumFunction(SumFunction):
         else:
             raise ValueError("Batch gradient is not yet implemented")
 
-    def next_function(self):
-        """ Selects the next subset from the list of :code:`functions` using the :code:`sampler`."""
-        self.function_num = self.sampler.next()
 
         

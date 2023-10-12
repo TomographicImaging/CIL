@@ -1,3 +1,5 @@
+* x.x.x
+  - Check that mask input to Masker is of type 'bool'
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
@@ -113,7 +115,7 @@
   - Recon.FBP allows 'astra' backend 
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
-  - Geometry alignmentment fix for 2D datasets
+  - Geometry alignment fix for 2D datasets
   - CGLS update for sapyb to enable complex data, bugfix in use of initial 
   - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
   - Allow use of square brackets in file paths to TIFF and Nikon datasets
@@ -156,7 +158,7 @@
   - Fixed bug in Zeiss reader geometry direction of rotation
   
 * 21.0.0
-  - Show2D now takes 4D datasets and slice infomation as input
+  - Show2D now takes 4D datasets and slice information as input
   - TIGRE reconstruction package wrapped for cone-beam tomography
   - Datacontainers have get_slice method which returns a dataset with a single slice of the data
   - Datacontainers have reorder method which reorders the data in memory as requested, or for use with 'astra' or 'tigre'

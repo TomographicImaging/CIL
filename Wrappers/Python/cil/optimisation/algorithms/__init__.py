@@ -26,3 +26,4 @@ from .FISTA import ISTA
 from .PDHG import PDHG
 from .ADMM import LADMM
 from .SPDHG import SPDHG
+from .sampler import Sampler

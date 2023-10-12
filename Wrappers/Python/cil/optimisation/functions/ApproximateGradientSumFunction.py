@@ -58,7 +58,7 @@ class ApproximateGradientSumFunction(SumFunction):
 
     """
 
-    def __init__(self, functions, sampler, initial=None):
+    def __init__(self, functions, sampler):
 
         self.sampler = sampler
 
@@ -67,7 +67,7 @@ class ApproximateGradientSumFunction(SumFunction):
         super(ApproximateGradientSumFunction, self).__init__(*functions)
 
     def __call__(self, x):
-        r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
+        r""" TODO: """
         return super(ApproximateGradientSumFunction, self).__call__(x)
 
     def full_gradient(self, x, out=None):

@@ -26,7 +26,7 @@ class SGFunction(ApproximateGradientSumFunction):
         Parameters:
         ----------
         functions: list or BlockFunction 
-            A list of functions.
+            A list of functions. #TODO: write it a bit clearer what the sum function requires :) 
         sampler: callable or None, optional
             A callable object that selects the function or batch of functions to compute the gradient. 
             
@@ -36,7 +36,7 @@ class SGFunction(ApproximateGradientSumFunction):
         if isinstance(functions, list):
             super(SGFunction, self).__init__(functions, sampler)    
         elif isinstance(functions, BlockFunction):
-            super(SGFunction, self).__init__(*functions.functions, sampler)
+            super(SGFunction, self).__init__(*functions.functions, sampler) #TODO: remove this 
         else:
             raise TypeError("Input to functions should be a list of functions or a BlockFunction")
     

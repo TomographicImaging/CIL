@@ -23,7 +23,7 @@ import os
 import sys
 from testclass import CCPiTestClass
 import numpy as np
-from cil.optimisation.algorithms import Sampler
+from cil.optimisation.utilities import Sampler
 initialise_tests()
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

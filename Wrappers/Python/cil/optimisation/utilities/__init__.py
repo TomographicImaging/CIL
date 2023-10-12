@@ -17,12 +17,5 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from .Algorithm import Algorithm
-from .CGLS import CGLS
-from .SIRT import SIRT
-from .GD import GD
-from .FISTA import FISTA
-from .FISTA import ISTA
-from .PDHG import PDHG
-from .ADMM import LADMM
-from .SPDHG import SPDHG
+
+from .sampler import Sampler

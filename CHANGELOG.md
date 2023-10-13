@@ -1,4 +1,6 @@
-
+* x.x.x
+  - Fix show2D bug for 3D DataContainers
+  
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object

@@ -134,9 +134,18 @@ class SPDHG(Algorithm):
         Parameters
         ----------
             gamma : float
-            parameter controlling the trade-off between the primal and dual step sizes
+                parameter controlling the trade-off between the primal and dual step sizes
             rho : float
-            parameter controlling the size of the product :math: \sigma\tau :math:
+                 parameter controlling the size of the product :math: \sigma\tau :math:
+        
+        Note
+        -----
+        The step sizes `sigma` anf `tau` are set using the equations:
+        .. math:: 
+
+            \sigma_i=\gamma\rho / (\|K_i\|**2)\\
+            \tau = (\rho/\gamma)\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+
         """
         if isinstance(gamma, Number):
             if gamma <= 0:
@@ -172,6 +181,36 @@ class SPDHG(Algorithm):
                 Step size parameter for Primal problem
 
         The user can set these or default values are calculated, either sigma, tau, both or None can be passed. 
+        
+        Note
+        -----
+        There are 4 possible cases considered by this function: 
+
+        - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
+          .. math:: 
+
+            \sigma_i=0.99 / (\|K_i\|**2)
+
+         and `tau` is set as per case 2
+
+        - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
+
+          .. math:: 
+
+            \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+    
+        - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
+
+          .. math:: 
+
+            \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
+
+        - Case 4: Both `sigma` and `tau` are provided.
+        
+        
+
+
+
         """
         gamma = 1.
         rho = .99

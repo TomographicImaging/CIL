@@ -29,7 +29,7 @@ from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
 from cil.framework import BlockGeometry
-from cil.framework import Sampler
+from cil.optimisation.utilities import Sampler
 
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator

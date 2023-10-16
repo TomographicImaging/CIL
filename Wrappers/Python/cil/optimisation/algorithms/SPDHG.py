@@ -52,10 +52,10 @@ class SPDHG(Algorithm):
 
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-    sampler: instance of the Sampler class
-        Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets
+    sampler: an instance of a `cil.optimisation.utilities.Sampler` class
+        Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
     precalculated_norms : list of floats
-        precalculated list of norms of the operators
+        precalculated list of norms of the operators #TODO: to remove based on pull request #1513
     **kwargs:
 
     prob : list of floats, optional, default=None
@@ -98,21 +98,23 @@ class SPDHG(Algorithm):
     Physics in Medicine & Biology, Volume 64, Number 22, 2019.
     '''
 
-    def __init__(self, f=None, g=None,  operator=None,
-                 initial=None, precalculated_norms=None,  sampler=None,  **kwargs):
+    def __init__(self, f=None, g=None, operator=None,
+                 initial=None, precalculated_norms=None, sampler=None,  **kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
 
-        self.prob_weights = kwargs.get('prob', None)
-        if kwargs.get('norms', None) is not None:
+        if precalculated_norms is None and kwargs.get('prob') is not None:
+            precalculated_norms = kwargs.get('norms', None)
             warnings.warn(
-                'norms is being deprecated, pass instead precalculated_norms=your_custom_norms')
-            if precalculated_norms is None:
-                precalculated_norms = kwargs.get('norms', None)
-
-        if self.prob_weights is not None:
-            warnings.warn('prob is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob)".\
-                          If you have passed both prob and a sampler then prob will be')
+                        'norms is being deprecated, pass instead precalculated_norms=your_custom_norms')
+        if sampler is not None:
+            self.prob_weights = sampler.prob
+        else:
+            if kwargs.get('prob', None) is not None:
+                warnings.warn('prob is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob)')
+            self.prob_weights = kwargs.get('prob', [1/len(operator)]*len(operator))
+            sampler=Sampler.randomWithReplacement(len(operator),  prob=self.prob_weights)
+        
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator,
@@ -165,9 +167,9 @@ class SPDHG(Algorithm):
         Parameters
         ----------
             sigma : list of positive float, optional, default=None
-            List of Step size parameters for Dual problem
+                List of Step size parameters for Dual problem
             tau : positive float, optional, default=None
-            Step size parameter for Primal problem
+                Step size parameter for Primal problem
 
         The user can set these or default values are calculated, either sigma, tau, both or None can be passed. 
         """
@@ -209,6 +211,11 @@ class SPDHG(Algorithm):
                     "The value of tau should be a Number")
             self._tau = tau
 
+    def set_step_sizes_default(self):
+        """Calculates the default values for sigma and tau """
+        self.set_step_sizes_custom(sigma=None, tau=None)
+
+
     def check_convergence(self):
         # TODO: check this with someone else
         """  Check whether convergence criterion for SPDHG is satisfied with scalar values of tau and sigma
@@ -216,18 +223,14 @@ class SPDHG(Algorithm):
         Returns
         -------
         Boolean
-            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
+            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. N.B Convergence criterion currently can only be checked for scalar values of tau.
         """
         for i in range(len(self._sigma)):
             if isinstance(self.tau, Number) and isinstance(self._sigma[i], Number):
                 if self._sigma[i] * self._tau * self.norms[i]**2 > self.prob_weights[i]:
-                    warnings.warn(
-                        "Convergence criterion of SPDHG for scalar step-sizes is not satisfied.")
                     return False
                 return True
             else:
-                warnings.warn(
-                    "Convergence criterion currently can only be checked for scalar values of tau.")
                 return False
 
     def set_up(self, f, g, operator,
@@ -249,8 +252,8 @@ class SPDHG(Algorithm):
             Initial point for the SPDHG algorithm
         gamma : float
             parameter controlling the trade-off between the primal and dual step sizes
-        sampler: instance of the Sampler class
-            Method of selecting the next mini-batch. If None, random sampling and each subset will have probability = 1/number of subsets. 
+        sampler: an instance of a `cil.optimisation.utilities.Sampler` class
+             Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
         precalculated_norms : list of floats
             precalculated list of norms of the operators 
         '''
@@ -290,7 +293,7 @@ class SPDHG(Algorithm):
         else:
             if not isinstance(sampler, Sampler):
                 raise ValueError(
-                    "The sampler should be an instance of the CIL Sampler class")
+                    "The sampler should be an instance of the cil.optimisation.utilities.Sampler class")
             self.sampler = sampler
             if sampler.prob is None:
                 self.prob_weights = [1/self.ndual_subsets] * self.ndual_subsets
@@ -298,7 +301,7 @@ class SPDHG(Algorithm):
                 self.prob_weights = sampler.prob
 
         # might not want to do this until it is called (if computationally expensive)
-        self.set_step_sizes_custom()
+        self.set_step_sizes_default()
 
         # initialize primal variable
         if initial is None:
@@ -327,7 +330,7 @@ class SPDHG(Algorithm):
         self.g.proximal(self.x_tmp, self._tau, out=self.x)
 
         # Choose subset
-        i = self.sampler.next()
+        i = next(self.sampler)
 
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x

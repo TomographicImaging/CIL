@@ -267,7 +267,7 @@ algorithm for reconstruction of cone-beam data measured with a standard circular
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
 <li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
-<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p></li>
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: {‘<cite>ram-lak</cite>’, ‘<cite>shepp-logan</cite>’, ‘<cite>cosine</cite>’, ‘<cite>hamming</cite>’, ‘<cite>hann</cite>’}, or a numpy array.</p></li>
 <li><p><strong>backend</strong> (<em>string</em>) – The backend to use, can be ‘astra’ or ‘tigre’. Data must be in the correct order for requested backend.</p></li>
 </ul>
 </dd>
@@ -437,7 +437,7 @@ True will filter projections in-place.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
 <li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
-<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p></li>
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: {‘<cite>ram-lak</cite>’, ‘<cite>shepp-logan</cite>’, ‘<cite>cosine</cite>’, ‘<cite>hamming</cite>’, ‘<cite>hann</cite>’}, or a numpy array.</p></li>
 </ul>
 </dd>
 </dl>

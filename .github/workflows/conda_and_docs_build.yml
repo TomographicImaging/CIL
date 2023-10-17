@@ -98,6 +98,11 @@ jobs:
       with:
         name: DocumentationHTML
         path: docs/build
+    - name: redirect to nightly
+      run: >
+        sed 's#DESTINATION#https://tomographicimaging.github.io/CIL/nightly/#g'
+        docs/.redirect-template.html
+        > docs/build/index.html
     - name: Push changes
       uses: casperdcl/push-dir@v1
       with:

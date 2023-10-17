@@ -851,7 +851,7 @@ class TestDataContainer(CCPiTestClass):
                 self.directional_reduction_unary_test(data_classes[j], test_funcs[i], expected_funcs[i], out_classes[j])
 
 
-    def test_reduction_mean_direction(self):
+    def test_mean_direction(self):
         np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         ig = ImageGeometry(2,2,2)
         data = ig.allocate(0)

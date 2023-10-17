@@ -2759,7 +2759,19 @@ class DataContainer(object):
                              self.dimension_labels))
     
     def get_dimension_axis(self, dimension_label):
+        """
+        Returns the axis index of the DataContainer array for specified dimension_label(s) 
         
+        Parameters
+        ----------
+        dimension_label: string or tuple of strings
+            The dimension_label(s) of the DataContainer to find the axis index of. 
+        
+        Returns
+        -------
+        int or tuple of ints
+            The axis index of the DataContainer matching the specified dimension_label
+        """
         if isinstance(dimension_label,(tuple,list)):
             temp = []
             for x in dimension_label:
@@ -3357,17 +3369,23 @@ class DataContainer(object):
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
-    def _directional_reduction_unary(self, pwop, direction=None, *args, **kwargs):
+    def _directional_reduction_unary(self, reduction_function, direction=None, *args, **kwargs):
         """
         Returns the result of a unary function, considering a direction argument to the function
         
         Parameters
         ----------
-        pwop : function 
-            The function to be evaluated
+        reduction_function : function 
+            The unary function to be evaluated
         direction : string or tuple of strings
-            Specify the axis or axes to calculate the sum along using a dimension_label. 
+            Specify the axis or axes to calculate 'reduction_function' along using a dimension_label. 
             Default calculates the function over the whole array
+        out: ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
+            for more details.
+            Default is None
         
         Returns
         -------
@@ -3375,31 +3393,30 @@ class DataContainer(object):
             The result of the unary function
         """
 
-        if kwargs.get('axis', None) is not None and kwargs.get('direction', None) is not None:
+        if kwargs.get('axis') is not None and kwargs.get('direction') is not None:
             raise ValueError ("Incompatible arguments: specify either direction or axis")
 
-        out = kwargs.get('out', None)  
+        out = kwargs.get('out')  
         
         if out is None:
             if direction is None:
-                result = pwop(self.as_array(), *args, **kwargs)
-                return result
+                result = reduction_function(self.as_array(), *args, **kwargs)
             else:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-                result = (pwop(self.as_array(), *args, **kwargs))  
+                result = reduction_function(self.as_array(), *args, **kwargs)
                 if isinstance(result, numpy.ndarray):
                     new_dimensions = numpy.array(self.dimension_labels)
                     new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
                     result = DataContainer(result, dimension_labels=new_dimensions)
-                return result                      
+            return result                      
                     
         elif issubclass(type(out), DataContainer):
             kwargs['out'] = None
             if direction is None:
-                result = pwop(self.as_array(), *args, **kwargs)
+                result = reduction_function(self.as_array(), *args, **kwargs)
             else:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-                result = pwop(self.as_array(), *args, **kwargs)
+                result = reduction_function(self.as_array(), *args, **kwargs)
             
             new_dimensions = numpy.array(self.dimension_labels)
             new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
@@ -3411,10 +3428,10 @@ class DataContainer(object):
         elif issubclass(type(out), numpy.ndarray):
             if direction is not None:
                 kwargs['axis'] = self.get_dimension_axis(direction)
-            pwop(self.as_array(), *args, **kwargs)
+            reduction_function(self.as_array(), *args, **kwargs)
 
         else:
-            raise ValueError (message(type(self),  "Incompatible class:" , pwop.__name__, type(out)))
+            raise ValueError (message(type(self),  "Incompatible class:" , reduction_function.__name__, type(out)))
 
     def sum(self, direction=None, *args, **kwargs):
         """
@@ -3427,7 +3444,9 @@ class DataContainer(object):
             Default is None, calculates the sum of the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
+            for more details.
             Default is None
         
         Returns
@@ -3436,7 +3455,7 @@ class DataContainer(object):
             The sum as a scalar or inside a DataContainer with reduced dimension_labels
             Default is to accumulate and return data as float64 or complex128
         """     
-        if kwargs.get('dtype', None) is not None:
+        if kwargs.get('dtype') is not None:
             logging.WARNING("dtype argument is ignored, using float64 or complex128")
         
         if numpy.isrealobj(self.array):
@@ -3457,7 +3476,9 @@ class DataContainer(object):
             Default is None, calculates the min of the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See 
+            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
+            for more details.
             Default is None
         
         Returns
@@ -3478,7 +3499,9 @@ class DataContainer(object):
             Default is None, calculates the max of the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
+            for more details.
             Default is None
         
         Returns
@@ -3499,7 +3522,9 @@ class DataContainer(object):
             Default is none, calculates the mean of the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
+            for more details.
             Default is None
             
         Returns

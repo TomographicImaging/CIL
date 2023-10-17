@@ -175,7 +175,7 @@ class Sampler():
     @staticmethod
     def hermanMeyer(num_indices):
         """
-        Function that takes a number of subsets and returns a sampler which outputs a Herman Meyer order 
+        Function that takes a number of indices and returns a sampler which outputs a Herman Meyer order 
 
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. For Herman-Meyer sampling this number should not be prime. 
@@ -193,7 +193,7 @@ class Sampler():
 
         """
         def _herman_meyer_order(n):
-            # Assuming that the subsets are in geometrical order
+            # Assuming that the indices are in geometrical order
             n_variable = n
             i = 2
             factors = []
@@ -208,7 +208,7 @@ class Sampler():
             n_factors = len(factors)
             if n_factors == 0:
                 raise ValueError(
-                    'Herman Meyer sampling defaults to sequential ordering if the number of subsets is prime. Please use an alternative sampling method or change the number of subsets. ')
+                    'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
             order = [0 for _ in range(n)]
             value = 0
             for factor_n in range(n_factors):
@@ -237,7 +237,7 @@ class Sampler():
     @staticmethod
     def staggered(num_indices, offset):
         """
-        Function that takes a number of subsets and returns a sampler which outputs in a staggered order. 
+        Function that takes a number of indices and returns a sampler which outputs in a staggered order. 
 
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
@@ -273,7 +273,7 @@ class Sampler():
         [ 0  4  8 12 16]
         """
         if offset >= num_indices:
-            raise (ValueError('The offset should be less than the number of subsets'))
+            raise (ValueError('The offset should be less than the number of indices'))
         indices = list(range(num_indices))
         order = []
         [order.extend(indices[i::offset]) for i in range(offset)]
@@ -283,7 +283,7 @@ class Sampler():
     @staticmethod
     def randomWithReplacement(num_indices, prob=None, seed=None):
         """
-        Function that takes a number of subsets and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices with given probability and with replacement. 
+        Function that takes a number of indices and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices with given probability and with replacement. 
 
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
@@ -322,7 +322,7 @@ class Sampler():
     @staticmethod
     def randomWithoutReplacement(num_indices, seed=None, shuffle=True):
         """
-        Function that takes a number of subsets and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices uniformly randomly without replacement.
+        Function that takes a number of indices and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices uniformly randomly without replacement.
 
 
         num_indices: int
@@ -374,7 +374,7 @@ class Sampler():
         self.prob = prob
         if prob is not None:
             self.iterator = self._next_prob
-        self.last_subset = self.num_indices-1
+        self.last_index = self.num_indices-1
 
     def _next_order(self):
         """ 
@@ -385,12 +385,12 @@ class Sampler():
         This function is used by samplers that sample without replacement. 
 
         """
-      #  print(self.last_subset)
-        if self.shuffle == True and self.last_subset == self.num_indices-1:
+      #  print(self.last_index)
+        if self.shuffle == True and self.last_index == self.num_indices-1:
             self.order = self.generator.permutation(self.order)
             # print(self.order)
-        self.last_subset = (self.last_subset+1) % self.num_indices
-        return (self.order[self.last_subset])
+        self.last_index = (self.last_index+1) % self.num_indices
+        return (self.order[self.last_index])
 
     def _next_prob(self):
         """ 
@@ -431,13 +431,13 @@ class Sampler():
 
         """
         save_generator = self.generator
-        save_last_subset = self.last_subset
-        self.last_subset = self.num_indices-1
+        save_last_index = self.last_index
+        self.last_index = self.num_indices-1
         save_order = self.order
         self.order = self.initial_order
         self.generator = np.random.RandomState(self.seed)
         output = [self.next() for _ in range(num_samples)]
         self.generator = save_generator
         self.order = save_order
-        self.last_subset = save_last_subset
+        self.last_index = save_last_index
         return (np.array(output))

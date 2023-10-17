@@ -33,62 +33,62 @@ class TestSamplers(CCPiTestClass):
     def test_init(self):
 
         sampler = Sampler.sequential(10)
-        self.assertEqual(sampler.num_subsets, 10)
+        self.assertEqual(sampler.num_indices, 10)
         self.assertEqual(sampler.type, 'sequential')
         self.assertListEqual(sampler.order, list(range(10)))
         self.assertListEqual(sampler.initial_order, list(range(10)))
         self.assertEqual(sampler.shuffle, False)
         self.assertEqual(sampler.prob, None)
-        self.assertEqual(sampler.last_subset, 9)
+        self.assertEqual(sampler.last_index, 9)
 
         sampler = Sampler.randomWithoutReplacement(7, shuffle=True)
-        self.assertEqual(sampler.num_subsets, 7)
+        self.assertEqual(sampler.num_indices, 7)
         self.assertEqual(sampler.type, 'random_without_replacement')
         self.assertListEqual(sampler.order, list(range(7)))
         self.assertListEqual(sampler.initial_order, list(range(7)))
         self.assertEqual(sampler.shuffle, True)
         self.assertEqual(sampler.prob, None)
-        self.assertEqual(sampler.last_subset, 6)
+        self.assertEqual(sampler.last_index, 6)
 
         sampler = Sampler.randomWithoutReplacement(8, shuffle=False, seed=1)
-        self.assertEqual(sampler.num_subsets, 8)
+        self.assertEqual(sampler.num_indices, 8)
         self.assertEqual(sampler.type, 'random_without_replacement')
         self.assertEqual(sampler.shuffle, False)
         self.assertEqual(sampler.prob, None)
-        self.assertEqual(sampler.last_subset, 7)
+        self.assertEqual(sampler.last_index, 7)
         self.assertEqual(sampler.seed, 1)
 
         sampler = Sampler.hermanMeyer(12)
-        self.assertEqual(sampler.num_subsets, 12)
+        self.assertEqual(sampler.num_indices, 12)
         self.assertEqual(sampler.type, 'herman_meyer')
         self.assertEqual(sampler.shuffle, False)
         self.assertEqual(sampler.prob, None)
-        self.assertEqual(sampler.last_subset, 11)
+        self.assertEqual(sampler.last_index, 11)
         self.assertListEqual(
             sampler.order, [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
         self.assertListEqual(sampler.initial_order, [
                              0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
 
         sampler = Sampler.randomWithReplacement(5)
-        self.assertEqual(sampler.num_subsets, 5)
+        self.assertEqual(sampler.num_indices, 5)
         self.assertEqual(sampler.type, 'random_with_replacement')
         self.assertEqual(sampler.order, None)
         self.assertEqual(sampler.initial_order, None)
         self.assertEqual(sampler.shuffle, False)
         self.assertListEqual(sampler.prob, [1/5] * 5)
-        self.assertEqual(sampler.last_subset, 4)
+        self.assertEqual(sampler.last_index, 4)
 
         sampler = Sampler.randomWithReplacement(4, [0.7, 0.1, 0.1, 0.1])
-        self.assertEqual(sampler.num_subsets, 4)
+        self.assertEqual(sampler.num_indices, 4)
         self.assertEqual(sampler.type, 'random_with_replacement')
         self.assertEqual(sampler.order, None)
         self.assertEqual(sampler.initial_order, None)
         self.assertEqual(sampler.shuffle, False)
         self.assertListEqual(sampler.prob, [0.7, 0.1, 0.1, 0.1])
-        self.assertEqual(sampler.last_subset, 3)
+        self.assertEqual(sampler.last_index, 3)
 
         sampler = Sampler.staggered(21, 4)
-        self.assertEqual(sampler.num_subsets, 21)
+        self.assertEqual(sampler.num_indices, 21)
         self.assertEqual(sampler.type, 'staggered')
         self.assertListEqual(sampler.order, [
                              0, 4, 8, 12, 16, 20, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19])
@@ -96,7 +96,7 @@ class TestSamplers(CCPiTestClass):
                              0, 4, 8, 12, 16, 20, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19])
         self.assertEqual(sampler.shuffle, False)
         self.assertEqual(sampler.prob, None)
-        self.assertEqual(sampler.last_subset, 20)
+        self.assertEqual(sampler.last_index, 20)
 
         try:
             Sampler.staggered(22, 25)
@@ -104,13 +104,13 @@ class TestSamplers(CCPiTestClass):
             self.assertTrue(True)
 
         sampler = Sampler.customOrder([1, 4, 6, 7, 8, 9, 11])
-        self.assertEqual(sampler.num_subsets, 7)
+        self.assertEqual(sampler.num_indices, 7)
         self.assertEqual(sampler.type, 'custom_order')
         self.assertListEqual(sampler.order, [1, 4, 6, 7, 8, 9, 11])
         self.assertListEqual(sampler.initial_order, [1, 4, 6, 7, 8, 9, 11])
         self.assertEqual(sampler.shuffle, False)
         self.assertEqual(sampler.prob, None)
-        self.assertEqual(sampler.last_subset, 6)
+        self.assertEqual(sampler.last_index, 6)
 
 
         

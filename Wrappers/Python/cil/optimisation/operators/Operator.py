@@ -72,12 +72,12 @@ class Operator(object):
     def set_norm(self, norm=None):
         '''Sets the norm of the operator to a custom value.
         '''
-        try:
-            if norm is not None and norm <=0:
-                raise ValueError("Norm must be a positive real value or None, got {}".format(norm))
-        except TypeError:
-            raise TypeError("Norm must be a positive real value or None, got {} of type {}".format(norm, type(norm)))
-
+        
+        if norm is not None and isinstance(norm, Number) is False:
+                raise TypeError("Norm must be a number or None, got {} of type {}".format(norm, type(norm)))
+         
+        if isinstance(norm, Number) and norm <=0: 
+            raise ValueError("Norm must be a positive real valued number or None, got {}".format(norm))
 
         self._norm = norm
 

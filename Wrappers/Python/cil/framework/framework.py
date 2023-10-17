@@ -3454,7 +3454,7 @@ class DataContainer(object):
         ----------
         direction : string or tuple of strings, optional
             Specify the axis or axes to calculate the minimum along using a dimension_label.
-            Default is None, calculates the min of the whole array
+            Default is None, calculates the min of the whole array returning a number.
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.

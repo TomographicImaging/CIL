@@ -190,11 +190,11 @@ class BlockOperator(Operator):
                                                       x_b.get_item(col),
                                                       out=out.get_item(row))                        
                     else:
-                        a = out.get_item(row)
+                        out_row_operator=out.get_item(row) # out_row_operator points to the row in out that we are updating 
                         self.get_item(row,col).direct(
                                                       x_b.get_item(col), 
                                                       out=tmp.get_item(row))
-                        a += tmp.get_item(row)
+                        out_row_operator += tmp.get_item(row)
                 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
@@ -250,8 +250,8 @@ class BlockOperator(Operator):
                             out += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row))
                         else:
-                            a = out.get_item(col)
-                            a += self.get_item(row,col).adjoint(
+                            out_col_operator = out.get_item(col) # out_col_operator points to the column in out that we are updating 
+                            out_col_operator += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row),
                                                         )
     def is_linear(self):

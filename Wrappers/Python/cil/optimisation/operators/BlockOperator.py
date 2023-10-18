@@ -349,10 +349,6 @@ class BlockOperator(Operator):
             tmp.append(self.get_item(i, 0).range_geometry())
         return BlockGeometry(*tmp)
 
-        # shape = (self.shape[1], 1)
-        # return BlockGeometry(*[el.range_geometry() for el in self.operators],
-        #            shape=shape)
-
     def sum_abs_row(self):
 
         res = []

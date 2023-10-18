@@ -141,8 +141,7 @@ class BlockOperator(Operator):
         return self.operators[index]
 
     def norm(self):
-        '''Returns the square root of the sum of the norms of the individual operators in the BlockOperators 
-        '''
+        '''Returns the Euclidean norm of the norms of the individual operators in the BlockOperators '''
         return numpy.sqrt(numpy.sum(numpy.array(self.get_norms())**2))
 
     def get_norms(self, ):

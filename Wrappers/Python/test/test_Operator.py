@@ -679,7 +679,7 @@ class TestBlockOperator(CCPiTestClass):
         self.assertNumpyArrayEqual(res.get_item(1).as_array(),
                                    4 * u.as_array())
         
-
+        
         x1 = B.adjoint(z1)
         # this should be [15 u, 10 u]
         el1 = B.get_item(0,0).adjoint(z1.get_item(0)) + B.get_item(1,0).adjoint(z1.get_item(1)) 

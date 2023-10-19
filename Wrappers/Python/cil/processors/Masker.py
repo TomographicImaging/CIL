@@ -77,7 +77,7 @@ class Masker(DataProcessor):
         :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation. 
         :type axis: str, int
-        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
+        :param method: One of the following interpolation methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
         :param method: str, default='linear'
         '''
 
@@ -102,7 +102,7 @@ class Masker(DataProcessor):
         :type value: float, default=0
         :param axis: specify axis as int or from 'dimension_labels' to calculate mean or median in respective modes 
         :type axis: str or int
-        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
+        :param method: One of the following interpolation methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
         :param method: str, default='linear'
         :return: DataContainer or it's subclass with masked outliers
         :rtype: DataContainer or it's subclass   

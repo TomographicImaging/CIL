@@ -62,7 +62,7 @@ def _proximal_step_numpy(arr, tau):
     
     Parameters:
     -----------
-    arr : DataContainer/ numpy array, best if contiguous memory. 
+    arr : DataContainer, best if contiguous memory. 
     tau: float, numpy array or DataContainer
 
     Returns:

@@ -76,7 +76,7 @@ class ApproximateGradientSumFunction(SumFunction):
 
     def approximate_gradient(self, function_num, x,  out=None):
         """ Computes the approximate gradient for each selected function at :code:`x`."""
-        raise NotImplemented
+        raise NotImplementedError
 
     def gradient(self, x, out=None):
         """ Selects a random function and uses this to calculate the approximate gradient at :code:`x`."""

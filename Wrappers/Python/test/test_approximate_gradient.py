@@ -72,10 +72,32 @@ if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
 class TestApproximateGradientSumFunction(CCPiTestClass):
+
+    def setUp(self):
+        self.sampler=Sampling(5)
+        self.initial = VectorData(np.zeros(25))
+        self.b =  VectorData(np.random.normal(0,1,25))
+        self.functions=[]
+        for i in range(5):
+            diagonal=np.zeros(25)
+            diagonal[5*i:5*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            self.functions.append( LeastSquares(A, A.direct(self.b)))
+            if i==0:
+               self.objective=LeastSquares(A, A.direct(self.b))
+            else:
+               self.objective+=LeastSquares(A, A.direct(self.b))
+        self.stochastic_objective=ApproximateGradientSumFunction(self.functions, self.sampler)
     def test_init(self):
-        pass
+        with self.assertRaises(NotImplementedError):
+            self.stochastic_objective.approximate_gradient(3, self.initial)
+        with self.assertRaises(NotImplementedError):
+            self.stochastic_objective.gradient( self.initial)
+        self.assertAlmostEqual(self.stochastic_objective(self.initial), self.objective(self.initial))
+        self.assertEqual(self.stochastic_objective.num_functions,5)
+        
         #TODO: 
-class Sampling():
+class Sampling(): #TO BE REPLACED BY SAMPLING CLASS THING WHEN THAT HAS BEEN MERGED 
     def __init__(self, num_subsets, prob=None, seed=99):
         self.num_subsets=num_subsets
         np.random.seed(seed)

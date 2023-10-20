@@ -137,6 +137,25 @@ class TestSGD(CCPiTestClass):
 
  #       alg.run(20, verbose=0)
   #      self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    def setUp(self):
+        self.sampler=Sampling(5)
+        self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data.reorder('astra')
+        self.data2d=self.data.get_slice(vertical='centre')
+        ag2D = self.data2d.geometry
+        ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
+        ig2D = ag2D.get_ImageGeometry()
+        self.A = ProjectionOperator(ig2D, ag2D, device = "cpu")
+        self.n_subsets = 5
+        self.partitioned_data=self.data2d.partition(self.n_subsets, 'sequential')
+        self.A_partitioned = ProjectionOperator(ig2D, self.partitioned_data.geometry, device = "cpu")
+        f_subsets = []
+        for i in range(self.n_subsets):
+            fi=LeastSquares(self.A_partitioned.operators[i],self. partitioned_data[i])
+            f_subsets.append(fi)
+        self.f=LeastSquares(self.A, self.data2d)
+        self.f_stochastic=SGFunction(f_subsets,self.sampler)
+        self.initial=ig2D.allocate()
 
     def test_SGD_toy_example(self): 
         sampler=Sampling(5)
@@ -170,49 +189,41 @@ class TestSGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
-    def test_SGD_simulated_parallel_beam_data(self): 
-        sampler=Sampling(5)
-        data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        data.reorder('astra')
-        data2d=data.get_slice(vertical='centre')
-        ag2D = data2d.geometry
-        ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-        ig2D = ag2D.get_ImageGeometry()
-        A = ProjectionOperator(ig2D, ag2D, device = "cpu")
-        n_subsets = 5
-        partitioned_data=data2d.partition(n_subsets, 'sequential')
-        A_partitioned = ProjectionOperator(ig2D, partitioned_data.geometry, device = "cpu")
-        f_subsets = []
-        for i in range(n_subsets):
-            fi=LeastSquares(A_partitioned.operators[i], partitioned_data[i])
-            f_subsets.append(fi)
-        f=LeastSquares(A, data2d)
-        initial=ig2D.allocate()
-        
 
-        rate = f.L
-    
-        alg = GD(initial=initial, 
-                              objective_function=f, update_objective_interval=500,
+                                
+
+    def test_SGD_simulated_parallel_beam_data(self): 
+
+        rate = self.f.L
+        alg = GD(initial=self.initial, 
+                              objective_function=self.f, update_objective_interval=500,
                               rate=rate, alpha=1e8)
         alg.max_iteration = 200
         alg.run(verbose=0)
        
         
-        objective=SGFunction(f_subsets, sampler)
-        alg_stochastic = GD(initial=initial, 
+        objective=self.f_stochastic
+        alg_stochastic = GD(initial=self.initial, 
                               objective_function=objective, update_objective_interval=500, 
                               step_size=1e-7, max_iteration =5000)
-        alg_stochastic.run( n_subsets*50, verbose=0)
+        alg_stochastic.run( self.n_subsets*50, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         
-    def test_full_gradient(self):
-        pass#TODO:
-
+  
+    
     def test_approximate_gradient(self):
-        pass#TODO:
-    def test_gradient(self):
-        pass
-    #TODO:
+        self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
+
+    def test_sampler(self):
+        pass #TODO: 
+
+    def test_direct(self):
+        self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
+
+    def test_full_gradient(self):
+        self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
+    
+
+
         
     

@@ -1,5 +1,5 @@
 * x.x.x
-  - Allow reduction functions on the DataContainer class to accept a direction argument which match values in dimension_labels
+  - Allow reduction methods on the DataContainer class to accept direction argument which matches values in dimension_labels
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

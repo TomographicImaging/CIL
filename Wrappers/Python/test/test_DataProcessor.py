@@ -2673,5 +2673,3 @@ if __name__ == "__main__":
     d = TestDataProcessor()
     d.test_DataProcessorChaining()
 
-    unittest.main()
-

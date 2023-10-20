@@ -1,5 +1,6 @@
 * x.x.x
   - Fix show2D bug for 3D DataContainers
+  - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
   
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

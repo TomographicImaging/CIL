@@ -105,7 +105,7 @@ class Masker(DataProcessor):
         :param method: One of the following interpolation methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
         :param method: str, default='linear'
         :return: DataContainer or it's subclass with masked outliers
-        :rtype: DataContainer or it's subclass   
+        :rtype: DataContainer or its subclass   
         '''
 
         kwargs = {'mask': mask,
@@ -119,7 +119,7 @@ class Masker(DataProcessor):
     def check_input(self, data):
 
         if self.mask is None:
-            raise ValueError('Please, provide a mask.')
+            raise ValueError('Please provide a mask.')
 
         if not (data.shape == self.mask.shape):
             raise Exception("Mask and Data must have the same shape." + 
@@ -173,9 +173,9 @@ class Masker(DataProcessor):
         elif self.mode == 'mean' or self.mode == 'median':
 
             if self.mode == 'mean':
-                average_method = numpy.mean
+                average_function = numpy.mean
             else:
-                average_method = numpy.median
+                average_function = numpy.median
             
             if axis_index is not None:
                 ndim = data.number_of_dimensions
@@ -188,16 +188,17 @@ class Masker(DataProcessor):
                     current_slice_obj = tuple(current_slice_obj)
                     # This is the slice that we are modifying (in the locations where the mask is present):
                     slice_data = arr[current_slice_obj]
-                    # This is the remaining data on the axis that we are averaging:
+                    # This is the remaining data on the axis that we are averaging, excluding the current
+                    # slice (as masked values are not included in the average):
                     remaining_data_on_axis = numpy.delete(arr, i, axis=axis_index)
                     # the mask on the slice that we are modifying:
                     mask_slice = mask_invert[current_slice_obj]
 
-                    slice_data[mask_slice] = average_method(remaining_data_on_axis, axis=axis_index)[mask_slice]
+                    slice_data[mask_slice] = average_function(remaining_data_on_axis, axis=axis_index)[mask_slice]
                     arr[current_slice_obj] = slice_data
                 
             else:
-                arr[mask_invert] = average_method(arr[mask_arr]) 
+                arr[mask_invert] = average_function(arr[mask_arr]) 
 
         
         elif self.mode == 'interpolate':

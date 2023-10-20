@@ -2780,6 +2780,8 @@ class DataContainer(object):
 
         if dimension_label in self.dimension_labels:
             return self.dimension_labels.index(dimension_label)
+        elif isinstance(dimension_label, int) and dimension_label > 0 and dimension_label < len(self.dimension_labels):
+            return dimension_label
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                             self.dimension_labels))
@@ -3393,45 +3395,74 @@ class DataContainer(object):
             The result of the unary function
         """
 
-        if kwargs.get('axis') is not None and kwargs.get('direction') is not None:
+        if kwargs.get('axis') is not None and direction is not None:
             raise ValueError ("Incompatible arguments: specify either direction or axis")
 
-        out = kwargs.get('out')  
-        
-        if out is None:
-            if direction is None:
-                result = reduction_function(self.as_array(), *args, **kwargs)
-            else:
-                kwargs['axis'] = self.get_dimension_axis(direction)
-                result = reduction_function(self.as_array(), *args, **kwargs)
-                if isinstance(result, numpy.ndarray):
-                    new_dimensions = numpy.array(self.dimension_labels)
-                    new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-                    result = DataContainer(result, dimension_labels=new_dimensions)
-            return result                      
-                    
-        elif issubclass(type(out), DataContainer):
-            kwargs['out'] = None
-            if direction is None:
-                result = reduction_function(self.as_array(), *args, **kwargs)
-            else:
-                kwargs['axis'] = self.get_dimension_axis(direction)
-                result = reduction_function(self.as_array(), *args, **kwargs)
+        out = kwargs.pop('out', None)  
+        if direction is None:
+            result = reduction_function(self.as_array(), *args, **kwargs)
+            if out is None and kwargs.get('axis') is not None:
+                return result
+        else:
+            kwargs['axis'] = self.get_dimension_axis(direction)
+            result = reduction_function(self.as_array(), *args, **kwargs)
             
+        if out is None:
+            if isinstance(result, numpy.ndarray):
+                new_dimensions = numpy.array(self.dimension_labels)
+                new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
+                result = DataContainer(result, dimension_labels=new_dimensions)
+            return  result
+        
+        elif issubclass(type(out), DataContainer):         
             new_dimensions = numpy.array(self.dimension_labels)
             new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
             if result.shape == out.shape and new_dimensions == out.dimension_labels:
                 out.fill(result.astype(out.dtype)) # convert to the type given in out
             else:
                 raise ValueError('Data mismatch: out.shape = {} result.shape = {}, out.dimension_labels = {} result.dimension_labels = {}'.format(out.shape, result.shape, out.dimension_labels, new_dimensions))   
-
+        
         elif issubclass(type(out), numpy.ndarray):
-            if direction is not None:
-                kwargs['axis'] = self.get_dimension_axis(direction)
-            reduction_function(self.as_array(), *args, **kwargs)
+            if result.shape == out.shape:
+                out[:] = result.astype(out.dtype)
 
         else:
             raise ValueError (message(type(self),  "Incompatible class:" , reduction_function.__name__, type(out)))
+        
+        # if out is None:
+        #     if direction is None:
+        #         result = reduction_function(self.as_array(), *args, **kwargs)
+        #     else:
+        #         kwargs['axis'] = self.get_dimension_axis(direction)
+        #         result = reduction_function(self.as_array(), *args, **kwargs)
+        #         if isinstance(result, numpy.ndarray):
+        #             new_dimensions = numpy.array(self.dimension_labels)
+        #             new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
+        #             result = DataContainer(result, dimension_labels=new_dimensions)
+        #     return result                      
+                    
+        # elif issubclass(type(out), DataContainer):
+        #     kwargs['out'] = None
+        #     if direction is None:
+        #         result = reduction_function(self.as_array(), *args, **kwargs)
+        #     else:
+        #         kwargs['axis'] = self.get_dimension_axis(direction)
+        #         result = reduction_function(self.as_array(), *args, **kwargs)
+            
+        #     new_dimensions = numpy.array(self.dimension_labels)
+        #     new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
+        #     if result.shape == out.shape and new_dimensions == out.dimension_labels:
+        #         out.fill(result.astype(out.dtype)) # convert to the type given in out
+        #     else:
+        #         raise ValueError('Data mismatch: out.shape = {} result.shape = {}, out.dimension_labels = {} result.dimension_labels = {}'.format(out.shape, result.shape, out.dimension_labels, new_dimensions))   
+
+        # elif issubclass(type(out), numpy.ndarray):
+        #     if direction is not None:
+        #         kwargs['axis'] = self.get_dimension_axis(direction)
+        #     reduction_function(self.as_array(), *args, **kwargs)
+
+        # else:
+        #     raise ValueError (message(type(self),  "Incompatible class:" , reduction_function.__name__, type(out)))
 
     def sum(self, direction=None, *args, **kwargs):
         """

@@ -19,10 +19,7 @@
 
 
 from cil.optimisation.functions import SumFunction
-
 import numbers
-
-
 class ApproximateGradientSumFunction(SumFunction):
 
     r"""ApproximateGradientSumFunction represents the following sum 
@@ -80,13 +77,10 @@ class ApproximateGradientSumFunction(SumFunction):
 
     def gradient(self, x, out=None):
         """ Selects a random function and uses this to calculate the approximate gradient at :code:`x`."""
-        self.function_num = next(self.sampler)
+        self.function_num = self.sampler.next()
 
         # single function
         if isinstance(self.function_num, numbers.Number):
             return self.approximate_gradient(self.function_num, x, out=out)
         else:
             raise ValueError("Batch gradient is not yet implemented")
-
-
-        

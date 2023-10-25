@@ -93,9 +93,17 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
             self.stochastic_objective.approximate_gradient(3, self.initial)
         with self.assertRaises(NotImplementedError):
             self.stochastic_objective.gradient( self.initial)
-        self.assertAlmostEqual(self.stochastic_objective(self.initial), self.objective(self.initial))
         self.assertEqual(self.stochastic_objective.num_functions,5)
+         #TODO: test sampler saved correctly - when we have a sampling class 
+
+    def test_direct_call(self):
+        self.assertAlmostEqual(self.stochastic_objective(self.initial), self.objective(self.initial))
+    
+    def test_full_gradient(self):
+        self.assertNumpyArrayAlmostEqual(self.stochastic_objective.full_gradient(self.initial).array, self.objective.gradient(self.initial).array)
         
+    def test_sampler(self):
+        pass
         #TODO: 
 class Sampling(): #TO BE REPLACED BY SAMPLING CLASS THING WHEN THAT HAS BEEN MERGED 
     def __init__(self, num_subsets, prob=None, seed=99):
@@ -107,36 +115,13 @@ class Sampling(): #TO BE REPLACED BY SAMPLING CLASS THING WHEN THAT HAS BEEN MER
         else:
             self.prob=prob
     def __next__(self):
-        
-            return int(np.random.choice(self.num_subsets, 1, p=self.prob))
+
+        return int(np.random.choice(self.num_subsets, 1, p=self.prob))
+    def next(self):
+        return int(np.random.choice(self.num_subsets, 1, p=self.prob))
 
 class TestSGD(CCPiTestClass):
 
- ##   def test_SGD_one_function(self): 
-  #      ig = ImageGeometry(12,13,14)
-  #      initial = ig.allocate()
-  #      b = ig.allocate('random')
-  #      identity = IdentityOperator(ig)
-  #      
-  #      norm2sq = LeastSquares(identity, b)
-  #      rate = norm2sq.L / 3.
-  #      sampler=Sampling(1)
-
-  #      objective=SGFunction([norm2sq], sampler)
-  #      alg = GD(initial=initial, 
-   #                           objective_function=objective, 
-  #                            rate=rate, atol=1e-9, rtol=1e-6)
-   #     alg.max_iteration = 1000
-   #     alg.run(verbose=0)
-   #     self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-   #     alg = GD(initial=initial, 
-   #                           objective_function=objective, 
-   #                           rate=rate, max_iteration=20,
-   #                           update_objective_interval=2,
-   #                           atol=1e-9, rtol=1e-6)#
-
- #       alg.run(20, verbose=0)
-  #      self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def setUp(self):
         self.sampler=Sampling(5)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -157,6 +142,38 @@ class TestSGD(CCPiTestClass):
         self.f_stochastic=SGFunction(f_subsets,self.sampler)
         self.initial=ig2D.allocate()
 
+    def test_approximate_gradient(self):
+        self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
+
+    def test_sampler(self):
+        pass #TODO: when we get a sampler class loaded in 
+
+    def test_direct(self):
+        self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
+
+    def test_full_gradient(self):
+        self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
+    
+            
+
+    def test_SGD_simulated_parallel_beam_data(self): 
+
+        rate = self.f.L
+        alg = GD(initial=self.initial, 
+                              objective_function=self.f, update_objective_interval=500,
+                              rate=rate, alpha=1e8)
+        alg.max_iteration = 200
+        alg.run(verbose=0)
+       
+        
+        objective=self.f_stochastic
+        alg_stochastic = GD(initial=self.initial, 
+                              objective_function=objective, update_objective_interval=500, 
+                              step_size=1e-7, max_iteration =5000)
+        alg_stochastic.run( self.n_subsets*50, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        
+  
     def test_SGD_toy_example(self): 
         sampler=Sampling(5)
         initial = VectorData(np.zeros(25))
@@ -189,40 +206,6 @@ class TestSGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
-
-                                
-
-    def test_SGD_simulated_parallel_beam_data(self): 
-
-        rate = self.f.L
-        alg = GD(initial=self.initial, 
-                              objective_function=self.f, update_objective_interval=500,
-                              rate=rate, alpha=1e8)
-        alg.max_iteration = 200
-        alg.run(verbose=0)
-       
-        
-        objective=self.f_stochastic
-        alg_stochastic = GD(initial=self.initial, 
-                              objective_function=objective, update_objective_interval=500, 
-                              step_size=1e-7, max_iteration =5000)
-        alg_stochastic.run( self.n_subsets*50, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
-        
-  
-    
-    def test_approximate_gradient(self):
-        self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
-
-    def test_sampler(self):
-        pass #TODO: 
-
-    def test_direct(self):
-        self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
-
-    def test_full_gradient(self):
-        self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
-    
 
 
         

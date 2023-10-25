@@ -24,7 +24,7 @@ from scipy import interpolate
 
 class Masker(DataProcessor):
     r'''
-    Processor to fill missing values provided by mask. Please use the desiried method to configure a processor for your needs.
+    Processor to fill missing values provided by mask. Please use the desired method to configure a processor for your needs.
     '''
 
     @staticmethod
@@ -77,7 +77,7 @@ class Masker(DataProcessor):
         :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation. 
         :type axis: str, int
-        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
+        :param method: One of the following interpolation methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
         :param method: str, default='linear'
         '''
 
@@ -102,10 +102,10 @@ class Masker(DataProcessor):
         :type value: float, default=0
         :param axis: specify axis as int or from 'dimension_labels' to calculate mean or median in respective modes 
         :type axis: str or int
-        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
+        :param method: One of the following interpolation methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
         :param method: str, default='linear'
         :return: DataContainer or it's subclass with masked outliers
-        :rtype: DataContainer or it's subclass   
+        :rtype: DataContainer or its subclass   
         '''
 
         kwargs = {'mask': mask,
@@ -119,7 +119,7 @@ class Masker(DataProcessor):
     def check_input(self, data):
 
         if self.mask is None:
-            raise ValueError('Please, provide a mask.')
+            raise ValueError('Please provide a mask.')
 
         if not (data.shape == self.mask.shape):
             raise Exception("Mask and Data must have the same shape." + 
@@ -171,42 +171,47 @@ class Masker(DataProcessor):
             arr[mask_invert] = self.value
         
         elif self.mode == 'mean' or self.mode == 'median':
+
+            if self.mode == 'mean':
+                average_function = numpy.mean
+            else:
+                average_function = numpy.median
             
             if axis_index is not None:
-                
                 ndim = data.number_of_dimensions
                     
                 slice_obj = [slice(None, None, 1)] * ndim
                             
                 for i in range(arr.shape[axis_index]):
-                    current_slice_obj = slice_obj[:]
+                    current_slice_obj = slice_obj.copy()
                     current_slice_obj[axis_index] = i
                     current_slice_obj = tuple(current_slice_obj)
+                    # This is the slice that we are modifying (in the locations where the mask is present):
                     slice_data = arr[current_slice_obj]
-                    if self.mode == 'mean':
-                        slice_data[mask_invert[current_slice_obj]] = numpy.mean(slice_data[mask_arr[current_slice_obj]])
-                    else:
-                        slice_data[mask_invert[current_slice_obj]] = numpy.median(slice_data[mask_arr[current_slice_obj]])
+                    # This is the remaining data on the axis that we are averaging, excluding the current
+                    # slice (as masked values are not included in the average):
+                    remaining_data_on_axis = numpy.delete(arr, i, axis=axis_index)
+                    # the mask on the slice that we are modifying:
+                    mask_slice = mask_invert[current_slice_obj]
+
+                    slice_data[mask_slice] = average_function(remaining_data_on_axis, axis=axis_index)[mask_slice]
                     arr[current_slice_obj] = slice_data
                 
             else:
+                arr[mask_invert] = average_function(arr[mask_arr]) 
 
-                if self.mode == 'mean':
-                    arr[mask_invert] = numpy.mean(arr[mask_arr]) 
-                else:
-                    arr[mask_invert] = numpy.median(arr[mask_arr]) 
         
         elif self.mode == 'interpolate':
             if self.method not in ['linear', 'nearest', 'zeros', 'linear', \
                                         'quadratic', 'cubic', 'previous', 'next']:
-                raise TypeError("Wrong interpolation method, one of the follwoing is expected:\n" + 
+                raise TypeError("Wrong interpolation method, one of the following is expected:\n" + 
                                 "linear, nearest, zeros, linear, quadratic, cubic, previous, next")
             
             ndim = data.number_of_dimensions
             shape = arr.shape
             
             if axis_index is None:
-                raise NotImplementedError ('Currently Only 1D interpolation is available. Please specify an axis to interpolate over.')
+                raise NotImplementedError('Currently Only 1D interpolation is available. Please specify an axis to interpolate over.')
             
             res_dim = 1
             for i in range(ndim):

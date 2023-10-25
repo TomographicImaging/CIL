@@ -380,7 +380,7 @@ class show2D(show_base):
 
     Plots 1 or more 2D plots in an (n x num_cols) matrix.
     Can plot multiple slices from one 3D dataset, or compare multiple datasets
-    Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
+    Inputs can be single arguments or list of arguments that will be sequentially applied to subplots
     If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
 
 
@@ -392,7 +392,7 @@ class show2D(show_base):
         The title for each figure
     slice_list: tuple, int, list of tuples, list of ints, optional
         The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
-    fix_range: boolian, tuple, list of tuples
+    fix_range: boolean, tuple, list of tuples
         Sets the display range of the data. `True` sets all plots to the global (min, max). 
     axis_labels: tuple, list of tuples, optional
         The axis labels for each figure e.g. ('x','y')
@@ -497,7 +497,10 @@ class show2D(show_base):
                             cut_axis[1] = data.dimension_labels[cut_axis[1]]
 
                         temp_dict = {cut_axis[0]:cut_slices[0], cut_axis[1]:cut_slices[1]}
-                        plot_data = data.get_slice(**temp_dict, force=True)
+                        if type(data) == DataContainer:
+                            plot_data = data.get_slice(**temp_dict)
+                        else:
+                            plot_data = data.get_slice(**temp_dict, force=True)
                     elif hasattr(data,'as_array'):
                         plot_data = data.as_array().take(indices=cut_slices[1], axis=cut_axis[1])
                         plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
@@ -535,7 +538,10 @@ class show2D(show_base):
                         if type(cut_axis) is int:
                             cut_axis = data.dimension_labels[cut_axis]
                         temp_dict = {cut_axis:cut_slice}
-                        plot_data = data.get_slice(**temp_dict, force=True)
+                        if type(data) == DataContainer:
+                            plot_data = data.get_slice(**temp_dict)
+                        else:
+                            plot_data = data.get_slice(**temp_dict, force=True)
                     elif hasattr(data,'as_array'):
                         plot_data = data.as_array().take(indices=cut_slice, axis=cut_axis)
                     else:

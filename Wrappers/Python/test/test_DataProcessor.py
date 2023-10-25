@@ -353,7 +353,7 @@ class TestBinner(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
+                {'vertical':(32,64,2)},
                 
                 # bin to single dimension
                 {'vertical':(31,33,2)},
@@ -582,21 +582,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -616,21 +616,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1009,7 +1009,7 @@ class TestSlicer(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
+                {'vertical':(32,64,2)},
                 
                 # slice to single dimension
                 {'vertical':(32,34,2)},
@@ -1353,21 +1353,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1385,21 +1385,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1654,7 +1654,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag_padded,
+        self.assertEqual(geometry_padded, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
 
 
@@ -1668,7 +1668,7 @@ class TestPaddder(unittest.TestCase):
             0.,   90.,  180.,  270.,\
             360., 450.,  540., 630., 720.]
 
-        self.assertEquals(geometry_padded, geometry_gold,
+        self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
@@ -1679,7 +1679,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag2_padded,
+        self.assertEqual(geometry_padded, self.ag2_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
 
     
@@ -1691,7 +1691,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_image_geometry()
 
-        self.assertEquals(geometry_padded, self.ig_padded,
+        self.assertEqual(geometry_padded, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
 
 
@@ -1730,21 +1730,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ag_padded,
+        self.assertEqual(geometry_out, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ag_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
 
@@ -1764,21 +1764,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ig_padded,
+        self.assertEqual(geometry_out, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ig_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
 
@@ -2504,39 +2504,60 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
 class TestMasker(unittest.TestCase):       
 
     def setUp(self):
-        IG = ImageGeometry(voxel_num_x=10,
+        IG_2D = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
+        IG_3D = ImageGeometry(voxel_num_x=5, 
+                            voxel_num_y=5,
+                            voxel_num_z=5)
         
-        self.data_init = IG.allocate('random')
+        self.data_2D_init = IG_2D.allocate('random')
+        self.data_3D_init = IG_3D.allocate('random')
+
+        self.data_2D = self.data_2D_init.copy()
+        self.data_3D = self.data_3D_init.copy()
+
+        self.mask_coords_2D = [(2,3), (4,5)]
+        self.mask_coords_3D = [(2,3,4), (3,1,2)]
         
-        self.data = self.data_init.copy()
+        self.data_2D.as_array()[self.mask_coords_2D[0]] = float('inf')
+        self.data_2D.as_array()[self.mask_coords_2D[1]] = float('nan')
+
+        self.data_3D.as_array()[self.mask_coords_3D[0]] = float('inf')
+        self.data_3D.as_array()[self.mask_coords_3D[1]] = float('nan')
         
-        self.data.as_array()[2,3] = float('inf')
-        self.data.as_array()[4,5] = float('nan')
+        mask_2D_manual = numpy.ones((10,10), dtype=bool)
+        mask_2D_manual[self.mask_coords_2D[0]] = 0
+        mask_2D_manual[self.mask_coords_2D[1]] = 0
+
+        mask_3D_manual = numpy.ones((5,5,5), dtype=bool)
+        mask_3D_manual[self.mask_coords_3D[0]] = 0
+        mask_3D_manual[self.mask_coords_3D[1]] = 0
         
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[2,3] = 0
-        mask_manual[4,5] = 0
-        
-        self.mask_manual = DataContainer(mask_manual, dimension_labels=self.data.dimension_labels) 
-        self.mask_generated = MaskGenerator.special_values()(self.data)
+        self.mask_2D_manual = DataContainer(mask_2D_manual, dimension_labels=self.data_2D.dimension_labels) 
+        self.mask_2D_generated = MaskGenerator.special_values()(self.data_2D)
+
+        self.mask_3D_manual = DataContainer(mask_3D_manual, dimension_labels=self.data_3D.dimension_labels)
+        self.mask_3D_generated = MaskGenerator.special_values()(self.data_3D)
 
     def test_Masker_Manual(self):
-        self.Masker_check(self.mask_manual, self.data, self.data_init)
+        self.Masker_check(self.mask_2D_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
 
     def test_Masker_generated(self):
-        self.Masker_check(self.mask_generated, self.data, self.data_init)
+        self.Masker_check(self.mask_2D_generated, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        self.Masker_check(self.mask_3D_generated, self.data_3D, self.data_3D_init, self.mask_coords_3D)
 
-    def Masker_check(self, mask, data, data_init): 
+    def Masker_check(self, mask, data, data_init, mask_coords): 
 
-        # test vaue mode
+        # test value mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         res = m.process()
         
         data_test = data.copy().as_array()
-        data_test[2,3] = 10
-        data_test[4,5] = 10
+
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = 10
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)     
         
@@ -2546,11 +2567,11 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        tmp = numpy.sum(data_init.as_array())-(data_init.as_array()[2,3]+data_init.as_array()[4,5])
-        tmp /= 98
-        data_test[2,3] = tmp
-        data_test[4,5] = tmp
-        
+        tmp = numpy.sum(data_init.as_array())-numpy.sum([data_init.as_array()[i] for i in mask_coords])
+        tmp /= (data_init.size - len(mask_coords))
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = tmp
+
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
         # test median mode
@@ -2560,8 +2581,8 @@ class TestMasker(unittest.TestCase):
         
         data_test = data.copy().as_array()
         tmp = data.as_array()[numpy.isfinite(data.as_array())]
-        data_test[2,3] = numpy.median(tmp)
-        data_test[4,5] = numpy.median(tmp)
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = numpy.median(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
         
@@ -2571,10 +2592,17 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        tmp1 = data.as_array()[2,:][numpy.isfinite(data.as_array()[2,:])]
-        tmp2 = data.as_array()[4,:][numpy.isfinite(data.as_array()[4,:])]
-        data_test[2,3] = numpy.median(tmp1)
-        data_test[4,5] = numpy.median(tmp2)
+
+        for mask_coord in mask_coords:
+            # get elements in mask_coord:
+            if len(mask_coord) == 2:
+                x, y = mask_coord
+                tmp = data.as_array()[:,y][numpy.isfinite(data.as_array()[:,y])]
+            else:
+                x, y, z = mask_coord
+                tmp = data.as_array()[:,y,z][numpy.isfinite(data.as_array()[:,y,z])]
+            
+            data_test[mask_coord] = numpy.median(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
@@ -2584,10 +2612,15 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        tmp1 = data.as_array()[:,3][numpy.isfinite(data.as_array()[:,3])]
-        tmp2 = data.as_array()[:,5][numpy.isfinite(data.as_array()[:,5])]
-        data_test[2,3] = numpy.sum(tmp1) / 9
-        data_test[4,5] = numpy.sum(tmp2) / 9
+        for mask_coord in mask_coords:
+            # get elements in mask_coord:
+            if len(mask_coord) == 2:
+                x, y = mask_coord
+                tmp = data.as_array()[x,:][numpy.isfinite(data.as_array()[x,:])]
+            else:
+                x, y, z = mask_coord
+                tmp = data.as_array()[x,:,z][numpy.isfinite(data.as_array()[x,:,z])]
+            data_test[mask_coord] = numpy.sum(tmp) / len(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
         
@@ -2598,8 +2631,8 @@ class TestMasker(unittest.TestCase):
         m.process(out=data)
         
         data_test = data_init.copy().as_array()
-        data_test[2,3] = 10
-        data_test[4,5] = 10
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = 10
         
         numpy.testing.assert_allclose(data.as_array(), data_test, rtol=1E-6) 
         
@@ -2610,22 +2643,28 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        data_test[2,3] = 10
-        data_test[4,5] = 10
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = 10
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
         # test interpolate
         data = data_init.copy()
-        m = Masker.interpolate(mask=mask, method='linear', axis='horizontal_y')
+        m = Masker.interpolate(mask=mask, method='linear', axis=0)
         m.set_input(data)
         res = m.process()
         
         data_test = data.copy().as_array()
-        data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
-        data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
+
+        for mask_coord in mask_coords:
+            if len(mask_coord) == 2:
+                x, y = mask_coord
+                data_test[mask_coord] = (data_test[x-1, y] + data_test[x+1, y]) / 2
+            else:
+                x, y, z = mask_coord
+                data_test[mask_coord] = (data_test[x-1, y, z] + data_test[x+1, y, z]) / 2
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
 
         

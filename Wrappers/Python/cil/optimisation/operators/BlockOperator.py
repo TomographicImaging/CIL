@@ -151,6 +151,9 @@ class BlockOperator(Operator):
 
     def set_norms(self, norms):
         '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
+        
+         Args:
+            :param: norms (:obj:`list`): A list of positive real values the same length as the number of operators in the BlockOperator.  
         '''
         if len(norms) != len(self):
             raise ValueError(

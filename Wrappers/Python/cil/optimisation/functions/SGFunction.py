@@ -36,7 +36,7 @@ class SGFunction(ApproximateGradientSumFunction):
         if isinstance(functions, list):
             super(SGFunction, self).__init__(functions, sampler)    
         elif isinstance(functions, SumFunction):
-            super(SGFunction, self).__init__(*functions.functions, sampler) #TODO: is this the right thing to do? 
+            super(SGFunction, self).__init__(functions.functions, sampler) #TODO: is this the right thing to do? 
         else:
             raise TypeError("Input to functions should be a list of functions or a SumFunction")
     

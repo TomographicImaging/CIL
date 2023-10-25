@@ -20,49 +20,23 @@
 #TODO: remove unused packages 
 import unittest
 from utils import initialise_tests
-import numpy
+
 import numpy as np
-from numpy import nan, inf
+
 from cil.framework import VectorData
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
-from cil.framework import AcquisitionGeometry
-from cil.framework import BlockDataContainer
-from cil.framework import BlockGeometry
 
-from cil.optimisation.operators import IdentityOperator
-from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
-
-from cil.optimisation.functions import LeastSquares, ZeroFunction, \
-   L2NormSquared, OperatorCompositionFunction
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
-from cil.optimisation.functions import IndicatorBox
-
-from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.algorithms import GD
-from cil.optimisation.algorithms import CGLS
-from cil.optimisation.algorithms import SIRT
-from cil.optimisation.algorithms import FISTA
-from cil.optimisation.algorithms import SPDHG
-from cil.optimisation.algorithms import PDHG
-from cil.optimisation.algorithms import LADMM
 
 
 from cil.utilities import dataexample
-from cil.utilities import noise as applynoise
-import time
-import warnings
-from cil.optimisation.functions import Rosenbrock
+from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction
-#from cil.optimisation.utilities import Sampler 
+#from cil.optimisation.utilities import Sampler #TODO: 
+from cil.optimisation.functions import SumFunction
+from cil.optimisation.operators import MatrixOperator
+from cil.optimisation.algorithms import GD 
+from cil.framework import VectorData
 
-from cil.framework import VectorData, VectorGeometry
-from cil.utilities.quality_measures import mae, mse, psnr
-# Fast Gradient Projection algorithm for Total Variation(TV)
-from cil.optimisation.functions import TotalVariation
-import logging
 from testclass import CCPiTestClass
 from utils import  has_astra
 
@@ -139,7 +113,7 @@ class TestSGD(CCPiTestClass):
             fi=LeastSquares(self.A_partitioned.operators[i],self. partitioned_data[i])
             f_subsets.append(fi)
         self.f=LeastSquares(self.A, self.data2d)
-        self.f_stochastic=SGFunction(f_subsets,self.sampler)
+        self.f_stochastic=SGFunction(SumFunction(*f_subsets),self.sampler)
         self.initial=ig2D.allocate()
 
     def test_approximate_gradient(self):

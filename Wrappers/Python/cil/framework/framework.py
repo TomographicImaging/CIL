@@ -2760,12 +2760,13 @@ class DataContainer(object):
     
     def get_dimension_axis(self, dimension_label):
         """
-        Returns the axis index of the DataContainer array for specified dimension_label(s) 
+        Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+        any dimension_labels of the DataContainer or their indices 
         
         Parameters
         ----------
-        dimension_label: string or tuple of strings
-            The dimension_label(s) of the DataContainer to find the axis index of. 
+        dimension_label: string or int or tuple of strings or ints
+            Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index 
         
         Returns
         -------
@@ -2780,7 +2781,7 @@ class DataContainer(object):
 
         if dimension_label in self.dimension_labels:
             return self.dimension_labels.index(dimension_label)
-        elif isinstance(dimension_label, int) and dimension_label > 0 and dimension_label < len(self.dimension_labels):
+        elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < len(self.dimension_labels):
             return dimension_label
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
@@ -3371,7 +3372,7 @@ class DataContainer(object):
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
-    def _directional_reduction_unary(self, reduction_function, direction=None, *args, **kwargs):
+    def _directional_reduction_unary(self, reduction_function, axis=None, out=None, *args, **kwargs):
         """
         Returns the result of a unary function, considering a direction argument to the function
         
@@ -3379,9 +3380,10 @@ class DataContainer(object):
         ----------
         reduction_function : function 
             The unary function to be evaluated
-        direction : string or tuple of strings
-            Specify the axis or axes to calculate 'reduction_function' along using a dimension_label. 
-            Default calculates the function over the whole array
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'reduction_function' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
         out: ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
@@ -3394,85 +3396,35 @@ class DataContainer(object):
         scalar or ndarray
             The result of the unary function
         """
+        if axis is not None:
+            axis = self.get_dimension_axis(axis)
 
-        if kwargs.get('axis') is not None and direction is not None:
-            raise ValueError ("Incompatible arguments: specify either direction or axis")
-
-        out = kwargs.pop('out', None)  
-        if direction is None:
-            result = reduction_function(self.as_array(), *args, **kwargs)
-            if out is None and kwargs.get('axis') is not None:
-                return result
-        else:
-            kwargs['axis'] = self.get_dimension_axis(direction)
-            result = reduction_function(self.as_array(), *args, **kwargs)
-            
         if out is None:
+            result = reduction_function(self.as_array(), axis=axis, *args, **kwargs)
             if isinstance(result, numpy.ndarray):
                 new_dimensions = numpy.array(self.dimension_labels)
-                new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-                result = DataContainer(result, dimension_labels=new_dimensions)
-            return  result
-        
-        elif issubclass(type(out), DataContainer):         
-            new_dimensions = numpy.array(self.dimension_labels)
-            new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
-            if result.shape == out.shape and new_dimensions == out.dimension_labels:
-                out.fill(result.astype(out.dtype)) # convert to the type given in out
+                new_dimensions = numpy.delete(new_dimensions, axis)
+                return DataContainer(result, dimension_labels=new_dimensions)
             else:
-                raise ValueError('Data mismatch: out.shape = {} result.shape = {}, out.dimension_labels = {} result.dimension_labels = {}'.format(out.shape, result.shape, out.dimension_labels, new_dimensions))   
-        
-        elif issubclass(type(out), numpy.ndarray):
-            if result.shape == out.shape:
-                out[:] = result.astype(out.dtype)
-
+                return result
         else:
-            raise ValueError (message(type(self),  "Incompatible class:" , reduction_function.__name__, type(out)))
-        
-        # if out is None:
-        #     if direction is None:
-        #         result = reduction_function(self.as_array(), *args, **kwargs)
-        #     else:
-        #         kwargs['axis'] = self.get_dimension_axis(direction)
-        #         result = reduction_function(self.as_array(), *args, **kwargs)
-        #         if isinstance(result, numpy.ndarray):
-        #             new_dimensions = numpy.array(self.dimension_labels)
-        #             new_dimensions = numpy.delete(new_dimensions, kwargs['axis'])
-        #             result = DataContainer(result, dimension_labels=new_dimensions)
-        #     return result                      
-                    
-        # elif issubclass(type(out), DataContainer):
-        #     kwargs['out'] = None
-        #     if direction is None:
-        #         result = reduction_function(self.as_array(), *args, **kwargs)
-        #     else:
-        #         kwargs['axis'] = self.get_dimension_axis(direction)
-        #         result = reduction_function(self.as_array(), *args, **kwargs)
-            
-        #     new_dimensions = numpy.array(self.dimension_labels)
-        #     new_dimensions = tuple(numpy.delete(new_dimensions, kwargs['axis']))
-        #     if result.shape == out.shape and new_dimensions == out.dimension_labels:
-        #         out.fill(result.astype(out.dtype)) # convert to the type given in out
-        #     else:
-        #         raise ValueError('Data mismatch: out.shape = {} result.shape = {}, out.dimension_labels = {} result.dimension_labels = {}'.format(out.shape, result.shape, out.dimension_labels, new_dimensions))   
+            if hasattr(out,'array'):
+                out_arr = out.array
+            else:
+                out_arr = out
 
-        # elif issubclass(type(out), numpy.ndarray):
-        #     if direction is not None:
-        #         kwargs['axis'] = self.get_dimension_axis(direction)
-        #     reduction_function(self.as_array(), *args, **kwargs)
+            reduction_function(self.as_array(), out=out_arr, axis=axis,  *args, **kwargs)
 
-        # else:
-        #     raise ValueError (message(type(self),  "Incompatible class:" , reduction_function.__name__, type(out)))
-
-    def sum(self, direction=None, *args, **kwargs):
+    def sum(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the sum of values in the DataContainer
         
         Parameters
         ----------
-        direction : string or tuple of strings, optional
-            Specify the axis or axes to calculate the sum along using a dimension_label. 
-            Default is None, calculates the sum of the whole array
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'sum' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
@@ -3494,17 +3446,18 @@ class DataContainer(object):
         else:
             kwargs['dtype'] = numpy.complex128
 
-        return self._directional_reduction_unary(numpy.sum, direction=direction, *args, **kwargs)
+        return self._directional_reduction_unary(numpy.sum, axis=axis, out=out, *args, **kwargs)
 
-    def min(self, direction=None, *args, **kwargs):
+    def min(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the min pixel value in the DataContainer
         
         Parameters
         ----------
-        direction : string or tuple of strings, optional
-            Specify the axis or axes to calculate the minimum along using a dimension_label.
-            Default is None, calculates the min of the whole array returning a number.
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'min' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See 
@@ -3517,17 +3470,18 @@ class DataContainer(object):
         scalar or DataContainer
             The min as a scalar or inside a DataContainer with reduced dimension_labels
         """
-        return self._directional_reduction_unary(numpy.min, direction=direction, *args, **kwargs)
+        return self._directional_reduction_unary(numpy.min, axis=axis, out=out, *args, **kwargs)
     
-    def max(self, direction=None, *args, **kwargs):
+    def max(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the max pixel value in the DataContainer
 
         Parameters
         ----------
-        direction : string or tuple of strings, optional
-            Specify the axis or axes to calculate the maximum along using a dimension_label.
-            Default is None, calculates the max of the whole array
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'max' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
@@ -3540,17 +3494,18 @@ class DataContainer(object):
         scalar or DataContainer 
             The max as a scalar or inside a DataContainer with reduced dimension_labels 
         """
-        return self._directional_reduction_unary(numpy.max, direction=direction, *args, **kwargs)
+        return self._directional_reduction_unary(numpy.max, axis=axis, out=out, *args, **kwargs)
         
-    def mean(self, direction=None, *args, **kwargs):
+    def mean(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the mean pixel value of the DataContainer
 
         Parameters
         ----------
-        direction : string or tuple of strings, optional
-            Specify the axis or axes to calculate the mean along using a dimension_label.
-            Default is none, calculates the mean of the whole array
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'mean' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
@@ -3573,7 +3528,7 @@ class DataContainer(object):
         else:
             kwargs['dtype'] = numpy.complex128
         
-        return self._directional_reduction_unary(numpy.mean, direction=direction, *args, **kwargs)
+        return self._directional_reduction_unary(numpy.mean, axis=axis, out=out, *args, **kwargs)
 
     # Logic operators between DataContainers and floats    
     def __le__(self, other):

@@ -766,7 +766,7 @@ class TestDataContainer(CCPiTestClass):
         norm = dc.norm()
         self.assertEqual(sqnorm, 8.0)
         numpy.testing.assert_almost_equal(norm, numpy.sqrt(8.0), decimal=7)
-        sum = dc.sum(direction=('X','Z'))
+        sum = dc.sum(axis=('X','Z'))
         numpy.testing.assert_almost_equal(sum.as_array(), [numpy.float64(4),numpy.float64(4)])
         numpy.testing.assert_equal(sum.dimension_labels,('Y',))
         sum = dc.sum()
@@ -789,34 +789,35 @@ class TestDataContainer(CCPiTestClass):
 
 
     def directional_reduction_unary_test(self, data, test_func, expected_func, out, function_name):
-        # test specifying function in 1 axis
         def error_message(function_name, test_name):
             return "Failed with reduction " + function_name + " on test " + test_name
-        result = test_func(direction=data.dimension_labels[1])
+        # test specifying function in 1 axis
+        result = test_func(axis=data.dimension_labels[1])
         expected = expected_func(data.as_array(), axis=1)
         expected_dimension_labels = data.dimension_labels[0],data.dimension_labels[2]
         numpy.testing.assert_almost_equal(result.as_array(), expected, err_msg=error_message(function_name, "'with 1 axis'"))
         numpy.testing.assert_equal(result.dimension_labels, expected_dimension_labels, err_msg=error_message(function_name, "'with 1 axis'"))
-        # test specifying direction with an int           
-        result = test_func(direction=1)
+        # test specifying axis with an int           
+        result = test_func(axis=1)
         numpy.testing.assert_almost_equal(result.as_array(), expected, err_msg=error_message(function_name, "'with 1 axis'"))
         numpy.testing.assert_equal(result.dimension_labels,expected_dimension_labels, err_msg=error_message(function_name, "'with 1 axis'"))
-        # test specifying direction with an axis argument
-        result = test_func(axis=1)
-        numpy.testing.assert_almost_equal(result, expected, err_msg=error_message(function_name, "'with 1 axis'"))
         # test specifying function in 2 axes
-        result = test_func(direction=(data.dimension_labels[0],data.dimension_labels[1]))
+        result = test_func(axis=(data.dimension_labels[0],data.dimension_labels[1]))
+        numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)), err_msg=error_message(function_name, "'with 2 axes'"))
+        numpy.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],), err_msg=error_message(function_name, "'with 2 axes'"))
+        # test specifying function in 2 axes with an int
+        result = test_func(axis=(0,1))
         numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)), err_msg=error_message(function_name, "'with 2 axes'"))
         numpy.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],), err_msg=error_message(function_name, "'with 2 axes'"))
         # test specifying function in 3 axes
-        result = test_func(direction=(data.dimension_labels[0],data.dimension_labels[1],data.dimension_labels[2]))
+        result = test_func(axis=(data.dimension_labels[0],data.dimension_labels[1],data.dimension_labels[2]))
         numpy.testing.assert_almost_equal(result, expected_func(data.as_array()), err_msg=error_message(function_name, "'with 3 axes'"))
         # test providing a DataContainer to out
         expected_array = expected_func(data.as_array(), axis = 0)
         test_func(axis=0, out=out)
         numpy.testing.assert_almost_equal(out.as_array(), expected_array, err_msg=error_message(function_name, "'of out argument'"))
         numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), err_msg=error_message(function_name, "'of out argument'"))
-        test_func(direction=data.dimension_labels[0], out=out)
+        test_func(axis=data.dimension_labels[0], out=out)
         numpy.testing.assert_almost_equal(out.as_array(), expected_array, err_msg=error_message(function_name, "'of out argument'"))
         numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), err_msg=error_message(function_name, "'of out argument'"))
         # test providing a numpy array to out
@@ -852,11 +853,9 @@ class TestDataContainer(CCPiTestClass):
         data_classes = [dc, id, id_complex, ad]
         out_classes = [dc_out,id_out,id_complex_out, ad_out]
         for j in numpy.arange(len(data_classes)):
-            test_funcs = [data_classes[j].mean, data_classes[j].sum, data_classes[j].min, data_classes[j].max]
-            expected_funcs = [numpy.mean, numpy.sum, numpy.min, numpy.max]
             function_names = ['mean','sum','min','max']
-            for i in numpy.arange(len(test_funcs)):
-                self.directional_reduction_unary_test(data_classes[j], test_funcs[i], expected_funcs[i], out_classes[j], function_names[i])
+            for i in numpy.arange(len(function_names)):
+                self.directional_reduction_unary_test(data_classes[j], getattr(data_classes[j],function_names[i]), getattr(numpy,function_names[i]), out_classes[j], function_names[i])
 
 
     def test_mean_direction(self):
@@ -866,29 +865,26 @@ class TestDataContainer(CCPiTestClass):
         data.fill(np_arr)
 
         # test specifying mean in 1 axis
-        mean = data.mean(direction='horizontal_y')
+        mean = data.mean(axis='horizontal_y')
         numpy.testing.assert_almost_equal(mean.as_array(), [[1.0, 2.0],[5.0, 6.0]])
         numpy.testing.assert_equal(mean.dimension_labels,('vertical','horizontal_x'))
         mean = data.mean(axis=1)
-        numpy.testing.assert_almost_equal(mean, [[1.0, 2.0],[5.0, 6.0]])
+        numpy.testing.assert_almost_equal(mean.as_array(), [[1.0, 2.0],[5.0, 6.0]])
         # test specifying mean in 2 axes
-        mean = data.mean(direction=('horizontal_y', 'vertical'))
+        mean = data.mean(axis=('horizontal_y', 'vertical'))
         numpy.testing.assert_almost_equal(mean.as_array(), [3.0, 4.0])
         numpy.testing.assert_equal(mean.dimension_labels,('horizontal_x',))
         # test specifying mean in 3 axes
         expected = numpy.float64(0+1+2+3+4+5+6+7)/numpy.float64(8)
-        mean = data.mean(direction=('horizontal_x','horizontal_y','vertical'))
+        mean = data.mean(axis=('horizontal_x','horizontal_y','vertical'))
         numpy.testing.assert_almost_equal(mean, expected)
-        # test specifying direction with an int   
-        with numpy.testing.assert_raises(ValueError):
-            mean = data.mean(direction=0)
         # test mean on VectorData
         np_arr = numpy.array([0,1,2,3,4])
         vg = VectorGeometry(5)
         vd = vg.allocate(0)
         vd.fill(np_arr)
         vd.dimension_labels = 'x'
-        numpy.testing.assert_almost_equal(vd.mean(direction='x'), numpy.mean(vd))     
+        numpy.testing.assert_almost_equal(vd.mean(axis='x'), numpy.mean(vd))     
         
 
     def test_multiply_out(self):
@@ -1134,23 +1130,20 @@ class TestDataContainer(CCPiTestClass):
         data.fill(np_arr)               
 
         # test specifying min in 3 axes
-        min = data.min(direction=('vertical','horizontal_x','horizontal_y'))
+        min = data.min(axis=('vertical','horizontal_x','horizontal_y'))
         self.assertAlmostEqual(min, 0)
         # test specifying min in 2 axes
-        min = data.min(direction=('horizontal_y', 'vertical'))
+        min = data.min(axis=('horizontal_y', 'vertical'))
         numpy.testing.assert_almost_equal(min.as_array(), [0.0, 1.0]) 
         # test specifying min in 1 axis
-        min = data.min(direction='horizontal_x')
+        min = data.min(axis='horizontal_x')
         expected = [[numpy.float64(0), numpy.float64(2)],[numpy.float64(4), numpy.float64(6)]]          
         numpy.testing.assert_almost_equal(min.as_array(), expected)
         numpy.testing.assert_equal(min.dimension_labels,('vertical','horizontal_y'))
         # test specifying min in 1 axis using numpy axis argument
         min = data.min(axis=0)
         expected = [[numpy.float64(0), numpy.float64(1)],[numpy.float64(2), numpy.float64(3)]]          
-        numpy.testing.assert_almost_equal(min, expected)      
-        # test specifying direction with an int   
-        with numpy.testing.assert_raises(ValueError):
-            min = data.min(direction=0)  
+        numpy.testing.assert_almost_equal(min.as_array(), expected)      
 
 
     def test_max(self):
@@ -1169,24 +1162,21 @@ class TestDataContainer(CCPiTestClass):
         data.fill(np_arr)            
 
         # test specifying max in 3 axes 
-        max = data.max(direction=('vertical','horizontal_x','horizontal_y'))
+        max = data.max(axis=('vertical','horizontal_x','horizontal_y'))
         self.assertAlmostEqual(max, 7)
         # test specifying max in 2 axes
-        max = data.max(direction=('horizontal_y', 'vertical'))
+        max = data.max(axis=('horizontal_y', 'vertical'))
         numpy.testing.assert_almost_equal(max.as_array(), [6.0, 7.0])
         numpy.testing.assert_equal(max.dimension_labels,('horizontal_x',)) 
         # test specifying max in 1 axis
-        max = data.max(direction='horizontal_x')
+        max = data.max(axis='horizontal_x')
         expected = [[numpy.float64(1), numpy.float64(3)],[numpy.float64(5), numpy.float64(7)]]
         numpy.testing.assert_almost_equal(max.as_array(), expected)
         numpy.testing.assert_equal(max.dimension_labels,('vertical','horizontal_y'))
         # test specifying max in 1 axis using numpy axis argument
         max = data.max(axis=0)
         expected = [[numpy.float64(4), numpy.float64(5)],[numpy.float64(6), numpy.float64(7)]]          
-        numpy.testing.assert_almost_equal(max, expected)            
-        # test specifying direction with an int   
-        with numpy.testing.assert_raises(ValueError):
-            max = data.max(direction=0)  
+        numpy.testing.assert_almost_equal(max.as_array(), expected)            
         
 
     def test_size(self):

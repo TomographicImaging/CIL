@@ -3374,7 +3374,7 @@ class DataContainer(object):
     
     def _directional_reduction_unary(self, reduction_function, axis=None, out=None, *args, **kwargs):
         """
-        Returns the result of a unary function, considering a direction argument to the function
+        Returns the result of a unary function, considering the direction from an axis argument to the function
         
         Parameters
         ----------

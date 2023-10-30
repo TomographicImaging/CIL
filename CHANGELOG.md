@@ -1,7 +1,8 @@
 
-*xx.x.x
+* xx.x.x
   - Added the a `Sampler` class as a CIL optimisation utility 
   - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
+  - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

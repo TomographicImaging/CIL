@@ -2774,18 +2774,15 @@ class DataContainer(object):
             The axis index of the DataContainer matching the specified dimension_label
         """
         if isinstance(dimension_label,(tuple,list)):
-            temp = []
-            for x in dimension_label:
-                temp.append(self.get_dimension_axis(x))
-            return tuple(temp)
+            return tuple(self.get_dimension_axis(x) for x in dimension_label)
 
         if dimension_label in self.dimension_labels:
             return self.dimension_labels.index(dimension_label)
-        elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < len(self.dimension_labels):
-            return dimension_label
+        elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < self.ndim:
+            return dimension_label 
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
-                            self.dimension_labels))
+            raise ValueError('Unknown dimension {0}. Should be one of {1}, or an integer in range {3} - {4}'.format(dimension_label,
+                            self.dimension_labels, ))
 
                         
     def as_array(self):

@@ -24,7 +24,7 @@ import warnings
 import logging
 from cil.optimisation.utilities import Sampler
 from numbers import Number
-
+import numpy as np
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
@@ -49,19 +49,16 @@ class SPDHG(Algorithm):
         List of Step size parameters for Dual problem
     initial : DataContainer, optional, default=None
         Initial point for the SPDHG algorithm
-
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
     sampler: an instance of a `cil.optimisation.utilities.Sampler` class
         Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
-    precalculated_norms : list of floats
-        precalculated list of norms of the operators #TODO: to remove based on pull request #1513
     **kwargs:
 
     prob : list of floats, optional, default=None
         List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
     norms : list of floats
-        precalculated list of norms of the operators. To be deprecated - replaced by precalculated_norms 
+        precalculated list of norms of the operators. To be deprecated and placed by the `set_norms` functionalist in a BlockOperator.
     Example 
     -------
 
@@ -99,27 +96,30 @@ class SPDHG(Algorithm):
     '''
 
     def __init__(self, f=None, g=None, operator=None,
-                 initial=None, precalculated_norms=None, sampler=None,  **kwargs):
+                 initial=None, sampler=None,  **kwargs):
 
         super(SPDHG, self).__init__(**kwargs)
 
-        if precalculated_norms is None and kwargs.get('prob') is not None:
-            precalculated_norms = kwargs.get('norms', None)
+        if kwargs.get('norms', None) is not None:
+            operator.set_norms(kwargs.get('norms'))
             warnings.warn(
-                        'norms is being deprecated, pass instead precalculated_norms=your_custom_norms')
+                        ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
+        
         if sampler is not None:
-            self.prob_weights = sampler.prob
+            if kwargs.get('prob', None) is not None:
+                warnings.warn('`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.') 
         else:
             if kwargs.get('prob', None) is not None:
-                warnings.warn('prob is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob)')
-            self.prob_weights = kwargs.get('prob', [1/len(operator)]*len(operator))
-            sampler=Sampler.randomWithReplacement(len(operator),  prob=self.prob_weights)
+                warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
+            sampler=Sampler.randomWithReplacement(len(operator),  prob=kwargs.get('prob', [1/len(operator)]*len(operator)))
         
 
-        if f is not None and operator is not None and g is not None:
+        if f is not None and operator is not None and g is not None and sampler is not None:
             self.set_up(f=f, g=g, operator=operator,
-                        initial=initial,  sampler=sampler, precalculated_norms=precalculated_norms)
+                        initial=initial,  sampler=sampler)
 
+        
+            
     @property
     def sigma(self):
         return self._sigma
@@ -273,7 +273,7 @@ class SPDHG(Algorithm):
                 return False
 
     def set_up(self, f, g, operator,
-               initial=None,   sampler=None, precalculated_norms=None):
+               initial=None,   sampler=None):
         '''set-up of the algorithm
         Parameters
         ----------
@@ -293,8 +293,6 @@ class SPDHG(Algorithm):
             parameter controlling the trade-off between the primal and dual step sizes
         sampler: an instance of a `cil.optimisation.utilities.Sampler` class
              Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
-        precalculated_norms : list of floats
-            precalculated list of norms of the operators 
         '''
         logging.info("{} setting up".format(self.__class__.__name__, ))
 
@@ -303,41 +301,14 @@ class SPDHG(Algorithm):
         self.g = g
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
+        self.sampler=sampler
+        self.norms = operator.get_norms()
 
-        if precalculated_norms is None:
-            # Compute norm of each sub-operator
-            self.norms = [self.operator.get_item(i, 0).norm()
-                          for i in range(self.ndual_subsets)]
-        else:
-            if len(precalculated_norms) == self.ndual_subsets:
-                if all(isinstance(x, Number) for x in precalculated_norms):
-                    if all(x > 0 for x in precalculated_norms):
-                        pass
-                    else:
-                        raise ValueError(
-                            "The norms of the operators should be positive")
-                else:
-                    raise ValueError(
-                        "The norms of the operators should be a Number")
-            else:
-                raise ValueError(
-                    "Please pass a list of floats to the precalculated norms with the same number of entries as number of operators")
-            self.norms = precalculated_norms
-
-        if sampler is None:
-            if self.prob_weights is None:
-                self.prob_weights = [1/self.ndual_subsets] * self.ndual_subsets
-            self.sampler = Sampler.randomWithReplacement(
-                self.ndual_subsets,  prob=self.prob_weights)
-        else:
-            if not isinstance(sampler, Sampler):
-                raise ValueError(
-                    "The sampler should be an instance of the cil.optimisation.utilities.Sampler class")
-            self.sampler = sampler
-            if sampler.prob is None:
-                self.prob_weights = [1/self.ndual_subsets] * self.ndual_subsets
-            else:
-                self.prob_weights = sampler.prob
+        self.prob_weights=sampler.prob_weights #TODO: write unit tests for this #TODO: consider the case it is uniform and not saving the array 
+        if self.prob_weights is None:
+            x=sampler.get_sampler(10000)
+            self.prob_weights=[np.count_nonzero((x==i)) for i in range(len(operator))]
+            self.prob_weights/=sum(self.prob_weights)
 
         # might not want to do this until it is called (if computationally expensive)
         self.set_step_sizes_default()

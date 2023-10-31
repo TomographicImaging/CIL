@@ -830,9 +830,9 @@ class TestSPDHG(CCPiTestClass):
 
     def test_spdhg_non_default_init(self):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
-                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10, precalculated_norms=[1]*self.subsets )
+                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )
 
-        self.assertListEqual(spdhg.norms, [1]*self.subsets)
+        
         self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
         self.assertTrue(isinstance(spdhg.sampler, Sampler))
         self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(1).array)

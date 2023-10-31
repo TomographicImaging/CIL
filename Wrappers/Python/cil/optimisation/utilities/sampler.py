@@ -48,6 +48,8 @@ class Sampler():
     seed:int, default=None
         Random seed for the methods that use a numpy random number generator.  If set to None, the seed will be set using the current time.  
 
+    prob_weights: list of floats of length num_indices that sum to 1. 
+        Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
 
 
     Example
@@ -134,7 +136,7 @@ class Sampler():
         0
         """
         order = list(range(num_indices))
-        sampler = Sampler(num_indices, sampling_type='sequential', order=order)
+        sampler = Sampler(num_indices, sampling_type='sequential', order=order, prob_weights=[1/num_indices]*num_indices)
         return sampler
 
     @staticmethod
@@ -167,9 +169,9 @@ class Sampler():
         [1 4 6 7 8]
 
         """
-        num_indices = len(customlist)
+        num_indices = len(customlist)#TODO: is this an issue
         sampler = Sampler(
-            num_indices, sampling_type='custom_order', order=customlist)
+            num_indices, sampling_type='custom_order', order=customlist, prob_weights=None)#TODO: 
         return sampler
 
     @staticmethod
@@ -231,7 +233,7 @@ class Sampler():
 
         order = _herman_meyer_order(num_indices)
         sampler = Sampler(
-            num_indices, sampling_type='herman_meyer', order=order)
+            num_indices, sampling_type='herman_meyer', order=order, prob_weights=[1/num_indices]*num_indices)
         return sampler
 
     @staticmethod
@@ -277,7 +279,7 @@ class Sampler():
         indices = list(range(num_indices))
         order = []
         [order.extend(indices[i::offset]) for i in range(offset)]
-        sampler = Sampler(num_indices, sampling_type='staggered', order=order)
+        sampler = Sampler(num_indices, sampling_type='staggered', order=order, prob_weights=[1/num_indices]*num_indices)
         return sampler
 
     @staticmethod
@@ -316,7 +318,7 @@ class Sampler():
         if prob == None:
             prob = [1/num_indices] * num_indices
         sampler = Sampler(
-            num_indices, sampling_type='random_with_replacement', prob=prob, seed=seed)
+            num_indices, sampling_type='random_with_replacement', prob=prob, seed=seed, prob_weights=prob)
         return sampler
 
     @staticmethod
@@ -349,14 +351,15 @@ class Sampler():
 
         order = list(range(num_indices))
         sampler = Sampler(num_indices, sampling_type='random_without_replacement',
-                          order=order, shuffle=shuffle, seed=seed)
+                          order=order, shuffle=shuffle, seed=seed, prob_weights=[1/num_indices]*num_indices)
         return sampler
 
-    def __init__(self, num_indices, sampling_type, shuffle=False, order=None, prob=None, seed=None):
+    def __init__(self, num_indices, sampling_type, shuffle=False, order=None, prob=None, seed=None, prob_weights=None):
         """
         This method is the internal init for the sampler method. Most users should call the static methods e.g. Sampler.sequential or Sampler.staggered. 
 
         """
+        self.prob_weights=prob_weights
         self.type = sampling_type
         self.num_indices = num_indices
         if seed is not None:

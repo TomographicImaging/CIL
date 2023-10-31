@@ -20,7 +20,7 @@
 
 from cil.optimisation.functions import SumFunction
 import numbers
-class ApproximateGradientSumFunction(SumFunction):
+class ApproximateGradientSumFunction(SumFunction): #TODO: should be an abstract base class
 
     r"""ApproximateGradientSumFunction represents the following sum 
 
@@ -71,7 +71,7 @@ class ApproximateGradientSumFunction(SumFunction):
         r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
         return super(ApproximateGradientSumFunction, self).gradient(x, out=out)
 
-    def approximate_gradient(self, function_num, x,  out=None):
+    def approximate_gradient(self, function_num, x,  out=None):#TODO: x, function_num instead 
         """ Computes the approximate gradient for each selected function at :code:`x`."""
         raise NotImplementedError
 

@@ -165,9 +165,9 @@ class SPDHG(Algorithm):
                 "We currently only support scalar values of gamma")
 
         self._sigma = [gamma * rho / ni for ni in self.norms]
-
-        self._tau = min([pi / (si * ni**2) for pi, ni,
-                         si in zip(self.prob_weights, self.norms, self._sigma)])
+        values=[pi / (si * ni**2) for pi, ni,
+                         si in zip(self.prob_weights, self.norms, self._sigma)]
+        self._tau = min([value for value in values if value>1e-6]) #TODO: what value should this be 
         self._tau *= (rho / gamma)
 
     def set_step_sizes_custom(self, sigma=None, tau=None):
@@ -237,8 +237,9 @@ class SPDHG(Algorithm):
                 gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self.norms, self.prob_weights)]
 
         if tau is None:
-            self._tau = min([pi / (si * ni**2) for pi, ni,
-                            si in zip(self.prob_weights, self.norms, self._sigma)])
+            values=[pi / (si * ni**2) for pi, ni,
+                         si in zip(self.prob_weights, self.norms, self._sigma)]
+            self._tau = min([value for value in values if value>1e-6]) #TODO: what value should this be 
             self._tau *= (rho / gamma)
         else:
             if isinstance(tau, Number):
@@ -304,11 +305,12 @@ class SPDHG(Algorithm):
         self.sampler=sampler
         self.norms = operator.get_norms()
 
-        self.prob_weights=sampler.prob_weights #TODO: write unit tests for this #TODO: consider the case it is uniform and not saving the array 
+        self.prob_weights=sampler.prob_weights #TODO: consider the case it is uniform and not saving the array 
         if self.prob_weights is None:
-            x=sampler.get_sampler(10000)
+            x=sampler.get_samples(10000)
             self.prob_weights=[np.count_nonzero((x==i)) for i in range(len(operator))]
-            self.prob_weights/=sum(self.prob_weights)
+            total=sum(self.prob_weights)
+            self.prob_weights[:] = [x / total for x in self.prob_weights]
 
         # might not want to do this until it is called (if computationally expensive)
         self.set_step_sizes_default()

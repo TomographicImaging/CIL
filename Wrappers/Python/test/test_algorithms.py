@@ -838,6 +838,16 @@ class TestSPDHG(CCPiTestClass):
         self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(1).array)
         self.assertEqual(spdhg.max_iteration, 1000)
         self.assertEqual(spdhg.update_objective_interval, 10)
+        
+    def test_spdhg_custom_sampler(self):
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.customOrder([0,0,0,0]),
+                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )        
+        self.assertListEqual(spdhg.prob_weights,  [1]+[0]*(len(self.A)-1))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.customOrder([0,1,0,1]),
+                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )        
+        self.assertListEqual(spdhg.prob_weights,  [.5]+[.5]+[0]*(len(self.A)-2))
+        
+        
 
     def test_spdhg_check_convergence(self):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)

@@ -151,7 +151,7 @@ class BlockOperator(Operator):
          
             param norms (:obj:`list`): A list of positive real values the same length as the number of operators in the BlockOperator.  
         '''
-        if len(norms) != len(self):
+        if len(norms) != self.size:
             raise ValueError(
                 "The length of the list of norms should be equal to the number of operators in the BlockOperator")
 
@@ -382,8 +382,13 @@ class BlockOperator(Operator):
         return BlockDataContainer(*res)
 
     def __len__(self):
-
         return len(self.operators)
+    
+    @property
+    def size(self):
+        return len(self.operators)
+    
+    
 
     def __getitem__(self, index):
         '''Returns the index-th operator in the block irrespectively of it's shape'''

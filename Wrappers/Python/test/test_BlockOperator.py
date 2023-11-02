@@ -45,14 +45,14 @@ class TestBlockOperator(unittest.TestCase):
         self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
         self.assertAlmostEqual(G2.norm(), numpy.sqrt(8), 2)
         self.assertAlmostEqual(A.norm(), numpy.sqrt(16), 2)
-        self.assertAlmostEqual(A.get_norms()[0], numpy.sqrt(8), 2)
-        self.assertAlmostEqual(A.get_norms()[1], numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[0], numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[1], numpy.sqrt(8), 2)
         
 
         #sets_norm
         A.set_norms([2,3]) 
         #gets cached norm
-        self.assertListEqual(A.get_norms(), [2,3], 2)
+        self.assertListEqual(A.get_norms_as_list(), [2,3], 2)
         self.assertEqual(A.norm(), numpy.sqrt(13))
         
 
@@ -64,8 +64,8 @@ class TestBlockOperator(unittest.TestCase):
         A.set_norms([None, None])
         #recalculates norm
         self.assertAlmostEqual(A.norm(), numpy.sqrt(16), 2)
-        self.assertAlmostEqual(A.get_norms()[0], numpy.sqrt(8), 2)
-        self.assertAlmostEqual(A.get_norms()[1], numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[0], numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[1], numpy.sqrt(8), 2)
 
         #Check the warnings on set_norms 
         #Check the length of list that is passed

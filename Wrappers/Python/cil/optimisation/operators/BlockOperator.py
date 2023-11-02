@@ -56,16 +56,11 @@ class BlockOperator(Operator):
 
     def __init__(self, *args, **kwargs):
         '''
-        Class creator
+        This is the class creator.
 
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-
-        Args:
+        Parameters:
             :param: vararg (Operator): Operators in the block.
-            :param: shape (:obj:`tuple`, optional): If shape is passed the Operators in 
-                  vararg are considered input in a row-by-row fashion. 
-                  Shape and number of Operators must match.
+            :param: shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion. Note that shape and number of Operators must match.
 
         Example:
             BlockOperator(op0,op1) results in a row block
@@ -129,7 +124,7 @@ class BlockOperator(Operator):
         return compatible
 
     def get_item(self, row, col):
-        '''returns the Operator at specified row and col'''
+        '''Returns the Operator at specified row and col'''
         if row > self.shape[0]:
             raise ValueError(
                 'Requested row {} > max {}'.format(row, self.shape[0]))
@@ -142,9 +137,9 @@ class BlockOperator(Operator):
 
     def norm(self):
         '''Returns the Euclidean norm of the norms of the individual operators in the BlockOperators '''
-        return numpy.sqrt(numpy.sum(numpy.array(self.get_norms())**2))
+        return numpy.sqrt(numpy.sum(numpy.array(self.get_norms_as_list())**2))
 
-    def get_norms(self, ):
+    def get_norms_as_list(self, ):
         '''Returns a list of the individual norms of the Operators in the BlockOperator
         '''
         return [op.norm() for op in self.operators]
@@ -153,7 +148,8 @@ class BlockOperator(Operator):
         '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
         
          Args:
-            :param: norms (:obj:`list`): A list of positive real values the same length as the number of operators in the BlockOperator.  
+         
+            param norms (:obj:`list`): A list of positive real values the same length as the number of operators in the BlockOperator.  
         '''
         if len(norms) != self.size:
             raise ValueError(
@@ -267,11 +263,11 @@ class BlockOperator(Operator):
                             )
 
     def is_linear(self):
-        '''returns whether all the elements of the BlockOperator are linear'''
+        '''Returns whether all the elements of the BlockOperator are linear'''
         return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)
 
     def get_output_shape(self, xshape, adjoint=False):
-        '''returns the shape of the output BlockDataContainer
+        '''Returns the shape of the output BlockDataContainer
 
         A(N,M) direct u(M,1) -> N,1
         A(N,M)^T adjoint u(N,1) -> M,1
@@ -294,7 +290,9 @@ class BlockOperator(Operator):
     def __rmul__(self, scalar):
         '''Defines the left multiplication with a scalar
 
-        :paramer scalar: (number or iterable containing numbers):
+        Args:
+
+        :`scalar`: (number or iterable containing numbers):
 
         Returns: a block operator with Scaled Operators inside'''
         if isinstance(scalar, list) or isinstance(scalar, tuple) or \
@@ -312,9 +310,9 @@ class BlockOperator(Operator):
 
     @property
     def T(self):
-        '''Return the transposed of self
-
-        input in a row-by-row'''
+        '''Returns the transposed of self.
+        
+        Recall the input list is shaped in a row-by-row fashion'''
         newshape = (self.shape[1], self.shape[0])
         oplist = []
         for col in range(newshape[1]):
@@ -323,7 +321,7 @@ class BlockOperator(Operator):
         return type(self)(*oplist, shape=newshape)
 
     def domain_geometry(self):
-        '''returns the domain of the BlockOperator
+        '''Returns the domain of the BlockOperator
 
         If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.
         Otherwise it is a BlockGeometry.
@@ -345,7 +343,7 @@ class BlockOperator(Operator):
             #        shape=self.shape)
 
     def range_geometry(self):
-        '''returns the range of the BlockOperator'''
+        '''Returns the range of the BlockOperator'''
 
         tmp = []
         for i in range(self.shape[0]):
@@ -393,9 +391,9 @@ class BlockOperator(Operator):
     
 
     def __getitem__(self, index):
-        '''returns the index-th operator in the block irrespectively of it's shape'''
+        '''Returns the index-th operator in the block irrespectively of it's shape'''
         return self.operators[index]
 
     def get_as_list(self):
-        '''returns the list of operators'''
+        '''Returns the list of operators'''
         return self.operators

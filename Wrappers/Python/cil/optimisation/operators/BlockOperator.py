@@ -263,11 +263,11 @@ class BlockOperator(Operator):
                             )
 
     def is_linear(self):
-        '''returns whether all the elements of the BlockOperator are linear'''
+        '''Returns whether all the elements of the BlockOperator are linear'''
         return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)
 
     def get_output_shape(self, xshape, adjoint=False):
-        '''returns the shape of the output BlockDataContainer
+        '''Returns the shape of the output BlockDataContainer
 
         A(N,M) direct u(M,1) -> N,1
         A(N,M)^T adjoint u(N,1) -> M,1

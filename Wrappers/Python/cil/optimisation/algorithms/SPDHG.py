@@ -303,7 +303,7 @@ class SPDHG(Algorithm):
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
         self.sampler=sampler
-        self.norms = operator.get_norms()
+        self.norms = operator.get_norms_as_list()
 
         self.prob_weights=sampler.prob_weights #TODO: consider the case it is uniform and not saving the array 
         if self.prob_weights is None:

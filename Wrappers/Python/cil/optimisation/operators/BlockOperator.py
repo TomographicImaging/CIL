@@ -64,10 +64,11 @@ class BlockOperator(Operator):
         '''
         This is the class creator.
 
-         Args:
+        Parameters:
          
-            param vararg (Operator): Operators in the block.
-            param shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion. Note that shape and number of Operators must match.
+            `vararg` (Operator): Operators in the block.
+           
+            `shape` (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion. Note that shape and number of Operators must match.
 
      
         '''

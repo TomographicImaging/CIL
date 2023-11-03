@@ -51,6 +51,12 @@ class BlockOperator(Operator):
 
     Operators in a Block are required to have the same domain column-wise and the
     same range row-wise.
+    
+    Example:
+            BlockOperator(op0,op1) results in a row block
+            BlockOperator(op0,op1,shape=(1,2)) results in a column block
+            
+            
     '''
     __array_priority__ = 1
 
@@ -58,13 +64,12 @@ class BlockOperator(Operator):
         '''
         This is the class creator.
 
-        Parameters:
-            :param: vararg (Operator): Operators in the block.
-            :param: shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion. Note that shape and number of Operators must match.
+         Args:
+         
+            param vararg (Operator): Operators in the block.
+            param shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion. Note that shape and number of Operators must match.
 
-        Example:
-            BlockOperator(op0,op1) results in a row block
-            BlockOperator(op0,op1,shape=(1,2)) results in a column block
+     
         '''
         self.operators = args
         shape = kwargs.get('shape', None)

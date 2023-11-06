@@ -2781,8 +2781,8 @@ class DataContainer(object):
         elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < self.ndim:
             return dimension_label 
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of {1}, or an integer in range {3} - {4}'.format(dimension_label,
-                            self.dimension_labels, ))
+            raise ValueError('Unknown dimension {0}. Should be one of {1}, or an integer in range {2} - {3}'.format(dimension_label,
+                            self.dimension_labels, 0, self.ndim))
 
                         
     def as_array(self):

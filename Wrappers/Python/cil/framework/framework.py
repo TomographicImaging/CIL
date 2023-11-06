@@ -3384,8 +3384,7 @@ class DataContainer(object):
         out: ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
-            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
-            for more details.
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
         
         Returns
@@ -3425,8 +3424,7 @@ class DataContainer(object):
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
-            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
-            for more details.
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
         
         Returns
@@ -3458,8 +3456,7 @@ class DataContainer(object):
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See 
-            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
-            for more details.
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
         
         Returns
@@ -3482,8 +3479,7 @@ class DataContainer(object):
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
-            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
-            for more details.
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
         
         Returns
@@ -3506,8 +3502,7 @@ class DataContainer(object):
         out : ndarray or DataContainer, optional
             Provide an object in which to place the result. The object must have the correct dimensions and 
             (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
-            [Output type determination](https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type) 
-            for more details.
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
             
         Returns

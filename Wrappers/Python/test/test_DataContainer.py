@@ -1158,7 +1158,7 @@ class TestDataContainer(CCPiTestClass):
     def test_max_direction(self):
         ig = ImageGeometry(2,2,2)
         data = ig.allocate(0)
-        np_arr = np.arange(8).reshape(2,2,2)
+        np_arr = numpy.array([[[0,1],[2,3]],[[4,5],[6,7]]])
         data.fill(np_arr)            
 
         # test specifying max in 3 axes 

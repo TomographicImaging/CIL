@@ -111,7 +111,7 @@ class SPDHG(Algorithm):
         else:
             if kwargs.get('prob', None) is not None:
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-            sampler=Sampler.randomWithReplacement(len(operator),  prob=kwargs.get('prob', [1/len(operator)]*len(operator)))
+            sampler=Sampler.random_with_replacement(len(operator),  prob=kwargs.get('prob', [1/len(operator)]*len(operator)))
         
 
         if f is not None and operator is not None and g is not None and sampler is not None:

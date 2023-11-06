@@ -789,7 +789,6 @@ class TestSPDHG(CCPiTestClass):
         self.assertListEqual(spdhg.norms, [self.A.get_item(i, 0).norm()
                      for i in range(self.subsets)])
         self.assertListEqual(spdhg.prob_weights, [1/self.subsets] * self.subsets)
-        self.assertTrue(isinstance(spdhg.sampler, Sampler))
         self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
                             si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
@@ -829,21 +828,20 @@ class TestSPDHG(CCPiTestClass):
 
 
     def test_spdhg_non_default_init(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.randomWithReplacement(10, list(np.arange(1,11)/55.)),
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.random_with_replacement(10, list(np.arange(1,11)/55.)),
                        initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )
 
         
         self.assertListEqual(spdhg.prob_weights,  list(np.arange(1,11)/55.))
-        self.assertTrue(isinstance(spdhg.sampler, Sampler))
         self.assertNumpyArrayEqual(spdhg.x.array, self.A.domain_geometry().allocate(1).array)
         self.assertEqual(spdhg.max_iteration, 1000)
         self.assertEqual(spdhg.update_objective_interval, 10)
         
     def test_spdhg_custom_sampler(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.customOrder([0,0,0,0]),
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.custom_order( len(self.A), [0,0,0,0]),
                        initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )        
         self.assertListEqual(spdhg.prob_weights,  [1]+[0]*(len(self.A)-1))
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.customOrder([0,1,0,1]),
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.custom_order(len(self.A),[0,1,0,1]),
                        initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10 )        
         self.assertListEqual(spdhg.prob_weights,  [.5]+[.5]+[0]*(len(self.A)-2))
         

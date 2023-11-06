@@ -3447,7 +3447,7 @@ class DataContainer(object):
 
     def min(self, axis=None, out=None, *args, **kwargs):
         """
-        Returns the min pixel value in the DataContainer
+        Returns the minimum pixel value in the DataContainer
         
         Parameters
         ----------
@@ -3471,7 +3471,7 @@ class DataContainer(object):
     
     def max(self, axis=None, out=None, *args, **kwargs):
         """
-        Returns the max pixel value in the DataContainer
+        Returns the maximum pixel value in the DataContainer
 
         Parameters
         ----------

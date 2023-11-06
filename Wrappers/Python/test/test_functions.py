@@ -69,49 +69,6 @@ if has_numba:
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
-class TestApproxGradientSumFunction(CCPiTestClass):    
-    def setUp(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
-
-        ig = data.geometry
-        ig.voxel_size_x = 0.1
-        ig.voxel_size_y = 0.1
-            
-        detectors = ig.shape[0]
-        angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
-        Aop = ProjectionOperator(ig, ag, 'cpu')
-        #Create noisy data 
-        sin = Aop.direct(data)
-        noisy_data = ag.allocate()
-        np.random.seed(10)
-        n1 = np.random.normal(0, 0.1, size = ag.shape)
-        noisy_data.fill(n1 + sin.as_array()) 
-
-        subsets = 5
-        size_of_subsets = int(len(angles)/subsets)
-        # take angles and create uniform subsets in uniform+sequential setting
-        list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
-        # create acquisition geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
-                        for i in range(len(list_angles))]
-        # create with operators as many as the subsets
-        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], 'cpu') for i in range(subsets)])
-        AD_list = []
-        for sub_num in range(subsets):
-            for i in range(0, len(angles), size_of_subsets):
-                arr = noisy_data.as_array()[i:i+size_of_subsets,:]
-                AD_list.append(AcquisitionData(arr, geometry=list_geoms[sub_num]))
-
-        g = BlockDataContainer(*AD_list)
-
-        ## block function
-        self.F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
-    
-    
-    def test_set_up(self):
-        pass
-
 
 class TestFunction(CCPiTestClass):
 

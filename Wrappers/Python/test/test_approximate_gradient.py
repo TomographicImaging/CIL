@@ -49,36 +49,27 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
 
     def setUp(self):
         self.sampler=Sampling(5)
-        self.initial = VectorData(np.zeros(25))
-        self.b =  VectorData(np.random.normal(0,1,25))
+        self.initial = VectorData(np.zeros(10))
+        self.b =  VectorData(np.random.normal(0,1,10))
         self.functions=[]
         for i in range(5):
-            diagonal=np.zeros(25)
-            diagonal[5*i:5*(i+1)]=1
+            diagonal=np.zeros(10)
+            diagonal[2*i:2*(i+1)]=1
             A=MatrixOperator(np.diag(diagonal))
             self.functions.append( LeastSquares(A, A.direct(self.b)))
             if i==0:
                self.objective=LeastSquares(A, A.direct(self.b))
             else:
                self.objective+=LeastSquares(A, A.direct(self.b))
-        self.stochastic_objective=ApproximateGradientSumFunction(self.functions, self.sampler)
-    def test_init(self):
-        with self.assertRaises(NotImplementedError):
-            self.stochastic_objective.approximate_gradient(3, self.initial)
-        with self.assertRaises(NotImplementedError):
-            self.stochastic_objective.gradient( self.initial)
-        self.assertEqual(self.stochastic_objective.num_functions,5)
-         #TODO: test sampler saved correctly - when we have a sampling class 
-
-    def test_direct_call(self):
-        self.assertAlmostEqual(self.stochastic_objective(self.initial), self.objective(self.initial))
-    
-    def test_full_gradient(self):
-        self.assertNumpyArrayAlmostEqual(self.stochastic_objective.full_gradient(self.initial).array, self.objective.gradient(self.initial).array)
         
-    def test_sampler(self):
-        pass
-        #TODO: 
+    def test_ABC(self):
+        try:
+            self.stochastic_objective=ApproximateGradientSumFunction(self.functions, self.sampler)
+        except TypeError:
+            pass
+        
+
+
 class Sampling(): #TO BE REPLACED BY SAMPLING CLASS THING WHEN THAT HAS BEEN MERGED 
     def __init__(self, num_subsets, prob=None, seed=99):
         self.num_subsets=num_subsets
@@ -172,9 +163,14 @@ class TestSGD(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        objective=SGFunction(functions, sampler)
+        stochastic_objective=SGFunction(functions, sampler)
+        self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
+        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
+        
+
+        
         alg_stochastic = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=1000,
+                              objective_function=stochastic_objective, update_objective_interval=1000,
                               step_size=0.01, max_iteration =5000)
         alg_stochastic.run( 400, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)

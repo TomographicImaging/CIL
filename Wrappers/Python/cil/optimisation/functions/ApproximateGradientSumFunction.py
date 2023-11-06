@@ -20,7 +20,9 @@
 
 from cil.optimisation.functions import SumFunction
 import numbers
-class ApproximateGradientSumFunction(SumFunction): #TODO: should be an abstract base class
+from abc import ABC, abstractmethod
+
+class ApproximateGradientSumFunction(SumFunction, ABC): #TODO: should be an abstract base class
 
     r"""ApproximateGradientSumFunction represents the following sum 
 
@@ -71,9 +73,10 @@ class ApproximateGradientSumFunction(SumFunction): #TODO: should be an abstract 
         r""" Computes the full gradient at :code:`x`. It is the sum of all the gradients for each function. """
         return super(ApproximateGradientSumFunction, self).gradient(x, out=out)
 
-    def approximate_gradient(self, function_num, x,  out=None):#TODO: x, function_num instead 
+    @abstractmethod
+    def approximate_gradient(self, x, function_num,   out=None):
         """ Computes the approximate gradient for each selected function at :code:`x`."""
-        raise NotImplementedError
+        pass
 
     def gradient(self, x, out=None):
         """ Selects a random function and uses this to calculate the approximate gradient at :code:`x`."""
@@ -81,6 +84,6 @@ class ApproximateGradientSumFunction(SumFunction): #TODO: should be an abstract 
 
         # single function
         if isinstance(self.function_num, numbers.Number):
-            return self.approximate_gradient(self.function_num, x, out=out)
+            return self.approximate_gradient(x, self.function_num, out=out)
         else:
             raise ValueError("Batch gradient is not yet implemented")

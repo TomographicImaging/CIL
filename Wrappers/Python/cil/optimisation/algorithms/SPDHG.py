@@ -307,10 +307,7 @@ class SPDHG(Algorithm):
 
         self.prob_weights=sampler.prob_weights #TODO: consider the case it is uniform and not saving the array 
         if self.prob_weights is None:
-            x=sampler.get_samples(10000)
-            self.prob_weights=[np.count_nonzero((x==i)) for i in range(len(operator))]
-            total=sum(self.prob_weights)
-            self.prob_weights[:] = [x / total for x in self.prob_weights]
+           self.prob_weights=[1/self.ndual_subsets]*self.ndual_subsets
 
         # might not want to do this until it is called (if computationally expensive)
         self.set_step_sizes_default()

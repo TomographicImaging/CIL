@@ -72,7 +72,7 @@ class Operator(object):
     def set_norm(self, norm=None):
         '''Sets the norm of the operator to a custom value.
 
-        Parameter
+        Parameters
         ---------
         norm: Positive real valued number of `None`
 

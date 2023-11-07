@@ -54,7 +54,10 @@ class BlockOperator(Operator):
 
     BlockOperators have a generic shape M x N, and when applied on an 
     Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
-    Notice: BlockDatacontainer are only allowed to have the shape of N x 1, with
+  
+    Note
+    -----
+    BlockDatacontainer are only allowed to have the shape of N x 1, with
     N rows and 1 column.
 
     User may specify the shape of the block, by default is a row vector
@@ -299,6 +302,7 @@ class BlockOperator(Operator):
         Examples
         --------
         A(N,M) direct u(M,1) -> N,1
+        
         A(N,M)^T adjoint u(N,1) -> M,1
         '''
         rows, cols = self.shape

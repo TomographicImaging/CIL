@@ -57,7 +57,7 @@ class SamplerFromFunction():
         self.prob_weights=prob_weights
         if self.prob_weights is None:
             self.prob_weights=[1/num_indices]*num_indices
-        self.iteration_number=-1
+        self.iteration_number=-1 #TODO:start at 0. 
         
         
         
@@ -68,7 +68,7 @@ class SamplerFromFunction():
 
         """
  
-        self.iteration_number+=1
+        self.iteration_number+=1 #TODO: call, iterate and then return 
         return (self.function(self.iteration_number))
 
     def __next__(self):
@@ -245,7 +245,7 @@ class SamplerRandom():
         if self.replace:
             return int(self.generator.choice(self.num_indices, 1, p=self.prob, replace=self.replace))
         else:
-            return int(self.generator.choice(self.num_indices, 1, p=self.prob, replace=self.replace))
+            return int(self.generator.choice(self.num_indices, 1, p=self.prob, replace=self.replace)) #TODO: 
 
 
 
@@ -363,7 +363,7 @@ class Sampler():
     def sequential(num_indices):
         """
         Function that outputs a sampler that outputs sequentially. 
-
+        #TODO: docstring
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
@@ -393,7 +393,7 @@ class Sampler():
         return sampler
 
     @staticmethod
-    def custom_order(num_indices, customlist, prob_weights=None): #TODO: swap to underscores 
+    def custom_order(num_indices, customlist, prob_weights=None):
         """
         Function that outputs a sampler that outputs from a list, one entry at a time before cycling back to the beginning. 
 

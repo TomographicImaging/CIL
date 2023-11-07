@@ -98,6 +98,7 @@ class SPDHG(Algorithm):
     def __init__(self, f=None, g=None, operator=None,
                  initial=None, sampler=None,  **kwargs):
 
+    #TODO: keep sigma, tau, gamma in the init and call set_custom_step_sizes 
         super(SPDHG, self).__init__(**kwargs)
 
         if kwargs.get('norms', None) is not None:
@@ -107,6 +108,8 @@ class SPDHG(Algorithm):
         
         if sampler is not None:
             if kwargs.get('prob', None) is not None:
+                #TODO: change warnings to logging 
+                #TODO: change this one to an error 
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.') 
         else:
             if kwargs.get('prob', None) is not None:
@@ -140,7 +143,7 @@ class SPDHG(Algorithm):
         
         Note
         -----
-        The step sizes `sigma` anf `tau` are set using the equations:
+        The step sizes `sigma` and `tau` are set using the equations:
         .. math:: 
 
             \sigma_i=\gamma\rho / (\|K_i\|**2)\\

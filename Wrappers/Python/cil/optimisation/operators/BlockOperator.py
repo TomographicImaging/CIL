@@ -34,6 +34,16 @@ except ImportError as ie:
 class BlockOperator(Operator):
     r'''A Block matrix containing Operators
 
+    Parameters
+    ----------
+    *args : Operator  
+        Operators in the block.  
+    **kwargs : dict  
+        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.  
+
+
+    Note
+    ----
     The Block Framework is a generic strategy to treat variational problems in the
     following form:
 
@@ -51,27 +61,20 @@ class BlockOperator(Operator):
 
     Operators in a Block are required to have the same domain column-wise and the
     same range row-wise.
-    
-    Example:
-            BlockOperator(op0,op1) results in a row block
-            BlockOperator(op0,op1,shape=(1,2)) results in a column block
-            
-            
+
+    Examples
+    -------
+
+    BlockOperator(op0,op1) results in a row block
+
+    BlockOperator(op0,op1,shape=(1,2)) results in a column block
+
+
     '''
     __array_priority__ = 1
 
     def __init__(self, *args, **kwargs):
-        '''
-        This is the class creator.
 
-        Parameters:
-         
-            `vararg` (Operator): Operators in the block.
-           
-            `shape` (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion. Note that shape and number of Operators must match.
-
-     
-        '''
         self.operators = args
         shape = kwargs.get('shape', None)
         if shape is None:
@@ -130,7 +133,14 @@ class BlockOperator(Operator):
         return compatible
 
     def get_item(self, row, col):
-        '''Returns the Operator at specified row and col'''
+        '''Returns the Operator at specified row and col
+        Parameters
+        ----------
+        row: `int`
+            The row index required. 
+        col: `int`
+            The column index required. 
+        '''
         if row > self.shape[0]:
             raise ValueError(
                 'Requested row {} > max {}'.format(row, self.shape[0]))
@@ -152,10 +162,12 @@ class BlockOperator(Operator):
 
     def set_norms(self, norms):
         '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
-        
-         Args:
-         
-            param norms (:obj:`list`): A list of positive real values the same length as the number of operators in the BlockOperator.  
+
+        Parameters  
+        ------------  
+        norms: list  
+            A list of positive real values the same length as the number of operators in the BlockOperator.  
+
         '''
         if len(norms) != self.size:
             raise ValueError(
@@ -167,7 +179,9 @@ class BlockOperator(Operator):
     def direct(self, x, out=None):
         '''Direct operation for the BlockOperator
 
-        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        Note
+        -----
+        BlockOperators work on BlockDataContainers, but they will also work on DataContainers
         and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
         '''
 
@@ -210,11 +224,13 @@ class BlockOperator(Operator):
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
 
+        Note
+        -----
         BlockOperator may contain both LinearOperator and Operator
         This method exists in BlockOperator as it is not known what type of
         Operator it will contain.
 
-        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        BlockOperators work on BlockDataContainers, but they will also work on DataContainers
         and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
 
         Raises: ValueError if the contained Operators are not linear
@@ -274,7 +290,14 @@ class BlockOperator(Operator):
 
     def get_output_shape(self, xshape, adjoint=False):
         '''Returns the shape of the output BlockDataContainer
+        Parameters
+        ----------
+        xshape: BlockDataContainer
 
+        adjoint: `bool`
+
+        Examples
+        --------
         A(N,M) direct u(M,1) -> N,1
         A(N,M)^T adjoint u(N,1) -> M,1
         '''
@@ -294,13 +317,14 @@ class BlockOperator(Operator):
         return (rows, xcols)
 
     def __rmul__(self, scalar):
-        '''Defines the left multiplication with a scalar
+        '''Defines the left multiplication with a scalar. Returns a block operator with Scaled Operators inside.
 
-        Args:
+        Parameters
+        ------------
 
-        :`scalar`: (number or iterable containing numbers):
+        scalar: number or iterable containing numbers
 
-        Returns: a block operator with Scaled Operators inside'''
+        '''
         if isinstance(scalar, list) or isinstance(scalar, tuple) or \
                 isinstance(scalar, numpy.ndarray):
             if len(scalar) != len(self.operators):
@@ -317,7 +341,7 @@ class BlockOperator(Operator):
     @property
     def T(self):
         '''Returns the transposed of self.
-        
+
         Recall the input list is shaped in a row-by-row fashion'''
         newshape = (self.shape[1], self.shape[0])
         oplist = []
@@ -389,12 +413,10 @@ class BlockOperator(Operator):
 
     def __len__(self):
         return len(self.operators)
-    
+
     @property
     def size(self):
         return len(self.operators)
-    
-    
 
     def __getitem__(self, index):
         '''Returns the index-th operator in the block irrespectively of it's shape'''

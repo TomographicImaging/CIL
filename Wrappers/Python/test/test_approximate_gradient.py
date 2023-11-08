@@ -70,20 +70,20 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
         
 
 
-class Sampling(): #TO BE REPLACED BY SAMPLING CLASS THING WHEN THAT HAS BEEN MERGED 
+class Sampling(): #TODO: TO  BE REPLACED BY SAMPLING CLASS THING WHEN THAT HAS BEEN MERGED 
     def __init__(self, num_subsets, prob=None, seed=99):
-        self.num_subsets=num_subsets
+        self.num_indices=num_subsets
         np.random.seed(seed)
 
         if prob==None:
-            self.prob = [1/self.num_subsets] * self.num_subsets
+            self.prob = [1/self.num_indices] * self.num_indices
         else:
             self.prob=prob
     def __next__(self):
 
-        return int(np.random.choice(self.num_subsets, 1, p=self.prob))
+        return int(np.random.choice(self.num_indices, 1, p=self.prob))
     def next(self):
-        return int(np.random.choice(self.num_subsets, 1, p=self.prob))
+        return int(np.random.choice(self.num_indices, 1, p=self.prob))
 
 class TestSGD(CCPiTestClass):
 
@@ -104,10 +104,10 @@ class TestSGD(CCPiTestClass):
             fi=LeastSquares(self.A_partitioned.operators[i],self. partitioned_data[i])
             f_subsets.append(fi)
         self.f=LeastSquares(self.A, self.data2d)
-        self.f_stochastic=SGFunction(SumFunction(*f_subsets),self.sampler)
+        self.f_stochastic=SGFunction(f_subsets,self.sampler)
         self.initial=ig2D.allocate()
 
-    def test_approximate_gradient(self):
+    def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
         self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
 
     def test_sampler(self):
@@ -119,7 +119,27 @@ class TestSGD(CCPiTestClass):
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
     
-            
+    def test_value_error_with_only_one_function(self):
+        try: 
+            SGFunction([self.f], self.sampler)
+        except ValueError:
+            pass
+    def test_type_error_if_functions_not_a_list(self):
+        try: 
+            SGFunction(self.f, self.sampler)
+        except TypeError:
+            pass
+        
+    
+    def test_sampler_without_next(self):
+        class bad_Sampler():
+            def init(self):
+                pass
+        bad_sampler=bad_Sampler()
+        try:
+           SGFunction([self.f, self.f], bad_sampler)
+        except ValueError:
+           pass  
 
     def test_SGD_simulated_parallel_beam_data(self): 
 

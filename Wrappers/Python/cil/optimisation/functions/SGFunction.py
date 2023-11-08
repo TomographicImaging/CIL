@@ -21,31 +21,37 @@ from .Function import SumFunction
 class SGFunction(ApproximateGradientSumFunction):
 
     """
-        Initialize the SGFunction.
-
-        Parameters:
-        ----------
-        functions: list or BlockFunction 
-            A list of functions. #TODO: write it a bit clearer what the sum function requires :) 
-        sampler: callable or None, optional
-            A callable object that selects the function or batch of functions to compute the gradient. 
-            
-     """
+    Stochastic gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
+   and the gradient function returns the approximate gradient :math:`n\nabla_xf_i(x)`. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic gradient descent algorithm. 
+   
+   Parameters:
+    -----------
+    functions : `list`  of functions
+                A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
+    sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
+        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
+    """
   
-    def __init__(self, functions, sampler):
-        if isinstance(functions, list):
-            super(SGFunction, self).__init__(functions, sampler)    
-        elif isinstance(functions, SumFunction):
-            super(SGFunction, self).__init__(functions.functions, sampler) #TODO: is this the right thing to do? 
-        else:
-            raise TypeError("Input to functions should be a list of functions or a SumFunction")
+    def __init__(self, functions, sampler=None):
+        super(SGFunction, self).__init__(functions, sampler)    
+        
     
     
 
     def approximate_gradient(self, x, function_num,  out=None):
         
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function or batch of functions is selected using the :meth:`~ApproximateGradientSumFunction.next_function`.
+            The function num is selected using the :meth:`~ApproximateGradientSumFunction.next_function`.
+        
+        Parameters
+        ----------
+        x: element in the domain of the `functions`
+        
+        function_num: `int` 
+            Between 1 and the number of functions in the list  
+        
+        
+        
         """     
 
         # flag to return or in-place computation
@@ -59,7 +65,7 @@ class SGFunction(ApproximateGradientSumFunction):
             self.functions[function_num].gradient(x, out = out) 
 
         # scale wrt number of functions 
-        out*=self.num_functions # TODO: need to document this decision somewhere 
+        out*=self.num_functions 
         
         if should_return:
             return out         

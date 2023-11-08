@@ -265,7 +265,28 @@
 
 <div class="viewcode-block" id="Operator.set_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.set_norm">[docs]</a>    <span class="k">def</span> <span class="nf">set_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets the norm of the operator to a custom value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        norm: float, optional</span>
+<span class="sd">            Positive real valued number or `None`</span>
+
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method. </span>
+<span class="sd">        If `None` is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called. </span>
 <span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">norm</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Norm must be a positive real valued number or None, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">norm</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Norm must be a number or None, got </span><span class="si">{}</span><span class="s2"> of type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">norm</span><span class="p">)))</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="n">norm</span></div>
 
 <div class="viewcode-block" id="Operator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -545,10 +566,16 @@
 <span class="sd">    of the result of direct and adjoint of the operator with the scalar.</span>
 <span class="sd">    For the rest it behaves like the operator it holds.</span>
 
-<span class="sd">    :param operator: a Operator or LinearOperator</span>
-<span class="sd">    :param scalar: a scalar multiplier</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator: a Operator or LinearOperator</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    scalar: a scalar multiplier</span>
+
+
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
 <span class="sd">       The scaled operator behaves like the following:</span>
 
 <span class="sd">    .. code-block:: python</span>
@@ -563,11 +590,6 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="ScaledOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
-
-<span class="sd">        :param operator: a Operator or LinearOperator</span>
-<span class="sd">        :param scalar: a scalar multiplier</span>
-<span class="sd">        :type scalar: Number&#39;&#39;&#39;</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">ScaledOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span>
                                              <span class="n">range_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
@@ -604,9 +626,7 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ScaledOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.ScaledOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns whether the operator is linear</span>
-
-<span class="sd">        :returns: boolean &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a `boolean` indicating whether the operator is linear &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">is_linear</span><span class="p">()</span></div></div>
 
 

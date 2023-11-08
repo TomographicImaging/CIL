@@ -2579,6 +2579,16 @@ method. Subsequent calls will return the cached norm.</p>
 <dt id="cil.optimisation.operators.Operator.set_norm">
 <code class="sig-name descname"><span class="pre">set_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.set_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.set_norm" title="Permalink to this definition">#</a></dt>
 <dd><p>Sets the norm of the operator to a custom value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>norm</strong> (<em>float</em><em>, </em><em>optional</em>) – Positive real valued number or <cite>None</cite></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method.
+If <cite>None</cite> is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -2758,8 +2768,8 @@ For the rest it behaves like the operator it holds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – a Operator or LinearOperator</p></li>
-<li><p><strong>scalar</strong> – a scalar multiplier</p></li>
+<li><p><strong>operator</strong> (<em>a Operator</em><em> or </em><a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – </p></li>
+<li><p><strong>scalar</strong> (<em>a scalar multiplier</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -2776,15 +2786,7 @@ For the rest it behaves like the operator it holds.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.ScaledOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#ScaledOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ScaledOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – a Operator or LinearOperator</p></li>
-<li><p><strong>scalar</strong> (<em>Number</em>) – a scalar multiplier</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2808,12 +2810,7 @@ For the rest it behaves like the operator it holds.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.ScaledOperator.is_linear">
 <code class="sig-name descname"><span class="pre">is_linear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#ScaledOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ScaledOperator.is_linear" title="Permalink to this definition">#</a></dt>
-<dd><p>returns whether the operator is linear</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>boolean</p>
-</dd>
-</dl>
+<dd><p>returns a <cite>boolean</cite> indicating whether the operator is linear</p>
 </dd></dl>
 
 </dd></dl>
@@ -4766,7 +4763,7 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 
 <dl class="py method">
 <dt id="cil.framework.BlockDataContainer.sapyb">
-<code class="sig-name descname"><span class="pre">sapyb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.sapyb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.sapyb" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">sapyb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.sapyb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.sapyb" title="Permalink to this definition">#</a></dt>
 <dd><p>performs axpby element-wise on the BlockDataContainer containers</p>
 <p>Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</p>
 <dl class="field-list simple">
@@ -4793,7 +4790,7 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 
 <dl class="py method">
 <dt id="cil.framework.BlockDataContainer.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.axpby" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.axpby" title="Permalink to this definition">#</a></dt>
 <dd><p>Deprecated method. Alias of sapyb</p>
 </dd></dl>
 
@@ -5102,34 +5099,38 @@ least squares fidelity function as</p>
 <dt id="cil.optimisation.operators.BlockOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">BlockOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator" title="Permalink to this definition">#</a></dt>
 <dd><p>A Block matrix containing Operators</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Operators in the block.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – shape (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>The Block Framework is a generic strategy to treat variational problems in the
 following form:</p>
 <div class="math notranslate nohighlight">
 \[\min Regulariser + Fidelity\]</div>
+</div>
 <p>BlockOperators have a generic shape M x N, and when applied on an
-Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
-Notice: BlockDatacontainer are only allowed to have the shape of N x 1, with
+Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>BlockDatacontainer are only allowed to have the shape of N x 1, with
 N rows and 1 column.</p>
 <p>User may specify the shape of the block, by default is a row vector</p>
 <p>Operators in a Block are required to have the same domain column-wise and the
 same range row-wise.</p>
+</div>
+<p class="rubric">Examples</p>
+<p>BlockOperator(op0,op1) results in a row block</p>
+<p>BlockOperator(op0,op1,shape=(1,2)) results in a column block</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Class creator</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Do not include the <cite>self</cite> parameter in the <code class="docutils literal notranslate"><span class="pre">Args</span></code> section.</p>
-</div>
-<p>:param : param: vararg (Operator): Operators in the block.
-:param : param: shape (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>, optional): If shape is passed the Operators in</p>
-<blockquote>
-<div><p>vararg are considered input in a row-by-row fashion.
-Shape and number of Operators must match.</p>
-</div></blockquote>
-<p class="rubric">Example</p>
-<p>BlockOperator(op0,op1) results in a row block
-BlockOperator(op0,op1,shape=(1,2)) results in a column block</p>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -5147,74 +5148,103 @@ BlockOperator(op0,op1,shape=(1,2)) results in a column block</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.get_item">
 <code class="sig-name descname"><span class="pre">get_item</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.get_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.get_item" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the Operator at specified row and col</p>
+<dd><p>Returns the Operator at specified row and col
+:param row: The row index required.
+:type row: <cite>int</cite>
+:param col: The column index required.
+:type col: <cite>int</cite></p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.norm">
-<code class="sig-name descname"><span class="pre">norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the BlockOperator</p>
-<p>if the operator in the block do not have method norm defined, i.e. they are SIRF
-AcquisitionModel’s we use PowerMethod if applicable, otherwise we raise an Error</p>
+<code class="sig-name descname"><span class="pre">norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.norm" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the Euclidean norm of the norms of the individual operators in the BlockOperators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.operators.BlockOperator.get_norms_as_list">
+<code class="sig-name descname"><span class="pre">get_norms_as_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.get_norms_as_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.get_norms_as_list" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a list of the individual norms of the Operators in the BlockOperator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.operators.BlockOperator.set_norms">
+<code class="sig-name descname"><span class="pre">set_norms</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.set_norms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.set_norms" title="Permalink to this definition">#</a></dt>
+<dd><p>Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>norms</strong> (<em>list</em>) – A list of positive real values the same length as the number of operators in the BlockOperator.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.direct" title="Permalink to this definition">#</a></dt>
 <dd><p>Direct operation for the BlockOperator</p>
-<p>BlockOperator work on BlockDataContainer, but they will work on DataContainers
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>BlockOperators work on BlockDataContainers, but they will also work on DataContainers
 and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.adjoint">
 <code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.adjoint" title="Permalink to this definition">#</a></dt>
 <dd><p>Adjoint operation for the BlockOperator</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>BlockOperator may contain both LinearOperator and Operator
 This method exists in BlockOperator as it is not known what type of
 Operator it will contain.</p>
-<p>BlockOperator work on BlockDataContainer, but they will work on DataContainers
+<p>BlockOperators work on BlockDataContainers, but they will also work on DataContainers
 and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)</p>
 <p>Raises: ValueError if the contained Operators are not linear</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.is_linear">
 <code class="sig-name descname"><span class="pre">is_linear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.is_linear" title="Permalink to this definition">#</a></dt>
-<dd><p>returns whether all the elements of the BlockOperator are linear</p>
+<dd><p>Returns whether all the elements of the BlockOperator are linear</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.get_output_shape">
 <code class="sig-name descname"><span class="pre">get_output_shape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xshape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.get_output_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.get_output_shape" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the shape of the output BlockDataContainer</p>
-<p>A(N,M) direct u(M,1) -&gt; N,1
-A(N,M)^T adjoint u(N,1) -&gt; M,1</p>
+<dd><p>Returns the shape of the output BlockDataContainer
+:param xshape:
+:type xshape: BlockDataContainer
+:param adjoint:
+:type adjoint: <cite>bool</cite></p>
+<p class="rubric">Examples</p>
+<p>A(N,M) direct u(M,1) -&gt; N,1</p>
+<p>A(N,M)^T adjoint u(N,1) -&gt; M,1</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.__rmul__">
 <code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.__rmul__" title="Permalink to this definition">#</a></dt>
-<dd><p>Defines the left multiplication with a scalar</p>
+<dd><p>Defines the left multiplication with a scalar. Returns a block operator with Scaled Operators inside.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Paramer scalar</dt>
-<dd class="field-odd"><p>(number or iterable containing numbers):</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>scalar</strong> (<em>number</em><em> or </em><em>iterable containing numbers</em>) – </p>
 </dd>
 </dl>
-<p>Returns: a block operator with Scaled Operators inside</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.T">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">T</span></code><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.T" title="Permalink to this definition">#</a></dt>
-<dd><p>Return the transposed of self</p>
-<p>input in a row-by-row</p>
+<dd><p>Returns the transposed of self.</p>
+<p>Recall the input list is shaped in a row-by-row fashion</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.domain_geometry">
 <code class="sig-name descname"><span class="pre">domain_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.domain_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.domain_geometry" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the domain of the BlockOperator</p>
+<dd><p>Returns the domain of the BlockOperator</p>
 <p>If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.
 Otherwise it is a BlockGeometry.</p>
 </dd></dl>
@@ -5222,19 +5252,19 @@ Otherwise it is a BlockGeometry.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.range_geometry">
 <code class="sig-name descname"><span class="pre">range_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.range_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.range_geometry" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the range of the BlockOperator</p>
+<dd><p>Returns the range of the BlockOperator</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.__getitem__">
 <code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.__getitem__" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the index-th operator in the block irrespectively of it’s shape</p>
+<dd><p>Returns the index-th operator in the block irrespectively of it’s shape</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.BlockOperator.get_as_list">
 <code class="sig-name descname"><span class="pre">get_as_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/BlockOperator.html#BlockOperator.get_as_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.get_as_list" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the list of operators</p>
+<dd><p>Returns the list of operators</p>
 </dd></dl>
 
 </dd></dl>

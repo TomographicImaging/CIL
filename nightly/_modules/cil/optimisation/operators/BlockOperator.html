@@ -213,6 +213,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">,</span> <span class="n">DataContainer</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">Operator</span><span class="p">,</span> <span class="n">LinearOperator</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
@@ -222,189 +223,218 @@
     <span class="n">has_sirf</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
     <span class="n">has_sirf</span> <span class="o">=</span> <span class="kc">False</span>
-       
+
+
 <div class="viewcode-block" id="BlockOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator">[docs]</a><span class="k">class</span> <span class="nc">BlockOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;A Block matrix containing Operators</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *args : Operator  </span>
+<span class="sd">        Operators in the block.  </span>
+<span class="sd">    **kwargs : dict  </span>
+<span class="sd">        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.  </span>
+
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
 <span class="sd">    The Block Framework is a generic strategy to treat variational problems in the</span>
 <span class="sd">    following form:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">    </span>
+
 <span class="sd">      \min Regulariser + Fidelity</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    BlockOperators have a generic shape M x N, and when applied on an </span>
 <span class="sd">    Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.</span>
-<span class="sd">    Notice: BlockDatacontainer are only allowed to have the shape of N x 1, with</span>
+<span class="sd">  </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    BlockDatacontainer are only allowed to have the shape of N x 1, with</span>
 <span class="sd">    N rows and 1 column.</span>
-<span class="sd">    </span>
+
 <span class="sd">    User may specify the shape of the block, by default is a row vector</span>
 
 <span class="sd">    Operators in a Block are required to have the same domain column-wise and the</span>
 <span class="sd">    same range row-wise.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    BlockOperator(op0,op1) results in a row block</span>
+
+<span class="sd">    BlockOperator(op0,op1,shape=(1,2)) results in a column block</span>
+
+
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">1</span>
+
 <div class="viewcode-block" id="BlockOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Class creator</span>
 
-<span class="sd">        Note:</span>
-<span class="sd">            Do not include the `self` parameter in the ``Args`` section.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            :param: vararg (Operator): Operators in the block.</span>
-<span class="sd">            :param: shape (:obj:`tuple`, optional): If shape is passed the Operators in </span>
-<span class="sd">                  vararg are considered input in a row-by-row fashion. </span>
-<span class="sd">                  Shape and number of Operators must match.</span>
-<span class="sd">                  </span>
-<span class="sd">        Example:</span>
-<span class="sd">            BlockOperator(op0,op1) results in a row block</span>
-<span class="sd">            BlockOperator(op0,op1,shape=(1,2)) results in a column block</span>
-<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operators</span> <span class="o">=</span> <span class="n">args</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
-        <span class="n">n_elements</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">n_elements</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_elements</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
-                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span></div>
+                <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span></div>
         <span class="c1"># TODO</span>
         <span class="c1"># until a decent way to check equality of Acquisition/Image geometries</span>
-        <span class="c1"># required to fullfil &quot;Operators in a Block are required to have the same </span>
+        <span class="c1"># required to fullfil &quot;Operators in a Block are required to have the same</span>
         <span class="c1"># domain column-wise and the same range row-wise.&quot;</span>
-        <span class="c1"># let us just not check if column/row-wise compatible, which is actually </span>
+        <span class="c1"># let us just not check if column/row-wise compatible, which is actually</span>
         <span class="c1"># the same achieved by the column_wise_compatible and row_wise_compatible methods.</span>
-        
+
         <span class="c1"># # test if operators are compatible</span>
         <span class="c1"># if not self.column_wise_compatible():</span>
         <span class="c1">#     raise ValueError(&#39;Operators in each column must have the same domain&#39;)</span>
         <span class="c1"># if not self.row_wise_compatible():</span>
         <span class="c1">#     raise ValueError(&#39;Operators in each row must have the same range&#39;)</span>
-    
+
 <div class="viewcode-block" id="BlockOperator.column_wise_compatible"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.column_wise_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">column_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Operators in a Block should have the same domain per column&#39;&#39;&#39;</span>
         <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">compatible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
             <span class="n">column_compatible</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">rows</span><span class="p">):</span>
-                <span class="n">dg0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
-                <span class="n">dg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg0</span><span class="p">,</span><span class="s1">&#39;handle&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg1</span><span class="p">,</span><span class="s1">&#39;handle&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+                <span class="n">dg0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+                <span class="n">dg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg0</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg1</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">):</span>
                     <span class="n">column_compatible</span> <span class="o">=</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">column_compatible</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">column_compatible</span> <span class="o">=</span> <span class="n">dg0</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">dg1</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">column_compatible</span>
             <span class="n">compatible</span> <span class="o">=</span> <span class="n">compatible</span> <span class="ow">and</span> <span class="n">column_compatible</span>
         <span class="k">return</span> <span class="n">compatible</span></div>
-    
+
 <div class="viewcode-block" id="BlockOperator.row_wise_compatible"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.row_wise_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">row_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Operators in a Block should have the same range per row&#39;&#39;&#39;</span>
         <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">compatible</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
             <span class="n">row_compatible</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">cols</span><span class="p">):</span>
-                <span class="n">dg0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
-                <span class="n">dg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg0</span><span class="p">,</span><span class="s1">&#39;handle&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg1</span><span class="p">,</span><span class="s1">&#39;handle&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+                <span class="n">dg0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+                <span class="n">dg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg0</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg1</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">):</span>
                     <span class="n">row_compatible</span> <span class="o">=</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">column_compatible</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">row_compatible</span> <span class="o">=</span> <span class="n">dg0</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">dg1</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">row_compatible</span>
-                
+
             <span class="n">compatible</span> <span class="o">=</span> <span class="n">compatible</span> <span class="ow">and</span> <span class="n">row_compatible</span>
-            
+
         <span class="k">return</span> <span class="n">compatible</span></div>
 
 <div class="viewcode-block" id="BlockOperator.get_item"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the Operator at specified row and col&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the Operator at specified row and col</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row: `int`</span>
+<span class="sd">            The row index required. </span>
+<span class="sd">        col: `int`</span>
+<span class="sd">            The column index required. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">row</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested row </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Requested row </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">if</span> <span class="n">col</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested col </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Requested col </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
         <span class="n">index</span> <span class="o">=</span> <span class="n">row</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">col</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
-    
-<div class="viewcode-block" id="BlockOperator.norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the BlockOperator</span>
 
-<span class="sd">        if the operator in the block do not have method norm defined, i.e. they are SIRF</span>
-<span class="sd">        AcquisitionModel&#39;s we use PowerMethod if applicable, otherwise we raise an Error</span>
+<div class="viewcode-block" id="BlockOperator.norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the Euclidean norm of the norms of the individual operators in the BlockOperators &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_norms_as_list</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BlockOperator.get_norms_as_list"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.get_norms_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_norms_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns a list of the individual norms of the Operators in the BlockOperator</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s1">&#39;norm&#39;</span><span class="p">):</span>
-                <span class="n">norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># use Power method</span>
-                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
-                    <span class="n">norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="mi">20</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                            <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">{}</span><span class="s1"> does not have a norm method and is not linear&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">norm</span><span class="p">))</span>    </div>
-    
+        <span class="k">return</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BlockOperator.set_norms"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.set_norms">[docs]</a>    <span class="k">def</span> <span class="nf">set_norms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. </span>
+
+<span class="sd">        Parameters  </span>
+<span class="sd">        ------------  </span>
+<span class="sd">        norms: list  </span>
+<span class="sd">            A list of positive real values the same length as the number of operators in the BlockOperator.  </span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">norms</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The length of the list of norms should be equal to the number of operators in the BlockOperator&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">norms</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_norm</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="BlockOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Direct operation for the BlockOperator</span>
 
-<span class="sd">        BlockOperator work on BlockDataContainer, but they will work on DataContainers</span>
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        BlockOperators work on BlockDataContainers, but they will also work on DataContainers</span>
 <span class="sd">        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">x</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_shape</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        
+
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
+                                              <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
-                
+
         <span class="k">else</span><span class="p">:</span>
-            
+
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>       
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
-                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
-                                                      <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>                        
+                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
+                            <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">a</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
-                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> 
-                                                      <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
+                            <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                         <span class="n">a</span> <span class="o">+=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
-                
+
 <div class="viewcode-block" id="BlockOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Adjoint operation for the BlockOperator</span>
 
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
 <span class="sd">        BlockOperator may contain both LinearOperator and Operator</span>
 <span class="sd">        This method exists in BlockOperator as it is not known what type of</span>
 <span class="sd">        Operator it will contain.</span>
 
-<span class="sd">        BlockOperator work on BlockDataContainer, but they will work on DataContainers</span>
+<span class="sd">        BlockOperators work on BlockDataContainers, but they will also work on DataContainers</span>
 <span class="sd">        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)</span>
 
 <span class="sd">        Raises: ValueError if the contained Operators are not linear</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not all operators in Block are linear.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">x</span>
@@ -414,11 +444,13 @@
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
+                                              <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c1"># the output is a single DataContainer, so we can take it out</span>
                 <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -429,129 +461,141 @@
                 <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> \
-                <span class="p">(</span> <span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)</span> <span class="p">):</span>
+                                <span class="p">(</span><span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)):</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span>
+                            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> \
-                <span class="p">(</span> <span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)</span> <span class="p">):</span>
-                            <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                                        <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                                <span class="p">(</span><span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)):</span>
+                            <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">a</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-                            <span class="n">a</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                                        <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                                        <span class="p">)</span></div>
+                            <span class="n">a</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                            <span class="p">)</span></div>
+
 <div class="viewcode-block" id="BlockOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns whether all the elements of the BlockOperator are linear&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns whether all the elements of the BlockOperator are linear&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">is_linear</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockOperator.get_output_shape"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.get_output_shape">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xshape</span><span class="p">,</span> <span class="n">adjoint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the shape of the output BlockDataContainer</span>
-<span class="sd">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the shape of the output BlockDataContainer</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xshape: BlockDataContainer</span>
+
+<span class="sd">        adjoint: `bool`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
 <span class="sd">        A(N,M) direct u(M,1) -&gt; N,1</span>
+<span class="sd">        </span>
 <span class="sd">        A(N,M)^T adjoint u(N,1) -&gt; M,1</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">rows</span> <span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">xrows</span><span class="p">,</span> <span class="n">xcols</span> <span class="o">=</span> <span class="n">xshape</span>
         <span class="k">if</span> <span class="n">xcols</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockDataContainer cannot have more than 1 column&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;BlockDataContainer cannot have more than 1 column&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">adjoint</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">rows</span> <span class="o">!=</span> <span class="n">xrows</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible shapes </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">xshape</span><span class="p">))</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">cols</span><span class="p">,</span><span class="n">xcols</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;Incompatible shapes </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">xshape</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">xcols</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cols</span> <span class="o">!=</span> <span class="n">xrows</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible shapes </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span><span class="n">cols</span><span class="p">),</span> <span class="n">xshape</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span><span class="n">xcols</span><span class="p">)</span></div>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Incompatible shapes </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span> <span class="n">xshape</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">xcols</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="BlockOperator.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Defines the left multiplication with a scalar</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Defines the left multiplication with a scalar. Returns a block operator with Scaled Operators inside.</span>
 
-<span class="sd">        :paramer scalar: (number or iterable containing numbers):</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
 
-<span class="sd">        Returns: a block operator with Scaled Operators inside&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> \
+<span class="sd">        scalar: number or iterable containing numbers</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> \
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;dimensions of scalars and operators do not match&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;dimensions of scalars and operators do not match&#39;</span><span class="p">)</span>
             <span class="n">scalars</span> <span class="o">=</span> <span class="n">scalar</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">scalars</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">]</span>
         <span class="c1"># create a list of ScaledOperator-s</span>
-        <span class="n">ops</span> <span class="o">=</span> <span class="p">[</span> <span class="n">v</span> <span class="o">*</span> <span class="n">op</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span><span class="n">op</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)]</span>
-        <span class="c1">#return BlockScaledOperator(self, scalars ,shape=self.shape)</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">*</span> <span class="n">op</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)]</span>
+        <span class="c1"># return BlockScaledOperator(self, scalars ,shape=self.shape)</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">ops</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Return the transposed of self</span>
-<span class="sd">        </span>
-<span class="sd">        input in a row-by-row&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the transposed of self.</span>
+
+<span class="sd">        Recall the input list is shaped in a row-by-row fashion&#39;&#39;&#39;</span>
         <span class="n">newshape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">oplist</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">newshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">newshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="n">oplist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">row</span><span class="p">))</span>
+                <span class="n">oplist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">oplist</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">newshape</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BlockOperator.domain_geometry"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the domain of the BlockOperator</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the domain of the BlockOperator</span>
 
 <span class="sd">        If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.</span>
 <span class="sd">        Otherwise it is a BlockGeometry.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># column BlockOperator</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># get the geometries column wise</span>
             <span class="c1"># we need only the geometries from the first row</span>
             <span class="c1"># since it is compatible from __init__</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
-            <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span>                </div>
-                                    
-            <span class="c1">#shape = (self.shape[0], 1)</span>
-            <span class="c1">#return BlockGeometry(*[el.domain_geometry() for el in self.operators],</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span></div>
+
+            <span class="c1"># shape = (self.shape[0], 1)</span>
+            <span class="c1"># return BlockGeometry(*[el.domain_geometry() for el in self.operators],</span>
             <span class="c1">#        shape=self.shape)</span>
 
 <div class="viewcode-block" id="BlockOperator.range_geometry"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the range of the BlockOperator&#39;&#39;&#39;</span>
-        
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the range of the BlockOperator&#39;&#39;&#39;</span>
+
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span>            </div>
-        
-        
-        <span class="c1">#shape = (self.shape[1], 1)</span>
-        <span class="c1">#return BlockGeometry(*[el.range_geometry() for el in self.operators],</span>
-        <span class="c1">#            shape=shape)</span>
-        
+            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">sum_abs_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>                            
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
+                    <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
+                    <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
             <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
-            
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            
+
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
-        
+
     <span class="k">def</span> <span class="nf">sum_abs_col</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
@@ -566,19 +610,19 @@
         <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>    
-    
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
+
 <div class="viewcode-block" id="BlockOperator.__getitem__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the index-th operator in the block irrespectively of it&#39;s shape&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the index-th operator in the block irrespectively of it&#39;s shape&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="BlockOperator.get_as_list"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.BlockOperator.get_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the list of operators&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the list of operators&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span></div></div>
-        
-        
-        
 </pre></div>
 
               </div>

@@ -63,10 +63,9 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
                self.objective+=LeastSquares(A, A.direct(self.b))
         
     def test_ABC(self):
-        try:
+        with self.assertRaises(TypeError):
             self.stochastic_objective=ApproximateGradientSumFunction(self.functions, self.sampler)
-        except TypeError:
-            pass
+
         
 
 
@@ -120,15 +119,13 @@ class TestSGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
     
     def test_value_error_with_only_one_function(self):
-        try: 
+        with self.assertRaises(ValueError):
             SGFunction([self.f], self.sampler)
-        except ValueError:
             pass
     def test_type_error_if_functions_not_a_list(self):
-        try: 
+        with self.assertRaises(TypeError):
             SGFunction(self.f, self.sampler)
-        except TypeError:
-            pass
+
         
     
     def test_sampler_without_next(self):
@@ -136,10 +133,9 @@ class TestSGD(CCPiTestClass):
             def init(self):
                 pass
         bad_sampler=bad_Sampler()
-        try:
+        with self.assertRaises(ValueError):
            SGFunction([self.f, self.f], bad_sampler)
-        except ValueError:
-           pass  
+  
 
     def test_SGD_simulated_parallel_beam_data(self): 
 

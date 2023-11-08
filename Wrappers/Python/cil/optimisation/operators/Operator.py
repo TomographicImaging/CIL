@@ -74,7 +74,9 @@ class Operator(object):
 
         Parameters
         ---------
-        norm: Positive real valued number of `None`
+        norm: float, optional
+            Positive real valued number or `None`
+
 
         Note
         ----

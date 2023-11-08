@@ -36,6 +36,8 @@ class LeastSquares(Function):
     
     .. math:: F(x) = c\|Ax-b\|_{2,W}^{2}
     
+    where :math:`W=diag(weight)`.
+    
     Parameters:
     -----------
         
@@ -50,11 +52,11 @@ class LeastSquares(Function):
     Members:  
     --------      
             
-        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c s1(A)^2`, or
+        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c \sigma_1(A)^2`, or
         
-        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||weight|| ||A||_2^2 = 2s1(A)^2`,
+        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||W|| ||A||_2^2 = 2\sigma_1(A)^2`,
     
-    where s1(A) is the largest singular value of A.
+    where :math:`\sigma_1(A)` is the largest singular value of :math:`A` and :math:`W=diag(weight)`.
        
     
     """
@@ -77,7 +79,7 @@ class LeastSquares(Function):
         
     def __call__(self, x):
         
-        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or c\|Ax-b\|_{2,weight}^2
+        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or math:`c\|Ax-b\|_{2,W}^2:
                         
         """
         # c * (A.direct(x)-b).dot((A.direct(x) - b))
@@ -96,8 +98,10 @@ class LeastSquares(Function):
         
              .. math:: F'(x) = 2cA^T(Ax-b)
              
-             .. math:: F'(x) = 2cA^T(weight(Ax-b))
+             .. math:: F'(x) = 2cA^T(W(Ax-b))
 
+        where :math:`W=diag(self.weight)`.
+    
         """
         should_return = True
         if out is not None:
@@ -157,6 +161,7 @@ class LeastSquares(Function):
 
     def __rmul__(self, other):
         '''defines the right multiplication with a number'''
+    
         if not isinstance (other, Number):
             raise NotImplemented
         constant = self.c * other

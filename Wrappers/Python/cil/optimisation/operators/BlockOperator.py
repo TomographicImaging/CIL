@@ -77,12 +77,7 @@ class BlockOperator(Operator):
     __array_priority__ = 1
 
     def __init__(self, *args, **kwargs):
-
-        Example:
-            BlockOperator(op0,op1) results in a row block
-            BlockOperator(op0,op1,shape=(1,2)) results in a column block
-        '''
-
+ 
         self.operators = args
         shape = kwargs.get('shape', None)
         if shape is None:
@@ -141,7 +136,6 @@ class BlockOperator(Operator):
         return compatible
 
     def get_item(self, row, col):
-
         '''Returns the Operator at specified row and col
         Parameters
         ----------
@@ -150,7 +144,6 @@ class BlockOperator(Operator):
         col: `int`
             The column index required. 
         '''
-
         if row > self.shape[0]:
             raise ValueError(
                 'Requested row {} > max {}'.format(row, self.shape[0]))
@@ -300,7 +293,6 @@ class BlockOperator(Operator):
 
     def get_output_shape(self, xshape, adjoint=False):
         '''Returns the shape of the output BlockDataContainer
-
         Parameters
         ----------
         xshape: BlockDataContainer
@@ -309,7 +301,6 @@ class BlockOperator(Operator):
 
         Examples
         --------
-
         A(N,M) direct u(M,1) -> N,1
         
         A(N,M)^T adjoint u(N,1) -> M,1
@@ -334,10 +325,10 @@ class BlockOperator(Operator):
 
         Parameters
         ------------
+        
         scalar: number or iterable containing numbers
 
         '''
-
         if isinstance(scalar, list) or isinstance(scalar, tuple) or \
                 isinstance(scalar, numpy.ndarray):
             if len(scalar) != len(self.operators):
@@ -354,6 +345,7 @@ class BlockOperator(Operator):
     @property
     def T(self):
         '''Returns the transposed of self.
+        
         Recall the input list is shaped in a row-by-row fashion'''
         newshape = (self.shape[1], self.shape[0])
         oplist = []

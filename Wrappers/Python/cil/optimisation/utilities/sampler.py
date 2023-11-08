@@ -39,7 +39,7 @@ class SamplerFromFunction():
 
         function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
 
-        prob_weights: list of floats of length num_indices that sum to 1. 
+        prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices #TODO: write unit tests.
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
 
 
@@ -54,10 +54,12 @@ class SamplerFromFunction():
         self.type=sampling_type
         self.num_indices=num_indices
         self.function=function
+        if abs(sum(prob_weights)-1)>1e-6:
+            raise ValueError('The provided prob_weights must sum to one')
+        if any(np.array(prob_weights)<0):
+            raise ValueError('The provided prob_weights must be greater than or equal to zero')
         self.prob_weights=prob_weights
-        if self.prob_weights is None:
-            self.prob_weights=[1/num_indices]*num_indices
-        self.iteration_number=-1 #TODO:start at 0. 
+        self.iteration_number=0
         
         
         
@@ -67,9 +69,9 @@ class SamplerFromFunction():
         A function of the sampler that selects from a list of indices {0, 1, …, S-1}, with S=num_indices, the next sample according to the type of sampling.
 
         """
- 
-        self.iteration_number+=1 #TODO: call, iterate and then return 
-        return (self.function(self.iteration_number))
+        out=self.function(self.iteration_number)
+        self.iteration_number=self.iteration_number+1 
+        return (out)
 
     def __next__(self):
         """ 
@@ -93,7 +95,7 @@ class SamplerFromFunction():
         [2 4 2 4 1 3 2 2 1 2 4 4 2 3 2 1 0 4 2 3]
         """
         save_last_index = self.iteration_number
-        self.iteration_number = -1
+        self.iteration_number = 0
         output = [self.next() for _ in range(num_samples)]
         self.iteration_number = save_last_index
         return (np.array(output))    
@@ -127,13 +129,15 @@ class SamplerFromOrder():
     
 
         """
+        if abs(sum(prob_weights)-1)>1e-6:
+            raise ValueError('The provided prob_weights must sum to one')
+        if any(np.array(prob_weights)<0):
+            raise ValueError('The provided prob_weights must be greater than or equal to zero')
+        
         self.prob_weights=prob_weights
         self.type = sampling_type
         self.num_indices = num_indices
-        self.order = order
-        self.initial_order = self.order
-
-     
+        self.order = order   
         self.last_index = len(order)-1
         
         
@@ -223,6 +227,11 @@ class SamplerRandom():
             self.prob_weights=prob
         else:
             self.prob_weights=[1/num_indices]*num_indices
+        if abs(sum(self.prob_weights)-1)>1e-6:
+            raise ValueError('The provided prob_weights must sum to one')
+        if any(np.array(self.prob_weights)<0):
+            raise ValueError('The provided prob_weights must be greater than or equal to zero')
+        
         self.type = sampling_type
         self.num_indices = num_indices
         if seed is not None:
@@ -242,10 +251,9 @@ class SamplerRandom():
         This function us used by samplers that select from a list of indices{0, 1, …, S-1}, with S=num_indices, randomly with and without replacement. 
 
         """
-        if self.replace:
-            return int(self.generator.choice(self.num_indices, 1, p=self.prob, replace=self.replace))
-        else:
-            return int(self.generator.choice(self.num_indices, 1, p=self.prob, replace=self.replace)) #TODO: 
+        
+        return int(self.generator.choice(self.num_indices, 1, p=self.prob, replace=self.replace))
+     
 
 
 
@@ -290,7 +298,7 @@ class Sampler():
         The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
     sampling_type:str
-        The sampling type used. Choose from "sequential", "custom_order", "herman_meyer", "staggered", "random_with_replacement" and "random_without_replacement".
+        The sampling type used. Choose from "from_function", "sequential", "custom_order", "herman_meyer", "staggered", "random_with_replacement" and "random_without_replacement".
 
     order: list of indices
         The list of indices the method selects from using next. 
@@ -363,7 +371,9 @@ class Sampler():
     def sequential(num_indices):
         """
         Function that outputs a sampler that outputs sequentially. 
-        #TODO: docstring
+        
+        Parameters
+        ----------
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
@@ -393,14 +403,19 @@ class Sampler():
         return sampler
 
     @staticmethod
-    def custom_order(num_indices, customlist, prob_weights=None):
+    def custom_order(num_indices, custom_list, prob_weights=None):
         """
         Function that outputs a sampler that outputs from a list, one entry at a time before cycling back to the beginning. 
 
-        customlist: list of indices
+        Parameters
+        ----------
+        num_indices: `int`
+            The sampler will select indices for `{1,....,n}` according to the order in `custom_list` where `n` is `num_indices`. 
+        custom_list: `list` of `int`
             The list that will be sampled from in order. 
 
-        #TODO:
+        prob_weights: list of floats of length num_indices that sum to 1. Default is None and the prob_weights are calculated automatically. 
+            Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
         
         Example
         --------
@@ -427,12 +442,13 @@ class Sampler():
         if prob_weights  is None:
             temp_list=[]
             for i in range(num_indices):
-                temp_list.append(customlist.count(i))
+                temp_list.append(custom_list.count(i))
             total=sum(temp_list)
             prob_weights=[x/total for x in temp_list]
+         
             
         sampler = SamplerFromOrder(
-            num_indices, sampling_type='custom_order', order=customlist, prob_weights=prob_weights)
+            num_indices, sampling_type='custom_order', order=custom_list, prob_weights=prob_weights)
         return sampler
 
     @staticmethod
@@ -608,7 +624,7 @@ class Sampler():
         return sampler
 
     @staticmethod
-    def from_function(num_indices, function):
+    def from_function(num_indices, function, prob_weights=None):
         """
         A class that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}.
         The function next() outputs a single next index from the list {0,1,…,S-1}.To be run again and again, depending on how many iterations.
@@ -622,10 +638,9 @@ class Sampler():
         sampling_type:str
             The sampling type used. Choose from "sequential", "custom_order", "herman_meyer", "staggered", "random_with_replacement" and "random_without_replacement".
 
-
         function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
 
-        prob_weights: list of floats of length num_indices that sum to 1. 
+        prob_weights: list of floats of length num_indices that sum to 1. Default is [1/num_indices]*num_indices 
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
 
 
@@ -663,8 +678,11 @@ class Sampler():
         [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
 
         """
+        if prob_weights is None:
+            prob_weights=[1/num_indices]*num_indices
+            
 
-        sampler = SamplerFromFunction(num_indices, sampling_type='from_function', function=function )
+        sampler = SamplerFromFunction(num_indices, sampling_type='from_function', function=function, prob_weights=prob_weights)
         return sampler
 
 

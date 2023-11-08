@@ -181,20 +181,19 @@ class BlockOperator(Operator):
             return BlockDataContainer(*res, shape=shape)
                 
         else:
-            
             tmp = self.range_geometry().allocate()
             for row in range(self.shape[0]):
-                for col in range(self.shape[1]):
+                for col in range(self.shape[1]):  
                     if col == 0:       
                         self.get_item(row,col).direct(
                                                       x_b.get_item(col),
                                                       out=out.get_item(row))                        
                     else:
-                        out_row_operator=out.get_item(row) # out_row_operator points to the row in out that we are updating 
+                        temp_out_row = out.get_item(row) # temp_out_row points to the element in out that we are adding to  
                         self.get_item(row,col).direct(
                                                       x_b.get_item(col), 
                                                       out=tmp.get_item(row))
-                        out_row_operator += tmp.get_item(row)
+                        temp_out_row += tmp.get_item(row)
                 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator

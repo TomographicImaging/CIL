@@ -2951,13 +2951,33 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown dimension </span><span class="si">{0}</span><span class="s1">. Should be one of </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">,</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
-    <span class="k">def</span> <span class="nf">get_dimension_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension_label</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="DataContainer.get_dimension_axis"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.get_dimension_axis">[docs]</a>    <span class="k">def</span> <span class="nf">get_dimension_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension_label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the axis index of the DataContainer array if the specified dimension_label(s) match</span>
+<span class="sd">        any dimension_labels of the DataContainer or their indices </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dimension_label: string or int or tuple of strings or ints</span>
+<span class="sd">            Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or tuple of ints</span>
+<span class="sd">            The axis index of the DataContainer matching the specified dimension_label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">,(</span><span class="nb">tuple</span><span class="p">,</span><span class="nb">list</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dimension_label</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dimension_label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dimension_label</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">dimension_label</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dimension_label</span> 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown dimension </span><span class="si">{0}</span><span class="s1">. Should be one of </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown dimension </span><span class="si">{0}</span><span class="s1">. Should be one of </span><span class="si">{1}</span><span class="s1">, or an integer in range </span><span class="si">{2}</span><span class="s1"> - </span><span class="si">{3}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span></div>
+
                         
 <div class="viewcode-block" id="DataContainer.as_array"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.as_array">[docs]</a>    <span class="k">def</span> <span class="nf">as_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the pointer to the array.</span>
@@ -3507,9 +3527,7 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Applies log pixel-wise to the DataContainer&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
-    <span class="c1">## reductions</span>
-    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="c1">## reductions        </span>
 <div class="viewcode-block" id="DataContainer.squared_norm"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.squared_norm">[docs]</a>    <span class="k">def</span> <span class="nf">squared_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;return the squared euclidean norm of the DataContainer viewed as a vector&#39;&#39;&#39;</span>
         <span class="c1">#shape = self.shape</span>
@@ -3545,20 +3563,158 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Shapes are not aligned: </span><span class="si">{}</span><span class="s1"> != </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
     
-<div class="viewcode-block" id="DataContainer.min"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the min pixel value in the DataContainer&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="DataContainer.max"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the max pixel value in the DataContainer&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="DataContainer.mean"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the mean pixel value of the DataContainer&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">_directional_reduction_unary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reduction_function</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the result of a unary function, considering the direction from an axis argument to the function</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reduction_function : function </span>
+<span class="sd">            The unary function to be evaluated</span>
+<span class="sd">        axis : string or tuple of strings or int or tuple of ints, optional</span>
+<span class="sd">            Specify the axis or axes to calculate &#39;reduction_function&#39; along. Can be specified as </span>
+<span class="sd">            string(s) of dimension_labels or int(s) of indices </span>
+<span class="sd">            Default None calculates the function over the whole array</span>
+<span class="sd">        out: ndarray or DataContainer, optional</span>
+<span class="sd">            Provide an object in which to place the result. The object must have the correct dimensions and </span>
+<span class="sd">            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See </span>
+<span class="sd">            `Output type determination &lt;https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type&gt;`_ for more details.</span>
+<span class="sd">            Default is None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scalar or ndarray</span>
+<span class="sd">            The result of the unary function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">reduction_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">new_dimensions</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
+                <span class="n">new_dimensions</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">new_dimensions</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="o">=</span><span class="n">new_dimensions</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="s1">&#39;array&#39;</span><span class="p">):</span>
+                <span class="n">out_arr</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_arr</span> <span class="o">=</span> <span class="n">out</span>
+
+            <span class="n">reduction_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out</span><span class="o">=</span><span class="n">out_arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>  <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataContainer.sum"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.sum">[docs]</a>    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the sum of values in the DataContainer</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        axis : string or tuple of strings or int or tuple of ints, optional</span>
+<span class="sd">            Specify the axis or axes to calculate &#39;sum&#39; along. Can be specified as </span>
+<span class="sd">            string(s) of dimension_labels or int(s) of indices </span>
+<span class="sd">            Default None calculates the function over the whole array</span>
+<span class="sd">        out : ndarray or DataContainer, optional</span>
+<span class="sd">            Provide an object in which to place the result. The object must have the correct dimensions and </span>
+<span class="sd">            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See </span>
+<span class="sd">            `Output type determination &lt;https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type&gt;`_ for more details.</span>
+<span class="sd">            Default is None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scalar or DataContainer</span>
+<span class="sd">            The sum as a scalar or inside a DataContainer with reduced dimension_labels</span>
+<span class="sd">            Default is to accumulate and return data as float64 or complex128</span>
+<span class="sd">        &quot;&quot;&quot;</span>     
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">(</span><span class="s2">&quot;dtype argument is ignored, using float64 or complex128&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isrealobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataContainer.min"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the minimum pixel value in the DataContainer</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        axis : string or tuple of strings or int or tuple of ints, optional</span>
+<span class="sd">            Specify the axis or axes to calculate &#39;min&#39; along. Can be specified as </span>
+<span class="sd">            string(s) of dimension_labels or int(s) of indices </span>
+<span class="sd">            Default None calculates the function over the whole array</span>
+<span class="sd">        out : ndarray or DataContainer, optional</span>
+<span class="sd">            Provide an object in which to place the result. The object must have the correct dimensions and </span>
+<span class="sd">            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See </span>
+<span class="sd">            `Output type determination &lt;https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type&gt;`_ for more details.</span>
+<span class="sd">            Default is None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scalar or DataContainer</span>
+<span class="sd">            The min as a scalar or inside a DataContainer with reduced dimension_labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DataContainer.max"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the maximum pixel value in the DataContainer</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        axis : string or tuple of strings or int or tuple of ints, optional</span>
+<span class="sd">            Specify the axis or axes to calculate &#39;max&#39; along. Can be specified as </span>
+<span class="sd">            string(s) of dimension_labels or int(s) of indices </span>
+<span class="sd">            Default None calculates the function over the whole array</span>
+<span class="sd">        out : ndarray or DataContainer, optional</span>
+<span class="sd">            Provide an object in which to place the result. The object must have the correct dimensions and </span>
+<span class="sd">            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See </span>
+<span class="sd">            `Output type determination &lt;https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type&gt;`_ for more details.</span>
+<span class="sd">            Default is None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scalar or DataContainer </span>
+<span class="sd">            The max as a scalar or inside a DataContainer with reduced dimension_labels </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="DataContainer.mean"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the mean pixel value of the DataContainer</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        axis : string or tuple of strings or int or tuple of ints, optional</span>
+<span class="sd">            Specify the axis or axes to calculate &#39;mean&#39; along. Can be specified as </span>
+<span class="sd">            string(s) of dimension_labels or int(s) of indices </span>
+<span class="sd">            Default None calculates the function over the whole array</span>
+<span class="sd">        out : ndarray or DataContainer, optional</span>
+<span class="sd">            Provide an object in which to place the result. The object must have the correct dimensions and </span>
+<span class="sd">            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See </span>
+<span class="sd">            `Output type determination &lt;https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type&gt;`_ for more details.</span>
+<span class="sd">            Default is None</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scalar or DataContainer</span>
+<span class="sd">            The mean as a scalar or inside a DataContainer with reduced dimension_labels</span>
+<span class="sd">            Default is to accumulate and return data as float64 or complex128</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">(</span><span class="s2">&quot;dtype argument is ignored, using float64 or complex128&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isrealobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="c1"># Logic operators between DataContainers and floats    </span>
     <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>

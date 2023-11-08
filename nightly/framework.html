@@ -715,6 +715,24 @@ Following operations are defined:</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.framework.DataContainer.get_dimension_axis">
+<code class="sig-name descname"><span class="pre">get_dimension_axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimension_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.get_dimension_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.get_dimension_axis" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+any dimension_labels of the DataContainer or their indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension_label</strong> (<em>string</em><em> or </em><em>int</em><em> or </em><em>tuple of strings</em><em> or </em><em>ints</em>) – Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The axis index of the DataContainer matching the specified dimension_label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int or tuple of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.framework.DataContainer.as_array">
 <code class="sig-name descname"><span class="pre">as_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.as_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.as_array" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the pointer to the array.</p>
@@ -843,21 +861,108 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.framework.DataContainer.sum">
+<code class="sig-name descname"><span class="pre">sum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.sum" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the sum of values in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘sum’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The sum as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.framework.DataContainer.min">
-<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.min" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the min pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.min" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the minimum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘min’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The min as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.DataContainer.max">
-<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.max" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the max pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.max" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the maximum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘max’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The max as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.DataContainer.mean">
-<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.mean" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#DataContainer.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the mean pixel value of the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘mean’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The mean as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -949,6 +1054,24 @@ self.dimension_labels: i.e.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.framework.AcquisitionData.get_dimension_axis">
+<code class="sig-name descname"><span class="pre">get_dimension_axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimension_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.get_dimension_axis" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+any dimension_labels of the DataContainer or their indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension_label</strong> (<em>string</em><em> or </em><em>int</em><em> or </em><em>tuple of strings</em><em> or </em><em>ints</em>) – Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The axis index of the DataContainer matching the specified dimension_label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int or tuple of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.framework.AcquisitionData.log">
 <code class="sig-name descname"><span class="pre">log</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.log" title="Permalink to this definition">#</a></dt>
 <dd><p>Applies log pixel-wise to the DataContainer</p>
@@ -956,20 +1079,81 @@ self.dimension_labels: i.e.</p>
 
 <dl class="py method">
 <dt id="cil.framework.AcquisitionData.max">
-<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.max" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the max pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.max" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the maximum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘max’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The max as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.AcquisitionData.mean">
-<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.mean" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the mean pixel value of the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘mean’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The mean as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.AcquisitionData.min">
-<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.min" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the min pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.min" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the minimum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘min’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The min as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1078,6 +1262,33 @@ generator will not be seeded.</p></li>
 <dt id="cil.framework.AcquisitionData.squared_norm">
 <code class="sig-name descname"><span class="pre">squared_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.squared_norm" title="Permalink to this definition">#</a></dt>
 <dd><p>return the squared euclidean norm of the DataContainer viewed as a vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.framework.AcquisitionData.sum">
+<code class="sig-name descname"><span class="pre">sum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.sum" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the sum of values in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘sum’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The sum as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1190,6 +1401,24 @@ self.dimension_labels: i.e.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.framework.ImageData.get_dimension_axis">
+<code class="sig-name descname"><span class="pre">get_dimension_axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimension_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.get_dimension_axis" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+any dimension_labels of the DataContainer or their indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension_label</strong> (<em>string</em><em> or </em><em>int</em><em> or </em><em>tuple of strings</em><em> or </em><em>ints</em>) – Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The axis index of the DataContainer matching the specified dimension_label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int or tuple of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.framework.ImageData.log">
 <code class="sig-name descname"><span class="pre">log</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.log" title="Permalink to this definition">#</a></dt>
 <dd><p>Applies log pixel-wise to the DataContainer</p>
@@ -1197,20 +1426,81 @@ self.dimension_labels: i.e.</p>
 
 <dl class="py method">
 <dt id="cil.framework.ImageData.max">
-<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.max" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the max pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.max" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the maximum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘max’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The max as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.ImageData.mean">
-<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.mean" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the mean pixel value of the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘mean’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The mean as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.ImageData.min">
-<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.min" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the min pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.min" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the minimum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘min’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The min as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1284,6 +1574,33 @@ self.dimension_labels: i.e.</p>
 <dt id="cil.framework.ImageData.squared_norm">
 <code class="sig-name descname"><span class="pre">squared_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.squared_norm" title="Permalink to this definition">#</a></dt>
 <dd><p>return the squared euclidean norm of the DataContainer viewed as a vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.framework.ImageData.sum">
+<code class="sig-name descname"><span class="pre">sum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.sum" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the sum of values in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘sum’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The sum as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1369,6 +1686,24 @@ self.dimension_labels: i.e.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.framework.VectorData.get_dimension_axis">
+<code class="sig-name descname"><span class="pre">get_dimension_axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimension_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.get_dimension_axis" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+any dimension_labels of the DataContainer or their indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension_label</strong> (<em>string</em><em> or </em><em>int</em><em> or </em><em>tuple of strings</em><em> or </em><em>ints</em>) – Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The axis index of the DataContainer matching the specified dimension_label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int or tuple of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.framework.VectorData.get_slice">
 <code class="sig-name descname"><span class="pre">get_slice</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.get_slice" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a new DataContainer containing a single slice of in the requested direction.         Pass keyword arguments &lt;dimension label&gt;=index</p>
@@ -1382,20 +1717,81 @@ self.dimension_labels: i.e.</p>
 
 <dl class="py method">
 <dt id="cil.framework.VectorData.max">
-<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.max" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the max pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">max</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.max" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the maximum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘max’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The max as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.VectorData.mean">
-<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.mean" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the mean pixel value of the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘mean’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The mean as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.framework.VectorData.min">
-<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.min" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the min pixel value in the DataContainer</p>
+<code class="sig-name descname"><span class="pre">min</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.min" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the minimum pixel value in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘min’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The min as a scalar or inside a DataContainer with reduced dimension_labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1471,13 +1867,40 @@ self.dimension_labels: i.e.</p>
 <dd><p>return the squared euclidean norm of the DataContainer viewed as a vector</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="cil.framework.VectorData.sum">
+<code class="sig-name descname"><span class="pre">sum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.sum" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the sum of values in the DataContainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>string</em><em> or </em><em>tuple of strings</em><em> or </em><em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Specify the axis or axes to calculate ‘sum’ along. Can be specified as
+string(s) of dimension_labels or int(s) of indices
+Default None calculates the function over the whole array</p></li>
+<li><p><strong>out</strong> (<em>ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – <p>Provide an object in which to place the result. The object must have the correct dimensions and
+(for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
+<a class="reference external" href="https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type">Output type determination</a> for more details.
+Default is None</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The sum as a scalar or inside a DataContainer with reduced dimension_labels
+Default is to accumulate and return data as float64 or complex128</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>scalar or <a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
 <div class="section" id="blockdatacontainer">
 <h3>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h3>
 <p>A <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code> can be instantiated from a number of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> and subclasses
-represents a column vector of :code:<a href="#id1"><span class="problematic" id="id2">`</span></a>DataContainer`s.</p>
+represents a column vector of :code:<a href="#id16"><span class="problematic" id="id17">`</span></a>DataContainer`s.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bdc</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">DataContainer0</span><span class="p">,</span> <span class="n">DataContainer1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1489,8 +1912,8 @@ represents a column vector of :code:<a href="#id1"><span class="problematic" id=
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id3"><span class="problematic" id="id4">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id5"><span class="problematic" id="id6">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id18"><span class="problematic" id="id19">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id20"><span class="problematic" id="id21">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,

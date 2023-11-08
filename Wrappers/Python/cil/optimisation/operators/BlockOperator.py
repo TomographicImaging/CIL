@@ -284,8 +284,8 @@ class BlockOperator(Operator):
                                 x_b.get_item(row))
                         else:
 
-                            out_col_operator = out.get_item(col) # out_col_operator points to the column in out that we are updating 
-                            out_col_operator += self.get_item(row,col).adjoint(
+                            temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating 
+                            temp_out_col += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row),
                                                         )
 

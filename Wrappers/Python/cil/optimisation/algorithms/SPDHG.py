@@ -26,6 +26,7 @@ from cil.optimisation.utilities import Sampler
 from numbers import Number
 import numpy as np
 
+
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
 
@@ -65,6 +66,33 @@ class SPDHG(Algorithm):
     Example of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
 
 
+
+    Note
+    -----
+    When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
+
+    - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
+        .. math:: 
+
+        \sigma_i=0.99 / (\|K_i\|**2)
+
+        and `tau` is set as per case 2
+
+    - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
+
+        .. math:: 
+
+        \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+
+    - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
+
+        .. math:: 
+
+        \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
+
+    - Case 4: Both `sigma` and `tau` are provided.
+
+
     Note
     ----
 
@@ -73,14 +101,6 @@ class SPDHG(Algorithm):
     .. math:: 
 
     \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
-
-    Note
-    ----
-
-    Notation for primal and dual step-sizes are reversed with comparison
-        to SPDHG.py
-
-
 
     References
     ----------
@@ -95,34 +115,30 @@ class SPDHG(Algorithm):
     Physics in Medicine & Biology, Volume 64, Number 22, 2019.
     '''
 
-    def __init__(self, f=None, g=None, operator=None,
+    def __init__(self, f=None, g=None, operator=None, sigma=None, tau=None,
                  initial=None, sampler=None,  **kwargs):
 
-    #TODO: keep sigma, tau, gamma in the init and call set_custom_step_sizes 
         super(SPDHG, self).__init__(**kwargs)
 
         if kwargs.get('norms', None) is not None:
             operator.set_norms(kwargs.get('norms'))
             warnings.warn(
-                        ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
-        
+                ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
+
         if sampler is not None:
             if kwargs.get('prob', None) is not None:
-                #TODO: change warnings to logging 
-                #TODO: change this one to an error 
-                warnings.warn('`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.') 
+                raise TypeError(
+                    '`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
         else:
             if kwargs.get('prob', None) is not None:
-                warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-            sampler=Sampler.random_with_replacement(len(operator),  prob=kwargs.get('prob', [1/len(operator)]*len(operator)))
-        
+                logging.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
+            sampler = Sampler.random_with_replacement(
+                len(operator),  prob=kwargs.get('prob', [1/len(operator)]*len(operator)))
 
         if f is not None and operator is not None and g is not None and sampler is not None:
-            self.set_up(f=f, g=g, operator=operator,
+            self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                         initial=initial,  sampler=sampler)
 
-        
-            
     @property
     def sigma(self):
         return self._sigma
@@ -140,7 +156,7 @@ class SPDHG(Algorithm):
                 parameter controlling the trade-off between the primal and dual step sizes
             rho : float
                  parameter controlling the size of the product :math: \sigma\tau :math:
-        
+
         Note
         -----
         The step sizes `sigma` and `tau` are set using the equations:
@@ -168,9 +184,9 @@ class SPDHG(Algorithm):
                 "We currently only support scalar values of gamma")
 
         self._sigma = [gamma * rho / ni for ni in self.norms]
-        values=[pi / (si * ni**2) for pi, ni,
-                         si in zip(self.prob_weights, self.norms, self._sigma)]
-        self._tau = min([value for value in values if value>1e-6]) #TODO: what value should this be 
+        values = [pi / (si * ni**2) for pi, ni,
+                  si in zip(self.prob_weights, self.norms, self._sigma)]
+        self._tau = min([value for value in values if value > 1e-8])
         self._tau *= (rho / gamma)
 
     def set_step_sizes_custom(self, sigma=None, tau=None):
@@ -184,7 +200,7 @@ class SPDHG(Algorithm):
                 Step size parameter for Primal problem
 
         The user can set these or default values are calculated, either sigma, tau, both or None can be passed. 
-        
+
         Note
         -----
         There are 4 possible cases considered by this function: 
@@ -201,7 +217,7 @@ class SPDHG(Algorithm):
           .. math:: 
 
             \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
-    
+
         - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
           .. math:: 
@@ -209,10 +225,6 @@ class SPDHG(Algorithm):
             \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
 
         - Case 4: Both `sigma` and `tau` are provided.
-        
-        
-
-
 
         """
         gamma = 1.
@@ -240,9 +252,9 @@ class SPDHG(Algorithm):
                 gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self.norms, self.prob_weights)]
 
         if tau is None:
-            values=[pi / (si * ni**2) for pi, ni,
-                         si in zip(self.prob_weights, self.norms, self._sigma)]
-            self._tau = min([value for value in values if value>1e-6]) #TODO: what value should this be 
+            values = [pi / (si * ni**2) for pi, ni,
+                      si in zip(self.prob_weights, self.norms, self._sigma)]
+            self._tau = min([value for value in values if value > 1e-8])
             self._tau *= (rho / gamma)
         else:
             if isinstance(tau, Number):
@@ -257,7 +269,6 @@ class SPDHG(Algorithm):
     def set_step_sizes_default(self):
         """Calculates the default values for sigma and tau """
         self.set_step_sizes_custom(sigma=None, tau=None)
-
 
     def check_convergence(self):
         # TODO: check this with someone else
@@ -276,7 +287,7 @@ class SPDHG(Algorithm):
             else:
                 return False
 
-    def set_up(self, f, g, operator,
+    def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None):
         '''set-up of the algorithm
         Parameters
@@ -305,15 +316,16 @@ class SPDHG(Algorithm):
         self.g = g
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
-        self.sampler=sampler
+        self.sampler = sampler
         self.norms = operator.get_norms_as_list()
 
-        self.prob_weights=sampler.prob_weights #TODO: consider the case it is uniform and not saving the array 
+        # TODO: consider the case it is uniform and not saving the array
+        self.prob_weights = sampler.prob_weights
         if self.prob_weights is None:
-           self.prob_weights=[1/self.ndual_subsets]*self.ndual_subsets
+            self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
 
         # might not want to do this until it is called (if computationally expensive)
-        self.set_step_sizes_default()
+        self.set_step_sizes_custom(sigma=sigma, tau=tau)
 
         # initialize primal variable
         if initial is None:

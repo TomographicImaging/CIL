@@ -79,7 +79,7 @@ class LeastSquares(Function):
         
     def __call__(self, x):
         
-        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or :math:`c\|Ax-b\|_{2,W}^2, where :math:`W=\text{diag}(weight)`:
+        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or :math:`c\|Ax-b\|_{2,W}^2`, where :math:`W=\text{diag}(weight)`:
                         
         """
         # c * (A.direct(x)-b).dot((A.direct(x) - b))

@@ -161,7 +161,7 @@ class Function(object):
     def L(self):
         '''Lipschitz of the gradient of function f.
         
-        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
+        L is positive real number, such that :math:`\|f'(x) - f'(y)\| \leq L\ |x-y\|`, assuming :math:`f: IG --> \mathbb{R}`'''
         return self._L
         # return self._L
     @L.setter

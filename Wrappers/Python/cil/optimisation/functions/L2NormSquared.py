@@ -126,8 +126,8 @@ class L2NormSquared(Function):
 
         Consider the following cases:
 
-                a) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
-                b) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
+                a) .. math:: \text{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
+                b) .. math:: \text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
 
         """
 
@@ -145,15 +145,15 @@ class L2NormSquared(Function):
 class WeightedL2NormSquared(Function):
 
     r""" WeightedL2NormSquared function: :math:`F(x) = \| x\|_{W,2}^2 = \Sigma_iw_ix_i^2 = <x, Wx> = x^TWx`
-    where :math:`W=diag(weight)` if `weight` is a `DataContainer or :math:`\mathrm{weight}I` if `weight` is a scalar.
+    where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer or :math:`\text{weight}I` if `weight` is a scalar.
 
     Parameters
     -----------
     **kwargs
 
     weight: a `scalar` or a `DataContainer` with the same shape as the intended domain of this `WeightedL2NormSquared` function
-    n: a `DataContainer` with the same shape as the intended domain of this `WeightedL2NormSquared` function
-        A shift so that the function becomes "function: :math:`F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = <x-b, W(x-b)> = (x-b)^TW(x-b)`
+    b: a `DataContainer` with the same shape as the intended domain of this `WeightedL2NormSquared` function
+        A shift so that the function becomes "function: :math:`F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = \langle x-b, W(x-b) \rangle = (x-b)^TW(x-b)`
 
 
     """
@@ -179,8 +179,8 @@ class WeightedL2NormSquared(Function):
         super(WeightedL2NormSquared, self).__init__(L=2 * tmp_norm)
 
     def __call__(self, x):
-        '''Calculates :math:`F(x) = \| x\|_{W,2}^2 = \Sigma_iw_ix_i^2 = <x, Wx> = x^TWx` or, if `b` is defined, :math:`F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = <x-b, W(x-b)> = (x-b)^TW(x-b)`
-        where :math:`W=diag(weight)` if `weight` is a `DataContainer or :math:`\mathrm{weight}I` if `weight` is a scalar.'''
+        '''Calculates :math:`F(x) = \| x\|_{W,2}^2 = \Sigma_iw_ix_i^2 = \langle x, Wx \rangle = x^TWx` or, if `b` is defined, :math:`F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = <x-b, W(x-b)> = (x-b)^TW(x-b)`
+        where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer or :math:`\text{weight}I` if `weight` is a scalar.'''
         self.operator_weight.direct(x, out=self.tmp_space)
         y = x.dot(self.tmp_space)
 
@@ -191,7 +191,7 @@ class WeightedL2NormSquared(Function):
 
     def gradient(self, x, out=None):
         r""" Returns the value of :math: `F'(x) = 2Wx` or, if `b` is defined,  :math: `F'(x) = 2W(x-b)`
-        where :math:`W=diag(weight)` if `weight` is a `DataContainer or :math:`\mathrm{weight}I` if `weight` is a scalar.`.
+        where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer or :math:`\text{weight}I` if `weight` is a scalar.`.
 
         """
 

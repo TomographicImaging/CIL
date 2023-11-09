@@ -102,7 +102,7 @@ class LeastSquares(Function):
              
              .. math:: F'(x) = 2cA^T(W(Ax-b))
 
-        where :math:`W=diag(self.weight)`.
+        where :math:`W=\text{diag}(weight)`.
     
         """
         should_return = True

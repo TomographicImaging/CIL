@@ -162,7 +162,7 @@ class Function(object):
     
     @property
     def L(self):
-        '''Lipschitz of the gradient of function f.
+        r'''Lipschitz of the gradient of function f.
         
         L is positive real number, such that :math:`\|f'(x) - f'(y)\| \leq L\ |x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`'''
         return self._L

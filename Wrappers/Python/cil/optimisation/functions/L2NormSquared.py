@@ -190,7 +190,7 @@ class WeightedL2NormSquared(Function):
         return y
 
     def gradient(self, x, out=None):
-        r""" Returns the value of :math: `F'(x) = 2Wx` or, if `b` is defined,  :math: `F'(x) = 2W(x-b)`
+        r""" Returns the value of :math:`F'(x) = 2Wx` or, if `b` is defined,  :math:`F'(x) = 2W(x-b)`
         where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer` or :math:`\text{weight}I` if `weight` is a scalar.`.
 
         """

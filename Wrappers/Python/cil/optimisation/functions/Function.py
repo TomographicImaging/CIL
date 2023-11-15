@@ -32,9 +32,11 @@ class Function(object):
         
         L: number, positive, default None
             Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-        domain: The domain of the function.
-
-        Lipschitz of the gradient of the function; it is a positive real number, such that :math:`\|f'(x) - f'(y)\| <= L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`
+        domain: The domain of the function
+        
+        Note
+        -----
+        The Lipschitz of the gradient of the function is a positive real number, such that :math:`\|f'(x) - f'(y)\| <= L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`
 
     """
     

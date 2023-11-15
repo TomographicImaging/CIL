@@ -54,8 +54,8 @@ class SPDHG(Algorithm):
         parameter controlling the trade-off between the primal and dual step sizes
     sampler: an instance of a `cil.optimisation.utilities.Sampler` class
         Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
+        
     **kwargs:
-
     prob : list of floats, optional, default=None
         List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
     norms : list of floats
@@ -81,13 +81,11 @@ class SPDHG(Algorithm):
     - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
 
         .. math:: 
-
         \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
 
     - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
         .. math:: 
-
         \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
 
     - Case 4: Both `sigma` and `tau` are provided.
@@ -99,7 +97,6 @@ class SPDHG(Algorithm):
     Convergence is guaranteed provided that [2, eq. (12)]:
 
     .. math:: 
-
     \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
 
     References
@@ -148,7 +145,7 @@ class SPDHG(Algorithm):
         return self._tau
 
     def set_step_sizes_from_ratio(self, gamma=1., rho=.99):
-        """ Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
+        r""" Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
 
         Parameters
         ----------
@@ -161,7 +158,6 @@ class SPDHG(Algorithm):
         -----
         The step sizes `sigma` and `tau` are set using the equations:
         .. math:: 
-
             \sigma_i=\gamma\rho / (\|K_i\|**2)\\
             \tau = (\rho/\gamma)\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
 
@@ -190,7 +186,7 @@ class SPDHG(Algorithm):
         self._tau *= (rho / gamma)
 
     def set_step_sizes_custom(self, sigma=None, tau=None):
-        """ Sets sigma step-sizes for the SPDHG algorithm. The step sizes can be either scalar or array-objects.
+        r""" Sets sigma step-sizes for the SPDHG algorithm. The step sizes can be either scalar or array-objects.
 
         Parameters
         ----------
@@ -207,7 +203,6 @@ class SPDHG(Algorithm):
 
         - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
           .. math:: 
-
             \sigma_i=0.99 / (\|K_i\|**2)
 
          and `tau` is set as per case 2
@@ -215,13 +210,11 @@ class SPDHG(Algorithm):
         - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
 
           .. math:: 
-
             \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
 
         - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
           .. math:: 
-
             \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
 
         - Case 4: Both `sigma` and `tau` are provided.

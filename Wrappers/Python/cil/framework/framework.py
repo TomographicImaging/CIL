@@ -2757,13 +2757,33 @@ class DataContainer(object):
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels))
+    
     def get_dimension_axis(self, dimension_label):
+        """
+        Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+        any dimension_labels of the DataContainer or their indices 
+        
+        Parameters
+        ----------
+        dimension_label: string or int or tuple of strings or ints
+            Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index 
+        
+        Returns
+        -------
+        int or tuple of ints
+            The axis index of the DataContainer matching the specified dimension_label
+        """
+        if isinstance(dimension_label,(tuple,list)):
+            return tuple(self.get_dimension_axis(x) for x in dimension_label)
 
         if dimension_label in self.dimension_labels:
             return self.dimension_labels.index(dimension_label)
+        elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < self.ndim:
+            return dimension_label 
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
-                             self.dimension_labels))
+            raise ValueError('Unknown dimension {0}. Should be one of {1}, or an integer in range {2} - {3}'.format(dimension_label,
+                            self.dimension_labels, 0, self.ndim))
+
                         
     def as_array(self):
         '''Returns the pointer to the array.
@@ -3313,9 +3333,7 @@ class DataContainer(object):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     
-    ## reductions
-    def sum(self, *args, **kwargs):
-        return self.as_array().sum(*args, **kwargs)
+    ## reductions        
     def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
         #shape = self.shape
@@ -3351,20 +3369,158 @@ class DataContainer(object):
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
-    def min(self, *args, **kwargs):
-        '''Returns the min pixel value in the DataContainer'''
-        return numpy.min(self.as_array(), *args, **kwargs)
-    
-    def max(self, *args, **kwargs):
-        '''Returns the max pixel value in the DataContainer'''
-        return numpy.max(self.as_array(), *args, **kwargs)
-    
-    def mean(self, *args, **kwargs):
-        '''Returns the mean pixel value of the DataContainer'''
-        if kwargs.get('dtype', None) is None:
-            kwargs['dtype'] = numpy.float64
-        return numpy.mean(self.as_array(), *args, **kwargs)
+    def _directional_reduction_unary(self, reduction_function, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the result of a unary function, considering the direction from an axis argument to the function
+        
+        Parameters
+        ----------
+        reduction_function : function 
+            The unary function to be evaluated
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'reduction_function' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out: ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or ndarray
+            The result of the unary function
+        """
+        if axis is not None:
+            axis = self.get_dimension_axis(axis)
 
+        if out is None:
+            result = reduction_function(self.as_array(), axis=axis, *args, **kwargs)
+            if isinstance(result, numpy.ndarray):
+                new_dimensions = numpy.array(self.dimension_labels)
+                new_dimensions = numpy.delete(new_dimensions, axis)
+                return DataContainer(result, dimension_labels=new_dimensions)
+            else:
+                return result
+        else:
+            if hasattr(out,'array'):
+                out_arr = out.array
+            else:
+                out_arr = out
+
+            reduction_function(self.as_array(), out=out_arr, axis=axis,  *args, **kwargs)
+
+    def sum(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the sum of values in the DataContainer
+        
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'sum' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or DataContainer
+            The sum as a scalar or inside a DataContainer with reduced dimension_labels
+            Default is to accumulate and return data as float64 or complex128
+        """     
+        if kwargs.get('dtype') is not None:
+            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        
+        if numpy.isrealobj(self.array):
+            kwargs['dtype'] = numpy.float64
+        else:
+            kwargs['dtype'] = numpy.complex128
+
+        return self._directional_reduction_unary(numpy.sum, axis=axis, out=out, *args, **kwargs)
+
+    def min(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the minimum pixel value in the DataContainer
+        
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'min' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or DataContainer
+            The min as a scalar or inside a DataContainer with reduced dimension_labels
+        """
+        return self._directional_reduction_unary(numpy.min, axis=axis, out=out, *args, **kwargs)
+    
+    def max(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the maximum pixel value in the DataContainer
+
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'max' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or DataContainer 
+            The max as a scalar or inside a DataContainer with reduced dimension_labels 
+        """
+        return self._directional_reduction_unary(numpy.max, axis=axis, out=out, *args, **kwargs)
+        
+    def mean(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the mean pixel value of the DataContainer
+
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'mean' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+            
+        Returns
+        -------
+        scalar or DataContainer
+            The mean as a scalar or inside a DataContainer with reduced dimension_labels
+            Default is to accumulate and return data as float64 or complex128
+        """
+        
+        if kwargs.get('dtype', None) is not None:
+            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        
+        if numpy.isrealobj(self.array):
+            kwargs['dtype'] = numpy.float64
+        else:
+            kwargs['dtype'] = numpy.complex128
+        
+        return self._directional_reduction_unary(numpy.mean, axis=axis, out=out, *args, **kwargs)
 
     # Logic operators between DataContainers and floats    
     def __le__(self, other):

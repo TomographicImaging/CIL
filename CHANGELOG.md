@@ -1,11 +1,10 @@
-* xx.x.x
-  - bugfix
-    - proximal of MixedL21Norm with numpy backend
-
 * x.x.x
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding 
+  - bugfixes:
+    - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

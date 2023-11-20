@@ -135,7 +135,7 @@ class BlockOperator(Operator):
         index = row*self.shape[1]+col
         return self.operators[index]
     
-    def norm(self, **kwargs):
+    def norm(self, **kwargs): 
         '''Returns the norm of the BlockOperator
 
         if the operator in the block do not have method norm defined, i.e. they are SIRF

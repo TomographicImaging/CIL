@@ -45,7 +45,7 @@ ${conda_cmd} python=$python numpy=$numpy \
         cil-data tigre=2.4 ccpi-regulariser=22.0.0 tomophantom=2.0.0  astra-toolbox'>=1.9.9.dev5,<2.1' \
         cvxpy python-wget scikit-image packaging \
         cmake'>=3.16' setuptools  \
-        ipp-include ipp-devel ipp \
+        ipp-include'<2021.10' ipp-devel'<2021.10' ipp'<2021.10' \
         ipywidgets scipy matplotlib \
         h5py pillow libgcc-ng dxchange olefile pywavelets numba tqdm \
         -c conda-forge -c intel  -c ccpi/label/dev -c ccpi -c astra-toolbox -c astra-toolbox/label/dev \

@@ -44,4 +44,4 @@ set -x
 
 conda create --name $name cmake python=$python numpy=$numpy scipy matplotlib \
   h5py pillow libgcc-ng dxchange olefile pywavelets python-wget scikit-image \
-  packaging  numba ipp ipp-devel ipp-include tqdm -c conda-forge -c intel  -c defaults --override-channels
+  packaging  numba ipp'<2021.10' ipp-devel'<2021.10' ipp-include'<2021.10' tqdm -c conda-forge -c intel  -c defaults --override-channels

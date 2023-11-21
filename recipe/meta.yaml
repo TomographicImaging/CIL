@@ -69,9 +69,9 @@ requirements:
     - vc 14         # [win]
     - cil-data
     - ripgrep
-    - ipp-include
-    - ipp-devel
-    - ipp
+    - ipp-include <2021.10
+    - ipp-devel <2021.10
+    - ipp <2021.10
 
   run:
     - python
@@ -89,7 +89,7 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data >=21.3.0
-    - ipp
+    - ipp <2021.10
     - tqdm
     - numba
 

@@ -20,7 +20,7 @@
 import unittest
 from utils import initialise_tests
 import logging
-from cil.optimisation.operators import BlockOperator, BlockDiagonalOperator, ZeroOperator
+from cil.optimisation.operators import BlockOperator, BlockDiagonalOperator, ZeroOperator, GradientOperator
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import IdentityOperator
 from cil.framework import ImageGeometry, ImageData
@@ -30,6 +30,56 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 initialise_tests()
 
 class TestBlockOperator(unittest.TestCase):
+    def test_norms(self):
+        numpy.random.seed(1)
+        N, M = 200, 300
+
+        ig = ImageGeometry(N, M)
+        G = GradientOperator(ig)
+        G2 = GradientOperator(ig)
+        
+        A=BlockOperator(G,G2)
+
+        
+        #calculates norm
+        self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
+        self.assertAlmostEqual(G2.norm(), numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.norm(), numpy.sqrt(16), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[0], numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[1], numpy.sqrt(8), 2)
+        
+
+        #sets_norm
+        A.set_norms([2,3]) 
+        #gets cached norm
+        self.assertListEqual(A.get_norms_as_list(), [2,3], 2)
+        self.assertEqual(A.norm(), numpy.sqrt(13))
+        
+
+        #Check that it changes the underlying operators
+        self.assertEqual(A.operators[0]._norm, 2)
+        self.assertEqual(A.operators[1]._norm, 3)
+
+        #sets cache to None
+        A.set_norms([None, None])
+        #recalculates norm
+        self.assertAlmostEqual(A.norm(), numpy.sqrt(16), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[0], numpy.sqrt(8), 2)
+        self.assertAlmostEqual(A.get_norms_as_list()[1], numpy.sqrt(8), 2)
+
+        #Check the warnings on set_norms 
+        #Check the length of list that is passed
+        with self.assertRaises(ValueError):
+            A.set_norms([1])
+        #Check that elements in the list are numbers or None 
+        with self.assertRaises(TypeError):
+            A.set_norms(['Banana', 'Apple'])
+        #Check that numbers in the list are positive
+        with self.assertRaises(ValueError):
+            A.set_norms([-1,-3])
+
+
+
 
     def test_BlockOperator(self):
         ig = [ ImageGeometry(10,20,30) , \

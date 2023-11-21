@@ -319,6 +319,6 @@ class BlockDiagonalOperator(Operator):
             tmp.append(self.diagonals[0][i].range_geometry())
         return BlockGeometry(*tmp)            
         
-     def is_linear(self):
+    def is_linear(self): TODO: 
         '''returns whether all the elements of the BlockOperator are linear'''
         return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)

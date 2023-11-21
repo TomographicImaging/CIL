@@ -69,7 +69,7 @@ class DiagonalOperator(LinearOperator):
         
         "Returns :math:`D\circ x` "
         
-        return self.direct(x, out=out)
+        return self.diagonal.conjugate().multiply(x,out=out)
 
   
     def calculate_norm(self, **kwargs):

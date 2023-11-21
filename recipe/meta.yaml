@@ -1,19 +1,19 @@
 #  -*- coding: utf-8 -*-
 # Copyright 2018 United Kingdom Research and Innovation
 # Copyright 2018 The University of Manchester
-    
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-    
+
 #     http://www.apache.org/licenses/LICENSE-2.0
-    
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-    
+
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Kyle Pidgeon (UKRI-STFC)
@@ -37,23 +37,23 @@ build:
 test:
   requires:
     - python-wget
-    - cvxpy # [ linux ]    
+    - cvxpy # [ linux ]
     - scikit-image
     - tomophantom=2.0.0 # [ linux ]
-    - tigre=2.4 # [ not osx ] 
+    - tigre=2.4 # [ not osx ]
     - packaging
     - ccpi-regulariser=22.0.0 # [ not osx ]
     - astra-toolbox>=1.9.9.dev5,<2.1
 
   source_files:
     - ./Wrappers/Python/test # [win]
-    - ./Wrappers/Python/test # [not win] 
+    - ./Wrappers/Python/test # [not win]
 
   commands:
     - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
     - python -m unittest discover -v -s Wrappers/Python/test  # [win]
     - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
-    
+
 requirements:
   build:
     - python
@@ -69,9 +69,9 @@ requirements:
     - vc 14         # [win]
     - cil-data
     - ripgrep
-    - ipp-include
-    - ipp-devel
-    - ipp
+    - ipp-include >=2021.10
+    - ipp-devel >=2021.10
+    - ipp >=2021.10
 
   run:
     - python
@@ -89,7 +89,7 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data >=21.3.0
-    - ipp
+    - ipp >=2021.10
     - tqdm
     - numba
 

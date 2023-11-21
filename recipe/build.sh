@@ -24,8 +24,6 @@ then
                         -DCMAKE_BUILD_TYPE="Release"\
                         -DLIBRARY_LIB=$CONDA_PREFIX/lib \
                         -DLIBRARY_INC=$CONDA_PREFIX/include \
-                        -DIPP_LIBRARY=$CONDA_PREFIX/lib \
-                        -DIPP_INCLUDE=$CONDA_PREFIX/include \
                         -DOPENMP_LIBRARIES=${CONDA_PREFIX}/lib \
                         -DOPENMP_INCLUDES=${CONDA_PREFIX}/include \
                         -DCMAKE_INSTALL_PREFIX=$PREFIX
@@ -36,8 +34,6 @@ else
                         -DCMAKE_BUILD_TYPE="Release"\
                         -DLIBRARY_LIB=$CONDA_PREFIX/lib \
                         -DLIBRARY_INC=$CONDA_PREFIX/include \
-                        -DIPP_LIBRARY=$CONDA_PREFIX/lib \
-                        -DIPP_INCLUDE=$CONDA_PREFIX/include \
                         -DCMAKE_INSTALL_PREFIX=$PREFIX
 
 fi

@@ -102,7 +102,7 @@ class BlockDiagonalOperator(Operator):
     Parameters
     ----------
     diagonals : Lists of operators (if k=0) or a list of lists of operators if len(k)>0 
-        
+        #TODO: take in a list or take a block operator 
     domain_geometry : ImageGeometry
         Specifies the geometry of the BlockOperator domain. If 'None' will use the diagonal geometries directly. default=None .
     range_geometry: 
@@ -118,11 +118,7 @@ class BlockDiagonalOperator(Operator):
     
     def __init__(self, diagonals, k=0, domain_geometry=None, range_geometry=None):
 
-        if domain_geometry is None:
-            domain_geometry = self.get_domain_geometry()
         
-        if range_geometry is None: 
-            range_geometry = self.get_range_geometry()
         
         if k==0:
             k=[0] 
@@ -131,11 +127,17 @@ class BlockDiagonalOperator(Operator):
             except:
                 diagonals=[diagonals]
         self.shape=(len(diagonals[0]),len(diagonals[0])) #TODO: deal with the non-square case
-        
-        super(BlockDiagonalOperator, self).__init__(domain_geometry=domain_geometry, 
-                                    range_geometry=domain_geometry)
         self.diagonals = diagonals
         self.k=k
+        
+        if domain_geometry is None:
+            domain_geometry = self.get_domain_geometry()
+        
+        if range_geometry is None: 
+            range_geometry = self.get_range_geometry()
+        super(BlockDiagonalOperator, self).__init__(domain_geometry=domain_geometry, 
+                                    range_geometry=domain_geometry)
+        
 
     def get_output_shape(self, xshape, adjoint=False):
         '''returns the shape of the output BlockDataContainer
@@ -178,11 +180,11 @@ class BlockDiagonalOperator(Operator):
                     col=row+offset
                     if 0<=col<self.shape[0]:
                         if j==0:
-                            prod = self.diagonal[j].get_item(min(row,col)).direct(x_b.get_item(col))
+                            prod = self.diagonals[j][min(row,col)].direct(x_b.get_item(col))
                         else:
-                            prod+= self.diagonal[j].get_item(min(row,col)).direct(x_b.get_item(col))
-                        res.append(prod)
-                return BlockDataContainer(*res, shape=shape)
+                            prod+= self.diagonals[j][min(row,col)].direct(x_b.get_item(col))
+                res.append(prod)
+            return BlockDataContainer(*res, shape=shape)
                 
         else:
             
@@ -192,12 +194,12 @@ class BlockDiagonalOperator(Operator):
                     col=row+offset
                     if 0<=col<self.shape[0]:
                         if j == 0:       
-                            self.self.diagonal[j].get_item(min(row,col)).direct(
+                            self.diagonals[j][min(row,col)].direct(
                                                         x_b.get_item(col),
                                                         out=out.get_item(row))                        
                         else:
                             a = out.get_item(row) #TODO: change a! 
-                            self.self.diagonal[j].get_item(min(row,col)).direct(
+                            self.diagonals[j][min(row,col)].direct(
                                                         x_b.get_item(col), 
                                                         out=tmp.get_item(row))
                             a += tmp.get_item(row)
@@ -220,10 +222,10 @@ class BlockDiagonalOperator(Operator):
                     row=col-offset
                     if 0<=row<self.shape[0]:
                         if j == 0:
-                            prod = self.self.diagonal[j].get_item(min(row,col)).adjoint(x_b.get_item(row))
+                            prod = self.diagonals[j][min(row,col)].adjoint(x_b.get_item(row))
                         else:
-                            prod += self.self.diagonal[j].get_item(min(row,col)).adjoint(x_b.get_item(row))
-                    res.append(prod)
+                            prod += self.diagonals[j][min(row,col)].adjoint(x_b.get_item(row))
+                res.append(prod)
             if self.shape[1]==1:
                 # the output is a single DataContainer, so we can take it out
                 return res[0]
@@ -235,26 +237,26 @@ class BlockDiagonalOperator(Operator):
                 for j, offset in enumerate(self.k):
                     row=col-offset
                     if 0<=row<self.shape[0]:
-                        if issubclass(out.__class__, DataContainer) or \
-                ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
-                            self.diagonal[j].get_item(min(row,col)).adjoint(
-                                                x_b.get_item(row),
-                                                out=out)
+                        if j==0:
+                            if issubclass(out.__class__, DataContainer) or \
+                    ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
+                                self.diagonals[j][min(row,col)].adjoint(
+                                                    x_b.get_item(row),
+                                                    out=out)
+                            else:
+                                self.diagonals[j][min(row,col)].adjoint(
+                                                    x_b.get_item(row),
+                                                    out=out.get_item(col))
                         else:
-                            op = self.get_item(row,col)
-                            self.diagonal[j].get_item(min(row,col)).adjoint(
-                                                x_b.get_item(row),
-                                                out=out.get_item(col))
-                    else:
-                        if issubclass(out.__class__, DataContainer) or \
-                ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
-                            out += self.diagonal[j].get_item(min(row,col)).adjoint(
-                                                        x_b.get_item(row))
-                        else:
-                            a = out.get_item(col) #TODO: get rid of a 
-                            a += self.diagonal[j].get_item(min(row,col)).adjoint(
-                                                        x_b.get_item(row),
-                                                        )
+                            if issubclass(out.__class__, DataContainer) or \
+                    ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
+                                out += self.diagonals[j][min(row,col)].adjoint(
+                                                            x_b.get_item(row))
+                            else:
+                                a = out.get_item(col) #TODO: get rid of a 
+                                a += self.diagonals[j][min(row,col)].adjoint(
+                                                            x_b.get_item(row),
+                                                            )
     @property
     def T(self):
         '''Return the transposed of self TODO:''' 
@@ -273,7 +275,7 @@ class BlockDiagonalOperator(Operator):
         hold=[]
         if self.k==[[0]]:
             for i in range(len(self.diagonals[0])):
-                hold.append(self.diagonals[0].get_item(i).norm)
+                hold.append(self.diagonals[0][i].norm)
             return hold.max()
         else:
             raise NotImplementedError
@@ -294,7 +296,7 @@ class BlockDiagonalOperator(Operator):
             # since it is compatible from __init__
             tmp = []
             for i in range(self.shape[1]):
-                tmp.append(self.diagonals[0].get_item(i).domain_geometry())
+                tmp.append(self.diagonals[0][i].domain_geometry())
             return BlockGeometry(*tmp)                
                                     
 
@@ -304,6 +306,6 @@ class BlockDiagonalOperator(Operator):
         
         tmp = []
         for i in range(self.shape[0]):
-            tmp.append(self.diagonals[0].get_item(i).range_geometry())
+            tmp.append(self.diagonals[0][i].range_geometry())
         return BlockGeometry(*tmp)            
         

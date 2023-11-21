@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.algorithms import Algorithm
+from cil.optimisation.functions import ZeroFunction
 import numpy
 import warnings
 import logging
@@ -57,8 +58,8 @@ class ISTA(Algorithm):
               Initial guess of ISTA.
     f : Function
         Differentiable function
-    g : Function
-        Convex function with *simple* proximal operator
+    g : Function or `None`
+        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA.
                 The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}.`
@@ -123,6 +124,8 @@ class ISTA(Algorithm):
         self.x_old = initial.copy()
         self.x = initial.copy()           
         self.f = f
+        if g is None:
+            g=ZeroFunction()
         self.g = g
 
         # set step_size
@@ -198,8 +201,8 @@ class FISTA(ISTA):
             Starting point of the algorithm
     f : Function
         Differentiable function
-    g : Function
-        Convex function with *simple* proximal operator
+    g : Function or `None`
+        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of FISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}`.
@@ -245,6 +248,8 @@ class FISTA(ISTA):
 
         self.y = initial.copy()
         self.t = 1
+        if g is None:
+            g=ZeroFunction()
         super(FISTA, self).__init__(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
               
     def update(self):

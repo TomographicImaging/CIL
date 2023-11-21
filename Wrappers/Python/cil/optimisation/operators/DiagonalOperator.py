@@ -97,12 +97,11 @@ class BlockDiagonalOperator(Operator):
 
     r"""DiagonalOperator 
 
-    TODO: description 
+    Constructs a square diagonal operator. The main diagonal must be provided but then any other diagonals can also be included. 
 
     Parameters
     ----------
     diagonals : Lists of operators (if k=0) or a list of lists of operators if len(k)>0 
-        #TODO: take in a list or take a block operator 
     domain_geometry : ImageGeometry
         Specifies the geometry of the BlockOperator domain. If 'None' will use the diagonal geometries directly. default=None .
     range_geometry: 
@@ -117,15 +116,15 @@ class BlockDiagonalOperator(Operator):
 
     
     def __init__(self, diagonals, k=0, domain_geometry=None, range_geometry=None):
-
-        
-        
         if k==0:
             k=[0] 
             try:
                 diagonals[0][0]
             except:
                 diagonals=[diagonals]
+        else:
+            if k[0]!=0:
+                raise TypeError("The main diagonal must always be provided first")
         self.shape=(len(diagonals[0]),len(diagonals[0])) #TODO: deal with the non-square case
         self.diagonals = diagonals
         self.k=k
@@ -208,8 +207,19 @@ class BlockDiagonalOperator(Operator):
 
     def adjoint(self,x, out=None):
         
-        "TODO: "
-        
+        '''Adjoint operation for the BlockOperator
+
+        BlockOperator may contain both LinearOperator and Operator
+        This method exists in BlockOperator as it is not known what type of
+        Operator it will contain.
+
+        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
+
+        Raises: ValueError if the contained Operators are not linear
+        '''
+        if not self.is_linear():
+            raise ValueError('Not all operators in Block are linear.')        
         if not isinstance (x, BlockDataContainer):
             x_b = BlockDataContainer(x)
         else:
@@ -309,3 +319,6 @@ class BlockDiagonalOperator(Operator):
             tmp.append(self.diagonals[0][i].range_geometry())
         return BlockGeometry(*tmp)            
         
+     def is_linear(self):
+        '''returns whether all the elements of the BlockOperator are linear'''
+        return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)

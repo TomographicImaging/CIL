@@ -17,6 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
+import functools
 import numpy as np
 from cil.framework import ImageData, DataContainer
 from cil.optimisation.operators import Operator, BlockOperator,  LinearOperator
@@ -197,11 +198,11 @@ class BlockDiagonalOperator(Operator):
                                                         x_b.get_item(col),
                                                         out=out.get_item(row))                        
                         else:
-                            a = out.get_item(row) #TODO: change a! 
+                            temp_out_row = out.get_item(row) #TODO: change a! 
                             self.diagonals[j][min(row,col)].direct(
                                                         x_b.get_item(col), 
                                                         out=tmp.get_item(row))
-                            a += tmp.get_item(row)
+                            temp_out_row += tmp.get_item(row)
         
         
 
@@ -263,8 +264,8 @@ class BlockDiagonalOperator(Operator):
                                 out += self.diagonals[j][min(row,col)].adjoint(
                                                             x_b.get_item(row))
                             else:
-                                a = out.get_item(col) #TODO: get rid of a 
-                                a += self.diagonals[j][min(row,col)].adjoint(
+                                temp_out_col= out.get_item(col) #TODO: get rid of a 
+                                temp_out_col += self.diagonals[j][min(row,col)].adjoint(
                                                             x_b.get_item(row),
                                                             )
     @property
@@ -279,7 +280,7 @@ class BlockDiagonalOperator(Operator):
   
     def calculate_norm(self, **kwargs):
         
-        r""" TODO:
+        r"""
 
         """
         hold=[]
@@ -288,7 +289,7 @@ class BlockDiagonalOperator(Operator):
                 hold.append(self.diagonals[0][i].norm)
             return hold.max()
         else:
-            raise NotImplementedError
+            raise NotImplementedError #TODO:
     
     
     def get_domain_geometry(self):
@@ -319,6 +320,9 @@ class BlockDiagonalOperator(Operator):
             tmp.append(self.diagonals[0][i].range_geometry())
         return BlockGeometry(*tmp)            
         
-    def is_linear(self): TODO: 
+    def is_linear(self): 
         '''returns whether all the elements of the BlockOperator are linear'''
-        return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)
+        op_list=[]
+        for i in len(self.k):
+            op_list.append(self.diagonals[i])
+        return functools.reduce(lambda x, y: x and y.is_linear(), op_list, True)

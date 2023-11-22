@@ -19,7 +19,7 @@
 
 
 from cil.optimisation.functions import SumFunction
-#from cil.optimisation.utilities import Sampler TODO: after sampler merged in 
+from cil.optimisation.utilities import Sampler 
 import numbers
 from abc import ABC, abstractmethod
 
@@ -61,8 +61,8 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     def __init__(self, functions, sampler =None):
         
-      #  if sampler is None:
-      #      sampler=Sampler.random_with_replacement(len(functions)) #TODO: once sampler is merged in and unit test for this! 
+        if sampler is None:
+            sampler=Sampler.random_with_replacement(len(functions)) 
         
         if not isinstance(functions, list):
             raise TypeError("Input to functions should be a list of functions")

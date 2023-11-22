@@ -126,7 +126,6 @@ class Partitioner(object):
             ag = self.geometry.copy()
             ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
             ags.append(ag)
-        
         return BlockGeometry(*ags)
 
     def partition(self, num_batches, mode, seed=None):
@@ -200,8 +199,11 @@ class Partitioner(object):
             
         for i in range(num_batches):
             out[i].fill(
-                numpy.take(self.array, partition_indices[i], axis=axis)
+                numpy.squeeze(
+                    numpy.take(self.array, partition_indices[i], axis=axis)
+                )
             )
+ 
         return out
          
     def _partition_random_permutation(self, num_batches, seed=None):
@@ -519,7 +521,7 @@ class ComponentDescription(object):
     @staticmethod  
     def create_vector(val):
         try:
-            vec = numpy.asarray(val, dtype=numpy.float64).reshape(len(val))
+            vec = numpy.array(val, dtype=numpy.float64).reshape(len(val))
         except:
             raise ValueError("Can't convert to numpy array")
    
@@ -1982,6 +1984,48 @@ class Configuration(object):
             configured = False
         return configured
 
+    def shift_detector_in_plane(self,
+                                          pixel_offset,
+                                          direction='horizontal'):
+        """
+        Adjusts the position of the detector in a specified direction within the imaging plane.
+
+        Parameters:
+        -----------
+        pixel_offset : float
+            The number of pixels to adjust the detector's position by.
+        direction : {'horizontal', 'vertical'}, optional
+            The direction in which to adjust the detector's position. Defaults to 'horizontal'.
+
+        Notes:
+        ------
+        - If `direction` is 'horizontal':
+            - If the panel's origin is 'left', positive offsets translate the detector to the right.
+            - If the panel's origin is 'right', positive offsets translate the detector to the left.
+
+        - If `direction` is 'vertical':
+            - If the panel's origin is 'bottom', positive offsets translate the detector upward.
+            - If the panel's origin is 'top', positive offsets translate the detector downward.
+
+        Returns:
+        --------
+        None
+        """
+
+        if direction == 'horizontal':
+            pixel_size = self.panel.pixel_size[0]
+            pixel_direction = self.system.detector.direction_x
+
+        elif direction == 'vertical':
+            pixel_size = self.panel.pixel_size[1]
+            pixel_direction = self.system.detector.direction_y
+
+        if 'bottom' in self.panel.origin or 'left' in self.panel.origin:
+            self.system.detector.position -= pixel_offset * pixel_direction * pixel_size
+        else:
+            self.system.detector.position += pixel_offset * pixel_direction * pixel_size
+
+
     def __str__(self):
         repres = ""
         if self.configured:
@@ -2111,7 +2155,6 @@ class AcquisitionGeometry(object):
                      AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
                      AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
                      AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
-
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -2714,13 +2757,33 @@ class DataContainer(object):
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels))
+    
     def get_dimension_axis(self, dimension_label):
+        """
+        Returns the axis index of the DataContainer array if the specified dimension_label(s) match
+        any dimension_labels of the DataContainer or their indices 
+        
+        Parameters
+        ----------
+        dimension_label: string or int or tuple of strings or ints
+            Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index 
+        
+        Returns
+        -------
+        int or tuple of ints
+            The axis index of the DataContainer matching the specified dimension_label
+        """
+        if isinstance(dimension_label,(tuple,list)):
+            return tuple(self.get_dimension_axis(x) for x in dimension_label)
 
         if dimension_label in self.dimension_labels:
             return self.dimension_labels.index(dimension_label)
+        elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < self.ndim:
+            return dimension_label 
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
-                             self.dimension_labels))
+            raise ValueError('Unknown dimension {0}. Should be one of {1}, or an integer in range {2} - {3}'.format(dimension_label,
+                            self.dimension_labels, 0, self.ndim))
+
                         
     def as_array(self):
         '''Returns the pointer to the array.
@@ -2950,12 +3013,12 @@ class DataContainer(object):
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
         
-        if new_order is None returns the labels of the axes as a sorted-by-key list
-        if new_order is a list of length number_of_dimensions, returns a list
+        If new_order is None returns the labels of the axes as a sorted-by-key list.
+        If new_order is a list of length number_of_dimensions, returns a list
         with the indices of the axes in new_order with respect to those in 
         self.dimension_labels: i.e.
-          self.dimension_labels = {0:'horizontal',1:'vertical'}
-          new_order = ['vertical','horizontal']
+          >>> self.dimension_labels = {0:'horizontal',1:'vertical'}
+          >>> new_order = ['vertical','horizontal']
           returns [1,0]
         '''
         if new_order is None:
@@ -3083,19 +3146,18 @@ class DataContainer(object):
         out : return DataContainer, if None a new DataContainer is returned, default None. 
             out can be self or y.
         num_threads : number of threads to use during the calculation, using the CIL C library
+            It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.
         
-        It will try to use the CIL C library and default to numpy operations, in case the C library does
-        not handle the types.
         
-        Example:
+        Example
         -------
 
-        a = 2
-        b = 3
-        ig = ImageGeometry(10,11)
-        x = ig.allocate(1)
-        y = ig.allocate(2)
-        out = x.sapyb(a,y,b)
+        >>> a = 2
+        >>> b = 3
+        >>> ig = ImageGeometry(10,11)
+        >>> x = ig.allocate(1)
+        >>> y = ig.allocate(2)
+        >>> out = x.sapyb(a,y,b)
         '''
         ret_out = False
         
@@ -3271,9 +3333,7 @@ class DataContainer(object):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     
-    ## reductions
-    def sum(self, *args, **kwargs):
-        return self.as_array().sum(*args, **kwargs)
+    ## reductions        
     def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
         #shape = self.shape
@@ -3286,11 +3346,8 @@ class DataContainer(object):
         return numpy.sqrt(self.squared_norm(**kwargs))
     
     def dot(self, other, *args, **kwargs):
-        '''return the inner product of 2 DataContainers viewed as vectors
-        
-        applies to real and complex data. In such case the dot method returns
-
-        a.dot(b.conjugate())
+        '''returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
+          For complex data,  the dot method returns a.dot(b.conjugate())
         '''
         method = kwargs.get('method', 'numpy')
         if method not in ['numpy','reduce']:
@@ -3312,20 +3369,158 @@ class DataContainer(object):
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
     
-    def min(self, *args, **kwargs):
-        '''Returns the min pixel value in the DataContainer'''
-        return numpy.min(self.as_array(), *args, **kwargs)
-    
-    def max(self, *args, **kwargs):
-        '''Returns the max pixel value in the DataContainer'''
-        return numpy.max(self.as_array(), *args, **kwargs)
-    
-    def mean(self, *args, **kwargs):
-        '''Returns the mean pixel value of the DataContainer'''
-        if kwargs.get('dtype', None) is None:
-            kwargs['dtype'] = numpy.float64
-        return numpy.mean(self.as_array(), *args, **kwargs)
+    def _directional_reduction_unary(self, reduction_function, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the result of a unary function, considering the direction from an axis argument to the function
+        
+        Parameters
+        ----------
+        reduction_function : function 
+            The unary function to be evaluated
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'reduction_function' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out: ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or ndarray
+            The result of the unary function
+        """
+        if axis is not None:
+            axis = self.get_dimension_axis(axis)
 
+        if out is None:
+            result = reduction_function(self.as_array(), axis=axis, *args, **kwargs)
+            if isinstance(result, numpy.ndarray):
+                new_dimensions = numpy.array(self.dimension_labels)
+                new_dimensions = numpy.delete(new_dimensions, axis)
+                return DataContainer(result, dimension_labels=new_dimensions)
+            else:
+                return result
+        else:
+            if hasattr(out,'array'):
+                out_arr = out.array
+            else:
+                out_arr = out
+
+            reduction_function(self.as_array(), out=out_arr, axis=axis,  *args, **kwargs)
+
+    def sum(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the sum of values in the DataContainer
+        
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'sum' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or DataContainer
+            The sum as a scalar or inside a DataContainer with reduced dimension_labels
+            Default is to accumulate and return data as float64 or complex128
+        """     
+        if kwargs.get('dtype') is not None:
+            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        
+        if numpy.isrealobj(self.array):
+            kwargs['dtype'] = numpy.float64
+        else:
+            kwargs['dtype'] = numpy.complex128
+
+        return self._directional_reduction_unary(numpy.sum, axis=axis, out=out, *args, **kwargs)
+
+    def min(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the minimum pixel value in the DataContainer
+        
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'min' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or DataContainer
+            The min as a scalar or inside a DataContainer with reduced dimension_labels
+        """
+        return self._directional_reduction_unary(numpy.min, axis=axis, out=out, *args, **kwargs)
+    
+    def max(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the maximum pixel value in the DataContainer
+
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'max' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+        
+        Returns
+        -------
+        scalar or DataContainer 
+            The max as a scalar or inside a DataContainer with reduced dimension_labels 
+        """
+        return self._directional_reduction_unary(numpy.max, axis=axis, out=out, *args, **kwargs)
+        
+    def mean(self, axis=None, out=None, *args, **kwargs):
+        """
+        Returns the mean pixel value of the DataContainer
+
+        Parameters
+        ----------
+        axis : string or tuple of strings or int or tuple of ints, optional
+            Specify the axis or axes to calculate 'mean' along. Can be specified as 
+            string(s) of dimension_labels or int(s) of indices 
+            Default None calculates the function over the whole array
+        out : ndarray or DataContainer, optional
+            Provide an object in which to place the result. The object must have the correct dimensions and 
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
+            Default is None
+            
+        Returns
+        -------
+        scalar or DataContainer
+            The mean as a scalar or inside a DataContainer with reduced dimension_labels
+            Default is to accumulate and return data as float64 or complex128
+        """
+        
+        if kwargs.get('dtype', None) is not None:
+            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        
+        if numpy.isrealobj(self.array):
+            kwargs['dtype'] = numpy.float64
+        else:
+            kwargs['dtype'] = numpy.complex128
+        
+        return self._directional_reduction_unary(numpy.mean, axis=axis, out=out, *args, **kwargs)
 
     # Logic operators between DataContainers and floats    
     def __le__(self, other):

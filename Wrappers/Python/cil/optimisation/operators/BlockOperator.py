@@ -77,7 +77,7 @@ class BlockOperator(Operator):
     __array_priority__ = 1
 
     def __init__(self, *args, **kwargs):
- 
+
         self.operators = args
         shape = kwargs.get('shape', None)
         if shape is None:

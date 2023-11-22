@@ -71,7 +71,28 @@ class Operator(object):
 
     def set_norm(self, norm=None):
         '''Sets the norm of the operator to a custom value.
+
+        Parameters
+        ---------
+        norm: float, optional
+            Positive real valued number or `None`
+
+
+        Note
+        ----
+        The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method. 
+        If `None` is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called. 
         '''
+
+        if norm is not None:
+            if isinstance(norm, Number):
+                if norm <= 0:
+                    raise ValueError(
+                        "Norm must be a positive real valued number or None, got {}".format(norm))
+            else:
+                raise TypeError(
+                    "Norm must be a number or None, got {} of type {}".format(norm, type(norm)))
+
         self._norm = norm
 
     def calculate_norm(self):
@@ -353,10 +374,16 @@ class ScaledOperator(Operator):
     of the result of direct and adjoint of the operator with the scalar.
     For the rest it behaves like the operator it holds.
 
-    :param operator: a Operator or LinearOperator
-    :param scalar: a scalar multiplier
+    Parameters
+    ----------
+    operator: a Operator or LinearOperator
 
-    Example:
+    scalar: a scalar multiplier
+
+
+
+    Example
+    -------
        The scaled operator behaves like the following:
 
     .. code-block:: python
@@ -371,11 +398,6 @@ class ScaledOperator(Operator):
     '''
 
     def __init__(self, operator, scalar, **kwargs):
-        '''creator
-
-        :param operator: a Operator or LinearOperator
-        :param scalar: a scalar multiplier
-        :type scalar: Number'''
 
         super(ScaledOperator, self).__init__(domain_geometry=operator.domain_geometry(),
                                              range_geometry=operator.range_geometry())
@@ -412,9 +434,7 @@ class ScaledOperator(Operator):
         return numpy.abs(self.scalar) * self.operator.norm(**kwargs)
 
     def is_linear(self):
-        '''returns whether the operator is linear
-
-        :returns: boolean '''
+        '''returns a `boolean` indicating whether the operator is linear '''
         return self.operator.is_linear()
 
 

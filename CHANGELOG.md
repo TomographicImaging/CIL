@@ -6,6 +6,7 @@
   - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
+  - Internal variable name change in BlockOperator to aid understanding 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

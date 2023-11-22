@@ -137,6 +137,7 @@ class LinearOperator(Operator):
     """
 
     def __init__(self, domain_geometry, **kwargs):
+        self._random_number_seed=kwargs.get('seed', 0)
         super(LinearOperator, self).__init__(domain_geometry, **kwargs)
 
     def is_linear(self):
@@ -150,7 +151,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
 
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto', seed=None):
         r"""Power method or Power iteration algorithm 
 
         The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
@@ -170,7 +171,8 @@ class LinearOperator(Operator):
             Toggles the verbosity of the return
         method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"` 
             The default `auto` lets the code choose the method, this can be specified with `"direct_only"` or `"composed_with_adjoint"`
-
+        seed: `int` or default = None
+            The random seed used by the random number generator to create the `initial` starting point, if it is not provided.  
 
         Returns
         -------
@@ -236,7 +238,7 @@ class LinearOperator(Operator):
                     apply_adjoint = False
 
         if initial is None:
-            x0 = operator.domain_geometry().allocate('random')
+            x0 = operator.domain_geometry().allocate('random', seed=seed)
         else:
             x0 = initial.copy()
 
@@ -293,7 +295,7 @@ class LinearOperator(Operator):
     def calculate_norm(self):
         r""" Returns the norm of the LinearOperator calculated by the PowerMethod with default values.
                 """
-        return LinearOperator.PowerMethod(self, method="composed_with_adjoint")
+        return LinearOperator.PowerMethod(self, method="composed_with_adjoint", seed=self._random_number_seed)
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):

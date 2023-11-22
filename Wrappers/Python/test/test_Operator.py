@@ -288,7 +288,18 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint")
         numpy.testing.assert_almost_equal(res1,res2, decimal=4)
 
-
+        #Test random seed
+        numpy.testing.assert_equal(M1op._random_number_seed,0)
+        res1 = M1op.PowerMethod(M1op,1, method="composed_with_adjoint", seed=2)
+        res2 = M1op.PowerMethod(M1op,1, method="composed_with_adjoint", seed=2)
+        res3 = M1op.PowerMethod(M1op,1, method="composed_with_adjoint", seed=3)
+        numpy.testing.assert_almost_equal(res1,res2, decimal=4)  
+        numpy.testing.assert_raises(AssertionError, numpy.testing.assert_almost_equal, res1,res3)
+        res4=M1op.norm()
+        res5=M1op.norm()
+        numpy.testing.assert_equal(res4,res5)
+        
+        
         # 2x3 real matrix, dominant eigenvalue = 4.711479432297657
         M1 = numpy.array([[1.,0.,3],[1,2.,3]])
         M1op = MatrixOperator(M1)

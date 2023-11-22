@@ -54,7 +54,7 @@ class SPDHG(Algorithm):
         parameter controlling the trade-off between the primal and dual step sizes
     sampler: an instance of a `cil.optimisation.utilities.Sampler` class
         Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
-        
+
     **kwargs:
     prob : list of floats, optional, default=None
         List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
@@ -112,20 +112,18 @@ class SPDHG(Algorithm):
     Physics in Medicine & Biology, Volume 64, Number 22, 2019.
     '''
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None, 
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
                  initial=None, sampler=None,  **kwargs):
 
-
-        
-        max_iteration=kwargs.pop('max_iteration', 0)
-        update_objective_interval=kwargs.pop('update_objective_interval', 1)
-        log_file=kwargs.pop('log_file', None)
-        super(SPDHG, self).__init__(max_iteration=max_iteration, update_objective_interval=update_objective_interval, log_file=log_file)
-        
+        max_iteration = kwargs.pop('max_iteration', 0)
+        update_objective_interval = kwargs.pop('update_objective_interval', 1)
+        log_file = kwargs.pop('log_file', None)
+        super(SPDHG, self).__init__(max_iteration=max_iteration,
+                                    update_objective_interval=update_objective_interval, log_file=log_file)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        initial=initial,  sampler=sampler)
-            
+                    initial=initial,  sampler=sampler)
+
     def _deprecated_kwargs(self, deprecated_kwargs):
         """
         Handle deprecated keyword arguments for backward compatibility.
@@ -139,9 +137,9 @@ class SPDHG(Algorithm):
         -----
         This method is called by the set_up method.
         """
-        norms= deprecated_kwargs.pop('norms', None)
-        prob=deprecated_kwargs.pop('prob', None)
-        if  norms is not None:
+        norms = deprecated_kwargs.pop('norms', None)
+        prob = deprecated_kwargs.pop('prob', None)
+        if norms is not None:
             self.operator.set_norms(norms)
             warnings.warn(
                 ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
@@ -153,11 +151,13 @@ class SPDHG(Algorithm):
         else:
             if prob is not None:
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-                self.sampler = Sampler.random_with_replacement(len(operator),  prob=prob)
-        
+                self.sampler = Sampler.random_with_replacement(
+                    len(operator),  prob=prob)
+
         if deprecated_kwargs:
-            warnings.warn("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
-            
+            warnings.warn("Additional keyword arguments passed but not used: {}".format(
+                deprecated_kwargs))
+
     @property
     def sigma(self):
         return self._sigma
@@ -329,10 +329,11 @@ class SPDHG(Algorithm):
         self.sampler = sampler
         self._deprecated_kwargs(deprecated_kwargs)
         if self.sampler is None:
-            self.sampler=Sampler.random_with_replacement(len(operator))
+            self.sampler = Sampler.random_with_replacement(len(operator))
         self.norms = operator.get_norms_as_list()
 
-        self.prob_weights = self.sampler.prob_weights  # TODO: consider the case it is uniform and not saving the array
+        # TODO: consider the case it is uniform and not saving the array
+        self.prob_weights = self.sampler.prob_weights
         if self.prob_weights is None:
             self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
 
@@ -361,9 +362,9 @@ class SPDHG(Algorithm):
     def update(self):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self.x.sapyb(1., self.zbar,  -self._tau, out=self.x_tmp)
+        self.x.sapyb(1., self.zbar,  -self.tau, out=self.x_tmp)
 
-        self.g.proximal(self.x_tmp, self._tau, out=self.x)
+        self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
         # Choose subset
         i = next(self.sampler)
@@ -372,9 +373,9 @@ class SPDHG(Algorithm):
         # y_k = y_old[i] + sigma[i] * K[i] x
         y_k = self.operator[i].direct(self.x)
 
-        y_k.sapyb(self._sigma[i], self.y_old[i], 1., out=y_k)
+        y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
 
-        y_k = self.f[i].proximal_conjugate(y_k, self._sigma[i])
+        y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
 
         # Back-project
         # x_tmp = K[i]^*(y_k - y_old[i])

@@ -40,7 +40,7 @@ class SamplerFromFunction():
 
         function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
 
-        prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices #TODO: write unit tests.
+        prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
 
 

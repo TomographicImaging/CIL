@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Copyright 2019 United Kingdom Research and Innovation
 # Copyright 2019 The University of Manchester
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,7 @@
 # limitations under the License.
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 set -euxo pipefail
 
 if test $(python -c "from __future__ import print_function; import platform; print(platform.system())") = Darwin ; then

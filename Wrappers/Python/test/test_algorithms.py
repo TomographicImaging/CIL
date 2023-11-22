@@ -808,21 +808,21 @@ class TestSPDHG(CCPiTestClass):
         
         gamma=1.
         rho=.99
-        spdhg.set_step_sizes_custom()
+        spdhg.set_step_sizes()
         self.assertListEqual(spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
                             si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
         
-        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=100)
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, 100)
         
-        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=None)
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, min([(pi / (si * ni**2))*(rho / gamma) for pi, ni,
                             si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)]))
 
-        spdhg.set_step_sizes_custom(sigma=None, tau=100)
+        spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertListEqual(spdhg.sigma, [gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg.norms, spdhg.prob_weights)] )
         self.assertEqual(spdhg.tau, 100)
 
@@ -862,19 +862,19 @@ class TestSPDHG(CCPiTestClass):
         spdhg.set_step_sizes_from_ratio(gamma,rho)
         self.assertFalse(spdhg.check_convergence())
         
-        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=100)
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
         self.assertFalse(spdhg.check_convergence())
         
-        spdhg.set_step_sizes_custom(sigma=[1]*self.subsets, tau=None)
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
         self.assertTrue(spdhg.check_convergence())
 
-        spdhg.set_step_sizes_custom(sigma=None, tau=100)
+        spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertTrue(spdhg.check_convergence())
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):        
         
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(12,12))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -922,7 +922,7 @@ class TestSPDHG(CCPiTestClass):
         
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
-                    max_iteration = 70,
+                    max_iteration = 80,
                     update_objective_interval = 1000)
         pdhg.run(verbose=0)
         
@@ -957,7 +957,7 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/len(A)]*len(A)
         
         spdhg = SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 320,
+                    max_iteration = 200,
                     update_objective_interval=1000, prob = prob)
         spdhg.run(1000, verbose=0)
         
@@ -974,7 +974,7 @@ class TestSPDHG(CCPiTestClass):
 
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(12,12))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -1039,8 +1039,8 @@ class TestSPDHG(CCPiTestClass):
 
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 220,
-                    update_objective_interval=220, prob = prob)
+                    max_iteration = 300,
+                    update_objective_interval=300, prob = prob)
         
         spdhg.run(1000, verbose=0)
 
@@ -1059,8 +1059,8 @@ class TestSPDHG(CCPiTestClass):
         f = BlockFunction(f1, f2)
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-        pdhg.max_iteration = 180
-        pdhg.update_objective_interval =180
+        pdhg.max_iteration = 300
+        pdhg.update_objective_interval =300
         
         pdhg.run(1000, verbose=0)
        
@@ -1155,15 +1155,15 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 330,
-                    update_objective_interval=330, prob = prob.copy(), use_axpby=True)
+                    max_iteration = 250,
+                    update_objective_interval=250, prob = prob.copy(), use_axpby=True)
         )
       
         algos[0].run(1000, verbose=0)
       
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 330,
-                    update_objective_interval=330, prob = prob.copy(), use_axpby=False)
+                    max_iteration = 250,
+                    update_objective_interval=250, prob = prob.copy(), use_axpby=False)
         )
         
         algos[1].run(1000, verbose=0)

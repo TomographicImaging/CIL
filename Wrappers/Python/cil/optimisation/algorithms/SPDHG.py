@@ -112,30 +112,52 @@ class SPDHG(Algorithm):
     Physics in Medicine & Biology, Volume 64, Number 22, 2019.
     '''
 
-    def __init__(self, f=None, g=None, operator=None, sigma=None, tau=None,
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None, 
                  initial=None, sampler=None,  **kwargs):
 
-        super(SPDHG, self).__init__(**kwargs)
 
-        if kwargs.get('norms', None) is not None:
-            operator.set_norms(kwargs.get('norms'))
+        
+        max_iteration=kwargs.pop('max_iteration', 0)
+        update_objective_interval=kwargs.pop('update_objective_interval', 1)
+        log_file=kwargs.pop('log_file', None)
+        super(SPDHG, self).__init__(max_iteration=max_iteration, update_objective_interval=update_objective_interval, log_file=log_file)
+        
+
+        self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                        initial=initial,  sampler=sampler)
+            
+    def _deprecated_kwargs(self, deprecated_kwargs):
+        """
+        Handle deprecated keyword arguments for backward compatibility.
+
+        Parameters
+        ----------
+        deprecated_kwargs : dict
+            Dictionary of keyword arguments.
+
+        Notes
+        -----
+        This method is called by the set_up method.
+        """
+        norms= deprecated_kwargs.pop('norms', None)
+        prob=deprecated_kwargs.pop('prob', None)
+        if  norms is not None:
+            self.operator.set_norms(norms)
             warnings.warn(
                 ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
 
-        if sampler is not None:
-            if kwargs.get('prob', None) is not None:
+        if self.sampler is not None:
+            if prob is not None:
                 raise TypeError(
                     '`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
         else:
-            if kwargs.get('prob', None) is not None:
-                logging.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-            sampler = Sampler.random_with_replacement(
-                len(operator),  prob=kwargs.get('prob', [1/len(operator)]*len(operator)))
-
-        if f is not None and operator is not None and g is not None and sampler is not None:
-            self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        initial=initial,  sampler=sampler)
-
+            if prob is not None:
+                warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
+                self.sampler = Sampler.random_with_replacement(len(operator),  prob=prob)
+        
+        if deprecated_kwargs:
+            warnings.warn("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
+            
     @property
     def sigma(self):
         return self._sigma
@@ -185,7 +207,7 @@ class SPDHG(Algorithm):
         self._tau = min([value for value in values if value > 1e-8])
         self._tau *= (rho / gamma)
 
-    def set_step_sizes_custom(self, sigma=None, tau=None):
+    def set_step_sizes(self, sigma=None, tau=None):
         r""" Sets sigma step-sizes for the SPDHG algorithm. The step sizes can be either scalar or array-objects.
 
         Parameters
@@ -259,12 +281,7 @@ class SPDHG(Algorithm):
                     "The value of tau should be a Number")
             self._tau = tau
 
-    def set_step_sizes_default(self):
-        """Calculates the default values for sigma and tau """
-        self.set_step_sizes_custom(sigma=None, tau=None)
-
     def check_convergence(self):
-        # TODO: check this with someone else
         """  Check whether convergence criterion for SPDHG is satisfied with scalar values of tau and sigma
 
         Returns
@@ -281,7 +298,7 @@ class SPDHG(Algorithm):
                 return False
 
     def set_up(self, f, g, operator, sigma=None, tau=None,
-               initial=None,   sampler=None):
+               initial=None,   sampler=None, **deprecated_kwargs):
         '''set-up of the algorithm
         Parameters
         ----------
@@ -310,15 +327,17 @@ class SPDHG(Algorithm):
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
         self.sampler = sampler
+        self._deprecated_kwargs(deprecated_kwargs)
+        if self.sampler is None:
+            self.sampler=Sampler.random_with_replacement(len(operator))
         self.norms = operator.get_norms_as_list()
 
-        # TODO: consider the case it is uniform and not saving the array
-        self.prob_weights = sampler.prob_weights
+        self.prob_weights = self.sampler.prob_weights  # TODO: consider the case it is uniform and not saving the array
         if self.prob_weights is None:
             self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
 
         # might not want to do this until it is called (if computationally expensive)
-        self.set_step_sizes_custom(sigma=sigma, tau=tau)
+        self.set_step_sizes(sigma=sigma, tau=tau)
 
         # initialize primal variable
         if initial is None:

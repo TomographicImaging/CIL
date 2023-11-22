@@ -398,6 +398,15 @@ class TestOperator(CCPiTestClass):
         #recalculates norm
         self.assertAlmostEqual(G.norm(), numpy.sqrt(8), 2)
 
+
+  
+        #Check that the provided element is a number or None 
+        with self.assertRaises(TypeError):
+            G.set_norm['Banana']
+        #Check that the provided norm is positive 
+        with self.assertRaises(ValueError):
+            G.set_norm(-1)
+
          # 2x2 real matrix, dominant eigenvalue = 2. Check norm uses the right flag for power method 
         M1 = numpy.array([[1,0],[1,2]], dtype=float)
         M1op = MatrixOperator(M1)
@@ -408,6 +417,7 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_almost_equal(res1,res3, decimal=4)
         self.assertNotEqual(res1, res2)
         self.assertNotEqual(res1,res4)
+
 
 
     def test_ProjectionMap(self):
@@ -684,7 +694,7 @@ class TestBlockOperator(CCPiTestClass):
         self.assertNumpyArrayEqual(res.get_item(1).as_array(),
                                    4 * u.as_array())
         
-
+        
         x1 = B.adjoint(z1)
         # this should be [15 u, 10 u]
         el1 = B.get_item(0,0).adjoint(z1.get_item(0)) + B.get_item(1,0).adjoint(z1.get_item(1)) 

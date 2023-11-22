@@ -1,5 +1,9 @@
 
-* x.x.x
+
+* xx.x.x
+  - Added the a `Sampler` class as a CIL optimisation utility 
+  - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
+  - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
 

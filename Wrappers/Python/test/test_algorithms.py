@@ -957,8 +957,8 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/len(A)]*len(A)
         
         spdhg = SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 200,
-                    update_objective_interval=1000, prob = prob)
+                    max_iteration = 250, sampler=Sampler.random_with_replacement(len(A), seed=2),
+                    update_objective_interval=1000)
         spdhg.run(1000, verbose=0)
         
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
@@ -974,7 +974,7 @@ class TestSPDHG(CCPiTestClass):
 
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(12,12))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16,16))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -1040,7 +1040,7 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 300,
-                    update_objective_interval=300, prob = prob)
+                    update_objective_interval=300, sampler=Sampler.random_with_replacement(len(A), prob=prob, seed=10))
         
         spdhg.run(1000, verbose=0)
 
@@ -1155,15 +1155,15 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 200,
-                    update_objective_interval=250, prob = prob.copy(), use_axpby=True)
+                    max_iteration = 220,
+                    update_objective_interval=250, sampler=Sampler.random_with_replacement(len(A), seed=2, prob=prob.copy()), use_axpby=True)
         )
       
         algos[0].run(1000, verbose=0)
       
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 200,
-                    update_objective_interval=250, prob = prob.copy(), use_axpby=False)
+                    max_iteration = 220,
+                    update_objective_interval=250, sampler=Sampler.random_with_replacement(len(A), seed=2, prob=prob.copy()), use_axpby=False)
         )
         
         algos[1].run(1000, verbose=0)

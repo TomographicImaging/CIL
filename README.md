@@ -35,7 +35,7 @@ conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0 astra-toolbox
 
 where:
 
-- `astra-toolbox` enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) projectors (GPLv3 license)
+- `astra-toolbox` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) projectors (GPLv3 license)
 - `tigre` (requires an NVIDIA GPU) enables support for [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license)
 - `ccpi-regulariser` is the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit)
 - `tomophantom` can generate phantoms to use as test data [Tomophantom](https://github.com/dkazanc/TomoPhantom)

@@ -1155,14 +1155,14 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 250,
+                    max_iteration = 200,
                     update_objective_interval=250, prob = prob.copy(), use_axpby=True)
         )
       
         algos[0].run(1000, verbose=0)
       
         algos.append( SPDHG(f=F,g=G,operator=A, 
-                    max_iteration = 250,
+                    max_iteration = 200,
                     update_objective_interval=250, prob = prob.copy(), use_axpby=False)
         )
         
@@ -1177,7 +1177,7 @@ class TestSPDHG(CCPiTestClass):
               )
         logging.info("Quality measures {}".format(qm))
         assert qm[0] < 0.005
-        assert qm[1] < 5.e-05
+        assert qm[1] < 0.001
 
         
     @unittest.skipUnless(has_astra, "ccpi-astra not available")

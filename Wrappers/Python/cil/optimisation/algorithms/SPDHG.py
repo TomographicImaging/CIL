@@ -144,14 +144,14 @@ class SPDHG(Algorithm):
             warnings.warn(
                 ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
 
-        if self.sampler is not None:
+        if self._sampler is not None:
             if prob is not None:
                 raise TypeError(
                     '`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
         else:
             if prob is not None:
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-                self.sampler = Sampler.random_with_replacement(
+                self._sampler = Sampler.random_with_replacement(
                     len(operator),  prob=prob)
 
         if deprecated_kwargs:
@@ -289,7 +289,7 @@ class SPDHG(Algorithm):
         Boolean
             True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. N.B Convergence criterion currently can only be checked for scalar values of tau.
         """
-        for i in range(len(self._sigma)):
+        for i in range(self.ndual_subsets):
             if isinstance(self.tau, Number) and isinstance(self._sigma[i], Number):
                 if self._sigma[i] * self._tau * self.norms[i]**2 > self.prob_weights[i]:
                     return False
@@ -326,18 +326,19 @@ class SPDHG(Algorithm):
         self.g = g
         self.operator = operator
         self.ndual_subsets = self.operator.shape[0]
-        self.sampler = sampler
+        self._sampler = sampler
         self._deprecated_kwargs(deprecated_kwargs)
-        if self.sampler is None:
-            self.sampler = Sampler.random_with_replacement(len(operator))
+        if self._sampler is None:
+            self._sampler = Sampler.random_with_replacement(len(operator))
         self.norms = operator.get_norms_as_list()
 
         # TODO: consider the case it is uniform and not saving the array
-        self.prob_weights = self.sampler.prob_weights
-        if self.prob_weights is None:
+        if self._sampler.prob_weights is None:
             self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
+        else:
+            self.prob_weights=self._sampler.prob_weights
 
-        # might not want to do this until it is called (if computationally expensive)
+  
         self.set_step_sizes(sigma=sigma, tau=tau)
 
         # initialize primal variable
@@ -367,7 +368,7 @@ class SPDHG(Algorithm):
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
         # Choose subset
-        i = next(self.sampler)
+        i = next(self._sampler)
 
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x

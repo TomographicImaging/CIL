@@ -19,8 +19,7 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <ipp.h>
-#include <ipps.h>
+#include "ipp.h"
 #include <chrono>
 #include <omp.h>
 #include <random>

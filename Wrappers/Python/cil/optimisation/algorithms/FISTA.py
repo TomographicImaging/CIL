@@ -57,15 +57,20 @@ class ISTA(Algorithm):
     initial : DataContainer
               Initial guess of ISTA.
     f : Function
-        Differentiable function
+        Differentiable function. If `None` is passed, the algorithm will use the ZeroFunction.
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA.
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}.`
+                The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
+    Note
+    -----
+    If the function `g` is set to `None` or to the `ZeroFunction` then the ISTA algorithm is equivalent to Gradient Descent. 
+    
+    If the function `f` is set to `None` or to the `ZeroFunction` then the ISTA algorithm is equivalent to a Proximal Point Algorithm. 
 
     Examples
     --------
@@ -122,7 +127,11 @@ class ISTA(Algorithm):
         # set up ISTA      
         self.initial = initial
         self.x_old = initial.copy()
-        self.x = initial.copy()           
+        self.x = initial.copy()    
+        if f is None:
+            f=ZeroFunction()
+            if step_size is None:
+                step_size=1   
         self.f = f
         if g is None:
             g=ZeroFunction()
@@ -200,15 +209,20 @@ class FISTA(ISTA):
     initial : DataContainer
             Starting point of the algorithm
     f : Function
-        Differentiable function
+        Differentiable function.  If `None` is passed, the algorithm will use the ZeroFunction.
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of FISTA.
-                The default :code:`step_size` is :math:`\frac{1}{L}`.
+                The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
+    Note
+    -----
+    If the function `g` is set to `None` or to the `ZeroFunction` then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (:cite:`nesterov2003introductory` algorithm 2.2.9).
+
+    If the function `f` is set to `None` or to the `ZeroFunction` then the FISTA algorithm is equivalent to Guler's First Accelerated Proximal Point Method  (:cite:`guler1992new` sec 2).
 
     Examples
     --------
@@ -248,8 +262,6 @@ class FISTA(ISTA):
 
         self.y = initial.copy()
         self.t = 1
-        if g is None:
-            g=ZeroFunction()
         super(FISTA, self).__init__(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
               
     def update(self):

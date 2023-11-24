@@ -36,7 +36,7 @@ class Function(object):
         
         Note
         -----
-        The Lipschitz of the gradient of the function is a positive real number, such that :math:`\|f'(x) - f'(y)\| <= L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`
+        The Lipschitz of the gradient of the function is a positive real number, such that :math:`\|f'(x) - f'(y)\| \leq L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`
 
     """
     
@@ -65,14 +65,16 @@ class Function(object):
     def proximal(self, x, tau, out=None):
         
         r"""Returns the proximal operator of function :math:`\tau F` at x        
+        
         .. math:: \text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
+        
         """
         raise NotImplementedError
 
     def convex_conjugate(self, x):
         r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`,
         
-        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} <x^{*}, x> - F(x)
+        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)
                 
         """
         raise NotImplementedError

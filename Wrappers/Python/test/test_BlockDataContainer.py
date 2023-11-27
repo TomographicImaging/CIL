@@ -20,7 +20,7 @@
 import unittest
 from utils import initialise_tests
 import numpy as np
-from cil.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry
 from cil.framework import ImageData, AcquisitionData, Partitioner
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
@@ -851,6 +851,23 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+    def test_iterator(self):
+        ig0 = VectorGeometry(5)
+        data0=ig0.allocate(0)
+        data1=ig0.allocate(1)
+        data2=ig0.allocate(2)
+        container=BlockDataContainer(data0,data1,data2)
+        a=[]
+        for data in container:
+            a.append(list(data.array))
+        self.assertListEqual(a, [[0.,0.,0.,0.,0.],[1.,1.,1.,1.,1.],[2,2,2,2,2]])
+        
+        a=[] #check it works a second time! 
+        for data in container:
+            a.append(list(data.array))
+        self.assertListEqual(a, [[0.,0.,0.,0.,0.],[1.,1.,1.,1.,1.],[2,2,2,2,2]])
+        
 
 class TestBlockGeometry(unittest.TestCase):
     def setUp(self):
@@ -920,7 +937,8 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         with self.assertRaises(ValueError):
             data = self.data.partition(num_batches, 'sequential')
        
-        
+    
+           
 
 
 
@@ -942,3 +960,5 @@ class TestAcquisitionDataPartition(unittest.TestCase):
                 k += 1
                 
         assert wrong == 0
+        
+        

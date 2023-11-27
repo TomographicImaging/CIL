@@ -120,12 +120,13 @@ class SPDHG(Algorithm):
         return_all=kwargs.pop('return_all', False)
         print_interval= kwargs.pop('print_interval', None)
         log_file= kwargs.pop('log_file', None)
-        update_objective_interval = kwargs.get('update_objective_interval', 1)
+        use_axpby=kwargs.pop('use_axpyb', None)
+        update_objective_interval = kwargs.pop('update_objective_interval', 1)
         super(SPDHG, self).__init__(max_iteration=max_iteration,
-                                    update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval, update_objective_interval=update_objective_interval, return_all=return_all)
+                                    update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval,  return_all=return_all)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    initial=initial,  sampler=sampler)
+                    initial=initial,  sampler=sampler, **kwargs)
         
     def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None, **deprecated_kwargs):
@@ -201,8 +202,6 @@ class SPDHG(Algorithm):
     def _deprecated_kwargs(self, deprecated_kwargs):
         """
         Handle deprecated keyword arguments for backward compatibility.
-
-        TODO: test this! 
         
         Parameters
         ----------
@@ -231,7 +230,7 @@ class SPDHG(Algorithm):
                     len(self.operator),  prob=prob)
 
         if deprecated_kwargs:
-            warnings.warn("Additional keyword arguments passed but not used: {}".format(
+            raise ValueError("Additional keyword arguments passed but not used: {}".format(
                 deprecated_kwargs))
 
     @property

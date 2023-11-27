@@ -19,6 +19,7 @@
 # Claire Delplancke (University of Bath)
 
 from cil.optimisation.algorithms import Algorithm
+from cil.optimisation.operators import BlockOperator
 import numpy as np
 import warnings
 import logging
@@ -116,18 +117,93 @@ class SPDHG(Algorithm):
                  initial=None, sampler=None,  **kwargs):
 
         max_iteration = kwargs.pop('max_iteration', 0)
-        update_objective_interval = kwargs.pop('update_objective_interval', 1)
-        log_file = kwargs.pop('log_file', None)
+        return_all=kwargs.pop('return_all', False)
+        print_interval= kwargs.pop('print_interval', None)
+        log_file= kwargs.pop('log_file', None)
+        update_objective_interval = kwargs.get('update_objective_interval', 1)
         super(SPDHG, self).__init__(max_iteration=max_iteration,
-                                    update_objective_interval=update_objective_interval, log_file=log_file)
+                                    update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval, update_objective_interval=update_objective_interval, return_all=return_all)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                     initial=initial,  sampler=sampler)
+        
+    def set_up(self, f, g, operator, sigma=None, tau=None,
+               initial=None,   sampler=None, **deprecated_kwargs):
+        '''set-up of the algorithm
+        Parameters
+        ----------
+        f : BlockFunction
+            Each must be a convex function with a "simple" proximal method of its conjugate
+        g : Function
+            A convex function with a "simple" proximal
+        operator : BlockOperator   
+            BlockOperator must contain Linear Operators    
+        tau : positive float, optional, default=None
+            Step size parameter for Primal problem
+        sigma : list of positive float, optional, default=None
+            List of Step size parameters for Dual problem
+        initial : DataContainer, optional, default=None
+            Initial point for the SPDHG algorithm
+        gamma : float
+            parameter controlling the trade-off between the primal and dual step sizes
+        sampler: an instance of a `cil.optimisation.utilities.Sampler` class
+             Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
+        '''
+        logging.info("{} setting up".format(self.__class__.__name__, ))
+
+        # algorithmic parameters
+        self.f = f
+        self.g = g
+        self.operator = operator
+        
+        if not isinstance(operator, BlockOperator):
+            raise TypeError("operator should be a BlockOperator")
+        
+        self.ndual_subsets = len(self.operator)
+        self._sampler = sampler
+        self._deprecated_kwargs(deprecated_kwargs)
+        
+        if self._sampler is None:
+            self._sampler = Sampler.random_with_replacement(len(operator))
+        
+        if self._sampler.num_indices != len(operator):
+            raise ValueError('The `num_indices` the sampler outputs from should be equal to the number of opertors in the BlockOperator `operator`')
+        
+        self.norms = operator.get_norms_as_list()
+
+        if self._sampler.prob_weights is None:
+            self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
+        else:
+            self.prob_weights=self._sampler.prob_weights
+
+        self.set_step_sizes(sigma=sigma, tau=tau)
+
+        # initialize primal variable
+        if initial is None:
+            self.x = self.operator.domain_geometry().allocate(0)
+        else:
+            self.x = initial.copy()
+
+        self.x_tmp = self.operator.domain_geometry().allocate(0)
+
+        # initialize dual variable to 0
+        self.y_old = operator.range_geometry().allocate(0)
+
+        # initialize variable z corresponding to back-projected dual variable
+        self.z = operator.domain_geometry().allocate(0)
+        self.zbar = operator.domain_geometry().allocate(0)
+        # relaxation parameter
+        self.theta = 1
+        self.configured = True
+        logging.info("{} configured".format(self.__class__.__name__, ))
+
 
     def _deprecated_kwargs(self, deprecated_kwargs):
         """
         Handle deprecated keyword arguments for backward compatibility.
 
+        TODO: test this! 
+        
         Parameters
         ----------
         deprecated_kwargs : dict
@@ -152,7 +228,7 @@ class SPDHG(Algorithm):
             if prob is not None:
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
                 self._sampler = Sampler.random_with_replacement(
-                    len(operator),  prob=prob)
+                    len(self.operator),  prob=prob)
 
         if deprecated_kwargs:
             warnings.warn("Additional keyword arguments passed but not used: {}".format(
@@ -171,9 +247,9 @@ class SPDHG(Algorithm):
 
         Parameters
         ----------
-            gamma : float
+            gamma : Positive float
                 parameter controlling the trade-off between the primal and dual step sizes
-            rho : float
+            rho : Positive float
                  parameter controlling the size of the product :math: \sigma\tau :math:
 
         Note
@@ -195,7 +271,7 @@ class SPDHG(Algorithm):
         if isinstance(rho, Number):
             if rho <= 0:
                 raise ValueError(
-                    "The step-sizes of SPDHG are positive, gamma should also be positive")
+                    "The step-sizes of SPDHG are positive, rho should also be positive")
 
         else:
             raise ValueError(
@@ -246,15 +322,12 @@ class SPDHG(Algorithm):
         rho = .99
         if sigma is not None:
             if len(sigma) == self.ndual_subsets:
-                if all(isinstance(x, Number) for x in sigma):
-                    if all(x > 0 for x in sigma):
+                if all(isinstance(x, Number) and x > 0  for x in sigma):
                         pass
-                    else:
-                        raise ValueError(
-                            "The values of sigma should be positive")
                 else:
                     raise ValueError(
-                        "The values of sigma should be a Number")
+                            "Sigma expected to be a positive number.")
+                
             else:
                 raise ValueError(
                     "Please pass a list of floats to sigma with the same number of entries as number of operators")
@@ -272,13 +345,12 @@ class SPDHG(Algorithm):
             self._tau = min([value for value in values if value > 1e-8])
             self._tau *= (rho / gamma)
         else:
-            if isinstance(tau, Number):
-                if tau <= 0:
-                    raise ValueError(
-                        "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
+            if isinstance(tau, Number) and  tau > 0:
+                pass
             else:
                 raise ValueError(
-                    "The value of tau should be a Number")
+                        "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
+            
             self._tau = tau
 
     def check_convergence(self):
@@ -297,69 +369,7 @@ class SPDHG(Algorithm):
             else:
                 return False
 
-    def set_up(self, f, g, operator, sigma=None, tau=None,
-               initial=None,   sampler=None, **deprecated_kwargs):
-        '''set-up of the algorithm
-        Parameters
-        ----------
-        f : BlockFunction
-            Each must be a convex function with a "simple" proximal method of its conjugate
-        g : Function
-            A convex function with a "simple" proximal
-        operator : BlockOperator   
-            BlockOperator must contain Linear Operators    
-        tau : positive float, optional, default=None
-            Step size parameter for Primal problem
-        sigma : list of positive float, optional, default=None
-            List of Step size parameters for Dual problem
-        initial : DataContainer, optional, default=None
-            Initial point for the SPDHG algorithm
-        gamma : float
-            parameter controlling the trade-off between the primal and dual step sizes
-        sampler: an instance of a `cil.optimisation.utilities.Sampler` class
-             Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
-        '''
-        logging.info("{} setting up".format(self.__class__.__name__, ))
-
-        # algorithmic parameters
-        self.f = f
-        self.g = g
-        self.operator = operator
-        self.ndual_subsets = self.operator.shape[0]
-        self._sampler = sampler
-        self._deprecated_kwargs(deprecated_kwargs)
-        if self._sampler is None:
-            self._sampler = Sampler.random_with_replacement(len(operator))
-        self.norms = operator.get_norms_as_list()
-
-        # TODO: consider the case it is uniform and not saving the array
-        if self._sampler.prob_weights is None:
-            self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
-        else:
-            self.prob_weights=self._sampler.prob_weights
-
-  
-        self.set_step_sizes(sigma=sigma, tau=tau)
-
-        # initialize primal variable
-        if initial is None:
-            self.x = self.operator.domain_geometry().allocate(0)
-        else:
-            self.x = initial.copy()
-
-        self.x_tmp = self.operator.domain_geometry().allocate(0)
-
-        # initialize dual variable to 0
-        self.y_old = operator.range_geometry().allocate(0)
-
-        # initialize variable z corresponding to back-projected dual variable
-        self.z = operator.domain_geometry().allocate(0)
-        self.zbar = operator.domain_geometry().allocate(0)
-        # relaxation parameter
-        self.theta = 1
-        self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
-
+    
     def update(self):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar

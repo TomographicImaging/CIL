@@ -22,12 +22,11 @@ import time
 
 
 class SamplerFromFunction():
-    def __init__(self, num_indices, function, sampling_type='from_function', prob_weights=None):
-        """
-        The user should call this through Sampler.from_function(num_indices, function, prob_weights) from cil.optimisation.utilities.sampler.
+    """     
         A class that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}.
         The function next() outputs a single next index from the list {0,1,…,S-1}.To be run again and again, depending on how many iterations.
 
+        It is recommended to use the static methods to configure your Sampler object rather than initialising this class directly: the user should call this through Sampler.from_function(num_indices, function, prob_weights) from cil.optimisation.utilities.sampler.
 
         Parameters
         ----------
@@ -37,11 +36,11 @@ class SamplerFromFunction():
         sampling_type:str
             The sampling type used. Choose from "from_function".
 
-
         function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
 
         prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
+        
         Example
         -------
         >>> def test_function(iteration_number):
@@ -51,9 +50,8 @@ class SamplerFromFunction():
         >>>     else:
         >>>         np.random.seed(iteration_number)
         >>>         return(np.random.choice(50,1)[0])
-
-
-        >>> sampler=SamplerFromFunction(50, test_function)
+        >>>
+        >>> Sampler.from_function(num_indices, function, prob_weights=None)
         >>> for _ in range(11):
         >>>     print(sampler.next())
         >>> print(list(sampler.get_samples(25)))
@@ -70,32 +68,43 @@ class SamplerFromFunction():
         9
         [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
 
-
         Note
         -----
         If your function involves a random number generator, then the seed should also depend on the iteration number, see the example in the documentation, otherwise
-        the get_samples() function may not accurately return the correct samples and may interrupt the next sample returned. 
-
-
-
+        the `get_samples()` function may not accurately return the correct samples and may interrupt the next sample returned. 
         """
+        
+    def __init__(self, num_indices, function, sampling_type='from_function', prob_weights=None):
+        
         self._type = sampling_type
         self._num_indices = num_indices
         self.function = function
+
         if abs(sum(prob_weights)-1) > 1e-6:
             raise ValueError('The provided prob_weights must sum to one')
+
         if any(np.array(prob_weights) < 0):
             raise ValueError(
                 'The provided prob_weights must be greater than or equal to zero')
+
         self._prob_weights = prob_weights
         self._iteration_number = 0
 
+    @property
+    def prob_weights(self):
+        return self._prob_weights
+    
+    @property
+    def num_indices(self):
+        return self._num_indices 
+    
+    
     def next(self):
         """ 
         Returns and increments the sampler 
         """
         out = self.function(self._iteration_number)
-        self._iteration_number +=1
+        self._iteration_number += 1
         return out
 
     def __next__(self):
@@ -103,18 +112,10 @@ class SamplerFromFunction():
 
     def get_samples(self,  num_samples=20):
         """
-        Function that takes an index, num_samples, and returns the first num_samples as a numpy array.
+        Returns the first `num_samples` produced by the sampler as a numpy array.
 
-        TODO: change this to be relevant to this class! 
         num_samples: int, default=20
             The number of samples to return. 
-
-        Example
-        -------
-
-        >>> sampler=Sampler.random_with_replacement(5)
-        >>> print(sampler.get_samples())
-        [2 4 2 4 1 3 2 2 1 2 4 4 2 3 2 1 0 4 2 3]
         """
         save_last_index = self._iteration_number
         self._iteration_number = 0
@@ -127,10 +128,9 @@ class SamplerFromOrder():
 
     def __init__(self, num_indices, order, sampling_type,  prob_weights=None):
         """
-        The user should call this through cil.optimisation.utilities.sampler and choose the desired static method from the Sampler class.  
-        A class to select from a list of indices {0, 1, …, S-1}
-        The function next() outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. To be run again and again, depending on how many iterations.
+        A class to select from a list of indices {0, 1, …, S-1}. The function next() outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. To be run again and again, depending on how many iterations.
 
+        It is recommended to use the static methods to configure your Sampler object rather than initialising this class directly: the user should call this through cil.optimisation.utilities.sampler and choose the desired static method from the Sampler class.  
 
         Parameters
         ----------
@@ -143,15 +143,58 @@ class SamplerFromOrder():
         order: list of indices
             The list of indices the method selects from using next. 
 
-
         prob_weights: list of floats of length num_indices that sum to 1. 
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
 
+        Example
+        -------
+        
+        >>> sampler=Sampler.custom_order(12,[1,4,6,7,8,9,11])
+        >>> print(sampler.get_samples(11))
+        >>> for _ in range(9):
+        >>>     print(sampler.next())
+        >>> print(sampler.get_samples(5)) 
 
+        [ 1  4  6  7  8  9 11  1  4  6  7]
+        1
+        4
+        6
+        7
+        8
+        9
+        11
+        1
+        4
+        [1 4 6 7 8]
+        
+        
+        >>> sampler=Sampler.staggered(21,4)
+        >>> print(sampler.get_samples(5))
+        >>> for _ in range(15):
+        >>>    print(sampler.next())
+        >>> print(sampler.get_samples(5))
 
+        [ 0  4  8 12 16]
+        0
+        4
+        8
+        12
+        16
+        20
+        1
+        5
+        9
+        13
+        17
+        2
+        6
+        10
+        14
+        [ 0  4  8 12 16]
         """
         if abs(sum(prob_weights)-1) > 1e-6:
             raise ValueError('The provided prob_weights must sum to one')
+
         if any(np.array(prob_weights) < 0):
             raise ValueError(
                 'The provided prob_weights must be greater than or equal to zero')
@@ -162,7 +205,17 @@ class SamplerFromOrder():
         self._order = order
         self._last_index = len(order)-1
 
-       # TODO: add in properties for the things that need calling by SPDHG
+   
+       
+    @property
+    def prob_weights(self):
+        return self._prob_weights
+    
+    @property
+    def num_indices(self):
+        return self._num_indices 
+    
+    
     def next(self):
         """Returns and increments the sampler """
 
@@ -174,7 +227,10 @@ class SamplerFromOrder():
 
     def get_samples(self,  num_samples=20):
         """
-        Function that takes an index, num_samples, and returns the first num_samples as a numpy array.
+        Returns the first `num_samples` as a numpy array.
+
+        Parameters
+        ----------
 
         num_samples: int, default=20
             The number of samples to return. 
@@ -195,12 +251,11 @@ class SamplerFromOrder():
 
 
 class SamplerRandom():
-
     r"""
-    The user should call this through cil.optimisation.utilities.sampler and choose the desired static method from the Sampler class.  
     A class to select from a list of indices {0, 1, …, S-1} using numpy.random.choice with and without replacement. 
     The function next() outputs a single next index from the list {0,1,…,S-1} .  To be run again and again, depending on how many iterations.
 
+    It is recommended to use the static methods to configure your Sampler object rather than initialising this class directly: the user should call this through cil.optimisation.utilities.sampler and choose the desired static method from the Sampler class.  
 
     Parameters
     ----------
@@ -221,35 +276,59 @@ class SamplerRandom():
 
     prob_weights: list of floats of length num_indices that sum to 1. 
         Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
+    
+    Example
+    -------
+    >>> sampler=Sampler.random_with_replacement(5)
+    >>> print(sampler.get_samples(10))
+    [3 4 0 0 2 3 3 2 2 1]
+
+    >>> sampler=Sampler.random_with_replacement(4, [0.7,0.1,0.1,0.1])
+    >>> print(sampler.get_samples(10))
+    [0 1 3 0 0 3 0 0 0 0]
+        
+    >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
+    >>> print(sampler.get_samples(16))
+    [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
     """
 
     def __init__(self, num_indices, replace,  sampling_type,  prob=None, seed=None):
-        """
-        This method is the internal init for the sampler method. Most users should call the static methods e.g. Sampler.sequential or Sampler.staggered. 
-
-        """
-
+        
         self._replace = replace
         self._prob = prob
+
         if prob is None:
             self._prob = [1/num_indices]*num_indices
+
         if replace:
             self._prob_weights = self._prob
         else:
             self._prob_weights = [1/num_indices]*num_indices
+
         if abs(sum(self._prob_weights)-1) > 1e-6:
             raise ValueError('The provided prob_weights must sum to one')
+
         if any(np.array(self._prob_weights) < 0):
             raise ValueError(
                 'The provided prob_weights must be greater than or equal to zero')
 
         self._type = sampling_type
         self._num_indices = num_indices
+
         if seed is not None:
             self._seed = seed
         else:
             self._seed = int(time.time())
+
         self._generator = np.random.RandomState(self._seed)
+        
+    @property
+    def prob_weights(self):
+        return self._prob_weights
+    
+    @property
+    def num_indices(self):
+        return self._num_indices 
 
     def next(self):
         """ Returns and increments the sampler """
@@ -261,14 +340,13 @@ class SamplerRandom():
 
     def get_samples(self,  num_samples=20):
         """
-        Function that takes an index, num_samples, and returns the first num_samples as a numpy array.
+        Returns the first `num_samples` as a numpy array.
 
         num_samples: int, default=20
             The number of samples to return. 
 
         Example
         -------
-
         >>> sampler=Sampler.random_with_replacement(5)
         >>> print(sampler.get_samples())
         [2 4 2 4 1 3 2 2 1 2 4 4 2 3 2 1 0 4 2 3]
@@ -316,7 +394,6 @@ class Sampler():
     >>> print(sampler.get_samples(5))
     >>> for _ in range(11):
             print(sampler.next())
-
     [0 1 2 3 4]
     0
     1
@@ -336,7 +413,6 @@ class Sampler():
     >>> for _ in range(12):
     >>>     print(next(sampler))
     >>> print(sampler.get_samples())
-
     3
     4
     0
@@ -380,7 +456,6 @@ class Sampler():
         >>> print(sampler.get_samples(5))
         >>> for _ in range(11):
                 print(sampler.next())
-
         [0 1 2 3 4]
         0
         1
@@ -422,7 +497,6 @@ class Sampler():
         >>> for _ in range(9):
         >>>     print(sampler.next())
         >>> print(sampler.get_samples(5)) 
-
         [ 1  4  6  7  8  9 11  1  4  6  7]
         1
         4
@@ -436,6 +510,7 @@ class Sampler():
         [1 4 6 7 8]
 
         """
+
         if prob_weights is None:
             temp_list = []
             for i in range(num_indices):
@@ -463,7 +538,6 @@ class Sampler():
         -------
         >>> sampler=Sampler.herman_meyer(12)
         >>> print(sampler.get_samples(16))
-
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
 
         """
@@ -472,34 +546,45 @@ class Sampler():
             n_variable = n
             i = 2
             factors = []
+
             while i * i <= n_variable:
                 if n_variable % i:
                     i += 1
                 else:
                     n_variable //= i
                     factors.append(i)
+
             if n_variable > 1:
                 factors.append(n_variable)
+
             n_factors = len(factors)
+
             if n_factors == 0:
                 raise ValueError(
                     'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
+
             order = [0 for _ in range(n)]
             value = 0
+
             for factor_n in range(n_factors):
                 n_rep_value = 0
+
                 if factor_n == 0:
                     n_change_value = 1
                 else:
                     n_change_value = math.prod(factors[:factor_n])
+
                 for element in range(n):
                     mapping = value
                     n_rep_value += 1
+
                     if n_rep_value >= n_change_value:
                         value = value + 1
                         n_rep_value = 0
+
                     if value == factors[factor_n]:
                         value = 0
+
                     order[element] = order[element] + \
                         math.prod(factors[factor_n+1:]) * mapping
             return order
@@ -528,7 +613,6 @@ class Sampler():
         >>> for _ in range(15):
         >>>    print(sampler.next())
         >>> print(sampler.get_samples(5))
-
         [ 0  4  8 12 16]
         0
         4
@@ -547,8 +631,10 @@ class Sampler():
         14
         [ 0  4  8 12 16]
         """
+
         if offset >= num_indices:
             raise (ValueError('The offset should be less than the number of indices'))
+
         indices = list(range(num_indices))
         order = []
         [order.extend(indices[i::offset]) for i in range(offset)]
@@ -573,24 +659,19 @@ class Sampler():
 
         Example
         -------
-
-
         >>> sampler=Sampler.random_with_replacement(5)
         >>> print(sampler.get_samples(10))
-
         [3 4 0 0 2 3 3 2 2 1]
 
-        Example
-        ------- 
-
+        
         >>> sampler=Sampler.random_with_replacement(4, [0.7,0.1,0.1,0.1])
         >>> print(sampler.get_samples(10))
-
         [0 1 3 0 0 3 0 0 0 0]
         """
 
         if prob == None:
             prob = [1/num_indices] * num_indices
+
         sampler = SamplerRandom(
             num_indices, sampling_type='random_with_replacement', replace=True, prob=prob, seed=seed)
         return sampler
@@ -600,20 +681,19 @@ class Sampler():
         """
         Function that takes a number of indices and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices uniformly randomly without replacement.
 
-
+        Parameters
+        ----------
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
         seed:int, default=None
             Random seed for the  random number generator.  If set to None, the seed will be set using the current time. 
 
-
         Example
         -------
         >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
         >>> print(sampler.get_samples(16))
         [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
-
 
         """
 
@@ -645,7 +725,7 @@ class Sampler():
         Note
         -----
         If your function involves a random number generator, then the seed should also depend on the iteration number, see the example in the documentation, otherwise
-        the get_samples() function may not accurately return the correct samples and may interrupt the next sample returned. 
+        the `get_samples()` function may not accurately return the correct samples and may interrupt the next sample returned. 
 
         Example
         -------

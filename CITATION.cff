@@ -13,15 +13,7 @@ identifiers:
   - description: "This is the collection of archived snapshots of all versions of the Core Imaging Library"
     type: doi
     value: 10.5281/zenodo.4746198
-  - description: "This is the archived snapshot of version 21.3.1 of the Core Imaging Library"
-    type: doi
-    value: 10.5281/zenodo.5825832
-  - description: "This is the archived snapshot of version 21.3.0 of the Core Imaging Library"
-    type: doi
-    value: 10.5281/zenodo.5752905
-  - description: "This is the archived snapshot of version 21.2.0 of the Core Imaging Library"
-    type: doi
-    value: 10.5281/zenodo.5012886
+
 keywords:
   - "tomographic imaging"
   - research
@@ -31,7 +23,7 @@ keywords:
   - hyperspectral
   - optimisation
 license: Apache-2.0
-message: "If you use this software, please cite both the article from preferred-citation and the software itself."
+message: "If you use this software, please cite both the article from preferred-citation and the software itself, via zenodo."
 preferred-citation:
   authors:
     - family-names: Jørgensen
@@ -42,8 +34,6 @@ preferred-citation:
       given-names: Genoveva
     - family-names: Fardell
       given-names: Gemma
-    - family-names: Murgatroyd
-      given-names: Laura
     - family-names: Papoutsellis
       given-names: Evangelos
     - family-names: Pasca
@@ -67,4 +57,4 @@ preferred-citation:
   year: 2021
 repository-code: "https://github.com/TomographicImaging/CIL.git"
 title: "CIL"
-version: 21.3.1
+version: 23.1.0

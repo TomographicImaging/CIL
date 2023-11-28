@@ -128,7 +128,7 @@ class SamplerFromOrder():
 
     def __init__(self, num_indices, order, sampling_type,  prob_weights=None):
         """
-        A class to select from a list of indices {0, 1, …, S-1}. The function next() outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. To be run again and again, depending on how many iterations.
+       This sampler will sample from a list `order` that is passed. 
 
         It is recommended to use the static methods to configure your Sampler object rather than initialising this class directly: the user should call this through cil.optimisation.utilities.sampler and choose the desired static method from the Sampler class.  
 
@@ -362,8 +362,10 @@ class SamplerRandom():
 class Sampler():
 
     r"""
-    A class to select from a list of indices {0, 1, …, S-1}
-    The function next() outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. To be run again and again, depending on how many iterations.
+    This class follows the factory design pattern. It is not instantiated but has 7 static methods that will return instances of 7 different samplers, which require a variety of parameters. The idea of the factory is to simplify the creation of these instances with the static methods.
+    
+    Each factory method will instantiate a  class to select from a list of indices `{0, 1, …, S-1}`
+    Common in each instatiated the class, the function `next()` outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
 
 
     Parameters

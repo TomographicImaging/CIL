@@ -64,9 +64,38 @@ class SPDHG(Algorithm):
     Example 
     -------
 
-    Example of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
 
-
+    Example
+    -------
+    >>> data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
+    >>> subsets = 10
+    >>> ig = data.geometry
+    >>> ig.voxel_size_x = 0.1
+    >>> ig.voxel_size_y = 0.1
+    >>> 
+    >>> detectors = ig.shape[0]
+    >>> angles = np.linspace(0, np.pi, 90)
+    >>> ag = AcquisitionGeometry.create_Parallel2D().set_angles(
+    >>> angles, angle_unit='radian').set_panel(detectors, 0.1)
+    >>> 
+    >>> Aop = ProjectionOperator(ig, ag, 'cpu')
+    >>> 
+    >>> sin = Aop.direct(data)
+    >>> partitioned_data = sin.partition(subsets, 'sequential')
+    >>> A = BlockOperator(
+        *[ProjectionOperator(ig. partitioned_data[i].geometry, 'cpu') for i in range(subsets)])
+    >>> 
+    >>> F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                            for i in range(subsets)])
+    >>> alpha = 0.025
+    >>> G = alpha * FGP_TV()
+    >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.custom_order(len(A), [1,3,0,4,5,8,2,3,8,4,5]),
+                      initial=A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
+    >>> spdhg.run(100)
+    
+    Example
+    -------
+    Further examples of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
 
     Note
     -----

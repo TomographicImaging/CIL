@@ -25,9 +25,7 @@ from numbers import Number
 import numpy as np
 
 
-class LeastSquares(Function):
-    
-    
+class LeastSquares(Function): 
     r""" (Weighted) Least Squares function
     
     .. math:: F(x) = c\|Ax-b\|_2^2 
@@ -40,25 +38,16 @@ class LeastSquares(Function):
     
     Parameters:
     -----------
+    A : LinearOperator
+    b : Data, DataContainer
+    c : Scaling Constant, float, default 1.0     
+    weight: DataContainer with all positive elements of size of the range of operator A, default None
         
-        A : LinearOperator
-
-        b : Data, DataContainer
-        
-        c : Scaling Constant, float, default 1.0
-               
-        weight: DataContainer with all positive elements of size of the range of operator A, default None
-        
-    Members:  
+    Note
     --------      
             
-        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c \sigma_1(A)^2`, or
-        
-        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||W|| ||A||_2^2 = 2c||W|| \sigma_1(A)^2`,
-    
-    where :math:`\sigma_1(A)` is the largest singular value of :math:`A` and :math:`W=\text{diag}(weight)`.
+    L is the  Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c \sigma_1(A)^2`, or :math:`2 c ||W|| ||A||_2^2 = 2c||W|| \sigma_1(A)^2`, where :math:`\sigma_1(A)` is the largest singular value of :math:`A` and :math:`W=\text{diag}(weight)`.
        
-    
     """
     
     def __init__(self, A, b, c=1.0, weight = None):

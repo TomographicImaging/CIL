@@ -32,8 +32,7 @@ class Function(object):
         
         L: number, positive, default None
             Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-        domain: The domain of the function
-        
+                
         Note
         -----
         The Lipschitz of the gradient of the function is a positive real number, such that :math:`\|f'(x) - f'(y)\| \leq L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`
@@ -45,11 +44,7 @@ class Function(object):
         # overrides the type check to allow None as initial value
         self._L = L
         
-    def __call__(self,x):
-        
-        r"""Returns the value of the function F at x: :math:`F(x)`
-        
-        """        
+    def __call__(self,x):    
         
         raise NotImplementedError
 

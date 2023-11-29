@@ -53,30 +53,10 @@ class L2NormSquared(Function):
     """
 
     def __init__(self, **kwargs):
-        '''creator
-
-        Cases considered (with/without data):            
-                a) .. math:: f(x) = \|x\|^{2}_{2} 
-                b) .. math:: f(x) = \|x - b\|^{2}_{2}
-
-        Parameters
-        ---------
-        b:`DataContainer`, optional
-            Translation of the function
-        '''
         super(L2NormSquared, self).__init__(L=2)
         self.b = kwargs.get('b', None)
 
     def __call__(self, x):
-        r"""Returns the value of the L2NormSquared function at :math:`x`, 
-
-        Following cases are considered:
-
-            a) :math:`F(x) = \|x\|^{2}_{2}`
-            b) :math:`F(x) = \|x - b\|^{2}_{2}`
-
-        """
-
         y = x
         if self.b is not None:
             y = x - self.b
@@ -179,8 +159,6 @@ class WeightedL2NormSquared(Function):
         super(WeightedL2NormSquared, self).__init__(L=2 * tmp_norm)
 
     def __call__(self, x):
-        r'''Calculates :math:`F(x) = \| x\|_{W,2}^2 = \Sigma_iw_ix_i^2 = \langle x, Wx \rangle = x^TWx` or, if `b` is defined, :math:`F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = \langle x-b, W(x-b)\rangle = (x-b)^TW(x-b)`
-        where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer` or :math:`\text{weight}I` if `weight` is a scalar.'''
         self.operator_weight.direct(x, out=self.tmp_space)
         y = x.dot(self.tmp_space)
 

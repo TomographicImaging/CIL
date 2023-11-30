@@ -75,36 +75,36 @@ class SPDHG(Algorithm):
     >>> 
     >>> detectors = ig.shape[0]
     >>> angles = np.linspace(0, np.pi, 90)
-    >>> ag = AcquisitionGeometry.create_Parallel2D().set_angles(
-    >>> angles, angle_unit='radian').set_panel(detectors, 0.1)
+    >>> ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles, angle_unit='radian').set_panel(detectors, 0.1)
     >>> 
     >>> Aop = ProjectionOperator(ig, ag, 'cpu')
     >>> 
     >>> sin = Aop.direct(data)
     >>> partitioned_data = sin.partition(subsets, 'sequential')
-    >>> A = BlockOperator(
-        *[ProjectionOperator(ig. partitioned_data[i].geometry, 'cpu') for i in range(subsets)])
+    >>> A = BlockOperator(*[ProjectionOperator(ig. partitioned_data[i].geometry, 'cpu') for i in range(subsets)])
     >>> 
     >>> F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
                             for i in range(subsets)])
+                            
     >>> alpha = 0.025
-    >>> G = alpha * FGP_TV()
+    >>> G = alpha * TotalVariation()
     >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.custom_order(len(A), [1,3,0,4,5,8,2,3,8,4,5]),
                       initial=A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
     >>> spdhg.run(100)
     
     Example
     -------
-    Further examples of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
+    Further examples of usage see the [CIL demos.](https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py)
 
     Note
     -----
     When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
 
     - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
+    
         .. math:: 
+          \sigma_i=0.99 / (\|K_i\|**2)
 
-        \sigma_i=0.99 / (\|K_i\|**2)
 
         and `tau` is set as per case 2
 
@@ -127,6 +127,7 @@ class SPDHG(Algorithm):
     Convergence is guaranteed provided that [2, eq. (12)]:
 
     .. math:: 
+    
     \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
 
     References
@@ -160,6 +161,7 @@ class SPDHG(Algorithm):
     def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None, **deprecated_kwargs):
         '''set-up of the algorithm
+        
         Parameters
         ----------
         f : BlockFunction
@@ -325,22 +327,24 @@ class SPDHG(Algorithm):
 
         Note
         -----
-        There are 4 possible cases considered by this function: 
+        When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
 
         - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
-          .. math:: 
+        
+            .. math:: 
             \sigma_i=0.99 / (\|K_i\|**2)
 
-         and `tau` is set as per case 2
+
+            and `tau` is set as per case 2
 
         - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
 
-          .. math:: 
+            .. math:: 
             \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
 
         - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
-          .. math:: 
+            .. math:: 
             \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
 
         - Case 4: Both `sigma` and `tau` are provided.

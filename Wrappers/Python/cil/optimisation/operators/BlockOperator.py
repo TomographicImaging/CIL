@@ -327,7 +327,7 @@ class BlockOperator(Operator):
 
         Parameters
         ------------
-        
+
         scalar: number or iterable containing numbers
 
         '''
@@ -347,7 +347,7 @@ class BlockOperator(Operator):
     @property
     def T(self):
         '''Returns the transposed of self.
-        
+
         Recall the input list is shaped in a row-by-row fashion'''
         newshape = (self.shape[1], self.shape[0])
         oplist = []

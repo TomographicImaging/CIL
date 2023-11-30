@@ -123,7 +123,14 @@ class SamplerFromFunction():
         self._iteration_number = save_last_index
         return np.array(output)
 
-
+    def __str__(self):
+        repres = "Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. \n"
+        repres += "Type : {} \n".format(self._type)
+        repres += "Current iteration number : {} \n".format(self._iteration_number)
+        repres += "Number of indices : {} \n".format(self._num_indices)
+        repres += "Probability weights : {} \n".format(self._prob_weights)
+        return repres
+    
 class SamplerFromOrder():
 
     def __init__(self, num_indices, order, sampling_type,  prob_weights=None):
@@ -249,6 +256,14 @@ class SamplerFromOrder():
         self._last_index = save_last_index
         return np.array(output)
 
+    def __str__(self):
+        repres = "Sampler that outputs in order from a list of integers taken from {0, 1, …, S-1}, where S is the number of indices.  \n"
+        repres += "Type : {} \n".format(self._type)
+        repres += "Order : {}  \n".format(self._order)
+        repres += "Number of indices : {} \n".format(self._num_indices)
+        repres += "Current iteration number (modulo the Number of indices) : {} \n".format(self._last_index)
+        repres += "Probability weights : {} \n".format(self._prob_weights)
+        return repres
 
 class SamplerRandom():
     r"""
@@ -359,13 +374,20 @@ class SamplerRandom():
         return np.array(output)
 
 
+    def __str__(self):
+            repres = "Sampler that wraps numpy.random.choice to sample from {0, 1, …, S-1}, where S is the number of indices."
+            repres += "Type : {} \n".format(self._type)
+            repres += "Number of indices : {} \n".format(self._num_indices)
+            repres += "Probability weights : {} \n".format(self._prob_weights)
+            return repres
+
 class Sampler():
 
     r"""
     This class follows the factory design pattern. It is not instantiated but has 7 static methods that will return instances of 7 different samplers, which require a variety of parameters. The idea of the factory is to simplify the creation of these instances with the static methods.
     
     Each factory method will instantiate a  class to select from a list of indices `{0, 1, …, S-1}`
-    Common in each instatiated the class, the function `next()` outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
+    Common in each instantiated  class, the function `next()` outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
 
 
     Parameters

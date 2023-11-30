@@ -236,19 +236,8 @@ class SamplerFromOrder():
         """
         Returns the first `num_samples` as a numpy array.
 
-        Parameters
-        ----------
-
         num_samples: int, default=20
             The number of samples to return. 
-
-        Example
-        -------
-
-        >>> sampler=Sampler.random_with_replacement(5)
-        >>> print(sampler.get_samples())
-        [2 4 2 4 1 3 2 2 1 2 4 4 2 3 2 1 0 4 2 3]
-
         """
         save_last_index = self._last_index
         self._last_index = len(self._order)-1
@@ -360,12 +349,6 @@ class SamplerRandom():
         num_samples: int, default=20
             The number of samples to return. 
 
-        Example
-        -------
-        >>> sampler=Sampler.random_with_replacement(5)
-        >>> print(sampler.get_samples())
-        [2 4 2 4 1 3 2 2 1 2 4 4 2 3 2 1 0 4 2 3]
-
         """
         save_generator = self._generator
         self._generator = np.random.RandomState(self._seed)
@@ -384,36 +367,14 @@ class SamplerRandom():
 class Sampler():
 
     r"""
-    This class follows the factory design pattern. It is not instantiated but has 7 static methods that will return instances of 7 different samplers, which require a variety of parameters. The idea of the factory is to simplify the creation of these instances with the static methods.
+    This class follows the factory design pattern. It is not instantiated but has 7 static methods that will return instances of 7 different samplers, which require a variety of parameters.
     
-    Each factory method will instantiate a  class to select from a list of indices `{0, 1, …, S-1}`
-    Common in each instantiated  class, the function `next()` outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
-
-
-    Parameters
-    ----------
-    num_indices: int
-        The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
-
-    sampling_type:str
-        The sampling type used. Choose from "from_function", "sequential", "custom_order", "herman_meyer", "staggered", "random_with_replacement", "random_without_replacement" and "from_function".
-
-    order: list of indices
-        The list of indices the method selects from using next. 
-
-    prob: list of floats of length num_indices that sum to 1. 
-        For random sampling with replacement, this is the probability for each index to be called by next. 
-
-    seed:int, default=None
-        Random seed for the methods that use a numpy random number generator.  If set to None, the seed will be set using the current time.  
-
-    prob_weights: list of floats of length num_indices that sum to 1. 
-        Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
-
+    Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
+    
+    Common in each instantiated  class, the function `next()` outputs a single next index from the list {0,1,…,S-1}. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
 
     Example
     -------
-
     >>> sampler=Sampler.sequential(10)
     >>> print(sampler.get_samples(5))
     >>> for _ in range(11):
@@ -466,7 +427,7 @@ class Sampler():
     @staticmethod
     def sequential(num_indices):
         """
-        Function that outputs a sampler that outputs sequentially. 
+        Instantiates a sampler that outputs sequentially. 
 
         Parameters
         ----------
@@ -549,8 +510,10 @@ class Sampler():
     @staticmethod
     def herman_meyer(num_indices):
         """
-        Function that takes a number of indices and returns a sampler which outputs a Herman Meyer order 
-
+        Instantiates a sampler which outputs in a Herman Meyer order.
+        
+        Parameters
+        ----------
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. For Herman-Meyer sampling this number should not be prime. 
 
@@ -621,8 +584,10 @@ class Sampler():
     @staticmethod
     def staggered(num_indices, offset):
         """
-        Function that takes a number of indices and returns a sampler which outputs in a staggered order. 
-
+        Instantiates a sampler which outputs in a staggered order. 
+        
+        Parameters
+        ----------
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
@@ -669,8 +634,10 @@ class Sampler():
     @staticmethod
     def random_with_replacement(num_indices, prob=None, seed=None):
         """
-        Function that takes a number of indices and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices with given probability and with replacement. 
+        Instantiates a sampler which outputs from a list of indices {0, 1, …, S-1}, with S=num_indices, with given probability and with replacement. 
 
+        Parameters
+        ----------
         num_indices: int
             The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
@@ -703,7 +670,7 @@ class Sampler():
     @staticmethod
     def random_without_replacement(num_indices, seed=None, prob=None):
         """
-        Function that takes a number of indices and returns a sampler which outputs from a list of indices {0, 1, …, S-1} with S=num_indices uniformly randomly without replacement.
+        Instantiates a sampler which outputs from a list of indices {0, 1, …, S-1}, with S=num_indices, uniformly randomly without replacement.
 
         Parameters
         ----------
@@ -728,9 +695,7 @@ class Sampler():
     @staticmethod
     def from_function(num_indices, function, prob_weights=None):
         """
-        A class that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}.
-        The function next() outputs a single next index from the list {0,1,…,S-1}.To be run again and again, depending on how many iterations.
-
+        Instantiates a sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}.
 
         Parameters
         ----------

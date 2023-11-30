@@ -128,11 +128,17 @@ class ISTA(Algorithm):
         self.initial = initial
         self.x_old = initial.copy()
         self.x = initial.copy()    
+        
         if f is None:
             f=ZeroFunction()
+            
             if step_size is None:
                 step_size=1   
+                
+            if g is None: 
+                warnings.warn('You set both f and g to be None and thus the iterative method will not update and will remain fixed at the initial value.')
         self.f = f
+        
         if g is None:
             g=ZeroFunction()
         self.g = g

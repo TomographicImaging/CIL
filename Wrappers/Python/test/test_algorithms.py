@@ -238,7 +238,8 @@ class TestAlgorithms(CCPiTestClass):
         with warnings.catch_warnings(record=True) as wa:
             alg = FISTA(initial=initial, f=None, g=None, max_iteration=2, update_objective_interval=2)
             assert "f and g to be None" in str(wa[0].message)         
-        
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), initial.as_array())
 
     def test_FISTA_update(self):
 

@@ -1,9 +1,10 @@
 
 * x.x.x
-  - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
+  - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_label
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class
   - Fixed formatting errors in the L2NormSquared and LeastSquares documentation 
   - Internal variable name change in BlockOperator to aid understanding 
+  - Bug fix for BlockDataContainer as iterator
   - Dropped support for IPP versions older than 2021.10 due to header changes
   - Fix build include directories
 

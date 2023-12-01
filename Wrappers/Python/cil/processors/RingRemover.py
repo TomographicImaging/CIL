@@ -145,7 +145,9 @@ class RingRemover(Processor):
         Corrected 2D sinogram data (Numpy Array)
         
         '''              
-                            
+
+        original_extent = [slice(s) for s in ima.shape]
+
         # allocate cH, cV, cD
         Ch = [None]*decNum
         Cv = [None]*decNum
@@ -174,5 +176,7 @@ class RingRemover(Processor):
         for i in range(decNum-1,-1,-1):
             nima = nima[0:Ch[i].shape[0],0:Ch[i].shape[1]]
             nima = pywt.idwt2((nima,(Ch[i],Cv[i],Cd[i])),wname)
-            
-        return nima      
+        
+        nima_crop = nima[original_extent[0], original_extent[1]]
+
+        return nima_crop

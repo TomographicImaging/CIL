@@ -365,6 +365,13 @@ Total variation
    :members:
    :special-members: 
 
+Total Generalised Variation
+---------------
+
+.. autoclass:: cil.optimisation.functions.TotalGeneralisedVariation
+   :members:
+   :special-members:    
+
 Block Framework
 ***************
 

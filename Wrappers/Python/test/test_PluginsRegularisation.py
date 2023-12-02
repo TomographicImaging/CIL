@@ -40,7 +40,6 @@ class TestPlugin(unittest.TestCase):
         self.alpha = 2.0
         self.iterations = 1000
         
-
     def tearDown(self):
         pass
 
@@ -52,9 +51,9 @@ class TestPlugin(unittest.TestCase):
         cmpx = np.zeros(data.shape, dtype=np.complex64)
         cmpx.real = datarr[:]
         cmpx.imag = datarr[:]
-        data.array = cmpx
+        self.data.array = cmpx
         reg = FGP_TV()
-        out = reg.proximal(data, 1)
+        out = reg.proximal(self.data, 1)
         outarr = out.as_array()
         np.testing.assert_almost_equal(outarr.imag, outarr.real)
 
@@ -104,7 +103,7 @@ class TestPlugin(unittest.TestCase):
 
         tau = 1.
         fcil = FGP_TV()
-        outcil = fcil.proximal(data, tau=tau)
+        outcil = fcil.proximal(self.data, tau=tau)
         # use CIL defaults
         outrgl, info = regularisers.FGP_TV(datarr, fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0, 1, 'cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
@@ -116,10 +115,13 @@ class TestPlugin(unittest.TestCase):
         datarr = data.as_array()
 
         tau = 1.
+        # default params: alpha1 = 1.0, alpha0 = 2.0, iter=100
         fcil = TGV()
-        outcil = fcil.proximal(data, tau=tau)
+        outcil = fcil.proximal(self.data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, 'cpu' )
+        datarr = self.data.as_array()
+        # default params: data, alpha, alpha1, alpha0, iters, lipschitz, tolerance, device
+        outrgl, info = regularisers.TGV(datarr, 1.0, 1.0, 2.0, 100, 12.0, 0, 'cpu')
 
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
@@ -132,7 +134,7 @@ class TestPlugin(unittest.TestCase):
 
         tau = 1.
         fcil = FGP_dTV(ref)
-        outcil = fcil.proximal(data, tau=tau)
+        outcil = fcil.proximal(self.data, tau=tau)
         # use CIL defaults
         outrgl, info = regularisers.FGP_dTV(datarr, ref.as_array(), fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0.01, 0, 1, 'cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
@@ -168,7 +170,7 @@ class TestPlugin(unittest.TestCase):
         
         fcil = TNV()
         with self.assertRaises(ValueError):
-            outcil = fcil.proximal(data, tau=tau)
+            outcil = fcil.proximal(self.data, tau=tau)
             
             
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
@@ -180,7 +182,7 @@ class TestPlugin(unittest.TestCase):
         
         fcil = TNV()
         with self.assertRaises(ValueError):
-            outcil = fcil.proximal(data, tau=tau)
+            outcil = fcil.proximal(self.data, tau=tau)
             
             
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")

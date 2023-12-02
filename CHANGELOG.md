@@ -110,6 +110,7 @@
     - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master
 
 * 21.4.1
+ - Added TotalGeneralisedVariation Function.
  - Removed prints from unittests and cleanup of unittest code.
  - CMake:
    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))

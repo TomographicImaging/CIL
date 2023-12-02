@@ -275,7 +275,7 @@ class FGP_TV(TV_Base):
         
 class TGV(RegulariserFunction):
 
-    def __init__(self, alpha=1, gamma=1, max_iteration=100, tolerance=0, device='cpu' , **kwargs):
+    def __init__(self, alpha = 1.0, alpha1 = 1.0, alpha0 = 2.0, max_iteration=100, tolerance=0, device='cpu' , **kwargs):
         '''Creator of Total Generalised Variation Function 
 
         :param alpha: regularisation parameter
@@ -292,7 +292,8 @@ class TGV(RegulariserFunction):
         '''
         
         self.alpha = alpha
-        self.gamma = gamma
+        self.alpha1 = alpha1
+        self.alpha0 = alpha0
         self.max_iteration = max_iteration
         self.tolerance = tolerance
         self.device = device
@@ -304,25 +305,12 @@ class TGV(RegulariserFunction):
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
-    @property
-    def gamma(self):
-        return self.__gamma
-    @gamma.setter
-    def gamma(self, value):
-        if value <= 2 and value >= 1:
-            self.__gamma = value
-    @property
-    def alpha2(self):
-        return self.alpha1 * self.gamma
-    @property
-    def alpha1(self):
-        return 1.
     
     def proximal_numpy(self, in_arr, tau):
         res , info = regularisers.TGV(in_arr,
-              self.alpha * tau,
-              self.alpha1,
-              self.alpha2,
+              self.alpha,
+              self.alpha1*tau,
+              self.alpha0*tau,
               self.max_iteration,
               self.LipshitzConstant,
               self.tolerance,
@@ -346,9 +334,6 @@ class TGV(RegulariserFunction):
         else:
             self.alpha *= scalar
             return self
-
-        # f = TGV()
-        # f = alpha * f
 
     def check_input(self, input):
         if len(input.shape) == 2:

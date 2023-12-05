@@ -2,10 +2,11 @@
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding 
-  - bugfixes:
-    - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
-
-
+  - Bug fix for BlockDataContainer as iterator
+  - Dropped support for IPP versions older than 2021.10 due to header changes
+  - Fix build include directories
+  - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object
@@ -103,25 +104,25 @@
   - Raise exception if filename or data haven't been set in NexusDataWriter
   - Fixes error when update_objective_interval is set to 0 in an algorithm run
   - Deprecated:
-    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader
   - GitHub Actions:
     - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master
-    
+
 * 21.4.1
  - Removed prints from unittests and cleanup of unittest code.
- - CMake: 
+ - CMake:
    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
  - TIFF writer uses logging
  - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version
-  - CMake fix due to use of pip install. 
-  - Recon.FBP allows 'astra' backend 
+  - CMake fix due to use of pip install.
+  - Recon.FBP allows 'astra' backend
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignmentment fix for 2D datasets
-  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial
   - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
   - Allow use of square brackets in file paths to TIFF and Nikon datasets
 
@@ -161,7 +162,7 @@
 * 21.1.0
   - Added TomoPhantom plugin to create 2D/3D + channel ImageData phantoms based on the TomoPhantom model library
   - Fixed bug in Zeiss reader geometry direction of rotation
-  
+
 * 21.0.0
   - Show2D now takes 4D datasets and slice infomation as input
   - TIGRE reconstruction package wrapped for cone-beam tomography
@@ -193,7 +194,7 @@
     - GradientDescent to GD
     - SparseFiniteDiff to SparseFiniteDifferenceOperator
     - LinearOperatorMatrix to MatrixOperator
-  - bugfix update_objective of SPDHG 
+  - bugfix update_objective of SPDHG
 
 * 20.09
   - added SPDHG algorithm

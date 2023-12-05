@@ -251,13 +251,13 @@
     
 
 
-<span class="k">def</span> <span class="nf">_proximal_step_numpy</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_proximal_step_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Numpy implementation of a step in the calculation of the proximal of MixedL21Norm</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
-<span class="sd">    tmp : DataContainer/ numpy array, best if contiguous memory. </span>
-<span class="sd">    tau: float or DataContainer</span>
+<span class="sd">    arr : DataContainer, best if contiguous memory. </span>
+<span class="sd">    tau: float, numpy array or DataContainer</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
@@ -266,15 +266,24 @@
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># Note: we divide x by tau so the cases of tau both scalar and </span>
     <span class="c1"># DataContainers run</span>
-    <span class="n">tmp</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">_exceptions</span><span class="o">.</span><span class="n">_UFuncInputCastingError</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+    
+    
+    <span class="n">arr</span> <span class="o">/=</span> <span class="n">tmp</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">res</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">/=</span> <span class="n">tmp</span>
+    <span class="n">res</span> <span class="o">/=</span> <span class="n">arr</span>
+
+    <span class="n">arr</span> <span class="o">*=</span> <span class="n">tmp</span>
 
     <span class="n">resarray</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="n">resarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">resarray</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">res</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">resarray</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">res</span>
+    
 
 <div class="viewcode-block" id="MixedL21Norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.MixedL21Norm">[docs]</a><span class="k">class</span> <span class="nc">MixedL21Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 <span class="w">    </span>

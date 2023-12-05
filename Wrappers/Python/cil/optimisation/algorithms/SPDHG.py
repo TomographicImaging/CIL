@@ -198,8 +198,8 @@ class SPDHG(Algorithm):
         if self._sampler is None:
             self._sampler = Sampler.random_with_replacement(len(operator))
         
-        if self._sampler.max_index_number != len(operator):
-            raise ValueError('The `max_index_number` the sampler outputs from should be equal to the number of opertors in the BlockOperator `operator`')
+        if self._sampler.num_indices != len(operator):
+            raise ValueError('The `num_indices` the sampler outputs from should be equal to the number of opertors in the BlockOperator `operator`')
         
         self.norms = operator.get_norms_as_list()
 

@@ -48,7 +48,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: conda-build
-      uses: paskino/conda-package-publish-action@v1.4.4
+      uses: TomographicImaging/conda-package-publish-action@v2
       with:
         subDir: recipe
         channels: -c conda-forge -c intel -c ccpi

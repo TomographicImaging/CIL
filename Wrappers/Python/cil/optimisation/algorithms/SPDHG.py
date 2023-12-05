@@ -88,7 +88,7 @@ class SPDHG(Algorithm):
                             
     >>> alpha = 0.025
     >>> G = alpha * TotalVariation()
-    >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.custom_order(len(A), [1,3,0,4,5,8,2,3,8,4,5]),
+    >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.sequential(len(A)),
                       initial=A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
     >>> spdhg.run(100)
     
@@ -198,8 +198,8 @@ class SPDHG(Algorithm):
         if self._sampler is None:
             self._sampler = Sampler.random_with_replacement(len(operator))
         
-        if self._sampler.num_indices != len(operator):
-            raise ValueError('The `num_indices` the sampler outputs from should be equal to the number of opertors in the BlockOperator `operator`')
+        if self._sampler.max_index_number != len(operator):
+            raise ValueError('The `max_index_number` the sampler outputs from should be equal to the number of opertors in the BlockOperator `operator`')
         
         self.norms = operator.get_norms_as_list()
 

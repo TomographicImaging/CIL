@@ -859,14 +859,6 @@ class TestSPDHG(CCPiTestClass):
             spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  norms=[
                           1]*len(self.A), sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
 
-    def test_spdhg_custom_sampler(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.custom_order(len(self.A), [0, 0, 0, 0]),
-                      initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
-        self.assertListEqual(spdhg.prob_weights,  [1]+[0]*(len(self.A)-1))
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.custom_order(len(self.A), [0, 1, 0, 1]),
-                      initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
-        self.assertListEqual(spdhg.prob_weights,
-                             [.5]+[.5]+[0]*(len(self.A)-2))
 
     def test_spdhg_set_norms(self):
 

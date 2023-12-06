@@ -301,18 +301,28 @@ class LinearOperator(Operator):
         Evaluates if the following equivalence holds
         .. math::
           Ax\times y = y \times A^Tx
-        :param operator: operator to test the dot_test
-        :param range_init: optional initialisation container in the operator range 
-        :param domain_init: optional initialisation container in the operator domain 
-        :param seed: Seed random generator
-        :type : int, default = 1
-        :param tolerance: Check if the following expression is below the tolerance
+          
+        Parameters
+        ----------
+        
+        operator:
+            operator to test the dot_test
+        range_init:
+            optional initialisation container in the operator range 
+        domain_init:
+            optional initialisation container in the operator domain 
+        seed: int, default = 1
+            Seed random generator
+        tolerance:float, default 1e-6
+            Check if the following expression is below the tolerance
         .. math:: 
 
             |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) < tolerance
 
-        :type : float, default 1e-6
-        :returns: boolean, True if the test is passed.       
+        
+        Returns
+        -------
+        boolean, True if the test is passed.       
         '''
 
         seed = kwargs.get('seed', 1)
@@ -351,11 +361,15 @@ class ScaledOperator(Operator):
     of the result of direct and adjoint of the operator with the scalar.
     For the rest it behaves like the operator it holds.
 
-    :param operator: a Operator or LinearOperator
-    :param scalar: a scalar multiplier
+    Parameters
+    -----------
+    operator: a `Operator` or `LinearOperator`
+    scalar: scalar: Number
+        a scalar multiplier
 
-    Example:
-       The scaled operator behaves like the following:
+    Example
+    --------
+    The scaled operator behaves like the following:
 
     .. code-block:: python
 
@@ -369,11 +383,6 @@ class ScaledOperator(Operator):
     '''
 
     def __init__(self, operator, scalar, **kwargs):
-        '''creator
-
-        :param operator: a Operator or LinearOperator
-        :param scalar: a scalar multiplier
-        :type scalar: Number'''
 
         super(ScaledOperator, self).__init__(domain_geometry=operator.domain_geometry(),
                                              range_geometry=operator.range_geometry())
@@ -423,7 +432,7 @@ class ScaledOperator(Operator):
 class SumOperator(Operator):
 
     def __init__(self, operator1, operator2):
-
+        #TODO: Add docstring 
         self.operator1 = operator1
         self.operator2 = operator2
 
@@ -472,7 +481,7 @@ class SumOperator(Operator):
 
 
 class CompositionOperator(Operator):
-
+    #TODO: add docstring 
     def __init__(self, *operators, **kwargs):
 
         # get a reference to the operators

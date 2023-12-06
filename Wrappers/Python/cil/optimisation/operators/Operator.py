@@ -430,9 +430,22 @@ class ScaledOperator(Operator):
 ###############################################################################
 
 class SumOperator(Operator):
-
+    """Sums two operators. 
+    For example, `SumOperator(left, right).direct(x) == left.direct(x)+right.direct(x)`
+    
+    Parameters
+    ----------
+    operator1: `Operator`
+        The first `Operator` in the sum
+    operator2: `Operator`
+        The second `Operator` in the sum
+        
+    Note
+    ----
+    Both operators must have the same domain and range. 
+    
+    """
     def __init__(self, operator1, operator2):
-        #TODO: Add docstring 
         self.operator1 = operator1
         self.operator2 = operator2
 
@@ -481,7 +494,15 @@ class SumOperator(Operator):
 
 
 class CompositionOperator(Operator):
-    #TODO: add docstring 
+    """Composes one or more operators. 
+    For example, `CompositionOperator(left, right).direct(x) == left.direct(right.direct(x))`
+    
+    Parameters
+    ----------
+    args: `Operator`s
+        Operators to be composed. As in mathematical notation, the operators will be applied right to left
+    
+    """
     def __init__(self, *operators, **kwargs):
 
         # get a reference to the operators

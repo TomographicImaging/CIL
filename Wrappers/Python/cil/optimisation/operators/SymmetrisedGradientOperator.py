@@ -28,7 +28,7 @@ class SymmetrisedGradientOperator(LinearOperator):
         
         .. math::
         
-            E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} ) \\
+            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} ) \\
                         
         
     In 2 dimensions, let :math:`v(x,y)=(v_1(x,y),v_2(x,y))` which gives
@@ -44,7 +44,7 @@ class SymmetrisedGradientOperator(LinearOperator):
         
         .. math::
         
-            E(v) = 0.5 * ( \nabla\cdot v + (\nabla\cdot v)^{T} )       
+            E(v) = 0.5  ( \nabla\cdot v + (\nabla\cdot v)^{T} )       
             =\left( \begin{matrix} 
                 \partial_{x} v_1 & 0.5 * (\partial_{y} v_1 + \partial_{x} v_2) \\
                 0.5 * (\partial_{x} v_1 + \partial_{y} v_2) & \partial_{y} v_2 

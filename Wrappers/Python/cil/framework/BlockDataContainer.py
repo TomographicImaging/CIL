@@ -86,6 +86,7 @@ class BlockDataContainer(object):
         
     def __iter__(self):
         '''BlockDataContainer is Iterable'''
+        self.index=0
         return self
     def next(self):
         '''python2 backwards compatibility'''

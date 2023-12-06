@@ -24,7 +24,7 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 
 class SymmetrisedGradientOperator(LinearOperator):
     
-    r''' Consider the operator :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrized Gradient and 
+    r''' The symmetrised gradient is the operator, :math:`E`, defined by :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrized Gradient and 
         
         .. math::
         
@@ -44,7 +44,7 @@ class SymmetrisedGradientOperator(LinearOperator):
         
         .. math::
         
-            E(v) = 0.5  ( \nabla\cdot v + (\nabla\cdot v)^{T} )       
+            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} )       
             =\left( \begin{matrix} 
                 \partial_{x} v_1 & 0.5  (\partial_{y} v_1 + \partial_{x} v_2) \\
                 0.5  (\partial_{x} v_1 + \partial_{y} v_2) & \partial_{y} v_2 

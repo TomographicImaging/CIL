@@ -24,33 +24,28 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 
 class SymmetrisedGradientOperator(LinearOperator):
     
-    r'''Symmetrized Gradient Operator: Consider the operator :math:`E: V -> W` where
+    r''' Consider the operator :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrized Gradient and 
         
-        `V` is `BlockGeometry` and  `W` is the range of the Symmetrized Gradient  
-        
-        and 
-        
-          .. math::
+        .. math::
         
             E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} ) \\
                         
         
-        In 2 dimensions, let :math:`v(x,y)=(v_1(x,y),v_2(x,y))` which gives
+    In 2 dimensions, let :math:`v(x,y)=(v_1(x,y),v_2(x,y))` which gives
         
-        ..math::
+        .. math::
         
             \nabla v =\left( \begin{matrix} 
                 \partial_{x} v_1 & \partial_x v_2\\
                 \partial_{y}v_1 & \partial_y v_2
             \end{matrix}\right)
         
-        and thus 
+    and thus 
         
         .. math::
         
-            E(v) &= 0.5 * ( \nabla\cdot v + (\nabla\cdot v)^{T} ) \\
-            
-            = \left( \begin{matrix} 
+            E(v) = 0.5 * ( \nabla\cdot v + (\nabla\cdot v)^{T} )       
+            =\left( \begin{matrix} 
                 \partial_{x} v_1 & 0.5 * (\partial_{y} v_1 + \partial_{x} v_2) \\
                 0.5 * (\partial_{x} v_1 + \partial_{y} v_2) & \partial_{y} v_2 
             \end{matrix}\right)
@@ -60,9 +55,9 @@ class SymmetrisedGradientOperator(LinearOperator):
     domain_geometry: `BlockGeometry` with shape (2,1) or (3,1)
         Set up the domain of the function. 
     bnd_cond: str, optional, default :code:`Neumann`
-        boundary condition either :code:`Neumann` or :code:`Periodic`
+        Boundary condition either :code:`Neumann` or :code:`Periodic`
     correlation: str, optional, default :code:`Channel`
-        correlation either :code:`SpaceChannel` or :code:`Channel`
+        Correlation either :code:`SpaceChannel` or :code:`Channel`
         
     '''
     
@@ -93,7 +88,7 @@ class SymmetrisedGradientOperator(LinearOperator):
         
     def direct(self, x, out=None):
         
-        '''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` '''        
+        f'''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` '''        
         
         if out is None:
             

@@ -88,7 +88,7 @@ class SymmetrisedGradientOperator(LinearOperator):
         
     def direct(self, x, out=None):
         
-        f'''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` '''        
+        r'''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` '''        
         
         if out is None:
             

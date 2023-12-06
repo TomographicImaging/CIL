@@ -46,8 +46,8 @@ class SymmetrisedGradientOperator(LinearOperator):
         
             E(v) = 0.5  ( \nabla\cdot v + (\nabla\cdot v)^{T} )       
             =\left( \begin{matrix} 
-                \partial_{x} v_1 & 0.5 * (\partial_{y} v_1 + \partial_{x} v_2) \\
-                0.5 * (\partial_{x} v_1 + \partial_{y} v_2) & \partial_{y} v_2 
+                \partial_{x} v_1 & 0.5  (\partial_{y} v_1 + \partial_{x} v_2) \\
+                0.5  (\partial_{x} v_1 + \partial_{y} v_2) & \partial_{y} v_2 
             \end{matrix}\right)
                           
     Parameters

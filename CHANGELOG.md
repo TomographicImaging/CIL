@@ -1,4 +1,3 @@
-
 * x.x.x
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_label
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class
@@ -7,8 +6,8 @@
   - Bug fix for BlockDataContainer as iterator
   - Dropped support for IPP versions older than 2021.10 due to header changes
   - Fix build include directories
-
-
+  - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object

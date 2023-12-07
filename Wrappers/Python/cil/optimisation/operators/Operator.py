@@ -451,7 +451,8 @@ class ScaledOperator(Operator):
 
 class SumOperator(Operator):
     """Sums two operators. 
-    For example, `SumOperator(left, right).direct(x) == left.direct(x)+right.direct(x)`
+    For example, `SumOperator(left, right).direct(x)` is equivalent to  `left.direct(x)+right.direct(x)`
+
     
     Parameters
     ----------
@@ -515,7 +516,8 @@ class SumOperator(Operator):
 
 class CompositionOperator(Operator):
     """Composes one or more operators. 
-    For example, `CompositionOperator(left, right).direct(x) == left.direct(right.direct(x))`
+    For example, `CompositionOperator(left, right).direct(x)` is equivalent to `left.direct(right.direct(x))`
+
     
     Parameters
     ----------

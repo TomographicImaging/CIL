@@ -20,6 +20,7 @@
 from cil.optimisation.functions import Function    
 from cil.framework import BlockDataContainer   
 import numpy as np
+import logging
 
  
 def soft_shrinkage(x, tau, out=None):
@@ -104,7 +105,7 @@ class L1Norm(Function):
                 return self.b.dot(x)
             else:
                 return 0.
-        return np.inf    
+        return np.inf
 
                     
     def proximal(self, x, tau, out=None):
@@ -187,8 +188,26 @@ class MixedL11Norm(Function):
 
         return soft_shrinkage(x, tau, out = out) 
 
-
 class WeightedL1Norm(Function):
+    r"""WeightedL1Norm function
+            
+            .. math:: F(x) = ||x||_{\ell^1(w)} (w is array of positive weights)
+    
+    Parameters:
+    -----------
+
+    weight: weight array matching the size of the wavelet coefficients, default None
+        If None returns the regular L1Norm
+    """
+
+    def __new__(cls, weight=None, b=None):
+            
+        if weight is None:
+            return L1Norm(b=b)
+        else:
+            return super(WeightedL1Norm, cls).__new__(_WeightedL1Norm)
+
+class _WeightedL1Norm(WeightedL1Norm):
     
     r"""WeightedL1Norm function
             
@@ -196,7 +215,7 @@ class WeightedL1Norm(Function):
                                 
     """   
            
-    def __init__(self, weight = None):
+    def __init__(self, weight=None, b=None):
         '''creator
 
         [OPTIONAL PARAMETERS]
@@ -204,8 +223,9 @@ class WeightedL1Norm(Function):
         '''
         super(WeightedL1Norm, self).__init__()
         self.weight = weight
+        self.b = b
 
-        if (weight is not None) and (np.min(weight) <= 0):
+        if np.min(weight) <= 0:
             raise ValueError("Weights should be strictly positive!")
         
     def __call__(self, x):
@@ -216,10 +236,11 @@ class WeightedL1Norm(Function):
             a) .. math:: f(x) = ||x||_{\ell^1}  (no weights -> regular L1Norm)   
             b) .. math:: f(x) = ||x||_{\ell^1(w)}
         """
-        if self.weight is None:
-            y = x
-        else:
-            y = x*self.weight
+        y = x*self.weight
+
+        if self.b is not None: 
+            y -= self.b
+
         return y.abs().sum() 
           
     def convex_conjugate(self,x):
@@ -244,16 +265,15 @@ class WeightedL1Norm(Function):
             \end{cases}
     
         """        
-        if self.weight is None:
-            tmp = x.abs().max() - 1
-        else:
-            tmp = (x.abs()/self.weight).max() - 1
+        tmp = (x.abs()/self.weight).max() - 1
 
         if tmp<=1e-5:            
-            return 0.
+            if self.b is not None:
+                return self.b.dot(x)
+            else:
+                return 0.
         return np.inf
 
-                    
     def proximal(self, x, tau, out=None):
         
         r"""Returns the value of the proximal operator of the WaveletNorm function at x.
@@ -273,10 +293,6 @@ class WeightedL1Norm(Function):
         .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
                             
         """  
-        if self.weight is not None:
-            tau *= self.weight
+        tau *= self.weight
 
-        if out is None:                                                
-            return soft_shrinkage(x, tau)
-        else: 
-            soft_shrinkage(x, tau, out = out)
+        return L1Norm.proximal(self, x, tau, out=out)

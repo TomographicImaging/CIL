@@ -42,6 +42,10 @@ class SamplerFromFunction():
         prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
         
+        Returns
+        -------
+        A Sampler wrapping a function that can be called with Sampler.next()  or next(Sampler)
+        
         Example
         -------
         This example creates a sampler that uniformly randomly with replacement samples from the numbers {0,1,...,48} for the first 500 iterations. 
@@ -55,20 +59,7 @@ class SamplerFromFunction():
         >>>         return(np.random.choice(50,1)[0])
         >>>
         >>> Sampler.from_function(num_indices, function, prob_weights=None)
-        >>> for _ in range(11):
-        >>>     print(sampler.next())
         >>> print(list(sampler.get_samples(25)))
-        44
-        37
-        40
-        42
-        46
-        35
-        10
-        47
-        3
-        28
-        9
         [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
 
 
@@ -91,22 +82,9 @@ class SamplerFromFunction():
         >>> prob_weights = [x/total for x in temp_list]
         >>> 
         >>> sampler=Sampler.from_function(num_indices=num_indices, function=test_function, prob_weights=prob_weights)
-        >>> for _ in range(11):
-        >>>     print(sampler.next())
         >>> print(list(sampler.get_samples(25)))
-        >>> print(sampler)
-        1
-        1
-        1
-        0
-        0
-        11
-        5
-        9
-        8
-        3
-        1
         [1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0]
+        >>> print(sampler)
         Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. 
         Type : from_function 
         Current iteration number : 11 
@@ -143,6 +121,12 @@ class SamplerFromFunction():
     @property
     def num_indices(self):
         return self._num_indices 
+    
+    @property
+    def current_iter_number(self):
+        return self._iteration_number
+    
+    
     
     
     def next(self):
@@ -198,33 +182,15 @@ class SamplerFromOrder():
 
         prob_weights: list of floats of length num_indices that sum to 1. 
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
-
-        Example
-        -------
-       
         
+        Returns
+        -------
+        A Sampler outputting in order from an list that can be called with Sampler.next()  or next(Sampler)
+        
+        Example
+        -------    
         >>> sampler=Sampler.staggered(21,4)
         >>> print(sampler.get_samples(5))
-        >>> for _ in range(15):
-        >>>    print(sampler.next())
-        >>> print(sampler.get_samples(5))
-
-        [ 0  4  8 12 16]
-        0
-        4
-        8
-        12
-        16
-        20
-        1
-        5
-        9
-        13
-        17
-        2
-        6
-        10
-        14
         [ 0  4  8 12 16]
         """
 
@@ -255,6 +221,11 @@ class SamplerFromOrder():
     def num_indices(self):
         return self._num_indices 
     
+    @property
+    def current_index_number(self):
+        return self._iteration_number
+    
+    
     
     def next(self):
         """Returns and increments the sampler """
@@ -283,7 +254,7 @@ class SamplerFromOrder():
         repres += "Type : {} \n".format(self._type)
         repres += "Order : {}  \n".format(self._order)
         repres += "Number of indices : {} \n".format(self._num_indices)
-        repres += "Current iteration number (modulo the number of indices) : {} \n".format(self._last_index)
+        repres += "Current index number : {} \n".format(self._last_index)
         repres += "Probability weights : {} \n".format(self._prob_weights)
         return repres
 
@@ -314,6 +285,11 @@ class SamplerRandom():
     prob_weights: list of floats of length num_indices that sum to 1. 
         Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
     
+    
+    Returns
+    -------
+    A Sampler wrapping numpy.random.choice that can be called with Sampler.next()  or next(Sampler)
+        
     Example
     -------
     >>> sampler=Sampler.random_with_replacement(5)
@@ -410,39 +386,13 @@ class Sampler():
     -------
     >>> sampler=Sampler.sequential(10)
     >>> print(sampler.get_samples(5))
-    >>> for _ in range(11):
-            print(sampler.next())
     [0 1 2 3 4]
-    0
-    1
-    2
-    3
-    4
-    5
-    6
-    7
-    8
-    9
-    0
+
 
     Example
     -------
     >>> sampler=Sampler.random_with_replacement(5)
-    >>> for _ in range(12):
-    >>>     print(next(sampler))
     >>> print(sampler.get_samples())
-    3
-    4
-    0
-    0
-    2
-    3
-    3
-    2
-    2
-    1
-    1
-    4
     [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
 
     Note
@@ -466,26 +416,16 @@ class Sampler():
         ----------
         num_indices: int
             One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
-
+        Returns
+        -------
+        A Sampler  that can be called with Sampler.next()  or next(Sampler) and outputs sequentially
+        
         Example
         -------
 
         >>> sampler=Sampler.sequential(10)
         >>> print(sampler.get_samples(5))
-        >>> for _ in range(11):
-                print(sampler.next())
         [0 1 2 3 4]
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
-        8
-        9
-        0
         """
         order = list(range(num_indices))
         sampler = SamplerFromOrder(num_indices=num_indices, sampling_type='sequential', order=order, prob_weights=[
@@ -507,63 +447,52 @@ class Sampler():
         Reference
         ----------
         Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
-
+        
+        Returns
+        -------
+        A Sampler  that can be called with Sampler.next()  or next(Sampler) and outputs in a Herman Meyer ordering 
+ 
         Example
         -------
         >>> sampler=Sampler.herman_meyer(12)
         >>> print(sampler.get_samples(16))
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
-
         """
-        def _herman_meyer_order(n):
-            # Assuming that the indices are in geometrical order
-            n_variable = n
-            i = 2
-            factors = []
 
-            while i * i <= n_variable:
-                if n_variable % i:
-                    i += 1
-                else:
-                    n_variable //= i
-                    factors.append(i)
+  
+        n_variable = num_indices
+        i = 2
+        factors = []
 
-            if n_variable > 1:
-                factors.append(n_variable)
+        #Prime factorisation 
+        while i * i <= n_variable:
+            if n_variable % i:
+                i += 1
+            else:
+                n_variable //= i
+                factors.append(i)          
+        if n_variable > 1:
+            factors.append(n_variable)
+     
+        n_factors = len(factors)
 
-            n_factors = len(factors)
+        if n_factors == 1:
+            raise ValueError(
+                'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
 
-            if n_factors == 0:
-                raise ValueError(
-                    'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
+        #Build the sampling order 
+        order = np.zeros(num_indices, dtype=np.int8)
+        for factor_n in range(n_factors):
+            if factor_n == 0:
+                block_length= 1
+            else:
+                block_length= math.prod(factors[:factor_n])
+      
+            addition=np.tile(np.repeat( math.prod(factors[factor_n+1:])*range(num_indices//(addition*block_length)), block_length), addition)
+            order +=  addition
+        order=list(order)
 
-            order = [0 for _ in range(n)]
-            value = 0
 
-            for factor_n in range(n_factors):
-                n_rep_value = 0
-
-                if factor_n == 0:
-                    n_change_value = 1
-                else:
-                    n_change_value = math.prod(factors[:factor_n])
-
-                for element in range(n):
-                    mapping = value
-                    n_rep_value += 1
-
-                    if n_rep_value >= n_change_value:
-                        value = value + 1
-                        n_rep_value = 0
-
-                    if value == factors[factor_n]:
-                        value = 0
-
-                    order[element] = order[element] + \
-                        math.prod(factors[factor_n+1:]) * mapping
-            return order
-
-        order = _herman_meyer_order(num_indices)
         sampler = SamplerFromOrder(
             num_indices=num_indices, sampling_type='herman_meyer', order=order, prob_weights=[1/num_indices]*num_indices)
         return sampler
@@ -581,30 +510,15 @@ class Sampler():
         offset: int
             The sampler will output in the order {0, a, 2a, 3a, ...., 1, 1+a, 1+2a, 1+3a,...., 2, 2+a, 2+2a, 2+3a,...} where a=offset. 
             The offset should be less than the num_indices
-
+        
+        Returns
+        -------
+        A Sampler  that can be called with Sampler.next()  or next(Sampler) and outputs in a staggered ordering
+ 
         Example
         -------
         >>> sampler=Sampler.staggered(21,4)
         >>> print(sampler.get_samples(5))
-        >>> for _ in range(15):
-        >>>    print(sampler.next())
-        >>> print(sampler.get_samples(5))
-        [ 0  4  8 12 16]
-        0
-        4
-        8
-        12
-        16
-        20
-        1
-        5
-        9
-        13
-        17
-        2
-        6
-        10
-        14
         [ 0  4  8 12 16]
         """
 
@@ -633,7 +547,11 @@ class Sampler():
 
         seed:int, default=None
             Random seed for the random number generator.  If set to None, the seed will be set using the current time.
-
+        
+        Returns
+        -------
+        A Sampler  that can be called with Sampler.next()  or next(Sampler) that samples randomly with replacement 
+ 
 
         Example
         -------
@@ -666,7 +584,10 @@ class Sampler():
 
         seed:int, default=None
             Random seed for the  random number generator.  If set to None, the seed will be set using the current time. 
-
+        
+        Returns
+        -------
+        A Sampler  that can be called with Sampler.next()  or next(Sampler) that samples randomly without replacement 
         Example
         -------
         >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
@@ -699,8 +620,10 @@ class Sampler():
         -----
         If your function involves a random number generator, then the seed should also depend on the iteration number, see the example in the documentation, otherwise
         the `get_samples()` function may not accurately return the correct samples and may interrupt the next sample returned. 
-
-        Example
+        
+        Returns
+        -------
+        A Sampler that wraps a function and can be called with Sampler.next()  or next(Sampler) 
         -------
         This example creates a sampler that uniformly randomly with replacement samples from the numbers {0,1,...,48} for the first 500 iterations. 
         For the next 500 iterations it uniformly randomly with replacement samples from {0,...,49}. The num_indices is 50 and the prob_weights are left as default because in the limit all indices will be seen with equal probability. 
@@ -713,20 +636,7 @@ class Sampler():
         >>>         return(np.random.choice(50,1)[0])
         >>>
         >>> Sampler.from_function(num_indices, function, prob_weights=None)
-        >>> for _ in range(11):
-        >>>     print(sampler.next())
         >>> print(list(sampler.get_samples(25)))
-        44
-        37
-        40
-        42
-        46
-        35
-        10
-        47
-        3
-        28
-        9
         [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
 
 
@@ -749,22 +659,9 @@ class Sampler():
         >>> prob_weights = [x/total for x in temp_list]
         >>> 
         >>> sampler=Sampler.from_function(num_indices=num_indices, function=test_function, prob_weights=prob_weights)
-        >>> for _ in range(11):
-        >>>     print(sampler.next())
         >>> print(list(sampler.get_samples(25)))
-        >>> print(sampler)
-        1
-        1
-        1
-        0
-        0
-        11
-        5
-        9
-        8
-        3
-        1
         [1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0]
+        >>> print(sampler)
         Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. 
         Type : from_function 
         Current iteration number : 11 

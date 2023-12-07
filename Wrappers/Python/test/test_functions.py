@@ -31,7 +31,8 @@ from cil.optimisation.operators import GradientOperator
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
-                                         Rosenbrock, IndicatorBox, TotalVariation
+                                         Rosenbrock, IndicatorBox, TotalVariation, \
+                                         WeightedL1Norm, WeightedL2NormSquared
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -913,7 +914,9 @@ class TestFunction(CCPiTestClass):
             (KullbackLeibler(b=b, backend='numba'), ag),
             (KullbackLeibler(b=b, backend='numpy'), ag),
             (L1Norm(), ag),
+            (WeightedL1Norm(), ag),
             (L2NormSquared(), ag),
+            (WeightedL2NormSquared(), ag),
             (MixedL21Norm(), bg),
             (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
             (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
@@ -939,6 +942,24 @@ class TestFunction(CCPiTestClass):
         else:
             np.testing.assert_allclose(a.as_array(), b.as_array(),
                                     rtol=1e-5, atol=1e-5)
+
+    def test_L1Norm(self):
+        f1 = L1Norm()
+        f2 = WeightedL1Norm(weight=None)
+        geom = ImageGeometry(2, 3)
+        x = geom.allocate('random', seed=1)
+
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+        
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
+
+
 
 
 class TestTotalVariation(unittest.TestCase):

@@ -41,7 +41,7 @@ class L2NormSquared(Function):
     Note
     -----
     
-    For case b) case we can use :code:`F = L2NormSquared().centered_at(b)`, see *TranslateFunction*.
+    For case b) we can use :code:`F = L2NormSquared().centered_at(b)`, see *TranslateFunction*.
 
     Example
     -------
@@ -169,7 +169,7 @@ class WeightedL2NormSquared(Function):
 
     def gradient(self, x, out=None):
         r""" Returns the value of :math:`F'(x) = 2Wx` or, if `b` is defined,  :math:`F'(x) = 2W(x-b)`
-        where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer` or :math:`\text{weight}I` if `weight` is a scalar.`.
+        where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer` or :math:`\text{weight}I` if `weight` is a scalar.
 
         """
 

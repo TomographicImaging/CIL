@@ -36,7 +36,7 @@ class LeastSquares(Function):
     
     where :math:`W=\text{diag}(weight)`.
     
-    Parameters:
+    Parameters
     -----------
     A : LinearOperator
     b : Data, DataContainer
@@ -85,11 +85,11 @@ class LeastSquares(Function):
         
         r""" Returns the value of the gradient of :math:`F(x)`:
         
-             .. math:: F'(x) = 2cA^T(Ax-b)
+        .. math:: F'(x) = 2cA^T(Ax-b)
              
-             or 
+        or 
              
-             .. math:: F'(x) = 2cA^T(W(Ax-b))
+        .. math:: F'(x) = 2cA^T(W(Ax-b))
 
         where :math:`W=\text{diag}(weight)`.
     

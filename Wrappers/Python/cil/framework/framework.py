@@ -2776,6 +2776,9 @@ class DataContainer(object):
         Returns a new DataContainer containing a single slice in the requested direction. \
         Pass keyword arguments <dimension label>=index
         '''
+        # Force is not relevant for a DataContainer:
+        kw.pop('force', None)
+
         new_array = None
 
         #get ordered list of current dimensions

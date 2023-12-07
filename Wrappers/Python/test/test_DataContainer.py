@@ -751,6 +751,37 @@ class TestDataContainer(CCPiTestClass):
         ss3 = vol.get_slice(channel=0)
         self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], list(ss3.geometry.dimension_labels))
 
+    def test_DataContainerSubset(self):
+        dc = DataContainer(numpy.ones((2,3,4,5)))
+        print(dc)
+
+        dc.dimension_labels =[AcquisitionGeometry.CHANNEL ,
+                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL]
+
+        # test reshape
+        new_order = [AcquisitionGeometry.HORIZONTAL ,
+                 AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.ANGLE]
+        dc.reorder(new_order)
+
+        self.assertListEqual(new_order, list(dc.dimension_labels))
+
+        ss1 = dc.get_slice(vertical = 0)
+
+        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
+                 AcquisitionGeometry.CHANNEL  ,
+                 AcquisitionGeometry.ANGLE], list(ss1.dimension_labels))
+        
+        ss2 = dc.get_slice(vertical = 0, channel=0)
+        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
+                 AcquisitionGeometry.ANGLE], list(ss2.dimension_labels))
+        
+        # Check we can get slice still even if force parameter is passed:
+        ss3 = dc.get_slice(vertical = 0, channel=0, force=True)
+        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
+                    AcquisitionGeometry.ANGLE], list(ss3.dimension_labels))
+        
 
     def test_DataContainerChaining(self):
         dc = self.create_DataContainer(256,256,256,1)
@@ -1135,4 +1166,3 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_array_equal(u.get_slice(channel=1, vertical=1).as_array(), 3 * a)
 
 
- 

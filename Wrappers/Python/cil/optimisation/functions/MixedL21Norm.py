@@ -57,13 +57,13 @@ except ImportError:
     
 
 
-def _proximal_step_numpy(tmp, tau):
+def _proximal_step_numpy(arr, tau):
     '''Numpy implementation of a step in the calculation of the proximal of MixedL21Norm
     
     Parameters:
     -----------
-    tmp : DataContainer/ numpy array, best if contiguous memory. 
-    tau: float or DataContainer
+    arr : DataContainer, best if contiguous memory. 
+    tau: float, numpy array or DataContainer
 
     Returns:
     --------
@@ -72,15 +72,24 @@ def _proximal_step_numpy(tmp, tau):
     '''
     # Note: we divide x by tau so the cases of tau both scalar and 
     # DataContainers run
-    tmp /= np.abs(tau, dtype=np.float32)
-    res = tmp - 1
+    try:
+        tmp = np.abs(tau, dtype=np.float32)
+    except np.core._exceptions._UFuncInputCastingError:
+        tmp = tau.abs()
+    
+    
+    arr /= tmp
+    res = arr - 1
     res.maximum(0.0, out=res)
-    res /= tmp
+    res /= arr
+
+    arr *= tmp
 
     resarray = res.as_array()
     resarray[np.isnan(resarray)] = 0
     res.fill(resarray)
     return res
+    
 
 class MixedL21Norm(Function):
     

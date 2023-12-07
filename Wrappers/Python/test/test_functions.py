@@ -943,11 +943,33 @@ class TestFunction(CCPiTestClass):
             np.testing.assert_allclose(a.as_array(), b.as_array(),
                                     rtol=1e-5, atol=1e-5)
 
-    def test_L1Norm(self):
+    def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
         f2 = WeightedL1Norm(weight=None)
-        geom = ImageGeometry(2, 3)
+
+        assert f1.__class__.__name__ == 'L1Norm'
+        assert f2.__class__.__name__ == 'L1Norm'
+
+    def test_L1Norm_vs_WeightedL1Norm(self):    
+        f1 = L1Norm()
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
         x = geom.allocate('random', seed=1)
+
+        weights = geom.allocate(1)
+        f2 = WeightedL1Norm(weight=weights)
+        
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+        
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
+        f2 = WeightedL1Norm(weight=weights, b=geom.allocate(1))
+        f1 = L1Norm(b=geom.allocate(1))
 
         np.testing.assert_almost_equal(f1(x), f2(x))
 
@@ -957,6 +979,9 @@ class TestFunction(CCPiTestClass):
                                    f2.proximal(x, tau).as_array())
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
+        
+
 
 
 

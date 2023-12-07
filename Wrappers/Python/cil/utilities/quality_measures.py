@@ -26,35 +26,74 @@ import numpy as np
 def mse(dc1, dc2, mask=None):    
     
     ''' Returns the Mean Squared error of two DataContainers
-    '''
+    
+    Parameters
+    ----------
+    dc1: `DataContainer`
+        One image to be compared
+    dc2: `DataContainer`
+        Second image to be compared 
+    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
+        Region of interest for the calculation. 
+    '''  
+
     if mask is None:
         diff = dc1 - dc2    
         return L2NormSquared().__call__(diff)/dc1.size
     
     else:
-        if isinstance(DataContainer):
+        if isinstance(mask,DataContainer):
             mask=mask.array
-        indices=np.where(bool(mask))
-        return ((dc1.array[indices]-dc2.array[indices])**2).mean()
+        return np.mean(((dc1.array-dc2.array)**2), where=mask.astype('bool'))
 
 
 def mae(dc1, dc2, mask=None):
     
     ''' Returns the Mean Absolute error of two DataContainers
+    
+        
+    Parameters
+    ----------
+    dc1: `DataContainer`
+        One image to be compared
+    dc2: `DataContainer`
+        Second image to be compared 
+    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
+        Region of interest for the calculation. 
+        
+        
     '''    
     if mask is None:
         diff = dc1 - dc2  
         return L1Norm().__call__(diff)/dc1.size
     else:
-        if isinstance(DataContainer):
+        if isinstance(mask, DataContainer):
             mask=mask.array
-    indices=np.where(bool(mask))
-    return np.abs((dc1.array[indices]-dc2.array[indices])).mean()
+    return np.mean(np.abs((dc1.array-dc2.array)), where=mask.astype('bool'))
 
-def psnr(ground_truth, corrupted, data_range = 255, mask=None):
+def psnr(ground_truth, corrupted, data_range = None, mask=None):
 
     ''' Returns the Peak signal to noise ratio
+    
+    Parameters
+    ----------
+    ground_truth: `DataContainer`
+        The reference image
+    corrupted: `DataContainer`
+        The image to be evaluated 
+    data_range: scalar value, default=None
+        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). To match with scikit-image the defauly is ground_truth.array.max()
+    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
+        Region of interest for the calculation. 
     '''  
+    if data_range is None:
+        if mask is None:
+            data_range=ground_truth.array.max()
+        else:
+            if isinstance(mask, DataContainer):
+                mask=mask.array
+            data_range=np.amax(ground_truth.array[mask.astype('bool')])
+    
     tmp_mse = mse(ground_truth, corrupted, mask=mask) 
 
     if tmp_mse == 0:

@@ -24,6 +24,7 @@ from cil.utilities import dataexample
 from cil.utilities import noise
 from cil.utilities.quality_measures import mse, mae, psnr
 from packaging import version
+from cil.processors import Slicer
 if version.parse(np.version.version) >= version.parse("1.13"):
     try:
         from skimage.metrics import mean_squared_error, peak_signal_noise_ratio
@@ -50,9 +51,22 @@ class TestQualityMeasures(unittest.TestCase):
 
             self.dc1 = dc1
             self.dc2 = dc2
+            
+            self.mask=ig.allocate(0)
+            self.mask.array[:50,:50]=1
+            
+            self.bool_mask=self.mask.array.astype('bool')
+            
             self.id_coins = id_coins
             self.id_coins_noisy = id_coins_noisy
 
+            roi = {'horizontal_x':(0,50,1),'horizontal_y':(0,50,1)}
+            processor = Slicer(roi)
+            processor.set_input(id_coins)
+            self.id_coins_sliced= processor.get_output()
+            processor = Slicer(roi)
+            processor.set_input(id_coins_noisy )
+            self.id_coins_noisy_sliced= processor.get_output()
 
     @unittest.skipIf((not has_skimage) or version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy {} < 1.13 or has_skimage {}".format(np.version.version, has_skimage))
     def test_mse1(self):
@@ -74,6 +88,13 @@ class TestQualityMeasures(unittest.TestCase):
         res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=3)
         
+    @unittest.skipIf((not has_skimage) or version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy {} < 1.13 or has_skimage {}".format(np.version.version, has_skimage))
+    def test_psnr2_default_data_range(self):
+        res1 = psnr(self.id_coins, self.id_coins_noisy)
+        res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
+        np.testing.assert_almost_equal(res1, res2, decimal=3)
+        
+        
 
 
     @unittest.skipIf((not has_skimage) or version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy {} < 1.13 or has_skimage {}".format(np.version.version, has_skimage))
@@ -81,5 +102,20 @@ class TestQualityMeasures(unittest.TestCase):
         res1 = psnr(self.dc1, self.dc2, data_range = self.dc1.max())
         res2 = peak_signal_noise_ratio(self.dc1.as_array(), self.dc2.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=3)
-        
+    
+    def test_mse_mask(self):
+        res1 = mse(self.id_coins_sliced, self.id_coins_noisy_sliced)
+        res2 = mse(self.id_coins, self.id_coins_noisy, mask=self.mask.array)
+        np.testing.assert_almost_equal(res1, res2, decimal=3)
 
+    def test_psnr_mask(self):
+        res1 = psnr(self.id_coins_sliced, self.id_coins_noisy_sliced)
+        res2 = psnr(self.id_coins, self.id_coins_noisy, mask=self.mask)
+        np.testing.assert_almost_equal(res1, res2, decimal=3)
+        
+    def test_mae_mask(self):
+        res1 = mae(self.id_coins_sliced, self.id_coins_noisy_sliced)
+        res2 = mae(self.id_coins, self.id_coins_noisy, mask=self.mask)
+        np.testing.assert_almost_equal(res1, res2, decimal=3)
+        
+        

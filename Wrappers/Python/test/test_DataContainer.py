@@ -753,7 +753,6 @@ class TestDataContainer(CCPiTestClass):
 
     def test_DataContainerSubset(self):
         dc = DataContainer(numpy.ones((2,3,4,5)))
-        print(dc)
 
         dc.dimension_labels =[AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
@@ -767,18 +766,18 @@ class TestDataContainer(CCPiTestClass):
 
         self.assertListEqual(new_order, list(dc.dimension_labels))
 
-        ss1 = dc.get_slice(vertical = 0)
+        ss1 = dc.get_slice(vertical=0)
 
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.CHANNEL  ,
                  AcquisitionGeometry.ANGLE], list(ss1.dimension_labels))
         
-        ss2 = dc.get_slice(vertical = 0, channel=0)
+        ss2 = dc.get_slice(vertical=0, channel=0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.ANGLE], list(ss2.dimension_labels))
         
         # Check we can get slice still even if force parameter is passed:
-        ss3 = dc.get_slice(vertical = 0, channel=0, force=True)
+        ss3 = dc.get_slice(vertical=0, channel=0, force=True)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                     AcquisitionGeometry.ANGLE], list(ss3.dimension_labels))
         

@@ -32,7 +32,8 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, \
-                                         WeightedL1Norm, WeightedL2NormSquared
+                                         WeightedL1Norm, WeightedL2NormSquared,\
+                                         WaveletNorm
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -981,6 +982,26 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
         
+    def test_WaveletNorm(self):    
+        f1 = L1Norm()
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate('random', seed=1)
+
+        weights = geom.allocate(1)
+
+        I = IdentityOperator(geom)
+        f2 = WaveletNorm(I, weight=weights)
+
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+        
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
 
 
 

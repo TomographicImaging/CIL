@@ -21,7 +21,6 @@ import numpy as np
 import pywt # PyWavelets module
 
 from cil.optimisation.operators import LinearOperator
-from cil.optimisation.functions import Function  
 from cil.framework import VectorGeometry
 
 
@@ -107,7 +106,7 @@ class WaveletOperator(LinearOperator):
             else:
                 raise AttributeError(f"Dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")
                     
-        super().__init__(domain_geometry=domain_geometry,range_geometry=range_geometry)
+        super().__init__(domain_geometry=domain_geometry, range_geometry=range_geometry)
 
 
     def _shape2slice(self):

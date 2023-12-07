@@ -19,6 +19,7 @@
 
 from cil.optimisation.functions import Function
 from cil.optimisation.functions.L1Norm import soft_shrinkage
+import numpy as np
 ###############################################################################
 ###############################################################################
 ####################### L1-norm of Wavelet Coefficients #######################
@@ -95,7 +96,7 @@ class WaveletNorm(Function):
         if self.weight is None:
             tmp = self.W.direct(x).abs().max() - 1
         else:
-            tmp = (self.W.direct(x).abs/self.weight).max() - 1
+            tmp = (self.W.direct(x).abs()/self.weight).max() - 1
 
         if tmp<=1e-5:            
             return 0.

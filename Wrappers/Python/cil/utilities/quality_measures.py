@@ -18,35 +18,51 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.functions import L2NormSquared, L1Norm
+from cil.framework import DataContainer
 import numpy as np
 
 
-def mse(dc1, dc2):    
+
+def mse(dc1, dc2, mask=None):    
     
     ''' Returns the Mean Squared error of two DataContainers
     '''
+    if mask is None:
+        diff = dc1 - dc2    
+        return L2NormSquared().__call__(diff)/dc1.size
     
-    diff = dc1 - dc2    
-    return L2NormSquared().__call__(diff)/dc1.size
+    else:
+        if isinstance(DataContainer):
+            mask=mask.array
+        indices=np.where(bool(mask))
+        return ((dc1.array[indices]-dc2.array[indices])**2).mean()
 
 
-def mae(dc1, dc2):
+def mae(dc1, dc2, mask=None):
     
     ''' Returns the Mean Absolute error of two DataContainers
     '''    
-    
-    diff = dc1 - dc2  
-    return L1Norm().__call__(diff)/dc1.size
+    if mask is None:
+        diff = dc1 - dc2  
+        return L1Norm().__call__(diff)/dc1.size
+    else:
+        if isinstance(DataContainer):
+            mask=mask.array
+    indices=np.where(bool(mask))
+    return np.abs((dc1.array[indices]-dc2.array[indices])).mean()
 
-def psnr(ground_truth, corrupted, data_range = 255):
+def psnr(ground_truth, corrupted, data_range = 255, mask=None):
 
     ''' Returns the Peak signal to noise ratio
-    '''   
-    
-    tmp_mse = mse(ground_truth, corrupted)
+    '''  
+    tmp_mse = mse(ground_truth, corrupted, mask=mask) 
+
     if tmp_mse == 0:
         return 1e5
     return 10 * np.log10((data_range ** 2) / tmp_mse)
+
+
+
 
 
 

@@ -188,4 +188,95 @@ class MixedL11Norm(Function):
         return soft_shrinkage(x, tau, out = out) 
 
 
+class WeightedL1Norm(Function):
+    
+    r"""WeightedL1Norm function
+            
+            .. math:: F(x) = ||x||_{\ell^1(w)} (w is array of positive weights)
+                                
+    """   
+           
+    def __init__(self, weight = None):
+        '''creator
 
+        [OPTIONAL PARAMETERS]
+        :param weight: weight array matching the size of the wavelet coefficients
+        '''
+        super(WeightedL1Norm, self).__init__()
+        self.weight = weight
+
+        if (weight is not None) and (np.min(weight) <= 0):
+            raise ValueError("Weights should be strictly positive!")
+        
+    def __call__(self, x):
+        
+        r"""Returns the value of the WeightedL1Norm function at x.
+        
+        Consider the following case:           
+            a) .. math:: f(x) = ||x||_{\ell^1}  (no weights -> regular L1Norm)   
+            b) .. math:: f(x) = ||x||_{\ell^1(w)}
+        """
+        if self.weight is None:
+            y = x
+        else:
+            y = x*self.weight
+        return y.abs().sum() 
+          
+    def convex_conjugate(self,x):
+        
+        r"""Returns the value of the convex conjugate of the WaveletNorm function at x.
+        Here, we need to use the convex conjugate of WaveletNorm, which is the Indicator of the unit 
+        :math:`\ell^{\infty}` norm.
+
+        Weighted case should be easy:
+        https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
+        
+        Consider the following cases:
+                
+                a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty}\leq 1\}}(x^{*})    
+                b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty(w^{-1})}\leq 1\}}(x^{*})
+        
+    
+        .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+            = \begin{cases} 
+            0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+            \infty, \mbox{otherwise}
+            \end{cases}
+    
+        """        
+        if self.weight is None:
+            tmp = x.abs().max() - 1
+        else:
+            tmp = (x.abs()/self.weight).max() - 1
+
+        if tmp<=1e-5:            
+            return 0.
+        return np.inf
+
+                    
+    def proximal(self, x, tau, out=None):
+        
+        r"""Returns the value of the proximal operator of the WaveletNorm function at x.
+        
+        Weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
+        by Amir Beck, SIAM 2017
+        https://archive.siam.org/books/mo25/mo25_ch6.pdf
+        
+        Consider the following cases:
+                
+                a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x)
+                b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*weight}(x)
+
+    
+        where,
+        
+        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
+                            
+        """  
+        if self.weight is not None:
+            tau *= self.weight
+
+        if out is None:                                                
+            return soft_shrinkage(x, tau)
+        else: 
+            soft_shrinkage(x, tau, out = out)

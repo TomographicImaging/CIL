@@ -32,4 +32,5 @@ from .MaskOperator import MaskOperator
 from .ChannelwiseOperator import ChannelwiseOperator
 from .BlurringOperator import BlurringOperator
 from .ProjectionMap import ProjectionMap
+from .WaveletOperator import WaveletOperator
 

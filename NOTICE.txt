@@ -31,6 +31,7 @@ Institutions Key:
 8 - UES Inc.
 9 - Swansea University
 10 - University of Warwick
+11 - University of Helsinki
 
 CIL Developers in date order:
 Edoardo Pasca (2017 – present) - 1 
@@ -42,6 +43,7 @@ Laura Murgatroyd (2021 - present) - 1
 Evelina Ametova (2018-2020) - 3, (2020-2021) - 6 
 Margaret Duff (2023 - present) - 1
 Hannah Robarts (2023 - present) - 1 
+Tommi Heikkila (2023 - present) - 11
 
 CIL Contributors:
 Srikanth Nagella (2017-2018) - 1

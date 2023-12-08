@@ -78,30 +78,22 @@ class TestL1NormRR(unittest.TestCase):
         np.testing.assert_almost_equal(error, 83.20592, 4)
         
 class TestRingRemover(CCPiTestClass):
-    def add_bad_pixels(self, data, number_of_columns, number_of_hot_pix, seed):
+    def add_defect_pixels(self, data, N_columns, N_defects, seed):
 
         data_corrupted = data.copy()
-
-        # get intensity range
-        low = np.amin(data.as_array())
-        high = np.amax(data.as_array())
-
-        # we seed random number generator for repeatability
         rng = np.random.RandomState(seed=seed) 
-        # indices of bad columns
-        columns = rng.randint(0, data.shape[1], size=number_of_columns)
-        # indices of hot pixels
-        pix_row = rng.randint(0, data.shape[0], size=number_of_hot_pix)
-        pix_col = rng.randint(0, data.shape[1], size=number_of_hot_pix)
-        # values in hot pixels
-        pixel_values = rng.uniform(low=low, high=high, size=number_of_hot_pix)
+        columns = rng.randint(0, data.shape[1], size=N_columns)
+        
+        pixel_values = rng.uniform(low=np.amin(data.as_array()), high=np.amax(data.as_array()), size=N_defects)
 
-        for i in range(number_of_columns):
-            col_pattern = rng.uniform(low=low, high=high, size=data.shape[0])
+        for i in range(N_columns):
+            col_pattern = rng.uniform(low=np.amin(data.as_array()), high=np.amax(data.as_array()), size=data.shape[0])
             data_corrupted.as_array()[:, columns[i]] = data.as_array()[:, columns[i]]+col_pattern
 
-        for i in range(number_of_hot_pix):
-            data_corrupted.as_array()[pix_row[i], pix_col[i]] = pixel_values[i]
+        defect_row = rng.randint(0, data.shape[0], size=N_columns)
+        defect_col = rng.randint(0, data.shape[1], size=N_columns)
+        for i in range(N_defects):
+            data_corrupted.as_array()[defect_row[i], defect_col[i]] = pixel_values[i]
 
         return data_corrupted
     
@@ -109,7 +101,7 @@ class TestRingRemover(CCPiTestClass):
         
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical=80)
 
-        data_corrupted = self.add_bad_pixels(data, 1, 1, 1312)
+        data_corrupted = self.add_defect_pixels(data, 1, 1, 1312)
         data_corrupted = TransmissionAbsorptionConverter()(data_corrupted)
         r = RingRemover(8,'db20', 1.5)
         r.set_input(data_corrupted)

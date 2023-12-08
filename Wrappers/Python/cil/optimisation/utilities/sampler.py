@@ -432,7 +432,25 @@ class Sampler():
                                    1/num_indices]*num_indices)
         return sampler
 
-   
+    @staticmethod
+    def _prime_factorisation(n):
+        factors = []
+
+        while n % 2 == 0:
+            n//=2
+            factors.append(2)
+
+        i = 3
+        while i*i <= n:
+            while n % i == 0:
+                n //= i;  
+                factors.append(i)
+            i += 2
+
+        if n > 1:
+            factors.append(n)
+
+        return factors
 
     @staticmethod
     def herman_meyer(num_indices):
@@ -459,27 +477,15 @@ class Sampler():
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
         """
 
-  
-        n_variable = num_indices
-        i = 2
-        factors = []
-
-        #Prime factorisation 
-        while i * i <= n_variable:
-            if n_variable % i:
-                i += 1
-            else:
-                n_variable //= i
-                factors.append(i)
-        if n_variable > 1:
-            factors.append(n_variable)
+        factors=Sampler._prime_factorisation(num_indices)
      
         n_factors = len(factors)
         if n_factors == 1:
             raise ValueError(
                 'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
 
-        #Build up the sampling order iteratively using the prime factors 
+        #Build up the sampling order iteratively using the prime factors
+        #In each iteration add on [ [0]*repeat_length, [addition]*repeat_length, ... ] tiled to fill the length of the list 
         order = np.zeros(num_indices, dtype=np.int8)
         for factor_n in range(n_factors):
             if factor_n == 0:

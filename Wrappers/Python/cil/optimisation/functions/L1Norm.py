@@ -20,7 +20,6 @@
 from cil.optimisation.functions import Function    
 from cil.framework import BlockDataContainer   
 import numpy as np
-
  
 def soft_shrinkage(x, tau, out=None):
     
@@ -104,7 +103,7 @@ class L1Norm(Function):
                 return self.b.dot(x)
             else:
                 return 0.
-        return np.inf    
+        return np.inf
 
                     
     def proximal(self, x, tau, out=None):
@@ -187,5 +186,117 @@ class MixedL11Norm(Function):
 
         return soft_shrinkage(x, tau, out = out) 
 
+class WeightedL1Norm(Function):
+    r"""WeightedL1Norm function
+            
+            .. math:: F(x) = ||x||_{\ell^1(w)} (w is array of positive weights)
+    
+    Parameters:
+    -----------
 
+    weight: weight array matching the size of the wavelet coefficients, default None
+        If None returns the regular L1Norm.
+    b: data, default None
+        Translation of the function.
+    """
 
+    def __new__(cls, weight=None, b=None):
+            
+        if weight is None:
+            return L1Norm(b=b)
+        else:
+            return super(WeightedL1Norm, cls).__new__(_WeightedL1Norm)
+
+class _WeightedL1Norm(WeightedL1Norm): 
+           
+    def __init__(self, weight=None, b=None):
+        super(WeightedL1Norm, self).__init__()
+        self.weight = weight
+        self.b = b
+
+        if np.min(weight) <= 0:
+            raise ValueError("Weights should be strictly positive!")
+        
+    def __call__(self, x):
+        
+        r"""Returns the value of the WeightedL1Norm function at x.
+        
+        Consider the following case:           
+            a) .. math:: f(x) = ||x||_{\ell^1}  (no weights -> regular L1Norm)   
+            b) .. math:: f(x) = ||x||_{\ell^1(w)}
+        """
+        y = x*self.weight
+
+        if self.b is not None: 
+            y -= self.b
+
+        return y.abs().sum() 
+          
+    def convex_conjugate(self,x):
+        
+        r"""Returns the value of the convex conjugate of the WeightedL1Norm function at x.
+        Here, we need to use the convex conjugate of WeightedL1Norm, which is the Indicator of the unit 
+        :math:`\ell^{\infty}` norm.
+
+        See:
+        https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
+        
+        Consider the following cases:
+                
+                a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty}\leq 1\}}(x^{*})    
+                b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty(w^{-1})}\leq 1\}}(x^{*})
+        
+    
+        .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+            = \begin{cases} 
+            0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+            \infty, \mbox{otherwise}
+            \end{cases}
+    
+
+        Parameters:
+        -----------
+
+        x : DataContainer
+
+        Returns:
+        --------
+        float: the value of the convex conjugate of the WeightedL1Norm function at x.
+        """        
+        tmp = (x.abs()/self.weight).max() - 1
+
+        if tmp<=1e-5:            
+            if self.b is not None:
+                return self.b.dot(x)
+            else:
+                return 0.
+        return np.inf
+
+    def proximal(self, x, tau, out=None):
+        
+        r"""Returns the value of the proximal operator of the WaveletNorm function at x.
+        
+        Weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
+        by Amir Beck, SIAM 2017
+        https://archive.siam.org/books/mo25/mo25_ch6.pdf
+        
+        Consider the following cases:
+                
+                a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x)
+                b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*weight}(x)
+
+    
+        where,
+        
+        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
+
+        Parameters:
+        -----------
+        x : DataContainer
+        tau : float, ndarray, DataContainer
+        out : DataContainer, default None
+            If not None, the result will be stored in this object.
+        """  
+        tau *= self.weight
+
+        return L1Norm.proximal(self, x, tau, out=out)

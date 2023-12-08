@@ -109,9 +109,19 @@ class CofR_xcorrelation(Processor):
 
             target -= 360     
 
-        ind = np.abs(angles_deg - target).argmin()
-        
-        ang_diff = abs(angles_deg[ind] - angles_deg[0])
+        ind1 = np.abs(angles_deg - target).argmin()
+        ang_diff1 = abs(angles_deg[ind1] - angles_deg[0])
+
+        ind2 = np.abs(angles_deg - target+360).argmin() 
+        ang_diff2 = abs(angles_deg[ind2] - angles_deg[0])
+
+        if abs(ang_diff1-180)>abs(ang_diff2-180):
+            ind = ind2
+            ang_diff = ang_diff2
+        else:
+            ind = ind1
+            ang_diff = ang_diff1
+
         if abs(ang_diff-180) > self.ang_tol:
             raise ValueError('Method requires projections at 180 +/- {0} degrees interval, got {1}.\nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, ang_diff))
 

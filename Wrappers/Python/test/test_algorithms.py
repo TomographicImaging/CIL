@@ -967,7 +967,7 @@ class TestSPDHG(CCPiTestClass):
         operator = Aop
         f = KullbackLeibler(b=noisy_data)
         alpha = 0.005
-        g = alpha * TotalVariation(50, 1e-4, lower=0)
+        g =  alpha * TotalVariation(50, 1e-4, lower=0, warm_start=True)   
         normK = operator.norm()
 
         # % 'implicit' PDHG, preconditioned step-sizes
@@ -1009,10 +1009,10 @@ class TestSPDHG(CCPiTestClass):
 
         g = BlockDataContainer(*AD_list)
 
-        # block function
-        F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)])
-        G = alpha * TotalVariation(50, 1e-4, lower=0)
 
+        ## block function
+        F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
+        G = alpha * TotalVariation(50, 1e-4, lower=0, warm_start=True) 
         prob = [1/len(A)]*len(A)
 
         spdhg = SPDHG(f=F, g=G, operator=A,

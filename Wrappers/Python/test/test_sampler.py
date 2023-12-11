@@ -64,9 +64,8 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.herman_meyer(12)
         self.assertEqual(sampler.num_indices, 12)
         self.assertEqual(sampler._type, 'herman_meyer')
-        self.assertEqual(sampler._last_index, 11)
-        self.assertListEqual(
-            sampler._order, [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
+        out = [sampler.next() for _ in range(12)]
+        self.assertListEqual(out, [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
         self.assertListEqual(sampler.prob_weights, [1/12] * 12)
 
         sampler = Sampler.random_with_replacement(5)

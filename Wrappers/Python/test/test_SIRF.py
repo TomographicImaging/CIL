@@ -251,7 +251,7 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
         
         # compare inplace proximal method of TV
         alpha = 0.5
-        TV = alpha * TotalVariation(max_iteration=10)
+        TV = alpha * TotalVariation(max_iteration=10, warm_start=False)
         res1 = TV.proximal(self.image1, tau=1.0)
 
         res2 = self.image1*0.

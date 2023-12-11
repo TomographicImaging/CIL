@@ -136,7 +136,7 @@ class ISTA(Algorithm):
                 step_size = 1   
                 
             if g is None: 
-                warnings.warn('You set both f and g to be None and thus the iterative method will not update and will remain fixed at the initial value.')
+                raise ValueError('You set both f and g to be None and thus the iterative method will not update and will remain fixed at the initial value.')
         self.f = f
         
         if g is None:

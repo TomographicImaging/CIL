@@ -305,5 +305,6 @@ class _WeightedL1Norm(WeightedL1Norm):
             If not None, the result will be stored in this object.
         """  
         tau *= self.weight
-
-        return L1Norm.proximal(self, x, tau, out=out)
+        ret = L1Norm.proximal(self, x, tau, out=out)
+        tau /= self.weight
+        return ret

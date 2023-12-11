@@ -5,7 +5,8 @@
   - Bug fix for BlockDataContainer as iterator
   - Dropped support for IPP versions older than 2021.10 due to header changes
   - Fix build include directories
-  - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - Proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - ZeroOperator no longer relies on the default of allocate
   
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

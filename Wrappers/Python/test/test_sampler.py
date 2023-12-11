@@ -44,8 +44,6 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.sequential(10)
         self.assertEqual(sampler.num_indices, 10)
         self.assertEqual(sampler._type, 'sequential')
-        self.assertListEqual(sampler._order, list(range(10)))
-        self.assertEqual(sampler._last_index, 9)
         self.assertListEqual(sampler.prob_weights, [1/10]*10)
 
         sampler = Sampler.random_without_replacement(7)
@@ -83,9 +81,8 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.staggered(21, 4)
         self.assertEqual(sampler.num_indices, 21)
         self.assertEqual(sampler._type, 'staggered')
-        self.assertListEqual(sampler._order, [
-                             0, 4, 8, 12, 16, 20, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19])
-        self.assertEqual(sampler._last_index, 20)
+        out = [sampler.next() for _ in range(21)]
+        self.assertListEqual(out, [0, 4, 8, 12, 16, 20, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19])
         self.assertListEqual(sampler.prob_weights, [1/21] * 21)
 
         with self.assertRaises(ValueError):

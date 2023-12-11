@@ -388,8 +388,6 @@ The static methods will call one of the following:
 .. autoclass:: cil.optimisation.utilities.SamplerFromFunction
    :members:
 
-.. autoclass:: cil.optimisation.utilities.SamplerFromOrder
-   :members:
 
 
 Block Framework

@@ -2985,11 +2985,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span></div>
 
 
-<div class="viewcode-block" id="DataContainer.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.get_slice"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns a new DataContainer containing a single slice of in the requested direction. \</span>
+<span class="sd">        Returns a new DataContainer containing a single slice in the requested direction. \</span>
 <span class="sd">        Pass keyword arguments &lt;dimension label&gt;=index</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Force is not relevant for a DataContainer:</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="n">new_array</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1">#get ordered list of current dimensions</span>

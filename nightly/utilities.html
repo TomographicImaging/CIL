@@ -606,7 +606,7 @@ POSSIBILITY OF SUCH DAMAGE.</p>
 <dd><p>This plots 2D slices from cil DataContainer types.</p>
 <p>Plots 1 or more 2D plots in an (n x num_cols) matrix.
 Can plot multiple slices from one 3D dataset, or compare multiple datasets
-Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
+Inputs can be single arguments or list of arguments that will be sequentially applied to subplots
 If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -614,7 +614,7 @@ If no slice_list is passed a 3D dataset will display the centre slice of the out
 <li><p><strong>datacontainers</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>list of  ImageData / AcquisitionData</em><em>, </em><a class="reference internal" href="optimisation.html#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – The DataContainers to be displayed</p></li>
 <li><p><strong>title</strong> (<em>string</em><em>, </em><em>list of strings</em><em>, </em><em>optional</em>) – The title for each figure</p></li>
 <li><p><strong>slice_list</strong> (<em>tuple</em><em>, </em><em>int</em><em>, </em><em>list of tuples</em><em>, </em><em>list of ints</em><em>, </em><em>optional</em>) – The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].</p></li>
-<li><p><strong>fix_range</strong> (<em>boolian</em><em>, </em><em>tuple</em><em>, </em><em>list of tuples</em>) – Sets the display range of the data. <cite>True</cite> sets all plots to the global (min, max).</p></li>
+<li><p><strong>fix_range</strong> (<em>boolean</em><em>, </em><em>tuple</em><em>, </em><em>list of tuples</em>) – Sets the display range of the data. <cite>True</cite> sets all plots to the global (min, max).</p></li>
 <li><p><strong>axis_labels</strong> (<em>tuple</em><em>, </em><em>list of tuples</em><em>, </em><em>optional</em>) – The axis labels for each figure e.g. (‘x’,’y’)</p></li>
 <li><p><strong>origin</strong> (<em>string</em><em>, </em><em>list of strings</em>) – Sets the display origin. ‘lower/upper-left/right’</p></li>
 <li><p><strong>cmap</strong> (<em>str</em><em>, </em><em>list</em><em> or </em><em>tuple of strings</em>) – Sets the colour map of the plot (see matplotlib.pyplot). If passed a list or tuple of the

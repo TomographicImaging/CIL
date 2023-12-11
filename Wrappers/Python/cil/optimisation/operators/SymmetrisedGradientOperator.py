@@ -88,7 +88,15 @@ class SymmetrisedGradientOperator(LinearOperator):
         
     def direct(self, x, out=None):
         
-        r'''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` '''        
+        r'''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` 
+        
+        Parameters:
+        -------------
+        
+        x: BlockDataContainer
+        out: BlockDataContainer, default None
+            If out is not None the output of direct will be filled in out, otherwise a new object is instantiated and returned.
+        '''        
         
         if out is None:
             

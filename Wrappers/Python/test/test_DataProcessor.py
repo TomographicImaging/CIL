@@ -23,7 +23,6 @@ from cil.framework import DataContainer
 from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
-from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
@@ -2532,13 +2531,12 @@ class TestMasker(unittest.TestCase):
     def test_Masker_generated(self):
         self.Masker_check(self.mask_generated, self.data, self.data_init)
 
-    def test_Masker_doesnt_accept_integer_masks(self):
-        with self.assertRaises(TypeError):
-            self.Masker_check(mask=self.mask_int_manual)
+    def test_Masker_with_integer_mask(self):
+        self.Masker_check(self.mask_int_manual, self.data, self.data_init)
 
     def Masker_check(self, mask, data, data_init): 
 
-        # test vaue mode
+        # test value mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         res = m.process()

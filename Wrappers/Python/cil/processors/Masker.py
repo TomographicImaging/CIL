@@ -18,7 +18,6 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer
-import warnings
 import numpy
 from scipy import interpolate
 
@@ -31,6 +30,7 @@ class Masker(DataProcessor):
     ----------
     mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
         A boolean array with the same dimensions as input, where 'False' represents masked values.
+        Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
         Mask can be generated using 'MaskGenerator' processor to identify outliers. 
     mode : {'value', 'mean', 'median', 'interpolate'}, default='value'
         The method to fill in missing values 
@@ -52,10 +52,14 @@ class Masker(DataProcessor):
     def value(mask=None, value=0):
         r'''This sets the masked values of the input data to the requested value.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param value: values to be assigned to missing elements
-        :type value: float, default=0
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        value : float, default=0
+            Values to be assigned to missing elements
         '''
 
         processor = Masker(mode='value', mask=mask, value=value)
@@ -66,10 +70,14 @@ class Masker(DataProcessor):
     def mean(mask=None, axis=None):
         r'''This sets the masked values of the input data to the mean of the unmasked values across the array or axis.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param axis: specify axis as int or from 'dimension_labels' to calculate mean. 
-        :type axis: str, int
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        axis : str, int
+            Specify axis as int or from 'dimension_labels' to calculate mean.
         '''
 
         processor = Masker(mode='mean', mask=mask, axis=axis)
@@ -80,10 +88,14 @@ class Masker(DataProcessor):
     def median(mask=None, axis=None):
         r'''This sets the masked values of the input data to the median of the unmasked values across the array or axis.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param axis: specify axis as int or from 'dimension_labels' to calculate median. 
-        :type axis: str, int
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        axis : str, int
+            Specify axis as int or from 'dimension_labels' to calculate median.
         '''
 
         processor = Masker(mode='median', mask=mask, axis=axis)
@@ -94,12 +106,16 @@ class Masker(DataProcessor):
     def interpolate(mask=None, axis=None, method='linear'):
         r'''This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param axis: specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation. 
-        :type axis: str, int
-        :param method: One of the following interpolation methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
-        :param method: str, default='linear'
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        axis : str, int
+            Specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation.
+        method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
+            Interpolation method to use.
         '''
 
         processor = Masker(mode='interpolate', mask=mask, axis=axis, method=method)
@@ -158,8 +174,7 @@ class Masker(DataProcessor):
         except:
             mask_arr = self.mask
 
-        if mask_arr.dtype != bool:
-            raise TypeError("Mask expected to be a boolean array got {}".format(mask_arr.dtype))
+        mask_arr = numpy.array(mask_arr, dtype=bool)
         
         mask_invert = ~mask_arr
             

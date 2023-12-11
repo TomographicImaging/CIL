@@ -1,8 +1,4 @@
 * x.x.x
-<<<<<<< HEAD
-  - Check that mask input to Masker is of type 'bool'
-
-=======
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding
@@ -11,8 +7,8 @@
   - Fix build include directories
   - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
   - Allow show2D to be used with 3D `DataContainer` instances
-  
->>>>>>> master
+  - Allow Masker to take integer arrays in addition to boolean
+
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object

@@ -5,8 +5,10 @@
   - Bug fix for BlockDataContainer as iterator
   - Dropped support for IPP versions older than 2021.10 due to header changes
   - Fix build include directories
-  - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - Proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
+
   
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

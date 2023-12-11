@@ -228,9 +228,7 @@ class _WeightedL1Norm(WeightedL1Norm):
         
         r"""Returns the value of the WeightedL1Norm function at x.
         
-        Consider the following case:           
-            a) .. math:: f(x) = ||x||_{\ell^1}   
-            b) .. math:: f(x) = ||x||_{\ell^1(w)}
+        .. math:: f(x) = ||x||_{\ell^1(w)}
         """
         y = x*self.weight
 
@@ -248,10 +246,7 @@ class _WeightedL1Norm(WeightedL1Norm):
         See:
         https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
         
-        Consider the following cases:
-                
-                a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty}\leq 1\}}(x^{*})    
-                b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty(w^{-1})}\leq 1\}}(x^{*})
+        .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty(w^{-1})}\leq 1\}}(x^{*})
         
     
         .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
@@ -287,11 +282,7 @@ class _WeightedL1Norm(WeightedL1Norm):
         by Amir Beck, SIAM 2017
         https://archive.siam.org/books/mo25/mo25_ch6.pdf
         
-        Consider the following cases:
-                
-                a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x)
-                b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*weight}(x)
-
+        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*weight}(x)
     
         where,
         

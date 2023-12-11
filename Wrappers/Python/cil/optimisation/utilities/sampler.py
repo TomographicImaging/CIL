@@ -19,7 +19,7 @@
 import numpy as np
 import math
 import time
-
+from functools import partial
 
 class SamplerFromFunction():
     """     
@@ -125,9 +125,6 @@ class SamplerFromFunction():
     @property
     def current_iter_number(self):
         return self._iteration_number
-    
-    
-    
     
     def next(self):
         """ 
@@ -452,55 +449,6 @@ class Sampler():
 
         return factors
 
-    @staticmethod
-    def herman_meyer(num_indices):
-        """
-        Instantiates a sampler which outputs in a Herman Meyer order.
-        
-        Parameters
-        ----------
-        num_indices: int
-            One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. For Herman-Meyer sampling this number should not be prime. 
-
-        Reference
-        ----------
-        Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
-        
-        Returns
-        -------
-        A Sampler  that can be called with Sampler.next()  or next(Sampler) and outputs in a Herman Meyer ordering 
- 
-        Example
-        -------
-        >>> sampler=Sampler.herman_meyer(12)
-        >>> print(sampler.get_samples(16))
-        [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
-        """
-
-        factors=Sampler._prime_factorisation(num_indices)
-     
-        n_factors = len(factors)
-        if n_factors == 1:
-            raise ValueError(
-                'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
-
-        #Build up the sampling order iteratively using the prime factors
-        #In each iteration add on [ [0]*repeat_length, [addition]*repeat_length, ... ] tiled to fill the length of the list 
-        order = np.zeros(num_indices, dtype=np.int8)
-        for factor_n in range(n_factors):
-            if factor_n == 0:
-                repeat_length= 1
-            else:
-                repeat_length= math.prod(factors[:factor_n])
-            addition=math.prod(factors[factor_n+1:])
-            mult=np.tile(np.repeat( range(num_indices//(addition*repeat_length)), repeat_length), addition)
-            order +=  addition* mult
-        order=list(order)
-
-        #define the sampler 
-        sampler = SamplerFromOrder(
-            num_indices=num_indices, sampling_type='herman_meyer', order=order, prob_weights=[1/num_indices]*num_indices)
-        return sampler
 
     @staticmethod
     def staggered(num_indices, offset):
@@ -681,3 +629,132 @@ class Sampler():
         sampler = SamplerFromFunction(
             num_indices=num_indices, sampling_type='from_function', function=function, prob_weights=prob_weights)
         return sampler
+
+    @staticmethod
+    def _prime_factorisation(n):
+            """
+            Parameters
+            ----------
+
+            n: int
+                The number to be factorised.
+
+            Returns
+            -------
+
+            factors: list of ints
+                The prime factors of n.
+
+            """
+            factors = []
+
+            while n % 2 == 0:
+                n//=2
+                factors.append(2)
+
+            i = 3
+            while i*i <= n:
+                while n % i == 0:
+                    n //= i;  
+                    factors.append(i)
+                i += 2
+
+            if n > 1:
+                factors.append(n)
+
+            return factors
+
+
+    @staticmethod
+    def _herman_meyer_function(num_indices, factors, addition_arr, repeat_length_arr, iteration_number):
+        """
+        Parameters
+        ----------
+        num_indices: int
+            The number of indices to be sampled from.
+
+        factors: list of ints
+            The prime factors of num_indices.
+
+        addition_arr: list of ints
+            The product of all factors at indices greater than the current factor.
+
+        repeat_length_arr: list of ints
+            The product of all factors at indices less than the current factor.
+
+        iteration_number: int
+            The current iteration number.
+
+        Returns
+        -------
+        index: int
+            The index to be sampled from.
+
+        """
+
+        index = 0
+        for n in range(len(factors)):
+            addition = addition_arr[n]
+            repeat_length = repeat_length_arr[n]
+
+            length = num_indices//(addition*repeat_length)
+            arr = np.arange(length) * addition
+
+            ind = math.floor(iteration_number/repeat_length) % length  
+            index += arr[ind] 
+
+        return index
+
+
+    @staticmethod
+    def herman_meyer(num_indices):
+        """
+        Instantiates a sampler which outputs in a Herman Meyer order.
+        
+        Parameters
+        ----------
+        num_indices: int
+            One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. For Herman-Meyer sampling this number should not be prime. 
+
+        Reference
+        ----------
+        Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
+        
+        Returns
+        -------
+        A Sampler  that can be called with Sampler.next()  or next(Sampler) and outputs in a Herman Meyer ordering 
+ 
+        Example
+        -------
+        >>> sampler=Sampler.herman_meyer(12)
+        >>> print(sampler.get_samples(16))
+        [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
+        """
+
+        factors = Sampler._prime_factorisation(num_indices)
+
+        n_factors = len(factors)
+        if n_factors == 1:
+            raise ValueError(
+                'Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. ')
+
+        addition_arr = np.empty(n_factors, dtype=np.int64)
+        repeat_length_arr = np.empty(n_factors, dtype=np.int64)
+
+        repeat_length = 1
+        addition = num_indices
+        for i in range(n_factors):
+            addition //= factors[i]
+            addition_arr[i] = addition
+
+            repeat_length_arr[i] = repeat_length
+            repeat_length *= factors[i]
+
+        hmf_call = partial(Sampler._herman_meyer_function, num_indices, factors, addition_arr, repeat_length_arr)
+
+        #define the sampler 
+        sampler = SamplerFromFunction(function=hmf_call,
+            num_indices=num_indices, sampling_type='herman_meyer', prob_weights=[1/num_indices]*num_indices)
+
+        return sampler
+    

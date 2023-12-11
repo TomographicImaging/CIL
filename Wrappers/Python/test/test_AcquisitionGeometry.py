@@ -21,7 +21,7 @@ import unittest
 from utils import initialise_tests
 import numpy as np
 import math
-from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry, AcquisitionData
 from cil.framework.framework import SystemConfiguration
 from cil.framework import Partitioner
 
@@ -1610,3 +1610,20 @@ class TestSubset(unittest.TestCase):
 
         for i, geo in enumerate(bg):
             np.testing.assert_allclose(geo.angles, np.asarray(gold[i]))
+    
+    def test_geometry_print_angles(self):
+        
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(90))\
+            .set_labels(['horizontal', 'angle'])
+        AD = AcquisitionData(np.zeros([10,90]), geometry=AG, deep_copy=False)
+        print(AD.geometry)
+        
+        # test no error occurs when angles<20
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))\
+            .set_labels(['horizontal', 'angle'])
+        AD = AcquisitionData(np.zeros([10,9]), geometry=AG, deep_copy=False)
+        print(AD.geometry)

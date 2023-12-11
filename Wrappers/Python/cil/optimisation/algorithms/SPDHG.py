@@ -147,7 +147,7 @@ class SPDHG(Algorithm):
                  initial=None, sampler=None,  **kwargs):
 
         max_iteration = kwargs.pop('max_iteration', 0)
-        return_all=kwargs.pop('return_all', False)
+       
         print_interval= kwargs.pop('print_interval', None)
         log_file= kwargs.pop('log_file', None)
         use_axpby=kwargs.pop('use_axpyb', None)

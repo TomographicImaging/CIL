@@ -67,7 +67,7 @@ class DiagonalOperator(LinearOperator):
 
     def adjoint(self,x, out=None):
         
-        "Returns :math:`D\circ x` "
+        "Returns :math:`D^*\circ x` "
         
         return self.diagonal.conjugate().multiply(x,out=out)
 

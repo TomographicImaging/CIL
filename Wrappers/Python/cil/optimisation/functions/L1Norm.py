@@ -189,18 +189,25 @@ class MixedL11Norm(Function):
 class WeightedL1Norm(Function):
     r"""WeightedL1Norm function
             
-            .. math:: F(x) = ||x||_{\ell^1(w)} (w is array of positive weights)
+            .. math:: F(x) = ||x||_{\ell^1(w)} 
+            
+            
+    Where :math:`w` is array of positive weights
     
     Parameters:
     -----------
 
-    weight: ndarray, default None
-        Weight array matching the size of the wavelet coefficients. If None returns the regular L1Norm.
+    weight: DataContainer, numpy ndarray, default None
+        Array of weights matching the size of the wavelet coefficients
+        If None returns the regular L1Norm.
     b: DataContainer, default None
         Translation of the function.
     """
 
     def __new__(cls, weight=None, b=None):
+        '''Create and return a new object.
+        
+        If weight is None, returns the regular L1Norm, otherwise returns an instance of :class:`_WeightedL1Norm`.'''
             
         if weight is None:
             return L1Norm(b=b)
@@ -222,7 +229,7 @@ class _WeightedL1Norm(WeightedL1Norm):
         r"""Returns the value of the WeightedL1Norm function at x.
         
         Consider the following case:           
-            a) .. math:: f(x) = ||x||_{\ell^1}  (no weights -> regular L1Norm)   
+            a) .. math:: f(x) = ||x||_{\ell^1}   
             b) .. math:: f(x) = ||x||_{\ell^1(w)}
         """
         y = x*self.weight

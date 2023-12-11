@@ -194,9 +194,9 @@ class WeightedL1Norm(Function):
     Parameters:
     -----------
 
-    weight: weight array matching the size of the wavelet coefficients, default None
-        If None returns the regular L1Norm.
-    b: data, default None
+    weight: ndarray, default None
+        Weight array matching the size of the wavelet coefficients. If None returns the regular L1Norm.
+    b: DataContainer, default None
         Translation of the function.
     """
 

@@ -153,7 +153,7 @@ class SPDHG(Algorithm):
         use_axpby=kwargs.pop('use_axpyb', None)
         update_objective_interval = kwargs.pop('update_objective_interval', 1)
         super(SPDHG, self).__init__(max_iteration=max_iteration,
-                                    update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval,  return_all=return_all)
+                                    update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                     initial=initial,  sampler=sampler, **kwargs)

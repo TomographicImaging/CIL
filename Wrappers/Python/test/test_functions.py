@@ -1035,7 +1035,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # TV as strongly convex, with "small" strongly convex constant
         TV_strongly_convex = self.alpha * TotalVariation(
-            strong_convexity_constant=1e-4)
+            strong_convexity_constant=1e-4, warm_start=False)
 
         # check call
         x_real = self.ig_real.allocate('random', seed=4)

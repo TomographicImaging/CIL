@@ -177,7 +177,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)        
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = TotalVariation(max_iteration=200)
+        TV = TotalVariation(max_iteration=200, warm_start=False)
         tv_cil = TV.proximal(self.data, tau=alpha**2)     
 
         # compare solution
@@ -209,7 +209,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)        
 
             # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-            TV = (alpha/3.0)*TotalVariation(max_iteration=200, isotropic=False)
+            TV = (alpha/3.0)*TotalVariation(max_iteration=200, isotropic=False, warm_start=False)
             tv_cil = TV.proximal(self.data, tau=3.0)     
 
             # compare solution
@@ -244,7 +244,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)   
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = alpha * TotalVariation(max_iteration = 500, strong_convexity_constant = gamma)
+        TV = alpha * TotalVariation(max_iteration = 500, strong_convexity_constant = gamma, warm_start=False)
         tv_cil = TV.proximal(self.data, tau=1.0)                
 
         # compare solution

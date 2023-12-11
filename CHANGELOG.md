@@ -7,6 +7,7 @@
   - Fix build include directories
   - Proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
   - ZeroOperator no longer relies on the default of allocate
+  - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
 
 * 23.1.0

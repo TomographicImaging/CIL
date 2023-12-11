@@ -215,72 +215,59 @@
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">DiagonalOperator</span>
 
+
 <div class="viewcode-block" id="L2NormSquared"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared">[docs]</a><span class="k">class</span> <span class="nc">L2NormSquared</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`</span>
-<span class="sd">          </span>
+
 <span class="sd">    Following cases are considered:</span>
-<span class="sd">                </span>
+
 <span class="sd">        a) :math:`F(x) = \|x\|^{2}_{2}`</span>
 <span class="sd">        b) :math:`F(x) = \|x - b\|^{2}_{2}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    </span>
+<span class="sd">    b:`DataContainer`, optional</span>
+<span class="sd">        Translation of the function</span>
+<span class="sd">                </span>
 <span class="sd">        </span>
-<span class="sd">    .. note::  For case b) case we can use :code:`F = L2NormSquared().centered_at(b)`,</span>
-<span class="sd">               see *TranslateFunction*.</span>
-<span class="sd">        </span>
-<span class="sd">    :Example:</span>
-<span class="sd">        </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    </span>
+<span class="sd">    For case b) we can use :code:`F = L2NormSquared().centered_at(b)`, see *TranslateFunction*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+
 <span class="sd">        &gt;&gt;&gt; F = L2NormSquared()</span>
 <span class="sd">        &gt;&gt;&gt; F = L2NormSquared(b=b) </span>
 <span class="sd">        &gt;&gt;&gt; F = L2NormSquared().centered_at(b)</span>
-<span class="sd">                                                          </span>
-<span class="sd">    &quot;&quot;&quot;</span>    
-    
-<div class="viewcode-block" id="L2NormSquared.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
-<span class="sd">        Cases considered (with/without data):            </span>
-<span class="sd">                a) .. math:: f(x) = \|x\|^{2}_{2} </span>
-<span class="sd">                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="sd">        :param b:  translation of the function</span>
-<span class="sd">        :type b: :code:`DataContainer`, optional</span>
-<span class="sd">        &#39;&#39;&#39;</span>                        
-        <span class="nb">super</span><span class="p">(</span><span class="n">L2NormSquared</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span> </div>
-        
-                            
-<div class="viewcode-block" id="L2NormSquared.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">L2NormSquared</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the L2NormSquared function at x.</span>
-<span class="sd">        </span>
-<span class="sd">        Following cases are considered:</span>
-<span class="sd">            </span>
-<span class="sd">            a) :math:`F(x) = \|x\|^{2}_{2}`</span>
-<span class="sd">            b) :math:`F(x) = \|x - b\|^{2}_{2}`</span>
-<span class="sd">    </span>
-<span class="sd">        :param: :math:`x`</span>
-<span class="sd">        :returns: :math:`\underset{i}{\sum}x_{i}^{2}`</span>
-<span class="sd">                </span>
-<span class="sd">        &quot;&quot;&quot;</span>          
-            
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ae</span><span class="p">:</span>
-            <span class="c1"># added for compatibility with SIRF </span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
-                
-<div class="viewcode-block" id="L2NormSquared.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>        
-<span class="w">        </span>
+            <span class="c1"># added for compatibility with SIRF</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="L2NormSquared.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the L2NormSquared function at x.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Following cases are considered:</span>
-<span class="sd">                </span>
+
 <span class="sd">            a) :math:`F&#39;(x) = 2x`</span>
 <span class="sd">            b) :math:`F&#39;(x) = 2(x-b)`</span>
-<span class="sd">                </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -290,37 +277,33 @@
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ret</span></div>
-                
-                                                       
+
 <div class="viewcode-block" id="L2NormSquared.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the L2NormSquared function at x.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Consider the following cases:</span>
-<span class="sd">                </span>
+
 <span class="sd">                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} </span>
-<span class="sd">                b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + &lt;x^{*}, b&gt;</span>
-<span class="sd">                </span>
-<span class="sd">        &quot;&quot;&quot;</span>                
+<span class="sd">                b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + \langle x^{*}, b\rangle</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> 
-            
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span> <span class="o">+</span> <span class="n">tmp</span></div>
 
-
-<div class="viewcode-block" id="L2NormSquared.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
+<div class="viewcode-block" id="L2NormSquared.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.L2NormSquared.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the L2NormSquared function at x.</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
+
 <span class="sd">        Consider the following cases:</span>
-<span class="sd">                </span>
-<span class="sd">                a) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}</span>
-<span class="sd">                b) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      </span>
-<span class="sd">                        </span>
-<span class="sd">        &quot;&quot;&quot;</span>            
+
+<span class="sd">                a) .. math:: \text{prox}_{\tau F}(x) = \frac{x}{1+2\tau}</span>
+<span class="sd">                b) .. math:: \text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">mult</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="p">)</span>
 
@@ -333,76 +316,84 @@
             <span class="k">return</span> <span class="n">ret</span></div></div>
 
 
-
 <div class="viewcode-block" id="WeightedL2NormSquared"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared">[docs]</a><span class="k">class</span> <span class="nc">WeightedL2NormSquared</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; WeightedL2NormSquared function: :math:`F(x) = \| x\|_{w}^{2}_{2} = \underset{i}{\sum}w_{i}*x_{i}^{2} = &lt;x, w*x&gt; = x^{T}*w*x`</span>
-<span class="sd">                                                                    </span>
-<span class="sd">    &quot;&quot;&quot;</span>                 
-              
-<div class="viewcode-block" id="WeightedL2NormSquared.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
-       <span class="c1"># Weight can be either a scalar or a DataContainer</span>
-       <span class="c1"># Lispchitz constant L = 2 *||weight||         </span>
-                   
-       <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> 
-       <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> 
-       <span class="n">tmp_norm</span> <span class="o">=</span> <span class="mf">1.0</span>  
-       <span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">*</span><span class="mf">0.</span> 
-                            
-       <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span> <span class="o">=</span> <span class="n">DiagonalOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span> 
-           <span class="n">tmp_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> 
-           <span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>  
-           
-           <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-               <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Weigth contains negative values&#39;</span><span class="p">)</span>             
 
-       <span class="nb">super</span><span class="p">(</span><span class="n">WeightedL2NormSquared</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tmp_norm</span>  <span class="p">)</span> </div>
-    
-<div class="viewcode-block" id="WeightedL2NormSquared.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-       
-       <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
-       <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
-       
-       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
-           <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
-       <span class="k">return</span> <span class="n">y</span></div>
-     
-                
-<div class="viewcode-block" id="WeightedL2NormSquared.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>        
-        
-                
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; WeightedL2NormSquared function: :math:`F(x) = \|x\|_{W,2}^2 = \Sigma_iw_ix_i^2 = \langle x, Wx\rangle = x^TWx`</span>
+<span class="sd">    where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer` or :math:`W=\text{weight} I` if `weight` is a scalar.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    **kwargs</span>
+
+<span class="sd">    weight: a `scalar` or a `DataContainer` with the same shape as the intended domain of this `WeightedL2NormSquared` function</span>
+<span class="sd">    b: a `DataContainer` with the same shape as the intended domain of this `WeightedL2NormSquared` function</span>
+<span class="sd">        A shift so that the function becomes  :math:`F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = \langle x-b, W(x-b) \rangle = (x-b)^TW(x-b)`</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="c1"># Weight can be either a scalar or a DataContainer</span>
+        <span class="c1"># Lispchitz constant L = 2 *||weight||</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">tmp_norm</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">*</span><span class="mf">0.</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span> <span class="o">=</span> <span class="n">DiagonalOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+            <span class="n">tmp_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Weight contains negative values&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">WeightedL2NormSquared</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">tmp_norm</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_space</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+<div class="viewcode-block" id="WeightedL2NormSquared.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the value of :math:`F&#39;(x) = 2Wx` or, if `b` is defined,  :math:`F&#39;(x) = 2W(x-b)`</span>
+<span class="sd">        where :math:`W=\text{diag}(weight)` if `weight` is a `DataContainer` or :math:`\text{weight}I` if `weight` is a scalar.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>        
+
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>                            
+            <span class="bp">self</span><span class="o">.</span><span class="n">operator_weight</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">*=</span> <span class="mi">2</span>
-            
+
         <span class="k">else</span><span class="p">:</span>
-            
+
             <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
             <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">*</span><span class="n">y</span></div>
-    
-<div class="viewcode-block" id="WeightedL2NormSquared.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-                      
-        <span class="n">tmp</span> <span class="o">=</span> <span class="mi">0</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> 
-            
-        <span class="k">return</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">sqrt</span><span class="p">())</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span> <span class="o">+</span> <span class="n">tmp</span></div>
-    
-<div class="viewcode-block" id="WeightedL2NormSquared.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-                  
 
+<div class="viewcode-block" id="WeightedL2NormSquared.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the WeightedL2NormSquared function at x.&quot;&quot;&quot;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">sqrt</span><span class="p">())</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span> <span class="o">+</span> <span class="n">tmp</span></div>
+
+<div class="viewcode-block" id="WeightedL2NormSquared.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.WeightedL2NormSquared.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the WeightedL2NormSquared function at x.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">x</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -412,14 +403,13 @@
                 <span class="k">return</span> <span class="n">tmp</span>
 
         <span class="k">else</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">/=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>                                     </div></div>
-
+                <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div></div>
 </pre></div>
 
               </div>

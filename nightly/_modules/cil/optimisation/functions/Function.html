@@ -219,32 +219,32 @@
 
 <div class="viewcode-block" id="Function"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function">[docs]</a><span class="k">class</span> <span class="nc">Function</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Abstract class representing a function </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Abstract class representing a function </span>
 <span class="sd">    </span>
-<span class="sd">        :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.</span>
-<span class="sd">        :type L: number, positive, default None</span>
-<span class="sd">        :param domain: The domain of the function.</span>
-
-<span class="sd">        Lipschitz of the gradient of the function; it is a positive real number, such that |f&#39;(x) - f&#39;(y)| &lt;= L ||x-y||, assuming f: IG --&gt; R</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        </span>
+<span class="sd">        L: number, positive, default None</span>
+<span class="sd">            Lipschitz constant of the gradient of the function F(x), when it is differentiable.</span>
+<span class="sd">                </span>
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        The Lipschitz of the gradient of the function is a positive real number, such that :math:`\|f&#39;(x) - f&#39;(y)\| \leq L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     
     
-<div class="viewcode-block" id="Function.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="c1"># overrides the type check to allow None as initial value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span>
         
-<div class="viewcode-block" id="Function.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the function F at x: :math:`F(x)`</span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>        
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>    
         
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="Function.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of function F at x, if it is differentiable</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of function :math:`F` at :math:`x`, if it is differentiable</span>
 <span class="sd">        </span>
 <span class="sd">        .. math:: F&#39;(x)</span>
 <span class="sd">        </span>
@@ -254,14 +254,16 @@
 <div class="viewcode-block" id="Function.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the proximal operator of function :math:`\tau F` at x        </span>
-<span class="sd">        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{z}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)</span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: \text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)</span>
+<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Function.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the convex conjugate of function :math:`F` at :math:`x^{*}`,</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)</span>
+<span class="sd">        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)</span>
 <span class="sd">                </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
@@ -270,11 +272,11 @@
 <span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the proximal operator of the convex conjugate of function :math:`\tau F` at :math:`x^{*}`</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: \mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})</span>
+<span class="sd">        .. math:: \text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})</span>
 <span class="sd">        </span>
 <span class="sd">        Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate :math:`F^{*}`</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)</span>
+<span class="sd">        .. math:: \text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)</span>
 <span class="sd">                </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -309,7 +311,7 @@
         <span class="c1"># Add/Substract with Scalar</span>
         <span class="c1"># Multiply with Scalar</span>
     
-<div class="viewcode-block" id="Function.__add__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the sum of the functions.</span>
 <span class="sd">        </span>
@@ -323,20 +325,20 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">SumScalarFunction</span><span class="p">,</span> <span class="n">ConstantFunction</span><span class="p">,</span> <span class="n">Number</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">SumScalarFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>   </div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>   
             
-<div class="viewcode-block" id="Function.__radd__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.__radd__">[docs]</a>    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Making addition commutative. &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">other</span> </div>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">other</span> 
                           
-<div class="viewcode-block" id="Function.__sub__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.__sub__">[docs]</a>    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the subtraction of the functions.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span>    </div>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span>    
 
-<div class="viewcode-block" id="Function.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a function multiplied by a scalar.&quot;&quot;&quot;</span>               
-        <span class="k">return</span> <span class="n">ScaledFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">ScaledFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rmul__</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span>
@@ -353,9 +355,9 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Lipschitz of the gradient of function f.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Lipschitz of the gradient of function f.</span>
 <span class="sd">        </span>
-<span class="sd">        L is positive real number, such that |f&#39;(x) - f&#39;(y)| &lt;= L ||x-y||, assuming f: IG --&gt; R&#39;&#39;&#39;</span>
+<span class="sd">        L is positive real number, such that :math:`\|f&#39;(x) - f&#39;(y)\| \leq L\|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
         <span class="c1"># return self._L</span>
     <span class="nd">@L</span><span class="o">.</span><span class="n">setter</span>
@@ -401,12 +403,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="SumFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">functions</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">functions</span> <span class="p">):</span>
                 
         <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>        
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">functions</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least 2 functions need to be passed&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="n">functions</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="n">functions</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -462,7 +464,7 @@
         <span class="c1"># call base class setter</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">Lmax</span><span class="o">.</span><span class="n">fset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span>        
 
-<div class="viewcode-block" id="SumFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the sum of functions at :math:`x`.</span>
 <span class="sd">        </span>
 <span class="sd">        .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)</span>
@@ -471,7 +473,7 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">+=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ret</span></div>
+        <span class="k">return</span> <span class="n">ret</span>
 
 
 <div class="viewcode-block" id="SumFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -496,7 +498,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SumFunction.__add__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumFunction.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Addition for the SumFunction.</span>
 <span class="sd">        </span>
@@ -514,7 +516,7 @@
             <span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="n">functions</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div></div>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScaledFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction">[docs]</a><span class="k">class</span> <span class="nc">ScaledFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
@@ -528,10 +530,10 @@
 <span class="sd">    1. :math:`G(x) = \alpha  F(x)` ( __call__ method )</span>
 <span class="sd">    2. :math:`G&#39;(x) = \alpha  F&#39;(x)` ( gradient method ) </span>
 <span class="sd">    3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )   </span>
-<span class="sd">    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)` ( proximal method ) </span>
+<span class="sd">    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)` ( proximal method ) </span>
 <span class="sd">           </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="ScaledFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">ScaledFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
                                                      
@@ -539,7 +541,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;expected scalar: got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scalar</span><span class="p">)))</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">=</span> <span class="n">scalar</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>       </div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>       
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -562,13 +564,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_scalar</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Expecting scalar type as a number type. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
-<div class="viewcode-block" id="ScaledFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the scaled function.</span>
 <span class="sd">        </span>
 <span class="sd">        .. math:: G(x) = \alpha F(x)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ScaledFunction.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the convex conjugate of the scaled function.</span>
@@ -606,7 +608,7 @@
 <span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the proximal operator of the scaled function.</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)</span>
+<span class="sd">        .. math:: \text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
 
@@ -655,11 +657,11 @@
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>    
     
-<div class="viewcode-block" id="SumScalarFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumScalarFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">constant</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">constant</span><span class="p">):</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">SumScalarFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">ConstantFunction</span><span class="p">(</span><span class="n">constant</span><span class="p">))</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="o">=</span> <span class="n">constant</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
         
 <div class="viewcode-block" id="SumScalarFunction.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumScalarFunction.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
 <span class="w">        </span>
@@ -674,7 +676,7 @@
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the proximal operator of :math:`F+scalar`</span>
 
-<span class="sd">        .. math:: \mathrm{prox}_{\tau (F+scalar)}(x) = \mathrm{prox}_{\tau F}</span>
+<span class="sd">        .. math:: \text{prox}_{\tau (F+scalar)}(x) = \text{prox}_{\tau F}</span>
 <span class="sd">                        </span>
 <span class="sd">        &quot;&quot;&quot;</span>                
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>        </div>
@@ -699,16 +701,16 @@
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="ConstantFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ConstantFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="o">=</span> <span class="n">constant</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ConstantFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConstantFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         
         
               
-<div class="viewcode-block" id="ConstantFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ConstantFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the value of the function, :math:`F(x) = constant`&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span>
         
 <div class="viewcode-block" id="ConstantFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ConstantFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span>
@@ -745,7 +747,7 @@
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the proximal operator of the constant function, which is the same element, i.e.,</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: \mathrm{prox}_{\tau F}(x) = x </span>
+<span class="sd">        .. math:: \text{prox}_{\tau F}(x) = x </span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -764,20 +766,20 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">0.</span>
-<div class="viewcode-block" id="ConstantFunction.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ConstantFunction.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;defines the right multiplication with a number&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">raise</span> <span class="bp">NotImplemented</span>
         <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="o">*</span> <span class="n">other</span>
-        <span class="k">return</span> <span class="n">ConstantFunction</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">ConstantFunction</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZeroFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ZeroFunction">[docs]</a><span class="k">class</span> <span class="nc">ZeroFunction</span><span class="p">(</span><span class="n">ConstantFunction</span><span class="p">):</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; ZeroFunction represents the zero function, :math:`F(x) = 0`        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="ZeroFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ZeroFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ZeroFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">constant</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> </div></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ZeroFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">constant</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> </div>
         
 <div class="viewcode-block" id="TranslateFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction">[docs]</a><span class="k">class</span> <span class="nc">TranslateFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 <span class="w">    </span>
@@ -792,11 +794,11 @@
 <span class="sd">    1. :math:`G(x) = F(x - b)` ( __call__ method )</span>
 <span class="sd">    2. :math:`G&#39;(x) = F&#39;(x - b)` ( gradient method ) </span>
 <span class="sd">    3. :math:`G^{*}(x^{*}) = F^{*}(x^{*}) + &lt;x^{*}, b &gt;` ( convex_conjugate method )   </span>
-<span class="sd">    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x - b)  + b` ( proximal method ) </span>
+<span class="sd">    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x - b)  + b` ( proximal method ) </span>
 <span class="sd">               </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="TranslateFunction.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">center</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">center</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">L</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">L</span>
         <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">nie</span><span class="p">:</span>
@@ -804,9 +806,9 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TranslateFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span><span class="p">)</span> 
                         
         <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
         
-<div class="viewcode-block" id="TranslateFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the translated function.</span>
 <span class="sd">        </span>
@@ -824,7 +826,7 @@
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">val</span></div>
+        <span class="k">return</span> <span class="n">val</span>
 
     
 <div class="viewcode-block" id="TranslateFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -856,7 +858,7 @@
 <span class="w">        </span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the proximal operator of the translated function.</span>
 <span class="sd">        </span>
-<span class="sd">        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b</span>
+<span class="sd">        .. math:: \text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x-b) + b</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">try</span><span class="p">:</span>

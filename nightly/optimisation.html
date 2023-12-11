@@ -497,22 +497,6 @@ a <code class="code docutils literal notranslate"><span class="pre">callback</sp
 value and can be used to trigger print to screens and other user interactions. The <code class="code docutils literal notranslate"><span class="pre">run</span></code>
 method will stop when the stopping criterion is met.</p>
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.Algorithm.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Constructor</p>
-<p>Set the minimal number of parameters:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>max_iteration</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – maximum number of iterations</p></li>
-<li><p><strong>update_objective_interval</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 1</em>) – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p></li>
-<li><p><strong>log_file</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default None</em>) – log verbose output to file</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.algorithms.Algorithm.set_up">
 <code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.set_up" title="Permalink to this definition">#</a></dt>
 <dd><p>Set up the algorithm</p>
@@ -532,21 +516,9 @@ method will stop when the stopping criterion is met.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.algorithms.Algorithm.__set_up_logger">
-<code class="sig-name descname"><span class="pre">__set_up_logger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.__set_up_logger" title="Permalink to this definition">#</a></dt>
-<dd><p>Set up the logger if desired</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">
 <code class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.max_iteration_stop_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion" title="Permalink to this definition">#</a></dt>
 <dd><p>default stop criterion for iterative algorithm: max_iteration reached</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.Algorithm.__iter__">
-<code class="sig-name descname"><span class="pre">__iter__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.__iter__" title="Permalink to this definition">#</a></dt>
-<dd><p>Algorithm is an iterable</p>
 </dd></dl>
 
 <dl class="py method">
@@ -554,26 +526,6 @@ method will stop when the stopping criterion is met.</p>
 <code class="sig-name descname"><span class="pre">next</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.next"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.next" title="Permalink to this definition">#</a></dt>
 <dd><p>Algorithm is an iterable</p>
 <p>python2 backwards compatibility</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.Algorithm.__next__">
-<code class="sig-name descname"><span class="pre">__next__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm.__next__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.__next__" title="Permalink to this definition">#</a></dt>
-<dd><p>Algorithm is an iterable</p>
-<p>calling this method triggers update and update_objective</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.algorithms.Algorithm._update_previous_solution">
-<code class="sig-name descname"><span class="pre">_update_previous_solution</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/Algorithm.html#Algorithm._update_previous_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm._update_previous_solution" title="Permalink to this definition">#</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tmp</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -653,12 +605,6 @@ In such cases nan will be printed.</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cil.optimisation.algorithms.Algorithm.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2733,7 +2679,7 @@ uses the method “direct_only” and if not the method “composed_with_adjoint
 <dd><p>Does a dot linearity test on the operator
 Evaluates if the following equivalence holds
 .. math:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -2749,7 +2695,7 @@ Evaluates if the following equivalence holds
 <p>:type : int, default = 1
 :param tolerance: Check if the following expression is below the tolerance
 .. math:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span><span class="o">|/</span><span class="p">(</span>\<span class="o">|</span><span class="n">A</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">x</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">y</span>\<span class="o">|</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span><span class="o">|/</span><span class="p">(</span>\<span class="o">|</span><span class="n">A</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">x</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">y</span>\<span class="o">|</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
 </pre></div>
 </div>
 <p>:type : float, default 1e-6
@@ -3264,29 +3210,17 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 <dd><p>Abstract class representing a function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>L</strong> (<em>number</em><em>, </em><em>positive</em><em>, </em><em>default None</em>) – Lipschitz constant of the gradient of the function F(x), when it is differentiable.</p></li>
-<li><p><strong>domain</strong> – The domain of the function.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>L</strong> (<em>number</em><em>, </em><em>positive</em><em>, </em><em>default None</em>) – Lipschitz constant of the gradient of the function F(x), when it is differentiable.</p>
 </dd>
 </dl>
-<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id32"><span class="problematic" id="id33">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
-<dl class="py method">
-<dt id="cil.optimisation.functions.Function.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.Function.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the function F at x: <span class="math notranslate nohighlight">\(F(x)\)</span></p>
-</dd></dl>
-
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Lipschitz of the gradient of the function is a positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L \|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</div>
 <dl class="py method">
 <dt id="cil.optimisation.functions.Function.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the gradient of function F at x, if it is differentiable</p>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
 <div class="math notranslate nohighlight">
 \[F'(x)\]</div>
 </dd></dl>
@@ -3294,8 +3228,9 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 <dl class="py method">
 <dt id="cil.optimisation.functions.Function.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x
-.. math:: mathrm{prox}_{tau F}(x) = underset{z}{mathrm{argmin}} frac{1}{2}|z - x|^{2} + tau F(z)</p>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -3303,7 +3238,7 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.convex_conjugate" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)\]</div>
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -3311,40 +3246,10 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 <code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.proximal_conjugate" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
 <p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.Function.__add__">
-<code class="sig-name descname"><span class="pre">__add__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__add__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the sum of the functions.</p>
-<dl class="simple">
-<dt>Cases: a) the sum of two functions <span class="math notranslate nohighlight">\((F_{1}+F_{2})(x) = F_{1}(x) + F_{2}(x)\)</span></dt><dd><ol class="loweralpha simple" start="2">
-<li><p>the sum of a function with a scalar <span class="math notranslate nohighlight">\((F_{1}+scalar)(x) = F_{1}(x) + scalar\)</span></p></li>
-</ol>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.Function.__radd__">
-<code class="sig-name descname"><span class="pre">__radd__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__radd__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__radd__" title="Permalink to this definition">#</a></dt>
-<dd><p>Making addition commutative.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.Function.__sub__">
-<code class="sig-name descname"><span class="pre">__sub__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__sub__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__sub__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the subtraction of the functions.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.Function.__rmul__">
-<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#Function.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Function.__rmul__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns a function multiplied by a scalar.</p>
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -3358,13 +3263,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.Function.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.Function.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id34"><span class="problematic" id="id35">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cil.optimisation.functions.Function.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.optimisation.functions.Function.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 </dd></dl>
@@ -3399,12 +3298,6 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="cil.optimisation.functions.SumFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">functions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.SumFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the Lipschitz constant for the SumFunction</p>
@@ -3423,14 +3316,6 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.SumFunction.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the sum of functions at <span class="math notranslate nohighlight">\(x\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[(F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)\]</div>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the sum of the gradient of functions at <span class="math notranslate nohighlight">\(x\)</span>, if all of them are differentiable.</p>
@@ -3439,13 +3324,37 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.SumFunction.__add__">
-<code class="sig-name descname"><span class="pre">__add__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__add__" title="Permalink to this definition">#</a></dt>
-<dd><p>Addition for the SumFunction.</p>
-<ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> + <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> is a <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code>.</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> + <code class="code docutils literal notranslate"><span class="pre">Function</span></code> is a <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code>.</p></li>
-</ul>
+<dt id="cil.optimisation.functions.SumFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumFunction.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumFunction.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3460,27 +3369,13 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <li><p><span class="math notranslate nohighlight">\(G(x) = \alpha  F(x)\)</span> ( __call__ method )</p></li>
 <li><p><span class="math notranslate nohighlight">\(G'(x) = \alpha  F'(x)\)</span> ( gradient method )</p></li>
 <li><p><span class="math notranslate nohighlight">\(G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})\)</span> ( convex_conjugate method )</p></li>
-<li><p><span class="math notranslate nohighlight">\(\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)\)</span> ( proximal method )</p></li>
+<li><p><span class="math notranslate nohighlight">\(\text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)\)</span> ( proximal method )</p></li>
 </ol>
-<dl class="py method">
-<dt id="cil.optimisation.functions.ScaledFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ScaledFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.functions.ScaledFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id36"><span class="problematic" id="id37">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.ScaledFunction.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ScaledFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the scaled function.</p>
-<div class="math notranslate nohighlight">
-\[G(x) = \alpha F(x)\]</div>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 <dl class="py method">
@@ -3504,13 +3399,20 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ScaledFunction.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the scaled function.</p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)\]</div>
+\[\text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)\]</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.ScaledFunction.proximal_conjugate">
 <code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ScaledFunction.proximal_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
 <dd><p>This returns the proximal operator for the function at x, tau</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ScaledFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
 </dd></dl>
 
 </dd></dl>
@@ -3529,12 +3431,6 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 </ol>
 <p>if the second argument is a ConstantFunction then we can derive the above analytically.</p>
 <dl class="py method">
-<dt id="cil.optimisation.functions.SumScalarFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumScalarFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.SumScalarFunction.convex_conjugate">
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumScalarFunction.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.convex_conjugate" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the convex conjugate of a <span class="math notranslate nohighlight">\((F+scalar)\)</span></p>
@@ -3547,7 +3443,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumScalarFunction.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of <span class="math notranslate nohighlight">\(F+scalar\)</span></p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{       au (F+scalar)}(x) = \mathrm{prox}_{     au F}\]</div>
+\[ext{prox}_{     au (F+scalar)}(x) =     ext{prox}_{     au F}\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -3557,6 +3453,41 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <div class="math notranslate nohighlight">
 \[L = \sum_{i} L_{i}\]</div>
 <p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumScalarFunction.Lmax">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Lmax</span></code><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.Lmax" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the maximum Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \max_{i}\{L_{i}\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumScalarFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumScalarFunction.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the sum of the gradient of functions at <span class="math notranslate nohighlight">\(x\)</span>, if all of them are differentiable.</p>
+<div class="math notranslate nohighlight">
+\[(F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumScalarFunction.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3572,22 +3503,8 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <li><p><span class="math notranslate nohighlight">\(G(x) = F(x - b)\)</span> ( __call__ method )</p></li>
 <li><p><span class="math notranslate nohighlight">\(G'(x) = F'(x - b)\)</span> ( gradient method )</p></li>
 <li><p><span class="math notranslate nohighlight">\(G^{*}(x^{*}) = F^{*}(x^{*}) + &lt;x^{*}, b &gt;\)</span> ( convex_conjugate method )</p></li>
-<li><p><span class="math notranslate nohighlight">\(\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x - b)  + b\)</span> ( proximal method )</p></li>
+<li><p><span class="math notranslate nohighlight">\(\text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x - b)  + b\)</span> ( proximal method )</p></li>
 </ol>
-<dl class="py method">
-<dt id="cil.optimisation.functions.TranslateFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#TranslateFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.TranslateFunction.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#TranslateFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the translated function.</p>
-<div class="math notranslate nohighlight">
-\[G(x) = F(x - b)\]</div>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.functions.TranslateFunction.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#TranslateFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.gradient" title="Permalink to this definition">#</a></dt>
@@ -3601,7 +3518,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#TranslateFunction.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the translated function.</p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b\]</div>
+\[\text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x-b) + b\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -3610,6 +3527,31 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dd><p>Returns the convex conjugate of the translated function.</p>
 <div class="math notranslate nohighlight">
 \[G^{*}(x^{*}) = F^{*}(x^{*}) + &lt;x^{*}, b &gt;\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.TranslateFunction.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.TranslateFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.TranslateFunction.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.TranslateFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3621,18 +3563,6 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.ConstantFunction">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">ConstantFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction" title="Permalink to this definition">#</a></dt>
 <dd><p>ConstantFunction: <span class="math notranslate nohighlight">\(F(x) = constant, constant\in\mathbb{R}\)</span></p>
-<dl class="py method">
-<dt id="cil.optimisation.functions.ConstantFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.ConstantFunction.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the function, <span class="math notranslate nohighlight">\(F(x) = constant\)</span></p>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.functions.ConstantFunction.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.gradient" title="Permalink to this definition">#</a></dt>
@@ -3663,20 +3593,32 @@ for convergence purposes.</p>
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the constant function, which is the same element, i.e.,</p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{       au F}(x) = x\]</div>
+\[ext{prox}_{     au F}(x) = x\]</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.ConstantFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id38"><span class="problematic" id="id39">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.ConstantFunction.__rmul__">
-<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.__rmul__" title="Permalink to this definition">#</a></dt>
-<dd><p>defines the right multiplication with a number</p>
+<dt id="cil.optimisation.functions.ConstantFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ConstantFunction.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3686,9 +3628,61 @@ for convergence purposes.</p>
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">ZeroFunction</span></code><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ZeroFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction" title="Permalink to this definition">#</a></dt>
 <dd><p>ZeroFunction represents the zero function, <span class="math notranslate nohighlight">\(F(x) = 0\)</span></p>
 <dl class="py method">
-<dt id="cil.optimisation.functions.ZeroFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ZeroFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt id="cil.optimisation.functions.ZeroFunction.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ZeroFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ZeroFunction.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>The convex conjugate of constant function <span class="math notranslate nohighlight">\(F(x) = c\in\mathbb{R}\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}F(x^{*})
+=
+\begin{cases}
+    -c, &amp; if x^{*} = 0\\
+    \infty, &amp; \mbox{otherwise}
+\end{cases}\end{split}\]</div>
+<p>However, <span class="math notranslate nohighlight">\(x^{*} = 0\)</span> only in the limit of iterations, so in fact this can be infinity.
+We do not want to have inf values in the convex conjugate, so we have to penalise this value accordingly.
+The following penalisation is useful in the PDHG algorithm, when we compute primal &amp; dual objectives
+for convergence purposes.</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \sum \max\{x^{*}, 0\}\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ZeroFunction.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of the function, <span class="math notranslate nohighlight">\(F'(x)=0\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ZeroFunction.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the constant function, which is the same element, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[ext{prox}_{     au F}(x) = x\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.ZeroFunction.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.ZeroFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3702,24 +3696,53 @@ for convergence purposes.</p>
 <p>F(x,y) = (alpha - x)^2 + beta(y-x^2)^2</p>
 <p>The function has a global minimum at .. math:: (x,y)=(alpha, alpha^2)</p>
 <dl class="py method">
-<dt id="cil.optimisation.functions.Rosenbrock.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Rosenbrock.html#Rosenbrock.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.Rosenbrock.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Rosenbrock.html#Rosenbrock.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the function F at x: <span class="math notranslate nohighlight">\(F(x)\)</span></p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.Rosenbrock.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Rosenbrock.html#Rosenbrock.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Gradient of the Rosenbrock function</p>
 <div class="math notranslate nohighlight">
 \[\]</div>
 <p>nabla f(x,y) = left[ 2*((x-alpha) - 2beta x(y-x^2)) ; 2beta (y - x^2)  right]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.Rosenbrock.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.Rosenbrock.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.Rosenbrock.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.Rosenbrock.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.Rosenbrock.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.Rosenbrock.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3730,7 +3753,7 @@ for convergence purposes.</p>
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id48"><span class="problematic" id="id49">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id34"><span class="problematic" id="id35">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -3751,30 +3774,10 @@ be expressed as</p>
 <p>For general operator, we have no explicit formulas for convex_conjugate,
 proximal and proximal_conjugate</p>
 <dl class="py method">
-<dt id="cil.optimisation.functions.OperatorCompositionFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/OperatorCompositionFunction.html#OperatorCompositionFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>creator</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<code class="code docutils literal notranslate"><span class="pre">Operator</span></code>) – operator</p></li>
-<li><p><strong>f</strong> (<code class="code docutils literal notranslate"><span class="pre">Function</span></code>) – function</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.OperatorCompositionFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id40"><span class="problematic" id="id41">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.OperatorCompositionFunction.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/OperatorCompositionFunction.html#OperatorCompositionFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns <span class="math notranslate nohighlight">\(F(Ax)\)</span></p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 <dl class="py method">
@@ -3782,6 +3785,40 @@ proximal and proximal_conjugate</p>
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/OperatorCompositionFunction.html#OperatorCompositionFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the gradient of F(Ax),</p>
 <p>..math ::  (F(Ax))’ = A^{T}F’(Ax)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.OperatorCompositionFunction.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.OperatorCompositionFunction.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.OperatorCompositionFunction.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.OperatorCompositionFunction.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3836,17 +3873,6 @@ function.</p>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.__new__">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">__new__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__new__" title="Permalink to this definition">#</a></dt>
-<dd><p>Create and return a new object.  See help(type) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__init__" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">
 <code class="sig-name descname"><span class="pre">set_suppress_evaluation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.set_suppress_evaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation" title="Permalink to this definition">#</a></dt>
 <dd><p>Suppresses the evaluation of the function</p>
@@ -3855,18 +3881,6 @@ function.</p>
 <dd class="field-odd"><p><strong>value</strong> (<em>bool</em>) – If True, the function evaluation on any input will return 0, without calculation.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.IndicatorBox.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Evaluates IndicatorBox at x</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p>
-</dd>
-</dl>
-<p>Evaluates the IndicatorBox at x. If <code class="docutils literal notranslate"><span class="pre">suppress_evaluation</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, returns 0.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3908,6 +3922,39 @@ function.</p>
 <code class="sig-name descname"><span class="pre">set_num_threads</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/IndicatorBox.html#IndicatorBox.set_num_threads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.set_num_threads" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the optional number of threads parameter to use for the accelerated version.</p>
 <p>This is discarded if <code class="docutils literal notranslate"><span class="pre">accelerated=False</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.IndicatorBox.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3965,15 +4012,52 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.__new__">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">__new__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__new__" title="Permalink to this definition">#</a></dt>
-<dd><p>Create and return a new object.  See help(type) for accurate signature.</p>
+<dt id="cil.optimisation.functions.KullbackLeibler.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.KullbackLeibler.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numba'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/KullbackLeibler.html#KullbackLeibler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt id="cil.optimisation.functions.KullbackLeibler.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.KullbackLeibler.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.KullbackLeibler.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
+<div class="math notranslate nohighlight">
+\[F'(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.KullbackLeibler.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.KullbackLeibler.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.KullbackLeibler.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -3996,37 +4080,6 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 </ol>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="cil.optimisation.functions.L1Norm.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>creator</p>
-<p>Cases considered (with/without data):
-a) <span class="math notranslate nohighlight">\(f(x) = ||x||_{1}\)</span>
-b) <span class="math notranslate nohighlight">\(f(x) = ||x - b||_{1}\)</span></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>b</strong> (<code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional) – translation of the function</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.L1Norm.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the L1Norm function at x.</p>
-<dl>
-<dt>Consider the following cases:</dt><dd><ol class="loweralpha">
-<li><div class="math notranslate nohighlight">
-\[F(x) = ||x||_{1}\]</div>
-</li>
-<li><div class="math notranslate nohighlight">
-\[F(x) = ||x - b||_{1}\]</div>
-</li>
-</ol>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.functions.L1Norm.convex_conjugate">
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.convex_conjugate" title="Permalink to this definition">#</a></dt>
@@ -4072,6 +4125,39 @@ Here, we need to use the convex conjugate of L1Norm, which is the Indicator of t
 \[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
 </dd></dl>
 
+<dl class="py method">
+<dt id="cil.optimisation.functions.L1Norm.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.L1Norm.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.L1Norm.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L1Norm.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.L1Norm.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L1Norm.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
+<div class="math notranslate nohighlight">
+\[F'(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.L1Norm.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L1Norm.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -4088,63 +4174,21 @@ Here, we need to use the convex conjugate of L1Norm, which is the Indicator of t
 <li><p><span class="math notranslate nohighlight">\(F(x) = \|x - b\|^{2}_{2}\)</span></p></li>
 </ol>
 </div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>b</strong> (<cite>DataContainer</cite>, optional) – Translation of the function</p>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For case b) case we can use <code class="code docutils literal notranslate"><span class="pre">F</span> <span class="pre">=</span> <span class="pre">L2NormSquared().centered_at(b)</span></code>,
-see <em>TranslateFunction</em>.</p>
+<p>For case b) we can use <code class="code docutils literal notranslate"><span class="pre">F</span> <span class="pre">=</span> <span class="pre">L2NormSquared().centered_at(b)</span></code>, see <em>TranslateFunction</em>.</p>
 </div>
-<dl class="field-list">
-<dt class="field-odd">Example</dt>
-<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span><span class="o">.</span><span class="n">centered_at</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="cil.optimisation.functions.L2NormSquared.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#L2NormSquared.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>creator</p>
-<dl>
-<dt>Cases considered (with/without data):</dt><dd><ol class="loweralpha">
-<li><div class="math notranslate nohighlight">
-\[f(x) = \|x\|^{2}_{2}\]</div>
-</li>
-<li><div class="math notranslate nohighlight">
-\[f(x) = \|\|x - b\|\|^{2}_{2}\]</div>
-</li>
-</ol>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>b</strong> (<code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional) – translation of the function</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.L2NormSquared.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#L2NormSquared.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the L2NormSquared function at x.</p>
-<p>Following cases are considered:</p>
-<blockquote>
-<div><ol class="loweralpha simple">
-<li><p><span class="math notranslate nohighlight">\(F(x) = \|x\|^{2}_{2}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(F(x) = \|x - b\|^{2}_{2}\)</span></p></li>
-</ol>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p><span class="math notranslate nohighlight">\(x\)</span></p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(\underset{i}{\sum}x_{i}^{2}\)</span></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.functions.L2NormSquared.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#L2NormSquared.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared.gradient" title="Permalink to this definition">#</a></dt>
@@ -4169,7 +4213,7 @@ see <em>TranslateFunction</em>.</p>
 \[F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2}\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + &lt;x^{*}, b&gt;\]</div>
+\[F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + \langle x^{*}, b\rangle\]</div>
 </li>
 </ol>
 </div></blockquote>
@@ -4183,13 +4227,38 @@ see <em>TranslateFunction</em>.</p>
 <blockquote>
 <div><ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}\]</div>
+\[\text{prox}_{\tau F}(x) = \frac{x}{1+2\tau}\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b\]</div>
+\[\text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b\]</div>
 </li>
 </ol>
 </div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.L2NormSquared.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.L2NormSquared.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.L2NormSquared.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -4197,40 +4266,59 @@ see <em>TranslateFunction</em>.</p>
 <dl class="py class">
 <dt id="cil.optimisation.functions.WeightedL2NormSquared">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">WeightedL2NormSquared</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#WeightedL2NormSquared"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared" title="Permalink to this definition">#</a></dt>
-<dd><p>WeightedL2NormSquared function: <span class="math notranslate nohighlight">\(F(x) = \| x\|_{w}^{2}_{2} = \underset{i}{\sum}w_{i}*x_{i}^{2} = &lt;x, w*x&gt; = x^{T}*w*x\)</span></p>
-<dl class="py method">
-<dt id="cil.optimisation.functions.WeightedL2NormSquared.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#WeightedL2NormSquared.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.WeightedL2NormSquared.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#WeightedL2NormSquared.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the function F at x: <span class="math notranslate nohighlight">\(F(x)\)</span></p>
-</dd></dl>
-
+<dd><p>WeightedL2NormSquared function: <span class="math notranslate nohighlight">\(F(x) = \|x\|_{W,2}^2 = \Sigma_iw_ix_i^2 = \langle x, Wx\rangle = x^TWx\)</span>
+where <span class="math notranslate nohighlight">\(W=\text{diag}(weight)\)</span> if <cite>weight</cite> is a <cite>DataContainer</cite> or <span class="math notranslate nohighlight">\(W=\text{weight} I\)</span> if <cite>weight</cite> is a scalar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>**kwargs</strong> – </p></li>
+<li><p><strong>weight</strong> (a <cite>scalar</cite> or a <cite>DataContainer</cite> with the same shape as the intended domain of this <cite>WeightedL2NormSquared</cite> function) – </p></li>
+<li><p><strong>b</strong> (a <cite>DataContainer</cite> with the same shape as the intended domain of this <cite>WeightedL2NormSquared</cite> function) – A shift so that the function becomes  <span class="math notranslate nohighlight">\(F(x) = \| x-b\|_{W,2}^2 = \Sigma_iw_i(x_i-b_i)^2 = \langle x-b, W(x-b) \rangle = (x-b)^TW(x-b)\)</span></p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="cil.optimisation.functions.WeightedL2NormSquared.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#WeightedL2NormSquared.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the gradient of function F at x, if it is differentiable</p>
-<div class="math notranslate nohighlight">
-\[F'(x)\]</div>
+<dd><p>Returns the value of <span class="math notranslate nohighlight">\(F'(x) = 2Wx\)</span> or, if <cite>b</cite> is defined,  <span class="math notranslate nohighlight">\(F'(x) = 2W(x-b)\)</span>
+where <span class="math notranslate nohighlight">\(W=\text{diag}(weight)\)</span> if <cite>weight</cite> is a <cite>DataContainer</cite> or <span class="math notranslate nohighlight">\(\text{weight}I\)</span> if <cite>weight</cite> is a scalar.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.WeightedL2NormSquared.convex_conjugate">
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#WeightedL2NormSquared.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.convex_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)\]</div>
+<dd><p>Returns the value of the convex conjugate of the WeightedL2NormSquared function at x.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.WeightedL2NormSquared.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.WeightedL2NormSquared.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.WeightedL2NormSquared.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#WeightedL2NormSquared.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x
-.. math:: mathrm{prox}_{tau F}(x) = underset{z}{mathrm{argmin}} frac{1}{2}|z - x|^{2} + tau F(z)</p>
+<dd><p>Returns the value of the proximal operator of the WeightedL2NormSquared function at x.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.WeightedL2NormSquared.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.WeightedL2NormSquared.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -4247,50 +4335,72 @@ see <em>TranslateFunction</em>.</p>
 <p>or if weighted</p>
 <div class="math notranslate nohighlight">
 \[F(x) = c\|Ax-b\|_{2,W}^{2}\]</div>
-<blockquote>
-<div><p>A : LinearOperator</p>
-<p>b : Data, DataContainer</p>
-<p>c : Scaling Constant, float, default 1.0</p>
-<p>weight: DataContainer with all positive elements of size of the range of operator A, default None</p>
-</div></blockquote>
-<blockquote>
-<div><p>L : Lipshitz Constant of the gradient of <span class="math notranslate nohighlight">\(F\)</span> which is <span class="math notranslate nohighlight">\(2 c ||A||_2^2 = 2 c s1(A)^2\)</span>, or</p>
-<p>L : Lipshitz Constant of the gradient of <span class="math notranslate nohighlight">\(F\)</span> which is <span class="math notranslate nohighlight">\(2 c ||weight|| ||A||_2^2 = 2s1(A)^2\)</span>,</p>
-</div></blockquote>
-<p>where s1(A) is the largest singular value of A.</p>
-<dl class="py method">
-<dt id="cil.optimisation.functions.LeastSquares.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/LeastSquares.html#LeastSquares.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.LeastSquares.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/LeastSquares.html#LeastSquares.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of <span class="math notranslate nohighlight">\(F(x) = c\|Ax-b\|_2^2\)</span> or c|Ax-b|_{2,weight}^2</p>
-</dd></dl>
-
+<p>where <span class="math notranslate nohighlight">\(W=\text{diag}(weight)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – </p></li>
+<li><p><strong>b</strong> (<em>Data</em><em>, </em><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>c</strong> (<em>Scaling Constant</em><em>, </em><em>float</em><em>, </em><em>default 1.0</em>) – </p></li>
+<li><p><strong>weight</strong> (<em>DataContainer with all positive elements of size of the range of operator A</em><em>, </em><em>default None</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>L is the  Lipshitz Constant of the gradient of <span class="math notranslate nohighlight">\(F\)</span> which is <span class="math notranslate nohighlight">\(2 c ||A||_2^2 = 2 c \sigma_1(A)^2\)</span>, or <span class="math notranslate nohighlight">\(2 c ||W|| ||A||_2^2 = 2c||W|| \sigma_1(A)^2\)</span>, where <span class="math notranslate nohighlight">\(\sigma_1(A)\)</span> is the largest singular value of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(W=\text{diag}(weight)\)</span>.</p>
+</div>
 <dl class="py method">
 <dt id="cil.optimisation.functions.LeastSquares.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/LeastSquares.html#LeastSquares.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.gradient" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the gradient of <span class="math notranslate nohighlight">\(F(x) = c*\|A*x-b\|_2^2\)</span></p>
+<dd><p>Returns the value of the gradient of <span class="math notranslate nohighlight">\(F(x)\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[F'(x) = 2cA^T(Ax-b)\]</div>
+<p>or</p>
 <div class="math notranslate nohighlight">
-\[F'(x) = 2cA^T(weight(Ax-b))\]</div>
+\[F'(x) = 2cA^T(W(Ax-b))\]</div>
+<p>where <span class="math notranslate nohighlight">\(W=\text{diag}(weight)\)</span>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.LeastSquares.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id42"><span class="problematic" id="id43">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.optimisation.functions.LeastSquares.__rmul__">
-<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/LeastSquares.html#LeastSquares.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.__rmul__" title="Permalink to this definition">#</a></dt>
-<dd><p>defines the right multiplication with a number</p>
+<dt id="cil.optimisation.functions.LeastSquares.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.LeastSquares.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.LeastSquares.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.LeastSquares.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -4303,23 +4413,6 @@ see <em>TranslateFunction</em>.</p>
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">MixedL21Norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#MixedL21Norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm" title="Permalink to this definition">#</a></dt>
 <dd><p>MixedL21Norm function: <span class="math notranslate nohighlight">\(F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}\)</span></p>
 <p>where x is a BlockDataContainer, i.e., <span class="math notranslate nohighlight">\(x=(x^{1}, x^{2}, \dots)\)</span></p>
-<dl class="py method">
-<dt id="cil.optimisation.functions.MixedL21Norm.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#MixedL21Norm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.MixedL21Norm.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#MixedL21Norm.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the MixedL21Norm function at x.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.optimisation.functions.MixedL21Norm.convex_conjugate">
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#MixedL21Norm.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.convex_conjugate" title="Permalink to this definition">#</a></dt>
@@ -4346,6 +4439,39 @@ see <em>TranslateFunction</em>.</p>
 <p>where the convention 0 · (0/0) = 0 is used.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL21Norm.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL21Norm.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL21Norm.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
+<div class="math notranslate nohighlight">
+\[F'(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL21Norm.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL21Norm.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -4358,26 +4484,51 @@ see <em>TranslateFunction</em>.</p>
 <p>where x is a BlockDataContainer, i.e., <span class="math notranslate nohighlight">\(x=(x^{1}, x^{2}, \dots)\)</span></p>
 <p>Conjugate, proximal and proximal conjugate methods no closed-form solution</p>
 <dl class="py method">
-<dt id="cil.optimisation.functions.SmoothMixedL21Norm.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>epsilon</strong> – smoothing parameter making MixedL21Norm differentiable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.SmoothMixedL21Norm.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the SmoothMixedL21Norm function at x.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id44"><span class="problematic" id="id45">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id32"><span class="problematic" id="id33">|x|</span></a>}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SmoothMixedL21Norm.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SmoothMixedL21Norm.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SmoothMixedL21Norm.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SmoothMixedL21Norm.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span> at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SmoothMixedL21Norm.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -4400,23 +4551,6 @@ see <em>TranslateFunction</em>.</p>
 <p><a class="reference internal" href="#cil.optimisation.functions.L1Norm" title="cil.optimisation.functions.L1Norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1Norm</span></code></a>, <a class="reference internal" href="#cil.optimisation.functions.MixedL21Norm" title="cil.optimisation.functions.MixedL21Norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MixedL21Norm</span></code></a></p>
 </div>
 <dl class="py method">
-<dt id="cil.optimisation.functions.MixedL11Norm.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.MixedL11Norm.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the MixedL11Norm function at x.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.MixedL11Norm.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the proximal operator of the MixedL11Norm function at x.</p>
@@ -4425,6 +4559,47 @@ see <em>TranslateFunction</em>.</p>
 <p>where,</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.gradient">
+<code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
+<div class="math notranslate nohighlight">
+\[F'(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 </dd></dl>
@@ -4450,7 +4625,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id50"><span class="problematic" id="id51">problem_</span></a> of the above problem, see <span id="id12">[<a class="reference internal" href="#id28" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id13">[<a class="reference internal" href="#id27" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id14">[<a class="reference internal" href="#id31" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">9</a>]</span>.</p>
+applied to the _dual <a href="#id36"><span class="problematic" id="id37">problem_</span></a> of the above problem, see <span id="id12">[<a class="reference internal" href="#id28" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id13">[<a class="reference internal" href="#id27" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id14">[<a class="reference internal" href="#id31" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">9</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -4529,18 +4704,6 @@ For more information, see <span id="id15">[<a class="reference internal" href="#
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="cil.optimisation.functions.TotalVariation.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.TotalVariation.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__call__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the TotalVariation function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> .</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.proximal" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the TotalVariation function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> .</p>
@@ -4553,9 +4716,34 @@ For more information, see <span id="id15">[<a class="reference internal" href="#
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.optimisation.functions.TotalVariation.L">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.optimisation.functions.TotalVariation.calculate_Lipschitz">
 <code class="sig-name descname"><span class="pre">calculate_Lipschitz</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.calculate_Lipschitz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.calculate_Lipschitz" title="Permalink to this definition">#</a></dt>
 <dd><p>Default value for the Lipschitz constant.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.TotalVariation.centered_at">
+<code class="sig-name descname"><span class="pre">centered_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.
+TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.TotalVariation.proximal_conjugate">
+<code class="sig-name descname"><span class="pre">proximal_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -4563,12 +4751,6 @@ For more information, see <span id="id15">[<a class="reference internal" href="#
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>GradientOperator is created if it is not instantiated yet. The domain of the <cite>_gradient</cite>,
 is created in the <cite>__call__</cite> and <cite>proximal</cite> methods.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.functions.TotalVariation.__rmul__">
-<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__rmul__" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns a function multiplied by a scalar.</p>
 </dd></dl>
 
 </dd></dl>
@@ -4589,7 +4771,7 @@ problems in the following form:</p>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a></p></li>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.operators.BlockOperators">BlockOperator</a></p></li>
 </ul>
-<p>The block framework allows writing more advanced <a href="#id52"><span class="problematic" id="id53">`optimisation problems`_</span></a>. Consider the typical
+<p>The block framework allows writing more advanced <a href="#id38"><span class="problematic" id="id39">`optimisation problems`_</span></a>. Consider the typical
 <a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
 <div class="math notranslate nohighlight">
 \[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
@@ -4620,7 +4802,7 @@ Block Framework comprising 4 main actors: <code class="code docutils literal not
 <code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id54"><span class="problematic" id="id55">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id40"><span class="problematic" id="id41">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
@@ -4956,7 +5138,7 @@ can be decomposed along the proximal operators of each function <span class="mat
 <dt id="cil.optimisation.functions.BlockFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.BlockFunction.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id46"><span class="problematic" id="id47">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
 </dd></dl>
 
 <dl class="py method">

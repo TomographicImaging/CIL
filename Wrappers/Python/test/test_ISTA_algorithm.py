@@ -48,7 +48,7 @@ class TestISTA(unittest.TestCase):
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
         self.g = ZeroFunction()
-        self.h=L1Norm()
+        self.h = L1Norm()
 
         self.ig = self.Aop.domain
 

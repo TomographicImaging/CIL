@@ -43,91 +43,68 @@ class TestSamplers(CCPiTestClass):
 
         sampler = Sampler.sequential(10)
         self.assertEqual(sampler.num_indices, 10)
-        self.assertEqual(sampler.type, 'sequential')
-        self.assertListEqual(sampler.order, list(range(10)))
-        self.assertEqual(sampler.last_index, 9)
+        self.assertEqual(sampler._type, 'sequential')
         self.assertListEqual(sampler.prob_weights, [1/10]*10)
 
         sampler = Sampler.random_without_replacement(7)
         self.assertEqual(sampler.num_indices, 7)
-        self.assertEqual(sampler.type, 'random_without_replacement')
-        self.assertEqual(sampler.prob, [1/7]*7)
-        self.assertListEqual(sampler.prob_weights, sampler.prob)
+        self.assertEqual(sampler._type, 'random_without_replacement')
+        self.assertEqual(sampler._prob, [1/7]*7)
+        self.assertListEqual(sampler.prob_weights, sampler._prob)
 
         sampler = Sampler.random_without_replacement(8, seed=1)
         self.assertEqual(sampler.num_indices, 8)
-        self.assertEqual(sampler.type, 'random_without_replacement')
-        self.assertEqual(sampler.prob,  [1/8]*8)
-        self.assertEqual(sampler.seed, 1)
-        self.assertListEqual(sampler.prob_weights, sampler.prob)
+        self.assertEqual(sampler._type, 'random_without_replacement')
+        self.assertEqual(sampler._prob,  [1/8]*8)
+        self.assertEqual(sampler._seed, 1)
+        self.assertListEqual(sampler.prob_weights, sampler._prob)
 
         sampler = Sampler.herman_meyer(12)
         self.assertEqual(sampler.num_indices, 12)
-        self.assertEqual(sampler.type, 'herman_meyer')
-        self.assertEqual(sampler.last_index, 11)
-        self.assertListEqual(
-            sampler.order, [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
+        self.assertEqual(sampler._type, 'herman_meyer')
+        out = [sampler.next() for _ in range(12)]
+        self.assertListEqual(out, [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
         self.assertListEqual(sampler.prob_weights, [1/12] * 12)
 
         sampler = Sampler.random_with_replacement(5)
         self.assertEqual(sampler.num_indices, 5)
-        self.assertEqual(sampler.type, 'random_with_replacement')
-        self.assertListEqual(sampler.prob, [1/5] * 5)
+        self.assertEqual(sampler._type, 'random_with_replacement')
+        self.assertListEqual(sampler._prob, [1/5] * 5)
         self.assertListEqual(sampler.prob_weights, [1/5] * 5)
 
         sampler = Sampler.random_with_replacement(4, [0.7, 0.1, 0.1, 0.1])
         self.assertEqual(sampler.num_indices, 4)
-        self.assertEqual(sampler.type, 'random_with_replacement')
-        self.assertListEqual(sampler.prob, [0.7, 0.1, 0.1, 0.1])
+        self.assertEqual(sampler._type, 'random_with_replacement')
+        self.assertListEqual(sampler._prob, [0.7, 0.1, 0.1, 0.1])
         self.assertListEqual(sampler.prob_weights, [0.7, 0.1, 0.1, 0.1])
 
         sampler = Sampler.staggered(21, 4)
         self.assertEqual(sampler.num_indices, 21)
-        self.assertEqual(sampler.type, 'staggered')
-        self.assertListEqual(sampler.order, [
-                             0, 4, 8, 12, 16, 20, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19])
-        self.assertEqual(sampler.last_index, 20)
+        self.assertEqual(sampler._type, 'staggered')
+        out = [sampler.next() for _ in range(21)]
+        self.assertListEqual(out, [0, 4, 8, 12, 16, 20, 1, 5, 9, 13, 17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19])
         self.assertListEqual(sampler.prob_weights, [1/21] * 21)
 
         with self.assertRaises(ValueError):
             Sampler.staggered(22, 25)
 
-
-        sampler = Sampler.custom_order(12, [1, 4, 6, 7, 8, 9, 11])
-        self.assertEqual(sampler.num_indices, 12)
-        self.assertEqual(sampler.type, 'custom_order')
-        self.assertListEqual(sampler.order, [1, 4, 6, 7, 8, 9, 11])
-        self.assertEqual(sampler.last_index, 6)
-        self.assertListEqual(sampler.prob_weights, [
-                             0, 1/7, 0, 0, 1/7, 0, 1/7, 1/7, 1/7, 1/7, 0, 1/7])
-        
-        sampler = Sampler.custom_order(10, [0,1, 2, 3, 4])
-        self.assertEqual(sampler.num_indices, 10)
-        self.assertEqual(sampler.type, 'custom_order')
-        self.assertListEqual(sampler.order, [0,1,2,3,4])
-        self.assertEqual(sampler.last_index, 4)
-        self.assertListEqual(sampler.prob_weights, [
-                             1/5,1/5,1/5,1/5,1/5,0,0,0,0,0])
-        
-        sampler = Sampler.custom_order(10, [0,1, 2, 3, 4], prob_weights=[1/10]*10)
-        self.assertListEqual(sampler.prob_weights, [1/10]*10)
         
         #Check probabilities sum to one and are positive
         with self.assertRaises(ValueError): 
-            Sampler.custom_order(10, [0,1, 2, 3, 4], prob_weights=[1/11]*10)
+            Sampler.from_function(10, self.example_function, prob_weights=[1/11]*10)
         with self.assertRaises(ValueError): 
-            Sampler.custom_order(10, [0,1, 2, 3, 4], prob_weights=[-1]+[2]+[0]*8)
+            Sampler.from_function(10, self.example_function, prob_weights=[-1]+[2]+[0]*8)
         
 
         sampler = Sampler.from_function(50, self.example_function)
         self.assertListEqual(sampler.prob_weights, [1/50] * 50)
         self.assertEqual(sampler.num_indices, 50)
-        self.assertEqual(sampler.type, 'from_function')
+        self.assertEqual(sampler._type, 'from_function')
         
         sampler = Sampler.from_function(40, self.example_function, [1]+[0]*39)
         self.assertListEqual(sampler.prob_weights,  [1]+[0]*39)
         self.assertEqual(sampler.num_indices, 40)
-        self.assertEqual(sampler.type, 'from_function')
+        self.assertEqual(sampler._type, 'from_function')
         
         #check probabilities sum to 1 and are positive
         with self.assertRaises(ValueError):
@@ -217,13 +194,4 @@ class TestSamplers(CCPiTestClass):
                 self.assertNumpyArrayEqual(
                     sampler.get_samples(10), np.array(order[:10]))
 
-    def test_custom_order_iterator_and_get_samples(self):
-        # Test the custom order sampler
-        sampler = Sampler.custom_order(12, [1, 4, 6, 7, 8, 9, 11])
-        order = [1, 4, 6, 7, 8, 9, 11, 1, 4, 6, 7, 8, 9,
-                 11, 1, 4, 6, 7, 8, 9, 11, 1, 4, 6, 7, 8, 9, 11]
-        for i in range(25):
-            self.assertEqual(sampler.next(), order[i % 7])
-            if i % 5 == 0:  # Check both that get samples works and doesn't interrupt the sampler
-                self.assertNumpyArrayEqual(
-                    sampler.get_samples(10), np.array(order[:10]))
+

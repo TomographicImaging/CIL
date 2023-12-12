@@ -77,7 +77,7 @@ class BlockOperator(Operator):
     __array_priority__ = 1
 
     def __init__(self, *args, **kwargs):
- 
+
         self.operators = args
         shape = kwargs.get('shape', None)
         if shape is None:
@@ -212,17 +212,18 @@ class BlockOperator(Operator):
 
             tmp = self.range_geometry().allocate()
             for row in range(self.shape[0]):
-                for col in range(self.shape[1]):
-                    if col == 0:
-                        self.get_item(row, col).direct(
-                            x_b.get_item(col),
-                            out=out.get_item(row))
+                for col in range(self.shape[1]):  
+                    if col == 0:       
+                        self.get_item(row,col).direct(
+                                                      x_b.get_item(col),
+                                                      out=out.get_item(row))                        
                     else:
-                        a = out.get_item(row)
-                        self.get_item(row, col).direct(
-                            x_b.get_item(col),
-                            out=tmp.get_item(row))
-                        a += tmp.get_item(row)
+                        temp_out_row = out.get_item(row) # temp_out_row points to the element in out that we are adding to  
+                        self.get_item(row,col).direct(
+                                                      x_b.get_item(col), 
+                                                      out=tmp.get_item(row))
+                        temp_out_row += tmp.get_item(row)
+                
 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
@@ -282,10 +283,11 @@ class BlockOperator(Operator):
                             out += self.get_item(row, col).adjoint(
                                 x_b.get_item(row))
                         else:
-                            a = out.get_item(col)
-                            a += self.get_item(row, col).adjoint(
-                                x_b.get_item(row),
-                            )
+
+                            temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating 
+                            temp_out_col += self.get_item(row,col).adjoint(
+                                                        x_b.get_item(row),
+                                                        )
 
     def is_linear(self):
         '''Returns whether all the elements of the BlockOperator are linear'''
@@ -325,7 +327,7 @@ class BlockOperator(Operator):
 
         Parameters
         ------------
-        
+
         scalar: number or iterable containing numbers
 
         '''
@@ -345,7 +347,7 @@ class BlockOperator(Operator):
     @property
     def T(self):
         '''Returns the transposed of self.
-        
+
         Recall the input list is shaped in a row-by-row fashion'''
         newshape = (self.shape[1], self.shape[0])
         oplist = []

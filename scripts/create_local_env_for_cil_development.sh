@@ -89,8 +89,6 @@ else
     -c intel
     -c ccpi/label/dev
     -c ccpi
-    -c astra-toolbox
-    -c astra-toolbox/label/dev
     --override-channels
   )
 fi

@@ -73,8 +73,7 @@ Base class
 ----------
 .. autoclass:: cil.optimisation.algorithms.Algorithm
    :members:
-   :private-members:
-   :special-members:
+   :inherited-members:
 
 GD
 --
@@ -236,37 +235,37 @@ Base classes
 
 .. autoclass:: cil.optimisation.functions.Function
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.SumFunction
    :members:
-   :special-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.ScaledFunction
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.SumScalarFunction
    :members:
-   :special-members: 
+   :inherited-members: 
 
 .. autoclass:: cil.optimisation.functions.TranslateFunction
    :members:
-   :special-members: 
+   :inherited-members:
    
 Simple functions
 ----------------
 .. autoclass:: cil.optimisation.functions.ConstantFunction
    :members:
-   :special-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.ZeroFunction
    :members:
-   :special-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.Rosenbrock
    :members:
-   :special-members: 
+   :inherited-members:
 
 Composition of operator and a function
 --------------------------------------
@@ -293,14 +292,14 @@ be expressed as
 
 .. autoclass:: cil.optimisation.functions.OperatorCompositionFunction
   :members:
-  :special-members: 
+  :inherited-members:
 
 Indicator box
 -------------
 
 .. autoclass:: cil.optimisation.functions.IndicatorBox
    :members:
-   :special-members:
+   :inherited-members:
 
 
 KullbackLeibler 
@@ -308,14 +307,14 @@ KullbackLeibler
 
 .. autoclass:: cil.optimisation.functions.KullbackLeibler
    :members:
-   :special-members:
+   :inherited-members:
 
 L1 Norm
 -------
 
 .. autoclass:: cil.optimisation.functions.L1Norm
    :members:
-   :special-members:
+   :inherited-members:
 
 L2 Norm Squared
 -----------------------
@@ -323,11 +322,11 @@ L2 Norm Squared
 
 .. autoclass:: cil.optimisation.functions.L2NormSquared
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.WeightedL2NormSquared
    :members:
-   :special-members:
+   :inherited-members:
    
 
 Least Squares
@@ -335,35 +334,35 @@ Least Squares
 
 .. autoclass:: cil.optimisation.functions.LeastSquares
    :members:
-   :special-members:
+   :inherited-members:
 
 Mixed L21 norm
 --------------
 
 .. autoclass:: cil.optimisation.functions.MixedL21Norm
    :members:
-   :special-members:
+   :inherited-members:
    
 Smooth Mixed L21 norm
 ---------------------
 
 .. autoclass:: cil.optimisation.functions.SmoothMixedL21Norm
    :members:
-   :special-members:   
+   :inherited-members:
 
 Mixed L11 norm
 ---------------------
 
 .. autoclass:: cil.optimisation.functions.MixedL11Norm
    :members:
-   :special-members:      
+   :inherited-members:     
 
 Total variation
 ---------------
 
 .. autoclass:: cil.optimisation.functions.TotalVariation
    :members:
-   :special-members: 
+   :inherited-members:
 
 Block Framework
 ***************

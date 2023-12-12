@@ -914,7 +914,7 @@ class TestFunction(CCPiTestClass):
             (KullbackLeibler(b=b, backend='numba'), ag),
             (KullbackLeibler(b=b, backend='numpy'), ag),
             (L1Norm(), ag),
-            (L1Norm(weight=ig.allocate(1)), ag),
+            (L1Norm(weight=ag.allocate(1)), ag),
             (L2NormSquared(), ag),
             (WeightedL2NormSquared(), ag),
             (MixedL21Norm(), bg),
@@ -963,12 +963,6 @@ class TestFunction(CCPiTestClass):
 
         tau = 1.
 
-        uno = f1.proximal(x, tau)
-        due = f2.proximal(x, tau)
-
-        assert due is not None
-        assert uno is not None
-        
         np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
                                    f2.proximal(x, tau).as_array())
         

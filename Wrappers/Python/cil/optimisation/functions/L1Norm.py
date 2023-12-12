@@ -157,7 +157,7 @@ class L1Norm(Function):
     The value of the proximal operator of the L1Norm function at x: DataContainer.
                         
         """  
-        self.function.proximal(x, tau, out=out)
+        return self.function.proximal(x, tau, out=out)
 
 
 class _L1Norm(Function):

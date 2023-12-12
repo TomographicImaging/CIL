@@ -99,7 +99,7 @@ class TestSGD(CCPiTestClass):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=SGFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
-        self.assertEqual(f.sampler.type, 'random_with_replacement')
+        self.assertEqual(f.sampler._type, 'random_with_replacement')
 
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)

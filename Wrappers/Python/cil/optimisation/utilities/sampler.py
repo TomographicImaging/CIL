@@ -380,7 +380,7 @@ class Sampler():
         """Function that takes in an iteration number and outputs an index number based on the staggered ordering.  """
         iter_number_mod = iter_number % num_indices
         floor = num_indices//offset
-        mod = mod
+        mod = num_indices%offset
 
         if iter_number_mod < (floor + 1)*mod:
             row_number = iter_number_mod // (floor + 1)
@@ -685,7 +685,7 @@ class Sampler():
             repeat_length *= factors[i]
 
         hmf_call = partial(Sampler._herman_meyer_function,
-                           num_indices, factors, addition_arr, repeat_length_arr)
+                           num_indices, addition_arr, repeat_length_arr)
 
         # define the sampler
         sampler = SamplerFromFunction(function=hmf_call,

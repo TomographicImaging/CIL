@@ -49,13 +49,14 @@ conda_args=(create --name="$name"
   cmake'>=3.16'
   dxchange
   h5py
-  ipp
-  ipp-devel
-  ipp-include
+  ipp'>=2021.10'
+  ipp-devel'>=2021.10'
+  ipp-include'>=2021.10'
   libgcc-ng
+  libstdcxx-ng
   matplotlib
   numba
-  olefile
+  olefile'>=0.46'
   packaging
   pillow
   python-wget
@@ -78,7 +79,10 @@ else
     cil-data
     cvxpy
     ipywidgets
+    packaging
+    python-wget
     setuptools
+    scikit-image
     tigre=2.4
     tomophantom=2.0.0
     -c conda-forge

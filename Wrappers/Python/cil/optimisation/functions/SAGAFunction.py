@@ -32,9 +32,9 @@ class SAGFunction(ApproximateGradientSumFunction):
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
     """
   
-    def __init__(self, functions, sampler=None):
+    def __init__(self, functions,  sampler=None, warm_start=False):
         self.set_up_done=False
-            
+        self.warm_start=warm_start
         super(SAGFunction, self).__init__(functions, sampler)    
         
     
@@ -59,9 +59,13 @@ class SAGFunction(ApproximateGradientSumFunction):
             self._set_up(x)
         
         self.stoch_grad_at_iterate=self.functions[function_num].gradient(x)
-        self.data_passes.append(round(self.data_passes[-1] + 1./self.num_functions,4))
+       
+        try:
+            self.data_passes.append(self.data_passes[-1] + 1./self.num_functions)
+        except IndexError:
+            self.data_passes.append(1./self.num_functions)
+ 
         self.stochastic_grad_difference= self.stoch_grad_at_iterate.sapyb(1., self.list_stored_gradients[function_num], -1.)
-        
         # flag to return or in-place computation
         should_return=False
         
@@ -74,10 +78,12 @@ class SAGFunction(ApproximateGradientSumFunction):
         else:
             # due to the convention that we follow: without the 1/n factor
             self.stochastic_grad_difference.sapyb(1., self.full_gradient_at_iterate, 1., out=out) 
+          #  print(out.array)
 
         self.list_stored_gradients[function_num].fill(self.stoch_grad_at_iterate)
         self.full_gradient_at_iterate.sapyb(1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)
         
+
         if should_return:
             return res        
 
@@ -94,7 +100,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         else:
             self.list_stored_gradients = [x*0.]*len(self.functions)
             self.full_gradient_at_iterate =  x*0         
-            self.data_passes=[]   
+            self.data_passes=[]
         self.stoch_grad_at_iterate = x * 0.0 # for CIL/SIRF compatibility
         self.stochastic_grad_difference = x * 0.0 # for CIL/SIRF compatibility
         self.set_up_done= True 

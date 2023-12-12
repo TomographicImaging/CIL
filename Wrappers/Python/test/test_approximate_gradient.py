@@ -30,7 +30,7 @@ from cil.framework import VectorData
 from cil.utilities import dataexample
 from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
-from cil.optimisation.functions import SGFunction
+from cil.optimisation.functions import SGFunction, SAGFunction
 from cil.optimisation.functions import SumFunction
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD 
@@ -182,6 +182,121 @@ class TestSGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
 
+class TestSAG(CCPiTestClass):
 
+    def setUp(self):
+        self.sampler=Sampler.random_with_replacement(5)
+        self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data.reorder('astra')
+        self.data2d=self.data.get_slice(vertical='centre')
+        ag2D = self.data2d.geometry
+        ig2D = ag2D.get_ImageGeometry()
+        self.A = ProjectionOperator(ig2D, ag2D, device = "cpu")
+        self.n_subsets = 5
+        self.partitioned_data=self.data2d.partition(self.n_subsets, 'sequential')
+        self.A_partitioned = ProjectionOperator(ig2D, self.partitioned_data.geometry, device = "cpu")
+        self.f_subsets = []
+        for i in range(self.n_subsets):
+            fi=LeastSquares(self.A_partitioned.operators[i],self. partitioned_data[i])
+            self.f_subsets.append(fi)
+        self.f=LeastSquares(self.A, self.data2d)
+        self.f_stochastic=SAGFunction(self.f_subsets,self.sampler)
+        self.initial=ig2D.allocate()
+
+    def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
+        self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
+
+    def test_sampler(self):
+        self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
+        f=SAGFunction(self.f_subsets)
+        self.assertTrue(isinstance( f.sampler, SamplerRandom))
+        self.assertEqual(f.sampler._type, 'random_with_replacement')
+
+    def test_direct(self):
+        self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
+
+    def test_full_gradient(self):
+        self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
+    
+    def test_value_error_with_only_one_function(self):
+        with self.assertRaises(ValueError):
+            SAGFunction([self.f], self.sampler)
+            pass
+    def test_type_error_if_functions_not_a_list(self):
+        with self.assertRaises(TypeError):
+            SAGFunction(self.f, self.sampler)
+
+        
+    
+    def test_sampler_without_next(self):
+        class bad_Sampler():
+            def init(self):
+                pass
+        bad_sampler=bad_Sampler()
+        with self.assertRaises(ValueError):
+           SAGFunction([self.f, self.f], bad_sampler)
+  
+
+    def test_SAG_simulated_parallel_beam_data(self): 
+
+        rate = self.f.L
+        alg = GD(initial=self.initial, 
+                              objective_function=self.f, update_objective_interval=500,
+                              rate=rate, alpha=1e8)
+        alg.max_iteration = 200
+        alg.run(verbose=0)
+       
+        
+        objective=self.f_stochastic
+        alg_stochastic = GD(initial=self.initial, 
+                              objective_function=objective, update_objective_interval=500, 
+                              step_size=5e-8, max_iteration =5000)
+        alg_stochastic.run( self.n_subsets*60, verbose=1)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        
+  
+  #TODO: Test warm start 
+  #TODO: TEst data passes 
+    def test_SAG_toy_example(self): 
+        sampler=Sampler.random_with_replacement(4)
+        initial = VectorData(np.zeros(20))
+        b =  VectorData(np.random.normal(0,4,20))
+        functions=[]
+        for i in range(4):
+            diagonal=np.zeros(20)
+            diagonal[5*i:5*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+            if i==0:
+               objective=LeastSquares(A, A.direct(b))
+            else:
+               objective+=LeastSquares(A, A.direct(b))
+
+        rate = objective.L / 3.
+    
+        alg = GD(initial=initial, 
+                              objective_function=objective, update_objective_interval=1000,
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg.max_iteration = 600
+        alg.run(verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        stochastic_objective=SAGFunction(functions, sampler)
+        self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
+        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
+        
+
+        
+        alg_stochastic = GD(initial=initial, 
+                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              step_size=0.05, max_iteration =5000)
+        alg_stochastic.run( 600, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
+
+
+
+        
+    
         
     

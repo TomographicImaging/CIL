@@ -64,6 +64,7 @@ class L1Norm(Function):
                                 
     """
     def __init__(self, b=None, weight=None):
+        super(L1Norm, self).__init__(L=None)
         if weight is None:
             self.function = _L1Norm(b=b)
         else:

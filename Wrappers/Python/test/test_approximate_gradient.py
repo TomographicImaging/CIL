@@ -201,7 +201,7 @@ class TestSAG(CCPiTestClass):
             self.f_subsets.append(fi)
         self.f=LeastSquares(self.A, self.data2d)
         self.f_stochastic=SAGFunction(self.f_subsets,self.sampler)
-        self.initial=ig2D.allocate()
+        self.initial=ig2D.allocate(0)
 
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
         self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
@@ -226,6 +226,27 @@ class TestSAG(CCPiTestClass):
         with self.assertRaises(TypeError):
             SAGFunction(self.f, self.sampler)
 
+    def test_warm_start_and_data_passes(self):
+     
+        f1=SAGFunction(self.f_subsets,Sampler.sequential(5))
+        self.assertFalse(f1.warm_start)
+        f=SAGFunction(self.f_subsets,Sampler.sequential(5), warm_start=True)
+        self.assertTrue(f.warm_start)
+        f1.gradient(self.initial)
+        f.gradient(self.initial)
+        self.assertEqual(f.function_num, 0)
+        self.assertEqual(f1.function_num, 0)
+        self.assertListEqual(f1.data_passes, [1./f1.num_functions])
+        self.assertListEqual(f.data_passes, [1, 1+1./f1.num_functions])
+        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, f1.list_stored_gradients[0].array)
+        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
+        
+        self.assertFalse((f.list_stored_gradients[1].array== f1.list_stored_gradients[1].array).any())
+        #TODO: this line is broken! 
+        self.assertNumpyArrayAlmostEqual(f1.list_stored_gradients[1].array, self.initial.array)
+        
+  
         
     
     def test_sampler_without_next(self):
@@ -282,6 +303,43 @@ class TestSAG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
         stochastic_objective=SAGFunction(functions, sampler)
+        self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
+        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
+        
+
+        
+        alg_stochastic = GD(initial=initial, 
+                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              step_size=0.05, max_iteration =5000)
+        alg_stochastic.run( 600, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
+
+    def test_SAG_toy_example_warm_start(self): 
+        sampler=Sampler.random_with_replacement(3)
+        initial = VectorData(np.zeros(21))
+        b =  VectorData(np.random.normal(0,4,21))
+        functions=[]
+        for i in range(3):
+            diagonal=np.zeros(21)
+            diagonal[7*i:7*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+            if i==0:
+               objective=LeastSquares(A, A.direct(b))
+            else:
+               objective+=LeastSquares(A, A.direct(b))
+
+        rate = objective.L / 3.
+    
+        alg = GD(initial=initial, 
+                              objective_function=objective, update_objective_interval=1000,
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg.max_iteration = 600
+        alg.run(verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        stochastic_objective=SAGFunction(functions, sampler, warm_start=True)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         
@@ -407,6 +465,42 @@ class TestSAGA(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
+    def test_SAGA_toy_example_warm_start(self): 
+        sampler=Sampler.random_with_replacement(6)
+        initial = VectorData(np.zeros(18))
+        b =  VectorData(np.random.normal(0,2,18))
+        functions=[]
+        for i in range(6):
+            diagonal=np.zeros(18)
+            diagonal[3*i:3*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+            if i==0:
+               objective=LeastSquares(A, A.direct(b))
+            else:
+               objective+=LeastSquares(A, A.direct(b))
+
+        rate = objective.L / 3.
+    
+        alg = GD(initial=initial, 
+                              objective_function=objective, update_objective_interval=1000,
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg.max_iteration = 600
+        alg.run(verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        stochastic_objective=SAGAFunction(functions, sampler, warm_start=True)
+        self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
+        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
+        
+
+        
+        alg_stochastic = GD(initial=initial, 
+                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              step_size=0.05, max_iteration =5000)
+        alg_stochastic.run( 600, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
 
         

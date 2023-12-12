@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
-           
+import numpy as np
            
 class SAGFunction(ApproximateGradientSumFunction):
 
@@ -82,6 +82,7 @@ class SAGFunction(ApproximateGradientSumFunction):
           #  print(out.array)
 
         self.list_stored_gradients[function_num].fill(self.stoch_grad_at_iterate)
+        print(self.list_stored_gradients[1].array)
         self.full_gradient_at_iterate.sapyb(1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)
         
 
@@ -99,8 +100,9 @@ class SAGFunction(ApproximateGradientSumFunction):
             self.full_gradient_at_iterate =  np.sum(self.list_stored_gradients) 
             self.data_passes = [1]     
         else:
-            self.list_stored_gradients = [x*0.]*len(self.functions)
-            self.full_gradient_at_iterate =  x*0         
+            self.list_stored_gradients = [x*0.0]*len(self.functions)
+            print(self.list_stored_gradients[1].array)
+            self.full_gradient_at_iterate =  x*0.0        
             self.data_passes=[]
         self.stoch_grad_at_iterate = x * 0.0 # for CIL/SIRF compatibility
         self.stochastic_grad_difference = x * 0.0 # for CIL/SIRF compatibility

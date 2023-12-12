@@ -20,5 +20,4 @@
 
 from .sampler import Sampler
 from .sampler import SamplerFromFunction
-from .sampler import SamplerFromOrder
 from .sampler import SamplerRandom

@@ -38,8 +38,129 @@ def soft_shrinkage(x, tau, out=None):
 
     if should_return:
         return out        
-    
+
 class L1Norm(Function):
+    r"""L1Norm function
+            
+    Consider the following cases:           
+    
+    a) .. math:: F(x) = ||x||_{1}
+    b) .. math:: F(x) = ||x - b||_{1}    
+            
+    In the weighted case, :math:`w` is an array of positive weights.
+    
+    a) .. math:: F(x) = ||x||_{\ell^1(w)}
+    b) .. math:: F(x) = ||x - b||_{\ell^1(w)}
+        
+
+    Parameters
+    -----------
+
+        weight: DataContainer, numpy ndarray, default None
+            Array of weights matching the size of the wavelet coefficients
+            If not None returns the weighted L1 Norm.
+        b: DataContainer, default None
+            Translation of the function.
+                                
+    """
+    def __init__(self, b=None, weight=None):
+        if weight is None:
+            self.function = _L1Norm(b=b)
+        else:
+            self.function = _WeightedL1Norm(b=b, weight=weight)
+
+    def __call__(self, x):
+        r"""Returns the value of the L1Norm function at x.
+        
+        .. math:: f(x) = ||x - b||_{\ell^1(w)}
+        """
+        return self.function(x)
+
+    def convex_conjugate(self, x):
+        r"""Returns the value of the convex conjugate of the L1Norm function at x.
+
+
+    This is the Indicator of the unit :math:`L^{\infty}` norm 
+    
+    Consider the following cases:
+            
+    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + <x^{*},b>      
+    
+
+    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+        = \begin{cases} 
+        0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+        \infty, \mbox{otherwise}
+        \end{cases}
+
+    In the weighted case the convex conjugate is the Indicator of the unit 
+    :math:`\ell^{\infty}` norm.
+
+    See:
+    https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
+    
+    .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\ell^\infty(w^{-1})}\leq 1\}}(x^{*})
+    
+
+    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+        = \begin{cases} 
+        0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+        \infty, \mbox{otherwise}
+        \end{cases}
+
+
+    Parameters
+    -----------
+
+    x : DataContainer
+        where to evaluate the convex conjugate of the L1Norm function.
+
+    Returns
+    --------
+    the value of the convex conjugate of the WeightedL1Norm function at x: float
+
+        """        
+        return self.function.convex_conjugate(x)
+
+    def proximal(self, x, tau, out=None):
+        r"""Returns the value of the proximal operator of the L1Norm function at x.
+        
+        
+    Consider the following cases:
+            
+    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b   
+
+    where,
+    
+    .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
+
+    The weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
+    by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
+    
+    .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*weight}(x)
+
+    where,
+    
+    .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
+
+    Parameters
+    -----------
+    x: DataContainer
+    tau: float, ndarray, DataContainer
+    out: DataContainer, default None
+        If not None, the result will be stored in this object.
+    
+    Returns
+    --------
+    The value of the proximal operator of the L1Norm function at x: DataContainer.
+                        
+        """  
+        self.function.proximal(x, tau, out=out)
+
+
+class _L1Norm(Function):
     
     r"""L1Norm function
             
@@ -59,7 +180,7 @@ class L1Norm(Function):
         :param b: translation of the function
         :type b: :code:`DataContainer`, optional
         '''
-        super(L1Norm, self).__init__()
+        super().__init__()
         self.b = kwargs.get('b',None)
         
     def __call__(self, x):
@@ -119,7 +240,8 @@ class L1Norm(Function):
         where,
         
         .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
-                            
+        
+        
         """  
 
                     
@@ -186,8 +308,8 @@ class MixedL11Norm(Function):
 
         return soft_shrinkage(x, tau, out = out) 
 
-class WeightedL1Norm(Function):
-    r"""WeightedL1Norm function
+class _WeightedL1Norm(Function): 
+    r"""The Weighted L1 Norm function
             
             .. math:: F(x) = ||x||_{\ell^1(w)} 
             
@@ -204,20 +326,8 @@ class WeightedL1Norm(Function):
         Translation of the function.
     """
 
-    def __new__(cls, weight=None, b=None):
-        '''Create and return a new object.
-        
-        If weight is None, returns the regular L1Norm, otherwise returns an instance of :class:`_WeightedL1Norm`.'''
-            
-        if weight is None:
-            return L1Norm(b=b)
-        else:
-            return super(WeightedL1Norm, cls).__new__(_WeightedL1Norm)
-
-class _WeightedL1Norm(WeightedL1Norm): 
-           
-    def __init__(self, weight=None, b=None):
-        super(WeightedL1Norm, self).__init__()
+    def __init__(self, weight, b=None):
+        super().__init__()
         self.weight = weight
         self.b = b
 
@@ -296,6 +406,6 @@ class _WeightedL1Norm(WeightedL1Norm):
             If not None, the result will be stored in this object.
         """  
         tau *= self.weight
-        ret = L1Norm.proximal(self, x, tau, out=out)
+        ret = _L1Norm.proximal(self, x, tau, out=out)
         tau /= self.weight
         return ret

@@ -317,13 +317,7 @@ L1 Norm
    :members:
    :special-members:
 
-.. autoclass:: cil.optimisation.functions.WeightedL1Norm
-   :members:
-   
-.. autoclass:: cil.optimisation.functions.L1Norm._WeightedL1Norm
-   :members:
-
-Squared L2 norm squared
+L2 Norm Squared
 -----------------------
 .. l2norm:
 

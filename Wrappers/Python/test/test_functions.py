@@ -32,7 +32,7 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, \
-                                         WeightedL1Norm, WeightedL2NormSquared
+                                         WeightedL2NormSquared
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -914,7 +914,7 @@ class TestFunction(CCPiTestClass):
             (KullbackLeibler(b=b, backend='numba'), ag),
             (KullbackLeibler(b=b, backend='numpy'), ag),
             (L1Norm(), ag),
-            (WeightedL1Norm(), ag),
+            (L1Norm(weight=ig.allocate(1)), ag),
             (L2NormSquared(), ag),
             (WeightedL2NormSquared(), ag),
             (MixedL21Norm(), bg),
@@ -945,10 +945,10 @@ class TestFunction(CCPiTestClass):
 
     def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
-        f2 = WeightedL1Norm(weight=None)
+        f2 = L1Norm(weight=None)
 
-        assert f1.__class__.__name__ == 'L1Norm'
-        assert f2.__class__.__name__ == 'L1Norm'
+        assert f1.function.__class__.__name__ == '_L1Norm'
+        assert f2.function.__class__.__name__ == '_L1Norm'
 
     def test_L1Norm_vs_WeightedL1Norm(self):    
         f1 = L1Norm()
@@ -957,18 +957,24 @@ class TestFunction(CCPiTestClass):
         x = geom.allocate('random', seed=1)
 
         weights = geom.allocate(1)
-        f2 = WeightedL1Norm(weight=weights)
+        f2 = L1Norm(weight=weights)
         
         np.testing.assert_almost_equal(f1(x), f2(x))
 
         tau = 1.
 
+        uno = f1.proximal(x, tau)
+        due = f2.proximal(x, tau)
+
+        assert due is not None
+        assert uno is not None
+        
         np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
                                    f2.proximal(x, tau).as_array())
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
-        f2 = WeightedL1Norm(weight=weights, b=geom.allocate(1))
+        f2 = L1Norm(weight=weights, b=geom.allocate(1))
         f1 = L1Norm(b=geom.allocate(1))
 
         np.testing.assert_almost_equal(f1(x), f2(x))

@@ -392,7 +392,7 @@ class TestSAGA(CCPiTestClass):
     
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
-            SAGFunction([self.f], self.sampler)
+            SAGAFunction([self.f], self.sampler)
             pass
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):

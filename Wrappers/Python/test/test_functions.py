@@ -980,6 +980,18 @@ class TestFunction(CCPiTestClass):
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
+        np.random.seed(1)
+        weights= geom.allocate('random')
+        w = weights.abs().sum()
+        x=geom.allocate(1)
+        f1 = L1Norm()
+        f2 = L1Norm(weight=weights)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        np.testing.assert_allclose(f2(x), f1(weights))
+
+
 
 class TestTotalVariation(unittest.TestCase):
 

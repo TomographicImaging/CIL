@@ -23,7 +23,7 @@ from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
 from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer
+    VectorGeometry, VectorData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
 from cil.optimisation.operators import GradientOperator
@@ -51,6 +51,7 @@ import cil.utilities.multiprocessing as cilmp
 
 from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
 import numba
+from numbers import Number
 
 initialise_tests()
 
@@ -990,6 +991,45 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
         np.testing.assert_allclose(f2(x), f1(weights))
+
+    def test_L1Norm_input(self):
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        
+        weights = geom.allocate('random').as_array()
+        f2 = L1Norm(weight=weights)
+
+        w = np.abs(weights).sum()
+        x = geom.allocate(1)
+        np.testing.assert_allclose(f2(x), w)
+
+        weights = 1.5
+        self.L1Norm_input_test(x, weights)
+
+        weights = 1.5 * np.ones_like(x.as_array())
+        self.L1Norm_input_test(x, weights)
+
+        weights = geom.allocate(1.5)
+        self.L1Norm_input_test(x, weights)
+
+
+    def L1Norm_input_test(self, x, weights):
+        f2 = L1Norm(weight=weights)
+        
+        if isinstance(weights, DataContainer):
+            w = weights.as_array()
+        else:
+            w = weights
+        b = np.sum(w)
+        if isinstance(w, Number):
+            b = w * x.as_array().size
+        np.testing.assert_allclose(f2(x), b)
+        np.testing.assert_allclose(f2.convex_conjugate(x), 0)
+
+        z = f2.proximal(x, 0)
+        np.testing.assert_allclose(f2.proximal(x, 0).as_array(), x.as_array())
+        np.testing.assert_allclose(f2.proximal(x, 1).as_array(), x.geometry.allocate(0).as_array())
+
 
 
 

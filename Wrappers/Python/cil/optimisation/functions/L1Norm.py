@@ -320,9 +320,8 @@ class _WeightedL1Norm(Function):
     Parameters:
     -----------
 
-    weight: DataContainer, numpy ndarray, default None
-        Array of weights matching the size of the wavelet coefficients
-        If None returns the regular L1Norm.
+    weight: DataContainer, numpy ndarray
+        In the case of DataContainer or numpy array with the same shape as the intended domain of this WeightedL1Norm function. Array of weights.
     b: DataContainer, default None
         Translation of the function.
     """

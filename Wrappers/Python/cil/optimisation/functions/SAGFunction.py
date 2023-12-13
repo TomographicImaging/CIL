@@ -79,10 +79,11 @@ class SAGFunction(ApproximateGradientSumFunction):
         else:
             # due to the convention that we follow: without the 1/n factor
             self.stochastic_grad_difference.sapyb(1., self.full_gradient_at_iterate, 1., out=out) 
-          #  print(out.array)
+            #  print(out.array)
+
+
 
         self.list_stored_gradients[function_num].fill(self.stoch_grad_at_iterate)
-        print(self.list_stored_gradients[1].array)
         self.full_gradient_at_iterate.sapyb(1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)
         
 
@@ -100,12 +101,10 @@ class SAGFunction(ApproximateGradientSumFunction):
             self.full_gradient_at_iterate =  np.sum(self.list_stored_gradients) 
             self.data_passes = [1]     
         else:
-            self.list_stored_gradients = [x*0.0]*len(self.functions)
-            print(self.list_stored_gradients[1].array)
-            self.full_gradient_at_iterate =  x*0.0        
+            self.list_stored_gradients = [x.geometry.allocate(0) for fi in self.functions]
+            
+            self.full_gradient_at_iterate =  x.geometry.allocate(0)        
             self.data_passes=[]
-        self.stoch_grad_at_iterate = x * 0.0 # for CIL/SIRF compatibility
-        self.stochastic_grad_difference = x * 0.0 # for CIL/SIRF compatibility
         self.set_up_done= True 
 
 
@@ -168,7 +167,6 @@ class SAGAFunction(SAGFunction):
         else:
             # due to the convention that we follow: without the 1/n factor
             self.stochastic_grad_difference.sapyb(self.num_functions, self.full_gradient_at_iterate, 1., out=out) 
-          #  print(out.array)
 
         self.list_stored_gradients[function_num].fill(self.stoch_grad_at_iterate)
         self.full_gradient_at_iterate.sapyb(1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)

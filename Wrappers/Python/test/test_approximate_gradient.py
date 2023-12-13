@@ -225,9 +225,6 @@ class TestSVRG(CCPiTestClass):
         with self.assertRaises(TypeError):
             SVRGFunction(self.f, self.sampler)
 
-   
-
-
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -236,6 +233,19 @@ class TestSVRG(CCPiTestClass):
         with self.assertRaises(ValueError):
            SVRGFunction([self.f, self.f], bad_sampler)
 
+    def test_SVRG_init(self):
+        pass
+    
+    def test_SVRG_data_passes(self):
+        pass
+    
+    def test_SVRG_update_frequency(self):
+        pass
+    
+    def test_SVRG_store_gradients(self):
+        pass
+        
+    
 
     def test_SVRG_simulated_parallel_beam_data(self): 
 
@@ -284,16 +294,59 @@ class TestSVRG(CCPiTestClass):
         stochastic_objective=SVRGFunction(functions, sampler)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
+       
+
+        alg_stochastic = GD(initial=initial, 
+                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              step_size=0.05, max_iteration =5000)
+        
+        alg_stochastic.run(14, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(stochastic_objective.data_passes), np.array([1.]+[4./3, 5./3, 6./3, 7./3, 8./3,11./3,12./3, 13./3, 14./3, 15./3., 16./3, 19./3, 20./3]))
+        alg_stochastic.run(100, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
+
+    def test_SVRG_toy_example_store_gradients(self): 
+        sampler=Sampler.random_with_replacement(3, seed=1)
+        initial = VectorData(np.zeros(15))
+        np.random.seed(4)
+        b =  VectorData(np.random.normal(0,3,15))
+        functions=[]
+        for i in range(3):
+            diagonal=np.zeros(15)
+            diagonal[5*i:5*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+            if i==0:
+               objective=LeastSquares(A, A.direct(b))
+            else:
+               objective+=LeastSquares(A, A.direct(b))
+
+        rate = objective.L / 3.
+
+        alg = GD(initial=initial, 
+                              objective_function=objective, update_objective_interval=1000,
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        
+        alg.max_iteration = 80
+        alg.run(verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        stochastic_objective=SVRGFunction(functions, sampler, store_gradients=True)
+        self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
+        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
 
 
 
         alg_stochastic = GD(initial=initial, 
                               objective_function=stochastic_objective, update_objective_interval=1000,
                               step_size=0.05, max_iteration =5000)
+        alg_stochastic.run(10, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(stochastic_objective.data_passes), np.array([1.]+[4./3, 5./3, 6./3, 7./3,  8./3, 11./3, 12./3, 13./3, 14./3]))
+      
         alg_stochastic.run( 100, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
-
 
 
 
@@ -339,7 +392,17 @@ class TestLSVRG(CCPiTestClass):
         with self.assertRaises(TypeError):
             LSVRGFunction(self.f, self.sampler)
 
-   
+    def test_LSVRG_init(self):
+        pass
+    
+    def test_LSVRG_data_passes(self):
+        pass
+    
+    def test_LSVRG_update_frequency(self):
+        pass
+    
+    def test_LSVRG_store_gradients(self):
+        pass
 
 
     def test_sampler_without_next(self):
@@ -351,7 +414,7 @@ class TestLSVRG(CCPiTestClass):
            SVRGFunction([self.f, self.f], bad_sampler)
 
 
-    def test_SVRG_simulated_parallel_beam_data(self): 
+    def test_LSVRG_simulated_parallel_beam_data(self): 
 
         rate = self.f.L
         alg = GD(initial=self.initial, 
@@ -408,3 +471,40 @@ class TestLSVRG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
+    def test_LSVRG_toy_example_store_gradients(self): 
+        sampler=Sampler.random_with_replacement(3, seed=1)
+        initial = VectorData(np.zeros(15))
+        np.random.seed(4)
+        b =  VectorData(np.random.normal(0,3,15))
+        functions=[]
+        for i in range(3):
+            diagonal=np.zeros(15)
+            diagonal[5*i:5*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+            if i==0:
+               objective=LeastSquares(A, A.direct(b))
+            else:
+               objective+=LeastSquares(A, A.direct(b))
+
+        rate = objective.L / 3.
+
+        alg = GD(initial=initial, 
+                              objective_function=objective, update_objective_interval=1000,
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg.max_iteration = 80
+        alg.run(verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        stochastic_objective=LSVRGFunction(functions, sampler, store_gradients=True)
+        self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
+        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
+
+
+
+        alg_stochastic = GD(initial=initial, 
+                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              step_size=0.05, max_iteration =5000)
+        alg_stochastic.run( 100, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)

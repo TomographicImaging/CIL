@@ -21,16 +21,24 @@ import numpy as np
 class SAGFunction(ApproximateGradientSumFunction):
 
     """
-    TODO:
-    Stochastic gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
-   and the gradient function returns the approximate gradient :math:`n\nabla_xf_i(x)`. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic gradient descent algorithm. 
-   
+
+    Stochastic average gradient (SAG) function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
+   and the gradient function returns the approximate gradient. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method.  
+   By incorporating a memory of previous gradient values the SAG method achieves a faster convergence rate than black-box stochastic gradient methods. #TODO:check this 
+  
    Parameters:
     -----------
     functions : `list`  of functions
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
     sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
+    warm_start: Boolean, default : False
+        If `warm_start` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
+ 
+    References
+    ----------
+    Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6
+    
     """
   
     def __init__(self, functions,  sampler=None, warm_start=False):
@@ -44,7 +52,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     def approximate_gradient(self, x, function_num,  out=None):
         
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function num is selected using the :meth:`~ApproximateGradientSumFunction.next_function`.
+            The function num is selected using the sampler. 
         
         Parameters
         ----------
@@ -52,8 +60,6 @@ class SAGFunction(ApproximateGradientSumFunction):
         
         function_num: `int` 
             Between 1 and the number of functions in the list  
-        
-        
         
         """     
         if not self.set_up_done:
@@ -112,8 +118,9 @@ class SAGAFunction(SAGFunction):
 
     """
     TODO:
-    Stochastic gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
-   and the gradient function returns the approximate gradient :math:`n\nabla_xf_i(x)`. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic gradient descent algorithm. 
+    Stochastic average gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
+   and the gradient function returns the approximate gradient.  This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method. 
+   SAGA improves on the theory behind SAG and SVRG, with better theoretical convergence rates.
    
    Parameters:
     -----------
@@ -121,6 +128,12 @@ class SAGAFunction(SAGFunction):
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
     sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
+    warm_start: Boolean, default : False
+        If `warm_start` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
+ 
+    References
+    ----------
+    Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
     """
   
     def __init__(self, functions,  sampler=None, warm_start=False):
@@ -132,7 +145,7 @@ class SAGAFunction(SAGFunction):
     def approximate_gradient(self, x, function_num,  out=None):
         
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function num is selected using the :meth:`~ApproximateGradientSumFunction.next_function`.
+            The function num is selected using the sampler.
         
         Parameters
         ----------
@@ -140,9 +153,7 @@ class SAGAFunction(SAGFunction):
         
         function_num: `int` 
             Between 1 and the number of functions in the list  
-        
-        
-        
+               
         """     
         if not self.set_up_done:
             self._set_up(x)

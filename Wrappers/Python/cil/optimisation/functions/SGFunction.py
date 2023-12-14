@@ -41,7 +41,7 @@ class SGFunction(ApproximateGradientSumFunction):
     def approximate_gradient(self, x, function_num,  out=None):
         
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function num is selected using the :meth:`~ApproximateGradientSumFunction.next_function`.
+            The function num is selected using the sampler. 
         
         Parameters
         ----------

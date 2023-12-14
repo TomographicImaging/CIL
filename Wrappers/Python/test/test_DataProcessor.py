@@ -1533,7 +1533,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
 
-class TestPaddder(unittest.TestCase):
+class TestPadder(unittest.TestCase):
     
     def setUp(self):
 
@@ -2625,10 +2625,18 @@ class TestMasker(unittest.TestCase):
         data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
         data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
-        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
 
+        m = Masker.nearest_neighbours(mask=mask)
+        m.set_input(data)
+        res = m.process()
         
+        data_test = data.copy().as_array()
+        data_test[2,3] = numpy.mean([data_test[1,3], data_test[3,3], data_test[2,2], data_test[2,4]])
+        data_test[4,5] = numpy.mean([data_test[3,5], data_test[5,5], data_test[4,4], data_test[4,6]])
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+
 if __name__ == "__main__":
     
     d = TestDataProcessor()

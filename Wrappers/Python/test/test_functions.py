@@ -1101,6 +1101,8 @@ class TestFunction(CCPiTestClass):
         ret = soft_shrinkage(-0.5 *x, tau)
         np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
 
+        np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
+
 
 class TestTotalVariation(unittest.TestCase):
 

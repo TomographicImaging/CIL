@@ -32,14 +32,18 @@ def soft_shrinkage(x, tau, out=None):
     tau : float, numpy ndarray, DataContainer
     out : DataContainer, default None
         where to store the result. If None, a new DataContainer is created.
+    
+    Returns
+    --------
+    the value of the soft-shrinkage operator at x: DataContainer.
     """
 
     should_return = False
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-            out = x.copy()
+            out = x * 0
             outarr = out.as_array()
-            outarr.real = np.abs(outarr)
+            outarr.real = x.abs().as_array()
             out.fill(outarr)
         else:
             out = x.abs()
@@ -47,7 +51,8 @@ def soft_shrinkage(x, tau, out=None):
     else:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             outarr = out.as_array()
-            outarr.real = np.abs(outarr)
+            outarr.real = x.abs().as_array()
+            outarr.imag = 0
             out.fill(outarr)
         else:
             x.abs(out = out)

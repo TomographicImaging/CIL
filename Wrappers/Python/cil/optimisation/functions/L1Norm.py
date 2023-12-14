@@ -77,7 +77,7 @@ class L1Norm(Function):
     -----------
 
         weight: DataContainer, numpy ndarray, default None
-            Array of weights. If :code:`None` returns the L1 Norm.
+            Array of positive weights. If :code:`None` returns the L1 Norm.
         b: DataContainer, default None
             Translation of the function.
                                 
@@ -100,9 +100,8 @@ class L1Norm(Function):
         r"""Returns the value of the convex conjugate of the L1 Norm function at x.
 
 
-    This is the indicator of the unit :math:`L^{\infty}` norm 
+    This is the indicator of the unit :math:`L^{\infty}` norm:
     
-    Consider the following cases:
             
     a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
     b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle      
@@ -133,13 +132,13 @@ class L1Norm(Function):
 
     Returns
     --------
-    the value of the convex conjugate of the WeightedL1Norm function at x: float
+    the value of the convex conjugate of the WeightedL1Norm function at x: DataContainer.
 
         """        
         return self.function.convex_conjugate(x)
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the value of the proximal operator of the L1 Norm function at x.
+        r"""Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter `tau`.
         
         
     Consider the following cases:

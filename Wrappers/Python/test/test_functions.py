@@ -1011,9 +1011,9 @@ class TestFunction(CCPiTestClass):
 
         weights = geom.allocate(1.5)
         self.L1Norm_input_test(x, weights)
-weights=geom.allocate(-1)
-with self.assertRaises(ValueError):
-    f2=L1Norm(weight=weights)
+        weights=geom.allocate(-1)
+        with self.assertRaises(ValueError):
+            f2=L1Norm(weight=weights)
 
     def L1Norm_input_test(self, x, weights):
         f2 = L1Norm(weight=weights)

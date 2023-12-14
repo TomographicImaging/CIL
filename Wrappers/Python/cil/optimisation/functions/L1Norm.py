@@ -45,7 +45,12 @@ def soft_shrinkage(x, tau, out=None):
             out = x.abs()
         should_return = True
     else:
-        x.abs(out = out)
+        if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
+            outarr = out.as_array()
+            outarr.real = np.abs(outarr)
+            out.fill(outarr)
+        else:
+            x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
     if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:

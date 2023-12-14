@@ -25,7 +25,7 @@ import numpy as np
 from cil.framework import ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
-from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
+from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
@@ -1030,7 +1030,74 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(f2.proximal(x, 0).as_array(), x.as_array())
         np.testing.assert_allclose(f2.proximal(x, 1).as_array(), x.geometry.allocate(0).as_array())
 
+    def test_soft_shrinkage(self):
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate(1)
+        self.soft_shrinkage_test(x)
 
+        xc = geom.allocate(1, dtype=np.complex64)
+        self.soft_shrinkage_test(xc)
+
+
+    def soft_shrinkage_test(self, x):
+        tau = 1.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1.
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2.
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1.
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        # tau np.ndarray
+        tau = 1. * np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+
+        # tau DataContainer
+        tau = 1. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1. * x
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2. * x
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1. * x
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
 
 
 class TestTotalVariation(unittest.TestCase):

@@ -1114,7 +1114,12 @@ class TestFunction(CCPiTestClass):
 
         I = IdentityOperator(geom)
         f2 = WaveletNorm(I, weight=weights)
+        self.WaveletNormTest(f1, f2, x)
 
+        f2 = WaveletNorm(I)
+        self.WaveletNormTest(f1, f2, x)
+
+    def WaveletNormTest(self, f1, f2, x):
         np.testing.assert_almost_equal(f1(x), f2(x))
 
         tau = 1.

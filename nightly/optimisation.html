@@ -180,7 +180,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#indicator-box">Indicator box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#kullbackleibler">KullbackLeibler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#l1-norm">L1 Norm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#squared-l2-norm-squared">Squared L2 norm squared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#l2-norm-squared">L2 Norm Squared</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#least-squares">Least Squares</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mixed-l21-norm">Mixed L21 norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
@@ -357,8 +357,8 @@
       </a>
      </li>
      <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#squared-l2-norm-squared">
-       Squared L2 norm squared
+      <a class="reference internal nav-link" href="#l2-norm-squared">
+       L2 Norm Squared
       </a>
      </li>
      <li class="toc-h3 nav-item toc-entry">
@@ -4067,10 +4067,10 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <h3>L1 Norm<a class="headerlink" href="#l1-norm" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.optimisation.functions.L1Norm">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">L1Norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">L1Norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm" title="Permalink to this definition">#</a></dt>
 <dd><p>L1Norm function</p>
-<dl>
-<dt>Consider the following cases:</dt><dd><ol class="loweralpha">
+<p>Consider the following cases:</p>
+<ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
 \[F(x) = ||x||_{1}\]</div>
 </li>
@@ -4078,40 +4078,75 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 \[F(x) = ||x - b||_{1}\]</div>
 </li>
 </ol>
+<p>In the weighted case, <span class="math notranslate nohighlight">\(w\)</span> is an array of positive weights.</p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[F(x) = ||x||_{L^1(w)}\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[F(x) = ||x - b||_{L^1(w)}\]</div>
+</li>
+</ol>
+<p>with <span class="math notranslate nohighlight">\(||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weight</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy ndarray</em><em>, </em><em>default None</em>) – Array of positive weights. If <code class="code docutils literal notranslate"><span class="pre">None</span></code> returns the L1 Norm.</p></li>
+<li><p><strong>b</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default None</em>) – Translation of the function.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="cil.optimisation.functions.L1Norm.convex_conjugate">
 <code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.convex_conjugate" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the convex conjugate of the L1Norm function at x.
-Here, we need to use the convex conjugate of L1Norm, which is the Indicator of the unit
-<span class="math notranslate nohighlight">\(L^{\infty}\)</span> norm</p>
-<p>Consider the following cases:</p>
-<blockquote>
-<div><ol class="loweralpha">
+<dd><p>Returns the value of the convex conjugate of the L1 Norm function at x.</p>
+<p>This is the indicator of the unit <span class="math notranslate nohighlight">\(L^{\infty}\)</span> norm:</p>
+<ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
 \[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + &lt;x^{*},b&gt;\]</div>
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle\]</div>
 </li>
 </ol>
-</div></blockquote>
 <div class="math notranslate nohighlight">
 \[\begin{split}\mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
 = \begin{cases}
 0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
 \infty, \mbox{otherwise}
 \end{cases}\end{split}\]</div>
+<p>In the weighted case the convex conjugate is the indicator of the unit
+<span class="math notranslate nohighlight">\(L^{\infty}\)</span> norm.</p>
+<p>See:
+<a class="reference external" href="https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight">https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight</a></p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle\]</div>
+</li>
+</ol>
+<p>with <span class="math notranslate nohighlight">\(\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – where to evaluate the convex conjugate of the L1 Norm function.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>the value of the convex conjugate of the WeightedL1Norm function at x</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataContainer.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.L1Norm.proximal">
 <code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#L1Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the proximal operator of the L1Norm function at x.</p>
+<dd><p>Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter <cite>tau</cite>.</p>
 <p>Consider the following cases:</p>
-<blockquote>
-<div><ol class="loweralpha">
+<ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)\]</div>
 </li>
@@ -4119,10 +4154,34 @@ Here, we need to use the convex conjugate of L1Norm, which is the Indicator of t
 \[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b\]</div>
 </li>
 </ol>
-</div></blockquote>
 <p>where,</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
+<p>The weighted case follows from Example 6.23 in Chapter 6 of “First-Order Methods in Optimization”
+by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam.org/books/mo25/mo25_ch6.pdf">https://archive.siam.org/books/mo25/mo25_ch6.pdf</a></p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b\]</div>
+</li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>tau</strong> (<em>float</em><em>, </em><em>ndarray</em><em>, </em><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default None</em>) – If not None, the result will be stored in this object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>The value of the proximal operator of the L1 norm function at x</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataContainer.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4161,8 +4220,8 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 </dd></dl>
 
 </div>
-<div class="section" id="squared-l2-norm-squared">
-<h3>Squared L2 norm squared<a class="headerlink" href="#squared-l2-norm-squared" title="Permalink to this headline">#</a></h3>
+<div class="section" id="l2-norm-squared">
+<h3>L2 Norm Squared<a class="headerlink" href="#l2-norm-squared" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.optimisation.functions.L2NormSquared">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">L2NormSquared</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L2NormSquared.html#L2NormSquared"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L2NormSquared" title="Permalink to this definition">#</a></dt>
@@ -4551,17 +4610,6 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <p><a class="reference internal" href="#cil.optimisation.functions.L1Norm" title="cil.optimisation.functions.L1Norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1Norm</span></code></a>, <a class="reference internal" href="#cil.optimisation.functions.MixedL21Norm" title="cil.optimisation.functions.MixedL21Norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MixedL21Norm</span></code></a></p>
 </div>
 <dl class="py method">
-<dt id="cil.optimisation.functions.MixedL11Norm.proximal">
-<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.proximal" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the value of the proximal operator of the MixedL11Norm function at x.</p>
-<div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)\]</div>
-<p>where,</p>
-<div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
-</dd></dl>
-
-<dl class="py method">
 <dt id="cil.optimisation.functions.MixedL11Norm.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.L" title="Permalink to this definition">#</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
@@ -4589,6 +4637,17 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
 <div class="math notranslate nohighlight">
 \[F'(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.MixedL11Norm.proximal">
+<code class="sig-name descname"><span class="pre">proximal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/L1Norm.html#MixedL11Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the proximal operator of the MixedL11Norm function at x.</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)\]</div>
+<p>where,</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
 </dd></dl>
 
 <dl class="py method">

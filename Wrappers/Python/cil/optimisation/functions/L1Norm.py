@@ -236,6 +236,40 @@ class _L1Norm(Function):
                 soft_shrinkage(x, tau, out = out)   
 
 
+class _WeightedL1Norm(Function): 
+
+    def __init__(self, weight, b=None):
+        super().__init__()
+        self.weight = weight
+        self.b = b
+
+        if np.min(weight) <= 0:
+            raise ValueError("Weights should be strictly positive!")
+        
+    def __call__(self, x):
+        y = x*self.weight
+
+        if self.b is not None: 
+            y -= self.b
+
+        return y.abs().sum() 
+          
+    def convex_conjugate(self,x):
+        tmp = (x.abs()/self.weight).max() - 1
+
+        if tmp<=1e-5:            
+            if self.b is not None:
+                return self.b.dot(x)
+            else:
+                return 0.
+        return np.inf
+
+    def proximal(self, x, tau, out=None):
+        tau *= self.weight
+        ret = _L1Norm.proximal(self, x, tau, out=out)
+        tau /= self.weight
+        return ret
+
 class MixedL11Norm(Function):
 
     r"""MixedL11Norm function
@@ -284,37 +318,3 @@ class MixedL11Norm(Function):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))         
 
         return soft_shrinkage(x, tau, out = out) 
-
-class _WeightedL1Norm(Function): 
-
-    def __init__(self, weight, b=None):
-        super().__init__()
-        self.weight = weight
-        self.b = b
-
-        if np.min(weight) <= 0:
-            raise ValueError("Weights should be strictly positive!")
-        
-    def __call__(self, x):
-        y = x*self.weight
-
-        if self.b is not None: 
-            y -= self.b
-
-        return y.abs().sum() 
-          
-    def convex_conjugate(self,x):
-        tmp = (x.abs()/self.weight).max() - 1
-
-        if tmp<=1e-5:            
-            if self.b is not None:
-                return self.b.dot(x)
-            else:
-                return 0.
-        return np.inf
-
-    def proximal(self, x, tau, out=None):
-        tau *= self.weight
-        ret = _L1Norm.proximal(self, x, tau, out=out)
-        tau /= self.weight
-        return ret

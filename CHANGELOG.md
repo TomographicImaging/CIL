@@ -1,4 +1,5 @@
 * x.x.x
+  - Added a weight argument to the L1Norm function 
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding

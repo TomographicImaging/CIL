@@ -22,17 +22,17 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import DataContainer, ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer
+from cil.framework import ImageGeometry, \
+    VectorGeometry, VectorData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
-from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
+from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, \
-                                         WeightedL1Norm, WeightedL2NormSquared,\
+                                         WeightedL2NormSquared,\
                                          WaveletNorm
 from cil.optimisation.functions import BlockFunction
 
@@ -52,6 +52,7 @@ import cil.utilities.multiprocessing as cilmp
 
 from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
 import numba
+from numbers import Number
 
 initialise_tests()
 
@@ -915,7 +916,7 @@ class TestFunction(CCPiTestClass):
             (KullbackLeibler(b=b, backend='numba'), ag),
             (KullbackLeibler(b=b, backend='numpy'), ag),
             (L1Norm(), ag),
-            (WeightedL1Norm(), ag),
+            (L1Norm(weight=ag.allocate(1)), ag),
             (L2NormSquared(), ag),
             (WeightedL2NormSquared(), ag),
             (MixedL21Norm(), bg),
@@ -946,10 +947,10 @@ class TestFunction(CCPiTestClass):
 
     def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
-        f2 = WeightedL1Norm(weight=None)
+        f2 = L1Norm(weight=None)
 
-        assert f1.__class__.__name__ == 'L1Norm'
-        assert f2.__class__.__name__ == 'L1Norm'
+        assert f1.function.__class__.__name__ == '_L1Norm'
+        assert f2.function.__class__.__name__ == '_L1Norm'
 
     def test_L1Norm_vs_WeightedL1Norm(self):    
         f1 = L1Norm()
@@ -958,7 +959,7 @@ class TestFunction(CCPiTestClass):
         x = geom.allocate('random', seed=1)
 
         weights = geom.allocate(1)
-        f2 = WeightedL1Norm(weight=weights)
+        f2 = L1Norm(weight=weights)
         
         np.testing.assert_almost_equal(f1(x), f2(x))
 
@@ -969,7 +970,7 @@ class TestFunction(CCPiTestClass):
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
-        f2 = WeightedL1Norm(weight=weights, b=geom.allocate(1))
+        f2 = L1Norm(weight=weights, b=geom.allocate(1))
         f1 = L1Norm(b=geom.allocate(1))
 
         np.testing.assert_almost_equal(f1(x), f2(x))
@@ -981,7 +982,128 @@ class TestFunction(CCPiTestClass):
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
+        np.random.seed(1)
+        weights= geom.allocate('random')
+        w = weights.abs().sum()
+        x=geom.allocate(1)
+        f1 = L1Norm()
+        f2 = L1Norm(weight=weights)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        np.testing.assert_allclose(f2(x), f1(weights))
+
+    def test_L1Norm_input(self):
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
         
+        weights = geom.allocate('random').as_array()
+        f2 = L1Norm(weight=weights)
+
+        w = np.abs(weights).sum()
+        x = geom.allocate(1)
+        np.testing.assert_allclose(f2(x), w)
+
+        weights = 1.5
+        self.L1Norm_input_test(x, weights)
+
+        weights = 1.5 * np.ones_like(x.as_array())
+        self.L1Norm_input_test(x, weights)
+
+        weights = geom.allocate(1.5)
+        self.L1Norm_input_test(x, weights)
+        weights=geom.allocate(-1)
+        with self.assertRaises(ValueError):
+            f2=L1Norm(weight=weights)
+
+    def L1Norm_input_test(self, x, weights):
+        f2 = L1Norm(weight=weights)
+        
+        if isinstance(weights, DataContainer):
+            w = weights.as_array()
+        else:
+            w = weights
+        b = np.sum(w)
+        if isinstance(w, Number):
+            b = w * x.as_array().size
+        np.testing.assert_allclose(f2(x), b)
+        np.testing.assert_allclose(f2.convex_conjugate(x), 0)
+
+        z = f2.proximal(x, 0)
+        np.testing.assert_allclose(f2.proximal(x, 0).as_array(), x.as_array())
+        np.testing.assert_allclose(f2.proximal(x, 1).as_array(), x.geometry.allocate(0).as_array())
+
+    def test_soft_shrinkage(self):
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate(1)
+        self.soft_shrinkage_test(x)
+
+        xc = geom.allocate(1, dtype=np.complex64)
+        self.soft_shrinkage_test(xc)
+
+
+    def soft_shrinkage_test(self, x):
+        tau = 1.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1.
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2.
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1.
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        # tau np.ndarray
+        tau = 1. * np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+
+        # tau DataContainer
+        tau = 1. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1. * x
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2. * x
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1. * x
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+
+        np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
+
     def test_WaveletNorm(self):    
         f1 = L1Norm()
         N, M = 2,3
@@ -1001,11 +1123,6 @@ class TestFunction(CCPiTestClass):
                                    f2.proximal(x, tau).as_array())
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
-
-
-
-
-
 
 
 class TestTotalVariation(unittest.TestCase):
@@ -1102,7 +1219,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # TV as strongly convex, with "small" strongly convex constant
         TV_strongly_convex = self.alpha * TotalVariation(
-            strong_convexity_constant=1e-4)
+            strong_convexity_constant=1e-4, warm_start=False)
 
         # check call
         x_real = self.ig_real.allocate('random', seed=4)

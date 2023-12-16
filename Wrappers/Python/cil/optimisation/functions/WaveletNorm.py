@@ -17,8 +17,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.optimisation.functions import Function
-from cil.optimisation.functions.L1Norm import soft_shrinkage
+from cil.optimisation.functions import Function, L1Norm, soft_shrinkage
+
 import numpy as np
 ###############################################################################
 ###############################################################################
@@ -51,10 +51,9 @@ class WaveletNorm(Function):
         '''
         super(WaveletNorm, self).__init__()
         self.W = W
-        self.weight = weight
+        
+        self.l1norm = L1Norm(weight=weight)
 
-        if (weight is not None) and (np.min(weight) <= 0):
-            raise ValueError("Weights should be strictly positive!")
         
     def __call__(self, x):
         
@@ -64,14 +63,11 @@ class WaveletNorm(Function):
             a) .. math:: f(x) = ||Wx||_{\ell^1}     
             b) .. math:: f(x) = ||Wx||_{\ell^1(w)} (weighted norm)
         """
-        if self.weight is None:
-            y = self.W.direct(x)
-        else:
-            y = self.W.direct(x)*self.weight
+        y = self.W.direct(x)
 
-        return y.abs().sum()  
+        return self.l1norm(y)  
           
-    def convex_conjugate(self,x):
+    def convex_conjugate(self, x):
         
         r"""Returns the value of the convex conjugate of the WaveletNorm function at x.
         Here, we need to use the convex conjugate of WaveletNorm, which is the Indicator of the unit 
@@ -92,15 +88,9 @@ class WaveletNorm(Function):
             \infty, \mbox{otherwise}
             \end{cases}
     
-        """        
-        if self.weight is None:
-            tmp = self.W.direct(x).abs().max() - 1
-        else:
-            tmp = (self.W.direct(x).abs()/self.weight).max() - 1
-
-        if tmp<=1e-5:            
-            return 0.
-        return np.inf
+        """
+        y = self.W.direct(x)
+        return self.l1norm.convex_conjugate(y)
 
                     
     def proximal(self, x, tau, out=None):
@@ -122,12 +112,6 @@ class WaveletNorm(Function):
         .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
                             
         """  
-        if self.weight is not None:
-            y = soft_shrinkage(self.W.direct(x), tau*self.weight)
-        else:
-            y = soft_shrinkage(self.W.direct(x), tau)
+        y = self.W.direct(x)
+        return self.l1norm.proximal(y, tau, out)
 
-        if out is None:                                              
-            return self.W.adjoint(y)
-        else: 
-            self.W.adjoint(y, out=out)

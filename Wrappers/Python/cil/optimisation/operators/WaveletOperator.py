@@ -65,6 +65,9 @@ class WaveletOperator(LinearOperator):
 
         
         if level is None:
+            # Default decomposition level is the theoretical maximum: log_2(min(input.shape)).
+            # However, this is not always recommended and pywt should give a warning if the coarsest
+            # scales are too small to be meaningful.
             level = pywt.dwtn_max_level(domain_geometry.shape, wavelet=wname, axes=axes)
         self.level = int(level)
 
@@ -144,7 +147,6 @@ class WaveletOperator(LinearOperator):
         if weight is not None:
             self._apply_weight(coeffs, weight)
         # else: apply no weight
-        # Note: weight takes priority over s
 
         Wx, _ = pywt.coeffs_to_array(coeffs, axes=self.axes)
 
@@ -165,16 +167,18 @@ class WaveletOperator(LinearOperator):
         if weight is not None:
             self._apply_weight(coeffs, weight)
         # else: apply no weight
-        # Note: weight takes priority over s
 
         x = pywt.waverecn(coeffs, wavelet=self.wname, axes=self.axes)
 
+        # Need to slice the output in case original size is of odd length
+        org_size = [slice(i) for i in self.domain_geometry().shape]
+
         if out is None:
             ret = self.domain_geometry().allocate()
-            ret.fill(x)
+            ret.fill(x[org_size])
             return ret
         else:
-            out.fill(x)
+            out.fill(x[org_size])
         
     def calculate_norm(self):
         orthWavelets = pywt.wavelist(family=None, kind="discrete")

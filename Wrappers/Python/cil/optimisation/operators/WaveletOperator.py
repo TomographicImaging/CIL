@@ -104,7 +104,8 @@ class WaveletOperator(LinearOperator):
                 range_geometry.voxel_num_x = range_shape[1]
                 range_geometry.voxel_num_y = range_shape[0]
             elif len(range_shape) == 1:
-                range_geometry.voxel_num_x = range_shape[0]
+                range_geometry.voxel_num_x = range_shape[0] # Not sure if this is needed
+                range_geometry.length = range_shape[0] # This is unique to vector geometry
                 range_geometry.shape = (range_shape[0],)
             else:
                 raise AttributeError(f"Dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")

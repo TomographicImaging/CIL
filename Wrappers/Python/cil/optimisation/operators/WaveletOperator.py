@@ -65,6 +65,9 @@ class WaveletOperator(LinearOperator):
 
         
         if level is None:
+            # Default decomposition level is the theoretical maximum: log_2(min(input.shape)).
+            # However, this is not always recommended and pywt should give a warning if the coarsest
+            # scales are too small to be meaningful.
             level = pywt.dwtn_max_level(domain_geometry.shape, wavelet=wname, axes=axes)
         self.level = int(level)
 
@@ -90,7 +93,7 @@ class WaveletOperator(LinearOperator):
             if hasattr(range_geometry, 'channels'):
                 if range_geometry.channels > 1:
                     range_geometry.channels = range_shape[0]
-                    range_shape = range_shape[1:]
+                    range_shape = range_shape[1:] # Remove channels temporarily
 
             
             if len(range_shape) == 3:
@@ -101,8 +104,8 @@ class WaveletOperator(LinearOperator):
                 range_geometry.voxel_num_x = range_shape[1]
                 range_geometry.voxel_num_y = range_shape[0]
             elif len(range_shape) == 1:
-                range_geometry.voxel_num_x = range_shape[0]
-                range_geometry.shape = (range_shape[0],)
+                range_geometry.voxel_num_x = range_shape[0] # Not sure if this is needed
+                range_geometry.length = range_shape[0] # This is unique to vector geometry
             else:
                 raise AttributeError(f"Dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")
                     
@@ -144,7 +147,6 @@ class WaveletOperator(LinearOperator):
         if weight is not None:
             self._apply_weight(coeffs, weight)
         # else: apply no weight
-        # Note: weight takes priority over s
 
         Wx, _ = pywt.coeffs_to_array(coeffs, axes=self.axes)
 
@@ -165,16 +167,18 @@ class WaveletOperator(LinearOperator):
         if weight is not None:
             self._apply_weight(coeffs, weight)
         # else: apply no weight
-        # Note: weight takes priority over s
 
         x = pywt.waverecn(coeffs, wavelet=self.wname, axes=self.axes)
 
+        # Need to slice the output in case original size is of odd length
+        org_size = tuple(slice(i) for i in self.domain_geometry().shape)
+
         if out is None:
             ret = self.domain_geometry().allocate()
-            ret.fill(x)
+            ret.fill(x[org_size])
             return ret
         else:
-            out.fill(x)
+            out.fill(x[org_size])
         
     def calculate_norm(self):
         orthWavelets = pywt.wavelist(family=None, kind="discrete")

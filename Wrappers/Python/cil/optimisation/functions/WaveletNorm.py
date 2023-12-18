@@ -113,5 +113,6 @@ class WaveletNorm(Function):
                             
         """  
         y = self.W.direct(x)
-        return self.l1norm.proximal(y, tau, out)
+        self.l1norm.proximal(y, tau, out=y)
+        return self.W.adjoint(y, out)
 

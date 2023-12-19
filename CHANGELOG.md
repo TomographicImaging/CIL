@@ -1,13 +1,17 @@
 * x.x.x
+  - Added a weight argument to the L1Norm function 
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding
+  - Fixed formatting errors in the L2NormSquared and LeastSquares documentation 
   - Bug fix for BlockDataContainer as iterator
   - Dropped support for IPP versions older than 2021.10 due to header changes
   - Fix build include directories
-  - proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - Proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - ZeroOperator no longer relies on the default of allocate
+  - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  
+
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object

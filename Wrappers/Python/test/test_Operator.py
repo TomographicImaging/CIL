@@ -75,6 +75,20 @@ class TestOperator(CCPiTestClass):
         A.adjoint(res1, out = out2)
         self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)
     
+    def test_ZeroOperator(self):
+        ig = ImageGeometry(10,20,30)
+        img = ig.allocate(3)
+        out=ig.allocate(0)
+        op1=ZeroOperator(ig)
+        self.assertNumpyArrayEqual(op1.direct(img).array,out.array)
+        self.assertNumpyArrayEqual(op1.adjoint(img).array,out.array)
+        ig2 = ImageGeometry(10,15,30)
+        out2=ig2.allocate(0)
+        img2=ig2.allocate(5)
+        op2=ZeroOperator(ig, ig2)
+        self.assertNumpyArrayEqual(op2.direct(img).array,out2.array)
+        self.assertNumpyArrayEqual(op2.adjoint(img2).array,out.array)
+        self.assertEqual(op2.calculate_norm(),0)
 
     def test_ScaledOperator(self):
         ig = ImageGeometry(10,20,30)

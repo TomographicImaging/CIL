@@ -24,7 +24,7 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 
 class SymmetrisedGradientOperator(LinearOperator):
     
-    r''' The symmetrised gradient is the operator, :math:`E`, defined by :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrized Gradient and 
+    r''' The symmetrised gradient is the operator, :math:`E`, defined by :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrised Gradient and 
         
         .. math::
         
@@ -125,7 +125,15 @@ class SymmetrisedGradientOperator(LinearOperator):
             
                                                
     def adjoint(self, x, out=None):
-        '''Returns the adjoint of the symmetrised gradient operator'''        
+        r'''Returns the adjoint of the symmetrised gradient operator
+        
+        Parameters:
+        -------------
+        
+        x: BlockDataContainer
+        out: BlockDataContainer, default None
+            If out is not None the output of adjoint will be filled in out, otherwise a new object is instantiated and returned.
+        '''         
        
         if out is None:
             

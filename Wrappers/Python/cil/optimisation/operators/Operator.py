@@ -386,7 +386,7 @@ class ScaledOperator(Operator):
 
     -----------
     operator: a `Operator` or `LinearOperator`
-    scalar: scalar: Number
+    scalar:  Number
         a scalar multiplier
 
     Example
@@ -481,7 +481,15 @@ class SumOperator(Operator):
                                           range_geometry=self.operator1.range_geometry())
 
     def direct(self, x, out=None):
-
+        r"""Calls the sum operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the domain of the SumOperator
+        out:  DataContainer or BlockDataContainer, default None
+            If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
         if out is None:
             return self.operator1.direct(x) + self.operator2.direct(x)
         else:
@@ -489,7 +497,16 @@ class SumOperator(Operator):
             out.add(self.operator2.direct(x), out=out)
 
     def adjoint(self, x, out=None):
-
+        r"""Calls the adjoint of the sum operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the range of the SumOperator
+        out: DataContainer or BlockDataContainer, default None
+            If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
+        
         if self.linear_flag:
             if out is None:
                 return self.operator1.adjoint(x) + self.operator2.adjoint(x)
@@ -503,6 +520,7 @@ class SumOperator(Operator):
         return self.linear_flag
 
     def calculate_norm(self):
+        '''Returns the norm of the SumOperator'''
         if self.is_linear():
             return LinearOperator.calculate_norm(self)
 
@@ -549,6 +567,15 @@ class CompositionOperator(Operator):
 
     def direct(self, x, out=None):
 
+        """Calls the composition operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the domain of the CompositionOperator
+        out:  DataContainer or BlockDataContainer, default None
+            If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
         if out is None:
             # return self.operator1.direct(self.operator2.direct(x))
             # return functools.reduce(lambda X,operator: operator.direct(X),
@@ -595,7 +622,16 @@ class CompositionOperator(Operator):
                 out.fill(step)
 
     def adjoint(self, x, out=None):
-
+        """Calls the adjoint of the composition operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the range of the CompositionOperator
+        out: DataContainer or BlockDataContainer, default None
+            If out is not None the output of the adjoint of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
+        
         if self.linear_flag:
 
             if out is not None:

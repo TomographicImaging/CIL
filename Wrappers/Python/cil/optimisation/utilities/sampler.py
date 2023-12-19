@@ -22,288 +22,52 @@ import time
 from functools import partial
 
 
-class SamplerFromFunction():
+class Sampler():
     """     
-        A class that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}.
+    This class follows the factory design pattern. It is not instantiated directly but has 6 static methods that will return instances of 6 different samplers, which require a variety of parameters.
 
-        The function next() outputs a single next index from the list {0,1,…,S-1}.To be run again and again, depending on how many iterations.
+    Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
 
-        It is recommended to use the static methods to configure your Sampler object rather than initialising this class directly: the user should call this through Sampler.from_function(num_indices, function, prob_weights) from cil.optimisation.utilities.sampler.
-
-        Parameters
-        ----------
-
-        function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
-
-        num_indices: int
-            One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
-
-        sampling_type:strm default='from_function"
-            The sampling type used. Choose from "sequential", "staggered", "herman_meyer" and "from_function". 
-
-        prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
-            Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
-
-        Returns
-        -------
-        A Sampler wrapping a function that can be called with Sampler.next()  or next(Sampler)
-
-        Example
-        -------    
-        >>> sampler=Sampler.staggered(21,4)
-        >>> print(sampler.get_samples(5))
-        [ 0  4  8 12 16]
-
-        Example
-        -------
-        >>> sampler=Sampler.sequential(10)
-        >>> print(sampler.get_samples(5))
-        [0 1 2 3 4]
-
-        Example
-        -------
-        >>> sampler=Sampler.herman_meyer(12)
-        >>> print(sampler.get_samples(16))
-        [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
+    Common in each instantiated class, the function `next()` outputs a single next index from the list {0,1,…,S-1}. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
 
 
-        Example
-        -------
-        This example creates a sampler that uniformly randomly with replacement samples from the numbers {0,1,...,48} for the first 500 iterations. 
-        For the next 500 iterations it uniformly randomly with replacement samples from {0,...,49}. The num_indices is 50 and the prob_weights are left as default because in the limit all indices will be seen with equal probability. 
-        >>> def test_function(iteration_number):
-        >>>     if iteration_number<500:
-        >>>         np.random.seed(iteration_number)
-        >>>         return(np.random.choice(49,1)[0])
-        >>>     else:
-        >>>         np.random.seed(iteration_number)
-        >>>         return(np.random.choice(50,1)[0])
-        >>>
-        >>> Sampler.from_function(num_indices, function, prob_weights=None)
-        >>> print(list(sampler.get_samples(25)))
-        [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
-
-
-        Example
-        -------
-        This example creates a sampler that samples in order from a custom list. The num_indices  is 13, although note that the index 12 is never called by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list. 
-        The probability weights are calculated and passed to the sampler as they are not uniform. 
-
-        >>> custom_list=[1,1,1,0,0,11,5,9,8,3]
-        >>> num_indices=13
-        >>> 
-        >>> def test_function(iteration_number, custom_list=custom_list):
-            return(custom_list[iteration_number%len(custom_list)])
-        >>> 
-        >>> #calculate prob weights 
-        >>> temp_list = []
-        >>> for i in range(num_indices):
-        >>>     temp_list.append(custom_list.count(i))
-        >>> total = sum(temp_list)
-        >>> prob_weights = [x/total for x in temp_list]
-        >>> 
-        >>> sampler=Sampler.from_function(num_indices=num_indices, function=test_function, prob_weights=prob_weights)
-        >>> print(list(sampler.get_samples(25)))
-        [1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0]
-        >>> print(sampler)
-        Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. 
-        Type : from_function 
-        Current iteration number : 11 
-        number of indices : 13 
-        Probability weights : [0.2, 0.3, 0.0, 0.1, 0.0, 0.1, 0.0, 0.0, 0.1, 0.1, 0.0, 0.1, 0.0] 
-
-
-        Note
-        -----
-        If your function involves a random number generator, then the seed should also depend on the iteration number, see the first example in the documentation, otherwise
-        the `get_samples()` function may not accurately return the correct samples and may interrupt the next sample returned. 
-        """
-
-    def __init__(self, function, num_indices,  sampling_type='from_function', prob_weights=None):
-
-        self._type = sampling_type
-        self._num_indices = num_indices
-        self.function = function
-
-        if abs(sum(prob_weights)-1) > 1e-6:
-            raise ValueError('The provided prob_weights must sum to one')
-
-        if any(np.array(prob_weights) < 0):
-            raise ValueError(
-                'The provided prob_weights must be greater than or equal to zero')
-
-        self._prob_weights = prob_weights
-        self._iteration_number = 0
-
-    @property
-    def prob_weights(self):
-        return self._prob_weights
-
-    @property
-    def num_indices(self):
-        return self._num_indices
-
-    @property
-    def current_iter_number(self):
-        return self._iteration_number
-
-    def next(self):
-        """ 
-        Returns and increments the sampler 
-        """
-        out = self.function(self._iteration_number)
-        self._iteration_number += 1
-        return out
-
-    def __next__(self):
-        return self.next()
-
-    def get_samples(self,  num_samples=20):
-        """
-        Returns the first `num_samples` produced by the sampler as a numpy array.
-
-        num_samples: int, default=20
-            The number of samples to return. 
-        """
-        save_last_index = self._iteration_number
-        self._iteration_number = 0
-        output = [self.next() for _ in range(num_samples)]
-        self._iteration_number = save_last_index
-        return np.array(output)
-
-    def __str__(self):
-        repres = "Deterministic sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. \n"
-        repres += "Type : {} \n".format(self._type)
-        repres += "Current iteration number : {} \n".format(
-            self._iteration_number)
-        repres += "Number of indices : {} \n".format(self._num_indices)
-        repres += "Probability weights : {} \n".format(self._prob_weights)
-        return repres
-
-
-class SamplerRandom():
-    r"""
-    A class to select from a list of indices {0, 1, …, S-1} using numpy.random.choice with and without replacement. 
-    The function next() outputs a single next index from the list {0,1,…,S-1} .  
-
-    It is recommended to use the static methods to configure your Sampler object rather than initialising this class directly: the user should call this through cil.optimisation.utilities.sampler and choose the desired static method from the Sampler class.  
-
+        
     Parameters
     ----------
+
+    function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
+
     num_indices: int
         One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
-    sampling_type:str
-         The sampling type used. Choose from "random_with_replacement" and "random_without_replacement"
+    sampling_type:str default='from_function"
+        The sampling type used. Choose from "random_with_replacement", "random_without_replacement", "sequential", "staggered", "herman_meyer" and "from_function". 
 
-    replace= bool
-        If True, sample with replace, otherwise sample without replacement
-
-    prob: list of floats of length num_indices that sum to 1. 
-        For random sampling with replacement, this is the probability for each index to be called by next. 
-
-    seed:int, default=None
-        Random seed for the methods that use a numpy random number generator.  If set to None, the seed will be set using the current time.  
-
-    prob_weights: list of floats of length num_indices that sum to 1. 
+    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
         Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
-
-
+    
+    replace: bool
+        If True, sample with replace, otherwise sample without replacement
+    
+    seed:int, default=None
+        Random seed for the methods that use a numpy random number generator.  If set to None, the seed will be set using the current time.
+    
     Returns
     -------
-    A Sampler wrapping numpy.random.choice that can be called with Sampler.next()  or next(Sampler)
+    A Sampler that can be called with Sampler.next() or next(Sampler)
 
     Example
     -------
     >>> sampler=Sampler.random_with_replacement(5)
-    >>> print(sampler.get_samples(10))
-    [3 4 0 0 2 3 3 2 2 1]
-
-    >>> sampler=Sampler.random_with_replacement(4, [0.7,0.1,0.1,0.1])
-    >>> print(sampler.get_samples(10))
-    [0 1 3 0 0 3 0 0 0 0]
-
-    >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
-    >>> print(sampler.get_samples(16))
-    [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
-    """
-
-    def __init__(self, num_indices, replace,  sampling_type,  prob=None, seed=None):
-
-        self._replace = replace
-        self._prob = prob
-
-        if prob is None:
-            self._prob = [1/num_indices]*num_indices
-
-        if replace:
-            self._prob_weights = self._prob
-        else:
-            self._prob_weights = [1/num_indices]*num_indices
-
-        if abs(sum(self._prob_weights)-1) > 1e-6:
-            raise ValueError('The provided prob_weights must sum to one')
-
-        if any(np.array(self._prob_weights) < 0):
-            raise ValueError(
-                'The provided prob_weights must be greater than or equal to zero')
-
-        self._type = sampling_type
-        self._num_indices = num_indices
-
-        if seed is not None:
-            self._seed = seed
-        else:
-            self._seed = int(time.time())
-
-        self._generator = np.random.RandomState(self._seed)
-
-    @property
-    def prob_weights(self):
-        return self._prob_weights
-
-    @property
-    def num_indices(self):
-        return self._num_indices
-
-    def next(self):
-        """ Returns and increments the sampler """
-
-        return int(self._generator.choice(self._num_indices, 1, p=self._prob, replace=self._replace))
-
-    def __next__(self):
-        return self.next()
-
-    def get_samples(self,  num_samples=20):
-        """
-        Returns the first `num_samples` as a numpy array.
-
-        num_samples: int, default=20
-            The number of samples to return. 
-
-        """
-        save_generator = self._generator
-        self._generator = np.random.RandomState(self._seed)
-        output = [self.next() for _ in range(num_samples)]
-        self._generator = save_generator
-        return np.array(output)
-
-    def __str__(self):
-        repres = "Random sampler that wraps numpy.random.choice to sample from {0, 1, …, S-1}, where S is the number of indices."
-        repres += "Type : {} \n".format(self._type)
-        repres += "Number of indices : {} \n".format(self._num_indices)
-        repres += "Probability weights : {} \n".format(self._prob_weights)
-        return repres
+    >>> print(sampler.get_samples())
+    [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
 
 
-class Sampler():
-
-    r"""
-    This class follows the factory design pattern. It is not instantiated but has 6 static methods that will return instances of 6 different samplers, which require a variety of parameters.
-
-    Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
-
-    Common in each instantiated  class, the function `next()` outputs a single next index from the list {0,1,…,S-1}. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
+    Example
+    -------    
+    >>> sampler=Sampler.staggered(21,4)
+    >>> print(sampler.get_samples(5))
+    [ 0  4  8 12 16]
 
     Example
     -------
@@ -311,12 +75,65 @@ class Sampler():
     >>> print(sampler.get_samples(5))
     [0 1 2 3 4]
 
+    Example
+    -------
+    >>> sampler=Sampler.herman_meyer(12)
+    >>> print(sampler.get_samples(16))
+    [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
+
+
+    Example TODO:
+    -------
+    This example creates a sampler that uniformly randomly with replacement samples from the numbers {0,1,...,48} for the first 500 iterations. 
+    For the next 500 iterations it uniformly randomly with replacement samples from {0,...,49}. The num_indices is 50 and the prob_weights are left as default because in the limit all indices will be seen with equal probability. 
+    >>> def test_function(iteration_number):
+    >>>     if iteration_number<500:
+    >>>         np.random.seed(iteration_number)
+    >>>         return(np.random.choice(49,1)[0])
+    >>>     else:
+    >>>         np.random.seed(iteration_number)
+    >>>         return(np.random.choice(50,1)[0])
+    >>>
+    >>> Sampler.from_function(num_indices, function, prob_weights=None)
+    >>> print(list(sampler.get_samples(25)))
+    [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
+
+    
+    Note TODO: 
+    -----
+    If your function involves a random number generator, then the seed should also depend on the iteration number otherwise
+    the `get_samples()` function may not accurately return the correct samples and may interrupt the next sample returned. 
+
 
     Example
     -------
-    >>> sampler=Sampler.random_with_replacement(5)
-    >>> print(sampler.get_samples())
-    [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
+    This example creates a sampler that samples in order from a custom list. The num_indices  is 13, although note that the index 12 is never called by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list. 
+    The probability weights are calculated and passed to the sampler as they are not uniform. 
+
+    >>> custom_list=[1,1,1,0,0,11,5,9,8,3]
+    >>> num_indices=13
+    >>> 
+    >>> def test_function(iteration_number, custom_list=custom_list):
+        return(custom_list[iteration_number%len(custom_list)])
+    >>> 
+    >>> #calculate prob weights 
+    >>> temp_list = []
+    >>> for i in range(num_indices):
+    >>>     temp_list.append(custom_list.count(i))
+    >>> total = sum(temp_list)
+    >>> prob_weights = [x/total for x in temp_list]
+    >>> 
+    >>> sampler=Sampler.from_function(num_indices=num_indices, function=test_function, prob_weights=prob_weights)
+    >>> print(list(sampler.get_samples(25)))
+    [1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0, 11, 5, 9, 8, 3, 1, 1, 1, 0, 0]
+    >>> print(sampler)
+    Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. 
+    Type : from_function 
+    Current iteration number : 11 
+    number of indices : 13 
+    Probability weights : [0.2, 0.3, 0.0, 0.1, 0.0, 0.1, 0.0, 0.0, 0.1, 0.1, 0.0, 0.1, 0.0] 
+
+
 
     Note
     -----
@@ -327,9 +144,7 @@ class Sampler():
     For example, to be 99% certain that you have seen all indices, for `n=20` you should take at least 152 samples, `n=50` at least 426 samples. To be more likely than not, for `n=20` you should take 78 samples and `n=50` you should take 228 samples. 
     In general, we note that for a large number of samples (e.g. `>20*num_indices`), the density of the outputted samples looks more and more uniform. For a small number of samples (e.g. `<5*num_indices`) the user may wish to consider
     another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
-
-    """
-
+        """
     @staticmethod
     def sequential(num_indices):
         """
@@ -351,29 +166,10 @@ class Sampler():
         [0 1 2 3 4]
         """
         def function(x): return x % num_indices
-        sampler = SamplerFromFunction(function=function, num_indices=num_indices, sampling_type='sequential',  prob_weights=[
+        sampler = Sampler(function=function, num_indices=num_indices, sampling_type='sequential',  prob_weights=[
             1/num_indices]*num_indices)
         return sampler
 
-    @staticmethod
-    def _prime_factorisation(n):
-        factors = []
-
-        while n % 2 == 0:
-            n //= 2
-            factors.append(2)
-
-        i = 3
-        while i*i <= n:
-            while n % i == 0:
-                n //= i
-                factors.append(i)
-            i += 2
-
-        if n > 1:
-            factors.append(n)
-
-        return factors
 
     @staticmethod
     def _staggered_function(num_indices, offset, iter_number):
@@ -419,10 +215,12 @@ class Sampler():
         if offset >= num_indices:
             raise (ValueError('The offset should be less than the number of indices'))
 
-        sampler = SamplerFromFunction(function=partial(Sampler._staggered_function, num_indices, offset), num_indices=num_indices, sampling_type='staggered', prob_weights=[
+        sampler = Sampler(function=partial(Sampler._staggered_function, num_indices, offset), num_indices=num_indices, sampling_type='staggered', prob_weights=[
             1/num_indices]*num_indices)
 
         return sampler
+    
+    
 
     @staticmethod
     def random_with_replacement(num_indices, prob=None, seed=None):
@@ -459,13 +257,15 @@ class Sampler():
 
         if prob == None:
             prob = [1/num_indices] * num_indices
+        
+        
 
-        sampler = SamplerRandom(
-            num_indices=num_indices, sampling_type='random_with_replacement', replace=True, prob=prob, seed=seed)
+        sampler = Sampler(
+            num_indices=num_indices, sampling_type='random_with_replacement', replace=True, prob_weights=prob, seed=seed)
         return sampler
 
     @staticmethod
-    def random_without_replacement(num_indices, seed=None, prob=None):
+    def random_without_replacement(num_indices, seed=None):
         """
         Instantiates a sampler which outputs from a list of indices {0, 1, …, S-1}, with S=num_indices, uniformly randomly without replacement.
 
@@ -488,8 +288,8 @@ class Sampler():
 
         """
 
-        sampler = SamplerRandom(
-            num_indices=num_indices, sampling_type='random_without_replacement', replace=False,  seed=seed, prob=prob)
+        sampler = Sampler(
+            num_indices=num_indices, sampling_type='random_without_replacement', replace=False,  seed=seed)
         return sampler
 
     @staticmethod
@@ -565,7 +365,7 @@ class Sampler():
         if prob_weights is None:
             prob_weights = [1/num_indices]*num_indices
 
-        sampler = SamplerFromFunction(
+        sampler = Sampler(
             num_indices=num_indices, sampling_type='from_function', function=function, prob_weights=prob_weights)
         return sampler
 
@@ -688,7 +488,109 @@ class Sampler():
                            num_indices, addition_arr, repeat_length_arr)
 
         # define the sampler
-        sampler = SamplerFromFunction(function=hmf_call,
+        sampler = Sampler(function=hmf_call,
                                       num_indices=num_indices, sampling_type='herman_meyer', prob_weights=[1/num_indices]*num_indices)
 
         return sampler
+
+    def __init__(self, num_indices, function=None, seed=None, replace='True',  sampling_type='random_with_replacement', prob_weights=None):
+
+        self._type = sampling_type
+        self._num_indices = num_indices
+        self.function = function
+        
+        if prob_weights is None:
+            prob_weights=[1/num_indices]*num_indices
+        else:
+            if abs(sum(prob_weights)-1) > 1e-6:
+                raise ValueError('The provided prob_weights must sum to one')
+
+            if any(np.array(prob_weights) < 0):
+                raise ValueError(
+                    'The provided prob_weights must be greater than or equal to zero')
+
+        self._prob_weights = prob_weights
+        self._iteration_number = 0
+        
+        if function is not None:
+            self.next=self.next_function
+            self.deterministic=True
+        else:
+            if seed is not None:
+                self._seed = seed
+            else:
+                self._seed = int(time.time())
+            self.next=self.next_random
+            self._generator = np.random.RandomState(self._seed)
+            self._sampling_list=None
+            self.deterministic=False
+            self._replace=replace
+            
+
+    @property
+    def prob_weights(self):
+        return self._prob_weights
+
+    @property
+    def num_indices(self):
+        return self._num_indices
+
+    @property
+    def current_iter_number(self):
+        return self._iteration_number
+
+    def next_function(self):
+        """ 
+        Returns and increments the sampler 
+        """
+
+        out = self.function(self._iteration_number)
+
+        self._iteration_number += 1
+        return out
+
+    def next_random(self):
+        """ Returns and increments the sampler """
+        if self._iteration_number% self._num_indices==0:
+            self._sampling_list=self._generator.choice(self._num_indices, self._num_indices, p=self._prob_weights, replace=self._replace)
+        out=self._sampling_list[self._iteration_number % self._num_indices]
+        self._iteration_number+=1
+        return out
+    
+    def __next__(self):
+        return self.next()
+
+    def get_samples(self,  num_samples=20):
+        """
+        Returns the first `num_samples` produced by the sampler as a numpy array.
+
+        Parameters
+        ----------
+        num_samples: int, default=20
+            The number of samples to return. 
+        """
+        save_last_index = self._iteration_number
+        self._iteration_number = 0
+        if not self.deterministic:
+            save_generator = self._generator
+            self._generator = np.random.RandomState(self._seed)
+            save_sampling_list=self._sampling_list
+        output = [self.next() for _ in range(num_samples)]
+        self._iteration_number = save_last_index
+        if not self.deterministic:
+            self._generator = save_generator
+            self._sampling_list=save_sampling_list 
+        return np.array(output)
+
+    def __str__(self): 
+        repres = "Sampler that selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. \n"
+        repres += "Type : {} \n".format(self._type)
+        repres += "Current iteration number : {} \n".format(
+            self._iteration_number)
+        repres += "Number of indices : {} \n".format(self._num_indices)
+        repres += "Probability weights : {} \n".format(self._prob_weights)
+        return repres
+
+
+
+    

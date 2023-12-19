@@ -26,7 +26,7 @@ import numpy as np
 from cil.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer, AcquisitionData, AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
-from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
+from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator, BlockOperator
 
 

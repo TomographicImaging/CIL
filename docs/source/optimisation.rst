@@ -316,7 +316,7 @@ L1 Norm
    :members:
    :inherited-members:
 
-Squared L2 norm squared
+L2 Norm Squared
 -----------------------
 .. l2norm:
 

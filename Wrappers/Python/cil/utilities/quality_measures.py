@@ -33,7 +33,7 @@ def mse(dc1, dc2, mask=None):
         One image to be compared
     dc2: `DataContainer`
         Second image to be compared 
-    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
+    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `dc1` and `dc2`
         Region of interest for the calculation. 
     '''  
 
@@ -57,7 +57,7 @@ def mae(dc1, dc2, mask=None):
         One image to be compared
     dc2: `DataContainer`
         Second image to be compared 
-    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
+    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `dc1` and `dc2`
         Region of interest for the calculation. 
         
         
@@ -81,7 +81,7 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
     corrupted: `DataContainer`
         The image to be evaluated 
     data_range: scalar value, default=None
-        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). To match with scikit-image the defauly is ground_truth.array.max()
+        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). To match with scikit-image the default is ground_truth.array.max()
     mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
         Region of interest for the calculation. 
     '''  

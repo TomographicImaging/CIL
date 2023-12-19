@@ -152,7 +152,7 @@ class SAGAFunction(SAGFunction):
 
         """
         if not self.set_up_done:
-            self._set_up(x)git 
+            self._set_up(x)
 
         self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 

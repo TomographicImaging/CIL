@@ -47,6 +47,17 @@ CIL's [optimised FDK/FBP](https://github.com/TomographicImaging/CIL/discussions/
 1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `intel` [channel](https://anaconda.org/intel/ipp).
 2. [TIGRE](https://github.com/CERN/TIGRE), which can be installed via conda from the `ccpi` channel.
 
+## Docker
+
+Finally, CIL can be run via a Jupyter Notebook enabled Docker container:
+
+```sh
+docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:latest
+```
+
+GPU support requires [`nvidia-container-toolkit`](https://github.com/NVIDIA/nvidia-container-toolkit) and an NVIDIA GPU.
+Omit the `--gpus all` to run without GPU support.
+
 # Getting Started with CIL
 
 ## CIL on binder
@@ -74,7 +85,7 @@ git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
 The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/TomographicImaging/CIL-Data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as
 
 ```sh
-git submodule update --init
+git submodule update --init --recursive
 ```
 
 ## Build dependencies
@@ -122,6 +133,15 @@ cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_l
 ```
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.
+
+## Building with Docker
+
+In the repository root, simply update submodules and run `docker build`:
+
+```sh
+git submodule update --init --recursive
+docker build . -t ghcr.io/tomographicimaging/cil
+```
 
 # References
 

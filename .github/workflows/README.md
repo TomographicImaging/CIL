@@ -16,6 +16,10 @@ It looks for conda-build dependencies in the channels listed [here](https://gith
 
 An artifact of the resulting tar.bz2 file is made available in the 'Summary' section of the action. It is called `cil-package`. This is used by the **docs** job. It can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page. Clicking on `cil-package` allows you to download a zip folder containing the tar.bz2 file.
 
+## Building/Pushing the Docker Image: docker job
+
+TODO
+
 ## Building/Publishing Documentation: docs job
 
 This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). To do this it uses a forked version of the [build-sphinx-action](https://github.com/lauramurgatroyd/build-sphinx-action).

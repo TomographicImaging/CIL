@@ -117,7 +117,7 @@ jobs:
       id: build-args
       run: |
         if ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}; then
-          echo "args=CIL_TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          echo "args=CIL_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
         else
           echo "args=" >> $GITHUB_OUTPUT
         fi

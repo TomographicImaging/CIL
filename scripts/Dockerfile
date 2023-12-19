@@ -10,12 +10,12 @@ LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 LABEL org.opencontainers.image.description="Core Imaging Library"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
-ARG CIL_TAG=23.1.0
+ARG CIL_VERSION=23.1.0
 # CUDA-specific packages
 ARG CIL_EXTRA_PACKAGES=astra-toolbox tigre
 RUN mamba install -y -c conda-forge -c intel -c ccpi \
   $CIL_EXTRA_PACKAGES \
-  cil=$CIL_TAG ccpi-regulariser tomophantom "ipywidgets<8" \
+  cil=$CIL_VERSION ccpi-regulariser tomophantom "ipywidgets<8" \
   jupyter-server-proxy \
   && mamba clean -a -y -f \
   && fix-permissions "${CONDA_DIR}" \

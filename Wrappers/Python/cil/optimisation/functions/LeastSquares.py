@@ -25,9 +25,7 @@ from numbers import Number
 import numpy as np
 
 
-class LeastSquares(Function):
-    
-    
+class LeastSquares(Function): 
     r""" (Weighted) Least Squares function
     
     .. math:: F(x) = c\|Ax-b\|_2^2 
@@ -36,27 +34,20 @@ class LeastSquares(Function):
     
     .. math:: F(x) = c\|Ax-b\|_{2,W}^{2}
     
-    Parameters:
+    where :math:`W=\text{diag}(weight)`.
+    
+    Parameters
     -----------
+    A : LinearOperator
+    b : Data, DataContainer
+    c : Scaling Constant, float, default 1.0     
+    weight: DataContainer with all positive elements of size of the range of operator A, default None
         
-        A : LinearOperator
-
-        b : Data, DataContainer
-        
-        c : Scaling Constant, float, default 1.0
-               
-        weight: DataContainer with all positive elements of size of the range of operator A, default None
-        
-    Members:  
+    Note
     --------      
             
-        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c s1(A)^2`, or
-        
-        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||weight|| ||A||_2^2 = 2s1(A)^2`,
-    
-    where s1(A) is the largest singular value of A.
+    L is the  Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c \sigma_1(A)^2`, or :math:`2 c ||W|| ||A||_2^2 = 2c||W|| \sigma_1(A)^2`, where :math:`\sigma_1(A)` is the largest singular value of :math:`A` and :math:`W=\text{diag}(weight)`.
        
-    
     """
     
     def __init__(self, A, b, c=1.0, weight = None):
@@ -77,7 +68,7 @@ class LeastSquares(Function):
         
     def __call__(self, x):
         
-        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or c\|Ax-b\|_{2,weight}^2
+        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or :math:`c\|Ax-b\|_{2,W}^2`, where :math:`W=\text{diag}(weight)`:
                         
         """
         # c * (A.direct(x)-b).dot((A.direct(x) - b))
@@ -92,12 +83,16 @@ class LeastSquares(Function):
 
     def gradient(self, x, out=None):
         
-        r""" Returns the value of the gradient of :math:`F(x) = c*\|A*x-b\|_2^2`
+        r""" Returns the value of the gradient of :math:`F(x)`:
         
-             .. math:: F'(x) = 2cA^T(Ax-b)
+        .. math:: F'(x) = 2cA^T(Ax-b)
              
-             .. math:: F'(x) = 2cA^T(weight(Ax-b))
+        or 
+             
+        .. math:: F'(x) = 2cA^T(W(Ax-b))
 
+        where :math:`W=\text{diag}(weight)`.
+    
         """
         should_return = True
         if out is not None:
@@ -157,6 +152,7 @@ class LeastSquares(Function):
 
     def __rmul__(self, other):
         '''defines the right multiplication with a number'''
+    
         if not isinstance (other, Number):
             raise NotImplemented
         constant = self.c * other

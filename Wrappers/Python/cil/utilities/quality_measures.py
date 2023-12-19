@@ -40,11 +40,10 @@ def mse(dc1, dc2, mask=None):
     if mask is None:
         diff = dc1 - dc2    
         return L2NormSquared().__call__(diff)/dc1.size
-    
     else:
-        if isinstance(mask,DataContainer):
-            mask=mask.array
-        return np.mean(((dc1.array-dc2.array)**2), where=mask.astype('bool'))
+        if isinstance(mask, DataContainer):
+            mask = mask.as_array()
+        return np.mean(((dc1.as_array() - dc2.as_array())**2), where=mask.astype('bool'))
 
 
 def mae(dc1, dc2, mask=None):
@@ -68,10 +67,10 @@ def mae(dc1, dc2, mask=None):
         return L1Norm().__call__(diff)/dc1.size
     else:
         if isinstance(mask, DataContainer):
-            mask=mask.array
-    return np.mean(np.abs((dc1.array-dc2.array)), where=mask.astype('bool'))
+            mask=mask.as_array()
+    return np.mean(np.abs((dc1.as_array()-dc2.as_array())), where=mask.astype('bool'))
 
-def psnr(ground_truth, corrupted, data_range = None, mask=None):
+def psnr(ground_truth, corrupted, data_range=None, mask=None):
 
     ''' Returns the Peak signal to noise ratio
     
@@ -91,8 +90,8 @@ def psnr(ground_truth, corrupted, data_range = None, mask=None):
             data_range=ground_truth.array.max()
         else:
             if isinstance(mask, DataContainer):
-                mask=mask.array
-            data_range=np.amax(ground_truth.array[mask.astype('bool')])
+                mask=mask.as_array()
+            data_range=np.amax(ground_truth.as_array()[mask.astype('bool')])
     
     tmp_mse = mse(ground_truth, corrupted, mask=mask) 
 

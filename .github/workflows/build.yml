@@ -107,7 +107,7 @@ jobs:
     - uses: docker/metadata-action@v5
       id: meta
       with:
-        images: tomographicimaging/cil
+        images: ghcr.io/${{ github.repository }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -116,8 +116,8 @@ jobs:
     - name: Get tag
       id: build-args
       run: |
-        if ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') }}; then
-          echo "args=CIL_TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        if ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}; then
+          echo "args=CIL_TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
         else
           echo "args=" >> $GITHUB_OUTPUT
         fi

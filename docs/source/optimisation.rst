@@ -147,27 +147,31 @@ A :code:`ScaledOperator` represents the multiplication of any operator with a sc
 
 .. autoclass:: cil.optimisation.operators.Operator
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.operators.LinearOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.ScaledOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.CompositionOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.DiagonalOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.ChannelwiseOperator
    :members:
-   :special-members:
+
+
+.. autoclass:: cil.optimisation.operators.SumOperator
+   :members:
+  
 
 Trivial operators
 -----------------
@@ -176,19 +180,19 @@ Trivial operators are the following.
 
 .. autoclass:: cil.optimisation.operators.IdentityOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.ZeroOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.MatrixOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.MaskOperator
    :members:
-   :special-members:
+
 
 
 GradientOperator 
@@ -316,7 +320,7 @@ L1 Norm
    :members:
    :inherited-members:
 
-Squared L2 norm squared
+L2 Norm Squared
 -----------------------
 .. l2norm:
 

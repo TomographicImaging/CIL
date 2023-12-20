@@ -322,18 +322,28 @@ class LinearOperator(Operator):
         Evaluates if the following equivalence holds
         .. math::
           Ax\times y = y \times A^Tx
-        :param operator: operator to test the dot_test
-        :param range_init: optional initialisation container in the operator range 
-        :param domain_init: optional initialisation container in the operator domain 
-        :param seed: Seed random generator
-        :type : int, default = 1
-        :param tolerance: Check if the following expression is below the tolerance
+          
+        Parameters
+        ----------
+        
+        operator:
+            operator to test the dot_test
+        range_init:
+            optional initialisation container in the operator range 
+        domain_init:
+            optional initialisation container in the operator domain 
+        seed: int, default = 1
+            Seed random generator
+        tolerance:float, default 1e-6
+            Check if the following expression is below the tolerance
         .. math:: 
 
             |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) < tolerance
 
-        :type : float, default 1e-6
-        :returns: boolean, True if the test is passed.       
+        
+        Returns
+        -------
+        boolean, True if the test is passed.       
         '''
 
         seed = kwargs.get('seed', 1)
@@ -373,16 +383,15 @@ class ScaledOperator(Operator):
     For the rest it behaves like the operator it holds.
 
     Parameters
-    ----------
-    operator: a Operator or LinearOperator
 
-    scalar: a scalar multiplier
-
-
+    -----------
+    operator: a `Operator` or `LinearOperator`
+    scalar:  Number
+        a scalar multiplier
 
     Example
-    -------
-       The scaled operator behaves like the following:
+    --------
+    The scaled operator behaves like the following:
 
     .. code-block:: python
 
@@ -441,9 +450,23 @@ class ScaledOperator(Operator):
 ###############################################################################
 
 class SumOperator(Operator):
+    """Sums two operators. 
+    For example, `SumOperator(left, right).direct(x)` is equivalent to  `left.direct(x)+right.direct(x)`
 
+    
+    Parameters
+    ----------
+    operator1: `Operator`
+        The first `Operator` in the sum
+    operator2: `Operator`
+        The second `Operator` in the sum
+        
+    Note
+    ----
+    Both operators must have the same domain and range. 
+    
+    """
     def __init__(self, operator1, operator2):
-
         self.operator1 = operator1
         self.operator2 = operator2
 
@@ -459,7 +482,15 @@ class SumOperator(Operator):
                                           range_geometry=self.operator1.range_geometry())
 
     def direct(self, x, out=None):
-
+        r"""Calls the sum operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the domain of the SumOperator
+        out:  DataContainer or BlockDataContainer, default None
+            If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
         if out is None:
             return self.operator1.direct(x) + self.operator2.direct(x)
         else:
@@ -467,7 +498,16 @@ class SumOperator(Operator):
             out.add(self.operator2.direct(x), out=out)
 
     def adjoint(self, x, out=None):
-
+        r"""Calls the adjoint of the sum operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the range of the SumOperator
+        out: DataContainer or BlockDataContainer, default None
+            If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
+        
         if self.linear_flag:
             if out is None:
                 return self.operator1.adjoint(x) + self.operator2.adjoint(x)
@@ -481,6 +521,7 @@ class SumOperator(Operator):
         return self.linear_flag
 
     def calculate_norm(self):
+        '''Returns the norm of the SumOperator'''
         if self.is_linear():
             return LinearOperator.calculate_norm(self)
 
@@ -492,7 +533,16 @@ class SumOperator(Operator):
 
 
 class CompositionOperator(Operator):
+    """Composes one or more operators. 
+    For example, `CompositionOperator(left, right).direct(x)` is equivalent to `left.direct(right.direct(x))`
 
+    
+    Parameters
+    ----------
+    args: `Operator`s
+        Operators to be composed. As in mathematical notation, the operators will be applied right to left
+    
+    """
     def __init__(self, *operators, **kwargs):
 
         # get a reference to the operators
@@ -519,6 +569,15 @@ class CompositionOperator(Operator):
 
     def direct(self, x, out=None):
 
+        """Calls the composition operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the domain of the CompositionOperator
+        out:  DataContainer or BlockDataContainer, default None
+            If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
         if out is None:
             # return self.operator1.direct(self.operator2.direct(x))
             # return functools.reduce(lambda X,operator: operator.direct(X),
@@ -565,7 +624,16 @@ class CompositionOperator(Operator):
                 out.fill(step)
 
     def adjoint(self, x, out=None):
-
+        """Calls the adjoint of the composition operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the range of the CompositionOperator
+        out: DataContainer or BlockDataContainer, default None
+            If out is not None the output of the adjoint of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
+        """
+        
         if self.linear_flag:
 
             if out is not None:

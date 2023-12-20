@@ -11,6 +11,7 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
+  - Update documentation for symmetrised gradient 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

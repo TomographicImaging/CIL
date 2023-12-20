@@ -521,7 +521,7 @@ class SumOperator(Operator):
         return self.linear_flag
 
     def calculate_norm(self):
-        '''Returns the norm of the SumOperator'''
+        '''Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.'''
         if self.is_linear():
             return LinearOperator.calculate_norm(self)
 
@@ -678,9 +678,8 @@ class CompositionOperator(Operator):
         return self.linear_flag
 
     def calculate_norm(self):
-        '''Returns the norm of the CompositionOperator, that is the product of the norms
-        of its operators.'''
-        norm = 1.
-        for operator in self.operators:
-            norm *= operator.norm()
-        return norm
+        '''Returns the norm of the CompositionOperator. Note that this gives a NotImplementedError if the CompositionOperator is not linear.'''
+        if self.is_linear():
+            return LinearOperator.calculate_norm(self)
+
+        return super().calculate_norm(self)

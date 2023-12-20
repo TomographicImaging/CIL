@@ -1072,48 +1072,61 @@ class TestOperatorCompositionSum(unittest.TestCase):
 
 
     def test_CompositionOperator_norm1(self):
+   
+        M1 = numpy.array([[1,0],[1,2]], dtype=float)
+        M1op = MatrixOperator(M1)
+        
+        M2=numpy.array([[3,1],[0,1]], dtype=float)
+        M2op = MatrixOperator(M2)
 
-        example_operator1 = Mock()
-        example_operator1.norm.return_value = 2.6
 
-        example_operator2 = Mock()
-        example_operator2.norm.return_value = 3.4
+        d = CompositionOperator(M1op, M2op)
 
-        d = CompositionOperator(example_operator1, example_operator2)
-
-        out1 = 8.84
-        out2 = d.norm()
-
-        numpy.testing.assert_almost_equal(out2, out1)
-
+        self.assertAlmostEqual(M2op.norm(), 3.1795867966025404,places=4)
+        self.assertAlmostEqual(M1op.norm(), 2.288245580264566, places=4)
+        self.assertAlmostEqual(d.norm(), 5.162277659459584, places=4)
 
     def test_CompositionOperator_norm2(self):
+   
+        M1 = numpy.array([[4,3],[1,1]], dtype=float)
+        M1op = MatrixOperator(M1)
+        
+        M2=numpy.array([[1,-3],[-1,4]], dtype=float)
+        M2op = MatrixOperator(M2)
 
-        example_operator1 = Mock()
-        example_operator1.norm.return_value = 2.6
 
-        example_operator2 = Mock()
-        example_operator2.norm.return_value = 3.4
+        d = CompositionOperator(M1op, M2op)
 
-        example_operator3 = Mock()
-        example_operator3.norm.return_value = 5.0
+        self.assertAlmostEqual(d.norm(), 1, places=4)
+        
 
-        d = CompositionOperator(example_operator1, example_operator2, example_operator3)
+    def test_CompositionOperator_norm3(self):
+        ig = self.ig
+        M1 = numpy.array([[4,3],[1,1]], dtype=float)
+        M1op = MatrixOperator(M1)
+        
+        M2=numpy.array([[1,-3],[-1,4]], dtype=float)
+        M2op = MatrixOperator(M2)
 
-        out1 = 44.2
+        M3=numpy.array([[1,-5],[-1,6]], dtype=float)
+        M3op = MatrixOperator(M2)
+
+        d = CompositionOperator(M1op, M2op, M3op)
+
+        out1 = M3op.norm()
         out2 = d.norm()
 
         numpy.testing.assert_almost_equal(out2, out1)
 
 
-    def test_CompositionOperator_norm3(self):
+    def test_CompositionOperator_norm4(self):
 
-        example_operator1 = Mock()
-        example_operator1.norm.return_value = 2.6
+        M1 = numpy.array([[4,0],[0,1]], dtype=float)
+        M1op = MatrixOperator(M1)
 
-        d = CompositionOperator(example_operator1)
+        d = CompositionOperator(M1op)
 
-        out1 = 2.6
+        out1 = 4
         out2 = d.norm()
 
         numpy.testing.assert_almost_equal(out2, out1)

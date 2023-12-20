@@ -15,6 +15,8 @@
   - Added the a `Sampler` class as a CIL optimisation utility 
   - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
   - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
+  - Update documentation for symmetrised gradient 
+  - Added documentation for CompositionOperator and SumOperator
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

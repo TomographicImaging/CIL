@@ -1,29 +1,24 @@
 #  -*- coding: utf-8 -*-
 # Copyright 2021 United Kingdom Research and Innovation
 # Copyright 2021 The University of Manchester
-
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-
 #     http://www.apache.org/licenses/LICENSE-2.0
-
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-name: conda_and_docs_build
+name: build
 on:
   release:
     types: [published]
   push:
     branches: [master]
-    tags:
-      - '**'
+    tags: ['**']
     paths-ignore:
     - 'CHANGELOG.md'
     - 'CITATION.cff'
@@ -41,7 +36,7 @@ on:
     - 'NOTICE.txt'
     - 'README.md'
 jobs:
-  conda_build:
+  conda:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v4
@@ -56,54 +51,44 @@ jobs:
         convert_osx: false
         test_pyver: 3.9
         test_npver: 1.22
-    - name: Upload artifact of the conda package.
+    - name: Upload artifact of the conda package
       uses: actions/upload-artifact@v3
       with:
         name: cil-package
         path: recipe/linux-64/cil*
-  docs_build:
-    needs: conda_build
+  docs:
+    needs: conda
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - run: ls
-    - name: Download artifact of the conda package.
+    - name: Download artifact of the conda package
       uses: actions/download-artifact@v3
       with:
         name: cil-package
-        path: 'conda_package'
-    - uses: conda-incubator/setup-miniconda@v2
+        path: conda_package
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: 3.9
     - uses: lauramurgatroyd/build-sphinx-action@v0.1.4
       with:
-        DOCS_PATH: docs
-        CONDA_BUILD_ENV_FILEPATH: docs/docs_environment.yml
-        ARTIFACT_NAME: DocumentationHTML
-        PACKAGE_FOLDER_PATH: conda_package
-        PACKAGE_NAME: cil
-        PACKAGE_CONDA_CHANNELS: conda-forge -c intel -c ccpi
-        BUILD_SUBDIR_NAME: nightly
+        docs_path: docs
+        conda_build_env_filepath: docs/docs_environment.yml
+        artifact_name: DocumentationHTML
+        package_folder_path: conda_package
+        package_name: cil
+        package_conda_channels: conda-forge -c intel -c ccpi
+        build_subdir_name: nightly
         python_version: 3.9
-  docs_publish:
-    needs: docs_build
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Download artifact of the html output.
-      uses: actions/download-artifact@v3
-      with:
-        name: DocumentationHTML
-        path: docs/build
     - name: redirect to nightly
       run: >
         sed 's#DESTINATION#https://tomographicimaging.github.io/CIL/nightly/#g'
         docs/.redirect-template.html
         > docs/build/index.html
     - name: Push changes
+      if: github.ref == 'refs/heads/master'
       uses: casperdcl/push-dir@v1
       with:
         message: Update documentation

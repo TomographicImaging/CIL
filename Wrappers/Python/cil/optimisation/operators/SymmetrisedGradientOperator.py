@@ -24,38 +24,48 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 
 class SymmetrisedGradientOperator(LinearOperator):
     
-    r'''Symmetrized Gradient Operator:  E: V -> W
-        
-        V : range of the Gradient Operator
-        W : range of the Symmetrized Gradient          
-
-        Example (2D): 
+    r''' The symmetrised gradient is the operator, :math:`E`, defined by :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrised Gradient and 
         
         .. math::
-            v = (v1, v2) \\
         
-            Ev = 0.5 * ( \nabla\cdot v + (\nabla\cdot c)^{T} ) \\
-            
-            \begin{matrix} 
-                \partial_{y} v1 & 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
-                0.5 * (\partial_{x} v1 + \partial_{y} v2) & \partial_{x} v2 
-            \end{matrix}
-                                                                  
+            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} ) \\
+                        
+        
+    In 2 dimensions, let :math:`v(x,y)=(v_1(x,y),v_2(x,y))` which gives
+        
+        .. math::
+        
+            \nabla v =\left( \begin{matrix} 
+                \partial_{x} v_1 & \partial_x v_2\\
+                \partial_{y}v_1 & \partial_y v_2
+            \end{matrix}\right)
+        
+    and thus 
+        
+        .. math::
+        
+            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} )       
+            =\left( \begin{matrix} 
+                \partial_{x} v_1 & 0.5  (\partial_{y} v_1 + \partial_{x} v_2) \\
+                0.5  (\partial_{x} v_1 + \partial_{y} v_2) & \partial_{y} v_2 
+            \end{matrix}\right)
+                          
+    Parameters
+    ----------
+    domain_geometry: `BlockGeometry` with shape (2,1) or (3,1)
+        Set up the domain of the function. 
+    bnd_cond: str, optional, default :code:`Neumann`
+        Boundary condition either :code:`Neumann` or :code:`Periodic`
+    correlation: str, optional, default :code:`Channel`
+        Correlation either :code:`SpaceChannel` or :code:`Channel`
+        
     '''
     
     CORRELATION_SPACE = "Space"
     CORRELATION_SPACECHANNEL = "SpaceChannels"
     
     def __init__(self, domain_geometry, bnd_cond = 'Neumann', **kwargs):
-        '''creator
-        
-        :param domain_geometry: domain of the operator
-        :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
-        :type bnd_cond: str, optional, default :code:`Neumann`
-        :param correlation: :code:`SpaceChannel` or :code:`Channel`
-        :type correlation: str, optional, default :code:`Channel`
-        '''
-        
+
         self.bnd_cond = bnd_cond
         self.correlation = kwargs.get('correlation',SymmetrisedGradientOperator.CORRELATION_SPACE)
                 
@@ -78,7 +88,15 @@ class SymmetrisedGradientOperator(LinearOperator):
         
     def direct(self, x, out=None):
         
-        '''Returns E(v)'''        
+        r'''Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` 
+        
+        Parameters:
+        -------------
+        
+        x: BlockDataContainer
+        out: BlockDataContainer, default None
+            If out is not None the output of direct will be filled in out, otherwise a new object is instantiated and returned.
+        '''        
         
         if out is None:
             
@@ -107,7 +125,16 @@ class SymmetrisedGradientOperator(LinearOperator):
             
                                                
     def adjoint(self, x, out=None):
+        r'''Returns the adjoint of the symmetrised gradient operator
         
+        Parameters:
+        -------------
+        
+        x: BlockDataContainer
+        out: BlockDataContainer, default None
+            If out is not None the output of adjoint will be filled in out, otherwise a new object is instantiated and returned.
+        '''         
+       
         if out is None:
             
             tmp = [None]*self.domain_geometry().shape[0]

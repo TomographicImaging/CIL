@@ -12,6 +12,8 @@
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
   - Update documentation for symmetrised gradient 
+  - Added documentation for CompositionOperator and SumOperator
+
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

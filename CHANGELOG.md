@@ -1,4 +1,5 @@
 * x.x.x
+  - Added a weight argument to the L1Norm function 
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding
@@ -10,6 +11,9 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
+  - Update documentation for symmetrised gradient 
+  - Added documentation for CompositionOperator and SumOperator
+
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

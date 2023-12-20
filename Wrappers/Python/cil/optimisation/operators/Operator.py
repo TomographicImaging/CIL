@@ -522,6 +522,7 @@ class SumOperator(Operator):
 
     def calculate_norm(self):
         '''Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.'''
+
         if self.is_linear():
             return LinearOperator.calculate_norm(self)
 

@@ -1,5 +1,6 @@
 
 * x.x.x
+  - Added a weight argument to the L1Norm function 
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class 
   - Internal variable name change in BlockOperator to aid understanding
@@ -14,6 +15,10 @@
   - Added the a `Sampler` class as a CIL optimisation utility 
   - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
   - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
+  - Update documentation for symmetrised gradient 
+  - Added documentation for CompositionOperator and SumOperator
+
+
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

@@ -3159,26 +3159,57 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py class">
 <dt id="cil.optimisation.operators.SymmetrisedGradientOperator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">SymmetrisedGradientOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bnd_cond</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neumann'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SymmetrisedGradientOperator.html#SymmetrisedGradientOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SymmetrisedGradientOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>Symmetrized Gradient Operator:  E: V -&gt; W</p>
-<p>V : range of the Gradient Operator
-W : range of the Symmetrized Gradient</p>
-<p>Example (2D):</p>
-<div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}\begin{split}v = (v1, v2) \\\end{split}\\\begin{split}Ev = 0.5 * ( \nabla\cdot v + (\nabla\cdot c)^{T} ) \\\end{split}\\\begin{split}\begin{matrix}
-    \partial_{y} v1 &amp; 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
-    0.5 * (\partial_{x} v1 + \partial_{y} v2) &amp; \partial_{x} v2
-\end{matrix}\end{split}\end{aligned}\end{align} \]</div>
+<dd><p>The symmetrised gradient is the operator, <span class="math notranslate nohighlight">\(E\)</span>, defined by <span class="math notranslate nohighlight">\(E: V \rightarrow W\)</span> where <cite>V</cite> is <cite>BlockGeometry</cite> and  <cite>W</cite> is the range of the Symmetrised Gradient and</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}E(v) = 0.5  ( \nabla v + (\nabla v)^{T} ) \\\end{split}\]</div>
+</div></blockquote>
+<p>In 2 dimensions, let <span class="math notranslate nohighlight">\(v(x,y)=(v_1(x,y),v_2(x,y))\)</span> which gives</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\nabla v =\left( \begin{matrix}
+    \partial_{x} v_1 &amp; \partial_x v_2\\
+    \partial_{y}v_1 &amp; \partial_y v_2
+\end{matrix}\right)\end{split}\]</div>
+</div></blockquote>
+<p>and thus</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}E(v) = 0.5  ( \nabla v + (\nabla v)^{T} )
+=\left( \begin{matrix}
+    \partial_{x} v_1 &amp; 0.5  (\partial_{y} v_1 + \partial_{x} v_2) \\
+    0.5  (\partial_{x} v_1 + \partial_{y} v_2) &amp; \partial_{y} v_2
+\end{matrix}\right)\end{split}\]</div>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_geometry</strong> (<cite>BlockGeometry</cite> with shape (2,1) or (3,1)) – Set up the domain of the function.</p></li>
+<li><p><strong>bnd_cond</strong> (str, optional, default <code class="code docutils literal notranslate"><span class="pre">Neumann</span></code>) – Boundary condition either <code class="code docutils literal notranslate"><span class="pre">Neumann</span></code> or <code class="code docutils literal notranslate"><span class="pre">Periodic</span></code></p></li>
+<li><p><strong>correlation</strong> (str, optional, default <code class="code docutils literal notranslate"><span class="pre">Channel</span></code>) – Correlation either <code class="code docutils literal notranslate"><span class="pre">SpaceChannel</span></code> or <code class="code docutils literal notranslate"><span class="pre">Channel</span></code></p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="cil.optimisation.operators.SymmetrisedGradientOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SymmetrisedGradientOperator.html#SymmetrisedGradientOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SymmetrisedGradientOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns E(v)</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )\)</span></p>
+<p>x: BlockDataContainer
+out: BlockDataContainer, default None</p>
+<blockquote>
+<div><p>If out is not None the output of direct will be filled in out, otherwise a new object is instantiated and returned.</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.SymmetrisedGradientOperator.adjoint">
 <code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/SymmetrisedGradientOperator.html#SymmetrisedGradientOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SymmetrisedGradientOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the adjoint/inverse operation</p>
-<p>only available to linear operators</p>
+<dd><p>Returns the adjoint of the symmetrised gradient operator</p>
+<p>x: BlockDataContainer
+out: BlockDataContainer, default None</p>
+<blockquote>
+<div><p>If out is not None the output of adjoint will be filled in out, otherwise a new object is instantiated and returned.</p>
+</div></blockquote>
 </dd></dl>
 
 </dd></dl>

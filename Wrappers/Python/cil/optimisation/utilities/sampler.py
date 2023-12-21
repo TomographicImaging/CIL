@@ -549,7 +549,7 @@ class SamplerRandom(Sampler):
     prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
         Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
 
-    replace: bool, defualt is True 
+    replace: bool, default is True 
         If True, sample with replace, otherwise sample without replacement
 
     seed:int, default = None
@@ -579,12 +579,12 @@ class SamplerRandom(Sampler):
     another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
         """
 
-    def __init__(self, num_indices,  seed=None, replace='True', prob=None,  sampling_type='random_with_replacement'):
+    def __init__(self, num_indices,  seed=None, replace=True, prob=None,  sampling_type='random_with_replacement'):
 
         if seed is not None:
             self._seed = seed
         else:
-            self._seed = int(time.time())  # TODO: check the seed
+            self._seed = int(time.time())  
         self._generator = np.random.RandomState(self._seed)
         self._sampling_list = None
         self._replace = replace
@@ -601,7 +601,7 @@ class SamplerRandom(Sampler):
         return self._replace
 
     def function(self, iteration_number):
-        """ Returns and increments the sampler """  # TODO: explain what happens in this piece of code
+        """ For each iteration number this function samples from a randomly generated list in order. Every num_indices the list is re-created. """
         location = iteration_number % self._num_indices
         if location == 0:
             self._sampling_list = self._generator.choice(
@@ -647,18 +647,20 @@ class SamplerRandom(Sampler):
 
 class MantidSampler(SamplerRandom):
     def function(self, iteration_number):
-        """ Returns and increments the sampler """
-        location = iteration_number % self.num_indices
-        if location == 0:
-            if iteration_number < 500:
-                self._sampling_list = self._generator.choice(self.num_indices-1, self.num_indices, p=[
+        """ For each iteration number this function samples from a randomly generated list in order. Every num_indices the list is re-created. For the first aproximately 50*(num_indices -1) iterations the last index is never called.  """
+        if iteration_number < 50*(self.num_indices -1):
+            location = iteration_number % (self.num_indices -1)
+            if location == 0:
+                self._sampling_list = self._generator.choice(self.num_indices-1, self.num_indices -1, p=[
                                                              1/(self.num_indices-1)]*(self.num_indices-1), replace=self.replace)
-            if iteration_number >= 500:
+        else:
+            location = iteration_number % self.num_indices
+            if location == 0:
                 self._sampling_list = self._generator.choice(
                     self.num_indices, self.num_indices, p=self.prob_weights, replace=self.replace)
         out = self._sampling_list[location]
         return out
 
-    def __init__(self, num_indices,  seed=None, replace='True', prob=None,  sampling_type='Mantid Sampler '):
+    def __init__(self, num_indices,  seed=None, replace=False, prob=None,  sampling_type='Mantid Sampler '):
         super(MantidSampler, self).__init__(
             num_indices,  seed, replace, prob,  sampling_type)

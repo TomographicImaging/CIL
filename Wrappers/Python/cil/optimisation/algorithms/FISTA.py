@@ -137,10 +137,6 @@ class ISTA(Algorithm):
         
         if f is None:
             f = ZeroFunction()
-            
-            if g is None: 
-                raise ValueError('You set both f and g to be None and thus the iterative method will not update and will remain fixed at the initial value.')
- 
                 
         self.f = f
         
@@ -148,6 +144,9 @@ class ISTA(Algorithm):
             g = ZeroFunction()
             
         self.g = g
+        
+        if isinstance(f, ZeroFunction) and isinstance(g, ZeroFunction):
+            raise ValueError('You set both f and g to be the ZeroFunction and thus the iterative method will not update and will remain fixed at the initial value.')
 
         # set step_size
         self.set_step_size(step_size=step_size)

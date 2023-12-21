@@ -31,7 +31,6 @@ class Sampler():
 
     Common in each instantiated class, the function `next()` outputs a single next index from the list {0,1,…,S-1}. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
 
-
         
     Parameters
     ----------
@@ -79,27 +78,10 @@ class Sampler():
     [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
 
 
-    Example TODO:
-    -------
-    This example creates a sampler that uniformly randomly with replacement samples from the numbers {0,1,...,48} for the first 500 iterations. 
-    For the next 500 iterations it uniformly randomly with replacement samples from {0,...,49}. The num_indices is 50 and the prob_weights are left as default because in the limit all indices will be seen with equal probability. 
-    >>> def test_function(iteration_number):
-    >>>     if iteration_number<500:
-    >>>         np.random.seed(iteration_number)
-    >>>         return(np.random.choice(49,1)[0])
-    >>>     else:
-    >>>         np.random.seed(iteration_number)
-    >>>         return(np.random.choice(50,1)[0])
-    >>>
-    >>> Sampler.from_function(num_indices, function, prob_weights=None)
-    >>> print(list(sampler.get_samples(25)))
-    [44, 37, 40, 42, 46, 35, 10, 47, 3, 28, 9, 25, 11, 18, 43, 8, 41, 47, 42, 29, 35, 9, 4, 19, 34]
-
-    
-    Note TODO: 
+  
+    Note
     -----
-    If your function involves a random number generator, then the seed should also depend on the iteration number otherwise
-    the `get_samples()` function may not accurately return the correct samples and may interrupt the next sample returned. 
+    If your function involves a random number generator, then it may be easier to subclass the SamplerRandom class instead. 
 
 
     Example
@@ -142,6 +124,7 @@ class Sampler():
     In general, we note that for a large number of samples (e.g. `>20*num_indices`), the density of the outputted samples looks more and more uniform. For a small number of samples (e.g. `<5*num_indices`) the user may wish to consider
     another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
         """
+        
     @staticmethod
     def sequential(num_indices):
         """
@@ -179,10 +162,10 @@ class Sampler():
             row_number = iter_number_mod // (floor + 1)
             column_number = (iter_number_mod % (floor + 1))
         else:
-            row_number = mod + (iter_number_mod-(floor+1)*mod)//floor
-            column_number = (iter_number_mod-(floor+1)*mod) % floor
+            row_number = mod + (iter_number_mod - (floor+1)*mod) // floor
+            column_number = (iter_number_mod - (floor+1)*mod) % floor
 
-        return row_number+offset*column_number
+        return row_number + offset*column_number
 
     @staticmethod
     def staggered(num_indices, offset):
@@ -414,7 +397,7 @@ class Sampler():
             addition = addition_arr[n]
             repeat_length = repeat_length_arr[n]
 
-            length = num_indices//(addition*repeat_length)
+            length = num_indices // (addition*repeat_length)
             arr = np.arange(length) * addition
 
             ind = math.floor(iteration_number/repeat_length) % length
@@ -482,7 +465,7 @@ class Sampler():
         self.function = function
         
         if prob_weights is None:
-            prob_weights=[1/num_indices]*num_indices
+            prob_weights = [1/num_indices]*num_indices
         else:
             if abs(sum(prob_weights)-1) > 1e-6:
                 raise ValueError('The provided prob_weights must sum to one')
@@ -556,7 +539,7 @@ class Sampler():
 
 class SamplerRandom(Sampler):
     """     
-    This class follows the factory design pattern. It is not instantiated directly but has 6 static methods that will return instances of 6 different samplers, which require a variety of parameters.
+    This class follows the factory design pattern. It is not designed to be instantiated directly but instead can be called from the  6 static methods in the parent Sampler class.
     Custom samplers can be created by subclassing the sampler class. 
 
     Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
@@ -568,18 +551,16 @@ class SamplerRandom(Sampler):
     Parameters
     ----------
 
-    function: A function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices. 
-
     num_indices: int
         One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
 
-    sampling_type:str default='from_function"
-        The sampling type used. Choose from "random_with_replacement", "random_without_replacement", "sequential", "staggered", "herman_meyer" and "from_function". 
+    sampling_type:str default='random_with_replacement"
+        The sampling type used. Choose from "random_with_replacement" and "random_without_replacement"
 
     prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
         Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
     
-    replace: bool
+    replace: bool, defualt is True 
         If True, sample with replace, otherwise sample without replacement
     
     seed:int, default=None
@@ -615,7 +596,7 @@ class SamplerRandom(Sampler):
         if seed is not None:
             self._seed = seed
         else:
-            self._seed = int(time.time())
+            self._seed = int(time.time()) #TODO: check the seed 
         self._generator = np.random.RandomState(self._seed)
         self._sampling_list = None
         self._replace = replace
@@ -687,7 +668,7 @@ class SamplerRandom(Sampler):
 
 class MantidSampler(SamplerRandom):
     def function(self, iteration_number):
-        """ Returns and increments the sampler """ #TODO: explain what happens in this piece of code 
+        """ Returns and increments the sampler """  
         location=iteration_number%self.num_indices
         if location==0:
             if iteration_number<500:

@@ -19,6 +19,7 @@
 
 import numpy as np
 import pywt # PyWavelets module
+import warnings
 
 from cil.optimisation.operators import LinearOperator
 from cil.framework import VectorGeometry
@@ -75,17 +76,22 @@ class WaveletOperator(LinearOperator):
 
         # Correlation is different way of defining decomposition axes
         self.correlation = kwargs.get('correlation', None)
-        if axes is None:
+        
+        if axes is None and len(domain_geometry.shape) > 1:
             if self.correlation in [None, 'All']:
                 axes = None
-            elif self.correlation in ["Space"]:
+            elif self.correlation in ["Space", "Spatial"]:
                 axes = [i for i,l in enumerate(domain_geometry.dimension_labels) if l != 'channel']
-            elif self.correlation in ["Channels"]:
+            elif self.correlation in ["Channels", "Channel"]:
                 axes = [i for i,l in enumerate(domain_geometry.dimension_labels) if l == 'channel']
+            else:
+                raise AttributeError(f"Unknown correlation type: '{self.correlation}'")
             if axes == []:
-                raise AttributeError(f"Correlation set to {self.correlation} but the data only has {domain_geometry.dimension_labels} as possible dimensions")
+                raise AttributeError(f"Correlation set to '{self.correlation}' but the data only has '{domain_geometry.dimension_labels}' as possible dimensions")
         elif axes is not None and self.correlation is not None:
-            raise UserWarning(f"Decomposition axes {axes} take priority over correlation {self.correlation}. Both should not be used.")
+            warnings.warn(f"Decomposition axes '{axes}' take priority over correlation '{self.correlation}'. Both should not be used.", UserWarning)
+        elif len(domain_geometry.shape) == 1 and self.correlation is not None:
+            warnings.warn(f"Setting correlation '{self.correlation}' is not valid for 1D data.", UserWarning)
 
         # Convolution boundary condition i.e. padding method
         self.bnd_cond = kwargs.get('bnd_cond', 'symmetric')
@@ -103,17 +109,18 @@ class WaveletOperator(LinearOperator):
         self._slices = self._shape2slice()
         self.moments = pywt.Wavelet(wname).vanishing_moments_psi
         
+        # Compute the correct wavelet domain size
+        range_shape = np.array(domain_geometry.shape)
+        if axes is None:
+            axes = range(len(domain_geometry.shape))
+        d = 'd'*len(axes) # Name of the diagonal element in unknown dimensional DWT
+        for k in axes:
+            range_shape[k] = self._shapes[0][k]
+            for l in range(level):
+                range_shape[k] += self._shapes[l+1][d][k]
+
         if range_geometry is None:
             range_geometry = domain_geometry.copy()
-            shapes = self._shapes
-            range_shape = np.array(domain_geometry.shape)
-            if axes is None:
-                axes = range(len(domain_geometry.shape))
-            d = 'd'*len(axes) # Name of the diagonal element in unknown dimensional DWT
-            for k in axes:
-                range_shape[k] = shapes[0][k]
-                for l in range(level):
-                    range_shape[k] += shapes[l+1][d][k]
 
             # Update new size
             if hasattr(range_geometry, 'channels'):
@@ -121,7 +128,6 @@ class WaveletOperator(LinearOperator):
                     range_geometry.channels = range_shape[0]
                     range_shape = range_shape[1:] # Remove channels temporarily
 
-            
             if len(range_shape) == 3:
                 range_geometry.voxel_num_x = range_shape[2]
                 range_geometry.voxel_num_y = range_shape[1]
@@ -133,6 +139,9 @@ class WaveletOperator(LinearOperator):
                 range_geometry = VectorGeometry(range_shape[0])
             else:
                 raise AttributeError(f"Spatial dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")
+            
+        elif range_geometry.shape != range_shape:
+            raise AttributeError(f"Size of the range geometry is {range_geometry.shape} but the size of the wavelet coefficient array must be {tuple(range_shape)}.")
                     
         super().__init__(domain_geometry=domain_geometry, range_geometry=range_geometry)
 

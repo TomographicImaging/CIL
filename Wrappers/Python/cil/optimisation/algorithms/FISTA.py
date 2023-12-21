@@ -104,11 +104,17 @@ class ISTA(Algorithm):
     def set_step_size(self, step_size):
         """ Set default step size.
         """
+    
         if step_size is None:
-            if isinstance(self.f.L, Number):
+            if isinstance(self.f, ZeroFunction):
+                self._step_size = 1
+                
+            elif isinstance(self.f.L, Number):
                 self._step_size = 0.99*2.0/self.f.L
+                
             else:
                 raise ValueError("Function f is not differentiable")
+            
         else:
             self._step_size = step_size            
         
@@ -132,20 +138,19 @@ class ISTA(Algorithm):
         if f is None:
             f = ZeroFunction()
             
-            if step_size is None:
-                step_size = 1   
-                
             if g is None: 
                 raise ValueError('You set both f and g to be None and thus the iterative method will not update and will remain fixed at the initial value.')
+ 
+                
         self.f = f
         
         if g is None:
             g = ZeroFunction()
+            
         self.g = g
 
         # set step_size
         self.set_step_size(step_size=step_size)
-        
         self.configured = True  
 
         logging.info("{} configured".format(self.__class__.__name__, ))
@@ -253,11 +258,18 @@ class FISTA(ISTA):
 
         """Set the default step size
         """
+
         if step_size is None:
-            if isinstance(self.f.L, Number):
+            
+            if isinstance(self.f, ZeroFunction):
+                self._step_size = 1
+                
+            elif isinstance(self.f.L, Number):
                 self._step_size = 1./self.f.L
+                
             else:
                 raise ValueError("Function f is not differentiable")
+            
         else:
             self._step_size = step_size
 

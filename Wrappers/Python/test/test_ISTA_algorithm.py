@@ -113,9 +113,9 @@ class TestISTA(unittest.TestCase):
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
-        for _ in range(1):         
-            x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
-            x_old.fill(x)
+              
+        x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
+        x_old.fill(x)
 
         np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
     
@@ -145,6 +145,12 @@ class TestISTA(unittest.TestCase):
         res2 = self.h(x)
         self.assertTrue( res1==res2) 
 
+    def test_f_and_g_none(self):
+        tmp_initial = self.ig.allocate()
+        with self.assertRaises(ValueError):
+            ista = ISTA(initial = tmp_initial, f = None, g = None,  max_iteration=1)  
+        
+        
 
     def test_provable_condition(self):
 

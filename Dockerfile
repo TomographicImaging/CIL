@@ -16,8 +16,11 @@ ARG CIL_EXTRA_PACKAGES=tigre astra-toolbox
 # build & runtime dependencies
 # TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng numpy _openmp_mutex pip)?
 COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
+# channel_priority: https://stackoverflow.com/q/58555389
 RUN sed -ri '/tigre|astra-toolbox/d' environment.yml \
   && for pkg in jupyter-server-proxy $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
+  && conda config --env --set channel_priority strict \
+  && for ch in defaults ccpi intel conda-forge; do conda config --env --add channels $ch; done \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \

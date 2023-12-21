@@ -20,7 +20,7 @@
 import unittest
 from utils import initialise_tests
 import logging
-from cil.optimisation.operators import BlockOperator, GradientOperator
+from cil.optimisation.operators import BlockOperator, BlockDiagonalOperator, ZeroOperator, GradientOperator
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import IdentityOperator
 from cil.framework import ImageGeometry, ImageData
@@ -247,3 +247,90 @@ class TestBlockOperator(unittest.TestCase):
         logging.info(ig1.shape==u1.shape)
         logging.info(str(G1.norm()))
         numpy.testing.assert_allclose(G1.norm(), numpy.sqrt(4), atol=0.1)
+
+
+class test_BlockDiagonalOperator(unittest.TestCase): 
+    def test_main_diag(self):
+        N, M = 200, 300
+        T=10
+        ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)   
+        G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann') 
+        
+        ZOp = ZeroOperator(ig, G.range_geometry())
+        Alist = [ZOp for i in range(T*T)]
+        for t in range(T):
+            Alist[t*T+t] = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann') 
+        A = BlockOperator(*Alist, shape=(T,T))
+        bList = [ig.allocate('random_int') for i in range(T)]
+        b = BlockDataContainer(*bList)
+        
+        diag_list= [FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann') for _ in range(T)]
+        
+        A_diag=BlockDiagonalOperator(diag_list)
+        
+        A_diag_b=A_diag.direct(b)
+        A_b=A.direct(b)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_b.get_item(i).as_array(),A_diag_b.get_item(i).as_array())
+        A_diag_adjoint_b=A_diag.adjoint(b)
+        A_adjoint_b=A.adjoint(b)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_adjoint_b.get_item(i).as_array(),A_diag_adjoint_b.get_item(i).as_array())
+             
+        out=BlockDataContainer(*[ig.allocate(0) for i in range(T)])
+        A_diag.direct(b, out=out)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_b.get_item(i).as_array(),out.get_item(i).as_array())
+        A_diag.adjoint(b, out=out)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_adjoint_b.get_item(i).as_array(),out.get_item(i).as_array())
+       
+        bList = [ig.allocate('random_int') for i in range(T)]
+        b = BlockDataContainer(*bList)
+        
+        A_T_b=A.T.direct(b)
+        A_diag_T_b=A_diag.T.direct(b)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_T_b.get_item(i).as_array(),A_diag_T_b.get_item(i).as_array())
+       
+        
+
+    def test_tri_diag(self):
+        N, M = 200, 250
+        T=12
+        ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)   
+        G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann') 
+        Id=IdentityOperator(ig,ig)
+        ZOp = ZeroOperator(ig, G.range_geometry())
+        Alist = [ZOp for i in range(T*T)]
+        for t in range(T):
+            Alist[t*T+t] = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann') 
+            if 0<=t*T+t+1<T*T:
+                Alist[t*T+t+1] = IdentityOperator(ig,ig)
+            if 0<=t*T+t-1<T*T:
+                Alist[t*T+t-1] = IdentityOperator(ig,ig)
+        A = BlockOperator(*Alist, shape=(T,T))
+        bList = [ig.allocate('random_int') for i in range(T)]
+        b = BlockDataContainer(*bList)
+        
+        diag_list= [FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann') for _ in range(T)]
+        diag_1_list=[IdentityOperator(ig,ig) for _ in range(T-1)]
+        diag_2_list=[IdentityOperator(ig,ig) for _ in range(T-1)]
+        A_diag=BlockDiagonalOperator([diag_list, diag_1_list, diag_2_list], k=[0,1,-1])
+        
+        A_diag_b=A_diag.direct(b)
+        A_b=A.direct(b)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_b.get_item(i).as_array(),A_diag_b.get_item(i).as_array())
+        A_diag_adjoint_b=A_diag.adjoint(b)
+        A_adjoint_b=A.adjoint(b)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_adjoint_b.get_item(i).as_array(),A_diag_adjoint_b.get_item(i).as_array())
+             
+        out=BlockDataContainer(*[ig.allocate(0) for i in range(T)])
+        A_diag.direct(b, out=out)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_b.get_item(i).as_array(),out.get_item(i).as_array())
+        A_diag.adjoint(b, out=out)
+        for i in range(T):
+             numpy.testing.assert_array_equal(A_adjoint_b.get_item(i).as_array(),out.get_item(i).as_array())

@@ -17,10 +17,18 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
+import functools
 import numpy as np
-from cil.framework import ImageData
-from cil.optimisation.operators import LinearOperator
-
+from cil.framework import ImageData, DataContainer
+from cil.optimisation.operators import Operator, BlockOperator,  LinearOperator
+from cil.framework import BlockDataContainer
+try:
+    from sirf import SIRF
+    from sirf.SIRF import DataContainer as SIRFDataContainer
+    has_sirf = True
+except ImportError as ie:
+    has_sirf = False
+from cil.framework import BlockGeometry
 class DiagonalOperator(LinearOperator):
 
     r"""DiagonalOperator 
@@ -69,7 +77,7 @@ class DiagonalOperator(LinearOperator):
         
         "Returns :math:`D\circ x` "
         
-        return self.direct(x, out=out)
+        return self.direct(x, out=out) 
 
   
     def calculate_norm(self, **kwargs):
@@ -81,3 +89,240 @@ class DiagonalOperator(LinearOperator):
         """
 
         return self.diagonal.abs().max()
+
+
+
+
+
+class BlockDiagonalOperator(Operator):
+
+    r"""DiagonalOperator 
+
+    Constructs a square diagonal operator. The main diagonal must be provided but then any other diagonals can also be included. 
+
+    Parameters
+    ----------
+    diagonals : Lists of operators (if k=0) or a list of lists of operators if len(k)>0 
+    domain_geometry : ImageGeometry
+        Specifies the geometry of the BlockOperator domain. If 'None' will use the diagonal geometries directly. default=None .
+    range_geometry: 
+        Specifies the geometry of the BlockOperator domain. If 'None' will use the diagonal geometries directly. default=None .
+    k: Either k=0 (default) or k is a list of diagonals to fill whose first entry should be 0. 
+         Use k>0 for diagonals above the main diagonal, and k<0 for diagonals below the main diagonal.
+    
+    Examples
+    --------
+    
+    """
+
+    
+    def __init__(self, diagonals, k=0, domain_geometry=None, range_geometry=None):
+        if k==0:
+            k=[0] 
+            try:
+                diagonals[0][0]
+            except:
+                diagonals=[diagonals]
+        else:
+            if k[0]!=0:
+                raise TypeError("The main diagonal must always be provided first")
+        self.shape=(len(diagonals[0]),len(diagonals[0])) #TODO: deal with the non-square case
+        self.diagonals = diagonals
+        self.k=k
+        
+        if domain_geometry is None:
+            domain_geometry = self.get_domain_geometry()
+        
+        if range_geometry is None: 
+            range_geometry = self.get_range_geometry()
+        super(BlockDiagonalOperator, self).__init__(domain_geometry=domain_geometry, 
+                                    range_geometry=domain_geometry)
+        
+
+    def get_output_shape(self, xshape, adjoint=False):
+        '''returns the shape of the output BlockDataContainer
+        
+        A(N,M) direct u(M,1) -> N,1
+        A(N,M)^T adjoint u(N,1) -> M,1
+        '''
+        rows , cols = self.shape
+        xrows, xcols = xshape
+        if xcols != 1:
+            raise ValueError('BlockDataContainer cannot have more than 1 column')
+        if adjoint:
+            if rows != xrows:
+                raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
+            return (cols,xcols)
+        if cols != xrows:
+            raise ValueError('Incompatible shapes {} {}'.format((rows,cols), xshape))
+        return (rows,xcols)
+    
+    
+    
+    def direct(self,x,out=None):
+        
+        '''Direct operation for the BlockOperator
+
+        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
+        '''
+        if not isinstance (x, BlockDataContainer):
+            x_b = BlockDataContainer(x)
+        else:
+            x_b = x
+        shape = self.get_output_shape(x_b.shape)
+        res = []
+        
+        if out is None:
+        
+            for  row in range(self.shape[0]):
+                for j, offset in enumerate(self.k):
+                    col=row+offset
+                    if 0<=col<self.shape[0]:
+                        if j==0:
+                            prod = self.diagonals[j][min(row,col)].direct(x_b.get_item(col))
+                        else:
+                            prod+= self.diagonals[j][min(row,col)].direct(x_b.get_item(col))
+                res.append(prod)
+            return BlockDataContainer(*res, shape=shape)
+                
+        else:
+            
+            tmp = self.range_geometry().allocate()
+            for row in range(self.shape[0]):
+                for j, offset in enumerate(self.k):
+                    col=row+offset
+                    if 0<=col<self.shape[0]:
+                        if j == 0:       
+                            self.diagonals[j][min(row,col)].direct(
+                                                        x_b.get_item(col),
+                                                        out=out.get_item(row))                        
+                        else:
+                            temp_out_row = out.get_item(row) #TODO: change a! 
+                            self.diagonals[j][min(row,col)].direct(
+                                                        x_b.get_item(col), 
+                                                        out=tmp.get_item(row))
+                            temp_out_row += tmp.get_item(row)
+        
+        
+
+    def adjoint(self,x, out=None):
+        
+        '''Adjoint operation for the BlockOperator
+
+        BlockOperator may contain both LinearOperator and Operator
+        This method exists in BlockOperator as it is not known what type of
+        Operator it will contain.
+
+        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
+
+        Raises: ValueError if the contained Operators are not linear
+        '''
+        if not self.is_linear():
+            raise ValueError('Not all operators in Block are linear.')        
+        if not isinstance (x, BlockDataContainer):
+            x_b = BlockDataContainer(x)
+        else:
+            x_b = x
+        shape = self.get_output_shape(x_b.shape, adjoint=True)
+        if out is None:
+            res = []
+            for col in range(self.shape[1]):
+                for j, offset in enumerate(self.k):
+                    row=col-offset
+                    if 0<=row<self.shape[0]:
+                        if j == 0:
+                            prod = self.diagonals[j][min(row,col)].adjoint(x_b.get_item(row))
+                        else:
+                            prod += self.diagonals[j][min(row,col)].adjoint(x_b.get_item(row))
+                res.append(prod)
+            if self.shape[1]==1:
+                # the output is a single DataContainer, so we can take it out
+                return res[0]
+            else:
+                return BlockDataContainer(*res, shape=shape)
+        else:
+
+            for col in range(self.shape[1]):
+                for j, offset in enumerate(self.k):
+                    row=col-offset
+                    if 0<=row<self.shape[0]:
+                        if j==0:
+                            if issubclass(out.__class__, DataContainer) or \
+                    ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
+                                self.diagonals[j][min(row,col)].adjoint(
+                                                    x_b.get_item(row),
+                                                    out=out)
+                            else:
+                                self.diagonals[j][min(row,col)].adjoint(
+                                                    x_b.get_item(row),
+                                                    out=out.get_item(col))
+                        else:
+                            if issubclass(out.__class__, DataContainer) or \
+                    ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
+                                out += self.diagonals[j][min(row,col)].adjoint(
+                                                            x_b.get_item(row))
+                            else:
+                                temp_out_col= out.get_item(col) #TODO: get rid of a 
+                                temp_out_col += self.diagonals[j][min(row,col)].adjoint(
+                                                            x_b.get_item(row),
+                                                            )
+    @property
+    def T(self):
+        '''Return the transposed of self TODO:''' 
+        new_k=[]
+        for i in range(len(self.k)):
+            new_k.append(-self.k[i])
+            
+        return type(self)(k=new_k, range_geometry=self.range_geometry, domain_geometry=self.domain_geometry, diagonals=self.diagonals)
+
+  
+    def calculate_norm(self, **kwargs):
+        
+        r"""
+
+        """
+        hold=[]
+        if self.k==[[0]]:
+            for i in range(len(self.diagonals[0])):
+                hold.append(self.diagonals[0][i].norm)
+            return hold.max()
+        else:
+            raise NotImplementedError #TODO:
+    
+    
+    def get_domain_geometry(self):
+        '''returns the domain of the BlockOperator
+
+        If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.
+        Otherwise it is a BlockGeometry.
+        '''
+        if self.shape[1] == 1:
+            # column BlockOperator
+            return self.diagonals[0].get_item(0).domain_geometry()
+        else:
+            # get the geometries column wise
+            # we need only the geometries from the first row
+            # since it is compatible from __init__
+            tmp = []
+            for i in range(self.shape[1]):
+                tmp.append(self.diagonals[0][i].domain_geometry())
+            return BlockGeometry(*tmp)                
+                                    
+
+
+    def get_range_geometry(self):
+        '''returns the range of the BlockOperator'''
+        
+        tmp = []
+        for i in range(self.shape[0]):
+            tmp.append(self.diagonals[0][i].range_geometry())
+        return BlockGeometry(*tmp)            
+        
+    def is_linear(self): 
+        '''returns whether all the elements of the BlockOperator are linear'''
+        op_list=[]
+        for i in len(self.k):
+            op_list.append(self.diagonals[i])
+        return functools.reduce(lambda x, y: x and y.is_linear(), op_list, True)

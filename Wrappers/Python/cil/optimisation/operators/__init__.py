@@ -27,7 +27,7 @@ from .SymmetrisedGradientOperator import SymmetrisedGradientOperator
 from .IdentityOperator import IdentityOperator
 from .ZeroOperator import ZeroOperator
 from .MatrixOperator import MatrixOperator
-from .DiagonalOperator import DiagonalOperator
+from .DiagonalOperator import DiagonalOperator, BlockDiagonalOperator
 from .MaskOperator import MaskOperator
 from .ChannelwiseOperator import ChannelwiseOperator
 from .BlurringOperator import BlurringOperator

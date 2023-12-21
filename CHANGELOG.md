@@ -13,7 +13,9 @@
   - Allow show2D to be used with 3D `DataContainer` instances
   - Update documentation for symmetrised gradient 
   - Added documentation for CompositionOperator and SumOperator
+  - Updated FISTA and ISTA algorithms to allow input functions to be None
   - Bug fix in the adjoint of the Diagonal Operator for complex values
+
 
 
 * 23.1.0

@@ -14,7 +14,8 @@ LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0
 # CUDA-specific packages
 ARG CIL_EXTRA_PACKAGES=tigre astra-toolbox
 # build & runtime dependencies
-# TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng numpy _openmp_mutex pip)?
+# TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng _openmp_mutex pip)?
+# vis. https://github.com/TomographicImaging/CIL/pull/1590
 COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
 # channel_priority: https://stackoverflow.com/q/58555389
 RUN sed -ri '/tigre|astra-toolbox/d' environment.yml \

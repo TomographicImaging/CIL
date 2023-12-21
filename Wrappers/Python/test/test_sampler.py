@@ -62,9 +62,10 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.herman_meyer(12)
         self.assertEqual(sampler.num_indices, 12)
         self.assertEqual(sampler._type, 'herman_meyer')
+        self.assertListEqual(sampler.prob_weights, [1/12] * 12)
         out = [sampler.next() for _ in range(12)]
         self.assertListEqual(out, [0, 6, 3, 9, 1, 7, 4, 10, 2, 8, 5, 11])
-        self.assertListEqual(sampler.prob_weights, [1/12] * 12)
+        
 
         sampler = Sampler.random_with_replacement(5)
         self.assertEqual(sampler.num_indices, 5)
@@ -108,6 +109,7 @@ class TestSamplers(CCPiTestClass):
         #check probabilities sum to 1 and are positive
         with self.assertRaises(ValueError):
             Sampler.from_function(40, self.example_function, [0.9]+[0]*39)
+            
         with self.assertRaises(ValueError):
             Sampler.from_function(40, self.example_function, [-1]+[2]+[0]*38)
 
@@ -198,6 +200,7 @@ class TestSamplers(CCPiTestClass):
         order = [0, 4, 8, 12, 16, 20, 1, 5, 9, 13,
                  17, 2, 6, 10, 14, 18, 3, 7, 11, 15, 19]
         self.assertNumpyArrayEqual(sampler.get_samples(10), np.array(order[:10]))
+        
         for i in range(25):
             self.assertEqual(next(sampler), order[i % 21])
 

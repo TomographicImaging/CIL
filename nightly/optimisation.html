@@ -939,7 +939,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SIRT</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Permalink to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id32" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">6</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id36" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">7</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1126,7 +1126,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">ISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Permalink to this definition">#</a></dt>
-<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id30" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id29" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id34" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id33" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <p>Iterative Shrinkage-Thresholding Algorithm (ISTA)</p>
 <div class="math notranslate nohighlight">
 \[x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))\]</div>
@@ -1147,14 +1147,19 @@ is guaranteed if</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess of ISTA.</p></li>
-<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function</p></li>
-<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Convex function with <em>simple</em> proximal operator</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
+<li><p><strong>g</strong> (Function or <cite>None</cite>) – Convex function with <em>simple</em> proximal operator. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
 <li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Step size for the gradient step of ISTA.
-The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is <span class="math notranslate nohighlight">\(\frac{0.99 * 2}{L}.\)</span></p></li>
+The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is <span class="math notranslate nohighlight">\(\frac{1}{L}\)</span> or 1 if <cite>f=None</cite>.</p></li>
 <li><p><strong>kwargs</strong> (<em>Keyword arguments</em>) – Arguments from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the ISTA algorithm is equivalent to Gradient Descent.</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the ISTA algorithm is equivalent to a Proximal Point Algorithm.</p>
+</div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
 \[\underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}\]</div>
@@ -1465,7 +1470,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">FISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Permalink to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id30" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id29" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id34" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id33" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
@@ -1483,14 +1488,19 @@ is the <code class="code docutils literal notranslate"><span class="pre">step_si
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Starting point of the algorithm</p></li>
-<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function</p></li>
-<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Convex function with <em>simple</em> proximal operator</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function.  If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
+<li><p><strong>g</strong> (Function or <cite>None</cite>) – Convex function with <em>simple</em> proximal operator. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
 <li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Step size for the gradient step of FISTA.
-The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is <span class="math notranslate nohighlight">\(\frac{1}{L}\)</span>.</p></li>
+The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is <span class="math notranslate nohighlight">\(\frac{1}{L}\)</span> or 1 if <cite>f=None</cite>.</p></li>
 <li><p><strong>kwargs</strong> (<em>Keyword arguments</em>) – Arguments from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id28" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">8</a>]</span> algorithm 2.2.9).</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id27" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">5</a>]</span> sec 2).</p>
+</div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
 \[\underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}\]</div>
@@ -1805,7 +1815,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">PDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id7">[<a class="reference internal" href="#id25" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id8">[<a class="reference internal" href="#id26" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">4</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id29" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id30" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">4</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1831,7 +1841,7 @@ In such cases nan will be printed.</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id9">[<a class="reference internal" href="#id28" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">5</a>]</span>, <span id="id10">[<a class="reference internal" href="#id27" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">7</a>]</span>.</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id32" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">6</a>]</span>, <span id="id12">[<a class="reference internal" href="#id31" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">9</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -1935,7 +1945,7 @@ In the future, these parameters will be properties of the corresponding function
 <p class="admonition-title">Note</p>
 <p>The case where both functions are strongly convex is not available at the moment.</p>
 </div>
-<div class="admonition-todo admonition" id="id11">
+<div class="admonition-todo admonition" id="id13">
 <p class="admonition-title">Todo</p>
 <p>Implement acceleration of PDHG when both functions are strongly convex.</p>
 </div>
@@ -2653,7 +2663,7 @@ Evaluates if the following equivalence holds
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default = 1</em>) – Seed random generator</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Check if the following expression is below the tolerance</p></li>
-<li><p><strong>math::</strong> (<em>.</em>) – <a href="#id34"><span class="problematic" id="id35">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
+<li><p><strong>math::</strong> (<em>.</em>) – <a href="#id38"><span class="problematic" id="id39">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2723,7 +2733,7 @@ scalar:  Number</p>
 For example, <cite>CompositionOperator(left, right).direct(x)</cite> is equivalent to <cite>left.direct(right.direct(x))</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> (<a href="#id12"><span class="problematic" id="id13">`</span></a>Operator`s) – Operators to be composed. As in mathematical notation, the operators will be applied right to left</p>
+<dd class="field-odd"><p><strong>args</strong> (<a href="#id14"><span class="problematic" id="id15">`</span></a>Operator`s) – Operators to be composed. As in mathematical notation, the operators will be applied right to left</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -3780,7 +3790,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id38"><span class="problematic" id="id39">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id42"><span class="problematic" id="id43">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -4573,7 +4583,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id36"><span class="problematic" id="id37">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id40"><span class="problematic" id="id41">|x|</span></a>}</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4711,7 +4721,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id40"><span class="problematic" id="id41">problem_</span></a> of the above problem, see <span id="id14">[<a class="reference internal" href="#id30" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id15">[<a class="reference internal" href="#id29" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id16">[<a class="reference internal" href="#id33" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">9</a>]</span>.</p>
+applied to the _dual <a href="#id44"><span class="problematic" id="id45">problem_</span></a> of the above problem, see <span id="id16">[<a class="reference internal" href="#id34" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id17">[<a class="reference internal" href="#id33" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id18">[<a class="reference internal" href="#id37" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">11</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -4761,7 +4771,7 @@ However, during the evaluation of <cite>proximal</cite> the memory requirements 
 <div class="math notranslate nohighlight">
 \[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
-For more information, see <span id="id17">[<a class="reference internal" href="#id31" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">8</a>]</span>, <span id="id18">[<a class="reference internal" href="#id25" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+For more information, see <span id="id19">[<a class="reference internal" href="#id35" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">10</a>]</span>, <span id="id20">[<a class="reference internal" href="#id29" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -4857,7 +4867,7 @@ problems in the following form:</p>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a></p></li>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.operators.BlockOperators">BlockOperator</a></p></li>
 </ul>
-<p>The block framework allows writing more advanced <a href="#id42"><span class="problematic" id="id43">`optimisation problems`_</span></a>. Consider the typical
+<p>The block framework allows writing more advanced <a href="#id46"><span class="problematic" id="id47">`optimisation problems`_</span></a>. Consider the typical
 <a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
 <div class="math notranslate nohighlight">
 \[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
@@ -4888,7 +4898,7 @@ Block Framework comprising 4 main actors: <code class="code docutils literal not
 <code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id44"><span class="problematic" id="id45">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id48"><span class="problematic" id="id49">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
@@ -4899,8 +4909,8 @@ do basic algebra between <a class="reference external" href="framework.html#cil.
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id19"><span class="problematic" id="id20">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id21"><span class="problematic" id="id22">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id21"><span class="problematic" id="id22">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id23"><span class="problematic" id="id24">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -5540,33 +5550,39 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <div class="section" id="references">
 <h3>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h3>
-<div class="docutils container" id="id24">
+<div class="docutils container" id="id26">
 <dl class="citation">
-<dt class="label" id="id30"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id14">3</a>)</span></dt>
+<dt class="label" id="id34"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id16">3</a>)</span></dt>
 <dd><p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. URL: <a class="reference external" href="https://doi.org/10.1137/080716542">https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/080716542">arXiv:https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
 </dd>
-<dt class="label" id="id29"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id6">2</a>,<a href="#id15">3</a>)</span></dt>
+<dt class="label" id="id33"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id6">2</a>,<a href="#id17">3</a>)</span></dt>
 <dd><p>Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. <em>IEEE Transactions on Image Processing</em>, 18(11):2419–2434, 2009. <a class="reference external" href="https://doi.org/10.1109/TIP.2009.2028250">doi:10.1109/TIP.2009.2028250</a>.</p>
 </dd>
-<dt class="label" id="id25"><span class="brackets">3</span><span class="fn-backref">(<a href="#id7">1</a>,<a href="#id18">2</a>)</span></dt>
+<dt class="label" id="id29"><span class="brackets">3</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id20">2</a>)</span></dt>
 <dd><p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </dd>
-<dt class="label" id="id26"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
+<dt class="label" id="id30"><span class="brackets"><a class="fn-backref" href="#id10">4</a></span></dt>
 <dd><p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </dd>
-<dt class="label" id="id28"><span class="brackets"><a class="fn-backref" href="#id9">5</a></span></dt>
+<dt class="label" id="id27"><span class="brackets"><a class="fn-backref" href="#id8">5</a></span></dt>
+<dd><p>Osman Güler. New proximal point algorithms for convex minimization. <em>SIAM Journal on Optimization</em>, 2(4):649–664, 1992.</p>
+</dd>
+<dt class="label" id="id32"><span class="brackets"><a class="fn-backref" href="#id11">6</a></span></dt>
 <dd><p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </dd>
-<dt class="label" id="id32"><span class="brackets"><a class="fn-backref" href="#id1">6</a></span></dt>
+<dt class="label" id="id36"><span class="brackets"><a class="fn-backref" href="#id1">7</a></span></dt>
 <dd><p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </dd>
-<dt class="label" id="id27"><span class="brackets"><a class="fn-backref" href="#id10">7</a></span></dt>
+<dt class="label" id="id28"><span class="brackets"><a class="fn-backref" href="#id7">8</a></span></dt>
+<dd><p>Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em>. Volume 87. Springer Science &amp; Business Media, 2003.</p>
+</dd>
+<dt class="label" id="id31"><span class="brackets"><a class="fn-backref" href="#id12">9</a></span></dt>
 <dd><p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </dd>
-<dt class="label" id="id31"><span class="brackets"><a class="fn-backref" href="#id17">8</a></span></dt>
+<dt class="label" id="id35"><span class="brackets"><a class="fn-backref" href="#id19">10</a></span></dt>
 <dd><p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
 </dd>
-<dt class="label" id="id33"><span class="brackets"><a class="fn-backref" href="#id16">9</a></span></dt>
+<dt class="label" id="id37"><span class="brackets"><a class="fn-backref" href="#id18">11</a></span></dt>
 <dd><p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </dd>
 </dl>

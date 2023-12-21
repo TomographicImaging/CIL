@@ -67,9 +67,9 @@ class DiagonalOperator(LinearOperator):
 
     def adjoint(self,x, out=None):
         
-        "Returns :math:`D\circ x` "
+        "Returns :math:`D^*\circ x` "
         
-        return self.direct(x, out=out)
+        return self.diagonal.conjugate().multiply(x,out=out)
 
   
     def calculate_norm(self, **kwargs):

@@ -37,7 +37,7 @@ on:
     - 'README.md'
 jobs:
   conda:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -58,7 +58,7 @@ jobs:
         path: recipe/linux-64/cil*
   docs:
     needs: conda
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:

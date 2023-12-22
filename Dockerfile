@@ -7,7 +7,6 @@
 # https://github.com/TomographicImaging/CIL/issues/1490
 FROM jupyter/tensorflow-notebook:ubuntu-20.04
 LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
-LABEL org.opencontainers.image.description="Core Imaging Library"
 # tigre: BSD-3-Clause, astra-toolbox: GPL-3.0
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 

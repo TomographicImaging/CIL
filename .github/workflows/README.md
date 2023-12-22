@@ -8,7 +8,7 @@ This github action builds and tests the conda package, by using the [conda-packa
 
 When pushing to master or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
 
-When opening or modifying a pull request to master, a single variant is built and tested. This variant is for linux with `python=3.9` and `numpy=1.22`.
+When opening or modifying a pull request to master, a single variant is built and tested. This variant is for linux with `python=3.10` and `numpy=1.24`.
 
 The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
 

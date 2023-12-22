@@ -49,8 +49,8 @@ jobs:
         channels: -c conda-forge -c intel -c ccpi
         convert_win: false
         convert_osx: false
-        test_pyver: 3.9
-        test_npver: 1.22
+        test_pyver: '3.10'
+        test_npver: 1.24
     - name: Upload artifact of the conda package
       uses: actions/upload-artifact@v3
       with:
@@ -71,7 +71,7 @@ jobs:
         path: conda_package
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        python-version: 3.9
+        python-version: '3.10'
     - uses: lauramurgatroyd/build-sphinx-action@v0.1.4
       with:
         docs_path: docs
@@ -81,7 +81,7 @@ jobs:
         package_name: cil
         package_conda_channels: conda-forge -c intel -c ccpi
         build_subdir_name: nightly
-        python_version: 3.9
+        python_version: '3.10'
     - name: redirect to nightly
       run: >
         sed 's#DESTINATION#https://tomographicimaging.github.io/CIL/nightly/#g'

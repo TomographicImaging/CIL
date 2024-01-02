@@ -25,13 +25,17 @@ from functools import reduce
 
 class Function(object):
     
-    """ Abstract class representing a function 
+    r""" Abstract class representing a function 
     
-        :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-        :type L: number, positive, default None
-        :param domain: The domain of the function.
-
-        Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
+        Parameters
+        ----------
+        
+        L: number, positive, default None
+            Lipschitz constant of the gradient of the function F(x), when it is differentiable.
+                
+        Note
+        -----
+        The Lipschitz of the gradient of the function is a positive real number, such that :math:`\|f'(x) - f'(y)\| \leq L \|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`
 
     """
     
@@ -40,17 +44,13 @@ class Function(object):
         # overrides the type check to allow None as initial value
         self._L = L
         
-    def __call__(self,x):
-        
-        r"""Returns the value of the function F at x: :math:`F(x)`
-        
-        """        
+    def __call__(self,x):    
         
         raise NotImplementedError
 
     def gradient(self, x, out=None):
         
-        r"""Returns the value of the gradient of function F at x, if it is differentiable
+        r"""Returns the value of the gradient of function :math:`F` at :math:`x`, if it is differentiable
         
         .. math:: F'(x)
         
@@ -60,14 +60,16 @@ class Function(object):
     def proximal(self, x, tau, out=None):
         
         r"""Returns the proximal operator of function :math:`\tau F` at x        
-        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{z}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
+        
+        .. math:: \text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
+        
         """
         raise NotImplementedError
 
     def convex_conjugate(self, x):
         r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`,
         
-        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} <x^{*}, x> - F(x)
+        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)
                 
         """
         raise NotImplementedError
@@ -76,11 +78,11 @@ class Function(object):
         
         r"""Returns the proximal operator of the convex conjugate of function :math:`\tau F` at :math:`x^{*}`
         
-        .. math:: \mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})
+        .. math:: \text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})
         
         Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate :math:`F^{*}`
         
-        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
+        .. math:: \text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)
                 
         """
         try:
@@ -159,9 +161,9 @@ class Function(object):
     
     @property
     def L(self):
-        '''Lipschitz of the gradient of function f.
+        r'''Lipschitz of the gradient of function f.
         
-        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
+        L is positive real number, such that :math:`\|f'(x) - f'(y)\| \leq L\|x-y\|`, assuming :math:`f: IG \rightarrow \mathbb{R}`'''
         return self._L
         # return self._L
     @L.setter
@@ -334,7 +336,7 @@ class ScaledFunction(Function):
     1. :math:`G(x) = \alpha  F(x)` ( __call__ method )
     2. :math:`G'(x) = \alpha  F'(x)` ( gradient method ) 
     3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )   
-    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)` ( proximal method ) 
+    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)` ( proximal method ) 
            
     """
     def __init__(self, function, scalar):
@@ -412,7 +414,7 @@ class ScaledFunction(Function):
         
         r"""Returns the proximal operator of the scaled function.
         
-        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)
+        .. math:: \text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)
         
         """        
 
@@ -480,7 +482,7 @@ class SumScalarFunction(SumFunction):
         
         """ Returns the proximal operator of :math:`F+scalar`
 
-        .. math:: \mathrm{prox}_{\tau (F+scalar)}(x) = \mathrm{prox}_{\tau F}
+        .. math:: \text{prox}_{\tau (F+scalar)}(x) = \text{prox}_{\tau F}
                         
         """                
         return self.function.proximal(x, tau, out=out)        
@@ -551,7 +553,7 @@ class ConstantFunction(Function):
         
         """Returns the proximal operator of the constant function, which is the same element, i.e.,
         
-        .. math:: \mathrm{prox}_{\tau F}(x) = x 
+        .. math:: \text{prox}_{\tau F}(x) = x 
         
         """
         if out is None:
@@ -598,7 +600,7 @@ class TranslateFunction(Function):
     1. :math:`G(x) = F(x - b)` ( __call__ method )
     2. :math:`G'(x) = F'(x - b)` ( gradient method ) 
     3. :math:`G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >` ( convex_conjugate method )   
-    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x - b)  + b` ( proximal method ) 
+    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x - b)  + b` ( proximal method ) 
                
     """
     
@@ -662,7 +664,7 @@ class TranslateFunction(Function):
         
         r"""Returns the proximal operator of the translated function.
         
-        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b
+        .. math:: \text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x-b) + b
         
         """        
         try:

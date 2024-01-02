@@ -146,7 +146,7 @@ class RingRemover(Processor):
         
         '''              
 
-        original_extent = [slice(s) for s in ima.shape]
+        original_extent = [slice(None, ima.shape[0], None), slice(None, ima.shape[1], None)]
 
         # allocate cH, cV, cD
         Ch = [None]*decNum
@@ -177,6 +177,7 @@ class RingRemover(Processor):
             nima = nima[0:Ch[i].shape[0],0:Ch[i].shape[1]]
             nima = pywt.idwt2((nima,(Ch[i],Cv[i],Cd[i])),wname)
         
-        nima_crop = nima[original_extent[0], original_extent[1]]
+        # if the original input is odd, the signal reconstructed with idwt2 will have one extra sample, which can be discarded
+        nima = nima[original_extent[0], original_extent[1]]
 
-        return nima_crop
+        return nima

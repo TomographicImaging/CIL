@@ -21,6 +21,7 @@ import unittest
 from cil.processors import RingRemover, TransmissionAbsorptionConverter, Slicer
 from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
 from cil.utilities import dataexample
+from cil.utilities.quality_measures import mse
 
 import os
 import numpy as np
@@ -100,20 +101,26 @@ class TestRingRemover(CCPiTestClass):
     def test_ring_remover(self):
         
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical=80)
+        data_test = TransmissionAbsorptionConverter()(data)
 
         data_corrupted = self.add_defect_pixels(data, 1, 1, 1312)
         data_corrupted = TransmissionAbsorptionConverter()(data_corrupted)
-        r = RingRemover(8,'db20', 1.5)
+        r = RingRemover(2,'db20', 1.5)
         r.set_input(data_corrupted)
         data_corrected = r.get_output()
 
         self.assertEqual(data_corrupted.shape, data_corrected.shape)
+        self.assertLessEqual(mse(data_test, data_corrected), 0.05)
 
         data_corrupted_odd = Slicer(roi={'horizontal': (1, None)})(data_corrupted)
         data_corrupted_odd = Slicer(roi={'angle': (1,None)})(data_corrupted_odd)
-        r = RingRemover(8,'db20', 1.5)
+        data_test = Slicer(roi={'horizontal': (1, None)})(data_test)
+        data_test = Slicer(roi={'angle': (1,None)})(data_test)
+
+        r = RingRemover(2,'db20', 1.5)
         r.set_input(data_corrupted_odd)
         data_corrected_odd = r.get_output()
 
         self.assertEqual(data_corrupted_odd.shape, data_corrected_odd.shape)
-
+        self.assertLessEqual(mse(data_test, data_corrected_odd), 0.05)
+        

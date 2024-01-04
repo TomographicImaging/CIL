@@ -2534,6 +2534,11 @@ class TestMasker(unittest.TestCase):
     def test_Masker_with_integer_mask(self):
         self.Masker_check(self.mask_int_manual, self.data, self.data_init)
 
+    def test_Masker_doesnt_modify_input_mask(self):
+        mask = self.mask_manual.copy()
+        self.Masker_check(self.mask_generated, self.data, self.data_init)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_manual.as_array())
+
     def Masker_check(self, mask, data, data_init): 
 
         # test value mode

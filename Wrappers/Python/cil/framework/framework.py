@@ -1928,7 +1928,7 @@ class Angles(object):
         repres = "Acquisition description:\n"
         repres += "\tNumber of positions: {0}\n".format(self.num_positions)
         num_print=min(10,self.num_positions)    
-        repres += "\tAngles 0-{0} in {1}s:\n{2}\n".format(num_print, self.angle_unit, numpy.array2string(self.angle_data[0:num_print], separator=', '))
+        repres += "\tAngles 0-{0} in {1}s:\n{2}\n".format(num_print-1, self.angle_unit, numpy.array2string(self.angle_data[0:num_print], separator=', '))
         if num_print < self.num_positions:
             num_print=max(0,self.num_positions-10)
             repres += "\tAngles {0}-{1} in {2}s:\n{3}\n".format(num_print, self.num_positions, self.angle_unit, numpy.array2string(self.angle_data[num_print:self.num_positions], separator=', '))

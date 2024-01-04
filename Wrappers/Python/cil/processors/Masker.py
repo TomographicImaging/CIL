@@ -35,7 +35,7 @@ class Masker(DataProcessor):
     mode : {'value', 'mean', 'median', 'interpolate'}, default='value'
         The method to fill in missing values 
     value : float, default=0
-        Substitute all outliers with a specific value
+        Substitute all outliers with a specific value if method='value', otherwise discarded.
     axis : str or int
         Specify axis as int or from 'dimension_labels' to calculate mean, median or interpolation
         (depending on mode) along that axis
@@ -44,7 +44,7 @@ class Masker(DataProcessor):
     
     Returns
     -------
-    DataContainer or it's subclass with masked outliers
+    DataContainer or its subclass with masked outliers
 
     '''
 
@@ -60,6 +60,10 @@ class Masker(DataProcessor):
             Mask can be generated using 'MaskGenerator' processor to identify outliers. 
         value : float, default=0
             Values to be assigned to missing elements
+
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='value', mask=mask, value=value)
@@ -78,6 +82,10 @@ class Masker(DataProcessor):
             Mask can be generated using 'MaskGenerator' processor to identify outliers. 
         axis : str, int
             Specify axis as int or from 'dimension_labels' to calculate mean.
+
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='mean', mask=mask, axis=axis)
@@ -96,6 +104,10 @@ class Masker(DataProcessor):
             Mask can be generated using 'MaskGenerator' processor to identify outliers. 
         axis : str, int
             Specify axis as int or from 'dimension_labels' to calculate median.
+
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='median', mask=mask, axis=axis)
@@ -116,6 +128,10 @@ class Masker(DataProcessor):
             Specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation.
         method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
             Interpolation method to use.
+        
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='interpolate', mask=mask, axis=axis, method=method)

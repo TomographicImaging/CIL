@@ -21,6 +21,9 @@ import unittest
 from utils import initialise_tests
 import numpy as np
 import math
+import re
+import io
+import sys
 from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry, AcquisitionData
 from cil.framework.framework import SystemConfiguration
 from cil.framework import Partitioner
@@ -1618,12 +1621,32 @@ class TestSubset(unittest.TestCase):
             .set_angles(angles=range(90))\
             .set_labels(['horizontal', 'angle'])
         AD = AcquisitionData(np.zeros([10,90]), geometry=AG, deep_copy=False)
+        
+        # redirect print output
+        capturedOutput = io.StringIO()                 
+        sys.stdout = capturedOutput                    
+        
         print(AD.geometry)
+        angles = re.findall('Angles [\d]+-[\d]+ in degrees:\s+\[.*\]+', capturedOutput.getvalue(), re.MULTILINE)
+        self.assertEqual(angles[0], 'Angles 0-9 in degrees:\n[0., 1., 2., 3., 4., 5., 6., 7., 8., 9.]')
+        self.assertEqual(angles[1], 'Angles 81-90 in degrees:\n[80., 81., 82., 83., 84., 85., 86., 87., 88., 89.]')
         
         # test no error occurs when angles<20
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(17))\
+            .set_labels(['horizontal', 'angle'])
+        AD = AcquisitionData(np.zeros([10,17]), geometry=AG, deep_copy=False)
+        print(AD.geometry)                                
+                         
+        # test no error occurs when angles<10
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
             .set_panel(num_pixels=10)\
             .set_angles(angles=range(9))\
             .set_labels(['horizontal', 'angle'])
         AD = AcquisitionData(np.zeros([10,9]), geometry=AG, deep_copy=False)
         print(AD.geometry)
+
+        # return to standard print output
+        sys.stdout = sys.__stdout__ 
+        

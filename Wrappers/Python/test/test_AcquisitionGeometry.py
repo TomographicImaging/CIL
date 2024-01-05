@@ -1647,6 +1647,14 @@ class TestSubset(unittest.TestCase):
         AD = AcquisitionData(np.zeros([10,9]), geometry=AG, deep_copy=False)
         print(AD.geometry)
 
+        # test no error occurs when angle=1
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(1))\
+            .set_labels(['horizontal', 'angle'])
+        AD = AcquisitionData(np.zeros([10,]), geometry=AG, deep_copy=False)
+        print(AD.geometry)
+
         # return to standard print output
         sys.stdout = sys.__stdout__ 
         

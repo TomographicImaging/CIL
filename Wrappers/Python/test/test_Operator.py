@@ -118,14 +118,29 @@ class TestOperator(CCPiTestClass):
         # test norm of diagonal
         norm1 = D.norm()
         numpy.testing.assert_almost_equal(norm1, numpy.max(diag.array))
+  
+
+    def test_DiagonalOperator_complex(self):
+        M = 3
+        ig = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100 ,dtype=numpy.complex64)
+        diag = ig.allocate('random',seed=101 ,dtype=numpy.complex64)
+        
+        # Set up example DiagonalOperator
+        D = DiagonalOperator(diag)
+    
+        # Apply direct and check whether result equals diag*x as expected.
+        z = D.direct(x)
+        numpy.testing.assert_array_equal(z.as_array(), (diag*x).as_array())
+    
+        # Apply adjoint and check whether results equals diag.conjugate()*(diag*x) as expected.
+        y = D.adjoint(z)
+        numpy.testing.assert_array_equal(y.as_array(), (diag.conjugate()*(diag*x)).as_array())
 
         # test norm of diagonal with complex value
-        diag = ig.allocate('random',seed=101, dtype=numpy.complex64)
-        D = DiagonalOperator(diag)
         norm1 = D.norm()
         numpy.testing.assert_almost_equal(norm1, numpy.max(numpy.abs(diag.array)))        
-
-    
+        
     def test_MaskOperator(self):
         M = 3
         ig = ImageGeometry(M, M)

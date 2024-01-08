@@ -96,8 +96,12 @@ class Operator(object):
         self._norm = norm
 
     def calculate_norm(self):
-        '''Calculates the norm of the Operator'''
-        raise NotImplementedError
+        '''Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.'''
+
+        if self.is_linear():
+            return LinearOperator.calculate_norm(self)
+
+        return NotImplementedError
 
     def range_geometry(self):
         '''Returns the range of the Operator: Y space'''
@@ -124,7 +128,7 @@ class Operator(object):
     def compose(self, *other, **kwargs):
         # TODO: check equality of domain and range of operators
         # if self.operator2.range_geometry != self.operator1.domain_geometry:
-        #    raise ValueError('Cannot compose operators, check domain geometry of {} and range geometry of {}'.format(self.operato1,self.operator2))
+        #    raise ValueError('Cannot compose operators, check domain geometry of {} and range geometry of {}'.format(self.operator1,self.operator2))
 
         return CompositionOperator(self, *other, **kwargs)
 
@@ -520,14 +524,7 @@ class SumOperator(Operator):
     def is_linear(self):
         return self.linear_flag
 
-    def calculate_norm(self):
-        '''Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.'''
-
-        if self.is_linear():
-            return LinearOperator.calculate_norm(self)
-
-        return super().calculate_norm(self)
-
+    
 ###############################################################################
 ################   Composition  ###########################################
 ###############################################################################
@@ -678,9 +675,4 @@ class CompositionOperator(Operator):
     def is_linear(self):
         return self.linear_flag
 
-    def calculate_norm(self):
-        '''Returns the norm of the CompositionOperator. Note that this gives a NotImplementedError if the CompositionOperator is not linear.'''
-        if self.is_linear():
-            return LinearOperator.calculate_norm(self)
-
-        return super().calculate_norm(self)
+    

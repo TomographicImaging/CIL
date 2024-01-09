@@ -24,13 +24,14 @@ from functools import partial
 
 class Sampler():
     """     
-    This class follows the factory design pattern. It is not instantiated directly but has static methods that will return instances of different samplers, which require a variety of parameters.
-    Custom samplers can be created by subclassing the sampler class. 
+    The user is recommended to not instantiate this class  directly but instead use one of the static methods that will return instances of different samplers.
+    
+    This class wraps a function that takes an in integer iteration number and returns an integer from {0, 1, …, S-1} with S=num_indices to produce a Sampler which returns a new index for each call of `next`.
 
-    Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
+    
+    Custom samplers can be created by subclassing this sampler class. 
 
-    Common in each instantiated class, the function `next()` outputs a single next index from the list {0,1,…,S-1}. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
-
+    
 
     Parameters
     ----------
@@ -75,11 +76,6 @@ class Sampler():
     >>> print(sampler.get_samples(16))
     [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
 
-
-
-    Note
-    -----
-    If your function involves a random number generator, then it may be easier to subclass the SamplerRandom class instead. 
 
 
     Example
@@ -527,14 +523,11 @@ class Sampler():
 
 class SamplerRandom(Sampler):
     """     
-    This class follows the factory design pattern. It is not designed to be instantiated directly but instead can be called from  static methods in the parent Sampler class.
-    Custom samplers can be created by subclassing the sampler class. 
+     The user is recommended to not instantiate this class  directly but instead use one of the static methods  in the parent Sampler class that will return instances of different samplers.
+    
+    This class produces Samplers that output random samples with and without replacement from the set {0, 1, …, S-1} where S=num_indices.
 
-    Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
-
-    Common in each instantiated class, the function `next()` outputs a single next index from the list {0,1,…,S-1}. Each class also has a `get_samples(n)` function which will output the first `n` samples. 
-
-
+    Custom samplers can be created by subclassing this sampler class. 
 
     Parameters
     ----------

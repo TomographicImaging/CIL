@@ -24,7 +24,7 @@ from functools import partial
 
 class Sampler():
     """     
-    This class follows the factory design pattern. It is not instantiated directly but has 6 static methods that will return instances of 6 different samplers, which require a variety of parameters.
+    This class follows the factory design pattern. It is not instantiated directly but has static methods that will return instances of different samplers, which require a variety of parameters.
     Custom samplers can be created by subclassing the sampler class. 
 
     Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
@@ -45,8 +45,6 @@ class Sampler():
 
     prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
         Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. 
-
-
 
     Returns
     -------
@@ -125,6 +123,77 @@ class Sampler():
     another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
         """
 
+    def __init__(self, num_indices, function,  sampling_type=None, prob_weights=None):
+
+        self._type = sampling_type
+        self._num_indices = num_indices
+        self.function = function
+
+        if prob_weights is None:
+            prob_weights = [1/num_indices]*num_indices
+        else:
+            if abs(sum(prob_weights)-1) > 1e-6:
+                raise ValueError('The provided prob_weights must sum to one')
+
+            if any(np.array(prob_weights) < 0):
+                raise ValueError(
+                    'The provided prob_weights must be greater than or equal to zero')
+
+        self._prob_weights = prob_weights
+        self._iteration_number = 0
+
+    @property
+    def prob_weights(self):
+        return self._prob_weights
+
+    @property
+    def num_indices(self):
+        return self._num_indices
+
+    @property
+    def current_iter_number(self):
+        return self._iteration_number
+
+    def next(self):
+        """ 
+        Returns a sample from the list of indices `{0, 1, …, S-1}, where S is the number of indices and increments the sampler.
+        """
+
+        out = self.function(self._iteration_number)
+
+        self._iteration_number += 1
+        return out
+
+    def __next__(self):
+        return self.next()
+
+    def get_samples(self,  num_samples=20):
+        """
+        Returns the first `num_samples` produced by the sampler as a numpy array.
+
+        Parameters
+        ----------
+        num_samples: int, default = 20
+            The number of samples to return. 
+        """
+        save_last_index = self._iteration_number
+        self._iteration_number = 0
+
+        output = [self.next() for _ in range(num_samples)]
+
+        self._iteration_number = save_last_index
+
+        return np.array(output)
+
+    def __str__(self):
+        repres = "Sampler that selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. \n"
+        repres += "Type : {} \n".format(self._type)
+        repres += "Current iteration number : {} \n".format(
+            self._iteration_number)
+        repres += "Number of indices : {} \n".format(self._num_indices)
+        repres += "Probability weights : {} \n".format(self._prob_weights)
+        return repres
+
     @staticmethod
     def sequential(num_indices):
         """
@@ -134,6 +203,7 @@ class Sampler():
         ----------
         num_indices: int
             One above the largest integer that could be drawn by the sampler. The sampler will select from a list of indices {0, 1, …, S-1} with S=num_indices. 
+        
         Returns
         -------
         A Sampler  that can be called with Sampler.next()  or next(Sampler) and outputs sequentially
@@ -341,7 +411,7 @@ class Sampler():
 
         Returns
         -------
-
+        
         factors: list of ints
             The prime factors of n.
 
@@ -454,81 +524,10 @@ class Sampler():
 
         return sampler
 
-    def __init__(self, num_indices, function,  sampling_type=None, prob_weights=None):
-
-        self._type = sampling_type
-        self._num_indices = num_indices
-        self.function = function
-
-        if prob_weights is None:
-            prob_weights = [1/num_indices]*num_indices
-        else:
-            if abs(sum(prob_weights)-1) > 1e-6:
-                raise ValueError('The provided prob_weights must sum to one')
-
-            if any(np.array(prob_weights) < 0):
-                raise ValueError(
-                    'The provided prob_weights must be greater than or equal to zero')
-
-        self._prob_weights = prob_weights
-        self._iteration_number = 0
-
-    @property
-    def prob_weights(self):
-        return self._prob_weights
-
-    @property
-    def num_indices(self):
-        return self._num_indices
-
-    @property
-    def current_iter_number(self):
-        return self._iteration_number
-
-    def next(self):
-        """ 
-        Returns and increments the sampler 
-        """
-
-        out = self.function(self._iteration_number)
-
-        self._iteration_number += 1
-        return out
-
-    def __next__(self):
-        return self.next()
-
-    def get_samples(self,  num_samples=20):
-        """
-        Returns the first `num_samples` produced by the sampler as a numpy array.
-
-        Parameters
-        ----------
-        num_samples: int, default = 20
-            The number of samples to return. 
-        """
-        save_last_index = self._iteration_number
-        self._iteration_number = 0
-
-        output = [self.next() for _ in range(num_samples)]
-
-        self._iteration_number = save_last_index
-
-        return np.array(output)
-
-    def __str__(self):
-        repres = "Sampler that selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. \n"
-        repres += "Type : {} \n".format(self._type)
-        repres += "Current iteration number : {} \n".format(
-            self._iteration_number)
-        repres += "Number of indices : {} \n".format(self._num_indices)
-        repres += "Probability weights : {} \n".format(self._prob_weights)
-        return repres
-
 
 class SamplerRandom(Sampler):
     """     
-    This class follows the factory design pattern. It is not designed to be instantiated directly but instead can be called from the  6 static methods in the parent Sampler class.
+    This class follows the factory design pattern. It is not designed to be instantiated directly but instead can be called from  static methods in the parent Sampler class.
     Custom samplers can be created by subclassing the sampler class. 
 
     Each factory method will instantiate a  class to select from the list of indices `{0, 1, …, S-1}, where S is the number of indices.`.
@@ -584,7 +583,7 @@ class SamplerRandom(Sampler):
         if seed is not None:
             self._seed = seed
         else:
-            self._seed = int(time.time())  
+            self._seed = int(time.time())
         self._generator = np.random.RandomState(self._seed)
         self._sampling_list = None
         self._replace = replace
@@ -634,13 +633,8 @@ class SamplerRandom(Sampler):
 
         return np.array(output)
 
-    def __str__(self):
-        repres = "Sampler that selects from a list of indices {0, 1, …, S-1}, where S is the number of indices. \n"
-        repres += "Type : {} \n".format(self._type)
-        repres += "Current iteration number : {} \n".format(
-            self._iteration_number)
-        repres += "Number of indices : {} \n".format(self._num_indices)
-        repres += "Probability weights : {} \n".format(self._prob_weights)
+    def __str__(self):  # TODO: Call the parent string and then append
+        repres=super().__str__()
         repres += "Seed : {} \n".format(self._seed)
         return repres
 
@@ -648,10 +642,10 @@ class SamplerRandom(Sampler):
 class MantidSampler(SamplerRandom):
     def function(self, iteration_number):
         """ For each iteration number this function samples from a randomly generated list in order. Every num_indices the list is re-created. For the first aproximately 50*(num_indices -1) iterations the last index is never called.  """
-        if iteration_number < 50*(self.num_indices -1):
-            location = iteration_number % (self.num_indices -1)
+        if iteration_number < 50*(self.num_indices - 1):
+            location = iteration_number % (self.num_indices - 1)
             if location == 0:
-                self._sampling_list = self._generator.choice(self.num_indices-1, self.num_indices -1, p=[
+                self._sampling_list = self._generator.choice(self.num_indices-1, self.num_indices - 1, p=[
                                                              1/(self.num_indices-1)]*(self.num_indices-1), replace=self.replace)
         else:
             location = iteration_number % self.num_indices
@@ -661,6 +655,6 @@ class MantidSampler(SamplerRandom):
         out = self._sampling_list[location]
         return out
 
-    def __init__(self, num_indices,  seed=None, replace=False, prob=None,  sampling_type='Mantid Sampler '):
+    def __init__(self, num_indices,  seed=None, replace=False, prob=None,  sampling_type='Mantid Sampler'):
         super(MantidSampler, self).__init__(
             num_indices,  seed, replace, prob,  sampling_type)

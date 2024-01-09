@@ -810,6 +810,7 @@ class TestSPDHG(CCPiTestClass):
                                            for i in range(self.subsets)])
         self.assertListEqual(spdhg.prob_weights, [
                              1/self.subsets] * self.subsets)
+        self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
         self.assertListEqual(
             spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
@@ -858,6 +859,23 @@ class TestSPDHG(CCPiTestClass):
             spdhg.x.array, self.A.domain_geometry().allocate(1).array)
         self.assertEqual(spdhg.max_iteration, 1000)
         self.assertEqual(spdhg.update_objective_interval, 10)
+        
+        with self.assertRaises(ValueError):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[1]*len(self.A), prob_weights=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
+            
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob_weights=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0],  initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
+        
+        self.assertListEqual(spdhg.prob_weights,  [1/(self.subsets-1)]*(self.subsets-1)+[0])     
+        self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
+        
+        
+    def test_spdhg_sampler_gives_too_large_index(self):
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.sequential(20),
+                      initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
+        with self.assertRaises(IndexError):
+            spdhg.run(12)   
 
     def test_spdhg_deprecated_vargs(self):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[
@@ -870,9 +888,14 @@ class TestSPDHG(CCPiTestClass):
         self.assertListEqual(spdhg.prob_weights, [
                              1/(self.subsets-1)]*(self.subsets-1)+[0])
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
+            
+            
+        with self.assertRaises(ValueError):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0], prob_weights= [1/(self.subsets-1)]*(self.subsets-1)+[0])
 
         with self.assertRaises(ValueError):
             spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  norms=[

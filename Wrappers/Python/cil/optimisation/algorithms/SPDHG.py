@@ -158,7 +158,7 @@ class SPDHG(Algorithm):
                     initial=initial,  sampler=sampler, **kwargs)
         
     def set_up(self, f, g, operator, sigma=None, tau=None,
-               initial=None,   sampler=None, **deprecated_kwargs):
+               initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
         '''set-up of the algorithm
         
         Parameters
@@ -177,8 +177,11 @@ class SPDHG(Algorithm):
             Initial point for the SPDHG algorithm
         gamma : float
             parameter controlling the trade-off between the primal and dual step sizes
-        sampler: an instance of a `cil.optimisation.utilities.Sampler` class
-             Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
+        sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting t a sample from {1,...,len(operator)}. 
+             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/number of subsets
+        prob_weights: (Optional) list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
+            Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
+
         '''
         logging.info("{} setting up".format(self.__class__.__name__, ))
 
@@ -192,20 +195,25 @@ class SPDHG(Algorithm):
         
         self.ndual_subsets = len(self.operator)
         self._sampler = sampler
+        
+        self.prob_weights=getattr(self._sampler, 'prob_weights', None)
+        if prob_weights is not None: 
+            if self.prob_weights is None: 
+                self.prob_weights = prob_weights
+            else:
+                 raise ValueError( 
+                    ' You passed a `prob_weights`argument and a sampler with attribute `prob_weights`, please remove the `prob_weights` argument.')
+        
         self._deprecated_kwargs(deprecated_kwargs)
         
-        if self._sampler is None:
-            self._sampler = Sampler.random_with_replacement(len(operator))
+        if self.prob_weights is None:
+            self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
         
-        if self._sampler.num_indices != len(operator):
-            raise ValueError('The `num_indices` the sampler outputs from should be equal to the number of opertors in the BlockOperator `operator`')
+        if self._sampler is None:
+            self._sampler = Sampler.random_with_replacement(len(operator), prob=self.prob_weights)
         
         self.norms = operator.get_norms_as_list()
 
-        if self._sampler.prob_weights is None:
-            self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
-        else:
-            self.prob_weights=self._sampler.prob_weights
 
         self.set_step_sizes(sigma=sigma, tau=tau)
 
@@ -244,20 +252,22 @@ class SPDHG(Algorithm):
         """
         norms = deprecated_kwargs.pop('norms', None)
         prob = deprecated_kwargs.pop('prob', None)
+        
+        if prob is not None:
+            if self.prob_weights is None:
+                warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilites to the calculation for `sigma` and `tau` please use `prob_weights`. ')
+                self.prob_weights=prob
+            else:
+                
+                raise ValueError( 
+                    '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler with a `prob_weights` property. Please give only one of the three. ')
+
+        
         if norms is not None:
             self.operator.set_norms(norms)
             warnings.warn(
                 ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
 
-        if self._sampler is not None:
-            if prob is not None:
-                raise TypeError(
-                    '`prob` is being deprecated to be replaced with a sampler class. You passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-        else:
-            if prob is not None:
-                warnings.warn('`prob` is being deprecated to be replaced with a sampler class. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). Note that if you passed a `sampler` and a `prob` argument this `prob` argument will be ignored.')
-                self._sampler = Sampler.random_with_replacement(
-                    len(self.operator),  prob=prob)
 
         if deprecated_kwargs:
             raise ValueError("Additional keyword arguments passed but not used: {}".format(
@@ -271,7 +281,7 @@ class SPDHG(Algorithm):
     def tau(self):
         return self._tau
 
-    def set_step_sizes_from_ratio(self, gamma=1., rho=.99):
+    def set_step_sizes_from_ratio(self, gamma=1.0, rho=0.99):
         r""" Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
 
         Parameters
@@ -413,7 +423,10 @@ class SPDHG(Algorithm):
 
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
-        y_k = self.operator[i].direct(self.x)
+        try:
+            y_k = self.operator[i].direct(self.x)
+        except IndexError:
+            raise IndexError('The sampler has outputted an index larger than the number of operators to sample from. Please ensure your sampler samples from {1,2,...,len(operator)} only.')
 
         y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
 

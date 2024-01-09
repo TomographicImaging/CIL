@@ -639,22 +639,3 @@ class SamplerRandom(Sampler):
         return repres
 
 
-class MantidSampler(SamplerRandom):
-    def function(self, iteration_number):
-        """ For each iteration number this function samples from a randomly generated list in order. Every num_indices the list is re-created. For the first aproximately 50*(num_indices -1) iterations the last index is never called.  """
-        if iteration_number < 50*(self.num_indices - 1):
-            location = iteration_number % (self.num_indices - 1)
-            if location == 0:
-                self._sampling_list = self._generator.choice(self.num_indices-1, self.num_indices - 1, p=[
-                                                             1/(self.num_indices-1)]*(self.num_indices-1), replace=self.replace)
-        else:
-            location = iteration_number % self.num_indices
-            if location == 0:
-                self._sampling_list = self._generator.choice(
-                    self.num_indices, self.num_indices, p=self.prob_weights, replace=self.replace)
-        out = self._sampling_list[location]
-        return out
-
-    def __init__(self, num_indices,  seed=None, replace=False, prob=None,  sampling_type='Mantid Sampler'):
-        super(MantidSampler, self).__init__(
-            num_indices,  seed, replace, prob,  sampling_type)

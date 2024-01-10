@@ -22,11 +22,9 @@ from cil.framework import DataContainer
 import numpy as np
 
 
+def mse(dc1, dc2, mask=None):
+    ''' Calculates the mean squared error of two images
 
-def mse(dc1, dc2, mask=None):    
-    
-    ''' Returns the Mean Squared error of two DataContainers
-    
     Parameters
     ----------
     dc1: `DataContainer`
@@ -34,23 +32,29 @@ def mse(dc1, dc2, mask=None):
     dc2: `DataContainer`
         Second image to be compared 
     mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `dc1` and `dc2`
-        Region of interest for the calculation. 
-    '''  
+        The pixelwise operation only considers values where the mask is True (or 1). 
 
-    if mask is None:
-        diff = dc1 - dc2    
-        return L2NormSquared().__call__(diff)/dc1.size
-    else:
+    Returns
+    -------
+    A number, the mean squared error of the two images
+    '''
+    dc1 = dc1.as_array()
+    dc2 = dc2.as_array()
+    
+    if mask is not None:
+        
         if isinstance(mask, DataContainer):
             mask = mask.as_array()
-        return np.mean(((dc1.as_array() - dc2.as_array())**2), where=mask.astype('bool'))
+            
+        mask = mask.astype('bool')
+        dc1 = np.extract(mask, dc1)
+        dc2 = np.extract(mask, dc2)
+    return np.mean(((dc1 - dc2)**2))
 
 
 def mae(dc1, dc2, mask=None):
-    
-    ''' Returns the Mean Absolute error of two DataContainers
-    
-        
+    ''' Calculates the Mean Absolute error of two images.
+
     Parameters
     ----------
     dc1: `DataContainer`
@@ -58,22 +62,31 @@ def mae(dc1, dc2, mask=None):
     dc2: `DataContainer`
         Second image to be compared 
     mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `dc1` and `dc2`
-        Region of interest for the calculation. 
+        The pixelwise operation only considers values where the mask is True (or 1). 
+
+
+    Returns
+    -------
+    A number with the mean absolute error between the two images. 
+    '''
+    dc1 = dc1.as_array()
+    dc2 = dc2.as_array()
+
+    if mask is not None:
         
-        
-    '''    
-    if mask is None:
-        diff = dc1 - dc2  
-        return L1Norm().__call__(diff)/dc1.size
-    else:
         if isinstance(mask, DataContainer):
-            mask=mask.as_array()
-    return np.mean(np.abs((dc1.as_array()-dc2.as_array())), where=mask.astype('bool'))
+            mask = mask.as_array()
+            
+        mask = mask.astype('bool')
+        dc1 = np.extract(mask, dc1)
+        dc2 = np.extract(mask, dc2)
+        
+    return np.mean(np.abs((dc1-dc2)))
+
 
 def psnr(ground_truth, corrupted, data_range=None, mask=None):
+    ''' Calculates the Peak signal to noise ratio (PSNR) between the two images. 
 
-    ''' Returns the Peak signal to noise ratio
-    
     Parameters
     ----------
     ground_truth: `DataContainer`
@@ -81,27 +94,30 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
     corrupted: `DataContainer`
         The image to be evaluated 
     data_range: scalar value, default=None
-        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). To match with scikit-image the default is ground_truth.array.max()
+        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.
     mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
-        Region of interest for the calculation. 
-    '''  
+        The pixelwise operation only considers values where the mask is True (or 1). 
+
+    Returns
+    -------
+    A number, the peak signal to noise ration between the two images.
+    '''
     if data_range is None:
+        
         if mask is None:
-            data_range=ground_truth.array.max()
+            data_range = ground_truth.array.max()
+            
         else:
+            
             if isinstance(mask, DataContainer):
-                mask=mask.as_array()
-            data_range=np.amax(ground_truth.as_array()[mask.astype('bool')])
-    
-    tmp_mse = mse(ground_truth, corrupted, mask=mask) 
+                mask = mask.as_array()
+            data_range = np.max(ground_truth.as_array(),
+                                 where=mask.astype('bool'), initial=-1e-8)
 
-    if tmp_mse == 0:
+    tmp_mse = mse(ground_truth, corrupted, mask=mask)
+
+    if tmp_mse < 1e-6:
+        
         return 1e5
+    
     return 10 * np.log10((data_range ** 2) / tmp_mse)
-
-
-
-
-
-
-

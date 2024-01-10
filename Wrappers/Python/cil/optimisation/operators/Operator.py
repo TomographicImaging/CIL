@@ -372,6 +372,45 @@ class LinearOperator(Operator):
             print('Left hand side  {}, \nRight hand side {}'.format(a, b))
             return False
 
+class AdjointOperator(LinearOperator):
+
+    """
+    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as 
+
+    .. math:: <x, A^* y> = <Ax, y>
+
+    Parameters
+    ----------
+
+    operator : A linear operator
+
+    Examples
+    --------
+    >>> ig = ImageGeometry(2,3) 
+    >>> G = GradientOperator(ig)
+    >>> div = AdjointOperator(G)
+    >>> x = G.domain.allocate("random_int")
+    >>> y = G.range.allocate("random_int")
+    >>> lhs = G.direct(x).dot(y)
+    >>> rhs = x.dot(div.direct(y))
+    >>> lhs == rhs # returns True
+
+
+ 
+
+    """    
+    
+    def __init__(self, operator):
+        super(AdjointOperator, self).__init__(domain_geometry=operator.range_geometry(), 
+                                       range_geometry=operator.domain_geometry())         
+        self.operator = operator
+                
+    def direct(self, x, out=None):
+        return self.operator.adjoint(x, out=out)
+        
+    def adjoint(self, x, out=None):
+        return self.operator.direct(x, out=out)            
+
 
 class ScaledOperator(Operator):
 

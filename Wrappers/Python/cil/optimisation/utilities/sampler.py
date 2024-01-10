@@ -87,7 +87,7 @@ class Sampler():
     >>> num_indices = 13
     >>> 
     >>> def test_function(iteration_number, custom_list=custom_list):
-        return(custom_list[iteration_number%len(custom_list)])
+    >>>    return(custom_list[iteration_number%len(custom_list)])
     >>> 
     >>> #calculate prob weights 
     >>> temp_list = []
@@ -368,7 +368,7 @@ class Sampler():
         >>> num_indices = 13
         >>> 
         >>> def test_function(iteration_number, custom_list=custom_list):
-            return(custom_list[iteration_number%len(custom_list)])
+        >>>    return(custom_list[iteration_number%len(custom_list)])
         >>> 
         >>> #calculate prob weights 
         >>> temp_list = []
@@ -523,7 +523,7 @@ class Sampler():
 
 class SamplerRandom(Sampler):
     """     
-     The user is recommended to not instantiate this class  directly but instead use one of the static methods  in the parent Sampler class that will return instances of different samplers.
+    The user is recommended to not instantiate this class  directly but instead use one of the static methods  in the parent Sampler class that will return instances of different samplers.
     
     This class produces Samplers that output random samples with and without replacement from the set {0, 1, …, S-1} where S=num_indices.
 
@@ -557,19 +557,14 @@ class SamplerRandom(Sampler):
     >>> print(sampler.get_samples())
     [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
 
+    Example
+    -------
+    >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
+    >>> print(sampler.get_samples(16))
+    [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
 
+    """
 
-
-    Note
-    -----
-    The optimal choice of sampler depends on the data and the number of calls to the sampler. 
-
-    For random sampling with replacement, there is the possibility, with a small number of calls to the sampler that some indices will not have been selected. For the case of uniform probabilities, the default, the number of
-    iterations required such that the probability that all indices have been selected at least once is greater than :math:`p` grows as :math:`nlog(n/p)` where `n` is `num_indices`. 
-    For example, to be 99% certain that you have seen all indices, for `n=20` you should take at least 152 samples, `n=50` at least 426 samples. To be more likely than not, for `n=20` you should take 78 samples and `n=50` you should take 228 samples. 
-    In general, we note that for a large number of samples (e.g. `>20*num_indices`), the density of the outputted samples looks more and more uniform. For a small number of samples (e.g. `<5*num_indices`) the user may wish to consider
-    another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
-        """
 
     def __init__(self, num_indices,  seed=None, replace=True, prob=None,  sampling_type='random_with_replacement'):
 
@@ -626,7 +621,7 @@ class SamplerRandom(Sampler):
 
         return np.array(output)
 
-    def __str__(self):  # TODO: Call the parent string and then append
+    def __str__(self):  
         repres=super().__str__()
         repres += "Seed : {} \n".format(self._seed)
         return repres

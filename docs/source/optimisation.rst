@@ -373,13 +373,12 @@ Utilities
 =======
 Contains utilities for the CIL optimisation framework. 
 
-Sampler
+Samplers
 --------
-A class to select from a list of indices {0, 1, …, S-1}. The function next() outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. To be run again and again, depending on how many iterations.
+Here, we define samplers that select from a list of indices {0, 1, …, S-1} either randomly or by some deterministic pattern.
+The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn. 
 
-It is recommended to use the static methods in `cil.optimisation.utilities.sampler` to configure your Sampler object rather than initialising this class directly.
-
-The parent `cil.optimisation.utilities.sampler` class wraps a function that takes in an iteration number and outputs an index:
+For ease of use it is  recommended to use the static methods in `cil.optimisation.utilities.sampler` to configure your sampler object rather than initialising the classes directly.
 
 .. autoclass:: cil.optimisation.utilities.Sampler
    :members:

@@ -53,16 +53,15 @@ class SPDHG(Algorithm):
         Initial point for the SPDHG algorithm
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-    sampler: an instance of a `cil.optimisation.utilities.Sampler` class
-        Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
+    sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
+             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/len(operator)
+  
 
     **kwargs:
     prob : list of floats, optional, default=None
         List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
     norms : list of floats
         precalculated list of norms of the operators. To be deprecated and placed by the `set_norms` functionalist in a BlockOperator.
-    Example 
-    -------
 
 
     Example
@@ -144,7 +143,7 @@ class SPDHG(Algorithm):
     '''
 
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 initial=None, sampler=None,  **kwargs):
+                 initial=None, sampler=None, prob_weights=None,   **kwargs):
 
         max_iteration = kwargs.pop('max_iteration', 0)
        
@@ -155,7 +154,7 @@ class SPDHG(Algorithm):
                                     update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    initial=initial,  sampler=sampler, **kwargs)
+                    initial=initial,  sampler=sampler, prob_weights=prob_weights,  **kwargs)
         
     def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
@@ -177,8 +176,8 @@ class SPDHG(Algorithm):
             Initial point for the SPDHG algorithm
         gamma : float
             parameter controlling the trade-off between the primal and dual step sizes
-        sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting t a sample from {1,...,len(operator)}. 
-             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/number of subsets
+        sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
+             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/len(operator)
         prob_weights: (Optional) list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
 

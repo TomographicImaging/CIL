@@ -20,5 +20,4 @@
 
 from .sampler import Sampler
 from .sampler import SamplerRandom
-from .sampler import MantidSampler
 

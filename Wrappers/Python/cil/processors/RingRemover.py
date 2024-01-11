@@ -26,30 +26,29 @@ class RingRemover(Processor):
     
     '''
         RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 
-        the algorithm in https://doi.org/10.1364/OE.17.008567
+        using the algorithm in https://doi.org/10.1364/OE.17.008567
 
-    '''
-        
-    def __init__(self, decNum, wname, sigma, info = True):
-        
-        '''
-    
         Parameters
         ----------
-        decNum : number of wavelet decompositions
+        decNum : int
+            Number of wavelet decompositions
         
-        wname : (str) name of wavelet filter from pywt 
-            Example: 'db1' -- 'db35', 'haar'
+        wname : str
+            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar'
     
-        sigma : Damping parameter in Fourier space.
+        sigma : float 
+            Damping parameter in Fourier space
         
-        info : Prints ring remover end message 
+        info : boolean
+            Flag to enable print of ring remover end message 
         
         Returns
         -------
-        Corrected ImageData/AcquisitionData 2D, 3D,
-                multi-spectral 2D, multi-spectral 3D    
-        '''             
+        DataContainer
+            Corrected ImageData/AcquisitionData 2D, 3D, multi-spectral 2D, multi-spectral 3D 
+    '''
+        
+    def __init__(self, decNum, wname, sigma, info = True):   
         
         kwargs = {'decNum': decNum,
                   'wname': wname,
@@ -94,12 +93,12 @@ class RingRemover(Processor):
             if 'vertical' in geom.dimension_labels:
                                 
                 for i in range(vertical):
-                    tmp_corrected = self.xRemoveStripesVertical(data.get_slice(vertical=i, force=True).as_array(), decNum, wname, sigma) 
+                    tmp_corrected = self._xRemoveStripesVertical(data.get_slice(vertical=i, force=True).as_array(), decNum, wname, sigma) 
                     out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
             else:
-                tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
+                tmp_corrected = self._xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
                 out.fill(tmp_corrected)        
         
         # for multichannel data        
@@ -114,7 +113,7 @@ class RingRemover(Processor):
                     data_ch_i = data.get_slice(channel=i)
                     
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.get_slice(vertical=j, force=True).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self._xRemoveStripesVertical(data_ch_i.get_slice(vertical=j, force=True).as_array(), decNum, wname, sigma)
                         out_ch_i.fill(tmp_corrected, vertical = j)
                         
                     out.fill(out_ch_i.as_array(), channel=i) 
@@ -125,7 +124,7 @@ class RingRemover(Processor):
             # for 2D data                        
             else:
                 for i in range(channels):
-                        tmp_corrected = self.xRemoveStripesVertical(data.get_slice(channel=i).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self._xRemoveStripesVertical(data.get_slice(channel=i).as_array(), decNum, wname, sigma)
                         out.fill(tmp_corrected, channel = i)
                         if info:
                             print("Finish channel {}".format(i))
@@ -135,11 +134,25 @@ class RingRemover(Processor):
         return out
 
           
-    def xRemoveStripesVertical(self,ima, decNum, wname, sigma):
+    def _xRemoveStripesVertical(self, ima, decNum, wname, sigma):
         
-        ''' Code from https://doi.org/10.1364/OE.17.008567 
+        ''' Ring removal algorithm via combined wavelet and fourier filtering
+            code from https://doi.org/10.1364/OE.17.008567
             translated in Python
-                            
+        Parameters
+        ----------
+        ima : ndarray
+            2D image data
+
+        decNum : int
+            Number of wavelet decompositions
+        
+        wname : str
+            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar'
+
+        sigma : float 
+            Damping parameter in Fourier space
+
         Returns
         -------
         Corrected 2D sinogram data (Numpy Array)

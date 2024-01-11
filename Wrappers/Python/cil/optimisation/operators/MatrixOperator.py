@@ -57,10 +57,10 @@ class MatrixOperator(LinearOperator):
     def adjoint(self,x, out=None):
         if out is None:
             tmp = self.domain_geometry().allocate()
-            tmp.fill(numpy.dot(self.A.transpose(),x.as_array()))
+            tmp.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return tmp
         else:            
-            out.fill(numpy.dot(self.A.transpose(),x.as_array()))
+            out.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
 
     def size(self):
         return self.A.shape

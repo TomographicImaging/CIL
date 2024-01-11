@@ -359,17 +359,18 @@ class LinearOperator(Operator):
 
         fx = operator.direct(x)
         by = operator.adjoint(y)
-        a = fx.dot(y)
-        b = by.dot(x).conjugate()
+        
+        lhs = fx.dot(y)
+        rhs = x.dot(by)
 
         # Check relative tolerance but normalised with respect to
         # operator, x and y norms and avoid zero division
-        error = numpy.abs(a - b) / (operator.norm()*x.norm()*y.norm() + 1e-12)
+        error = numpy.abs(lhs - rhs) / (operator.norm()*x.norm()*y.norm() + 1e-12)
 
         if error < tolerance:
             return True
         else:
-            print('Left hand side  {}, \nRight hand side {}'.format(a, b))
+            print('Left hand side  {}, \nRight hand side {}'.format(lhs, rhs))
             return False
 
 class AdjointOperator(LinearOperator):

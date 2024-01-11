@@ -66,50 +66,33 @@ class TestAdjointOperator(CCPiTestClass):
         np.testing.assert_allclose(lhs, rhs_a, atol=1e-3) 
         np.testing.assert_allclose(lhs, rhs_b, atol=1e-3) 
 
-    # def test_direct_adjoint_matrix_operator_complex(self):
+    def test_direct_adjoint_matrix_operator_complex(self):
         
-    #     np.random.seed(10)
-    #     n = 3  
-    #     m = 2
-    #     Anp = np.random.normal(0,1, (m, n)).astype('float32') + np.random.normal(-1,1, (m, n)).astype('float32') + 0j
+        np.random.seed(10)
+        n = 3  
+        m = 2
+        Anp = np.random.uniform(0,1, (n, m)) - 1.j*np.random.uniform(0,1, (n, m)) + 3.j*np.random.uniform(0,1, (n, m))
         
-    #     Amat = MatrixOperator(Anp)
-    #     Amat_tr = MatrixOperator(Anp.T)
+        Amat = MatrixOperator(Anp)
+        Amat_tr = AdjointOperator(Amat)
 
-    #     x = Amat.domain_geometry().allocate("random", dtype="complex")
-    #     y = Amat.range_geometry().allocate("random", dtype="complex")
-
-
-    #     lhs = Amat.direct(x).dot(y)
-    #     rhs = x.dot(Amat_tr.direct(y)).conjugate()
-    #     print(lhs)
-    #     print(rhs)
-    #     # res1 = Amat.direct(x)
-    #     # res2 = Amat_tr.adjoint(x)
-    #     # print(res1.array)
-    #     # print(res2.array)
-
-    #     # res1 = Amat.adjoint(y)
-    #     # res2 = Amat_tr.direct(y)
-    #     # np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
-
-    #     # res3 = Amat.direct(x)
-    #     # res4 = Amat_tr.adjoint(x)
-    #     # np.testing.assert_allclose(res3.array, res4.array, atol=1e-3) 
-
-    #     # self.assertTrue(Amat.dot_test(Amat), True)  
-    #     # self.assertTrue(Amat_tr.dot_test(Amat_tr), True)
-
-    #     # # <Ax, y> = <x, A^T y>
-    #     # lhs = res3.dot(y)
-    #     # rhs_a = x.dot(res2)
-    #     # rhs_b = x.dot(Amat.adjoint(y))
-    #     # np.testing.assert_allclose(lhs, rhs_a, atol=1e-3) 
-    #     # np.testing.assert_allclose(lhs, rhs_b, atol=1e-3)         
+        x = Amat.domain_geometry().allocate("random", dtype="complex")
+        y = Amat.range_geometry().allocate("random", dtype="complex")
 
 
+        # <Ax,y> = <x, A^* y> using numpy arrays
+        # convention is to conjugate the second vector, see `dot` method in `framework`
+        lhs_np = np.dot(Amat.direct(x).array,y.array.conjugate())
+        rhs_np = np.dot(x.array, Amat.adjoint(y).conjugate().array)
+        np.testing.assert_allclose(lhs_np, rhs_np, atol=1e-3) 
 
-            
+        # using `dot` method from DataContainer
+        lhs = Amat.direct(x).dot(y) # conjugate of y is applied in the dot method
+        rhs_a = x.dot(Amat.adjoint(y)) # conjugate of y is applied in the dot method
+        rhs_b = x.dot(Amat_tr.direct(y)) 
+
+        np.testing.assert_allclose(lhs, rhs_a, atol=1e-3)  
+        np.testing.assert_allclose(lhs, rhs_b, atol=1e-3)         
 
 
-
+        

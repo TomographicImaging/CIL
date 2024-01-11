@@ -503,7 +503,10 @@ class ImageGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                if numpy.iscomplexobj(out.array):
+                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                else:
+                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass

@@ -31,8 +31,8 @@ def mse(dc1, dc2, mask=None):
         One image to be compared
     dc2: `DataContainer`
         Second image to be compared 
-    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `dc1` and `dc2`
-        The pixelwise operation only considers values where the mask is True (or 1). 
+    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`
+        The pixelwise operation only considers values where the mask is True or NonZero.
 
     Returns
     -------
@@ -61,8 +61,8 @@ def mae(dc1, dc2, mask=None):
         One image to be compared
     dc2: `DataContainer`
         Second image to be compared 
-    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `dc1` and `dc2`
-        The pixelwise operation only considers values where the mask is True (or 1). 
+    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`
+        The pixelwise operation only considers values where the mask is True or NonZero. 
 
 
     Returns
@@ -95,8 +95,8 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
         The image to be evaluated 
     data_range: scalar value, default=None
         PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.
-    mask: array or `DataContainer` of Boolean values or 0's and 1's with the same dimensions as the `ground_truth` and `corrupted`
-        The pixelwise operation only considers values where the mask is True (or 1). 
+    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`
+        The pixelwise operation only considers values where the mask is True or NonZero.. 
 
     Returns
     -------
@@ -116,8 +116,5 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
 
     tmp_mse = mse(ground_truth, corrupted, mask=mask)
 
-    if tmp_mse < 1e-6:
-        
-        return 1e5
-    
     return 10 * np.log10((data_range ** 2) / tmp_mse)
+  

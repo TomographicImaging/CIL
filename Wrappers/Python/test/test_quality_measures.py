@@ -25,6 +25,7 @@ from cil.utilities import noise
 from cil.utilities.quality_measures import mse, mae, psnr
 from packaging import version
 from cil.processors import Slicer
+from testclass import CCPiTestClass
 if version.parse(np.version.version) >= version.parse("1.13"):
     try:
         from skimage.metrics import mean_squared_error, peak_signal_noise_ratio
@@ -36,7 +37,7 @@ else:
     
 initialise_tests()
 
-class TestQualityMeasures(unittest.TestCase):
+class TestQualityMeasures(CCPiTestClass):
     
     def setUp(self):
         if has_skimage:
@@ -126,5 +127,9 @@ class TestQualityMeasures(unittest.TestCase):
         res1 = mae(self.id_coins_sliced, self.id_coins_noisy_sliced)
         res2 = mae(self.id_coins, self.id_coins_noisy, mask=self.mask)
         np.testing.assert_almost_equal(res1, res2, decimal=3)
+        
+    def test_infinite_psnr(self):
+        self.assertEqual(psnr(self.id_coins_sliced, self.id_coins_sliced), np.inf)
+            
         
         

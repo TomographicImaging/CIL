@@ -105,7 +105,8 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
     if data_range is None:
         
         if mask is None:
-            data_range = ground_truth.array.max()
+            data_range = ground_truth.as_array().max()
+
             
         else:
             

@@ -133,5 +133,7 @@ class TestQualityMeasures(CCPiTestClass):
         with warnings.catch_warnings(record=True) as w:
             self.assertEqual(psnr(self.id_coins_sliced, self.id_coins_sliced), np.inf)
             assert issubclass(w[-1].category, RuntimeWarning)
-        
+
+            
+
         

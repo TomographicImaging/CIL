@@ -31,13 +31,14 @@ class RingRemover(Processor):
         Parameters
         ----------
         decNum : int
-            Number of wavelet decompositions
+            Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal
+            but can alter the profile of the data
         
         wname : str
             Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar'
     
         sigma : float 
-            Damping parameter in Fourier space
+            Damping parameter in Fourier space - increasing sigma, increases the size of artefacts which can be removed
         
         info : boolean
             Flag to enable print of ring remover end message 
@@ -48,7 +49,7 @@ class RingRemover(Processor):
             Corrected ImageData/AcquisitionData 2D, 3D, multi-spectral 2D, multi-spectral 3D 
     '''
         
-    def __init__(self, decNum, wname, sigma, info = True):   
+    def __init__(self, decNum=4, wname='db10', sigma=1.5, info = True):   
         
         kwargs = {'decNum': decNum,
                   'wname': wname,
@@ -145,13 +146,14 @@ class RingRemover(Processor):
             2D image data
 
         decNum : int
-            Number of wavelet decompositions
+            Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal
+            but can alter the profile of the data
         
         wname : str
             Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar'
 
         sigma : float 
-            Damping parameter in Fourier space
+            Damping parameter in Fourier space - increasing sigma, increase the size of artefacts which can be removed
 
         Returns
         -------

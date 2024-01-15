@@ -290,8 +290,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="n">norm</span></div>
 
 <div class="viewcode-block" id="Operator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Calculates the norm of the Operator&#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Operator.range_geometry"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.Operator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the range of the Operator: Y space&#39;&#39;&#39;</span>
@@ -318,7 +322,7 @@
     <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># TODO: check equality of domain and range of operators</span>
         <span class="c1"># if self.operator2.range_geometry != self.operator1.domain_geometry:</span>
-        <span class="c1">#    raise ValueError(&#39;Cannot compose operators, check domain geometry of {} and range geometry of {}&#39;.format(self.operato1,self.operator2))</span>
+        <span class="c1">#    raise ValueError(&#39;Cannot compose operators, check domain geometry of {} and range geometry of {}&#39;.format(self.operator1,self.operator2))</span>
 
         <span class="k">return</span> <span class="n">CompositionOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -712,15 +716,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No adjoint operation with non-linear operators&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SumOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.SumOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div></div>
 
-<div class="viewcode-block" id="SumOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.SumOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the SumOperator&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
-
+    
 <span class="c1">###############################################################################</span>
 <span class="c1">################   Composition  ###########################################</span>
 <span class="c1">###############################################################################</span>
@@ -869,15 +867,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No adjoint operation with non-linear operators&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompositionOperator.is_linear"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div></div>
 
-<div class="viewcode-block" id="CompositionOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.CompositionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the norm of the CompositionOperator, that is the product of the norms</span>
-<span class="sd">        of its operators.&#39;&#39;&#39;</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.</span>
-        <span class="k">for</span> <span class="n">operator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">*=</span> <span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">norm</span></div></div>
+    
 </pre></div>
 
               </div>

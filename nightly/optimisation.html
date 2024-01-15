@@ -2544,7 +2544,7 @@ If <cite>None</cite> is passed, the cache is cleared prompting the function to c
 <dl class="py method">
 <dt id="cil.optimisation.operators.Operator.calculate_norm">
 <code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculates the norm of the Operator</p>
+<dd><p>Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2770,13 +2770,6 @@ For example, <cite>CompositionOperator(left, right).direct(x)</cite> is equivale
 <dd><p>Returns if the operator is linear</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="cil.optimisation.operators.CompositionOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#CompositionOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the CompositionOperator, that is the product of the norms
-of its operators.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
@@ -2912,12 +2905,6 @@ For example, <cite>SumOperator(left, right).direct(x)</cite> is equivalent to  <
 <dt id="cil.optimisation.operators.SumOperator.is_linear">
 <code class="sig-name descname"><span class="pre">is_linear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#SumOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SumOperator.is_linear" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns if the operator is linear</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.operators.SumOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#SumOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SumOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the SumOperator</p>
 </dd></dl>
 
 </dd></dl>

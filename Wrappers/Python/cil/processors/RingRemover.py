@@ -35,7 +35,8 @@ class RingRemover(Processor):
             but can alter the profile of the data
         
         wname : str
-            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar'
+            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar' - increasing the wavelet filter increases the strength of 
+            the ring removal, but also increases the computational effort
     
         sigma : float 
             Damping parameter in Fourier space - increasing sigma, increases the size of artefacts which can be removed
@@ -150,7 +151,8 @@ class RingRemover(Processor):
             but can alter the profile of the data
         
         wname : str
-            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar'
+            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar' - increasing the wavelet filter increases the strength of 
+            the ring removal, but also increases the computational effort
 
         sigma : float 
             Damping parameter in Fourier space - increasing sigma, increase the size of artefacts which can be removed

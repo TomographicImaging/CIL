@@ -372,6 +372,8 @@ class BlockOperator(Operator):
             tmp = []
             for i in range(self.shape[1]):
                 tmp.append(self.get_item(0, i).domain_geometry())
+            if self.shape[1] == 1:
+                return tmp[0]
             return BlockGeometry(*tmp)
 
             # shape = (self.shape[0], 1)
@@ -384,6 +386,8 @@ class BlockOperator(Operator):
         tmp = []
         for i in range(self.shape[0]):
             tmp.append(self.get_item(i, 0).range_geometry())
+        if self.shape[0] == 1:
+            return tmp[0]
         return BlockGeometry(*tmp)
 
     def sum_abs_row(self):

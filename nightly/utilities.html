@@ -579,20 +579,66 @@ POSSIBILITY OF SUCH DAMAGE.</p>
 <span id="image-quality-metrics"></span><h2>Image Quality metrics<a class="headerlink" href="#module-cil.utilities.quality_measures" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt id="cil.utilities.quality_measures.mse">
-<code class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></code><code class="sig-name descname"><span class="pre">mse</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/utilities/quality_measures.html#mse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.mse" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the Mean Squared error of two DataContainers</p>
+<code class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></code><code class="sig-name descname"><span class="pre">mse</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/utilities/quality_measures.html#mse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.mse" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the mean squared error of two images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dc1</strong> (<cite>DataContainer</cite>) – One image to be compared</p></li>
+<li><p><strong>dc2</strong> (<cite>DataContainer</cite>) – Second image to be compared</p></li>
+<li><p><strong>mask</strong> (array or <cite>DataContainer</cite> with the same dimensions as the <cite>dc1</cite> and <cite>dc2</cite>) – The pixelwise operation only considers values where the mask is True or NonZero.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A number, the mean squared error of the two images</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="cil.utilities.quality_measures.mae">
-<code class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></code><code class="sig-name descname"><span class="pre">mae</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/utilities/quality_measures.html#mae"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.mae" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the Mean Absolute error of two DataContainers</p>
+<code class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></code><code class="sig-name descname"><span class="pre">mae</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/utilities/quality_measures.html#mae"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.mae" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the Mean Absolute error of two images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dc1</strong> (<cite>DataContainer</cite>) – One image to be compared</p></li>
+<li><p><strong>dc2</strong> (<cite>DataContainer</cite>) – Second image to be compared</p></li>
+<li><p><strong>mask</strong> (array or <cite>DataContainer</cite> with the same dimensions as the <cite>dc1</cite> and <cite>dc2</cite>) – The pixelwise operation only considers values where the mask is True or NonZero.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A number with the mean absolute error between the two images.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="cil.utilities.quality_measures.psnr">
-<code class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></code><code class="sig-name descname"><span class="pre">psnr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrupted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">255</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/utilities/quality_measures.html#psnr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.psnr" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the Peak signal to noise ratio</p>
+<code class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></code><code class="sig-name descname"><span class="pre">psnr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrupted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/utilities/quality_measures.html#psnr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.psnr" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the Peak signal to noise ratio (PSNR) between the two images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ground_truth</strong> (<cite>DataContainer</cite>) – The reference image</p></li>
+<li><p><strong>corrupted</strong> (<cite>DataContainer</cite>) – The image to be evaluated</p></li>
+<li><p><strong>data_range</strong> (<em>scalar value</em><em>, </em><em>default=None</em>) – PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.</p></li>
+<li><p><strong>mask</strong> (array or <cite>DataContainer</cite> with the same dimensions as the <cite>dc1</cite> and <cite>dc2</cite>) – The pixelwise operation only considers values where the mask is True or NonZero..</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A number, the peak signal to noise ration between the two images.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

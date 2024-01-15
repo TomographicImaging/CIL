@@ -50,7 +50,7 @@ class Masker(DataProcessor):
 
     @staticmethod
     def value(mask=None, value=0):
-        r'''This sets the masked values of the input data to the requested value.
+        r'''Returns a Masker that sets the masked values of the input data to the requested value.
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class Masker(DataProcessor):
     
     @staticmethod
     def mean(mask=None, axis=None):
-        r'''This sets the masked values of the input data to the mean of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.
 
         Parameters
         ----------
@@ -94,7 +94,7 @@ class Masker(DataProcessor):
     
     @staticmethod
     def median(mask=None, axis=None):
-        r'''This sets the masked values of the input data to the median of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.
 
         Parameters
         ----------
@@ -116,7 +116,7 @@ class Masker(DataProcessor):
     
     @staticmethod
     def interpolate(mask=None, axis=None, method='linear'):
-        r'''This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.
+        r'''Returns a Masker that operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.
 
         Parameters
         ----------

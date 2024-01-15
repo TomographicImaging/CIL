@@ -17,7 +17,8 @@
   - Bug fix in the adjoint of the Diagonal Operator for complex values
   - Update conda build action to v2 for 2.5x quicker builds
   - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
-  - Quality metrics have added mask option 
+  - Quality metrics have added mask option
+  - Bug fix for norm of CompositionOperator
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

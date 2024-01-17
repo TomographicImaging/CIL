@@ -1358,26 +1358,27 @@ and scales result by white_level (default=1)</p>
 <h3>Ring Remover<a class="headerlink" href="#ring-remover" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.processors.RingRemover">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">RingRemover</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">RingRemover</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decNum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'db10'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover" title="Permalink to this definition">#</a></dt>
 <dd><p>RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData)
-the algorithm in <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></p>
-<dl class="py method">
-<dt id="cil.processors.RingRemover.xRemoveStripesVertical">
-<code class="sig-name descname"><span class="pre">xRemoveStripesVertical</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ima</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.xRemoveStripesVertical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover.xRemoveStripesVertical" title="Permalink to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>Code from <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></dt><dd><p>translated in Python</p>
-</dd>
-</dl>
+using the algorithm in <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decNum</strong> (<em>int</em>) – Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal
+but can alter the profile of the data</p></li>
+<li><p><strong>wname</strong> (<em>str</em>) – Name of wavelet filter from pywt e.g. ‘db1’ – ‘db35’, ‘haar’ - increasing the wavelet filter increases the strength of
+the ring removal, but also increases the computational effort</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – Damping parameter in Fourier space - increasing sigma, increases the size of artefacts which can be removed</p></li>
+<li><p><strong>info</strong> (<em>boolean</em>) – Flag to enable print of ring remover end message</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Corrected 2D sinogram data (Numpy Array)</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Corrected ImageData/AcquisitionData 2D, 3D, multi-spectral 2D, multi-spectral 3D</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
 </dd>
 </dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="cil.processors.RingRemover.get_output">
 <code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.RingRemover.get_output" title="Permalink to this definition">#</a></dt>

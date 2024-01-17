@@ -219,6 +219,25 @@ class TestAlgorithms(CCPiTestClass):
 
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        #Testing g=None
+        alg = FISTA(initial=initial, f=norm2sq, g=None, max_iteration=2, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        #Testing f=None
+        alg = FISTA(initial=initial, f=None, g=L1Norm(b=b), max_iteration=2, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        #Testing f and g is None 
+        with self.assertRaises(ValueError):
+            alg = FISTA(initial=initial, f=None, g=None, max_iteration=2, update_objective_interval=2)         
+        
 
     def test_FISTA_update(self):
 
@@ -790,7 +809,7 @@ class TestSPDHG(unittest.TestCase):
         operator = Aop 
         f = KullbackLeibler(b=noisy_data)        
         alpha = 0.005
-        g =  alpha * TotalVariation(50, 1e-4, lower=0)   
+        g =  alpha * TotalVariation(50, 1e-4, lower=0, warm_start=True)   
         normK = operator.norm()
             
         #% 'implicit' PDHG, preconditioned step-sizes
@@ -828,7 +847,7 @@ class TestSPDHG(unittest.TestCase):
 
         ## block function
         F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
-        G = alpha * TotalVariation(50, 1e-4, lower=0) 
+        G = alpha * TotalVariation(50, 1e-4, lower=0, warm_start=True) 
     
         prob = [1/len(A)]*len(A)
         spdhg = SPDHG(f=F,g=G,operator=A, 

@@ -86,7 +86,6 @@ class BlockDataContainer(object):
         
     def __iter__(self):
         '''BlockDataContainer is Iterable'''
-        self.index=0
         return self
     def next(self):
         '''python2 backwards compatibility'''
@@ -639,11 +638,15 @@ class BlockDataContainer(object):
         return -1 * self     
     
     def dot(self, other):
-#        
-        tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
+        if not isinstance(other, BlockDataContainer):
+            tmp = [ self.containers[i].dot(other) for i in range(self.shape[0])]
+        else:
+            tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
         return sum(tmp)
     
     def __len__(self):
         
         return self.shape[0]
     
+    def max(self):
+        return max([el.max() for el in self.containers])

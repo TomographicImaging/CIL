@@ -39,7 +39,7 @@ class Slicer(DataProcessor):
     ----------
 
     roi : dict
-        The region-of-interest to bin {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
+        The region-of-interest to slice {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
         The `key` being the axis name to apply the processor to, the `value` holding a tuple containing the ROI description
 
         Start: Starting index of input data. Must be an integer, or `None` defaults to index 0.

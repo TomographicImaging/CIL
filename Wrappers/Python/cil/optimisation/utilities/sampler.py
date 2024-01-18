@@ -23,6 +23,7 @@ import time
 
 
 class Sampler():
+    #TODO: Work out how to make the examples testable
     """     
     The user is recommended to not instantiate this class  directly but instead use one of the static methods that will return instances of different samplers.
     
@@ -53,7 +54,7 @@ class Sampler():
     Sampler
         An instance of the Sampler class representing the desired configuration.
 
-    Example
+    Example  
     -------
     >>> sampler = Sampler.random_with_replacement(5)
     >>> print(sampler.get_samples())

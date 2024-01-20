@@ -401,6 +401,8 @@ class Slicer(DataProcessor):
 
         # return if just acting on geometry
         if not self._data_array:
+            if new_geometry is None:
+                raise AttributeError("Binned system geometry not created")
             return new_geometry
 
         # create output array or check size and shape of passed out

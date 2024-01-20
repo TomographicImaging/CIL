@@ -17,108 +17,221 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, DataContainer, AcquisitionData,\
- AcquisitionGeometry, ImageGeometry, ImageData
-import numpy
+from cil.framework import Processor, DataContainer
+import numpy as np
+import weakref
+import logging
+from numba import jit, prange
+
+
+
+@jit(parallel=True, nopython=True)
+def numba_apply_normalisation_default(arr_in, arr_out, offset, scale, num_proj):
+    #numba supports operations on multidimensional arrays of the same size so offset and scale can be float or images
+    for i in prange(num_proj):
+        arr_out[i] = (arr_in[i] - offset) * scale
+
+
+@jit(parallel=True, nopython=True)
+def numba_apply_normalisation_default_inplace(arr_in, offset, scale, num_proj):
+    #numba supports operations on multidimensional arrays of the same size so offset and scale can be float or images
+    for i in prange(num_proj):
+        arr_in[i] -= offset 
+        arr_in[i] *= scale
+
 
 class Normaliser(Processor):
-    '''Normalisation based on flat and dark
-    
-    This processor read in a AcquisitionData and normalises it based on 
-    the instrument reading with and without incident photons or neutrons.
-    
-    Input: AcquisitionData
-    Parameter: 2D projection with flat field (or stack)
-               2D projection with dark field (or stack)
-    Output: AcquisitionDataSetn
-    '''
-    
-    def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
+
+    def __init__(self, flat_field=None, dark_field=None, method='default', tolerance=1e-6):
+        """
+        Acquisition Data normalisation applying corrections as:
+
+        (data - darkfield) / (flatfield - darkfield)
+
+        
+        Parameters
+        ----------
+        flat_field: float, ndarray, optional
+            the normalisation arrays, stack of arrays or value
+        dark_field: float, ndarray
+            The normalisation arrays, stack of arrays or value
+        method: str, optional
+
+            'default' - applies single correction to all projections 
+            requires a float or an ndarray matching the panel size
+            
+            'mean' -  applies single correction to all projections 
+            requires stack of ndarrays matching panel size
+
+            'stack' - applies a different correction to each projection
+            apply one correction per projection
+            requires a list of floats or a stack of ndarrays matching panel size
+
+        """
+
+        if method not in ['default', 'mean', 'stack']:
+            raise ValueError("'method' not recognised")
+
+        if flat_field is None and dark_field is None:
+            logging.warning("No normalisation images/values provided")
+
         kwargs = {
-                  'flat_field'  : flat_field, 
-                  'dark_field'  : dark_field,
-                  # very small number. Used when there is a division by zero
-                  'tolerance'   : tolerance
+                  '_darkfield'  : 0.0,
+                  '_flatfield'  : 1.0,
+                  '_method' : method,
+                  '_tolerance' : tolerance
+
                   }
-        
-        #DataProcessor.__init__(self, **kwargs)
+
         super(Normaliser, self).__init__(**kwargs)
-        if not flat_field is None:
-            self.set_flat_field(flat_field)
-        if not dark_field is None:
-            self.set_dark_field(dark_field)
-    
-    def check_input(self, dataset):
-        if dataset.number_of_dimensions == 3 or\
-           dataset.number_of_dimensions == 2:
-               return True
-        else:
-            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
-                             .format(dataset.number_of_dimensions))
-    
-    def set_dark_field(self, df):
-        if type(df) is numpy.ndarray:
-            if len(numpy.shape(df)) == 3:
-                raise ValueError('Dark Field should be 2D')
-            elif len(numpy.shape(df)) == 2:
-                self.dark_field = df
-        elif issubclass(type(df), DataContainer):
-            self.dark_field = self.set_dark_field(df.as_array())
-    
-    def set_flat_field(self, df):
-        if type(df) is numpy.ndarray:
-            if len(numpy.shape(df)) == 3:
-                raise ValueError('Flat Field should be 2D')
-            elif len(numpy.shape(df)) == 2:
-                self.flat_field = df
-        elif issubclass(type(df), DataContainer):
-            self.flat_field = self.set_flat_field(df.as_array())
-    
-    @staticmethod
-    def Normalise_projection(projection, flat, dark, tolerance):
-        a = (projection - dark)
-        b = (flat-dark)
-        with numpy.errstate(divide='ignore', invalid='ignore'):
-            c = numpy.true_divide( a, b )
-            c[ ~ numpy.isfinite( c )] = tolerance # set to not zero if 0/0 
-        return c
-    
-    @staticmethod
-    def estimate_normalised_error(projection, flat, dark, delta_flat, delta_dark):
-        '''returns the estimated relative error of the normalised projection
-        
-        n = (projection - dark) / (flat - dark)
-        Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)
-        ''' 
-        a = (projection - dark)
-        b = (flat-dark)
-        df = delta_flat / flat
-        dd = delta_dark / dark
-        rel_norm_error = (b + a) / (b * a) * (df + dd)
-        return rel_norm_error
-        
-    def process(self, out=None):
-        
-        projections = self.get_input()
-        dark = self.dark_field
-        flat = self.flat_field
-        
-        if projections.number_of_dimensions == 3:
-            if not (projections.shape[1:] == dark.shape and \
-               projections.shape[1:] == flat.shape):
-                raise ValueError('Flats/Dark and projections size do not match.')
+
+
+        #set up
+        if isinstance(flat_field, np.ndarray):
+            flat_field = np.asarray(flat_field,dtype=np.float32)
+
+        if isinstance(dark_field, np.ndarray):
+            dark_field = np.asarray(dark_field,dtype=np.float32)
+
+        if dark_field is not None:
+
+            if method == 'default':
                 
-                   
-            a = numpy.asarray(
-                    [ Normaliser.Normalise_projection(
-                            projection, flat, dark, self.tolerance) \
-                     for projection in projections.as_array() ]
-                    )
-        elif projections.number_of_dimensions == 2:
-            a = Normaliser.Normalise_projection(projections.as_array(), 
-                                                flat, dark, self.tolerance)
-        y = type(projections)( a , True, 
-                    dimension_labels=projections.dimension_labels,
-                    geometry=projections.geometry)
-        return y
-    
+                if isinstance(dark_field, np.ndarray):
+                    if dark_field.ndim > 2:
+                        raise ValueError("'default' mode normalisation requires a single value or image only")
+                else:
+                    try:
+                        float(dark_field)
+                    except TypeError:
+                        raise TypeError("'default' mode normalisation requires a single value or image only")
+                
+                self._darkfield = dark_field
+
+
+            if method == 'mean':
+                self._darkfield =  np.mean(dark_field, axis=0)
+            else:
+                self._darkfield =  dark_field
+
+
+        if flat_field is not None:
+            if method == 'default':
+
+                if isinstance(flat_field, np.ndarray):
+                    if flat_field.ndim > 2:
+                        raise ValueError("'default' mode normalisation requires a single value or image only")
+                else:
+                    try:
+                        float(flat_field)
+                    except TypeError:
+                        raise TypeError("'default' mode normalisation requires a single value or image only")
+
+
+            if method == 'mean':
+                self._flatfield =  np.mean(flat_field, axis=0)
+            else:
+                self._flatfield =  flat_field
+
+
+    def set_input(self, dataset):
+        """
+        Set the input data to the processor
+
+        Parameters
+        ----------
+        input : DataContainer
+            The input DataContainer
+        """
+
+        if issubclass(type(dataset), (DataContainer, np.ndarray)):
+            if self.check_input(dataset):
+                self.__dict__['input'] = weakref.ref(dataset)
+                self.__dict__['shouldRun'] = True
+            else:
+                raise ValueError('Input data not compatible')
+        else:
+            raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(type(dataset), DataContainer))
+        
+
+    def check_input(self, dataset):
+
+        # if dataset.ndim > 3:
+        #     shape_expected = dataset.shape[-2,-1]
+        # else:
+        #     shape_expected = dataset.shape[-1]
+
+        # if self._method == 'stack':
+        #     if dataset.shape[0] != self._scale.shape[0]:
+        #         raise ValueError("method 'stack' expects the normalisation shape to be the same as the data shape")       
+        # else:        
+        #     if len(self._scale.shape) > 1:
+        #      if self._scale.shape != shape_expected:
+        #          raise ValueError("Shape mismatch")
+             
+        return True
+
+
+    def process(self, out=None):
+
+        projections = self.get_input()
+        return_flag = False
+
+        if out is None:
+            return_flag = True
+            out = projections.geometry.allocate(None)
+        else:
+            if out.shape != projections.shape or out.dtype != projections.dtype:
+                raise AttributeError("out not compatible with input data")
+            
+        if self._method == 'default' or self._method=='mean':
+                self.apply_normalisation_default(projections.array, out.array, self._darkfield, self._flatfield)
+        else:
+            raise NotImplementedError("stack not implemented yet")
+
+
+        if return_flag:
+            return out
+            
+
+
+    @staticmethod
+    def apply_normalisation_default(arr_in, arr_out, dark, flat):
+        """
+        Applies the default normalisation on numpy arrays      
+        """
+        shape_orig = arr_in.shape
+
+        if isinstance(flat, np.ndarray):
+            num_chunks = arr_in.size // flat.size
+            arr_in.shape = (num_chunks, *flat.shape)
+
+        elif isinstance(dark, np.ndarray):
+            num_chunks = arr_in.size // dark.size
+            arr_in.shape = (num_chunks, *dark.shape)
+
+        elif arr_in.ndim == 4:
+                num_chunks = arr_in[0] * arr_in[1]
+                arr_in.shape = (num_chunks, *arr_in.shape[2::])
+        else:
+            num_chunks = arr_in.shape[0]
+
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            scale_img = 1 / (flat - dark)
+
+        if id(arr_in) == id(arr_out):
+            numba_apply_normalisation_default_inplace(arr_in, dark, scale_img, num_chunks)
+        else:
+            arr_out.shape = arr_in.shape
+            numba_apply_normalisation_default(arr_in, arr_out, dark, scale_img, num_chunks)
+            arr_out.shape = shape_orig
+
+        #reset shape
+        arr_in.shape = shape_orig
+
+
+
+
+

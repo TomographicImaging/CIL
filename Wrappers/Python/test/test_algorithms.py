@@ -754,13 +754,13 @@ class TestSIRT(CCPiTestClass):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
         A=IdentityOperator(ig)
-        constraint=TotalVariation()
+        constraint=TotalVariation(warm_start=False, max_iteration=100)
         initial=ig.allocate('random', seed=5)
-        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=100, constraint=constraint)
-        sirt.run(2, verbose=2)
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=2, constraint=constraint)
+        sirt.run(2, verbose=0)
         f=LeastSquares(A,data, c=0.5)
-        fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=100)
-        fista.run(100, verbose=2)
+        fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
+        fista.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
         self.assertAlmostEqual(fista.loss[-1], sirt.loss[-1])
 

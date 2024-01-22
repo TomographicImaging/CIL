@@ -116,7 +116,8 @@ class SIRT(Algorithm):
             if lower is not None or upper is not None:
                 # IndicatorBox accepts None for lower and/or upper
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
-        
+        self._in_place=isinstance(self.constraint, IndicatorBox)
+            
         self._relaxation_parameter = 1
 
         # Set up scaling matrices D and M.
@@ -200,8 +201,11 @@ class SIRT(Algorithm):
         self.x.sapyb(1.0, self.tmp_x, self._Dscaled, out=self.x)
 
         if self.constraint is not None:
-            # IndicatorBox allows inplace operation for proximal
-            self.constraint.proximal(self.x, tau=1, out=self.x)
+            if self.in_place:
+                # IndicatorBox allows inplace operation for proximal
+                self.constraint.proximal(self.x, tau=1, out=self.x)
+            else:
+                self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
         r"""Returns the objective 

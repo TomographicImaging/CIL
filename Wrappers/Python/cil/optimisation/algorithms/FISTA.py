@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.algorithms import Algorithm
+from cil.optimisation.functions import ZeroFunction
 import numpy
 import warnings
 import logging
@@ -56,15 +57,20 @@ class ISTA(Algorithm):
     initial : DataContainer
               Initial guess of ISTA.
     f : Function
-        Differentiable function
-    g : Function
-        Convex function with *simple* proximal operator
+        Differentiable function. If `None` is passed, the algorithm will use the ZeroFunction.
+    g : Function or `None`
+        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA.
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}.`
+                The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
+    Note
+    -----
+    If the function `g` is set to `None` or to the `ZeroFunction` then the ISTA algorithm is equivalent to Gradient Descent. 
+    
+    If the function `f` is set to `None` or to the `ZeroFunction` then the ISTA algorithm is equivalent to a Proximal Point Algorithm. 
 
     Examples
     --------
@@ -98,11 +104,17 @@ class ISTA(Algorithm):
     def set_step_size(self, step_size):
         """ Set default step size.
         """
+    
         if step_size is None:
-            if isinstance(self.f.L, Number):
+            if isinstance(self.f, ZeroFunction):
+                self._step_size = 1
+                
+            elif isinstance(self.f.L, Number):
                 self._step_size = 0.99*2.0/self.f.L
+                
             else:
                 raise ValueError("Function f is not differentiable")
+            
         else:
             self._step_size = step_size            
         
@@ -121,13 +133,23 @@ class ISTA(Algorithm):
         # set up ISTA      
         self.initial = initial
         self.x_old = initial.copy()
-        self.x = initial.copy()           
+        self.x = initial.copy()    
+        
+        if f is None:
+            f = ZeroFunction()
+                
         self.f = f
+        
+        if g is None:
+            g = ZeroFunction()
+            
         self.g = g
+        
+        if isinstance(f, ZeroFunction) and isinstance(g, ZeroFunction):
+            raise ValueError('You set both f and g to be the ZeroFunction and thus the iterative method will not update and will remain fixed at the initial value.')
 
         # set step_size
         self.set_step_size(step_size=step_size)
-        
         self.configured = True  
 
         logging.info("{} configured".format(self.__class__.__name__, ))
@@ -197,15 +219,20 @@ class FISTA(ISTA):
     initial : DataContainer
             Starting point of the algorithm
     f : Function
-        Differentiable function
-    g : Function
-        Convex function with *simple* proximal operator
+        Differentiable function.  If `None` is passed, the algorithm will use the ZeroFunction.
+    g : Function or `None`
+        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of FISTA.
-                The default :code:`step_size` is :math:`\frac{1}{L}`.
+                The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
+    Note
+    -----
+    If the function `g` is set to `None` or to the `ZeroFunction` then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (:cite:`nesterov2003introductory` algorithm 2.2.9).
+
+    If the function `f` is set to `None` or to the `ZeroFunction` then the FISTA algorithm is equivalent to Guler's First Accelerated Proximal Point Method  (:cite:`guler1992new` sec 2).
 
     Examples
     --------
@@ -230,11 +257,18 @@ class FISTA(ISTA):
 
         """Set the default step size
         """
+
         if step_size is None:
-            if isinstance(self.f.L, Number):
+            
+            if isinstance(self.f, ZeroFunction):
+                self._step_size = 1
+                
+            elif isinstance(self.f.L, Number):
                 self._step_size = 1./self.f.L
+                
             else:
                 raise ValueError("Function f is not differentiable")
+            
         else:
             self._step_size = step_size
 

@@ -201,8 +201,7 @@ class SIRT(Algorithm):
         self.x.sapyb(1.0, self.tmp_x, self._Dscaled, out=self.x)
 
         if self.constraint is not None:
-            if self.in_place:
-                # IndicatorBox allows inplace operation for proximal
+            if self.in_place: # Can be removed once in-place calculations are checked to be safe for all functions
                 self.constraint.proximal(self.x, tau=1, out=self.x)
             else:
                 self.x=self.constraint.proximal(self.x, tau=1)

@@ -26,30 +26,31 @@ class RingRemover(Processor):
     
     '''
         RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 
-        the algorithm in https://doi.org/10.1364/OE.17.008567
+        using the algorithm in https://doi.org/10.1364/OE.17.008567
 
-    '''
-        
-    def __init__(self, decNum, wname, sigma, info = True):
-        
-        '''
-    
         Parameters
         ----------
-        decNum : number of wavelet decompositions
+        decNum : int
+            Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal
+            but can alter the profile of the data
         
-        wname : (str) name of wavelet filter from pywt 
-            Example: 'db1' -- 'db35', 'haar'
+        wname : str
+            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar' - increasing the wavelet filter increases the strength of 
+            the ring removal, but also increases the computational effort
     
-        sigma : Damping parameter in Fourier space.
+        sigma : float 
+            Damping parameter in Fourier space - increasing sigma, increases the size of artefacts which can be removed
         
-        info : Prints ring remover end message 
+        info : boolean
+            Flag to enable print of ring remover end message 
         
         Returns
         -------
-        Corrected ImageData/AcquisitionData 2D, 3D,
-                multi-spectral 2D, multi-spectral 3D    
-        '''             
+        DataContainer
+            Corrected ImageData/AcquisitionData 2D, 3D, multi-spectral 2D, multi-spectral 3D 
+    '''
+        
+    def __init__(self, decNum=4, wname='db10', sigma=1.5, info = True):   
         
         kwargs = {'decNum': decNum,
                   'wname': wname,
@@ -94,12 +95,12 @@ class RingRemover(Processor):
             if 'vertical' in geom.dimension_labels:
                                 
                 for i in range(vertical):
-                    tmp_corrected = self.xRemoveStripesVertical(data.get_slice(vertical=i, force=True).as_array(), decNum, wname, sigma) 
+                    tmp_corrected = self._xRemoveStripesVertical(data.get_slice(vertical=i, force=True).as_array(), decNum, wname, sigma) 
                     out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
             else:
-                tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
+                tmp_corrected = self._xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
                 out.fill(tmp_corrected)        
         
         # for multichannel data        
@@ -114,7 +115,7 @@ class RingRemover(Processor):
                     data_ch_i = data.get_slice(channel=i)
                     
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.get_slice(vertical=j, force=True).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self._xRemoveStripesVertical(data_ch_i.get_slice(vertical=j, force=True).as_array(), decNum, wname, sigma)
                         out_ch_i.fill(tmp_corrected, vertical = j)
                         
                     out.fill(out_ch_i.as_array(), channel=i) 
@@ -125,7 +126,7 @@ class RingRemover(Processor):
             # for 2D data                        
             else:
                 for i in range(channels):
-                        tmp_corrected = self.xRemoveStripesVertical(data.get_slice(channel=i).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self._xRemoveStripesVertical(data.get_slice(channel=i).as_array(), decNum, wname, sigma)
                         out.fill(tmp_corrected, channel = i)
                         if info:
                             print("Finish channel {}".format(i))
@@ -135,17 +136,35 @@ class RingRemover(Processor):
         return out
 
           
-    def xRemoveStripesVertical(self,ima, decNum, wname, sigma):
+    def _xRemoveStripesVertical(self, ima, decNum, wname, sigma):
         
-        ''' Code from https://doi.org/10.1364/OE.17.008567 
+        ''' Ring removal algorithm via combined wavelet and fourier filtering
+            code from https://doi.org/10.1364/OE.17.008567
             translated in Python
-                            
+        Parameters
+        ----------
+        ima : ndarray
+            2D image data
+
+        decNum : int
+            Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal
+            but can alter the profile of the data
+        
+        wname : str
+            Name of wavelet filter from pywt e.g. 'db1' -- 'db35', 'haar' - increasing the wavelet filter increases the strength of 
+            the ring removal, but also increases the computational effort
+
+        sigma : float 
+            Damping parameter in Fourier space - increasing sigma, increase the size of artefacts which can be removed
+
         Returns
         -------
         Corrected 2D sinogram data (Numpy Array)
         
         '''              
-                            
+
+        original_extent = [slice(None, ima.shape[0], None), slice(None, ima.shape[1], None)]
+
         # allocate cH, cV, cD
         Ch = [None]*decNum
         Cv = [None]*decNum
@@ -174,5 +193,8 @@ class RingRemover(Processor):
         for i in range(decNum-1,-1,-1):
             nima = nima[0:Ch[i].shape[0],0:Ch[i].shape[1]]
             nima = pywt.idwt2((nima,(Ch[i],Cv[i],Cd[i])),wname)
-            
-        return nima      
+        
+        # if the original input is odd, the signal reconstructed with idwt2 will have one extra sample, which can be discarded
+        nima = nima[original_extent[0], original_extent[1]]
+
+        return nima

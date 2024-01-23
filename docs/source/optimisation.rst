@@ -378,7 +378,7 @@ Samplers
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
 The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn. 
 
-For ease of use it is  recommended to use the static methods in `cil.optimisation.utilities.sampler` to configure your sampler object rather than initialising the classes directly:
+For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
 
 .. automethod:: cil.optimisation.utilities.Sampler.from_function
 

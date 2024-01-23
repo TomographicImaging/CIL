@@ -20,14 +20,16 @@ import numpy as np
 import math
 from functools import partial
 import time
-
+import numbers
 
 class Sampler():
     # TODO: Work out how to make the examples testable
     """     
-    The user is recommended to not instantiate this class directly but instead use one of the static methods that will return instances of different samplers.
-
     Initialises a sampler that returns and then increments indices from a sequence defined by a function.
+    
+    Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement. 
+
+    
 
 
     Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.
@@ -43,10 +45,10 @@ class Sampler():
     num_indices: int
         The sampler will select from a range of indices 0 to num_indices.
 
-    sampling_type:str default is None 
-        The sampling type used. Choose from  "sequential", "staggered", "herman_meyer" and "from_function". 
+    sampling_type:str, optional,  default = None 
+        The sampling type used. This is recorded for reference and printed when `print` is called. 
 
-    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
+    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices 
         Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 
 
     Returns
@@ -65,9 +67,7 @@ class Sampler():
     4
 
 
-    Example
-    -------    
-    >>> sampler = Sampler.staggered(21,4)
+    >>> sampler = Sampler.staggered(num_indices=21, stride=4)
     >>> print(next(sampler))
     0
     >>> print(sampler.next())
@@ -110,7 +110,7 @@ class Sampler():
 
     Note
     -----
-    The optimal choice of sampler depends on the data and the number of calls to the sampler.  Note that a low number of calls to a random sampler won't give an even distribution
+    The optimal choice of sampler depends on the data and the number of calls to the sampler.  Note that a low number of calls to a random sampler won't give an even distribution.
     For a small number of samples (e.g. `<5*num_indices`) the user may wish to consider another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
         """
 
@@ -118,7 +118,7 @@ class Sampler():
 
         self._type = sampling_type
 
-        if num_indices == int(num_indices):
+        if not isinstance (num_indices, numbers.Integral):  
             self._num_indices = num_indices
         else:
             raise ValueError('`num_indices` should be an integer. ')
@@ -129,9 +129,9 @@ class Sampler():
             raise ValueError('`function` should be an callable function. ')
 
         if prob_weights is None:
-            prob_weights = [1/num_indices]*num_indices
+            prob_weights = [1 / num_indices] * num_indices
         else:
-            if abs(sum(prob_weights)-1) > 1e-6:
+            if abs(sum(prob_weights) - 1) > 1e-6:
                 raise ValueError('The provided prob_weights must sum to one')
 
             if any(np.array(prob_weights) < 0):
@@ -252,7 +252,7 @@ class Sampler():
             The index to be outputted by the sampler corresponding to the `iter_number`
 
         """
-        if num_indices != int(num_indices):
+        if not isinstance (num_indices, numbers.Integral):
             raise ValueError('`num_indices` should be an integer. ')
 
         iter_number_mod = iter_number % num_indices
@@ -289,7 +289,7 @@ class Sampler():
 
         Example
         -------    
-        >>> sampler = Sampler.staggered(21,4)
+        >>> sampler = Sampler.staggered(num_indices=21, stride=4)
         >>> print(next(sampler))
         0
         >>> print(sampler.next())
@@ -298,7 +298,7 @@ class Sampler():
         [ 0  4  8 12 16]
         Example
         -------    
-        >>> sampler = Sampler.staggered(17,8)
+        >>> sampler = Sampler.staggered(num_indices=17, stride=8)
         >>> print(next(sampler))
         0
         >>> print(sampler.next())
@@ -349,7 +349,7 @@ class Sampler():
         >>> print(sampler.next())
         4
 
-        >>> sampler = Sampler.random_with_replacement(4, [0.7,0.1,0.1,0.1])
+        >>> sampler = Sampler.random_with_replacement(num_indices=4, prob=[0.7,0.1,0.1,0.1])
         >>> print(sampler.get_samples(10))
         [0 1 3 0 0 3 0 0 0 0]
         """
@@ -383,7 +383,7 @@ class Sampler():
 
         Example
         -------
-        >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
+        >>> sampler=Sampler.randomWithoutReplacement(num_indices=7, seed=1)
         >>> print(sampler.get_samples(16))
         [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
 
@@ -410,7 +410,7 @@ class Sampler():
         function : Callable[[int], int]
             A deterministic function that takes an integer iteration number and returns an integer between 0 and num_indices.
 
-        prob_weights: list of floats of length num_indices that sum to 1. Default is [1/num_indices]*num_indices 
+        prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices 
             Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 
 
         Returns
@@ -574,7 +574,7 @@ class Sampler():
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
         """
 
-        if num_indices != int(num_indices):
+        if not isinstance (num_indices, numbers.Integral):  
             raise ValueError('`num_indices` should be an integer. ')
 
         factors = Sampler._prime_factorisation(num_indices)
@@ -603,7 +603,7 @@ class Sampler():
         sampler = Sampler(function=hmf_call,
                           num_indices=num_indices,
                           sampling_type='herman_meyer',
-                          prob_weights=[1/num_indices]*num_indices
+                          prob_weights=[1 / num_indices] * num_indices
                           )
 
         return sampler
@@ -623,10 +623,10 @@ class SamplerRandom(Sampler):
     num_indices: int
         The sampler will select from a range of indices 0 to num_indices.
 
-    sampling_type:str default = 'random_with_replacement"
-        The sampling type used. Choose from "random_with_replacement" and "random_without_replacement"
+    sampling_type:str, optional,  default = 'random_with_replacement"
+        The sampling type used. This is recorded for reference and printed when `print` is called. 
 
-    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1/num_indices]*num_indices 
+    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices
         Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 
 
     replace: bool, default is True 
@@ -648,7 +648,7 @@ class SamplerRandom(Sampler):
 
     Example
     -------
-    >>> sampler=Sampler.randomWithoutReplacement(7, seed=1)
+    >>> sampler=Sampler.randomWithoutReplacement(num_indices=7, seed=1)
     >>> print(sampler.get_samples(16))
     [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
 

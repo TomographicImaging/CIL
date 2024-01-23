@@ -13,8 +13,6 @@
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
   - Added the a `Sampler` class as a CIL optimisation utility 
-  - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
-  - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None

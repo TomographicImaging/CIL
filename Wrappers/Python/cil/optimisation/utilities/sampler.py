@@ -252,7 +252,7 @@ class Sampler():
             The index to be outputted by the sampler corresponding to the `iter_number`
 
         """
-        if isinstance (num_indices, numbers.Integral):
+        if not isinstance (num_indices, numbers.Integral):
             raise ValueError('`num_indices` should be an integer. ')
 
         iter_number_mod = iter_number % num_indices
@@ -574,7 +574,7 @@ class Sampler():
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
         """
 
-        if isinstance (num_indices, numbers.Integral):  
+        if not isinstance (num_indices, numbers.Integral):  
             raise ValueError('`num_indices` should be an integer. ')
 
         factors = Sampler._prime_factorisation(num_indices)

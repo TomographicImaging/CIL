@@ -17,12 +17,37 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import time, functools
-from numbers import Integral, Number
+import functools
 import logging
+import time
+from abc import ABC, abstractmethod
+from numbers import Integral
+
 import numpy as np
 
-class Algorithm(object):
+
+class Callback(ABC):
+    '''Base Callback to inherit from for use in :code:`Algorithm.run(callbacks: list[Callback])`.'''
+    def __init__(self, verbose=1):
+        self.verbose = verbose
+
+    @abstractmethod
+    def __call__(self, algorithm):
+        pass
+
+
+class OldCallback(Callback):
+    '''Converts an old-style :code:`function(iteration, objective, x)` to a new-style :code:`Callback`.'''
+    def __init__(self, function, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.func = function
+
+    def __call__(self, algorithm):
+        if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
+            self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose), algorithm.x)
+
+
+class Algorithm:
     '''Base class for iterative algorithms
 
       provides the minimal infrastructure.
@@ -33,12 +58,13 @@ class Algorithm(object):
       and :code:`update_objective` methods
 
       A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
-      a :code:`callback` function that receives the current iteration number and the actual objective
-      value and can be used to trigger print to screens and other user interactions. The :code:`run`
-      method will stop when the stopping criterion is met.
+      a :code:`callbacks` list of callables, each of which receive the current Algorithm object
+      (which in turn contains the iteration number and the actual objective value)
+      and can be used to trigger print to screens and other user interactions. The :code:`run`
+      method will stop when the stopping criterion is met or `StopIteration` is raised.
    '''
 
-    def __init__(self, **kwargs):
+    def __init__(self, max_iteration=0, update_objective_interval=1, log_file=None, **kwargs):
         '''Constructor
 
         Set the minimal number of parameters:
@@ -55,24 +81,24 @@ class Algorithm(object):
         :type log_file: str, optional, default None
         '''
         self.iteration = -1
-        self.__max_iteration = kwargs.get('max_iteration', 0)
+        self.__max_iteration = max_iteration
         self.__loss = []
         self.memopt = False
         self.configured = False
         self.timing = []
         self._iteration = []
-        self.update_objective_interval = kwargs.get('update_objective_interval', 1)
+        self.update_objective_interval = update_objective_interval
         # self.x = None
         self.iter_string = 'Iter'
         self.logger = None
-        self.__set_up_logger(kwargs.get('log_file', None))
+        self.__set_up_logger(log_file)
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
-        raise NotImplementedError()
+        raise NotImplementedError
     def update(self):
         '''A single iteration of the algorithm'''
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def should_stop(self):
         '''default stopping criterion: number of iterations
@@ -96,18 +122,14 @@ class Algorithm(object):
     def __iter__(self):
         '''Algorithm is an iterable'''
         return self
-    def next(self):
-        '''Algorithm is an iterable
 
-        python2 backwards compatibility'''
-        return self.__next__()
     def __next__(self):
         '''Algorithm is an iterable
 
         calling this method triggers update and update_objective
         '''
         if self.should_stop():
-            raise StopIteration()
+            raise StopIteration
         else:
             if self.iteration == -1 and self.update_objective_interval > 0:
                 self._iteration.append(self.iteration)
@@ -191,7 +213,7 @@ class Algorithm(object):
 
     def update_objective(self):
         '''calculates the objective with the current solution'''
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @property
     def iterations(self):
@@ -236,12 +258,17 @@ class Algorithm(object):
         else:
             raise ValueError('Update objective interval must be an integer >= 0')
 
-    def run(self, iterations=None, verbose=1, callback=None, **kwargs):
+    def run(self, iterations=None, callbacks: list[Callback] | None=None,
+            # TODO: deprecate these
+            verbose=1, **kwargs):
         '''run n iterations and update the user with the callback if specified
 
         :param iterations: number of iterations to run. If not set the algorithm will
           run until max_iteration or until stop criterion is reached
         :param verbose: sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose
+        :param callbacks: list of callables which are passed the current Algorithm object each iteration.
+
+
         :param callback: is a function that receives: current iteration number,
           last objective function value and the current solution and gets executed at each update_objective_interval
         :param print_interval: integer, controls every how many iteration there's a print to
@@ -249,6 +276,13 @@ class Algorithm(object):
                                and so the print might be out of sync wrt the calculation of the objective.
                                In such cases nan will be printed.
         '''
+        if callbacks is None:
+            callbacks = []
+        # transform old-style callbacks into new
+        callback = kwargs.get('callback', None)
+        if callback is not None:
+            callbacks += OldCallback(callback, verbose=verbose>=2)
+
         print_interval = kwargs.get('print_interval', self.update_objective_interval)
         if print_interval > self.update_objective_interval:
             print_interval = self.update_objective_interval
@@ -276,15 +310,13 @@ class Algorithm(object):
         else:
             print (self.verbose_output(very_verbose))
 
-        for i in range(iterations):
+        for _ in range(iterations):
             try:
                 self.__next__()
+                for callback in callbacks:
+                    callback(self)
             except StopIteration:
                 break
-            if self.update_objective_interval > 0 and\
-                self.iteration % self.update_objective_interval == 0:
-                if callback is not None:
-                    callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
                 if (print_interval != 0 and self.iteration % print_interval == 0) or \
                         ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):

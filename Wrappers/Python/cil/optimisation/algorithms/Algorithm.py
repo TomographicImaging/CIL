@@ -19,11 +19,12 @@
 
 import functools
 import logging
-import time
 from abc import ABC, abstractmethod
 from numbers import Integral
+from warnings import warn
 
 import numpy as np
+from tqdm.auto import tqdm as tqdm_auto
 
 
 class Callback(ABC):
@@ -37,7 +38,9 @@ class Callback(ABC):
 
 
 class OldCallback(Callback):
-    '''Converts an old-style :code:`function(iteration, objective, x)` to a new-style :code:`Callback`.'''
+    '''Converts an old-style :code:`function(iteration, objective, x)`
+      to a new-style :code:`Callback`.
+    '''
     def __init__(self, function, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.func = function
@@ -45,6 +48,28 @@ class OldCallback(Callback):
     def __call__(self, algorithm):
         if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
             self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose), algorithm.x)
+
+
+class ProgressCallback(Callback):
+    ''':code:`tqdm`-based progress bar.'''
+    def __init__(self, verbose=1, tqdm_class=tqdm_auto, **tqdm_kwargs):
+        '''
+        :param tqdm_kwargs: passed to :code:`tqdm_class`
+          (e.g. :code:`file=some_logfile`).
+        '''
+        super().__init__(verbose=verbose)
+        self.tqdm_class = tqdm_class
+        self.tqdm_kwargs = tqdm_kwargs
+
+    def __call__(self, algorithm):
+        if not hasattr(self, 'pbar'):
+            tqdm_kwargs = self.tqdm_kwargs
+            tqdm_kwargs.setdefault('total', algorithm.max_iteration)
+            tqdm_kwargs.setdefault('disable', not self.verbose)
+            self.pbar = self.tqdm_class(**tqdm_kwargs)
+        if self.pbar.update(algorithm.iteration - self.pbar.n): # only if screen was updated
+            self.pbar.set_postfix(objective=algorithm.objective_to_string(self.verbose>=2))
+            # if algorithm.logger: algorithm.logger.debug(self.pbar)
 
 
 class Algorithm:
@@ -85,7 +110,6 @@ class Algorithm:
         self.__loss = []
         self.memopt = False
         self.configured = False
-        self.timing = []
         self._iteration = []
         self.update_objective_interval = update_objective_interval
         # self.x = None
@@ -130,26 +154,23 @@ class Algorithm:
         '''
         if self.should_stop():
             raise StopIteration
-        else:
-            if self.iteration == -1 and self.update_objective_interval > 0:
-                self._iteration.append(self.iteration)
-                self.update_objective()
-                self.iteration += 1
-                return
-            time0 = time.time()
-            if not self.configured:
-                raise ValueError('Algorithm not configured correctly. Please run set_up.')
-            self.update()
-            self.timing.append( time.time() - time0 )
+        if self.iteration == -1 and self.update_objective_interval > 0:
+            self._iteration.append(self.iteration)
+            self.update_objective()
             self.iteration += 1
+            return
+        if not self.configured:
+            raise ValueError('Algorithm not configured correctly. Please run set_up.')
+        self.update()
+        self.iteration += 1
 
-            self._update_previous_solution()
+        self._update_previous_solution()
 
-            if self.iteration >= 0 and self.update_objective_interval > 0 and\
-                self.iteration % self.update_objective_interval == 0:
+        if self.iteration >= 0 and self.update_objective_interval > 0 and\
+            self.iteration % self.update_objective_interval == 0:
 
-                self._iteration.append(self.iteration)
-                self.update_objective()
+            self._iteration.append(self.iteration)
+            self.update_objective()
 
 
     def _update_previous_solution(self):
@@ -186,27 +207,20 @@ class Algorithm:
     def solution(self):
         return self.get_output()
 
-    def get_last_loss(self, **kwargs):
+    def get_last_loss(self, return_all=False):
         '''Returns the last stored value of the loss function
 
         if update_objective_interval is 1 it is the value of the objective at the current
         iteration. If update_objective_interval > 1 it is the last stored value.
         '''
-        return_all =  kwargs.get('return_all', False)
         try:
             objective = self.__loss[-1]
-        except IndexError as ie:
-            objective = [np.nan, np.nan, np.nan] if return_all else np.nan
-        if isinstance (objective, list):
-            if return_all:
-                return objective
-            else:
-                return objective[0]
+        except IndexError:
+            objective = np.nan
+        if isinstance(objective, list):
+            return objective if return_all else objective[0]
         else:
-            if return_all:
-                return [ objective, np.nan, np.nan]
-            else:
-                return objective
+            return [objective, np.nan, np.nan] if return_all else objective
     def get_last_objective(self, **kwargs):
         '''alias to get_last_loss'''
         return self.get_last_loss(**kwargs)
@@ -258,105 +272,44 @@ class Algorithm:
         else:
             raise ValueError('Update objective interval must be an integer >= 0')
 
-    def run(self, iterations=None, callbacks: list[Callback] | None=None,
-            # TODO: deprecate these
-            verbose=1, **kwargs):
+    def run(self, iterations=None, callbacks: list[Callback] | None=None, verbose=1, **kwargs):
         '''run n iterations and update the user with the callback if specified
 
         :param iterations: number of iterations to run. If not set the algorithm will
           run until max_iteration or until stop criterion is reached
-        :param verbose: sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose
-        :param callbacks: list of callables which are passed the current Algorithm object each iteration.
-
-
-        :param callback: is a function that receives: current iteration number,
-          last objective function value and the current solution and gets executed at each update_objective_interval
-        :param print_interval: integer, controls every how many iteration there's a print to
-                               screen. Notice that printing will not evaluate the objective function
-                               and so the print might be out of sync wrt the calculation of the objective.
-                               In such cases nan will be printed.
+        :param verbose: sets the verbosity output to screen: 0=quiet, 1=info, 2=debug
+        :param callbacks: list of callables which are passed the current Algorithm
+          object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
         '''
+        very_verbose = verbose>=2
+
         if callbacks is None:
-            callbacks = []
+            callbacks = [ProgressCallback(verbose=verbose)]
         # transform old-style callbacks into new
         callback = kwargs.get('callback', None)
         if callback is not None:
-            callbacks += OldCallback(callback, verbose=verbose>=2)
+            callbacks += OldCallback(callback, verbose=very_verbose)
 
-        print_interval = kwargs.get('print_interval', self.update_objective_interval)
-        if print_interval > self.update_objective_interval:
-            print_interval = self.update_objective_interval
-        if verbose == 0:
-            verbose = False
-            very_verbose = False
-        elif verbose == 1:
-            verbose = True
-            very_verbose = False
-        elif verbose == 2:
-            verbose = True
-            very_verbose = True
-        else:
-            raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
-            print ("Stop criterion has been reached.")
-        if iterations is None :
+            print("Stop criterion has been reached.")
+        if iterations is None:
             iterations = self.max_iteration
-
-        if verbose:
-            print (self.verbose_header(very_verbose))
 
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
-        else:
-            print (self.verbose_output(very_verbose))
 
         for _ in range(iterations):
             try:
-                self.__next__()
+                next(self)
                 for callback in callbacks:
                     callback(self)
             except StopIteration:
                 break
-            if verbose:
-                if (print_interval != 0 and self.iteration % print_interval == 0) or \
-                        ( self.update_objective_interval != 0 and self.iteration % self.update_objective_interval == 0):
-                    print (self.verbose_output(very_verbose))
-
-        if verbose:
-            start = 3 # I don't understand why this
-            bars = ['-' for i in range(start+9+10+13+20)]
-            if (very_verbose):
-                bars = ['-' for i in range(start+9+10+13+13+13+15)]
-            # print a nice ---- with proper length at the end
-            # print (functools.reduce(lambda x,y: x+y, bars, ''))
-            out = "{}\n{}\n{}\n".format(functools.reduce(lambda x,y: x+y, bars, '') ,
-                                        self.verbose_output(very_verbose),
-                                        "Stop criterion has been reached.")
-            print (out)
-            # Print to log file if desired
-            if self.logger:
-                self.logger.info(out)
-
-
-    def verbose_output(self, verbose=False):
-        '''Creates a nice tabulated output'''
-        timing = self.timing
-        if len (timing) == 0:
-            t = 0
-        else:
-            t = sum(timing)/len(timing)
-        out = "{:>9} {:>10} {:>13} {}".format(
-                 self.iteration,
-                 self.max_iteration,
-                 "{:.3f}".format(t),
-                 self.objective_to_string(verbose)
-               )
-        # Print to log file if desired
-        if self.logger:
-            self.logger.info(out)
-        return out
 
     def objective_to_string(self, verbose=False):
+        # TODO: return a dict for `tqdm.set_postfix` instead
+        # TODO: then deprecate this function
+        # NOTE: see `verbose_header` for dict keys
         el = self.get_last_objective(return_all=verbose)
         if self.update_objective_interval == 0 or \
             self.iteration % self.update_objective_interval != 0:
@@ -379,32 +332,20 @@ class Algorithm:
             else:
                 string = "{:>20.5e}".format(el)
         return string
-    def verbose_header(self, verbose=False):
-        el = self.get_last_objective(return_all=verbose)
 
-        if type(el) == list:
-            out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format(self.iter_string,
-                                                      'Max {}'.format(self.iter_string),
-                                                      'Time/{}'.format(self.iter_string),
-                                                      'Primal' , 'Dual',
-                                                      'Primal-Dual')
-            out += "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}".format('',
-                                                      '',
-                                                      '[s]',
-                                                      'Objective' ,
-                                                      'Objective',
-                                                      'Gap')
-        else:
-            out = "{:>9} {:>10} {:>13} {:>20}\n".format(self.iter_string,
-                                                      'Max {}'.format(self.iter_string),
-                                                      'Time/{}'.format(self.iter_string),
-                                                      'Objective')
-            out += "{:>9} {:>10} {:>13} {:>20}".format('',
-                                                      '',
-                                                      '[s]',
-                                                      '')
-        # Print to log file if desired
-        if self.logger:
-            self.logger.info(out)
+    def verbose_output(self, *_, **__):
+        warn("use `run(callbacks=[ProgressCallback()])` instead", DeprecationWarning, stacklevel=2)
 
-        return out
+    def verbose_header(self, *_, **__):
+        # el = self.get_last_objective(return_all=verbose)
+        # Iter = self.iter_string
+        # if type(el) == list:
+        #     out = (f"{Iter:>9} {'Max ' + Iter:>10} {'Time/' + Iter:>13} {'Primal':>13} {'Dual':>13} {'Primal-Dual':>15}\n"
+        #            f"{'':>9} {'':>10} {'[s]':>13} {'Objective':>13} {'Objective':>13} {'Gap':>15}")
+        # else:
+        #     out = (f"{Iter:>9} {'Max ' + Iter:>10} {'Time/' + Iter:>13} {'Objective':>20}\n"
+        #            f"{'':>9} {'':>10} {'[s]':>13} {'':>20}")
+        # if self.logger:
+        #     self.logger.info(out)
+        # return out
+        warn("no longer needed", DeprecationWarning, stacklevel=2)

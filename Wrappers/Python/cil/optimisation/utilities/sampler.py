@@ -30,7 +30,7 @@ class Sampler():
     Initialises a sampler that returns and then increments indices from a sequence defined by a function.
 
 
-    Custom samplers can be created by subclassing this sampler class. 
+    Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.
 
 
 
@@ -615,7 +615,7 @@ class SamplerRandom(Sampler):
 
     This class produces Samplers that output random samples with and without replacement from the set {0, 1, …, N-1} where N=num_indices.
 
-    Custom samplers can be created by subclassing this sampler class. 
+    Custom random samplers can be created by subclassing this sampler class. 
 
     Parameters
     ----------

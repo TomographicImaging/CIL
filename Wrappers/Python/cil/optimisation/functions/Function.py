@@ -49,7 +49,7 @@ class Function(object):
         raise NotImplementedError
 
     def gradient(self, x, out=None):
-        r"""Returns the value of the gradient of function :math:`F` at :math:`x`, if it is differentiable
+        r"""Returns the value of the gradient of function :math:`F`  evaluated at :math:`x`, if it is differentiable
 
         .. math:: F'(x)
 
@@ -61,13 +61,13 @@ class Function(object):
 
         Returns
         --------
-        DataContainer, the value of the gradient of the function at x. 
+        DataContainer, the value of the gradient of the function at x or nothing if `out`  
 
         """
         raise NotImplementedError
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the proximal operator of function :math:`\tau F` at x        
+        r"""Returns the proximal operator of function :math:`\tau F`  evaluated at x        
 
         .. math:: \text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
 
@@ -81,15 +81,15 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau`. 
+        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or nothing if `out`. 
 
         """
         raise NotImplementedError
 
     def convex_conjugate(self, x):
-        r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`,
+        r""" Evaluation of the function F* at x, where F* is the convex conjugate of function F,
 
-        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} \langle x^{*}, x \rangle - F(x)
+        .. math:: F^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - F(x)
 
         Parameters
         ----------
@@ -103,7 +103,7 @@ class Function(object):
         raise NotImplementedError
 
     def proximal_conjugate(self, x, tau, out=None):
-        r"""Returns the proximal operator of the convex conjugate of function :math:`\tau F` at :math:`x^{*}`
+        r"""Returns the proximal operator of the convex conjugate of function :math:`\tau F` evaluated at :math:`x^{*}`
 
         .. math:: \text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})
 
@@ -121,7 +121,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau`. 
+        DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or nothing if `out`. 
 
         """
         try:
@@ -312,7 +312,7 @@ class SumFunction(Function):
         super(SumFunction, self.__class__).Lmax.fset(self, value)
 
     def __call__(self, x):
-        r"""Returns the value of the sum of functions at :math:`x`.
+        r"""Returns the value of the sum of functions evaluated at :math:`x`.
 
         .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
 
@@ -323,7 +323,7 @@ class SumFunction(Function):
         return ret
 
     def gradient(self, x, out=None):
-        r"""Returns the value of the sum of the gradient of functions at :math:`x`, if all of them are differentiable.
+        r"""Returns the value of the sum of the gradient of functions evaluated at :math:`x`, if all of them are differentiable.
 
         .. math:: (F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)
 
@@ -335,7 +335,7 @@ class SumFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the sum of the gradients at point :math:`x`. 
+        DataContainer, the value of the sum of the gradients evaluated at point :math:`x` or nothing if `out`.
 
         """
 
@@ -425,7 +425,7 @@ class ScaledFunction(Function):
                 'Expecting scalar type as a number type. Got {}'.format(type(value)))
 
     def __call__(self, x, out=None):
-        r"""Returns the value of the scaled function.
+        r"""Returns the value of the scaled function evaluated at :math:`x`.
 
         .. math:: G(x) = \alpha F(x)
 
@@ -437,8 +437,7 @@ class ScaledFunction(Function):
 
         Returns
         --------
-
-        DataContainer, the value of the scaled function 
+        DataContainer, the value of the scaled function or nothing if `out` .
         """
         return self.scalar * self.function(x)
 
@@ -470,7 +469,7 @@ class ScaledFunction(Function):
         return self.scalar * val
 
     def gradient(self, x, out=None):
-        r"""Returns the gradient of the scaled function.
+        r"""Returns the gradient of the scaled function evaluated at :math:`x`.
 
         .. math:: G'(x) = \alpha  F'(x)
 
@@ -482,7 +481,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the gradient of the scaled function at :math:`x`. 
+        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or nothing if `out`. 
 
         """
         if out is None:
@@ -492,7 +491,7 @@ class ScaledFunction(Function):
             out *= self.scalar
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the proximal operator of the scaled function.
+        r"""Returns the proximal operator of the scaled function, evaluated at :math:`x`.
 
         .. math:: \text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)
 
@@ -506,7 +505,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau`. 
+        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or nothing if `out`. 
 
         """
 
@@ -525,7 +524,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau`. 
+        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or nothing if `out`.
 
         """
         try:
@@ -573,7 +572,7 @@ class SumScalarFunction(SumFunction):
         self.function = function
 
     def convex_conjugate(self, x):
-        r""" Returns the convex conjugate of a :math:`(F+scalar)`
+        r""" Returns the convex conjugate of a :math:`(F+scalar)`, evaluated at :math:`x`.
 
         .. math:: (F+scalar)^{*}(x^{*}) = F^{*}(x^{*}) - scalar
 
@@ -583,7 +582,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        The value of the convex conjugate at :math:`x`. 
+        The value of the convex conjugate evaluated at :math:`x`. 
 
         """
         return self.function.convex_conjugate(x) - self.constant
@@ -603,7 +602,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        DataContainer, the evaluation of the proximal operator at :math:`x` and :math:`\tau`. 
+        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or nothing if `out`. 
 
         """
         return self.function.proximal(x, tau, out=out)
@@ -647,7 +646,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        A DataContainer of zeros, the same size as :math:`x`. 
+        A DataContainer of zeros, the same size as :math:`x` or nothing if `out`  
 
         """
         if out is None:
@@ -700,7 +699,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        DataContainer, equal to :math:`x`. 
+        DataContainer, equal to :math:`x` or nothing if `out`. 
 
         """
         if out is None:
@@ -777,7 +776,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        The value of the translated function at :math:`x`. 
+        The value of the translated function evaluated at :math:`x`. 
 
 
         """
@@ -808,7 +807,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the gradient of the translated function at :math:`x`.
+        DataContainer, the gradient of the translated function evaluated at :math:`x` or nothing if `out`.
         """
         try:
             x.subtract(self.center, out=x)
@@ -842,7 +841,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau`.
+        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or nothing if `out`.
 
         """
         try:
@@ -881,45 +880,3 @@ class TranslateFunction(Function):
 
         return self.function.convex_conjugate(x) + self.center.dot(x)
 
-
-if __name__ == "__main__":
-
-    F1 = Function()
-    F2 = Function()
-
-    res1 = F1 + F2
-    print("sum two function", res1.__class__)  # SumFunction
-
-    res2 = F1 + 5
-    print("sum function and scalar", res2.__class__)  # SumScalarFunction
-
-    res3 = 5 + F1
-    print("sum scalar and function", res3.__class__)  # SumScalarFunction
-
-    res4 = F1 + ConstantFunction(5)
-    print("sum function and constant", res4.__class__)  # SumFunction
-
-    res4 = ConstantFunction(5) + 5
-    print("sum constant and function", res4.__class__)  # SumScalarFunction
-
-    res4 = ZeroFunction() + 5
-    print("sum zero function and function",
-          res4.__class__)  # SumScalarFunction
-
-    res3 = res1 + (F1+F2)
-    print(res3.__class__)
-
-    from cil.optimisation.functions import L2NormSquared
-    from cil.framework import ImageGeometry
-    ig = ImageGeometry(3, 4)
-    f1 = L2NormSquared()
-    f2 = 0.5 * L2NormSquared(b=1)
-    F = SumFunction(f1, f2)
-    x = ig.allocate(5)
-    F(x)
-
-    G = SumFunction(*[f1]*4)
-    len(G.functions)
-
-    F = SumFunction(*[L2NormSquared(b=ig.allocate(i)) for i in range(10)])
-    print(len(F.functions))

@@ -83,6 +83,9 @@ class TestOperator(CCPiTestClass):
         Amat = numpy.random.randn(m, n) + 1j*numpy.random.randn(m, n)
         A = MatrixOperator(Amat)  
         self.assertTrue(A.dot_test(A))      
+        
+        
+        
     
     def test_ZeroOperator(self):
         ig = ImageGeometry(10,20,30)

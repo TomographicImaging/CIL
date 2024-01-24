@@ -44,11 +44,27 @@ class Operator(object):
         self._range_geometry = kwargs.get('range_geometry', None)
 
     def is_linear(self):
-        '''Returns if the operator is linear'''
+        '''Returns if the operator is linear
+        Returns
+        -------
+        `Bool`
+        '''
         return False
 
     def direct(self, x, out=None):
-        '''Returns the application of the Operator on x'''
+        r"""Calls the operator 
+        
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the domain of the SOperator
+        out:  DataContainer or BlockDataContainer, default None
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
+        Returns
+        -------
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        
+        """
         raise NotImplementedError
 
     def norm(self, **kwargs):
@@ -96,7 +112,11 @@ class Operator(object):
         self._norm = norm
 
     def calculate_norm(self):
-        '''Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.'''
+        '''Returns the norm of the Operator. Note that this gives a NotImplementedError if the SumOperator is not linear.
+        Returns
+        -------
+        Scalar: the norm of the Operator
+        '''
 
         if self.is_linear():
             return LinearOperator.calculate_norm(self)
@@ -169,9 +189,20 @@ class LinearOperator(Operator):
         return True
 
     def adjoint(self, x, out=None):
-        '''returns the adjoint/inverse operation
+        '''Returns the adjoint/inverse operation evaluated at the point :math:`x`
 
-        only available to linear operators'''
+        Parameters
+        ----------
+        x: DataContainer or BlockDataContainer
+            Element in the domain of the SOperator
+        out:  DataContainer or BlockDataContainer, default None
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
+        Returns
+        -------
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        Note
+        ----
+        Only available to linear operators'''
         raise NotImplementedError
 
     @staticmethod
@@ -391,6 +422,7 @@ class AdjointOperator(LinearOperator):
 
     Examples
     --------
+    This example demonstrates that :math:` LHS:=<Gx, y> =<x, G^* y>=:RHS`, where :math:`G` is the gradient operator. 
     >>> ig = ImageGeometry(2,3) 
     >>> G = GradientOperator(ig)
     >>> div = AdjointOperator(G)
@@ -399,10 +431,6 @@ class AdjointOperator(LinearOperator):
     >>> lhs = G.direct(x).dot(y)
     >>> rhs = x.dot(div.direct(y))
     >>> lhs == rhs # returns True
-
-
- 
-
     """    
     
     def __init__(self, operator):
@@ -534,6 +562,10 @@ class SumOperator(Operator):
             Element in the domain of the SumOperator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+        Returns
+        -------
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        
         """
         if out is None:
             return self.operator1.direct(x) + self.operator2.direct(x)
@@ -542,7 +574,7 @@ class SumOperator(Operator):
             out.add(self.operator2.direct(x), out=out)
 
     def adjoint(self, x, out=None):
-        r"""Calls the adjoint of the sum operator 
+        r"""Calls the adjoint of the sum operator, evaluated at the point :math:`x`. 
         
         Parameters
         ----------
@@ -550,6 +582,9 @@ class SumOperator(Operator):
             Element in the range of the SumOperator
         out: DataContainer or BlockDataContainer, default None
             If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+        Returns
+        -------
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
         """
         
         if self.linear_flag:
@@ -607,7 +642,7 @@ class CompositionOperator(Operator):
 
     def direct(self, x, out=None):
 
-        """Calls the composition operator 
+        """Calls the composition operator at the point :math:`x`. 
         
         Parameters
         ----------
@@ -615,6 +650,10 @@ class CompositionOperator(Operator):
             Element in the domain of the CompositionOperator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
+        Returns
+        -------
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        
         """
         if out is None:
             # return self.operator1.direct(self.operator2.direct(x))
@@ -662,7 +701,7 @@ class CompositionOperator(Operator):
                 out.fill(step)
 
     def adjoint(self, x, out=None):
-        """Calls the adjoint of the composition operator 
+        """Calls the adjoint of the composition operator at the point :math:`x`. 
         
         Parameters
         ----------
@@ -670,6 +709,10 @@ class CompositionOperator(Operator):
             Element in the range of the CompositionOperator
         out: DataContainer or BlockDataContainer, default None
             If out is not None the output of the adjoint of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
+        
+        Returns
+        -------
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
         """
         
         if self.linear_flag:

@@ -1451,6 +1451,19 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
+        # test there is no error with limited angle data, and target angle below 180
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data_limited = Slicer(roi={'angle': ((abs(data.geometry.angles-1)).argmin(), (abs(data.geometry.angles-179.5)).argmin(), 1)})(data)
+        processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=3)
+        processor.set_input(data_limited) 
+        processor.get_output(out=data_limited)
+
+        # test there is an error when the target angle is not within tolerance
+        with self.assertRaises(ValueError):
+            processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
+            processor.set_input(data_limited) 
+            processor.get_output(out=data_limited)
+
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
 

@@ -16,9 +16,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-import functools
-import logging
 from abc import ABC, abstractmethod
 from numbers import Integral
 from warnings import warn
@@ -30,6 +27,7 @@ from tqdm.auto import tqdm as tqdm_auto
 class Callback(ABC):
     '''Base Callback to inherit from for use in :code:`Algorithm.run(callbacks: list[Callback])`.'''
     def __init__(self, verbose=1):
+        ''':param verbose: int, 0=quiet, 1=info, 2=debug'''
         self.verbose = verbose
 
     @abstractmethod
@@ -38,12 +36,12 @@ class Callback(ABC):
 
 
 class OldCallback(Callback):
-    '''Converts an old-style :code:`function(iteration, objective, x)`
-      to a new-style :code:`Callback`.
+    '''Converts an old-style :code:`def callback(iteration, objective, x)`
+    to a new-style :code:`class Callback`.
     '''
-    def __init__(self, function, *args, **kwargs):
+    def __init__(self, callback, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.func = function
+        self.func = callback
 
     def __call__(self, algorithm):
         if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
@@ -67,9 +65,16 @@ class ProgressCallback(Callback):
             tqdm_kwargs.setdefault('total', algorithm.max_iteration)
             tqdm_kwargs.setdefault('disable', not self.verbose)
             self.pbar = self.tqdm_class(**tqdm_kwargs)
-        if self.pbar.update(algorithm.iteration - self.pbar.n): # only if screen was updated
-            self.pbar.set_postfix(objective=algorithm.objective_to_string(self.verbose>=2))
-            # if algorithm.logger: algorithm.logger.debug(self.pbar)
+        self.pbar.set_postfix(algorithm.objective_to_dict(self.verbose>=2), refresh=False)
+        self.pbar.update(algorithm.iteration - self.pbar.n)
+
+
+class LogfileCallback(ProgressCallback):
+    ''':code:`ProgressCallback` but to a file instead of screen'''
+    def __init__(self, log_file=None, mode='a', mininterval=5, **kwargs):
+        """:param miniterval: approximate number of seconds between updates."""
+        self.fd = open(log_file, mode=mode)
+        super().__init__(file=self.fd, mininterval=mininterval, **kwargs)
 
 
 class Algorithm:
@@ -89,11 +94,8 @@ class Algorithm:
       method will stop when the stopping criterion is met or `StopIteration` is raised.
    '''
 
-    def __init__(self, max_iteration=0, update_objective_interval=1, log_file=None, **kwargs):
-        '''Constructor
-
-        Set the minimal number of parameters:
-
+    def __init__(self, max_iteration=0, update_objective_interval=1, **kwargs):
+        '''Set the minimal number of parameters:
 
         :param max_iteration: maximum number of iterations
         :type max_iteration: int, optional, default 0
@@ -102,8 +104,6 @@ class Algorithm:
                                        and so forth. This is by default 1 and should be increased\
                                        when evaluating the objective is computationally expensive.
         :type update_objective_interval: int, optional, default 1
-        :param log_file: log verbose output to file
-        :type log_file: str, optional, default None
         '''
         self.iteration = -1
         self.__max_iteration = max_iteration
@@ -114,8 +114,10 @@ class Algorithm:
         self.update_objective_interval = update_objective_interval
         # self.x = None
         self.iter_string = 'Iter'
-        self.logger = None
-        self.__set_up_logger(log_file)
+        if 'log_file' in kwargs:
+            warn("use `run(callbacks=[LogfileCallback(log_file)])` instead of `log_file`",
+                 DeprecationWarning, stacklevel=2)
+            self.__log_file = kwargs['log_file']
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
@@ -130,14 +132,8 @@ class Algorithm:
         The user can change this in concrete implementation of iterative algorithms.'''
         return self.max_iteration_stop_criterion()
 
-    def __set_up_logger(self, fname):
-        """Set up the logger if desired"""
-        if fname:
-            print("Will output results to: " +  fname)
-            handler = logging.FileHandler(fname)
-            self.logger = logging.getLogger("obj_fn")
-            self.logger.setLevel(logging.INFO)
-            self.logger.addHandler(handler)
+    def __set_up_logger(self, *_, **__):
+        warn("use `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
 
     def max_iteration_stop_criterion(self):
         '''default stop criterion for iterative algorithm: max_iteration reached'''
@@ -172,7 +168,6 @@ class Algorithm:
             self._iteration.append(self.iteration)
             self.update_objective()
 
-
     def _update_previous_solution(self):
         """ Update the previous solution with the current one
 
@@ -186,14 +181,12 @@ class Algorithm:
             self.x_old = self.x
             self.x = tmp
 
-
         """
         pass
 
     def get_output(self):
         " Returns the current solution. "
         return self.x
-
 
     def _provable_convergence_condition(self):
         raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
@@ -219,11 +212,9 @@ class Algorithm:
             objective = np.nan
         if isinstance(objective, list):
             return objective if return_all else objective[0]
-        else:
-            return [objective, np.nan, np.nan] if return_all else objective
-    def get_last_objective(self, **kwargs):
-        '''alias to get_last_loss'''
-        return self.get_last_loss(**kwargs)
+        return [objective, np.nan, np.nan] if return_all else objective
+
+    get_last_objective = get_last_loss # alias
 
     def update_objective(self):
         '''calculates the objective with the current solution'''
@@ -242,10 +233,7 @@ class Algorithm:
         '''
         return self.__loss
 
-    @property
-    def objective(self):
-        '''alias of loss'''
-        return self.loss
+    objective = loss # alias
 
     @property
     def max_iteration(self):
@@ -255,7 +243,7 @@ class Algorithm:
     @max_iteration.setter
     def max_iteration(self, value):
         '''sets the maximum number of iterations'''
-        assert isinstance(value, int)
+        assert isinstance(value, Integral)
         self.__max_iteration = value
 
     @property
@@ -264,20 +252,16 @@ class Algorithm:
 
     @update_objective_interval.setter
     def update_objective_interval(self, value):
-        if isinstance(value, Integral):
-            if value >= 0:
-                self.__update_objective_interval = value
-            else:
-                raise ValueError('Update objective interval must be an integer >= 0')
-        else:
-            raise ValueError('Update objective interval must be an integer >= 0')
+        if not isinstance(value, Integral) or value < 0:
+            raise ValueError('interval must be an integer >= 0')
+        self.__update_objective_interval = value
 
     def run(self, iterations=None, callbacks: list[Callback] | None=None, verbose=1, **kwargs):
         '''run n iterations and update the user with the callback if specified
 
         :param iterations: number of iterations to run. If not set the algorithm will
           run until max_iteration or until stop criterion is reached
-        :param verbose: sets the verbosity output to screen: 0=quiet, 1=info, 2=debug
+        :param verbose: 0=quiet, 1=info, 2=debug
         :param callbacks: list of callables which are passed the current Algorithm
           object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
         '''
@@ -289,6 +273,8 @@ class Algorithm:
         callback = kwargs.get('callback', None)
         if callback is not None:
             callbacks += OldCallback(callback, verbose=very_verbose)
+        if hasattr(self, '__log_file'):
+            callbacks += LogfileCallback(self.__log_file, verbose=verbose)
 
         if self.should_stop():
             print("Stop criterion has been reached.")
@@ -306,46 +292,18 @@ class Algorithm:
             except StopIteration:
                 break
 
-    def objective_to_string(self, verbose=False):
-        # TODO: return a dict for `tqdm.set_postfix` instead
-        # TODO: then deprecate this function
-        # NOTE: see `verbose_header` for dict keys
+    def objective_to_dict(self, verbose=False):
         el = self.get_last_objective(return_all=verbose)
-        if self.update_objective_interval == 0 or \
-            self.iteration % self.update_objective_interval != 0:
-            el = [ np.nan, np.nan, np.nan] if verbose else np.nan
-        if isinstance (el, list):
-            if np.isnan(el[0]):
-                string = functools.reduce(lambda x,y: x+' {:>13s}'.format(''), el[:-1],'')
-            elif not np.isnan(el[0]) and np.isnan(el[1]):
-                string = ' {:>13.5e}'.format(el[0])
-                string += ' {:>13s}'.format('')
-            else:
-                string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
-            if np.isnan(el[-1]):
-                string += '{:>15s}'.format('')
-            else:
-                string += '{:>15.5e}'.format(el[-1])
-        else:
-            if np.isnan(el):
-                string = '{:>20s}'.format('')
-            else:
-                string = "{:>20.5e}".format(el)
-        return string
+        if isinstance(el, list) and len(el) == 3:
+            return {'primal': el[0], 'dual': el[1], 'primal_dual': el[2]}
+        return {'objective': el}
+
+    def objective_to_string(self, verbose=False):
+        warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
+        return str(self.objective_to_dict(verbose=verbose))
 
     def verbose_output(self, *_, **__):
         warn("use `run(callbacks=[ProgressCallback()])` instead", DeprecationWarning, stacklevel=2)
 
     def verbose_header(self, *_, **__):
-        # el = self.get_last_objective(return_all=verbose)
-        # Iter = self.iter_string
-        # if type(el) == list:
-        #     out = (f"{Iter:>9} {'Max ' + Iter:>10} {'Time/' + Iter:>13} {'Primal':>13} {'Dual':>13} {'Primal-Dual':>15}\n"
-        #            f"{'':>9} {'':>10} {'[s]':>13} {'Objective':>13} {'Objective':>13} {'Gap':>15}")
-        # else:
-        #     out = (f"{Iter:>9} {'Max ' + Iter:>10} {'Time/' + Iter:>13} {'Objective':>20}\n"
-        #            f"{'':>9} {'':>10} {'[s]':>13} {'':>20}")
-        # if self.logger:
-        #     self.logger.info(out)
-        # return out
-        warn("no longer needed", DeprecationWarning, stacklevel=2)
+        warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)

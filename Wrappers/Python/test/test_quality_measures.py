@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+import warnings
 from utils import initialise_tests
 import numpy as np
 from cil.utilities import dataexample
@@ -129,7 +130,10 @@ class TestQualityMeasures(CCPiTestClass):
         np.testing.assert_almost_equal(res1, res2, decimal=3)
         
     def test_infinite_psnr(self):
-        self.assertEqual(psnr(self.id_coins_sliced, self.id_coins_sliced), np.inf)
+        with warnings.catch_warnings(record=True) as w:
+            self.assertEqual(psnr(self.id_coins_sliced, self.id_coins_sliced), np.inf)
+            assert issubclass(w[-1].category, RuntimeWarning)
+
             
-        
+
         

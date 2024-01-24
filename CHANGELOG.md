@@ -1,4 +1,5 @@
 * x.x.x
+  - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class
@@ -17,7 +18,8 @@
   - Bug fix in the adjoint of the Diagonal Operator for complex values
   - Update conda build action to v2 for 2.5x quicker builds
   - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
-  - Quality metrics have added mask option 
+  - Quality metrics have added mask option
+  - Bug fix for norm of CompositionOperator
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 from abc import ABC, abstractmethod
 from numbers import Integral
+from typing import Optional
 from warnings import warn
 
 import numpy as np
@@ -256,7 +257,7 @@ class Algorithm:
             raise ValueError('interval must be an integer >= 0')
         self.__update_objective_interval = value
 
-    def run(self, iterations=None, callbacks: list[Callback] | None=None, verbose=1, **kwargs):
+    def run(self, iterations=None, callbacks: Optional[list[Callback]]=None, verbose=1, **kwargs):
         '''run n iterations and update the user with the callback if specified
 
         :param iterations: number of iterations to run. If not set the algorithm will

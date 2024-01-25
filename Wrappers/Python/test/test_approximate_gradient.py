@@ -17,7 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#TODO: remove unused packages 
+
 import unittest
 from utils import initialise_tests
 
@@ -31,7 +31,6 @@ from cil.utilities import dataexample
 from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction
-from cil.optimisation.functions import SumFunction
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD 
 from cil.framework import VectorData
@@ -124,6 +123,15 @@ class TestSGD(CCPiTestClass):
         bad_sampler=bad_Sampler()
         with self.assertRaises(ValueError):
            SGFunction([self.f, self.f], bad_sampler)
+           
+    def test_sampler_out_of_range(self):
+        bad_sampler=Sampler.sequential(10)
+        f=SGFunction([self.f, self.f], bad_sampler)
+        with self.assertRaises(IndexError):
+            f.gradient(self.initial)
+            f.gradient(self.initial)
+            f.gradient(self.initial)
+           
   
 
     def test_SGD_simulated_parallel_beam_data(self): 

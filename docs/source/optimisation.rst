@@ -373,22 +373,37 @@ Utilities
 =======
 Contains utilities for the CIL optimisation framework. 
 
-Sampler
---------
-A class to select from a list of indices {0, 1, …, S-1}. The function next() outputs a single next index from the list {0,1,…,S-1} . Different orders are possible including with and without replacement. To be run again and again, depending on how many iterations.
 
-It is recommended to use the static methods in `cil.optimisation.utilities.sampler` to configure your Sampler object rather than initialising this class directly:
+Samplers
+--------
+Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
+The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn. 
+
+For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
+
+.. automethod:: cil.optimisation.utilities.Sampler.from_function
+
+.. automethod:: cil.optimisation.utilities.Sampler.sequential
+
+.. automethod:: cil.optimisation.utilities.Sampler.staggered
+
+.. automethod:: cil.optimisation.utilities.Sampler.herman_meyer
+
+.. automethod:: cil.optimisation.utilities.Sampler.random_with_replacement
+
+.. automethod:: cil.optimisation.utilities.Sampler.random_without_replacement
+
+
+They will all instantiate a Sampler defined in the following class: 
 
 .. autoclass:: cil.optimisation.utilities.Sampler
    :members:
 
 
-The static methods will call one of the following: 
+
+In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement: 
 
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
-   :members:
-
-.. autoclass:: cil.optimisation.utilities.SamplerFromFunction
    :members:
 
 

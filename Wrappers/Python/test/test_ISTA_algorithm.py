@@ -21,7 +21,7 @@
 from cil.optimisation.algorithms import ISTA
 from cil.optimisation.operators import MatrixOperator
 from cil.framework import VectorData
-from cil.optimisation.functions import LeastSquares, ZeroFunction
+from cil.optimisation.functions import LeastSquares, ZeroFunction, L1Norm
 
 import numpy as np
 
@@ -48,6 +48,7 @@ class TestISTA(unittest.TestCase):
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
         self.g = ZeroFunction()
+        self.h = L1Norm()
 
         self.ig = self.Aop.domain
 
@@ -101,6 +102,55 @@ class TestISTA(unittest.TestCase):
         res1 = ista.objective[-1]
         res2 = self.f(x) + self.g(x)
         self.assertTrue( res1==res2) 
+        
+    def test_update_g_none(self):
+
+        # ista run 10 iteration
+        tmp_initial = self.ig.allocate()
+        ista = ISTA(initial = tmp_initial, f = self.f, g = None,  max_iteration=1)  
+        ista.run()
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+              
+        x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
+        x_old.fill(x)
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
+    
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue( res1==res2) 
+        
+    def test_update_f_none(self):
+
+        # ista run 1 iteration
+        tmp_initial = self.ig.allocate()
+        ista = ISTA(initial = tmp_initial, f = None, g = self.h,  max_iteration=1)  
+        ista.run()
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(1):         
+            x = ista.g.proximal(x_old,ista.step_size)
+            x_old.fill(x)
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
+    
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.h(x)
+        self.assertTrue( res1==res2) 
+
+    def test_f_and_g_none(self):
+        tmp_initial = self.ig.allocate()
+        with self.assertRaises(ValueError):
+            ista = ISTA(initial = tmp_initial, f = None, g = None,  max_iteration=1)  
+        
+        
 
     def test_provable_condition(self):
 

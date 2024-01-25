@@ -273,9 +273,9 @@ class Algorithm:
         # transform old-style callbacks into new
         callback = kwargs.get('callback', None)
         if callback is not None:
-            callbacks += OldCallback(callback, verbose=very_verbose)
+            callbacks.append(OldCallback(callback, verbose=very_verbose))
         if hasattr(self, '__log_file'):
-            callbacks += LogfileCallback(self.__log_file, verbose=verbose)
+            callbacks.append(LogfileCallback(self.__log_file, verbose=verbose))
 
         if self.should_stop():
             print("Stop criterion has been reached.")

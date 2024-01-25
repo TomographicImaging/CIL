@@ -19,14 +19,9 @@
 # Claire Delplancke (University of Bath)
 
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.operators import BlockOperator
 import numpy as np
 import warnings
 import logging
-from cil.optimisation.utilities import Sampler
-from numbers import Number
-import numpy as np
-
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
@@ -55,12 +50,8 @@ class SPDHG(Algorithm):
         List of probabilities. If None each subset will have probability = 1/number of subsets
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-    sampler: an instance of a `cil.optimisation.utilities.Sampler` class
-        Method of selecting the next index for the SPDHG update. If None, random sampling and each index will have probability = 1/number of subsets
 
     **kwargs:
-    prob : list of floats, optional, default=None
-        List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
     norms : list of floats
         precalculated list of norms of the operators
 
@@ -119,7 +110,6 @@ class SPDHG(Algorithm):
                initial=None, prob=None, gamma=1., norms=None):
         
         '''set-up of the algorithm
-        
         Parameters
         ----------
         f : BlockFunction

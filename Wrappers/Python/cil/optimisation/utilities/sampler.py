@@ -18,7 +18,6 @@
 
 import numpy as np
 import math
-
 from functools import partial
 import time
 import numbers
@@ -34,7 +33,6 @@ class Sampler():
 
 
     Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.
-
 
 
 
@@ -93,6 +91,8 @@ class Sampler():
     >>> print(sampler.get_samples(16))
     [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
 
+
+
     Example
     --------
     This example creates a sampler that outputs sequential indices, starting from 1.  
@@ -108,7 +108,6 @@ class Sampler():
 
 
 
-
     Note
     -----
     The optimal choice of sampler depends on the data and the number of calls to the sampler.  Note that a low number of calls to a random sampler won't give an even distribution.
@@ -118,7 +117,7 @@ class Sampler():
     def __init__(self, num_indices, function,  sampling_type=None, prob_weights=None):
 
         self._type = sampling_type
-        
+
         if isinstance (num_indices, numbers.Integral):  
             self._num_indices = num_indices
         else:
@@ -227,7 +226,6 @@ class Sampler():
         def function(x):
             return x % num_indices
 
-
         sampler = Sampler(function=function, num_indices=num_indices,
                           sampling_type='sequential'
                           )
@@ -256,7 +254,7 @@ class Sampler():
         """
         if not isinstance (num_indices, numbers.Integral):
             raise ValueError('`num_indices` should be an integer. ')
-            
+
         iter_number_mod = iter_number % num_indices
         floor = num_indices // stride
         mod = num_indices % stride
@@ -278,7 +276,6 @@ class Sampler():
         Parameters
         ----------
         num_indices: int
-
             The sampler will select from a range of indices 0 to num_indices.
 
         stride: int
@@ -308,7 +305,6 @@ class Sampler():
         8
         >>> print(sampler.get_samples(10))
         [ 0  8  16 1 9 2 10 3 11 4]
-
 
 
         """
@@ -357,7 +353,6 @@ class Sampler():
         >>> print(sampler.get_samples(10))
         [0 1 3 0 0 3 0 0 0 0]
         """
-
 
         sampler = SamplerRandom(
             num_indices=num_indices,

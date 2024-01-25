@@ -32,7 +32,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 class TestSamplers(CCPiTestClass):
 
     def example_function(self, iteration_number):
-
         return ((iteration_number+5) % 50)
 
     def test_init_Sampler(self):

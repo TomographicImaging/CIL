@@ -373,7 +373,6 @@ Utilities
 =======
 Contains utilities for the CIL optimisation framework. 
 
-
 Samplers
 --------
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
@@ -400,11 +399,12 @@ They will all instantiate a Sampler defined in the following class:
    :members:
 
 
-
 In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement: 
 
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
    :members:
+
+
 
 
 

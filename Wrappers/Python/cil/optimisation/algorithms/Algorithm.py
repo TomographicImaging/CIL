@@ -147,7 +147,7 @@ class Algorithm:
     def __next__(self):
         '''Algorithm is an iterable
 
-        calling this method triggers update and update_objective
+        This method triggers :code:`update()` and :code:`update_objective()`
         '''
         if self.should_stop():
             raise StopIteration
@@ -155,7 +155,7 @@ class Algorithm:
             self._iteration.append(self.iteration)
             self.update_objective()
             self.iteration += 1
-            return
+            return self.iteration
         if not self.configured:
             raise ValueError('Algorithm not configured correctly. Please run set_up.')
         self.update()
@@ -168,6 +168,7 @@ class Algorithm:
 
             self._iteration.append(self.iteration)
             self.update_objective()
+        return self.iteration
 
     def _update_previous_solution(self):
         """ Update the previous solution with the current one
@@ -285,19 +286,18 @@ class Algorithm:
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
 
-        for _ in range(iterations):
-            try:
-                next(self)
-                for callback in callbacks:
-                    callback(self)
-            except StopIteration:
-                break
+        # call `__next__` upto `iteration` times or until `StopIteration` is raised
+        for _ in zip(range(iterations), self):
+            for callback in callbacks:
+                callback(self)
 
     def objective_to_dict(self, verbose=False):
-        el = self.get_last_objective(return_all=verbose)
-        if isinstance(el, list) and len(el) == 3:
-            return {'primal': el[0], 'dual': el[1], 'primal_dual': el[2]}
-        return {'objective': el}
+        obj = self.get_last_objective(return_all=verbose)
+        if isinstance(obj, list) and len(obj) == 3:
+            if not np.isnan(obj[1:]).all():
+                return {'primal': obj[0], 'dual': obj[1], 'primal_dual': obj[2]}
+            obj = obj[0]
+        return {'objective': obj}
 
     def objective_to_string(self, verbose=False):
         warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)

@@ -407,8 +407,8 @@ class Sampler():
         num_indices: int
             The sampler will select from a range of indices 0 to num_indices.
 
-        function : Callable[[int], int]
-            A deterministic function that takes an integer iteration number and returns an integer between 0 and num_indices.
+    function : callable
+        A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -> int
 
         prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices 
             Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 

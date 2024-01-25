@@ -781,8 +781,22 @@ class TestSIRT(CCPiTestClass):
         fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
         fista.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
-        self.assertAlmostEqual(fista.loss[-1], sirt.loss[-1])
-
+        
+    def test_SIRT_with_TV_warm_start(self):
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        ig = data.geometry
+        A=IdentityOperator(ig)
+        constraint=TotalVariation(warm_start=True)
+        initial=ig.allocate('random', seed=5)
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=2, constraint=constraint)
+        sirt.run(100, verbose=0)
+        constraint=TotalVariation(warm_start=True)
+        f=LeastSquares(A,data, c=0.5)
+        fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
+        fista.run(100, verbose=0)
+        self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
+        
+    
 class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")

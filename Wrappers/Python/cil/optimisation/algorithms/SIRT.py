@@ -212,7 +212,5 @@ class SIRT(Algorithm):
         .. math:: \frac{1}{2}\|A x - b\|^{2}
 
         """
-        if self.constraint is None:
-            self.loss.append(0.5*self.r.squared_norm())
-        else:
-            self.loss.append(0.5*self.r.squared_norm()+self.constraint(self.x))
+        self.loss.append(0.5*self.r.squared_norm())
+     

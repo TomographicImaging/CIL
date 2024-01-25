@@ -188,6 +188,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#total-variation">Total variation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#samplers">Samplers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#block-framework">Block Framework</a><ul>
@@ -384,6 +388,18 @@
      <li class="toc-h3 nav-item toc-entry">
       <a class="reference internal nav-link" href="#total-variation">
        Total variation
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#utilities">
+     Utilities
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#samplers">
+       Samplers
       </a>
      </li>
     </ul>
@@ -939,7 +955,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">SIRT</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/SIRT.html#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Permalink to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id36" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">7</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id45" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">7</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1126,7 +1142,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">ISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Permalink to this definition">#</a></dt>
-<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id34" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id33" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id43" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id42" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <p>Iterative Shrinkage-Thresholding Algorithm (ISTA)</p>
 <div class="math notranslate nohighlight">
 \[x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))\]</div>
@@ -1470,7 +1486,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">FISTA</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/FISTA.html#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Permalink to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id34" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id33" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id43" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id42" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
@@ -1498,8 +1514,8 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id28" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">8</a>]</span> algorithm 2.2.9).</p>
-<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id27" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">5</a>]</span> sec 2).</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id37" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">8</a>]</span> algorithm 2.2.9).</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id36" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">5</a>]</span> sec 2).</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1815,7 +1831,7 @@ In such cases nan will be printed.</p></li>
 <dl class="py class">
 <dt id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></code><code class="sig-name descname"><span class="pre">PDHG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id29" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id30" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">4</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id38" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id39" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">4</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1841,7 +1857,7 @@ In such cases nan will be printed.</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id32" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">6</a>]</span>, <span id="id12">[<a class="reference internal" href="#id31" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">9</a>]</span>.</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id41" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">6</a>]</span>, <span id="id12">[<a class="reference internal" href="#id40" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">9</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -2663,7 +2679,7 @@ Evaluates if the following equivalence holds
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default = 1</em>) – Seed random generator</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Check if the following expression is below the tolerance</p></li>
-<li><p><strong>math::</strong> (<em>.</em>) – <a href="#id38"><span class="problematic" id="id39">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
+<li><p><strong>math::</strong> (<em>.</em>) – <a href="#id47"><span class="problematic" id="id48">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -3777,7 +3793,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id42"><span class="problematic" id="id43">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id51"><span class="problematic" id="id52">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -4570,7 +4586,7 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 <dt id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id40"><span class="problematic" id="id41">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id49"><span class="problematic" id="id50">|x|</span></a>}</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4708,7 +4724,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id44"><span class="problematic" id="id45">problem_</span></a> of the above problem, see <span id="id16">[<a class="reference internal" href="#id34" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id17">[<a class="reference internal" href="#id33" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id18">[<a class="reference internal" href="#id37" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">11</a>]</span>.</p>
+applied to the _dual <a href="#id53"><span class="problematic" id="id54">problem_</span></a> of the above problem, see <span id="id16">[<a class="reference internal" href="#id43" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id17">[<a class="reference internal" href="#id42" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id18">[<a class="reference internal" href="#id46" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">11</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -4758,7 +4774,7 @@ However, during the evaluation of <cite>proximal</cite> the memory requirements 
 <div class="math notranslate nohighlight">
 \[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
-For more information, see <span id="id19">[<a class="reference internal" href="#id35" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">10</a>]</span>, <span id="id20">[<a class="reference internal" href="#id29" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+For more information, see <span id="id19">[<a class="reference internal" href="#id44" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">10</a>]</span>, <span id="id20">[<a class="reference internal" href="#id38" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -4840,6 +4856,617 @@ is created in the <cite>__call__</cite> and <cite>proximal</cite> methods.</p>
 
 </div>
 </div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">#</a></h2>
+<p>Contains utilities for the CIL optimisation framework.</p>
+<div class="section" id="samplers">
+<h3>Samplers<a class="headerlink" href="#samplers" title="Permalink to this headline">#</a></h3>
+<p>Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
+The <cite>cil.optimisation.utilities.sampler</cite> class defines a function next() which gives the next sample. It also has utility to <cite>get_samples</cite> to access which samples have or will be drawn.</p>
+<p>For ease of use we provide the following static methods in <cite>cil.optimisation.utilities.sampler</cite> that allow you to configure your sampler object rather than initialising the classes directly:</p>
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.from_function">
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">Sampler.</span></code><code class="sig-name descname"><span class="pre">from_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.from_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.from_function" title="Permalink to this definition">#</a></dt>
+<dd><blockquote>
+<div><p>Instantiate a sampler that wraps a function for index selection.</p>
+<dl class="simple">
+<dt>num_indices: int</dt><dd><p>The sampler will select from a range of indices 0 to num_indices.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl>
+<dt>function<span class="classifier">callable</span></dt><dd><p>A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -&gt; int</p>
+<dl class="simple">
+<dt>prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices</dt><dd><p>Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Sampler</dt><dd><p>An instance of the Sampler class which samples from a function.</p>
+</dd>
+</dl>
+<p>This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">12</span><span class="p">)))</span>
+<span class="go">[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]</span>
+</pre></div>
+</div>
+<p>This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="go">[1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+<p>This example creates a sampler that samples in order from a custom list. The num_indices  is 6, although note that the index 5 is never output by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list.
+The probability weights are passed to the sampler as they are not uniform.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">custom_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">,</span> <span class="n">custom_list</span><span class="o">=</span><span class="n">custom_list</span><span class="p">]):</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span><span class="p">(</span><span class="n">custom_list</span><span class="p">[</span><span class="n">iteration_number</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">custom_list</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="go">[0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="p">)</span>
+<span class="go">Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices.</span>
+<span class="go">Type : from_function</span>
+<span class="go">Current iteration number : 0</span>
+<span class="go">number of indices : 6</span>
+<span class="go">Probability weights : [0.6, 0.1, 0.1, 0.1, 0.1, 0.0]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.sequential">
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">Sampler.</span></code><code class="sig-name descname"><span class="pre">sequential</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.sequential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.sequential" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler that outputs sequential indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class that will generate indices sequentially.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="go">[0 1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.staggered">
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">Sampler.</span></code><code class="sig-name descname"><span class="pre">staggered</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.staggered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.staggered" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs in a staggered order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p></li>
+<li><p><strong>stride</strong> (<em>int</em>) – The stride between returned indices. The stride should be less than the num_indices.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class that will generate indices in a staggered pattern.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">staggered</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[ 0  4  8 12 16]</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">staggered</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[ 0  8  16 1 9 2 10 3 11 4]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.herman_meyer">
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">Sampler.</span></code><code class="sig-name descname"><span class="pre">herman_meyer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.herman_meyer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.herman_meyer" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs in a Herman Meyer order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices. For Herman-Meyer sampling this number should not be prime.</p></li>
+<li><p><strong>Reference</strong> – </p></li>
+<li><p><strong>----------</strong> – </p></li>
+<li><p><strong>GT</strong> (<em>Herman</em>) – </p></li>
+<li><p><strong>LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi</strong> (<em>Meyer</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class which outputs in a Herman Meyer order.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">herman_meyer</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="go">[ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.random_with_replacement">
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">Sampler.</span></code><code class="sig-name descname"><span class="pre">random_with_replacement</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.random_with_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.random_with_replacement" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs an index between 0 - num_indices with a given probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices</p></li>
+<li><p><strong>prob</strong> (<em>list of floats</em><em>, </em><em>optional</em>) – The probability for each index to be selected by the ‘next’ operation. If not provided, the indices will be sampled uniformly. The list should have a length equal to num_indices, and the values should sum to 1</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Used to initialise the random number generator where repeatability is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the <cite>RandomSampler</cite> class that will generate indices randomly with replacement</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>RandomSampler</cite></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[3 4 0 0 2 3 3 2 2 1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="p">[</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[0 1 3 0 0 3 0 0 0 0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.random_without_replacement">
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">Sampler.</span></code><code class="sig-name descname"><span class="pre">random_without_replacement</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.random_without_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.random_without_replacement" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs an index between 0 - num_indices. Once sampled the index will not be sampled again until all indices have been returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Used to initialise the random number generator where repeatability is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the <cite>RandomSampler</cite> class that will generate indices randomly without replacement</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>RandomSampler</cite></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">randomWithoutReplacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="go">[6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>They will all instantiate a Sampler defined in the following class:</p>
+<dl class="py class">
+<dt id="cil.optimisation.utilities.Sampler">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.</span></code><code class="sig-name descname"><span class="pre">Sampler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialises a sampler that returns and then increments indices from a sequence defined by a function.</p>
+<p>Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement.</p>
+<p>Custom deterministic samplers can be created by using the <cite>from_function</cite> static method or by subclassing this sampler class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> (<em>Callable</em><em>[</em><em>[</em><em>int</em><em>]</em><em>, </em><em>int</em><em>]</em>) – A function that takes an integer iteration number and returns an integer between 0 and num_indices.</p></li>
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p></li>
+<li><p><strong>sampling_type</strong> (<em>str</em><em>, </em><em>optional</em><em>,  </em><em>default = None</em>) – The sampling type used. This is recorded for reference and printed when <cite>print</cite> is called.</p></li>
+<li><p><strong>prob_weights</strong> (<em>list of floats of length num_indices that sum to 1.  Default is</em><em> [</em><em>1 / num_indices</em><em>] </em><em>* num_indices</em>) – Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class representing the desired configuration.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+<span class="go">[3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">staggered</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[ 0  4  8 12 16]</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="go">[0 1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">herman_meyer</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="go">[ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<p>This example creates a sampler that outputs sequential indices, starting from 1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="go">[1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The optimal choice of sampler depends on the data and the number of calls to the sampler.  Note that a low number of calls to a random sampler won’t give an even distribution.
+For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may wish to consider another sampling method e.g. random without replacement, which, when calling <cite>num_indices</cite> samples is guaranteed to draw each index exactly once.</p>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.next">
+<code class="sig-name descname"><span class="pre">next</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.next"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.next" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a sample from the list of indices <a href="#id21"><span class="problematic" id="id22">`</span></a>{0, 1, …, N-1}, where N is the number of indices and increments the sampler.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.utilities.Sampler.get_samples">
+<code class="sig-name descname"><span class="pre">get_samples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.get_samples" title="Permalink to this definition">#</a></dt>
+<dd><p>Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_samples</strong> (<em>int</em>) – The number of samples to return.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The first <a href="#id23"><span class="problematic" id="id24">`</span></a>num_samples” output by the sampler.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id0">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">sequential</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.sequential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler that outputs sequential indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class that will generate indices sequentially.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="go">[0 1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id25">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">staggered</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.staggered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id25" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs in a staggered order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p></li>
+<li><p><strong>stride</strong> (<em>int</em>) – The stride between returned indices. The stride should be less than the num_indices.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class that will generate indices in a staggered pattern.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">staggered</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[ 0  4  8 12 16]</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">staggered</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[ 0  8  16 1 9 2 10 3 11 4]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id26">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">random_with_replacement</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.random_with_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id26" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs an index between 0 - num_indices with a given probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices</p></li>
+<li><p><strong>prob</strong> (<em>list of floats</em><em>, </em><em>optional</em>) – The probability for each index to be selected by the ‘next’ operation. If not provided, the indices will be sampled uniformly. The list should have a length equal to num_indices, and the values should sum to 1</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Used to initialise the random number generator where repeatability is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the <cite>RandomSampler</cite> class that will generate indices randomly with replacement</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>RandomSampler</cite></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[3 4 0 0 2 3 3 2 2 1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="p">[</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[0 1 3 0 0 3 0 0 0 0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id27">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">random_without_replacement</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.random_without_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id27" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs an index between 0 - num_indices. Once sampled the index will not be sampled again until all indices have been returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Used to initialise the random number generator where repeatability is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the <cite>RandomSampler</cite> class that will generate indices randomly without replacement</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>RandomSampler</cite></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">randomWithoutReplacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="go">[6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id28">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">from_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.from_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id28" title="Permalink to this definition">#</a></dt>
+<dd><blockquote>
+<div><p>Instantiate a sampler that wraps a function for index selection.</p>
+<dl class="simple">
+<dt>num_indices: int</dt><dd><p>The sampler will select from a range of indices 0 to num_indices.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl>
+<dt>function<span class="classifier">callable</span></dt><dd><p>A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -&gt; int</p>
+<dl class="simple">
+<dt>prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices</dt><dd><p>Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Sampler</dt><dd><p>An instance of the Sampler class which samples from a function.</p>
+</dd>
+</dl>
+<p>This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">12</span><span class="p">)))</span>
+<span class="go">[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]</span>
+</pre></div>
+</div>
+<p>This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="go">[1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+<p>This example creates a sampler that samples in order from a custom list. The num_indices  is 6, although note that the index 5 is never output by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list.
+The probability weights are passed to the sampler as they are not uniform.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">custom_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">,</span> <span class="n">custom_list</span><span class="o">=</span><span class="n">custom_list</span><span class="p">]):</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span><span class="p">(</span><span class="n">custom_list</span><span class="p">[</span><span class="n">iteration_number</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">custom_list</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="go">[0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="p">)</span>
+<span class="go">Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices.</span>
+<span class="go">Type : from_function</span>
+<span class="go">Current iteration number : 0</span>
+<span class="go">number of indices : 6</span>
+<span class="go">Probability weights : [0.6, 0.1, 0.1, 0.1, 0.1, 0.0]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id29">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">herman_meyer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#Sampler.herman_meyer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id29" title="Permalink to this definition">#</a></dt>
+<dd><p>Instantiates a sampler which outputs in a Herman Meyer order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices. For Herman-Meyer sampling this number should not be prime.</p></li>
+<li><p><strong>Reference</strong> – </p></li>
+<li><p><strong>----------</strong> – </p></li>
+<li><p><strong>GT</strong> (<em>Herman</em>) – </p></li>
+<li><p><strong>LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi</strong> (<em>Meyer</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class which outputs in a Herman Meyer order.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">herman_meyer</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="go">[ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<p>In addition, we provide a random sampling class which is a child class of  <cite>cil.optimisation.utilities.sampler</cite> and provides options for sampling with and without replacement:</p>
+<dl class="py class">
+<dt id="cil.optimisation.utilities.SamplerRandom">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.</span></code><code class="sig-name descname"><span class="pre">SamplerRandom</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_with_replacement'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#SamplerRandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.SamplerRandom" title="Permalink to this definition">#</a></dt>
+<dd><p>The user is recommended to not instantiate this class  directly but instead use one of the static methods  in the parent Sampler class that will return instances of different samplers.</p>
+<p>This class produces Samplers that output random samples with and without replacement from the set {0, 1, …, N-1} where N=num_indices.</p>
+<p>Custom random samplers can be created by subclassing this sampler class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_indices</strong> (<em>int</em>) – The sampler will select from a range of indices 0 to num_indices.</p></li>
+<li><p><strong>sampling_type</strong> (<em>str</em><em>, </em><em>optional</em><em>,  </em><em>default = 'random_with_replacement&quot;</em>) – The sampling type used. This is recorded for reference and printed when <cite>print</cite> is called.</p></li>
+<li><p><strong>prob_weights</strong> (<em>list of floats of length num_indices that sum to 1.  Default is</em><em> [</em><em>1 / num_indices</em><em>] </em><em>* num_indices</em>) – Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</p></li>
+<li><p><strong>replace</strong> (<em>bool</em><em>, </em><em>default is True</em>) – If True, sample with replace, otherwise sample without replacement</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Used to initialise the random number generator where repeatability is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the Sampler class representing the desired configuration.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+<span class="go">[3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">randomWithoutReplacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="go">[6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="cil.optimisation.utilities.SamplerRandom.get_samples">
+<code class="sig-name descname"><span class="pre">get_samples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/utilities/sampler.html#SamplerRandom.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.SamplerRandom.get_samples" title="Permalink to this definition">#</a></dt>
+<dd><p>Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_samples</strong> (<em>int</em>) – The number of samples to return.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The first <cite>num_samples</cite> produced by the sampler</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 </div>
 <div class="section" id="block-framework">
 <h1>Block Framework<a class="headerlink" href="#block-framework" title="Permalink to this headline">#</a></h1>
@@ -4854,7 +5481,7 @@ problems in the following form:</p>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a></p></li>
 <li><p><a class="reference external" href="optimisation.html#cil.optimisation.operators.BlockOperators">BlockOperator</a></p></li>
 </ul>
-<p>The block framework allows writing more advanced <a href="#id46"><span class="problematic" id="id47">`optimisation problems`_</span></a>. Consider the typical
+<p>The block framework allows writing more advanced <a href="#id55"><span class="problematic" id="id56">`optimisation problems`_</span></a>. Consider the typical
 <a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
 <div class="math notranslate nohighlight">
 \[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
@@ -4885,7 +5512,7 @@ Block Framework comprising 4 main actors: <code class="code docutils literal not
 <code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id48"><span class="problematic" id="id49">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id57"><span class="problematic" id="id58">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
@@ -4896,8 +5523,8 @@ do basic algebra between <a class="reference external" href="framework.html#cil.
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id21"><span class="problematic" id="id22">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id23"><span class="problematic" id="id24">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id30"><span class="problematic" id="id31">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id32"><span class="problematic" id="id33">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -5537,39 +6164,39 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <div class="section" id="references">
 <h3>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h3>
-<div class="docutils container" id="id26">
+<div class="docutils container" id="id35">
 <dl class="citation">
-<dt class="label" id="id34"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id16">3</a>)</span></dt>
+<dt class="label" id="id43"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id16">3</a>)</span></dt>
 <dd><p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. URL: <a class="reference external" href="https://doi.org/10.1137/080716542">https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/080716542">arXiv:https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
 </dd>
-<dt class="label" id="id33"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id6">2</a>,<a href="#id17">3</a>)</span></dt>
+<dt class="label" id="id42"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id6">2</a>,<a href="#id17">3</a>)</span></dt>
 <dd><p>Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. <em>IEEE Transactions on Image Processing</em>, 18(11):2419–2434, 2009. <a class="reference external" href="https://doi.org/10.1109/TIP.2009.2028250">doi:10.1109/TIP.2009.2028250</a>.</p>
 </dd>
-<dt class="label" id="id29"><span class="brackets">3</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id20">2</a>)</span></dt>
+<dt class="label" id="id38"><span class="brackets">3</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id20">2</a>)</span></dt>
 <dd><p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </dd>
-<dt class="label" id="id30"><span class="brackets"><a class="fn-backref" href="#id10">4</a></span></dt>
+<dt class="label" id="id39"><span class="brackets"><a class="fn-backref" href="#id10">4</a></span></dt>
 <dd><p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </dd>
-<dt class="label" id="id27"><span class="brackets"><a class="fn-backref" href="#id8">5</a></span></dt>
+<dt class="label" id="id36"><span class="brackets"><a class="fn-backref" href="#id8">5</a></span></dt>
 <dd><p>Osman Güler. New proximal point algorithms for convex minimization. <em>SIAM Journal on Optimization</em>, 2(4):649–664, 1992.</p>
 </dd>
-<dt class="label" id="id32"><span class="brackets"><a class="fn-backref" href="#id11">6</a></span></dt>
+<dt class="label" id="id41"><span class="brackets"><a class="fn-backref" href="#id11">6</a></span></dt>
 <dd><p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </dd>
-<dt class="label" id="id36"><span class="brackets"><a class="fn-backref" href="#id1">7</a></span></dt>
+<dt class="label" id="id45"><span class="brackets"><a class="fn-backref" href="#id1">7</a></span></dt>
 <dd><p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </dd>
-<dt class="label" id="id28"><span class="brackets"><a class="fn-backref" href="#id7">8</a></span></dt>
+<dt class="label" id="id37"><span class="brackets"><a class="fn-backref" href="#id7">8</a></span></dt>
 <dd><p>Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em>. Volume 87. Springer Science &amp; Business Media, 2003.</p>
 </dd>
-<dt class="label" id="id31"><span class="brackets"><a class="fn-backref" href="#id12">9</a></span></dt>
+<dt class="label" id="id40"><span class="brackets"><a class="fn-backref" href="#id12">9</a></span></dt>
 <dd><p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </dd>
-<dt class="label" id="id35"><span class="brackets"><a class="fn-backref" href="#id19">10</a></span></dt>
+<dt class="label" id="id44"><span class="brackets"><a class="fn-backref" href="#id19">10</a></span></dt>
 <dd><p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
 </dd>
-<dt class="label" id="id37"><span class="brackets"><a class="fn-backref" href="#id18">11</a></span></dt>
+<dt class="label" id="id46"><span class="brackets"><a class="fn-backref" href="#id18">11</a></span></dt>
 <dd><p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </dd>
 </dl>

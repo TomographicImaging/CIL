@@ -786,15 +786,12 @@ class TestSIRT(CCPiTestClass):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
         A=IdentityOperator(ig)
-        constraint=TotalVariation(warm_start=True)
+        constraint=1e6*TotalVariation(warm_start=True, max_iteration=100)
         initial=ig.allocate('random', seed=5)
-        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=2, constraint=constraint)
-        sirt.run(100, verbose=0)
-        constraint=TotalVariation(warm_start=True)
-        f=LeastSquares(A,data, c=0.5)
-        fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
-        fista.run(100, verbose=0)
-        self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=150, constraint=constraint)
+        sirt.run(25, verbose=0)
+
+        self.assertNumpyArrayAlmostEqual(sirt.x.as_array(), ig.allocate(0.25).as_array(),3)
         
     
 class TestSPDHG(unittest.TestCase):

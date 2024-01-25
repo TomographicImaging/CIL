@@ -29,7 +29,7 @@ import numpy as np
 
 
 class SPDHG(Algorithm):
-    r'''Stochastic Primal Dual Hybrid Gradient
+    r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
 
     Problem: 
 
@@ -53,15 +53,15 @@ class SPDHG(Algorithm):
         Initial point for the SPDHG algorithm
     gamma : float
         parameter controlling the trade-off between the primal and dual step sizes
-    sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
-             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/len(operator)
-  
+    sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting an integer from {1,...,len(operator)}. 
+             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling with replacement and each index will have probability = 1/len(operator)
+
 
     **kwargs:
     prob : list of floats, optional, default=None
-        List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated/ 
+        List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated.
     norms : list of floats
-        precalculated list of norms of the operators. To be deprecated and placed by the `set_norms` functionalist in a BlockOperator.
+        Precalculated list of norms of the operators. To be deprecated and placed by the `set_norms` functionalist in a BlockOperator.
 
 
     Example
@@ -84,13 +84,13 @@ class SPDHG(Algorithm):
     >>> 
     >>> F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
                             for i in range(subsets)])
-                            
+
     >>> alpha = 0.025
     >>> G = alpha * TotalVariation()
     >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.sequential(len(A)),
                       initial=A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
     >>> spdhg.run(100)
-    
+
     Example
     -------
     Further examples of usage see the [CIL demos.](https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py)
@@ -100,10 +100,9 @@ class SPDHG(Algorithm):
     When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
 
     - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
-    
+
         .. math:: 
           \sigma_i=0.99 / (\|K_i\|**2)
-
 
         and `tau` is set as per case 2
 
@@ -126,7 +125,7 @@ class SPDHG(Algorithm):
     Convergence is guaranteed provided that [2, eq. (12)]:
 
     .. math:: 
-    
+
     \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
 
     References
@@ -146,20 +145,20 @@ class SPDHG(Algorithm):
                  initial=None, sampler=None, prob_weights=None,   **kwargs):
 
         max_iteration = kwargs.pop('max_iteration', 0)
-       
-        print_interval= kwargs.pop('print_interval', None)
-        log_file= kwargs.pop('log_file', None)
+
+        print_interval = kwargs.pop('print_interval', None)
+        log_file = kwargs.pop('log_file', None)
         update_objective_interval = kwargs.pop('update_objective_interval', 1)
         super(SPDHG, self).__init__(max_iteration=max_iteration,
                                     update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                     initial=initial,  sampler=sampler, prob_weights=prob_weights,  **kwargs)
-        
+
     def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
         '''set-up of the algorithm
-        
+
         Parameters
         ----------
         f : BlockFunction
@@ -178,7 +177,7 @@ class SPDHG(Algorithm):
             parameter controlling the trade-off between the primal and dual step sizes
         sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
              Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/len(operator)
-        prob_weights: (Optional) list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
+        prob_weights: list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
 
         '''
@@ -188,31 +187,31 @@ class SPDHG(Algorithm):
         self.f = f
         self.g = g
         self.operator = operator
-        
+
         if not isinstance(operator, BlockOperator):
             raise TypeError("operator should be a BlockOperator")
-        
-        self.ndual_subsets = len(self.operator)
-        self._sampler = sampler
-        
-        self.prob_weights=getattr(self._sampler, 'prob_weights', None)
-        if prob_weights is not None: 
-            if self.prob_weights is None: 
-                self.prob_weights = prob_weights
-            else:
-                 raise ValueError( 
-                    ' You passed a `prob_weights`argument and a sampler with attribute `prob_weights`, please remove the `prob_weights` argument.')
-        
-        self._deprecated_kwargs(deprecated_kwargs)
-        
-        if self.prob_weights is None:
-            self.prob_weights = [1/self.ndual_subsets]*self.ndual_subsets
-        
-        if self._sampler is None:
-            self._sampler = Sampler.random_with_replacement(len(operator), prob=self.prob_weights)
-        
-        self.norms = operator.get_norms_as_list()
 
+        self._ndual_subsets = len(self.operator)
+        self._sampler = sampler
+
+        self._prob_weights = getattr(self._sampler, 'prob_weights', None)
+        if prob_weights is not None:
+            if self._prob_weights is None:
+                self._prob_weights = prob_weights
+            else:
+                raise ValueError(
+                    ' You passed a `prob_weights` argument and a sampler with attribute `prob_weights`, please remove the `prob_weights` argument.')
+
+        self._deprecated_kwargs(deprecated_kwargs)
+
+        if self._prob_weights is None:
+            self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
+
+        if self._sampler is None:
+            self._sampler = Sampler.random_with_replacement(
+                len(operator), prob=self._prob_weights)
+
+        self._norms = operator.get_norms_as_list()
 
         self.set_step_sizes(sigma=sigma, tau=tau)
 
@@ -222,24 +221,24 @@ class SPDHG(Algorithm):
         else:
             self.x = initial.copy()
 
-        self.x_tmp = self.operator.domain_geometry().allocate(0)
+        self._x_tmp = self.operator.domain_geometry().allocate(0)
 
         # initialize dual variable to 0
-        self.y_old = operator.range_geometry().allocate(0)
+        self._y_old = operator.range_geometry().allocate(0)
 
         # initialize variable z corresponding to back-projected dual variable
-        self.z = operator.domain_geometry().allocate(0)
-        self.zbar = operator.domain_geometry().allocate(0)
+        self._z = operator.domain_geometry().allocate(0)
+        self._zbar = operator.domain_geometry().allocate(0)
         # relaxation parameter
-        self.theta = 1
+        self._theta = 1
+        
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
-
 
     def _deprecated_kwargs(self, deprecated_kwargs):
         """
         Handle deprecated keyword arguments for backward compatibility.
-        
+
         Parameters
         ----------
         deprecated_kwargs : dict
@@ -251,22 +250,20 @@ class SPDHG(Algorithm):
         """
         norms = deprecated_kwargs.pop('norms', None)
         prob = deprecated_kwargs.pop('prob', None)
-        
+
         if prob is not None:
-            if self.prob_weights is None:
+            if self._prob_weights is None:
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilites to the calculation for `sigma` and `tau` please use `prob_weights`. ')
-                self.prob_weights=prob
+                self._prob_weights = prob
             else:
-                
-                raise ValueError( 
+
+                raise ValueError(
                     '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler with a `prob_weights` property. Please give only one of the three. ')
 
-        
         if norms is not None:
             self.operator.set_norms(norms)
             warnings.warn(
                 ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
-
 
         if deprecated_kwargs:
             raise ValueError("Additional keyword arguments passed but not used: {}".format(
@@ -315,14 +312,14 @@ class SPDHG(Algorithm):
             raise ValueError(
                 "We currently only support scalar values of gamma")
 
-        self._sigma = [gamma * rho / ni for ni in self.norms]
+        self._sigma = [gamma * rho / ni for ni in self._norms]
         values = [pi / (si * ni**2) for pi, ni,
-                  si in zip(self.prob_weights, self.norms, self._sigma)]
+                  si in zip(self._prob_weights, self._norms, self._sigma)]
         self._tau = min([value for value in values if value > 1e-8])
         self._tau *= (rho / gamma)
 
     def set_step_sizes(self, sigma=None, tau=None):
-        r""" Sets sigma step-sizes for the SPDHG algorithm. The step sizes can be either scalar or array-objects.
+        r""" Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.
 
         Parameters
         ----------
@@ -338,7 +335,7 @@ class SPDHG(Algorithm):
         When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
 
         - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
-        
+
             .. math:: 
             \sigma_i=0.99 / (\|K_i\|**2)
 
@@ -361,61 +358,72 @@ class SPDHG(Algorithm):
         gamma = 1.
         rho = .99
         if sigma is not None:
-            if len(sigma) == self.ndual_subsets:
-                if all(isinstance(x, Number) and x > 0  for x in sigma):
-                        pass
+            if len(sigma) == self._ndual_subsets:
+                if all(isinstance(x, Number) and x > 0 for x in sigma):
+                    pass
                 else:
                     raise ValueError(
-                            "Sigma expected to be a positive number.")
-                
+                        "Sigma expected to be a positive number.")
+
             else:
                 raise ValueError(
                     "Please pass a list of floats to sigma with the same number of entries as number of operators")
             self._sigma = sigma
 
         elif tau is None:
-            self._sigma = [gamma * rho / ni for ni in self.norms]
+            self._sigma = [gamma * rho / ni for ni in self._norms]
         else:
             self._sigma = [
-                gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self.norms, self.prob_weights)]
+                gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self._norms, self._prob_weights)]
 
         if tau is None:
             values = [pi / (si * ni**2) for pi, ni,
-                      si in zip(self.prob_weights, self.norms, self._sigma)]
+                      si in zip(self._prob_weights, self._norms, self._sigma)]
             self._tau = min([value for value in values if value > 1e-8])
             self._tau *= (rho / gamma)
         else:
-            if isinstance(tau, Number) and  tau > 0:
+            if isinstance(tau, Number) and tau > 0:
                 pass
             else:
                 raise ValueError(
-                        "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
-            
+                    "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
+
             self._tau = tau
 
     def check_convergence(self):
-        """  Check whether convergence criterion for SPDHG is satisfied with scalar values of tau and sigma
+        """  Checks whether convergence criterion for SPDHG is satisfied with the current scalar values of tau and sigma
 
         Returns
         -------
         Boolean
-            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. N.B Convergence criterion currently can only be checked for scalar values of tau.
+            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. 
+            
+        Note
+        -----
+        Convergence criterion currently can only be checked for scalar values of tau.
+        
+        Note
+        ----
+        This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge. 
+        Alternatively, step sizes outside the convergence criterion may still allow (fast) convergence. 
         """
-        for i in range(self.ndual_subsets):
-            if isinstance(self.tau, Number) and isinstance(self._sigma[i], Number):
-                if self._sigma[i] * self._tau * self.norms[i]**2 > self.prob_weights[i]:
+        for i in range(self._ndual_subsets):
+            if isinstance(self._tau, Number) and isinstance(self._sigma[i], Number):
+                if self._sigma[i] * self._tau * self._norms[i]**2 > self._prob_weights[i]:
                     return False
                 return True
             else:
                 return False
 
-    
     def update(self):
+        """  Runs one iteration of SPDHG 
+
+        """
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self.x.sapyb(1., self.zbar,  -self.tau, out=self.x_tmp)
+        self.x.sapyb(1., self._zbar,  -self._tau, out=self._x_tmp)
 
-        self.g.proximal(self.x_tmp, self.tau, out=self.x)
+        self.g.proximal(self._x_tmp, self._tau, out=self.x)
 
         # Choose subset
         i = next(self._sampler)
@@ -425,29 +433,30 @@ class SPDHG(Algorithm):
         try:
             y_k = self.operator[i].direct(self.x)
         except IndexError:
-            raise IndexError('The sampler has outputted an index larger than the number of operators to sample from. Please ensure your sampler samples from {1,2,...,len(operator)} only.')
+            raise IndexError(
+                'The sampler has outputted an index larger than the number of operators to sample from. Please ensure your sampler samples from {1,2,...,len(operator)} only.')
 
-        y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
+        y_k.sapyb(self._sigma[i], self._y_old[i], 1., out=y_k)
 
-        y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
+        y_k = self.f[i].proximal_conjugate(y_k, self._sigma[i])
 
         # Back-project
         # x_tmp = K[i]^*(y_k - y_old[i])
-        y_k.subtract(self.y_old[i], out=self.y_old[i])
+        y_k.subtract(self._y_old[i], out=self._y_old[i])
 
-        self.operator[i].adjoint(self.y_old[i], out=self.x_tmp)
+        self.operator[i].adjoint(self._y_old[i], out=self._x_tmp)
         # Update backprojected dual variable and extrapolate
         # zbar = z + (1 + theta/p[i]) x_tmp
 
         # z = z + x_tmp
-        self.z.add(self.x_tmp, out=self.z)
+        self._z.add(self._x_tmp, out=self._z)
         # zbar = z + (theta/p[i]) * x_tmp
 
-        self.z.sapyb(1., self.x_tmp, self.theta /
-                     self.prob_weights[i], out=self.zbar)
+        self._z.sapyb(1., self._x_tmp, self._theta /
+                     self._prob_weights[i], out=self._zbar)
 
         # save previous iteration
-        self.save_previous_iteration(i, y_k)
+        self._save_previous_iteration(i, y_k)
 
     def update_objective(self):
         # p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
@@ -456,8 +465,8 @@ class SPDHG(Algorithm):
             p1 += self.f[i](op.direct(self.x))
         p1 += self.g(self.x)
 
-        d1 = - self.f.convex_conjugate(self.y_old)
-        tmp = self.operator.adjoint(self.y_old)
+        d1 = - self.f.convex_conjugate(self._y_old)
+        tmp = self.operator.adjoint(self._y_old)
         tmp *= -1
         d1 -= self.g.convex_conjugate(tmp)
 
@@ -465,16 +474,35 @@ class SPDHG(Algorithm):
 
     @property
     def objective(self):
-        '''alias of loss'''
+        '''The saved primal objectives. 
+        Returns
+        -------
+        list
+            The saved primal objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. 
+        '''
         return [x[0] for x in self.loss]
 
     @property
     def dual_objective(self):
+        '''The saved dual objectives. 
+        Returns
+        -------
+        list
+            The saved dual objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. 
+        '''
         return [x[1] for x in self.loss]
 
     @property
     def primal_dual_gap(self):
+        '''The saved primal-dual gap. 
+        Returns
+        -------
+        list
+            The saved primal dual gap from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. 
+        '''
         return [x[2] for x in self.loss]
 
-    def save_previous_iteration(self, index, y_current):
-        self.y_old[index].fill(y_current)
+    def _save_previous_iteration(self, index, y_current):
+        ''' Internal function used to save the previous iteration 
+        '''
+        self._y_old[index].fill(y_current)

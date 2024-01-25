@@ -664,7 +664,6 @@ class SamplerRandom(Sampler):
         self._sampling_list = None
         self._replace = replace
 
-
         super(SamplerRandom, self).__init__(num_indices, self._function,
                                             sampling_type=sampling_type, prob_weights=prob)
 
@@ -718,4 +717,3 @@ class SamplerRandom(Sampler):
         repres = super().__str__()
         repres += "Seed : {} \n".format(self._seed)
         return repres
-

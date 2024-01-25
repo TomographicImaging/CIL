@@ -806,17 +806,17 @@ class TestSPDHG(CCPiTestClass):
         rho = .99
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
 
-        self.assertListEqual(spdhg.norms, [self.A.get_item(i, 0).norm()
+        self.assertListEqual(spdhg._norms, [self.A.get_item(i, 0).norm()
                                            for i in range(self.subsets)])
-        self.assertListEqual(spdhg.prob_weights, [
+        self.assertListEqual(spdhg._prob_weights, [
                              1/self.subsets] * self.subsets)
         self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
         self.assertListEqual(
-            spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)])*(rho / gamma))
         self.assertNumpyArrayEqual(
-            spdhg.x.array, self.A.domain_geometry().allocate(0).array)
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
         self.assertEqual(spdhg.max_iteration, 0)
         self.assertEqual(spdhg.update_objective_interval, 1)
 
@@ -824,17 +824,17 @@ class TestSPDHG(CCPiTestClass):
         rho = 5.6
         spdhg.set_step_sizes_from_ratio(gamma, rho)
         self.assertListEqual(
-            spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)])*(rho / gamma))
 
         gamma = 1.
         rho = .99
         spdhg.set_step_sizes()
         self.assertListEqual(
-            spdhg.sigma, [gamma * rho / ni for ni in spdhg.norms])
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
         self.assertEqual(spdhg.tau, min([pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)])*(rho / gamma))
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)])*(rho / gamma))
 
         spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
@@ -843,31 +843,31 @@ class TestSPDHG(CCPiTestClass):
         spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, min([(pi / (si * ni**2))*(rho / gamma) for pi, ni,
-                                         si in zip(spdhg.prob_weights, spdhg.norms, spdhg.sigma)]))
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
 
         spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertListEqual(spdhg.sigma, [
-                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg.norms, spdhg.prob_weights)])
+                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
         self.assertEqual(spdhg.tau, 100)
 
     def test_spdhg_non_default_init(self):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)),
                       initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
 
-        self.assertListEqual(spdhg.prob_weights,  list(np.arange(1, 11)/55.))
+        self.assertListEqual(spdhg._prob_weights,  list(np.arange(1, 11)/55.))
         self.assertNumpyArrayEqual(
-            spdhg.x.array, self.A.domain_geometry().allocate(1).array)
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(1).as_array())
         self.assertEqual(spdhg.max_iteration, 1000)
         self.assertEqual(spdhg.update_objective_interval, 10)
         
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[1]*len(self.A), prob_weights=[1/(self.subsets-1)]*(
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, _norms=[1]*len(self.A), prob_weights=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
             
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob_weights=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0],  initial=self.A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
         
-        self.assertListEqual(spdhg.prob_weights,  [1/(self.subsets-1)]*(self.subsets-1)+[0])     
+        self.assertListEqual(spdhg._prob_weights,  [1/(self.subsets-1)]*(self.subsets-1)+[0])     
         self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
         
         
@@ -882,23 +882,23 @@ class TestSPDHG(CCPiTestClass):
                       1]*len(self.A), prob=[1/(self.subsets-1)]*(self.subsets-1)+[0])
 
         self.assertListEqual(self.A.get_norms_as_list(), [1]*len(self.A))
-        self.assertListEqual(spdhg.norms, [1]*len(self.A))
+        self.assertListEqual(spdhg._norms, [1]*len(self.A))
         self.assertListEqual(spdhg._sampler.prob_weights, [
                              1/(self.subsets-1)]*(self.subsets-1)+[0])
-        self.assertListEqual(spdhg.prob_weights, [
+        self.assertListEqual(spdhg._prob_weights, [
                              1/(self.subsets-1)]*(self.subsets-1)+[0])
 
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, _norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
             
             
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, _norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], prob_weights= [1/(self.subsets-1)]*(self.subsets-1)+[0])
 
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  norms=[
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  _norms=[
                           1]*len(self.A), sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
 
 
@@ -906,7 +906,7 @@ class TestSPDHG(CCPiTestClass):
 
         self.A2.set_norms([1]*len(self.A2))
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A2)
-        self.assertListEqual(spdhg.norms, [1]*len(self.A2))
+        self.assertListEqual(spdhg._norms, [1]*len(self.A2))
 
     def test_spdhg_check_convergence(self):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)

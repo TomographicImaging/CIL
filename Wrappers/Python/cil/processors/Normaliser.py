@@ -28,9 +28,20 @@ class Normaliser(Processor):
     the instrument reading with and without incident photons or neutrons.
     
     Input: AcquisitionData
-    Parameter: 2D projection with flat field (or stack)
-               2D projection with dark field (or stack)
-    Output: AcquisitionDataSetn
+    Parameters
+    ----------
+    flat_field : DataContainer or numpy array, optional
+        2D projection (or stack) of flat field data
+    dark_field : DataContainer or numpy array, optional
+        2D projection (or stack) of dark field data
+    tolerance: float,
+        Small number to prevent division by zero
+    
+    Returns
+    -------
+    AcquisitionData
+        Normalised AcquisitionData
+
     '''
     
     def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
@@ -59,20 +70,28 @@ class Normaliser(Processor):
     def set_dark_field(self, df):
         if type(df) is numpy.ndarray:
             if len(numpy.shape(df)) == 3:
-                raise ValueError('Dark Field should be 2D')
+                # TO DO: if only 2 projections - linear interpolation
+                self.dark_field = numpy.mean(df, axis = 0)
             elif len(numpy.shape(df)) == 2:
                 self.dark_field = df
         elif issubclass(type(df), DataContainer):
-            self.dark_field = self.set_dark_field(df.as_array())
+            if 'angle' in df.dimension_labels:
+                self.flat_field = df.mean(axis = 'angle')
+            else:
+                self.dark_field = self.set_dark_field(df.as_array())
     
     def set_flat_field(self, df):
         if type(df) is numpy.ndarray:
             if len(numpy.shape(df)) == 3:
-                raise ValueError('Flat Field should be 2D')
+                # TO DO: if only 2 projections - linear interpolation
+                self.flat_field = numpy.mean(df, axis = 0)
             elif len(numpy.shape(df)) == 2:
                 self.flat_field = df
         elif issubclass(type(df), DataContainer):
-            self.flat_field = self.set_flat_field(df.as_array())
+            if 'angle' in df.dimension_labels:
+                self.flat_field = df.mean(axis = 'angle')
+            else:
+                self.flat_field = self.set_flat_field(df.as_array())
     
     @staticmethod
     def Normalise_projection(projection, flat, dark, tolerance):

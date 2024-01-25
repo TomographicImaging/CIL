@@ -30,7 +30,7 @@ from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
+from cil.processors import Slicer, Binner, MaskGenerator, Normaliser, Masker, Padder
 import gc
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
@@ -2408,6 +2408,20 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((200,200), dtype=bool)
         mask_manual[7,4] = 0
         numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+class TestNormaliser(unittest.TestCase):       
+   
+    def test_Normaliser(self): 
+        np_arr = numpy.array([[[1,1],[1,1]],[[1,1],[1,1]],[[1,1],[1,1]]], dtype=numpy.float32)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=3)).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(np_arr)
+        df = numpy.array([[[0,0],[0,0]],[[0,0],[0,0]]], dtype=numpy.float32)
+        ff = numpy.array([[[1,1],[1,0]],[[1,1],[1,0]]], dtype=numpy.float32)
+        tolerance = 1e-5
+        proc = Normaliser(ff, df, tolerance = tolerance)(ad)
+        self.assertEqual(proc.array.all(), numpy.array([[[1,1],[1,tolerance]],[[1,1],[1,tolerance]],[[1,1],[1,tolerance]]], dtype=numpy.float32).all())
+
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 

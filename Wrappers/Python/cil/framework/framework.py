@@ -3763,6 +3763,10 @@ class AcquisitionData(DataContainer, Partitioner):
                  array = None, 
                  deep_copy=True, 
                  geometry = None,
+                 dark = None,
+                 dark_geometry = None,
+                 flat = None,
+                 flat_geometry = None,
                  **kwargs):
 
         dtype = kwargs.get('dtype', numpy.float32)
@@ -3782,9 +3786,54 @@ class AcquisitionData(DataContainer, Partitioner):
             pass
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-            
+                    
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
+        
+        if dark is None:
+            dark = numpy.zeros(geometry.shape, dtype=dtype)
+        elif issubclass(type(dark) , DataContainer):
+            dark = dark.as_array()
+        elif issubclass(type(dark) , numpy.ndarray):
+            pass
+        else:
+            raise TypeError('dark must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(dark)))
+
+        if flat is None:
+            flat = numpy.ones(geometry.shape, dtype=dtype)
+        elif issubclass(type(flat) , DataContainer):
+            flat = flat.as_array()
+        elif issubclass(type(flat) , numpy.ndarray):
+            pass
+        else:
+            raise TypeError('flat must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(flat)))
+        
+        if dark.shape != flat.shape:
+            raise ValueError('dark and flat shape must be the same, got {} and {}'.format(dark.shape, flat.shape))
+        
+        if dark_geometry is None:
+            if dark.shape == array.shape:
+                dark_geometry = geometry
+            elif dark.shape == (geometry.pixel_num_v, geometry.pixel_num_h):
+                dark_geometry = geometry.copy()
+                dark_geometry.set_angles(0).set_panel((geometry.pixel_num_h, geometry.pixel_num_v))
+            else: 
+                raise AttributeError("dark requires dark_geometry unless the size matches data")
+        elif dark.shape != dark_geometry.shape:
+            raise ValueError('Dark array shape mismatch, got {} expected {}'.format(flat.shape, flat_geometry.shape))
+        elif (dark_geometry.pixel_num_v, dark_geometry.pixel_num_h) != (geometry.pixel_num_v, geometry.pixel_num_h):
+            raise ValueError(('dark_geometry detector shape mismatch, got ({},{}) expected ({},{})'.format(dark_geometry.pixel_num_v, dark_geometry.pixel_num_h, geometry.pixel_num_v, geometry.pixel_num_h)))
+            
+        if flat_geometry is None:
+            if flat.shape == array.shape:
+                flat_geometry = geometry
+            elif flat.shape == (geometry.pixel_num_v, geometry.pixel_num_h):
+                flat_geometry = geometry.copy()
+                flat_geometry.set_angles(0).set_panel((geometry.pixel_num_h, geometry.pixel_num_v))
+            else:
+                raise AttributeError("flat requires flat_geometry unless the size matches data")
+        elif flat.shape != flat_geometry.shape:
+            raise ValueError('Flat array shape mismatch, got {} expected {}'.format(flat.shape, flat_geometry.shape))
     
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
   

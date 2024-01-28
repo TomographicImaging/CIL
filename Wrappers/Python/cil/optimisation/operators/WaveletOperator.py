@@ -215,9 +215,9 @@ class WaveletOperator(LinearOperator):
             out.fill(x[org_size])
         
     def calculate_norm(self):
-        orthWavelets = pywt.wavelist(family=None, kind="discrete")
-        if self.wname in orthWavelets:
+        wavelet = pywt.Wavelet(self.wname)
+        if wavelet.orthogonal:
             norm = 1.0
         else:
-            raise AttributeError(f"Unkown wavelet: {self.wname}! Norm not known.")
+            norm = LinearOperator.calculate_norm(self)
         return norm

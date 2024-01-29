@@ -80,9 +80,9 @@ class WaveletOperator(LinearOperator):
         if axes is None and len(domain_geometry.shape) > 1:
             if self.correlation in [None, 'All']:
                 axes = None
-            elif self.correlation in ["Space", "Spatial"]:
+            elif self.correlation.lower() in ["space", "spatial"]:
                 axes = [i for i,l in enumerate(domain_geometry.dimension_labels) if l != 'channel']
-            elif self.correlation in ["Channels", "Channel"]:
+            elif self.correlation.lower() in ["channels", "channel"]:
                 axes = [i for i,l in enumerate(domain_geometry.dimension_labels) if l == 'channel']
             else:
                 raise AttributeError(f"Unknown correlation type: '{self.correlation}'")
@@ -140,7 +140,7 @@ class WaveletOperator(LinearOperator):
             else:
                 raise AttributeError(f"Spatial dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")
             
-        elif range_geometry.shape != range_shape:
+        elif (range_geometry.shape != range_shape).any():
             raise AttributeError(f"Size of the range geometry is {range_geometry.shape} but the size of the wavelet coefficient array must be {tuple(range_shape)}.")
                     
         super().__init__(domain_geometry=domain_geometry, range_geometry=range_geometry)

@@ -33,8 +33,7 @@ class ProgressCallback(Callback):
     ''':code:`tqdm`-based progress bar.'''
     def __init__(self, verbose=1, tqdm_class=tqdm_auto, **tqdm_kwargs):
         '''
-        :param tqdm_kwargs: passed to :code:`tqdm_class`
-          (e.g. :code:`file=some_logfile`).
+        :param tqdm_kwargs: passed to :code:`tqdm_class`.
         '''
         super().__init__(verbose=verbose)
         self.tqdm_class = tqdm_class
@@ -62,7 +61,7 @@ class _TqdmText(tqdm_std):
         fp_flush = getattr(file, 'flush', lambda: None)
 
         def fp_write(s):
-            file.write(str(s))
+            file.write(f"{s}\n")
             fp_flush()
 
         return fp_write
@@ -77,7 +76,7 @@ class TextProgressCallback(ProgressCallback):
 
 class LogfileCallback(TextProgressCallback):
     ''':code:`TextProgressCallback` but to a file instead of screen.'''
-    def __init__(self, log_file=None, mode='a', **kwargs):
+    def __init__(self, log_file, mode='a', **kwargs):
         """
         :param log_file: passed to :code:`open()`.
         :param mode: passed to :code:`open()`.

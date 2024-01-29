@@ -50,10 +50,8 @@ class ProgressCallback(Callback):
 
 
 class _TqdmText(tqdm_std):
-    ''':code:`tqdm`-based progress but text-only updates on separate lines.'''
-    def __init__(self, *args, mininterval=1, position=0, **kwargs):
-        """:param miniterval: approximate number of seconds between updates."""
-        super().__init__(*args, mininterval=mininterval, position=position, **kwargs)
+    def __init__(self, *args, mininterval=5, bar_format="{l_bar}{r_bar}", position=0, **kwargs):
+        super().__init__(*args, mininterval=mininterval, bar_format=bar_format, position=position, **kwargs)
         self._instances.remove(self)  # don't interfere with external progress bars
 
     @staticmethod

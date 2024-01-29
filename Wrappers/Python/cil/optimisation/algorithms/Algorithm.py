@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -23,6 +22,7 @@ from warnings import warn
 
 import numpy as np
 from tqdm.auto import tqdm as tqdm_auto
+from tqdm.std import tqdm as tqdm_std
 
 
 class Callback(ABC):
@@ -71,11 +71,34 @@ class ProgressCallback(Callback):
 
 
 class LogfileCallback(ProgressCallback):
-    ''':code:`ProgressCallback` but to a file instead of screen'''
+    ''':code:`ProgressCallback` but to a file instead of screen.'''
     def __init__(self, log_file=None, mode='a', mininterval=5, **kwargs):
         """:param miniterval: approximate number of seconds between updates."""
         self.fd = open(log_file, mode=mode)
         super().__init__(file=self.fd, mininterval=mininterval, **kwargs)
+
+
+class TqdmText(tqdm_std):
+    ''':code:`tqdm`-based progress but text-only updates on separate lines.'''
+    def __init__(self, *args, mininterval=1, position=0, **kwargs):
+        """:param miniterval: approximate number of seconds between updates."""
+        super().__init__(*args, mininterval=mininterval, position=position, **kwargs)
+        self._instances.remove(self)  # don't interfere with external progress bars
+    @staticmethod
+    def status_printer(file):
+        fp_flush = getattr(file, 'flush', lambda: None)
+
+        def fp_write(s):
+            file.write(str(s))
+            fp_flush()
+
+        return fp_write
+
+
+class TextProgressCallback(ProgressCallback):
+    ''':code:`ProgressCallback` but printed on separate lines to screen.'''
+    def __init__(self, tqdm_class=TqdmText, **kwargs):
+        super().__init__(tqdm_class=tqdm_class, **kwargs)
 
 
 class Algorithm:
@@ -259,10 +282,10 @@ class Algorithm:
         self.__update_objective_interval = value
 
     def run(self, iterations=None, callbacks: Optional[list[Callback]]=None, verbose=1, **kwargs):
-        '''run n iterations and update the user with the callback if specified
+        '''run upto :code:`iterations` with callbacks/logging.
 
         :param iterations: number of iterations to run. If not set the algorithm will
-          run until max_iteration or until stop criterion is reached
+          run until :code:`max_iteration` or until stop criterion is reached
         :param verbose: 0=quiet, 1=info, 2=debug
         :param callbacks: list of callables which are passed the current Algorithm
           object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.

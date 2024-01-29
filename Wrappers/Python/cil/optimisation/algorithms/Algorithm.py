@@ -21,7 +21,7 @@ from warnings import warn
 
 import numpy as np
 
-from cil.utilities.callbacks import Callback, LogfileCallback, OldCallback, ProgressCallback
+from cil.utilities.callbacks import Callback, LogfileCallback, _OldCallback, ProgressCallback
 
 
 class Algorithm:
@@ -220,7 +220,7 @@ class Algorithm:
         # transform old-style callbacks into new
         callback = kwargs.get('callback', None)
         if callback is not None:
-            callbacks.append(OldCallback(callback, verbose=very_verbose))
+            callbacks.append(_OldCallback(callback, verbose=very_verbose))
         if hasattr(self, '__log_file'):
             callbacks.append(LogfileCallback(self.__log_file, verbose=verbose))
 

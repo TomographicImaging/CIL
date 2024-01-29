@@ -21,7 +21,7 @@ class Callback(ABC):
         pass
 
 
-class OldCallback(Callback):
+class _OldCallback(Callback):
     '''Converts an old-style :code:`def callback` to a new-style :code:`class Callback`.
 
     Parameters

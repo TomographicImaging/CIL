@@ -23,7 +23,7 @@ from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
 from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, DataContainer
+    VectorGeometry, VectorData, BlockDataContainer, DataContainer, AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -31,8 +31,8 @@ from cil.optimisation.operators import GradientOperator
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
-                                         Rosenbrock, IndicatorBox, TotalVariation, \
-                                         WeightedL2NormSquared
+                                         Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -96,6 +96,8 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
+
+    
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         numpy.random.seed(1)
@@ -1103,7 +1105,142 @@ class TestFunction(CCPiTestClass):
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 
+    def test_in_place(self):
 
+        ag = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
+
+        #default
+        ag.set_angles(angles)
+        ag.set_panel(5)
+
+        ig = ag.get_ImageGeometry()
+
+        scalar=4
+
+        b = ag.allocate('random', seed=2)
+        weight_ls=ig.allocate('random', seed=2)
+
+        numpy.random.seed(1)
+
+        A = IdentityOperator(ig)
+        b_ig = ig.allocate('random')
+        c = numpy.float64(0.3)
+        bg = BlockGeometry(ig, ig)
+        vg = VectorGeometry(11)
+ 
+        func_geom_test_list = [
+            (IndicatorBox(), ag),
+            (KullbackLeibler(b=b, backend='numba'), ag),
+            (KullbackLeibler(b=b, backend='numpy'), ag),
+            (L1Norm(), ag),
+            (TranslateFunction(L1Norm(), b), ag),
+            (L2NormSquared(), ag),
+            (scalar * L2NormSquared(), ag),
+            (SumFunction(L2NormSquared(),scalar * L2NormSquared()), ag),
+            (SumScalarFunction(L2NormSquared(),3), ag),
+            (ConstantFunction(3), ag),
+            (ZeroFunction(), ag),
+            (Rosenbrock(3,4), vg),
+            ( L2NormSquared(b=b), ag),
+            ( L2NormSquared(), ag),
+            (LeastSquares(A, b_ig, c, weight_ls), ig),
+            (LeastSquares(A, b_ig, c), ig),
+            (WeightedL2NormSquared(weight=b_ig),ig),
+            (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
+            (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
+            (OperatorCompositionFunction(L2NormSquared(), A), ig),
+            (MixedL21Norm(), bg),
+            (SmoothMixedL21Norm( epsilon=0.3), bg),
+            (MixedL11Norm(), bg)
+            
+        ]
+        error_list=[]
+        for func, geom in func_geom_test_list:
+            try:
+                self.functions_in_place(func, geom)
+            except AssertionError as e:
+                error_list.append(e)
+                
+        if len(error_list)!=0:
+            error_string=''
+            for i in range(len(error_list)):
+                error_string+= str(error_list[i])+'\n'
+            raise AssertionError(error_string)
+            
+    def functions_in_place(self, func, geom):
+        error_list=[]
+        data=geom.allocate('random')
+        if hasattr(func, "proximal_conjugate"):
+            try:
+                out = func.proximal_conjugate(data, tau=1)
+                out2=geom.allocate('random')
+                func.proximal_conjugate(data, tau=1, out=out2)
+                out3 = data.copy()
+                func.proximal_conjugate(out3, tau=1,   out=out3)
+                try:
+                    if isinstance(geom, BlockGeometry):
+                        for i in range(len(geom.geometries)):
+                            numpy.testing.assert_array_almost_equal(out[i].as_array(), out2[i].as_array(),err_msg='Failed for case  func.proximal_conjugate(data, tau=1.,  out=out) where operator is ' +func.__class__.__name__ )
+                            numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  func.proximal_conjugate(data, tau=1.,  out=data) where operator is ' +func.__class__.__name__ )
+                    else:
+                        numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(),err_msg='Failed for case  func.proximal_conjugate(data, tau=1.,  out=out) where operator is ' +func.__class__.__name__ )
+                        numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  func.proximal_conjugate(data, tau=1.,  out=data) where operator is ' +func.__class__.__name__ )
+                except AssertionError as e:
+                    error_list.append(e)
+                        
+            except NotImplementedError:
+                pass
+        
+        
+        if hasattr(func, "proximal"):
+            try:
+                out = func.proximal(data, tau=1)
+                out2=geom.allocate('random')
+                func.proximal(data, tau=1, out=out2)
+                out3 = data.copy()
+                func.proximal(out3, tau=1,  out=out3)
+                try:
+                    if isinstance(geom, BlockGeometry):
+                        for i in range(len(geom.geometries)):
+                            numpy.testing.assert_array_almost_equal(out[i].as_array(), out2[i].as_array(),err_msg='Failed for case  func.proximal(data, tau=1.,  out=out) where operator is ' +func.__class__.__name__ )
+                            numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  func.proximal(data, tau=1.,  out=data) where operator is ' +func.__class__.__name__ )
+        
+                    else:
+                        numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(),err_msg='Failed for case  func.proximal(data, tau=1.,  out=out) where operator is ' +func.__class__.__name__ )
+                        numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  func.proximal(data, tau=1.,  out=data) where operator is ' +func.__class__.__name__ )
+                except AssertionError as e: 
+                    error_list.append(e)
+            except NotImplementedError:
+                pass
+        
+        if hasattr(func, "gradient"):
+            if (not isinstance(func, TotalVariation)) and (not isinstance(func, IndicatorBox)):
+                try:
+                    out = func.gradient(data)
+                    out2=geom.allocate('random')
+                    func.gradient(data, out=out2)
+                    out3 = data.copy()
+                    func.gradient(out3,  out=out3)
+                    try:
+                        if isinstance(geom, BlockGeometry):
+                            for i in range(len(geom.geometries)):
+                                numpy.testing.assert_array_almost_equal(out[i].as_array(), out2[i].as_array(),err_msg='Failed for case  func.gradient(data, tau=1.,  out=out) where operator is ' +func.__class__.__name__ )
+                                numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  func.gradient(data, tau=1.,  out=data) where operator is ' +func.__class__.__name__ )
+                        else:
+                            numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(),err_msg='Failed for case  func.gradient(data, tau=1.,  out=out) where operator is ' +func.__class__.__name__ )
+                            numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  func.gradient(data, tau=1.,  out=data) where operator is ' +func.__class__.__name__ )
+                    except AssertionError as e: 
+                        error_list.append(e)
+                except NotImplementedError:
+                    pass
+        if len(error_list)!=0:
+            error_string=''
+            for i in range(len(error_list)):
+                error_string+= str(error_list[i])+'\n'
+            raise AssertionError(error_string)
+        
+        
 class TestTotalVariation(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -2008,3 +2145,6 @@ class TestIndicatorBox(unittest.TestCase):
             N = 10
             ib.set_num_threads(N)
             assert ib.num_threads == N
+
+
+    

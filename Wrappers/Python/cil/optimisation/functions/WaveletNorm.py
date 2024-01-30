@@ -117,9 +117,6 @@ class WaveletNorm(Function):
                             
         """  
         y = self.W.direct(x)
-        y = self.l1norm.proximal(y, tau)
-        if out is None:
-            return self.W.adjoint(y)
-        else:
-            self.W.adjoint(y, out=out)
+        self.l1norm.proximal(y, tau, out=y)
+        self.W.adjoint(y, out)
 

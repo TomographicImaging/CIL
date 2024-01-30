@@ -215,6 +215,9 @@ class Algorithm:
         '''
         very_verbose = verbose>=2
 
+        if 'print_interval' in kwargs:
+            warn("use `TextProgressCallback(miniters)` instead of `run(print_interval)`",
+                 DeprecationWarning, stacklevel=2)
         if callbacks is None:
             callbacks = [ProgressCallback(verbose=verbose)]
         # transform old-style callbacks into new

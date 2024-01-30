@@ -1,5 +1,5 @@
-
 from abc import ABC, abstractmethod
+from functools import partialmethod
 
 from tqdm.auto import tqdm as tqdm_auto
 from tqdm.std import tqdm as tqdm_std
@@ -66,11 +66,11 @@ class _TqdmText(tqdm_std):
 
     Parameters
     ----------
-    miniterval: float, default 5
-        Approximate number of seconds between updates.
+    bar_format: str
+        Passed to :code:`tqdm`.
     '''
-    def __init__(self, *args, mininterval=5, bar_format="{l_bar}{r_bar}", position=0, **kwargs):
-        super().__init__(*args, mininterval=mininterval, bar_format=bar_format, position=position, **kwargs)
+    def __init__(self, *args, bar_format="{l_bar}{r_bar}", **kwargs):
+        super().__init__(*args, bar_format=bar_format, mininterval=0, maxinterval=0, position=0, **kwargs)
         self._instances.remove(self)  # don't interfere with external progress bars
 
     @staticmethod
@@ -89,11 +89,17 @@ class TextProgressCallback(ProgressCallback):
 
     Parameters
     ----------
-    miniterval: float, default 5
-        Approximate number of seconds between updates.
+    miniters: int, default :code:`Algorithm.update_objective_interval`
+        Number of algorithm iterations between screen prints.
     '''
-    def __init__(self, tqdm_class=_TqdmText, **kwargs):
-        super().__init__(tqdm_class=tqdm_class, **kwargs)
+    __init__ = partialmethod(ProgressCallback.__init__, tqdm_class=_TqdmText)
+
+    def __call__(self, algorithm):
+        if not hasattr(self, 'pbar'):
+            self.tqdm_kwargs['miniters'] = min((
+                self.tqdm_kwargs.get('miniters', algorithm.update_objective_interval),
+                algorithm.update_objective_interval))
+        return super().__call__(algorithm)
 
 
 class LogfileCallback(TextProgressCallback):

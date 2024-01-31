@@ -34,7 +34,7 @@ class _OldCallback(Callback):
 
     def __call__(self, algorithm):
         if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
-            self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose), algorithm.x)
+            self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose>=2), algorithm.x)
 
 
 class ProgressCallback(Callback):

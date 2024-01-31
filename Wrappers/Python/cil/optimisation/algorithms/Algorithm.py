@@ -213,8 +213,6 @@ class Algorithm:
         :param callbacks: list of callables which are passed the current Algorithm
           object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
         '''
-        very_verbose = verbose>=2
-
         if 'print_interval' in kwargs:
             warn("use `TextProgressCallback(miniters)` instead of `run(print_interval)`",
                  DeprecationWarning, stacklevel=2)
@@ -223,7 +221,7 @@ class Algorithm:
         # transform old-style callbacks into new
         callback = kwargs.get('callback', None)
         if callback is not None:
-            callbacks.append(_OldCallback(callback, verbose=very_verbose))
+            callbacks.append(_OldCallback(callback, verbose=verbose))
         if hasattr(self, '__log_file'):
             callbacks.append(LogfileCallback(self.__log_file, verbose=verbose))
 

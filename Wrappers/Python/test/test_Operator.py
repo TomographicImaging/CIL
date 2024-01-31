@@ -34,6 +34,7 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
+from cil.utilities.errors import InPlaceError
 
 
 initialise_tests()
@@ -159,17 +160,21 @@ class TestOperator(CCPiTestClass):
         
         if in_out_same:
             out3 = data.copy()
-            operator.direct(out3,  out=out3)
             try:
-                if isinstance(output_geom, BlockGeometry):
-                    for i in range(len(output_geom.geometries)):
-                        numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  operator.direct(data,  out=data) where operator is ' +operator.__class__.__name__  )
-                else:
-                    numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  operator.direct(data,  out=data) where operator is ' +operator.__class__.__name__  )
+                operator.direct(out3,  out=out3)
             
-            except AssertionError as e: 
-                error_list.append(e)  
+                try:
+                    if isinstance(output_geom, BlockGeometry):
+                        for i in range(len(output_geom.geometries)):
+                            numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  operator.direct(data,  out=data) where operator is ' +operator.__class__.__name__  )
+                    else:
+                        numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  operator.direct(data,  out=data) where operator is ' +operator.__class__.__name__  )
                 
+                except AssertionError as e: 
+                    error_list.append(e)  
+            except InPlaceError: 
+                        pass 
+                    
         data=output_geom.allocate('random')
         out = operator.adjoint(data)
         out2=input_geom.allocate('random')
@@ -179,24 +184,28 @@ class TestOperator(CCPiTestClass):
             if isinstance(input_geom, BlockGeometry):
                     for i in range(len(input_geom.geometries)):
                         numpy.testing.assert_array_almost_equal(out[i].as_array(), out2[i].as_array(), err_msg='Failed for case  operator.adjoint(data,  out=out) where operator is ' +operator.__class__.__name__ )
-                else:
-                    numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(), err_msg='Failed for case  operator.adjoint(data,  out=out) where operator is ' +operator.__class__.__name__ )
+            else:
+                numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(), err_msg='Failed for case  operator.adjoint(data,  out=out) where operator is ' +operator.__class__.__name__ )
         except AssertionError as e: 
                 error_list.append(e)  
             
         if in_out_same:
             out3 = data.copy()
-            operator.adjoint(out3,  out=out3)
             try:
-                if isinstance(input_geom, BlockGeometry):
-                        for i in range(len(input_geom.geometries)):
-                            numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  operator.adjoint(data,  out=data) where operator is ' +operator.__class__.__name__  )
-                else:
-                        numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  operator.adjoint(data,  out=data) where operator is ' +operator.__class__.__name__  )
+                operator.adjoint(out3,  out=out3)
             
-            except AssertionError as e: 
-                error_list.append(e)      
-            
+                try:
+                    if isinstance(input_geom, BlockGeometry):
+                            for i in range(len(input_geom.geometries)):
+                                numpy.testing.assert_array_almost_equal(out[i].as_array(), out3[i].as_array(),err_msg='Failed for case  operator.adjoint(data,  out=data) where operator is ' +operator.__class__.__name__  )
+                    else:
+                            numpy.testing.assert_array_almost_equal(out.as_array(), out3.as_array(),err_msg='Failed for case  operator.adjoint(data,  out=data) where operator is ' +operator.__class__.__name__  )
+                
+                except AssertionError as e: 
+                    error_list.append(e)      
+            except InPlaceError: 
+                        pass 
+                    
         if len(error_list)!=0:
             error_string=''
             for i in range(len(error_list)):

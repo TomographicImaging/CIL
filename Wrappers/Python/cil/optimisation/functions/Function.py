@@ -22,6 +22,7 @@ import warnings
 from numbers import Number
 import numpy as np
 from functools import reduce
+from cil.utilities.errors import InPlaceError
 
 class Function(object):
     
@@ -85,6 +86,8 @@ class Function(object):
         .. math:: \text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)
                 
         """
+        if id(x)==id(out):
+            raise InPlaceError
         try:
             tmp = x
             x.divide(tau, out = tmp)

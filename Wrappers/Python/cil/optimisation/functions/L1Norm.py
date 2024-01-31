@@ -39,6 +39,12 @@ def soft_shrinkage(x, tau, out=None):
     """
 
     should_return = False
+    # get the sign of the input
+    if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
+        dsign = np.exp(1j*np.angle(x.as_array()))
+    else:
+        dsign = x.sign()
+ 
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             out = x * 0
@@ -58,15 +64,10 @@ def soft_shrinkage(x, tau, out=None):
             x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
-    if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-        out *= np.exp(1j*np.angle(x.as_array()))
-        
-    else:
-        out *= x.sign()
+    out *= dsign
     
-
     if should_return:
-        return out        
+        return out              
 
 class L1Norm(Function):
     r"""L1Norm function

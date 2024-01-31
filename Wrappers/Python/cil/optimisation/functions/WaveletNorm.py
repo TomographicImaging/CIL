@@ -20,6 +20,7 @@
 from cil.optimisation.functions import Function, L1Norm, soft_shrinkage
 
 import numpy as np
+import pywt
 ###############################################################################
 ###############################################################################
 ####################### L1-norm of Wavelet Coefficients #######################
@@ -49,6 +50,9 @@ class WaveletNorm(Function):
         [OPTIONAL PARAMETERS]
         :param weight: weight array matching the size of the wavelet coefficients
         '''
+        if not pywt.Wavelet(W.wname).orthogonal:
+            raise AttributeError(f"Invalid wavelet: `{W.wname}`. WaveletNorm is only defined for orthogonal wavelets!")
+
         super(WaveletNorm, self).__init__()
         self.W = W
         

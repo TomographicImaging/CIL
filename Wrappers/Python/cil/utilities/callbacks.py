@@ -69,7 +69,7 @@ class _TqdmText(tqdm_std):
     bar_format: str
         Passed to :code:`tqdm`.
     '''
-    def __init__(self, *args, bar_format="{l_bar}{r_bar}", **kwargs):
+    def __init__(self, *args, bar_format="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
         super().__init__(*args, bar_format=bar_format, mininterval=0, maxinterval=0, position=0, **kwargs)
         self._instances.remove(self)  # don't interfere with external progress bars
 

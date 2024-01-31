@@ -86,7 +86,7 @@ class Function(object):
         .. math:: \text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)
                 
         """
-        if id(x)==id(out):
+        if out is not None and id(x)==id(out):
             raise InPlaceError
         try:
             tmp = x
@@ -292,6 +292,8 @@ class SumFunction(Function):
         .. math:: (F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)
         
         """
+        if out is not None and id(x)==id(out):
+            raise InPlaceError
         
         if out is None:            
             for i,f in enumerate(self.functions):
@@ -427,6 +429,9 @@ class ScaledFunction(Function):
     def proximal_conjugate(self, x, tau, out = None):
         r"""This returns the proximal operator for the function at x, tau
         """
+        if out is not None and id(x)==id(out):
+            raise InPlaceError
+        
         try:
             tmp = x
             x.divide(tau, out = tmp)

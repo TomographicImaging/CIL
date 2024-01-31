@@ -25,7 +25,7 @@ import numpy as np
 from numbers import Number
 import warnings
 import logging
-
+from cil.utilities.errors import InPlaceError
 
 class TotalVariation(Function):
 
@@ -261,6 +261,10 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out=None):
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""
 
+        if out is not None and id(x)==id(out):
+            raise InPlaceError
+        
+        
         if self.strong_convexity_constant > 0:
 
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)

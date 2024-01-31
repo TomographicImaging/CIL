@@ -151,6 +151,7 @@ class TestOperator(CCPiTestClass):
             if isinstance(output_geom, BlockGeometry):
                 for i in range(len(output_geom.geometries)):
                     numpy.testing.assert_array_almost_equal(out[i].as_array(), out2[i].as_array(), err_msg='Failed for case  operator.direct(data,  out=out) where operator is ' +operator.__class__.__name__ )
+            else:
                 numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(), err_msg='Failed for case  operator.direct(data,  out=out) where operator is ' +operator.__class__.__name__ )
         
         except AssertionError as e: 
@@ -178,6 +179,7 @@ class TestOperator(CCPiTestClass):
             if isinstance(input_geom, BlockGeometry):
                     for i in range(len(input_geom.geometries)):
                         numpy.testing.assert_array_almost_equal(out[i].as_array(), out2[i].as_array(), err_msg='Failed for case  operator.adjoint(data,  out=out) where operator is ' +operator.__class__.__name__ )
+                else:
                     numpy.testing.assert_array_almost_equal(out.as_array(), out2.as_array(), err_msg='Failed for case  operator.adjoint(data,  out=out) where operator is ' +operator.__class__.__name__ )
         except AssertionError as e: 
                 error_list.append(e)  

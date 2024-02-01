@@ -1141,19 +1141,19 @@ class TestCallbacks(unittest.TestCase):
     def test_progress(self):
         algo = self.PrintAlgo()
 
-        algo.run(20, verbose=2)
+        algo.run(20)
         self.assertListEqual(algo.iterations, [-1, 10, 20])
-        algo.run(3, callbacks=[callbacks.TextProgressCallback()], verbose=1)  # upto 23
+        algo.run(3, callbacks=[callbacks.TextProgressCallback()])  # upto 23
         self.assertListEqual(algo.iterations, [-1, 10, 20])
 
         with self.assertWarnsRegex(DeprecationWarning, 'print_interval'):
-            algo.run(40, print_interval=2, verbose=1)  # upto 63
+            algo.run(40, print_interval=2)  # upto 63
 
         def old_callback(iteration, objective, solution):
             print(f"Called {iteration} {objective} {solution}")
 
         with NamedTemporaryFile() as log:
-            algo.run(20, callbacks=[callbacks.LogfileCallback(log.name)], verbose=2, callback=old_callback)
+            algo.run(20, callbacks=[callbacks.LogfileCallback(log.name)], callback=old_callback)
             self.assertListEqual(
                 ["64/1000", "74/1000", "83/1000", ""],
                 [line.lstrip().decode().split(" ", 1)[0] for line in log])
@@ -1165,7 +1165,7 @@ class TestCallbacks(unittest.TestCase):
 
     def test_stopiteration(self):
         algo = self.PrintAlgo()
-        algo.run(20, verbose=2, callbacks=[])
+        algo.run(20, callbacks=[])
         self.assertEqual(algo.iteration, 20)
 
         class EarlyStopping(callbacks.Callback):
@@ -1174,9 +1174,8 @@ class TestCallbacks(unittest.TestCase):
                     raise StopIteration
 
         algo = self.PrintAlgo()
-        algo.run(20, verbose=2, callbacks=[EarlyStopping()])
+        algo.run(20, callbacks=[EarlyStopping()])
         self.assertEqual(algo.iteration, 15)
-
 
 
 class TestADMM(unittest.TestCase):

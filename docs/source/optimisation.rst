@@ -123,7 +123,7 @@ LADMM
 SPDHG
 -----
 .. autoclass:: cil.optimisation.algorithms.SPDHG
-   :members:
+   :members: update, set_step_sizes, set_step_sizes_from_ratio, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
 

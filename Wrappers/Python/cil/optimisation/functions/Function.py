@@ -61,7 +61,7 @@ class Function(object):
 
         Returns
         --------
-        DataContainer, the value of the gradient of the function at x or nothing if `out`  
+        DataContainer, the value of the gradient of the function at x or `None` if `out`  
 
         """
         raise NotImplementedError
@@ -81,7 +81,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or nothing if `out`. 
+        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or `None` if `out`. 
 
         """
         raise NotImplementedError
@@ -121,7 +121,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or nothing if `out`. 
+        DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`. 
 
         """
         try:
@@ -335,7 +335,7 @@ class SumFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the sum of the gradients evaluated at point :math:`x` or nothing if `out`.
+        DataContainer, the value of the sum of the gradients evaluated at point :math:`x` or `None` if `out`.
 
         """
 
@@ -437,7 +437,7 @@ class ScaledFunction(Function):
 
         Returns
         --------
-        DataContainer, the value of the scaled function or nothing if `out` .
+        DataContainer, the value of the scaled function or `None` if `out` .
         """
         return self.scalar * self.function(x)
 
@@ -481,7 +481,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or nothing if `out`. 
+        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or `None` if `out`. 
 
         """
         if out is None:
@@ -505,7 +505,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or nothing if `out`. 
+        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or `None` if `out`. 
 
         """
 
@@ -524,7 +524,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or nothing if `out`.
+        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
 
         """
         try:
@@ -602,7 +602,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or nothing if `out`. 
+        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or `None` if `out`. 
 
         """
         return self.function.proximal(x, tau, out=out)
@@ -646,7 +646,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        A DataContainer of zeros, the same size as :math:`x` or nothing if `out`  
+        A DataContainer of zeros, the same size as :math:`x` or `None` if `out`  
 
         """
         if out is None:
@@ -699,7 +699,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        DataContainer, equal to :math:`x` or nothing if `out`. 
+        DataContainer, equal to :math:`x` or `None` if `out`. 
 
         """
         if out is None:
@@ -807,7 +807,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the gradient of the translated function evaluated at :math:`x` or nothing if `out`.
+        DataContainer, the gradient of the translated function evaluated at :math:`x` or `None` if `out`.
         """
         try:
             x.subtract(self.center, out=x)
@@ -841,7 +841,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or nothing if `out`.
+        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or `None` if `out`.
 
         """
         try:

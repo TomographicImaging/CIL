@@ -13,7 +13,7 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  - Added the a `Sampler` class as a CIL optimisation utility 
+  - Added the a `Sampler` class as a CIL optimisation utility
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None
@@ -22,8 +22,11 @@
   - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
-  - Functions updated to use sapyb 
-
+  - Functions updated to use sapyb
+  - Added `utilities.callbacks`
+    - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
+    - Deprecated `Algorithm.run(callback: Callable)`
+    - Added `Algorithm.run(callbacks: list[Callback])`
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

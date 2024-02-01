@@ -18,10 +18,10 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
-import numpy
+
 import numpy as np
-from numpy import nan, inf
+import logging
+
 from cil.framework import VectorData
 from cil.framework import ImageData
 from cil.framework import AcquisitionData
@@ -50,18 +50,14 @@ from cil.optimisation.algorithms import LADMM
 
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
-import time
-import warnings
 from cil.optimisation.functions import Rosenbrock
 from cil.framework import VectorData, VectorGeometry
 from cil.utilities.quality_measures import mae, mse, psnr
 
-
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
-import logging
 from testclass import CCPiTestClass
-from utils import  has_astra
+from utils import has_astra, initialise_tests
 
 initialise_tests()
 
@@ -75,7 +71,7 @@ class TestAlgorithms(CCPiTestClass):
         initial = ig.allocate()
         # b = initial.copy()
         # fill with random numbers
-        # b.fill(numpy.random.random(initial.shape))
+        # b.fill(np.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
 
@@ -127,7 +123,7 @@ class TestAlgorithms(CCPiTestClass):
         initial = ig.allocate()
         # b = initial.copy()
         # fill with random numbers
-        # b.fill(numpy.random.random(initial.shape))
+        # b.fill(np.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
 
@@ -156,7 +152,7 @@ class TestAlgorithms(CCPiTestClass):
         vg = VectorGeometry(2)
         x = vg.allocate('random_int', seed=2)
         # x = vg.allocate('random', seed=1)
-        x.fill(numpy.asarray([10.,-3.]))
+        x.fill(np.asarray([10.,-3.]))
 
         max_iter = 10000
         update_interval = 1000
@@ -166,15 +162,15 @@ class TestAlgorithms(CCPiTestClass):
         alg.run(verbose=0)
 
         # this with 10k iterations
-        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.13463363, 0.01604593], decimal = 5)
+        np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.13463363, 0.01604593], decimal = 5)
         # this with 1m iterations
-        # numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
-        # numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
+        # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
+        # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
 
     def test_CGLS(self):
         ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
+        np.random.seed(2)
         initial = ig.allocate(1.)
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
@@ -199,7 +195,7 @@ class TestAlgorithms(CCPiTestClass):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(np.random.random(initial.shape))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
 
@@ -274,7 +270,7 @@ class TestAlgorithms(CCPiTestClass):
         for _ in range(1):
 
             x = g.proximal(y_old - step_size * f.gradient(y_old), tau = step_size)
-            t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
+            t = 0.5*(1 + np.sqrt(1 + 4*(t_old**2)))
             y = x + ((t_old-1)/t)* ( x - x_old)
 
             x_old.fill(x)
@@ -325,7 +321,7 @@ class TestAlgorithms(CCPiTestClass):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(np.random.random(initial.shape))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
 
@@ -514,9 +510,8 @@ class TestAlgorithms(CCPiTestClass):
         # check warning message if condition is not satisfied
         sigma = 4
         tau = 1/3
-        with warnings.catch_warnings(record=True) as wa:
+        with self.assertWarnsRegex(UserWarning, "Convergence criterion"):
             pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, sigma = sigma, max_iteration=10)
-            assert "Convergence criterion" in str(wa[0].message)
 
 
     def test_PDHG_strongly_convex_gamma_g(self):
@@ -743,8 +738,8 @@ class TestSIRT(unittest.TestCase):
         tmp_initial = self.ig.allocate()
         sirt = SIRT(initial = tmp_initial, operator=Aop_nan_inf, data=self.bop, max_iteration=5)
 
-        self.assertFalse(np.any(sirt.M == inf))
-        self.assertFalse(np.any(sirt.D == inf))
+        self.assertFalse(np.any(sirt.M == np.inf))
+        self.assertFalse(np.any(sirt.D == np.inf))
 
 
     def test_SIRT_remove_nan_or_inf_with_BlockDataContainer(self):
@@ -765,9 +760,9 @@ class TestSIRT(unittest.TestCase):
 
         sirt = SIRT(initial = tmp_initial, operator=Aop, data=bop, max_iteration=5)
         for el in sirt.M.containers:
-            self.assertFalse(np.any(el == inf))
+            self.assertFalse(np.any(el == np.inf))
 
-        self.assertFalse(np.any(sirt.D == inf))
+        self.assertFalse(np.any(sirt.D == np.inf))
 
 
 class TestSPDHG(unittest.TestCase):
@@ -969,7 +964,7 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=numpy.float32)
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=np.float32)
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -1083,12 +1078,12 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             scale = 5
             eta = 0
-            noisy_data = AcquisitionData(numpy.asarray(np.random.poisson( scale * (eta + sin.as_array())),dtype=numpy.float32)/scale, geometry=ag)
+            noisy_data = AcquisitionData(np.asarray(np.random.poisson( scale * (eta + sin.as_array())),dtype=np.float32)/scale, geometry=ag)
 
         elif noise == 'gaussian':
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(numpy.asarray(n1 + sin.as_array(), dtype=numpy.float32), geometry=ag)
+            noisy_data = AcquisitionData(np.asarray(n1 + sin.as_array(), dtype=np.float32), geometry=ag)
 
         else:
             raise ValueError('Unsupported Noise ', noise)
@@ -1202,7 +1197,7 @@ class TestADMM(unittest.TestCase):
 
 
         self.fidelities = [ 0.5 * L2NormSquared(b=noisy_data), L1Norm(b=noisy_data),
-            KullbackLeibler(b=noisy_data, backend="numpy")]
+            KullbackLeibler(b=noisy_data, backend='numpy')]
 
         F = self.alpha * MixedL21Norm()
         K = GradientOperator(ig)
@@ -1260,7 +1255,7 @@ class TestADMM(unittest.TestCase):
 
         # fidelity = 0.5 * L2NormSquared(b=noisy_data)
         # fidelity = L1Norm(b=noisy_data)
-        fidelity = KullbackLeibler(b=noisy_data, backend="numpy")
+        fidelity = KullbackLeibler(b=noisy_data, backend='numpy')
 
         # Setup and run the PDHG algorithm
         F = BlockFunction(alpha * MixedL21Norm(),fidelity)

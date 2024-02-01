@@ -56,6 +56,7 @@ class ProgressCallback(Callback):
             tqdm_kwargs = self.tqdm_kwargs
             tqdm_kwargs.setdefault('total', algorithm.max_iteration)
             tqdm_kwargs.setdefault('disable', not self.verbose)
+            tqdm_kwargs.setdefault('initial', max(0, algorithm.iteration))
             self.pbar = self.tqdm_class(**tqdm_kwargs)
         self.pbar.set_postfix(algorithm.objective_to_dict(self.verbose>=2), refresh=False)
         self.pbar.update(algorithm.iteration - self.pbar.n)

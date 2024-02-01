@@ -368,6 +368,46 @@ Total variation
    :members:
    :inherited-members:
 
+
+Utilities
+=======
+Contains utilities for the CIL optimisation framework. 
+
+Samplers
+--------
+Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
+The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn. 
+
+For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
+
+.. automethod:: cil.optimisation.utilities.Sampler.from_function
+
+.. automethod:: cil.optimisation.utilities.Sampler.sequential
+
+.. automethod:: cil.optimisation.utilities.Sampler.staggered
+
+.. automethod:: cil.optimisation.utilities.Sampler.herman_meyer
+
+.. automethod:: cil.optimisation.utilities.Sampler.random_with_replacement
+
+.. automethod:: cil.optimisation.utilities.Sampler.random_without_replacement
+
+
+They will all instantiate a Sampler defined in the following class: 
+
+.. autoclass:: cil.optimisation.utilities.Sampler
+   :members:
+
+
+In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement: 
+
+.. autoclass:: cil.optimisation.utilities.SamplerRandom
+   :members:
+
+
+
+
+
 Block Framework
 ***************
 
@@ -565,6 +605,8 @@ Which in Python would be like
 .. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
 .. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
 .. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+
+
 
 
 References

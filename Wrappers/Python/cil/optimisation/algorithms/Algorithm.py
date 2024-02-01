@@ -235,8 +235,11 @@ class Algorithm:
 
         # call `__next__` upto `iteration` times or until `StopIteration` is raised
         for _ in zip(range(iterations), self):
-            for callback in callbacks:
-                callback(self)
+            try:
+                for callback in callbacks:
+                    callback(self)
+            except StopIteration:
+                break
 
     def objective_to_dict(self, verbose=False):
         obj = self.get_last_objective(return_all=verbose)

@@ -189,7 +189,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
                             
         """        
-        if out is not None and id(x)==id(out):
+        if  id(x)==id(out):
             raise InPlaceError
         
         if out is None:        

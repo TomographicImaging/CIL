@@ -56,67 +56,65 @@ from utils import  initialise_tests
 initialise_tests()
 
 
-class TestFunction(CCPiTestClass):
+class TestFunctionOutAndInPlace(CCPiTestClass):
 
     def setUp(self):
 
-        self.ag = AcquisitionGeometry.create_Parallel2D()
+        ag = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
 
         # default
-        self.ag.set_angles(angles)
-        self.ag.set_panel(10)
+        ag.set_angles(angles)
+        ag.set_panel(10)
 
-        self.ig = self.ag.get_ImageGeometry()
+        ig = ag.get_ImageGeometry()
 
         scalar = 4
 
-        b = self.ag.allocate('random', seed=2)
-        weight_ls = self.ig.allocate('random', seed=2)
+        b = ag.allocate('random', seed=2)
+        weight_ls = ig.allocate('random', seed=2)
 
-        numpy.random.seed(1)
-
-        A = IdentityOperator(self.ig)
-        b_ig = self.ig.allocate('random')
+        A = IdentityOperator(ig)
+        b_ig = ig.allocate('random')
         c = numpy.float64(0.3)
-        self.bg = BlockGeometry(self.ig, self.ig)
+        bg = BlockGeometry(ig, ig)
 
         self.func_geom_test_list = [
-            (IndicatorBox(), self.ag),
-            (KullbackLeibler(b=b, backend='numba'), self.ag),
-            (KullbackLeibler(b=b, backend='numpy'), self.ag),
-            (L1Norm(), self.ag),
-            (L1Norm(), self.ig),
-            (L1Norm(b=b), self.ag),
-            (L1Norm(b=b, weight=b), self.ag),
-            (TranslateFunction(L1Norm(), b), self.ag),
-            (TranslateFunction(L2NormSquared(), b), self.ag),
-            (L2NormSquared(), self.ag),
-            (scalar * L2NormSquared(), self.ag),
-            (SumFunction(L2NormSquared(), scalar * L2NormSquared()), self.ag),
-            (SumScalarFunction(L2NormSquared(), 3), self.ag),
-            (ConstantFunction(3), self.ag),
-            (ZeroFunction(), self.ag),
-            (L2NormSquared(b=b), self.ag),
-            (L2NormSquared(), self.ag),
-            (LeastSquares(A, b_ig, c, weight_ls), self.ig),
-            (LeastSquares(A, b_ig, c), self.ig),
-            (WeightedL2NormSquared(weight=b_ig), self.ig),
-            (TotalVariation(backend='c', warm_start=False, max_iteration=100), self.ig),
-            (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), self.ig),
-            (OperatorCompositionFunction(L2NormSquared(), A), self.ig),
-            (MixedL21Norm(), self.bg),
-            (SmoothMixedL21Norm(epsilon=0.3), self.bg),
-            (MixedL11Norm(), self.bg)
+            (IndicatorBox(), ag),
+            (KullbackLeibler(b=b, backend='numba'), ag),
+            (KullbackLeibler(b=b, backend='numpy'), ag),
+            (L1Norm(), ag),
+            (L1Norm(), ig),
+            (L1Norm(b=b), ag),
+            (L1Norm(b=b, weight=b), ag),
+            (TranslateFunction(L1Norm(), b), ag),
+            (TranslateFunction(L2NormSquared(), b), ag),
+            (L2NormSquared(), ag),
+            (scalar * L2NormSquared(), ag),
+            (SumFunction(L2NormSquared(), scalar * L2NormSquared()), ag),
+            (SumScalarFunction(L2NormSquared(), 3), ag),
+            (ConstantFunction(3), ag),
+            (ZeroFunction(), ag),
+            (L2NormSquared(b=b), ag),
+            (L2NormSquared(), ag),
+            (LeastSquares(A, b_ig, c, weight_ls), ig),
+            (LeastSquares(A, b_ig, c), ig),
+            (WeightedL2NormSquared(weight=b_ig), ig),
+            (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
+            (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
+            (OperatorCompositionFunction(L2NormSquared(), A), ig),
+            (MixedL21Norm(), bg),
+            (SmoothMixedL21Norm(epsilon=0.3), bg),
+            (MixedL11Norm(), bg)
 
         ]
 
-        np.random.seed(5)
+        np.random.seed(5) #TODO:set some datatypes dtype=np.float32, float64, complex64, complex128 
         self.data_arrays=[np.random.normal(0,1, (10,10)), np.array(range(0,65500, 655)).reshape((10,10)), np.random.uniform(-0.1,1,(10,10))]
 
     def get_result(self, function, method, x, *args):
         try:
-            input=x.copy()
+            input=x.copy() #To check that it isn't changed after function calls 
             if method == 'proximal':
                 out= function.proximal(x, *args)
             elif method == 'proximal_conjugate':
@@ -129,7 +127,7 @@ class TestFunction(CCPiTestClass):
             print(function.__class__.__name__+method)
             return None
         
-    def in_place_test(self, function, method,desired_result,   x, *args, ):
+    def in_place_test(self, function, method,desired_result,   x, *args, ): # TODO: move desired result first 
             out3 = x.copy()
             try:
                 if method == 'proximal':
@@ -165,7 +163,7 @@ class TestFunction(CCPiTestClass):
     def test_proximal_conjugate_out(self):
         for func, geom in self.func_geom_test_list:
             for data_array in self.data_arrays:
-                data=geom.allocate(0)
+                data=geom.allocate(None)
                 data.fill(data_array)
                 result=self.get_result(func, 'proximal_conjugate', data, 0.5)
                 self.out_test(func, 'proximal_conjugate', result,  data, 0.5)
@@ -174,7 +172,7 @@ class TestFunction(CCPiTestClass):
     def test_proximal_out(self):
         for func, geom in self.func_geom_test_list:
             for data_array in self.data_arrays:
-                data=geom.allocate(0)
+                data=geom.allocate(None)
                 data.fill(data_array)
                 result=self.get_result(func, 'proximal', data, 0.5)
                 self.out_test(func, 'proximal', result,  data, 0.5)
@@ -182,9 +180,9 @@ class TestFunction(CCPiTestClass):
                 
     def test_gradient_out(self):
         for func, geom in self.func_geom_test_list:
-            if (not isinstance(func, TotalVariation)) and (not isinstance(func, IndicatorBox)):
                 for data_array in self.data_arrays:
-                    data=geom.allocate(0)
+                    print(func.__class__.__name__)
+                    data=geom.allocate(None)
                     data.fill(data_array)
                     result=self.get_result(func, 'gradient', data)
                     self.out_test(func, 'gradient', result,  data)

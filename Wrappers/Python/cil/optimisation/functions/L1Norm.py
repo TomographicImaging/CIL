@@ -38,7 +38,7 @@ def soft_shrinkage(x, tau, out=None):
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
     """
-    if out is not None and id(x)==id(out):
+    if  id(x)==id(out):
         raise InPlaceError
 
     should_return = False

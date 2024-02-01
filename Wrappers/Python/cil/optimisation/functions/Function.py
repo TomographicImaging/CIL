@@ -86,8 +86,9 @@ class Function(object):
         .. math:: \text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)
                 
         """
-        if out is not None and id(x)==id(out):
+        if id(x)==id(out):
             raise InPlaceError
+        
         try:
             tmp = x
             x.divide(tau, out = tmp)
@@ -649,7 +650,10 @@ class TranslateFunction(Function):
         
         .. math:: G'(x) =  F'(x - b)
         
-        """        
+        """ 
+        if id(x)==id(out):
+            raise InPlaceError 
+              
         try:
             x.subtract(self.center, out = x)
             tmp = x
@@ -675,6 +679,10 @@ class TranslateFunction(Function):
         .. math:: \text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x-b) + b
         
         """        
+        
+        if id(x)==id(out):
+            raise InPlaceError
+ 
         try:
             x.subtract(self.center, out = x)
             tmp = x

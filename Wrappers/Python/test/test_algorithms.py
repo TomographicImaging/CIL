@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+from tempfile import NamedTemporaryFile
 
 import numpy as np
 import logging
@@ -47,8 +48,7 @@ from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
 
-
-from cil.utilities import dataexample
+from cil.utilities import callbacks, dataexample
 from cil.utilities import noise as applynoise
 from cil.optimisation.functions import Rosenbrock
 from cil.framework import VectorData, VectorGeometry
@@ -1126,63 +1126,56 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_array_less( qm[1], 3e-05)
 
 
+class TestCallbacks(unittest.TestCase):
+    class PrintAlgo(Algorithm):
+        def __init__(self):
+            super().__init__(update_objective_interval=10, max_iteration=1000)
+            self.configured = True
 
-class PrintAlgo(Algorithm):
-    def __init__(self, **kwargs):
-        super(PrintAlgo, self).__init__(**kwargs)
-        # self.update_objective()
-        self.configured = True
+        def update(self):
+            self.x = -self.iteration / self.max_iteration
 
+        def update_objective(self):
+            self.loss.append(2 ** getattr(self, 'x', np.nan))
 
-    def update(self):
-        self.x = - self.iteration
-        time.sleep(0.01)
+    def test_progress(self):
+        algo = self.PrintAlgo()
 
+        algo.run(20)
+        self.assertListEqual(algo.iterations, [-1, 10, 20])
+        algo.run(3, callbacks=[callbacks.TextProgressCallback()])  # upto 23
+        self.assertListEqual(algo.iterations, [-1, 10, 20])
 
-    def update_objective(self):
-        self.loss.append(self.iteration * self.iteration)
+        with self.assertWarnsRegex(DeprecationWarning, 'print_interval'):
+            algo.run(40, print_interval=2)  # upto 63
 
+        def old_callback(iteration, objective, solution):
+            print(f"Called {iteration} {objective} {solution}")
 
-class TestPrint(unittest.TestCase):
-    def test_print(self):
-        def callback (iteration, objective, solution):
-            print("I am being called ", iteration)
-        algo = PrintAlgo(update_objective_interval = 10, max_iteration = 1000)
+        with NamedTemporaryFile() as log:
+            algo.run(20, callbacks=[callbacks.LogfileCallback(log.name)], callback=old_callback)
+            self.assertListEqual(
+                ["64/1000", "74/1000", "83/1000", ""],
+                [line.lstrip().decode().split(" ", 1)[0] for line in log])
 
-        algo.run(20, verbose=2, print_interval = 2)
-        # it 0
-        # it 10
-        # it 20
-        # --- stop
-        algo.run(3, verbose=1, print_interval = 2)
-        # it 20
-        # --- stop
+        its = list(range(10, 90, 10))
+        self.assertListEqual([-1] + its, algo.iterations)
+        np.testing.assert_array_equal(
+            [np.nan] + [2 ** ((-i+1) / algo.max_iteration) for i in its], algo.objective)
 
-        algo.run(20, verbose=1, print_interval = 7)
-        # it 20
-        # it 30
-        # -- stop
+    def test_stopiteration(self):
+        algo = self.PrintAlgo()
+        algo.run(20, callbacks=[])
+        self.assertEqual(algo.iteration, 20)
 
-        algo.run(20, verbose=1, very_verbose=False)
-        algo.run(20, verbose=2, print_interval=7, callback=callback)
+        class EarlyStopping(callbacks.Callback):
+            def __call__(self, algorithm: Algorithm):
+                if algorithm.iteration >= 15:
+                    raise StopIteration
 
-        logging.info(algo._iteration)
-        logging.info(algo.objective)
-        np.testing.assert_array_equal([-1, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
-        np.testing.assert_array_equal([1, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)
-
-
-    def test_print2(self):
-        algo = PrintAlgo(update_objective_interval = 4, max_iteration = 1000)
-        algo.run(10, verbose=2, print_interval=2)
-        logging.info (algo.iteration)
-
-        algo.run(10, verbose=2, print_interval=2)
-        logging.info("{} {}".format(algo._iteration, algo.objective))
-
-        algo = PrintAlgo(update_objective_interval = 4, max_iteration = 1000)
-        algo.run(20, verbose=2, print_interval=2)
-
+        algo = self.PrintAlgo()
+        algo.run(20, callbacks=[EarlyStopping()])
+        self.assertEqual(algo.iteration, 15)
 
 
 class TestADMM(unittest.TestCase):

@@ -1441,22 +1441,21 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def test_find_xcor_angle(self):
 
-        angles_deg =numpy.array( [590, 0.5, 179.5, 187, -310, 51])
-        ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles_deg).set_panel((2,2))
-        ad = ag.allocate()
-        ad.fill(numpy.ones([6, 2, 2]))
-
-        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=1)
-        corr.set_input(ad)
-        ind = corr._find_xcor_angle(ag) 
-        self.assertEqual(angles_deg[ind], angles_deg[4])
-
-        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=1, ang_tol=1)
-        corr.set_input(ad)
-        ind = corr._find_xcor_angle(ag) 
-        self.assertEqual(angles_deg[ind], angles_deg[2])
+        angles_list = [numpy.array([590, 0, 2, -310]),
+                       numpy.array([0.5, 10, 20, 179.5]),
+                       numpy.array([-360,-300, -240, -180, 0]),
+                       numpy.array([-0.5, -90, -100, -179.5])]
         
+        for angles in angles_list:
+            ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles).set_panel((2,2))
+            ad = ag.allocate()
+            ad.fill(numpy.ones([len(angles), 2, 2]))
 
+            corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=1)
+            corr.set_input(ad)
+            ind = corr._find_xcor_angle(ag) 
+            self.assertEqual(angles[ind], angles[3])
+        
     def test_CofR_xcorrelation(self):      
 
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)

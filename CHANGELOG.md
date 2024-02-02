@@ -22,7 +22,8 @@
   - Add docker image, test & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
-  - Functions updated to use sapyb 
+  - Functions updated to use sapyb
+  - Fix KullbackLeibler numba gradient ignoring mask
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

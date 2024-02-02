@@ -821,7 +821,7 @@ class TranslateFunction(Function):
         DataContainer, the gradient of the translated function evaluated at :math:`x` or `None` if `out`.
         """
         
-         if id(x)==id(out):
+        if id(x)==id(out):
             raise InPlaceError
             
         try:
@@ -857,7 +857,8 @@ class TranslateFunction(Function):
         Returns
         -------
         DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or `None` if `out`.
-
+        """
+        
         if id(x)==id(out):
             raise InPlaceError
             

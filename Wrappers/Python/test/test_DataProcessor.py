@@ -1439,7 +1439,25 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
-    def test_CofR_xcorrelation(self):       
+    def test_find_xcor_angle(self):
+
+        angles_deg =numpy.array( [590, 0.5, 179.5, 187, -310, 51])
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles_deg).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(numpy.ones([6, 2, 2]))
+
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=1)
+        corr.set_input(ad)
+        ind = corr._find_xcor_angle(ag) 
+        self.assertEqual(angles_deg[ind], angles_deg[4])
+
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=1, ang_tol=1)
+        corr.set_input(ad)
+        ind = corr._find_xcor_angle(ag) 
+        self.assertEqual(angles_deg[ind], angles_deg[2])
+        
+
+    def test_CofR_xcorrelation(self):      
 
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
@@ -1463,7 +1481,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
             processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
             processor.set_input(data_limited) 
             processor.get_output(out=data_limited)
-
+        
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
 

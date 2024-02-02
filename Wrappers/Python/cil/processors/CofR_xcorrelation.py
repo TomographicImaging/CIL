@@ -45,7 +45,7 @@ class CofR_xcorrelation(Processor):
         kwargs = {
                     'slice_index': slice_index,
                     'ang_tol': ang_tol,
-                    'projection_index': 0
+                    'projection_index': projection_index
                  }
 
         super(CofR_xcorrelation, self).__init__(**kwargs)
@@ -77,61 +77,49 @@ class CofR_xcorrelation(Processor):
 
         return True
     
-    def process(self, out=None):
+    def _find_xcor_angle(self, geometry):
 
+        angles_deg = geometry.config.angles.angle_data.copy()
+        
+        if geometry.config.angles.angle_unit == "radian":
+            angles_deg *= 180/np.pi 
+
+        # set the target projection to 0
+        angles_deg -= angles_deg[self.projection_index]
+
+        #keep angles in range 0 to 360
+        while angles_deg.min() <0:
+            angles_deg[angles_deg<0] += 360
+        while angles_deg.max() >= 360:
+            angles_deg[angles_deg>=360] -= 360
+   
+        ind = np.abs(angles_deg - 180).argmin()
+        ang_diff = abs(angles_deg[ind] - angles_deg[self.projection_index])
+
+        if abs(ang_diff-180) > self.ang_tol:
+            raise ValueError('Method requires projections 180+/-{0} degrees apart, for chosen projection angle {1} found closest angle {2}.\
+                             \nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, geometry.angles[self.projection_index], geometry.angles[ind]))
+        else:
+            return ind
+
+    def process(self, out=None):
 
         data_full = self.get_input()
 
         if data_full.geometry.dimension == '3D':
+
             data = data_full.get_slice(vertical=self.slice_index)
         else:
             data = data_full
 
         geometry = data.geometry
-
-        angles_deg = geometry.config.angles.angle_data.copy()
-
-        if geometry.config.angles.angle_unit == "radian":
-            angles_deg *= 180/np.pi 
-
-        #keep angles in range -180 to 180
-        while angles_deg.min() <=-180:
-            angles_deg[angles_deg<=-180] += 360
-
-        while angles_deg.max() > 180:
-            angles_deg[angles_deg>180] -= 360
-
-        target = angles_deg[self.projection_index] + 180
         
-        if target <= -180:
-            target += 360
-        elif target > 180:
-
-            target -= 360     
-
-        ind1 = np.abs(angles_deg - target).argmin()
-        ang_diff1 = abs(angles_deg[ind1] - angles_deg[0])
-
-        target2 = target+360
-        ind2 = np.abs(angles_deg - target2).argmin() 
-        ang_diff2 = abs(angles_deg[ind2] - angles_deg[0])
-
-        if abs(ang_diff1-180)>abs(ang_diff2-180):
-            ind = ind2
-            ang_diff = ang_diff2
-            target = target2
-        else:
-            ind = ind1
-            ang_diff = ang_diff1
-
-        if abs(ang_diff-180) > self.ang_tol:
-            raise ValueError('Method requires projections at {0} +/- {1} degrees interval, got {2}.\nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(target, self.ang_tol, ang_diff))
-
+        ind = self._find_xcor_angle(geometry)
+        
         #cross correlate single slice with the 180deg one reversed
-        data1 = data.get_slice(angle=0).as_array()
+        data1 = data.get_slice(angle=self.projection_index).as_array()
         data2 = np.flip(data.get_slice(angle=ind).as_array())
 
-    
         border = int(data1.size * 0.05)
         lag = np.correlate(data1[border:-border],data2[border:-border],"full")
 
@@ -144,7 +132,6 @@ class CofR_xcorrelation(Processor):
 
         shift = (quad_max - (lag.size-1)/2)/2
         shift = np.floor(shift *100 +0.5)/100
-
 
         new_geometry = data_full.geometry.copy()
 

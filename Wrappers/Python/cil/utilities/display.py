@@ -119,9 +119,9 @@ class show1D(show_base):
     ----------
     data : DataContainer, list of DataContainer, tuple of DataContainer
         Multi-dimensional data to be reduced to 1D.
-    slice_list : list of tuple or list of list of tuple, default=None
-        A list, or nested list, of (dimension, coordinate) pairs for
-        slicing `data` (default is None, which is only valid when 1D
+    slice_list : tuple, list of tuple or list of list of tuple, default=None
+        A tuple of (dimension, coordinate) pair, or a list, or nested list, of 
+        such pairs for slicing `data` (default is None, which is only valid when 1D
         data is passed)
     label : 'default', str, list of str, None, default='default'
         Label(s) to use in the plot's legend. Use `None` to suppress legend.
@@ -254,7 +254,7 @@ class show1D(show_base):
             The axis to draw on
         data : DataContainer
             The data to be sliced and plotted
-        slice_list : list of tuples, optional
+        slice_list : tuple or list of tuples, optional
             (dimension, coordinate) pairs for slicing `data` (default is
             None, which is only valid when 1D data is passed)
         label : str, default=None
@@ -269,6 +269,8 @@ class show1D(show_base):
         if len(data.shape) == 1:
             is_1d = True
 
+        if isinstance(slice_list, tuple):
+            slice_list = [slice_list]
 
         dims = {}
         if not is_1d:
@@ -276,7 +278,7 @@ class show1D(show_base):
                 for el in slice_list:
                     dims[el[0]] = el[1]
             except TypeError:
-                raise TypeError(f'Expected list of tuples for slicing, ' \
+                raise TypeError(f'Expected tuple or list of tuples for slicing, ' \
                                 f'received {type(slice_list)}')
 
         arr = self._extract_vector(data, dims)
@@ -294,9 +296,9 @@ class show1D(show_base):
         data : DataContainer, list of DataContainer or tuple of
         DataContainer
             The data to be sliced and plotted
-        slice_list : list of tuple or list of list of tuple, optional
-            A list, or nested list, of (dimension, coordinate) pairs for
-            slicing `data` (default is None, which is only valid when 1D
+        slice_list : tuple, list of tuple, or list of list of tuple, optional
+            A (dimension, coordinate) pair or a list, or nested list, of such
+            pairs for slicing `data` (default is None, which is only valid when 1D
             data is passed)
         labels : 'default', str, list of str, None, default='default'
             Label(s) to use in the plot's legend. Use `None` to suppress legend.
@@ -327,7 +329,8 @@ class show1D(show_base):
         colour_cyc = cycle(CB_PALETTE)
         ls_cyc = cycle(["-","--","-.",":"])
         _lbls = labels
-        if slice_list is None or isinstance(slice_list[0], tuple):
+
+        if slice_list is None or isinstance(slice_list, tuple) or isinstance(slice_list[0], tuple): # None or is a list of tuples
 
             for i in range(num_data):
                 _data = data if isinstance(data, DataContainer) else data[i]
@@ -364,6 +367,9 @@ class show1D(show_base):
                                    ', '.join(f'{c[0]}={c[1]}' for c in sl)
                     self._plot_slice(ax, data[i], sl, label=_lbls[i], line_colour=_cl,
                                      line_style=_ls)
+
+        else:
+            raise TypeError(f'Unexpected type for slice_list: {type(slice_list)}, expected: (tuple, list of tuples, list of list of tuples)')
 
         ax.set_title(title)
         ax.set_xlabel(axis_labels[0])

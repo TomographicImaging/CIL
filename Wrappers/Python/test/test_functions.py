@@ -1413,7 +1413,7 @@ class TestTotalVariation(unittest.TestCase):
         tv=TotalVariation(warm_start=True, max_iteration=10)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
-        checkp2=tv.gradient.range_geometry().allocate(0)
+        checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         test=tv.proximal(data, 1.)
@@ -1430,7 +1430,7 @@ class TestTotalVariation(unittest.TestCase):
         tv=TotalVariation(warm_start=False)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
-        checkp2=tv.gradient.range_geometry().allocate(0)
+        checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         tv.proximal(data, 1.)

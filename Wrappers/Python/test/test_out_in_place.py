@@ -234,7 +234,6 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             (FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann') , ig),
             (FiniteDifferenceOperator(ig, direction = 0) , ig)]
 
-        print(PSF.shape)
         
         self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.array(range(0,65400, 218), dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]
         self.vector_data_arrays=[np.random.normal(0,1, (10)).astype(np.float32),  np.array(range(0,65400, 6540), dtype=np.uint16), np.random.uniform(-0.1,1,(10)).astype(np.float32)]

@@ -213,13 +213,18 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
                                                 f.proximal(u1,tau=tau).as_array(), decimal=4)
 
     def test_KullbackLeibler_numba_gradient(self):
-        f = self.f
-        f_np = self.f_np
-        tau = self.tau
-        u1 = self.u1
-
-        numpy.testing.assert_allclose(f.gradient(u1).as_array(), f_np.gradient(u1).as_array(), rtol=1e-3)
-
+        with self.subTest():
+            f = self.f
+            f_np = self.f_np
+            u1 = self.u1
+            grad_np = f_np.gradient(u1).as_array()
+            numpy.testing.assert_allclose(f.gradient(u1).as_array(), grad_np, rtol=1e-3)
+        with self.subTest("mask"):
+            f = self.f_mask
+            mask = self.mask>0
+            grad_mask = f.gradient(u1).as_array()
+            numpy.testing.assert_allclose(grad_mask[mask], grad_np[mask], rtol=1e-3)
+            self.assertFalse(grad_mask[~mask].any())
 
     def test_KullbackLeibler_numba_convex_conjugate(self):
         f = self.f

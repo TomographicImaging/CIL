@@ -20,6 +20,7 @@
 import numpy as np
 
 from cil.optimisation.operators import LinearOperator
+from cil.utilities.errors import InPlaceError
         
 class FiniteDifferenceOperator(LinearOperator):
     
@@ -85,6 +86,9 @@ class FiniteDifferenceOperator(LinearOperator):
         return tmp       
 
     def direct(self, x, out = None):
+        
+        if id(x)==id(out):
+            raise InPlaceError
         
         x_asarr = x.as_array()
         
@@ -225,6 +229,9 @@ class FiniteDifferenceOperator(LinearOperator):
                  
         
     def adjoint(self, x, out=None):
+        
+        if id(x)==id(out):
+            raise InPlaceError
         
         # Adjoint operation defined as  
                       

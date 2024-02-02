@@ -330,7 +330,7 @@ class show1D(show_base):
         ls_cyc = cycle(["-","--","-.",":"])
         _lbls = labels
 
-        if slice_list is None or isinstance(slice_list, tuple) or isinstance(slice_list[0], tuple): # None or is a list of tuples
+        if slice_list is None or isinstance(slice_list, tuple) or isinstance(slice_list[0], tuple): 
 
             for i in range(num_data):
                 _data = data if isinstance(data, DataContainer) else data[i]

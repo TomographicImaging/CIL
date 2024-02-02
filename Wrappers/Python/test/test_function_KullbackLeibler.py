@@ -118,6 +118,7 @@ class TestKullbackLeiblerNumpy(unittest.TestCase):
         res2 = self.f.convex_conjugate(self.u1)
         numpy.testing.assert_equal(res1, res2)
 
+@unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
 class TestKullbackLeiblerNumba(unittest.TestCase):
     def setUp(self):
         #numpy.random.seed(1)
@@ -164,8 +165,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         self.f_on_mask = f_on_mask
         self.u1_on_mask = u1_on_mask
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_call(self):
         f = self.f
         f_np = self.f_np
@@ -174,8 +173,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
 
         numpy.testing.assert_allclose(f(u1), f_np(u1),  rtol=1e-5)
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_call_mask(self):
         f = self.f
         f_np = self.f_np
@@ -191,8 +188,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
 
         numpy.testing.assert_allclose(f_mask(u1) + f_mask_c(u1), f(u1),  rtol=1e-5)
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal(self):
         f = self.f
         f_np = self.f_np
@@ -203,9 +198,7 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
                                       f_np.proximal(u1,tau=tau).as_array(), rtol=7e-3)
         numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=tau).as_array(),
         f_np.proximal(u1,tau=tau).as_array(), decimal=4)
-        
-    
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+
     def test_KullbackLeibler_numba_proximal_arr(self):
         f = self.f
         f_np = self.f_np
@@ -219,8 +212,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=self.tau).as_array(),
                                                 f.proximal(u1,tau=tau).as_array(), decimal=4)
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_gradient(self):
         f = self.f
         f_np = self.f_np
@@ -230,7 +221,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         numpy.testing.assert_allclose(f.gradient(u1).as_array(), f_np.gradient(u1).as_array(), rtol=1e-3)
 
 
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_convex_conjugate(self):
         f = self.f
         f_np = self.f_np
@@ -239,8 +229,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
 
         numpy.testing.assert_allclose(f.convex_conjugate(u1), f_np.convex_conjugate(u1), rtol=1e-3)
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal_conjugate_arr(self):
         f = self.f
         f_np = self.f_np
@@ -250,8 +238,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         numpy.testing.assert_allclose(f.proximal_conjugate(u1,tau=tau).as_array(),
                         f_np.proximal_conjugate(u1,tau=tau).as_array(), rtol=1e-3)
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_convex_conjugate_mask(self):
         f = self.f
         tau = self.tau
@@ -268,8 +254,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
             f_mask.convex_conjugate(u1) + f_mask_c.convex_conjugate(u1) ,\
                  rtol=1e-3)
 
-
-    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal_conjugate_mask(self):
         f = self.f
         f_mask = self.f_mask

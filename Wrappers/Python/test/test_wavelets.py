@@ -16,25 +16,67 @@ def setUp(self):
 class TestWavelets(CCPiTestClass):
 
     def test_WaveletOperator_dimensions(self):
-        m, n = 20, 21
-        wname = "haar"
+        m, n = 42, 47
         level = 3
-        for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
-            with self.subTest(msg=f"Failed for {dg.__class__.__name__} of size {dg.shape}", dg=dg):
-                x = dg.allocate('random')
+        for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3']:
+            for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
+                with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
+                    x = dg.allocate('random')
 
-                W = WaveletOperator(dg, wname=wname, level=level)
-                rg = W.range_geometry() # Range
-                Wx = W.direct(x)
-                y = W.adjoint(Wx)
+                    W = WaveletOperator(dg, wname=wname, level=level)
+                    rg = W.range_geometry() # Range
+                    Wx = W.direct(x)
+                    y = W.adjoint(Wx)
 
-                self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
-                self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
+                    self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
+                    self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
 
-                # Reconstruction should be (almost) the original input
-                self.assertNumpyArrayAlmostEqual(x.as_array(), y.as_array())
+                    # Reconstruction should be (almost) the original input
+                    self.assertNumpyArrayAlmostEqual(x.as_array(), y.as_array())
 
-                self.assertRaises(AttributeError, WaveletOperator, dg, range_geometry=dg, wname='db2', msg="Geometry shape mismatch should raise error")
+                    self.assertRaises(AttributeError, WaveletOperator, domain_geometry=dg, range_geometry=dg, wname=wname, msg="Geometry shape mismatch should raise error")
+    
+    def test_WaveletOperator_dimensions_biorthogonal(self):
+        m, n = 48, 47
+        level = 2
+        for wname in ["bior3.5", "bior3.3", "rbio3.5", "rbio4.4"]:
+            for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
+                with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
+                    x = dg.allocate('random')
+
+                    W = WaveletOperator(dg, wname=wname, level=level)
+                    rg = W.range_geometry() # Range
+                    Wx = W.direct(x)
+                    y = W.adjoint(Wx)
+
+                    self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
+                    self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
+
+                    # Reconstruction should be imperfect
+                    self.assertLess(0, (x - y).norm(), msg="Biorthogonal wavelets with true adjoint should no longer produce perfect reconstructions")
+
+                    self.assertRaises(AttributeError, WaveletOperator, domain_geometry=dg, range_geometry=dg, wname=wname, msg="Geometry shape mismatch should raise error")
+    
+    def test_WaveletOperator_biorthogonal_reconstruction(self):
+        m, n = 48, 49
+        level = 2
+        for wname in ["bior3.5", "bior3.3", "rbio3.5", "rbio4.4"]:
+            for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
+                with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
+                    x = dg.allocate('random')
+
+                    W = WaveletOperator(dg, wname=wname, level=level, true_adjoint=False)
+                    rg = W.range_geometry() # Range
+                    Wx = W.direct(x)
+                    y = W.adjoint(Wx)
+
+                    self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
+                    self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
+
+                    # Reconstruction should be (almost) the original input
+                    self.assertNumpyArrayAlmostEqual(x.as_array(), y.as_array())
+
+                    self.assertRaises(AttributeError, WaveletOperator, domain_geometry=dg, range_geometry=dg, wname=wname, msg="Geometry shape mismatch should raise error")
 
     def test_wavelet_axes(self):
         m, n = 20, 21
@@ -100,11 +142,8 @@ class TestWavelets(CCPiTestClass):
         m, n = 48, 64
         dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n) # Domain
         x = dg.allocate('random')
-        for wname in ['haar', 'db3', 'sym4', 'coif1', 'bior3.5', 'rbio3.5']:
+        for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3', 'bior3.5', 'bior3.3', 'rbio3.5', 'rbio3.3']:
             with self.subTest(msg=f"Failed for wavelet {wname}", wname=wname):
-                if (not pywt.Wavelet(wname).orthogonal) and pywt.Wavelet(wname).biorthogonal:
-                    self.skipTest(f"Biorthogonal {wname} wavelet adjoint not implemented (yet)")
-
                 W = WaveletOperator(dg, wname=wname, level=2, bnd_cond='periodization') # Note: this is different from bnd_cond='periodic'
                 rg = W.range_geometry()
                 c = rg.allocate('random')
@@ -112,8 +151,21 @@ class TestWavelets(CCPiTestClass):
                 ip1 = c.dot(W.direct(x))
                 ip2 = x.dot(W.adjoint(c))
                 M = x.norm() # Normalization
-                self.assertAlmostEqual(ip1/M, ip2/M, places=5, msg="Periodic convolution should be closest to true adjoint")
+                self.assertAlmostEqual(ip1/M, ip2/M, places=5, msg="Periodization convolution should be closest to true adjoint")
     
+    def test_WaveletOperator_norm(self):
+        n = 64
+        dg = VectorGeometry(n)
+        for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3']:
+            with self.subTest(msg=f"Failed for wavelet {wname}", wname=wname):
+                W = WaveletOperator(dg, wname=wname, level=1)
+                self.assertEqual(W.norm(), 1.0, msg="Orthogonal wavelet transform should have unit norm")
+        
+        for wname in ['bior3.5', 'bior3.3', 'rbio3.5', 'rbio3.3']:
+            with self.subTest(msg=f"Failed for wavelet {wname}", wname=wname):
+                W = WaveletOperator(dg, wname=wname, level=2, bnd_cond='periodization') # Need to set bnd_cond for most faithful adjoint
+                self.assertLess(0.9, W.norm())
+
     def test_WaveletNorm(self):
         n = 20
         wname = 'db2'
@@ -152,6 +204,12 @@ class TestWavelets(CCPiTestClass):
 
         convConj = WN.convex_conjugate(0.9*y)
         self.assertEqual(0, convConj, msg="All coefficient should be < 1")
+
+        dg = VectorGeometry(48)
+        for true_adjoint in [True, False]:
+            with self.subTest(msg=f"Failed for biorthogonal wavelet with true_adjoint set to {true_adjoint}"):
+                W = WaveletOperator(dg, wname='bior3.5', level=1, true_adjoint=true_adjoint)
+                self.assertRaises(AttributeError, WaveletNorm, W) # This should always give error no matter which adjoint setting
 
 
 if __name__ == "__main__":

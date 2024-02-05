@@ -50,7 +50,7 @@ class WaveletNorm(Function):
         [OPTIONAL PARAMETERS]
         :param weight: weight array matching the size of the wavelet coefficients
         '''
-        if not pywt.Wavelet(W.wname).orthogonal:
+        if not W._wavelet.orthogonal:
             raise AttributeError(f"Invalid wavelet: `{W.wname}`. WaveletNorm is only defined for orthogonal wavelets!")
 
         super(WaveletNorm, self).__init__()

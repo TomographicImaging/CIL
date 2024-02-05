@@ -95,19 +95,24 @@ class WaveletOperator(LinearOperator):
 
         # Convolution boundary condition i.e. padding method
         self.bnd_cond = kwargs.get('bnd_cond', 'symmetric')
+
+        self.wname = wname
+        self._wavelet = pywt.Wavelet(wname)
+        self.moments = self._wavelet.vanishing_moments_psi
+        self._trueAdj = kwargs.get('true_adjoint', True)
+        if all([not self._wavelet.orthogonal, self._wavelet.biorthogonal, self._trueAdj]): # True adjoint for biorthogonal wavelet
+            self._wavelet = self._getBiortFilters(wname)
         
         if level is None:
             # Default decomposition level is the theoretical maximum: log_2(min(input.shape)).
             # However, this is not always recommended and pywt should give a warning if the coarsest
             # scales are too small to be meaningful.
-            level = pywt.dwtn_max_level(domain_geometry.shape, wavelet=wname, axes=axes)
+            level = pywt.dwtn_max_level(domain_geometry.shape, wavelet=self._wavelet, axes=axes)
         self.level = int(level)
 
-        self._shapes = pywt.wavedecn_shapes(domain_geometry.shape, wavelet=wname, level=level, axes=axes, mode=self.bnd_cond)
-        self.wname = wname
+        self._shapes = pywt.wavedecn_shapes(domain_geometry.shape, wavelet=self._wavelet, level=level, axes=axes, mode=self.bnd_cond)
         self.axes = axes
         self._slices = self._shape2slice()
-        self.moments = pywt.Wavelet(wname).vanishing_moments_psi
         
         # Compute the correct wavelet domain size
         range_shape = np.array(domain_geometry.shape)
@@ -159,28 +164,24 @@ class WaveletOperator(LinearOperator):
         _, slices = pywt.coeffs_to_array(coeff_tmp, padding=0, axes=self.axes)
         return slices
     
-    def _apply_weight(self, coeffs, weight):
-        """
-        Apply weight function to coefficients at different scales j.
-        """
-
-        # Only detail coefficients are affected
-        for j,Cj in enumerate(coeffs[1:]):
-            # All "directions" are treated the same per scale
-            Cweighted = {k:weight(j)*c for (k,c) in Cj.items()}
-            coeffs[j+1] = Cweighted
-
+    def _getBiortFilters(self, wname):
+        """Helper function for creating a custom wavelet object.
+        Using mirrored decomposition filters for reconstruction gives adjoint.
+        This is only needed for biorthogonal wavelets."""
+        fb = pywt.Wavelet(wname).filter_bank
+        ifb = pywt.Wavelet(wname).inverse_filter_bank
+        adj_filter_bank = fb[0:2] + ifb[2:4]
+        wavelet = pywt.Wavelet(wname, filter_bank=adj_filter_bank)
+        wavelet.orthogonal = False
+        wavelet.biorthogonal = True
+        return wavelet
         
-    def direct(self, x, out = None, weight = None):
+    def direct(self, x, out = None):
         '''Forward operator -- decomposition -- analysis'''
         
         x_arr = x.as_array()
         
-        coeffs = pywt.wavedecn(x_arr, wavelet=self.wname, level=self.level, axes=self.axes, mode=self.bnd_cond)
-
-        if weight is not None:
-            self._apply_weight(coeffs, weight)
-        # else: apply no weight
+        coeffs = pywt.wavedecn(x_arr, wavelet=self._wavelet, level=self.level, axes=self.axes, mode=self.bnd_cond)
 
         Wx, _ = pywt.coeffs_to_array(coeffs, axes=self.axes)
 
@@ -191,18 +192,13 @@ class WaveletOperator(LinearOperator):
         else:
             out.fill(Wx) 
     
-    def adjoint(self, Wx, out = None, weight = None):
+    def adjoint(self, Wx, out = None):
         '''Adjoint operator -- reconstruction -- synthesis'''
                       
         Wx_arr = Wx.as_array()
         coeffs = pywt.array_to_coeffs(Wx_arr, self._slices)
 
-        # Apply given weight function
-        if weight is not None:
-            self._apply_weight(coeffs, weight)
-        # else: apply no weight
-
-        x = pywt.waverecn(coeffs, wavelet=self.wname, axes=self.axes, mode=self.bnd_cond)
+        x = pywt.waverecn(coeffs, wavelet=self._wavelet, axes=self.axes, mode=self.bnd_cond)
 
         # Need to slice the output in case original size is of odd length
         org_size = tuple(slice(i) for i in self.domain_geometry().shape)
@@ -215,8 +211,7 @@ class WaveletOperator(LinearOperator):
             out.fill(x[org_size])
         
     def calculate_norm(self):
-        wavelet = pywt.Wavelet(self.wname)
-        if wavelet.orthogonal:
+        if self._wavelet.orthogonal:
             norm = 1.0
         else:
             norm = LinearOperator.calculate_norm(self)

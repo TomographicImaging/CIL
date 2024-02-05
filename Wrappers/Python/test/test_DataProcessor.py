@@ -1441,11 +1441,12 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def test_find_xcor_angle(self):
 
-        angles_list = [numpy.array([590, 0, 2, -310]),
-                       numpy.array([0.5, 10, 20, 179.5]),
-                       numpy.array([-360,-300, -240, -180, 0]),
+        angles_list = [numpy.array([590, 0, 2, -310.5]),
+                       numpy.array([0.5, 10, 20, 180]),
+                       numpy.array([-360,-300, -240, -180.5, 0]),
                        numpy.array([-0.5, -90, -100, -179.5])]
         
+        # test finding angle 180 degrees apart to correlate with
         for angles in angles_list:
             ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles).set_panel((2,2))
             ad = ag.allocate()
@@ -1453,8 +1454,33 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 
             corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=1)
             corr.set_input(ad)
-            ind = corr._find_xcor_angle(ag) 
-            self.assertEqual(angles[ind], angles[3])
+            ind1, ind2 = corr._find_xcor_angle(ag) 
+            self.assertEqual(angles[ind2], angles[3])
+
+            # test there is an error when the target angle is not within tolerance
+            with self.assertRaises(ValueError):
+                corr = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = (0, 3), ang_tol=0.1)
+                corr.set_input(ad)
+                corr._find_xcor_angle(ag)
+
+        # test using a tuple of projection indices
+        for angles in angles_list:
+            ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles).set_panel((2,2))
+            ad = ag.allocate()
+            ad.fill(numpy.ones([len(angles), 2, 2]))
+
+            corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=(0, 3), ang_tol=1)
+            corr.set_input(ad)
+            ind1, ind2 = corr._find_xcor_angle(ag) 
+            self.assertEqual(angles[ind1], angles[0])
+            self.assertEqual(angles[ind2], angles[3])
+
+            # test there is an error when the target angle is not within tolerance
+            with self.assertRaises(ValueError):
+                corr = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=0.1)
+                corr.set_input(ad)
+                corr._find_xcor_angle(ag)
+
         
     def test_CofR_xcorrelation(self):      
 

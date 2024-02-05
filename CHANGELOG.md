@@ -22,7 +22,8 @@
   - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
-  - Functions updated to use sapyb 
+  - Functions updated to use sapyb
+  - show1D slice_list parameter can now be of type tuple 
 
 
 * 23.1.0

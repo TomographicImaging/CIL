@@ -48,9 +48,10 @@ from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
 
-from cil.utilities import callbacks, dataexample
+from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 from cil.optimisation.functions import Rosenbrock
+from cil.optimisation.utilities import callbacks
 from cil.framework import VectorData, VectorGeometry
 from cil.utilities.quality_measures import mae, mse, psnr
 

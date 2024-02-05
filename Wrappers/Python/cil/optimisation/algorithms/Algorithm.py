@@ -21,7 +21,7 @@ from warnings import warn
 
 import numpy as np
 
-from cil.utilities.callbacks import Callback, LogfileCallback, _OldCallback, ProgressCallback
+from cil.optimisation.utilities.callbacks import Callback, LogfileCallback, _OldCallback, ProgressCallback
 
 
 class Algorithm:

@@ -33,7 +33,8 @@ def setup_explicit_TGV(A, data, alpha, delta=1.0):
     # Set up the 3 operator A, Grad and Epsilon                           
     # A, the projection operator is passed by the user    
     K11 = A
-    K21 = alpha * GradientOperator(K11.domain)
+    grad = GradientOperator(K11.domain)
+    K21 = alpha * grad
     # https://tomographicimaging.github.io/CIL/nightly/optimisation.html#cil.optimisation.operators.SymmetrisedGradientOperator
     K32 = beta * SymmetrisedGradientOperator(K21.range)
     # these define the domain and range of the other operators

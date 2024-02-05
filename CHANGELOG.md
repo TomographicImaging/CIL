@@ -13,16 +13,16 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  - Added the a `Sampler` class as a CIL optimisation utility 
+  - Added the a `Sampler` class as a CIL optimisation utility
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None
   - Bug fix in the adjoint of the Diagonal Operator for complex values
   - Update conda build action to v2 for 2.5x quicker builds
-  - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
+  - Add docker image, test & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
-
+  - Functions updated to use sapyb 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

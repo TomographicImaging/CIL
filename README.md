@@ -54,8 +54,20 @@ Finally, CIL can be run via a Jupyter Notebook enabled Docker container:
 docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:latest
 ```
 
-GPU support requires [`nvidia-container-toolkit`](https://github.com/NVIDIA/nvidia-container-toolkit) and an NVIDIA GPU.
-Omit the `--gpus all` to run without GPU support.
+> [!NOTE]
+> GPU support requires [`nvidia-container-toolkit`](https://github.com/NVIDIA/nvidia-container-toolkit) and an NVIDIA GPU.
+> Omit the `--gpus all` to run without GPU support.
+
+<!-- <br/> -->
+
+> [!IMPORTANT]
+> Folders can be shared with the correct (host) user permissions using
+> `--user $(id -u) --group-add users -v /local/path:/container/path`.
+
+<!-- <br/> -->
+
+> [!TIP]
+> See [jupyter-docker-stacks](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html) for more information.
 
 ## Getting Started with CIL
 

@@ -106,6 +106,10 @@ jobs:
         fetch-depth: 0
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
         submodules: recursive
+    - uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        docker-images: false
+        large-packages: false
     - uses: docker/setup-buildx-action@v3
     - uses: docker/metadata-action@v5
       id: meta

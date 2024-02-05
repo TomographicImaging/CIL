@@ -32,9 +32,9 @@ class CofR_xcorrelation(Processor):
 
     Parameters
     ----------
-    slice_index: int or str, default='centre', optional
+    slice_index: int or str, optional
         An integer defining the vertical slice to run the algorithm on or string='centre' specifying the central slice should be used
-    projection_index: int or tuple of ints, default=0, optional
+    projection_index: int or tuple of ints, optional
         An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
         Or a tuple of ints specifying the two indices to be used for cross correlation.
     ang_tol: float, optional

@@ -23,7 +23,6 @@ channels:
   - intel
   - ccpi
   - defaults
-  - astra-toolbox
 dependencies:
   - dxchange
   - python-wget

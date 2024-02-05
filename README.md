@@ -92,13 +92,13 @@ git submodule update --init --recursive
 To create a conda environment with all the dependencies for building CIL run the following shell script:
 
 ```sh
-sh scripts/create_local_env_for_cil_development.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+bash scripts/create_local_env_for_cil_development.sh
 ```
 
 Or with the CIL build and test dependencies:
 
 ```sh
-sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+bash scripts/create_local_env_for_cil_development.sh -t
 ```
 
 And then install CIL in to this environment using CMake.

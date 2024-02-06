@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2019 United Kingdom Research and Innovation
-#  Copyright 2019 The University of Manchester
+#  Copyright 2023 United Kingdom Research and Innovation
+#  Copyright 2023 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,14 +16,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-name: test_new
-dependencies:
-  - python=3.6.7=h8dc6b48_1004
-  - numpy=1.11.3=py36hdf140aa_1207  
-  - spyder=3.3.4=py36_0  
-  - scikit-image=0.15.0=py36h6de7cb9_0
-  - scipy=1.2.1=py36hbd7caa9_1    
-  - astra-toolbox=1.8.3=py36h804c3c0_0
 
 
+from .sampler import Sampler
+from .sampler import SamplerRandom
 

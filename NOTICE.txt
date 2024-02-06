@@ -31,6 +31,7 @@ Institutions Key:
 8 - UES Inc.
 9 - Swansea University
 10 - University of Warwick
+11 - University of Helsinki
 
 CIL Developers in date order:
 Edoardo Pasca (2017 – present) - 1 
@@ -55,6 +56,7 @@ Sam Tygier (2022) - 1
 Andrew Sharits (2022) - 8
 Kyle Pidgeon (2023) - 1
 Letizia Protopapa (2023) - 1
+Tommi Heikkilä (2023) - 11
 
 CIL Advisory Board:
 Llion Evans - 9

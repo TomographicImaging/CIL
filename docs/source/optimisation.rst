@@ -73,8 +73,7 @@ Base class
 ----------
 .. autoclass:: cil.optimisation.algorithms.Algorithm
    :members:
-   :private-members:
-   :special-members:
+   :inherited-members:
 
 GD
 --
@@ -148,27 +147,31 @@ A :code:`ScaledOperator` represents the multiplication of any operator with a sc
 
 .. autoclass:: cil.optimisation.operators.Operator
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.operators.LinearOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.ScaledOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.CompositionOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.DiagonalOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.ChannelwiseOperator
    :members:
-   :special-members:
+
+
+.. autoclass:: cil.optimisation.operators.SumOperator
+   :members:
+  
 
 Trivial operators
 -----------------
@@ -177,19 +180,19 @@ Trivial operators are the following.
 
 .. autoclass:: cil.optimisation.operators.IdentityOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.ZeroOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.MatrixOperator
    :members:
-   :special-members:
+
 
 .. autoclass:: cil.optimisation.operators.MaskOperator
    :members:
-   :special-members:
+
 
 
 GradientOperator 
@@ -236,37 +239,37 @@ Base classes
 
 .. autoclass:: cil.optimisation.functions.Function
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.SumFunction
    :members:
-   :special-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.ScaledFunction
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.SumScalarFunction
    :members:
-   :special-members: 
+   :inherited-members: 
 
 .. autoclass:: cil.optimisation.functions.TranslateFunction
    :members:
-   :special-members: 
+   :inherited-members:
    
 Simple functions
 ----------------
 .. autoclass:: cil.optimisation.functions.ConstantFunction
    :members:
-   :special-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.ZeroFunction
    :members:
-   :special-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.Rosenbrock
    :members:
-   :special-members: 
+   :inherited-members:
 
 Composition of operator and a function
 --------------------------------------
@@ -293,14 +296,14 @@ be expressed as
 
 .. autoclass:: cil.optimisation.functions.OperatorCompositionFunction
   :members:
-  :special-members: 
+  :inherited-members:
 
 Indicator box
 -------------
 
 .. autoclass:: cil.optimisation.functions.IndicatorBox
    :members:
-   :special-members:
+   :inherited-members:
 
 
 KullbackLeibler 
@@ -308,26 +311,26 @@ KullbackLeibler
 
 .. autoclass:: cil.optimisation.functions.KullbackLeibler
    :members:
-   :special-members:
+   :inherited-members:
 
 L1 Norm
 -------
 
 .. autoclass:: cil.optimisation.functions.L1Norm
    :members:
-   :special-members:
+   :inherited-members:
 
-Squared L2 norm squared
+L2 Norm Squared
 -----------------------
 .. l2norm:
 
 .. autoclass:: cil.optimisation.functions.L2NormSquared
    :members:
-   :special-members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.WeightedL2NormSquared
    :members:
-   :special-members:
+   :inherited-members:
    
 
 Least Squares
@@ -335,35 +338,75 @@ Least Squares
 
 .. autoclass:: cil.optimisation.functions.LeastSquares
    :members:
-   :special-members:
+   :inherited-members:
 
 Mixed L21 norm
 --------------
 
 .. autoclass:: cil.optimisation.functions.MixedL21Norm
    :members:
-   :special-members:
+   :inherited-members:
    
 Smooth Mixed L21 norm
 ---------------------
 
 .. autoclass:: cil.optimisation.functions.SmoothMixedL21Norm
    :members:
-   :special-members:   
+   :inherited-members:
 
 Mixed L11 norm
 ---------------------
 
 .. autoclass:: cil.optimisation.functions.MixedL11Norm
    :members:
-   :special-members:      
+   :inherited-members:     
 
 Total variation
 ---------------
 
 .. autoclass:: cil.optimisation.functions.TotalVariation
    :members:
-   :special-members: 
+   :inherited-members:
+
+
+Utilities
+=======
+Contains utilities for the CIL optimisation framework. 
+
+Samplers
+--------
+Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
+The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn. 
+
+For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
+
+.. automethod:: cil.optimisation.utilities.Sampler.from_function
+
+.. automethod:: cil.optimisation.utilities.Sampler.sequential
+
+.. automethod:: cil.optimisation.utilities.Sampler.staggered
+
+.. automethod:: cil.optimisation.utilities.Sampler.herman_meyer
+
+.. automethod:: cil.optimisation.utilities.Sampler.random_with_replacement
+
+.. automethod:: cil.optimisation.utilities.Sampler.random_without_replacement
+
+
+They will all instantiate a Sampler defined in the following class: 
+
+.. autoclass:: cil.optimisation.utilities.Sampler
+   :members:
+
+
+In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement: 
+
+.. autoclass:: cil.optimisation.utilities.SamplerRandom
+   :members:
+
+
+
+
 
 Block Framework
 ***************
@@ -562,6 +605,8 @@ Which in Python would be like
 .. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
 .. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
 .. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+
+
 
 
 References

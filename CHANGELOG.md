@@ -1,10 +1,28 @@
 
 * x.x.x
+  - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
+  - Added a weight argument to the L1Norm function
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
   - Added the functions `set_norms` and `get_norms` to the `BlockOperator` class
   - Internal variable name change in BlockOperator to aid understanding
+  - Fixed formatting errors in the L2NormSquared and LeastSquares documentation
+  - Bug fix for BlockDataContainer as iterator
   - Dropped support for IPP versions older than 2021.10 due to header changes
   - Fix build include directories
+  - Proximal of MixedL21Norm with numpy backend now accepts numpy ndarray, DataContainer and float as tau parameter
+  - ZeroOperator no longer relies on the default of allocate
+  - Bug fix in SIRF TotalVariation unit tests with warm_start
+  - Allow show2D to be used with 3D `DataContainer` instances
+  - Added the a `Sampler` class as a CIL optimisation utility
+  - Update documentation for symmetrised gradient
+  - Added documentation for CompositionOperator and SumOperator
+  - Updated FISTA and ISTA algorithms to allow input functions to be None
+  - Bug fix in the adjoint of the Diagonal Operator for complex values
+  - Update conda build action to v2 for 2.5x quicker builds
+  - Add docker image, test & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
+  - Quality metrics have added mask option
+  - Bug fix for norm of CompositionOperator
+  - Functions updated to use sapyb 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
@@ -108,11 +126,11 @@
     - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master
 
 * 21.4.1
- - Removed prints from unittests and cleanup of unittest code.
- - CMake:
-   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
- - TIFF writer uses logging
- - Added unittests for TIFF functionality
+  - Removed prints from unittests and cleanup of unittest code.
+  - CMake:
+    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+  - TIFF writer uses logging
+  - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version
@@ -219,7 +237,7 @@
   - introduction of Algorithm class
   - unit test expanded and moved to test directory
   - unified build system on Jenkins based on CCPi-VirtualMachine repo
- - switched to calendar versioning YY.0M.
+  - switched to calendar versioning YY.0M.
 
 * 0.10.0
 

@@ -125,7 +125,7 @@ The user will then need to add the path `<install_directory>/lib` to the environ
 
 # Citation
 
-To cite CIL, we request that you include citations to **both** the software on Zenodo, and a CIL paper:
+If you use CIL in your research, please include citations to **both** the software on Zenodo, and a CIL paper:
 
 [1] Pasca, E., Jørgensen, J. S., Papoutsellis, E., Ametova, E., Fardell, G., Thielemans, K., Murgatroyd, L., Duff, M., & Robarts, H. (2023). Core Imaging Library (CIL). Zenodo. https://doi.org/10.5281/zenodo.4746198
 

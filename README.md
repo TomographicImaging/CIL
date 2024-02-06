@@ -123,9 +123,18 @@ cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_l
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.
 
-# References
+# Citation
 
-[1] Jørgensen JS et al. 2021 [Core Imaging Library Part I: a versatile python framework for tomographic imaging](https://doi.org/10.1098/rsta.2020.0192). Phil. Trans. R. Soc. A 20200192. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I) [Pre-print](https://arxiv.org/abs/2102.04560)
+To cite CIL, we request that you include citations to **both** the software on Zenodo, and a CIL paper:
 
-[2] Papoutsellis E et al. 2021 [Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
+[1] Pasca, E., Jørgensen, J. S., Papoutsellis, E., Ametova, E., Fardell, G., Thielemans, K., Murgatroyd, L., Duff, M., & Robarts, H. (2023). Core Imaging Library (CIL). Zenodo. https://doi.org/10.5281/zenodo.4746198
+
+
+In most cases, the first CIL paper will be the appropriate choice:
+
+[2] Jørgensen JS et al. 2021 [Core Imaging Library Part I: a versatile python framework for tomographic imaging](https://doi.org/10.1098/rsta.2020.0192). Phil. Trans. R. Soc. A 20200192. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I) [Pre-print](https://arxiv.org/abs/2102.04560)
+
+However, if your work is more closely related to topics covered in our second CIL paper then please additionally or alternatively reference the second paper:
+
+[3] Papoutsellis E et al. 2021 [Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
 tomography](https://doi.org/10.1098/rsta.2020.0193). Phil. Trans. R. Soc. A 20200193. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II) [Pre-print](https://arxiv.org/abs/2102.06126)

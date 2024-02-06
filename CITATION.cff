@@ -1,4 +1,5 @@
 cff-version: 1.2.0
+message: "If you use this software, please cite the software itself via zenodo as below, plus a CIL article, please see the CIL README for more details: https://github.com/TomographicImaging/CIL/blob/improve_citation/README.md"
 abstract: "The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging 
            with particular emphasis on reconstruction of challenging datasets. Conventional filtered 
            backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard
@@ -7,13 +8,31 @@ abstract: "The Core Imaging Library (CIL) is an open-source Python framework for
            including sparsity and total variation regularisation, as well as tools for loading, preprocessing 
            and visualising tomographic data."
 authors:
-  - name: UK Research and Innovation and University of Manchester
+  - family-names: Pasca
+    given-names: Edoardo
+  - family-names: Jørgensen
+    given-names: Jakob Sauer
+  - family-names: Papoutsellis
+    given-names: Evangelos
+  - family-names: Ametova
+    given-names: Evelina
+  - family-names: Fardell
+    given-names: Gemma
+  - family-names: Thielemans
+    given-names: Kris
+  - family-names: Murgatroyd
+    given-names: Laura
+  - family-names: Duff
+    given-names: Margaret
+  - family-names: Robarts
+    given-names: Hannah
+title: "The Core Imaging Library"
+doi: 10.5281/zenodo.4746198
 date-released: "08-01-18"
 identifiers:
   - description: "This is the collection of archived snapshots of all versions of the Core Imaging Library"
     type: doi
     value: 10.5281/zenodo.4746198
-
 keywords:
   - "tomographic imaging"
   - research
@@ -23,38 +42,3 @@ keywords:
   - hyperspectral
   - optimisation
 license: Apache-2.0
-message: "If you use this software, please cite both the article from preferred-citation and the software itself, via zenodo."
-preferred-citation:
-  authors:
-    - family-names: Jørgensen
-      given-names: Jakob Sauer
-    - family-names: Ametova
-      given-names: Evelina
-    - family-names: Burca
-      given-names: Genoveva
-    - family-names: Fardell
-      given-names: Gemma
-    - family-names: Papoutsellis
-      given-names: Evangelos
-    - family-names: Pasca
-      given-names: Edoardo
-    - family-names: Thielemans
-      given-names: Kris
-    - family-names: Turner
-      given-names: Martin
-    - family-names: Warr
-      given-names: Ryan
-    - family-names: Lionheart
-      given-names: William RB
-    - family-names: Withers
-      given-names: Philip J     
-  title: "Core Imaging Library - Part I: a versatile Python framework for tomographic imaging"
-  type: article
-  doi: 10.1098/rsta.2020.0192
-  issue: 2204
-  volume: 379
-  journal: "Philosophical Transactions of The Royal Society A"
-  year: 2021
-repository-code: "https://github.com/TomographicImaging/CIL.git"
-title: "CIL"
-version: 23.1.0

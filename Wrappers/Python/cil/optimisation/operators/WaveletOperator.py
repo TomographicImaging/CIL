@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2019 United Kingdom Research and Innovation
-#  Copyright 2019 The University of Manchester
+#  Copyright 2023 United Kingdom Research and Innovation
+#  Copyright 2023 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,80 +18,84 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import numpy as np
-import pywt # PyWavelets module
+import pywt  # PyWavelets module
 import warnings
 
 from cil.optimisation.operators import LinearOperator
 from cil.framework import VectorGeometry
 
 
-###############################################################################
-###############################################################################
-########################## Discrete Wavelet Transform #########################
-###############################################################################
-###############################################################################
-
 class WaveletOperator(LinearOperator):
-    
+
     r'''                  
         Computes forward or inverse (adjoint) discrete wavelet transform of the input
-        
+
         Parameters
         ----------
-        :param domain_geometry: Domain geometry for the WaveletOperator
+        param domain_geometry: cil geometry 
+            Domain geometry for the WaveletOperator
 
-        [OPTIONAL PARAMETERS]
-        :param range_geometry: Output geometry for the WaveletOperator. 
-            Default = domain_geometry with the right coefficient array size deduced from pywt
-        :param level: integer for decomposition level.
-            Default = log_2(min(shape(axes))), i.e. the maximum number of accurate downsamplings possible
-        :type wname: string label for wavelet used.
-            Default = "haar"
-        :type axes: range of ints to define the dimensions to decompose along. Note that channel is the first dimension:
-            For example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
+        param range_geometry: cil geometry, optional
+            Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywt
+
+        param level: int, optional, default= log_2(min(shape(axes)))
+            integer for decomposition level. Default = log_2(min(shape(axes))), i.e. the maximum number of accurate downsamplings possible
+        wname: string, optional, default='haar'
+            label for wavelet used.D
+        axes: list of ints, optional, default=None
+            Defines the dimensions to decompose along. Note that channel is the first dimension:
+            for example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
             Default = None, meaning all dimensions are transformed. Same as axes = range(ndim)
+
         **kwargs:
-            correlation: str, default 'All'. Only applied if 'axes' = None!
-                'All' will compute the wavelet decomposition on every possible dimension.
-                'Space' will compute the wavelet decomposition on only the spatial dimensions. If there are multiple channels, each channel is decomposed independently.
-                'Channels' will compute the wavelet decomposition on only the channels, independently for every spatial point.
-            bnd_cond: str, default 'symmetric'. More commonly known as the padding or extension method used in discrete convolutions. All options supported by PyWavelets are valid.
-                Most common examples are 'symmetric' (padding by mirroring edge values), 'zero' (padding with zeros), 'periodic' (wrapping values around as in circular convolution).
-                Some padding methods can have unexpected effect on the wavelet coefficients at the edges.
-                See https://pywavelets.readthedocs.io/en/latest/ref/signal-extension-modes.html for more details and all options.
-        
+        ---------
+        correlation: str, default 'All'. Only applied if 'axes' = None!
+            'All' will compute the wavelet decomposition on every possible dimension.
+            'Space' will compute the wavelet decomposition on only the spatial dimensions. If there are multiple channels, each channel is decomposed independently.
+            'Channels' will compute the wavelet decomposition on only the channels, independently for every spatial point.
+        bnd_cond: str, default 'symmetric'. More commonly known as the padding or extension method used in discrete convolutions. All options supported by PyWavelets are valid.
+            Most common examples are 'symmetric' (padding by mirroring edge values), 'zero' (padding with zeros), 'periodic' (wrapping values around as in circular convolution).
+            Some padding methods can have unexpected effect on the wavelet coefficients at the edges.
+            See https://pywavelets.readthedocs.io/en/latest/ref/signal-extension-modes.html for more details and all options.
+
         Attributes
         ----------
-        :param moments: integer for number of vanishing moments.
-            Default = Known for Daubechies, None for others
-        
-     '''     
-       
-    def __init__(self, domain_geometry, 
-                       range_geometry=None, 
-                       level = None,
-                       wname = "haar",
-                       axes = None,
-                       **kwargs):
+        moments: integer for 
+            number of vanishing moments. Known for Daubechies, None for others
+
+     '''
+
+    def __init__(self, domain_geometry,
+                 range_geometry=None,
+                 level=None,
+                 wname="haar",
+                 axes=None,
+                 **kwargs):
 
         # Correlation is different way of defining decomposition axes
         self.correlation = kwargs.get('correlation', None)
-        
+
         if axes is None and len(domain_geometry.shape) > 1:
             if self.correlation in [None, 'All']:
                 axes = None
             elif self.correlation.lower() in ["space", "spatial"]:
-                axes = [i for i,l in enumerate(domain_geometry.dimension_labels) if l != 'channel']
+                axes = [i for i, l in enumerate(
+                    domain_geometry.dimension_labels) if l != 'channel']
             elif self.correlation.lower() in ["channels", "channel"]:
-                axes = [i for i,l in enumerate(domain_geometry.dimension_labels) if l == 'channel']
+                axes = [i for i, l in enumerate(
+                    domain_geometry.dimension_labels) if l == 'channel']
             else:
-                raise AttributeError(f"Unknown correlation type: '{self.correlation}'")
+                raise AttributeError(
+                    f"Unknown correlation type: '{self.correlation}'")
             if axes == []:
-                raise AttributeError(f"Correlation set to '{self.correlation}' but the data only has '{domain_geometry.dimension_labels}' as possible dimensions")
+                raise AttributeError(
+                    f"Correlation set to '{self.correlation}' but the data only has '{domain_geometry.dimension_labels}' as possible dimensions")
         elif axes is not None and self.correlation is not None:
-            warnings.warn(f"Decomposition axes '{axes}' take priority over correlation '{self.correlation}'. Both should not be used.", UserWarning)
+            warnings.warn(
+                f"Decomposition axes '{axes}' take priority over correlation '{self.correlation}'. Both should not be used.", UserWarning)
         elif len(domain_geometry.shape) == 1 and self.correlation is not None:
-            warnings.warn(f"Setting correlation '{self.correlation}' is not valid for 1D data.", UserWarning)
+            warnings.warn(
+                f"Setting correlation '{self.correlation}' is not valid for 1D data.", UserWarning)
 
         # Convolution boundary condition i.e. padding method
         self.bnd_cond = kwargs.get('bnd_cond', 'symmetric')
@@ -107,10 +111,12 @@ class WaveletOperator(LinearOperator):
             # Default decomposition level is the theoretical maximum: log_2(min(input.shape)).
             # However, this is not always recommended and pywt should give a warning if the coarsest
             # scales are too small to be meaningful.
-            level = pywt.dwtn_max_level(domain_geometry.shape, wavelet=self._wavelet, axes=axes)
+            level = pywt.dwtn_max_level(
+            	domain_geometry.shape, wavelet=self._wavelet, axes=axes)
         self.level = int(level)
 
-        self._shapes = pywt.wavedecn_shapes(domain_geometry.shape, wavelet=self._wavelet, level=level, axes=axes, mode=self.bnd_cond)
+        self._shapes = pywt.wavedecn_shapes(
+        	domain_geometry.shape, wavelet=self._wavelet, level=level, axes=axes, mode=self.bnd_cond)
         self.axes = axes
         self._slices = self._shape2slice()
         
@@ -118,7 +124,8 @@ class WaveletOperator(LinearOperator):
         range_shape = np.array(domain_geometry.shape)
         if axes is None:
             axes = range(len(domain_geometry.shape))
-        d = 'd'*len(axes) # Name of the diagonal element in unknown dimensional DWT
+        # Name of the diagonal element in unknown dimensional DWT
+        d = 'd'*len(axes)
         for k in axes:
             range_shape[k] = self._shapes[0][k]
             for l in range(level):
@@ -131,7 +138,8 @@ class WaveletOperator(LinearOperator):
             if hasattr(range_geometry, 'channels'):
                 if range_geometry.channels > 1:
                     range_geometry.channels = range_shape[0]
-                    range_shape = range_shape[1:] # Remove channels temporarily
+                    # Remove channels temporarily
+                    range_shape = range_shape[1:]
 
             if len(range_shape) == 3:
                 range_geometry.voxel_num_x = range_shape[2]
@@ -140,16 +148,17 @@ class WaveletOperator(LinearOperator):
             elif len(range_shape) == 2:
                 range_geometry.voxel_num_x = range_shape[1]
                 range_geometry.voxel_num_y = range_shape[0]
-            elif len(range_shape) == 1: # VectorGeometry is bit special
+            elif len(range_shape) == 1:  # VectorGeometry is bit special
                 range_geometry = VectorGeometry(range_shape[0])
             else:
-                raise AttributeError(f"Spatial dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")
-            
-        elif (range_geometry.shape != range_shape).any():
-            raise AttributeError(f"Size of the range geometry is {range_geometry.shape} but the size of the wavelet coefficient array must be {tuple(range_shape)}.")
-                    
-        super().__init__(domain_geometry=domain_geometry, range_geometry=range_geometry)
+                raise AttributeError(
+                    f"Spatial dimension of range_geometry can be at most 3. Now it is {len(range_shape)}!")
 
+        elif (range_geometry.shape != range_shape).any():
+            raise AttributeError(
+                f"Size of the range geometry is {range_geometry.shape} but the size of the wavelet coefficient array must be {tuple(range_shape)}.")
+
+        super().__init__(domain_geometry=domain_geometry, range_geometry=range_geometry)
 
     def _shape2slice(self):
         """Helper function for turning shape of coefficients to slices"""
@@ -163,6 +172,7 @@ class WaveletOperator(LinearOperator):
 
         _, slices = pywt.coeffs_to_array(coeff_tmp, padding=0, axes=self.axes)
         return slices
+<<<<<<< HEAD
     
     def _getBiortFilters(self, wname):
         """Helper function for creating a custom wavelet object.
@@ -175,13 +185,27 @@ class WaveletOperator(LinearOperator):
         wavelet.orthogonal = False
         wavelet.biorthogonal = True
         return wavelet
-        
-    def direct(self, x, out = None):
-        '''Forward operator -- decomposition -- analysis'''
-        
+    
+    def direct(self, x, out=None):
+        r"""Returns the value of the WaveletOperator applied to :math:`x`
+
+
+        Parameters
+        ----------
+        x : DataContainer
+
+        out: return DataContainer, if None a new DataContainer is returned, default None.
+
+        Returns
+        --------
+        DataContainer, the value of the WaveletOperator applied to :math:`x` or `None` if `out`  
+
+        """
+
         x_arr = x.as_array()
         
-        coeffs = pywt.wavedecn(x_arr, wavelet=self._wavelet, level=self.level, axes=self.axes, mode=self.bnd_cond)
+        coeffs = pywt.wavedecn(
+        	x_arr, wavelet=self._wavelet, level=self.level, axes=self.axes, mode=self.bnd_cond)
 
         Wx, _ = pywt.coeffs_to_array(coeffs, axes=self.axes)
 
@@ -190,6 +214,7 @@ class WaveletOperator(LinearOperator):
             ret.fill(Wx)
             return ret
         else:
+<<<<<<< HEAD
             out.fill(Wx) 
     
     def adjoint(self, Wx, out = None):
@@ -199,6 +224,30 @@ class WaveletOperator(LinearOperator):
         coeffs = pywt.array_to_coeffs(Wx_arr, self._slices)
 
         x = pywt.waverecn(coeffs, wavelet=self._wavelet, axes=self.axes, mode=self.bnd_cond)
+=======
+            out.fill(Wx)
+
+    def adjoint(self, Wx, out=None):
+        r"""Returns the value of the adjoint of the WaveletOperator applied to :math:`x`
+
+
+        Parameters
+        ----------
+        x : DataContainer
+
+        out: return DataContainer, if None a new DataContainer is returned, default None.
+
+        Returns
+        --------
+        DataContainer, the value of the adjoint of the WaveletOperator applied to :math:`x` or `None` if `out`  
+
+        """
+
+        Wx_arr = Wx.as_array()
+        coeffs = pywt.array_to_coeffs(Wx_arr, self._slices)
+
+        x = pywt.waverecn(
+        	coeffs, wavelet=self._wavelet, axes=self.axes, mode=self.bnd_cond)
 
         # Need to slice the output in case original size is of odd length
         org_size = tuple(slice(i) for i in self.domain_geometry().shape)
@@ -209,8 +258,17 @@ class WaveletOperator(LinearOperator):
             return ret
         else:
             out.fill(x[org_size])
-        
+
     def calculate_norm(self):
+<<<<<<< HEAD
+        if self._wavelet.orthogonal:
+=======
+        '''Returns the norm of WaveletOperator, which is equal to 1.o if the wavelet is orthogonal
+
+        Returns
+        --------
+        norm: float 
+        '''
         if self._wavelet.orthogonal:
             norm = 1.0
         else:

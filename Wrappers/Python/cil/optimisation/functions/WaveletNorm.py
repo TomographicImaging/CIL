@@ -46,14 +46,10 @@ class WaveletNorm(Function):
         a) :math:`f(x) = ||Wx||_{\ell^1}`
         b) :math:`f(x) = ||Wx||_{\ell^1(w)}` (weighted norm)        
         '''
-<<<<<<< HEAD
+
         if not W._wavelet.orthogonal:
-            raise AttributeError(f"Invalid wavelet: `{W.wname}`. WaveletNorm is only defined for orthogonal wavelets!")
-=======
-        if not pywt.Wavelet(W.wname).orthogonal:
             raise AttributeError(
                 f"Invalid wavelet: `{W.wname}`. WaveletNorm is only defined for orthogonal wavelets!")
->>>>>>> wavelet_regularisation
 
         super(WaveletNorm, self).__init__()
         self.W = W
@@ -68,7 +64,6 @@ class WaveletNorm(Function):
             b) .. math:: f(x) = ||Wx||_{\ell^1(w)} (weighted norm)
         """
         y = self.W.direct(x)
-
         return self.l1norm(y)
 
     def convex_conjugate(self, x):

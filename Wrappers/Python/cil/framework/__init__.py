@@ -24,7 +24,8 @@ import warnings
 from functools import reduce
 from .framework import cilacc
 from .DataContainer import DataContainer
-from .framework import ImageData, AcquisitionData
+from .framework import ImageData
+from .AcquisitionData import AcquisitionData
 from .framework import ImageGeometry, AcquisitionGeometry
 from .framework import VectorData, VectorGeometry
 from .framework import find_key, message

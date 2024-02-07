@@ -23,7 +23,7 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from .framework import cilacc
-from .framework import DataContainer
+from .DataContainer import DataContainer
 from .framework import ImageData, AcquisitionData
 from .framework import ImageGeometry, AcquisitionGeometry
 from .framework import VectorData, VectorGeometry

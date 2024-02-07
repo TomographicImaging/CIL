@@ -172,7 +172,6 @@ class WaveletOperator(LinearOperator):
 
         _, slices = pywt.coeffs_to_array(coeff_tmp, padding=0, axes=self.axes)
         return slices
-<<<<<<< HEAD
     
     def _getBiortFilters(self, wname):
         """Helper function for creating a custom wavelet object.
@@ -214,18 +213,7 @@ class WaveletOperator(LinearOperator):
             ret.fill(Wx)
             return ret
         else:
-<<<<<<< HEAD
             out.fill(Wx) 
-    
-    def adjoint(self, Wx, out = None):
-        '''Adjoint operator -- reconstruction -- synthesis'''
-                      
-        Wx_arr = Wx.as_array()
-        coeffs = pywt.array_to_coeffs(Wx_arr, self._slices)
-
-        x = pywt.waverecn(coeffs, wavelet=self._wavelet, axes=self.axes, mode=self.bnd_cond)
-=======
-            out.fill(Wx)
 
     def adjoint(self, Wx, out=None):
         r"""Returns the value of the adjoint of the WaveletOperator applied to :math:`x`
@@ -260,9 +248,6 @@ class WaveletOperator(LinearOperator):
             out.fill(x[org_size])
 
     def calculate_norm(self):
-<<<<<<< HEAD
-        if self._wavelet.orthogonal:
-=======
         '''Returns the norm of WaveletOperator, which is equal to 1.o if the wavelet is orthogonal
 
         Returns

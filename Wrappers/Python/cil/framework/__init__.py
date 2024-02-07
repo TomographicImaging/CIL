@@ -29,8 +29,7 @@ from .AcquisitionData import AcquisitionData
 from .framework import ImageGeometry, AcquisitionGeometry
 from .framework import VectorData, VectorGeometry
 from .framework import find_key, message
-from .framework import DataProcessor, Processor
-from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
+from .processors import Processor, DataProcessor, AX, CastDataContainer, PixelByPixelDataProcessor
 from .BlockDataContainer import BlockDataContainer
 from .BlockGeometry import BlockGeometry
 from .framework import DataOrder

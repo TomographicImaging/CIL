@@ -52,7 +52,7 @@ jobs:
         test_pyver: 3.9
         test_npver: 1.22
     - name: Upload artifact of the conda package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cil-package
         path: recipe/linux-64/cil*
@@ -93,7 +93,7 @@ jobs:
         sphinx-build -b dirhtml source "build/$docs_dir"
         sed 's#DESTINATION#nightly#g' .redirect-template.html > build/index.html
         ./mkversions.py
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: DocumentationHTML
         path: docs/build

@@ -5,11 +5,17 @@
 # To generate packages.plain, you will need to run the command as follows from the terminal:
 # `pyreverse -A -k -o plain ..\..\Wrappers\Python\cil\`
 
+import os
+
+fname = "output/overall-CIL-packages.plain"
+if not os.path.exists(fname):
+    raise IOError(fname + " does not exists. Please make sure you run `./extract-UML.sh` first.")
+
 # A dictionary containing the edges
 links = {}
 
 # Open the file
-f = open('packages.plain','r')
+f = open(fname, 'r')
 
 # Process every line of the file
 for line in f:

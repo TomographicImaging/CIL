@@ -67,8 +67,8 @@ pygments_style = None  # syntax highlighting
 html_theme = 'pydata_sphinx_theme'
 # default: ['localtoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html']
 html_sidebars = {
-   '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'],
-   'using/windows': ['windowssidebar.html', 'searchbox.html'],
+   '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html', 'version-switcher.html'],
+   'using/windows': ['windowssidebar.html', 'searchbox.html', 'version-switcher.html'],
 }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -116,3 +116,9 @@ bibtex_bibfiles = ['refs.bib']
 bibtex_encoding = 'latin'
 bibtex_reference_style = 'label'
 bibtex_default_style = 'plain'
+html_theme_options = {
+    "switcher": {
+        "json_url": "/CIL/versions.json", # baseurl
+        "version_match": version
+    },
+}

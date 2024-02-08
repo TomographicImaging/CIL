@@ -69,9 +69,8 @@ jobs:
     - name: install dependencies
       run: |
         cd docs
-        sed -r '/tigre|astra-toolbox/d' ../scripts/requirements-test.yml > cil_environment.yml
-        conda install -c conda-forge -y conda-merge
-        conda-merge cil_environment.yml docs_environment.yml > environment.yml
+        conda install -c conda-forge -yq conda-merge
+        conda-merge <(sed -r '/tigre|astra-toolbox/d' ../scripts/requirements-test.yml) docs_environment.yml > environment.yml
         conda env update -n test
         conda list
     - name: build cil
@@ -79,18 +78,32 @@ jobs:
         mkdir build && cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
         cmake --build . --target install
-    - run: make -C docs dirhtml
+    - name: checkout docs
+      uses: actions/checkout@v4
+      with:
+        path: docs/build
+        ref: gh-pages
+    - name: update docs
+      run: |
+        cd docs
+        docs_dir="${{ github.ref_name }}"
+        docs_dir="${docs_dir//\//_}"
+        if test "$docs_dir" = master; then docs_dir=nightly; fi
+        rm -rf "build/$docs_dir"
+        sphinx-build -b dirhtml source "build/$docs_dir"
+        sed 's#DESTINATION#nightly#g' .redirect-template.html > build/index.html
+        ./mkversions.py
     - uses: actions/upload-artifact@v3
       with:
         name: DocumentationHTML
-        path: docs/build/dirhtml
+        path: docs/build
     - name: Push changes
       if: github.ref == 'refs/heads/master'
       uses: casperdcl/push-dir@v1
       with:
         message: Update documentation
         branch: gh-pages
-        dir: docs/build/dirhtml
+        dir: docs/build
         nojekyll: true
   docker:
     runs-on: ubuntu-latest

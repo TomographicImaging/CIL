@@ -50,7 +50,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.bibtex'
+    'sphinxcontrib.bibtex',
 ]
 
 templates_path = ['_templates']
@@ -65,10 +65,32 @@ pygments_style = None  # syntax highlighting
 
 # HTML config
 html_theme = 'pydata_sphinx_theme'
-# default: ['localtoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html']
+html_theme_options = {
+    "switcher": {
+        "json_url": "/CIL/versions.json", # baseurl
+        "version_match": version
+    },
+    "favicons": [{"rel": "icon", "sizes": "32x32", "href": "https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png"}],
+    "logo": {
+        "image_light": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg",
+        "image_dark": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg",
+    },
+    "header_links_before_dropdown": 9,
+    "navbar_persistent": [], # no search icon in top right
+    "footer_start": ["copyright"], "footer_end": [], # clean footers
+    "use_edit_page_button": True, # edit on GitHub link
+    "primary_sidebar_end": [],
+    "secondary_sidebar_items": [], # remove right sidebar
+}
 html_sidebars = {
-   '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html', 'version-switcher.html'],
-   'using/windows': ['windowssidebar.html', 'searchbox.html', 'version-switcher.html'],
+   '**': ['search-field', 'version-switcher', 'globaltoc', 'edit-this-page'],
+   'using/windows': ['search-field', 'version-switcher', 'windowssidebar', 'edit-this-page'],
+}
+html_show_sourcelink = False
+html_context = {
+    "github_user": "TomographicImaging", "github_repo": "CIL",
+    "github_version": "master",
+    "doc_path": "docs/source",
 }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -116,9 +138,3 @@ bibtex_bibfiles = ['refs.bib']
 bibtex_encoding = 'latin'
 bibtex_reference_style = 'label'
 bibtex_default_style = 'plain'
-html_theme_options = {
-    "switcher": {
-        "json_url": "/CIL/versions.json", # baseurl
-        "version_match": version
-    },
-}

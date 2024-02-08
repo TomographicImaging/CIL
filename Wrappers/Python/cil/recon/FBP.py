@@ -22,7 +22,7 @@ from typing import Literal, Optional, Union
 from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry, AcquisitionData
 from cil.framework.framework import ImageData, ImageGeometry
-from cil.recon.Reconstructor import Reconstructor
+from .Reconstructor import Reconstructor
 from scipy.fft import fftfreq
 
 import numpy as np

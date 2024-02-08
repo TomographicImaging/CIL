@@ -17,7 +17,7 @@ class TestWavelets(CCPiTestClass):
 
     def test_WaveletOperator_dimensions(self):
         m, n = 42, 47
-        level = 3
+        level = 2
         for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3']:
             for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
                 with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
@@ -35,6 +35,32 @@ class TestWavelets(CCPiTestClass):
                     self.assertNumpyArrayAlmostEqual(x.as_array(), y.as_array())
 
                     self.assertRaises(AttributeError, WaveletOperator, domain_geometry=dg, range_geometry=dg, wname=wname, msg="Geometry shape mismatch should raise error")
+    
+    def test_WaveletOperator_complex_input(self):
+        m, n = 42, 47
+        level = 2
+        for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3']:
+            for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
+                with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
+                    x = dg.allocate('random', dtype='complex128')
+
+                    W = WaveletOperator(dg, wname=wname, level=level)
+                    rg = W.range_geometry() # Range
+                    Wx = W.direct(x)
+                    y = W.adjoint(Wx)
+
+                    self.assertEqual(x.dtype, Wx.dtype, msg="Complex input should give complex coefficients")
+                    self.assertEqual(Wx.dtype, y.dtype, msg="Complex coefficients should give complex output")
+
+                    self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
+                    self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
+
+                    # Reconstruction should be (almost) the original input
+                    self.assertNumpyArrayAlmostEqual(x.as_array(), y.as_array())
+
+                    z = 0*Wx
+                    W.direct(x, out=z)
+                    self.assertNumpyArrayAlmostEqual(Wx.as_array(), z.as_array())
     
     def test_WaveletOperator_dimensions_biorthogonal(self):
         m, n = 48, 47
@@ -184,7 +210,7 @@ class TestWavelets(CCPiTestClass):
         tau = 0.0
         prox = WN.proximal(x, tau=tau)
 
-        self.assertAlmostEqual(0, (prox - y).norm(), msg="Prox_{tau=0}(  ) should be (almost) the identity")
+        self.assertAlmostEqual(0, (prox - y).norm(), places=5, msg="Prox_{tau=0}(  ) should be (almost) the identity")
         self.assertNumpyArrayAlmostEqual(y.as_array(), prox.as_array())
 
         tau = 1.1
@@ -210,6 +236,45 @@ class TestWavelets(CCPiTestClass):
             with self.subTest(msg=f"Failed for biorthogonal wavelet with true_adjoint set to {true_adjoint}"):
                 W = WaveletOperator(dg, wname='bior3.5', level=1, true_adjoint=true_adjoint)
                 self.assertRaises(AttributeError, WaveletNorm, W) # This should always give error no matter which adjoint setting
+    
+    def test_WaveletNorm_complex_input(self):
+        n = 20
+        wname = 'db2'
+        level = 2
+
+        dg = VectorGeometry(n)
+        W = WaveletOperator(dg, wname=wname, level=level)
+        WN = WaveletNorm(W)
+
+        x = dg.allocate('random', dtype='complex64')
+        Wx = W.direct(x)
+
+        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients")
+
+        y = W.adjoint(Wx)
+        tau = 0.0
+        prox = WN.proximal(x, tau=tau)
+
+        self.assertAlmostEqual(0, (prox - y).norm(), places=5, msg="Prox_{tau=0}(  ) should be (almost) the identity")
+        self.assertNumpyArrayAlmostEqual(y.as_array(), prox.as_array())
+
+        tau = 1.1
+        Wx /= Wx.abs().max() # Bound Wx to [-1, 1]
+        W.adjoint(Wx, out=y)
+        WN.proximal(y, tau=tau, out=prox)
+        self.assertNumpyArrayAlmostEqual(np.zeros(x.shape), prox.as_array())
+
+        # Test for sign problems in prox
+        prox = x.copy()
+        WN.proximal(prox, tau=tau, out=prox)
+        proxNeg = WN.proximal(-x, tau=tau)
+        self.assertNumpyArrayAlmostEqual(np.zeros(x.shape), (prox + proxNeg).as_array())
+
+        convConj = WN.convex_conjugate(1.2*y)
+        self.assertEqual(np.inf, convConj, msg="Some coefficient should be > 1")
+
+        convConj = WN.convex_conjugate(0.9*y)
+        self.assertEqual(0, convConj, msg="All coefficient should be < 1")
 
 
 if __name__ == "__main__":

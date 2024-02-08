@@ -209,7 +209,7 @@ class WaveletOperator(LinearOperator):
         Wx, _ = pywt.coeffs_to_array(coeffs, axes=self.axes)
 
         if out is None:
-            ret = self.range_geometry().allocate()
+            ret = self.range_geometry().allocate(dtype=x.dtype)
             ret.fill(Wx)
             return ret
         else:
@@ -241,7 +241,7 @@ class WaveletOperator(LinearOperator):
         org_size = tuple(slice(i) for i in self.domain_geometry().shape)
 
         if out is None:
-            ret = self.domain_geometry().allocate()
+            ret = self.domain_geometry().allocate(dtype=Wx.dtype)
             ret.fill(x[org_size])
             return ret
         else:

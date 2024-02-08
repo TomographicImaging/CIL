@@ -27,7 +27,7 @@ from ctypes import util
 import math
 import weakref
 import logging
-from label import image_labels, acquisition_labels
+from .label import image_labels, acquisition_labels
 
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension

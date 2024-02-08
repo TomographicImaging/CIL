@@ -27,6 +27,7 @@ from ctypes import util
 import math
 import weakref
 import logging
+from label import image_labels, acquisition_labels
 
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
@@ -252,10 +253,10 @@ class ImageGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {ImageGeometry.CHANNEL: self.channels,
-                     ImageGeometry.VERTICAL: self.voxel_num_z,
-                     ImageGeometry.HORIZONTAL_Y: self.voxel_num_y,        
-                     ImageGeometry.HORIZONTAL_X: self.voxel_num_x}
+        shape_dict = {image_labels["CHANNEL"]: self.channels,
+                      image_labels["VERTICAL"]: self.voxel_num_z,
+                      image_labels["HORIZONTAL_Y"]: self.voxel_num_y,
+                      image_labels["HORIZONTAL_X"]: self.voxel_num_x}
 
         shape = []
         for label in self.dimension_labels:
@@ -270,10 +271,10 @@ class ImageGeometry(object):
     @property
     def spacing(self):
 
-        spacing_dict = {ImageGeometry.CHANNEL: self.channel_spacing,
-                        ImageGeometry.VERTICAL: self.voxel_size_z,
-                        ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,        
-                        ImageGeometry.HORIZONTAL_X: self.voxel_size_x}
+        spacing_dict = {image_labels["CHANNEL"]: self.channel_spacing,
+                        image_labels["VERTICAL"]: self.voxel_size_z,
+                        image_labels["HORIZONTAL_Y"]: self.voxel_size_y,
+                        image_labels["HORIZONTAL_X"]: self.voxel_size_x}
 
         spacing = []
         for label in self.dimension_labels:
@@ -489,7 +490,7 @@ class ImageGeometry(object):
             # it's created empty, so we make it 0
             out.array.fill(value)
         else:
-            if value == ImageGeometry.RANDOM:
+            if value == image_labels["RANDOM"]:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -498,7 +499,7 @@ class ImageGeometry(object):
                     out.fill(r)
                 else: 
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == ImageGeometry.RANDOM_INT:
+            elif value == image_labels["RANDOM_INT"]:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -687,7 +688,7 @@ class SystemConfiguration(object):
 
     @geometry.setter
     def geometry(self,val):
-        if val != AcquisitionGeometry.CONE and val != AcquisitionGeometry.PARALLEL:
+        if val != acquisition_labels["CONE"] and val != acquisition_labels["PARALLEL"]:
             raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
         else:
             self._geometry = val
@@ -699,7 +700,7 @@ class SystemConfiguration(object):
         self.geometry = geometry
         self.units = units
         
-        if geometry == AcquisitionGeometry.PARALLEL:
+        if geometry == acquisition_labels["PARALLEL"]:
             self.ray = DirectionVector(dof)
         else:
             self.source = PositionVector(dof)
@@ -1919,7 +1920,7 @@ class Angles(object):
 
     @angle_unit.setter
     def angle_unit(self,val):
-        if val != AcquisitionGeometry.DEGREE and val != AcquisitionGeometry.RADIAN:
+        if val != acquisition_labels["DEGREE"] and val != acquisition_labels["RADIAN"]:
             raise ValueError('angle_unit = {} not recognised please specify \'degree\' or \'radian\''.format(val))
         else:
             self._angle_unit = val
@@ -2156,10 +2157,10 @@ class AcquisitionGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
-                     AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
-                     AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
-                     AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
+        shape_dict = {acquisition_labels["CHANNEL"]: self.config.channels.num_channels,
+                      acquisition_labels["ANGLE"]: self.config.angles.num_positions,
+                      acquisition_labels["VERTICAL"]: self.config.panel.num_pixels[1],
+                      acquisition_labels["HORIZONTAL"]: self.config.panel.num_pixels[0]}
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -2611,7 +2612,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
         
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
+            if geometry_new.geom_type == acquisition_labels["PARALLEL"] or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
@@ -2642,7 +2643,7 @@ class AcquisitionGeometry(object):
             # it's created empty, so we make it 0
             out.array.fill(value)
         else:
-            if value == AcquisitionGeometry.RANDOM:
+            if value == acquisition_labels["RANDOM"]:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -2651,7 +2652,7 @@ class AcquisitionGeometry(object):
                     out.fill(r)
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == AcquisitionGeometry.RANDOM_INT:
+            elif value == acquisition_labels["RANDOM_INT"]:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -4226,13 +4227,13 @@ class DataOrder():
 
     ENGINES = ['astra','tigre','cil']
 
-    ASTRA_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-    TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-    ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
-    TIGRE_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
-    CIL_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-    CIL_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL] 
-    TOMOPHANTOM_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    ASTRA_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+    TIGRE_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+    ASTRA_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"], acquisition_labels["HORIZONTAL"]]
+    TIGRE_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["ANGLE"], acquisition_labels["VERTICAL"], acquisition_labels["HORIZONTAL"]]
+    CIL_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+    CIL_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["ANGLE"], acquisition_labels["VERTICAL"], acquisition_labels["HORIZONTAL"]]
+    TOMOPHANTOM_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
     
     @staticmethod
     def get_order_for_engine(engine, geometry):

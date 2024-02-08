@@ -243,12 +243,6 @@ def message(cls, msg, *args):
     return msg.format(*args )
 
 class ImageGeometry(object):
-    RANDOM = 'random'
-    RANDOM_INT = 'random_int'
-    CHANNEL = 'channel'
-    VERTICAL = 'vertical'
-    HORIZONTAL_X = 'horizontal_x'
-    HORIZONTAL_Y = 'horizontal_y'
     
     @property
     def shape(self):
@@ -2072,19 +2066,6 @@ class AcquisitionGeometry(object):
     `AcquisitionGeometry.create_Cone3D()`
     """
 
-    RANDOM = 'random'
-    RANDOM_INT = 'random_int'
-    ANGLE_UNIT = 'angle_unit'
-    DEGREE = 'degree'
-    RADIAN = 'radian'
-    CHANNEL = 'channel'
-    ANGLE = 'angle'
-    VERTICAL = 'vertical'
-    HORIZONTAL = 'horizontal'
-    PARALLEL = 'parallel'
-    CONE = 'cone'
-    DIM2 = '2D'
-    DIM3 = '3D'
 
     #for backwards compatibility
     @property

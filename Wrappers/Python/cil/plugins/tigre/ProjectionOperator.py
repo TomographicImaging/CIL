@@ -18,7 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
-from cil.framework import DataOrder
+from cil.framework import DataOrder, acquisition_labels
 from cil.framework.BlockGeometry import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.optimisation.operators import LinearOperator
@@ -231,7 +231,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         data = x.as_array()
 
         #if single angle projection add the dimension in for TIGRE
-        if x.dimension_labels[0] != AcquisitionGeometry.ANGLE:
+        if x.dimension_labels[0] != acquisition_labels["ANGLE"]:
             data = np.expand_dims(data, axis=0)
 
         if self.tigre_geom.is2D:

@@ -17,7 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, ImageGeometry, DataContainer
+from cil.framework import ImageData, ImageGeometry, image_labels
 import numpy
 import numpy as np
 from PIL import Image
@@ -216,7 +216,7 @@ class TestData(object):
             sdata = numpy.zeros((N, M))
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(M/4)):int(round(3*M/4))] = 0.5
             sdata[int(round(N/8)):int(round(7*N/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]])
             data = ig.allocate()
             data.fill(sdata)
 
@@ -231,7 +231,7 @@ class TestData(object):
                     N = size[0]
                     M = size[1]
                 
-                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]])
                 data = ig.allocate()
                 tmp = numpy.array(f.convert('L').resize((M,N)))
                 data.fill(tmp/numpy.max(tmp))
@@ -253,13 +253,13 @@ class TestData(object):
                         bands = tmp.getbands()
 
                     ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands), 
-                    dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
+                    dimension_labels=[image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"],image_labels["CHANNEL"]])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
-                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    data.reorder([image_labels["CHANNEL"],image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]])
                     data.geometry.channel_labels = bands
                 else:
-                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
 

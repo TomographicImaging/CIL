@@ -17,7 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework import acquisition_labels
 import numpy as np
 
 try:
@@ -34,7 +34,7 @@ class CIL2TIGREGeometry(object):
         #angles
         angles = ag.config.angles.angle_data + ag.config.angles.initial_angle
 
-        if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
+        if ag.config.angles.angle_unit == acquisition_labels["DEGREE"]:
             angles *= (np.pi/180.) 
 
         #convert CIL to TIGRE angles s

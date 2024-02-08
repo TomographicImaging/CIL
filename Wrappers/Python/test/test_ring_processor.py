@@ -19,7 +19,7 @@
 
 import unittest
 from cil.processors import RingRemover, TransmissionAbsorptionConverter, Slicer
-from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageGeometry, AcquisitionGeometry, acquisition_labels
 from cil.utilities import dataexample
 from cil.utilities.quality_measures import mse
 
@@ -62,7 +62,7 @@ class TestL1NormRR(unittest.TestCase):
         angles = np.linspace(0, 180, 120, dtype=np.float32)
 
         ag = AcquisitionGeometry.create_Parallel2D()\
-            .set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)\
+            .set_angles(angles, angle_unit=acquisition_labels["DEGREE"])\
             .set_panel(detectors)
         sin = ag.allocate(None)
         sino = TomoP2D.ModelSino(model, detectors, detectors, angles, path_library2D)

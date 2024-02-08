@@ -25,6 +25,7 @@ from cil.framework import ImageData
 from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
+from cil.framework import acquisition_labels, image_labels
 from timeit import default_timer as timer
 
 initialise_tests()
@@ -213,8 +214,8 @@ class TestSubset(unittest.TestCase):
 
     def test_ImageDataAllocate1a(self):
         data = self.ig.allocate()
-        default_dimension_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        default_dimension_labels = [image_labels["CHANNEL"], image_labels["VERTICAL"],
+                image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
         self.assertTrue( default_dimension_labels == list(data.dimension_labels) )
 
     def test_ImageDataAllocate1b(self):
@@ -222,64 +223,64 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( data.shape == (5,4,3,2))
         
     def test_ImageDataAllocate2a(self):
-        non_default_dimension_labels = [ ImageGeometry.HORIZONTAL_X, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL]
+        non_default_dimension_labels = [ image_labels["HORIZONTAL_X"], image_labels["VERTICAL"],
+                image_labels["HORIZONTAL_Y"], image_labels["CHANNEL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         self.assertTrue( non_default_dimension_labels == list(data.dimension_labels) )
         
     def test_ImageDataAllocate2b(self):
-        non_default_dimension_labels = [ ImageGeometry.HORIZONTAL_X, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL]
+        non_default_dimension_labels = [ image_labels["HORIZONTAL_X"], image_labels["VERTICAL"],
+                image_labels["HORIZONTAL_Y"], image_labels["CHANNEL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         self.assertTrue( data.shape == (2,4,3,5))
 
     def test_ImageDataSubset1a(self):
-        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
-        ImageGeometry.VERTICAL]
+        non_default_dimension_labels = [image_labels["HORIZONTAL_X"], image_labels["CHANNEL"], image_labels["HORIZONTAL_Y"],
+        image_labels["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(horizontal_y = 1)
         self.assertTrue( sub.shape == (2,5,4))
 
     def test_ImageDataSubset2a(self):
-        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
-        ImageGeometry.VERTICAL]
+        non_default_dimension_labels = [image_labels["HORIZONTAL_X"], image_labels["CHANNEL"], image_labels["HORIZONTAL_Y"],
+        image_labels["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(horizontal_x = 1)
         self.assertTrue( sub.shape == (5,3,4))
 
     def test_ImageDataSubset3a(self):
-        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
-        ImageGeometry.VERTICAL]
+        non_default_dimension_labels = [image_labels["HORIZONTAL_X"], image_labels["CHANNEL"], image_labels["HORIZONTAL_Y"],
+        image_labels["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(channel = 1)
         self.assertTrue( sub.shape == (2,3,4))
 
     def test_ImageDataSubset4a(self):
-        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
-        ImageGeometry.VERTICAL]
+        non_default_dimension_labels = [image_labels["HORIZONTAL_X"], image_labels["CHANNEL"], image_labels["HORIZONTAL_Y"],
+        image_labels["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(vertical = 1)
         self.assertTrue( sub.shape == (2,5,3))
 
     def test_ImageDataSubset5a(self):
-        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y]
+        non_default_dimension_labels = [image_labels["HORIZONTAL_X"], image_labels["HORIZONTAL_Y"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(horizontal_y = 1)
         self.assertTrue( sub.shape == (2,))
 
     def test_ImageDataSubset1b(self):
-        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
-        ImageGeometry.VERTICAL]
+        non_default_dimension_labels = [image_labels["HORIZONTAL_X"], image_labels["CHANNEL"], image_labels["HORIZONTAL_Y"],
+        image_labels["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        new_dimension_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_X]
+        new_dimension_labels = [image_labels["HORIZONTAL_Y"], image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_X"]]
         data.reorder(new_dimension_labels)
         self.assertTrue( data.shape == (3,5,4,2))
 
@@ -291,9 +292,9 @@ class TestSubset(unittest.TestCase):
 
     def test_AcquisitionDataAllocate1a(self):
         data = self.ag.allocate()
-        default_dimension_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
+        default_dimension_labels = [acquisition_labels["CHANNEL"] ,
+                 acquisition_labels["ANGLE"] , acquisition_labels["VERTICAL"] ,
+                 acquisition_labels["HORIZONTAL"]]
         self.assertTrue(  default_dimension_labels == list(data.dimension_labels) )
 
     def test_AcquisitionDataAllocate1b(self):
@@ -301,8 +302,8 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( data.shape == (4,3,2,20))
 
     def test_AcquisitionDataAllocate2a(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
 
@@ -310,15 +311,15 @@ class TestSubset(unittest.TestCase):
         self.assertTrue(  non_default_dimension_labels == list(data.dimension_labels) )
         
     def test_AcquisitionDataAllocate2b(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         self.assertTrue( data.shape == (4,20,2,3))
 
     def test_AcquisitionDataSubset1a(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
@@ -326,24 +327,24 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( sub.shape == (4,20,3))
     
     def test_AcquisitionDataSubset1b(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sub = data.get_slice(channel = 0)
         self.assertTrue( sub.shape == (20,2,3))
     def test_AcquisitionDataSubset1c(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sub = data.get_slice(horizontal = 0, force=True)
         self.assertTrue( sub.shape == (4,2,3))
     def test_AcquisitionDataSubset1d(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
@@ -353,8 +354,8 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( sub.shape == (4,20,2) )
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
     def test_AcquisitionDataSubset1e(self):
-        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
-         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        non_default_dimension_labels = [acquisition_labels["CHANNEL"], acquisition_labels["HORIZONTAL"],
+         acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"]]
         self.ag.set_labels(non_default_dimension_labels)
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))

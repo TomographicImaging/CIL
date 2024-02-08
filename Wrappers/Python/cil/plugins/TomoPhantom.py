@@ -17,8 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData, DataOrder
+from cil.framework import ImageData, DataOrder, image_labels
 import tomophantom
 from tomophantom import TomoP2D, TomoP3D
 import os
@@ -140,7 +139,7 @@ def get_ImageData(num_model, geometry):
           ag.set_panel((N,N-2))
         
       ag.set_channels(channels)
-      ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)
+      ag.set_angles(angles, angle_unit=acquisition_labels["DEGREE"])
         
         
       ig = ag.get_ImageGeometry()
@@ -153,7 +152,7 @@ def get_ImageData(num_model, geometry):
     ig.set_labels(DataOrder.TOMOPHANTOM_IG_LABELS)
     num_dims = len(ig.dimension_labels)
     
-    if ImageGeometry.CHANNEL in ig.dimension_labels:
+    if image_labels["CHANNEL"] in ig.dimension_labels:
         if not is_model_temporal(num_model):
             raise ValueError('Selected model {} is not a temporal model, please change your selection'.format(num_model))
         if num_dims == 4:

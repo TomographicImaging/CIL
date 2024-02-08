@@ -19,7 +19,7 @@
 # Andrew Shartis (UES, Inc.)
 
 
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, DataOrder
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, DataOrder, acquisition_labels
 import numpy as np
 import os
 import olefile
@@ -234,11 +234,11 @@ class ZEISSDataReader(object):
                 ) \
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']],\
                         pixel_size=[self._metadata['detector_pixel_size']/1000,self._metadata['detector_pixel_size']/1000])\
-                    .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=acquisition_labels["RADIAN"])
         else:
             self._geometry = AcquisitionGeometry.create_Parallel3D()\
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']])\
-                    .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=acquisition_labels["RADIAN"])
         self._geometry.dimension_labels =  ['angle', 'vertical', 'horizontal']
 
     def _setup_image_geometry(self):

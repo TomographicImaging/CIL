@@ -26,6 +26,7 @@ from cil.framework import ImageData
 from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry
 from cil.framework import AcquisitionGeometry
+from cil.framework import acquisition_labels, image_labels
 from timeit import default_timer as timer
 import logging
 from testclass import CCPiTestClass
@@ -459,8 +460,8 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(vol.number_of_dimensions, 3)
         
         ig2 = ImageGeometry (voxel_num_x=2,voxel_num_y=3,voxel_num_z=4, 
-                     dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y,
-                 ImageGeometry.VERTICAL])
+                     dimension_labels=[image_labels["HORIZONTAL_X"], image_labels["HORIZONTAL_Y"],
+                 image_labels["VERTICAL"]])
         data = ig2.allocate()
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ig2.shape))
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
@@ -505,8 +506,8 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
         
         ag2 = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((2,3)).set_channels(4)\
-                                 .set_labels([AcquisitionGeometry.VERTICAL ,
-                         AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL, AcquisitionGeometry.CHANNEL])
+                                 .set_labels([acquisition_labels["VERTICAL"] ,
+                         acquisition_labels["ANGLE"], acquisition_labels["HORIZONTAL"], acquisition_labels["CHANNEL"]])
         
         data = ag2.allocate()
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag2.shape))
@@ -700,27 +701,27 @@ class TestDataContainer(CCPiTestClass):
 
         # expected dimension_labels
         
-        self.assertListEqual([AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL],
+        self.assertListEqual([acquisition_labels["CHANNEL"] ,
+                 acquisition_labels["ANGLE"] , acquisition_labels["VERTICAL"] ,
+                 acquisition_labels["HORIZONTAL"]],
                               list(sgeometry.dimension_labels))
         sino = sgeometry.allocate()
 
         # test reshape
-        new_order = [AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.ANGLE]
+        new_order = [acquisition_labels["HORIZONTAL"] ,
+                 acquisition_labels["CHANNEL"] , acquisition_labels["VERTICAL"] ,
+                 acquisition_labels["ANGLE"]]
         sino.reorder(new_order)
 
         self.assertListEqual(new_order, list(sino.geometry.dimension_labels))
 
         ss1 = sino.get_slice(vertical = 0)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL  ,
-                 AcquisitionGeometry.ANGLE], list(ss1.geometry.dimension_labels))
+        self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
+                 acquisition_labels["CHANNEL"]  ,
+                 acquisition_labels["ANGLE"]], list(ss1.geometry.dimension_labels))
         ss2 = sino.get_slice(vertical = 0, channel=0)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.ANGLE], list(ss2.geometry.dimension_labels))
+        self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
+                 acquisition_labels["ANGLE"]], list(ss2.geometry.dimension_labels))
 
 
     def test_ImageDataSubset(self):
@@ -744,42 +745,42 @@ class TestDataContainer(CCPiTestClass):
         self.assertListEqual(['channel', 'horizontal_y'], list(ss1.geometry.dimension_labels))
 
         vg = ImageGeometry(3,4,5,channels=2)
-        self.assertListEqual([ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X],
+        self.assertListEqual([image_labels["CHANNEL"], image_labels["VERTICAL"],
+                image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]],
                               list(vg.dimension_labels))
         ss2 = vg.allocate()
         ss3 = vol.get_slice(channel=0)
-        self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], list(ss3.geometry.dimension_labels))
+        self.assertListEqual([image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]], list(ss3.geometry.dimension_labels))
 
     def test_DataContainerSubset(self):
         dc = DataContainer(numpy.ones((2,3,4,5)))
 
-        dc.dimension_labels =[AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
+        dc.dimension_labels =[acquisition_labels["CHANNEL"] ,
+                 acquisition_labels["ANGLE"] , acquisition_labels["VERTICAL"] ,
+                 acquisition_labels["HORIZONTAL"]]
 
         # test reshape
-        new_order = [AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.ANGLE]
+        new_order = [acquisition_labels["HORIZONTAL"] ,
+                 acquisition_labels["CHANNEL"] , acquisition_labels["VERTICAL"] ,
+                 acquisition_labels["ANGLE"]]
         dc.reorder(new_order)
 
         self.assertListEqual(new_order, list(dc.dimension_labels))
 
         ss1 = dc.get_slice(vertical=0)
 
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL  ,
-                 AcquisitionGeometry.ANGLE], list(ss1.dimension_labels))
+        self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
+                 acquisition_labels["CHANNEL"]  ,
+                 acquisition_labels["ANGLE"]], list(ss1.dimension_labels))
         
         ss2 = dc.get_slice(vertical=0, channel=0)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.ANGLE], list(ss2.dimension_labels))
+        self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
+                 acquisition_labels["ANGLE"]], list(ss2.dimension_labels))
         
         # Check we can get slice still even if force parameter is passed:
         ss3 = dc.get_slice(vertical=0, channel=0, force=True)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                    AcquisitionGeometry.ANGLE], list(ss3.dimension_labels))
+        self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
+                    acquisition_labels["ANGLE"]], list(ss3.dimension_labels))
         
 
     def test_DataContainerChaining(self):
@@ -926,7 +927,7 @@ class TestDataContainer(CCPiTestClass):
         
         numpy.testing.assert_array_equal(a, u.as_array())
         
-        #u = ig.allocate(ImageGeometry.RANDOM_INT, seed=1)
+        #u = ig.allocate(image_labels["RANDOM_INT"], seed=1)
         l = functools.reduce(lambda x,y: x*y, (10,11,12), 1)
         
         a = numpy.zeros((l, ), dtype=numpy.float32)
@@ -1235,7 +1236,7 @@ class TestDataContainer(CCPiTestClass):
         ig = ImageGeometry(2,3,4)
         u = ig.allocate(0)
         a = numpy.ones((4,2))
-        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        # default_labels = [image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
         
         data = u.as_array()
         axis_number = u.get_dimension_axis('horizontal_y')
@@ -1263,7 +1264,7 @@ class TestDataContainer(CCPiTestClass):
         ag.set_labels(('horizontal','angle','vertical','channel'))
         u = ag.allocate(0)
         a = numpy.ones((4,2))
-        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        # default_labels = [image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
         
         data = u.as_array()
         axis_number = u.get_dimension_axis('horizontal_y')
@@ -1297,7 +1298,7 @@ class TestDataContainer(CCPiTestClass):
         u = ag.allocate(0)
         # (2, 5, 3, 4)
         a = numpy.ones((2,5))
-        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        # default_labels = [image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
         b = u.get_slice(channel=0, vertical=0)
         data = u.as_array()
         

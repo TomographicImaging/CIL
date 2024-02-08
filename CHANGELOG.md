@@ -24,6 +24,7 @@
   - Bug fix for norm of CompositionOperator
   - Functions updated to use sapyb
   - Fix KullbackLeibler numba gradient ignoring mask
+  - show1D slice_list parameter can now be of type tuple 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

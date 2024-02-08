@@ -17,11 +17,6 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import numpy
-import sys
-from datetime import timedelta, datetime
-import warnings
-from functools import reduce
 from .framework import cilacc
 from .DataContainer import DataContainer
 from .framework import ImageData

@@ -705,8 +705,8 @@ a line plot generated in each case.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>list of DataContainer</em><em>, </em><em>tuple of DataContainer</em>) – Multi-dimensional data to be reduced to 1D.</p></li>
-<li><p><strong>slice_list</strong> (<em>list of tuple</em><em> or </em><em>list of list of tuple</em><em>, </em><em>default=None</em>) – A list, or nested list, of (dimension, coordinate) pairs for
-slicing <cite>data</cite> (default is None, which is only valid when 1D
+<li><p><strong>slice_list</strong> (<em>tuple</em><em>, </em><em>list of tuple</em><em> or </em><em>list of list of tuple</em><em>, </em><em>default=None</em>) – A tuple of (dimension, coordinate) pair, or a list, or nested list, of
+such pairs for slicing <cite>data</cite> (default is None, which is only valid when 1D
 data is passed)</p></li>
 <li><p><strong>label</strong> (<em>'default'</em><em>, </em><em>str</em><em>, </em><em>list of str</em><em>, </em><em>None</em><em>, </em><em>default='default'</em>) – Label(s) to use in the plot’s legend. Use <cite>None</cite> to suppress legend.</p></li>
 <li><p><strong>title</strong> (<em>str</em><em>, </em><em>default None</em>) – A title for the plot</p></li>

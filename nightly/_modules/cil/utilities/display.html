@@ -313,9 +313,9 @@
 <span class="sd">    ----------</span>
 <span class="sd">    data : DataContainer, list of DataContainer, tuple of DataContainer</span>
 <span class="sd">        Multi-dimensional data to be reduced to 1D.</span>
-<span class="sd">    slice_list : list of tuple or list of list of tuple, default=None</span>
-<span class="sd">        A list, or nested list, of (dimension, coordinate) pairs for</span>
-<span class="sd">        slicing `data` (default is None, which is only valid when 1D</span>
+<span class="sd">    slice_list : tuple, list of tuple or list of list of tuple, default=None</span>
+<span class="sd">        A tuple of (dimension, coordinate) pair, or a list, or nested list, of </span>
+<span class="sd">        such pairs for slicing `data` (default is None, which is only valid when 1D</span>
 <span class="sd">        data is passed)</span>
 <span class="sd">    label : &#39;default&#39;, str, list of str, None, default=&#39;default&#39;</span>
 <span class="sd">        Label(s) to use in the plot&#39;s legend. Use `None` to suppress legend.</span>
@@ -448,7 +448,7 @@
 <span class="sd">            The axis to draw on</span>
 <span class="sd">        data : DataContainer</span>
 <span class="sd">            The data to be sliced and plotted</span>
-<span class="sd">        slice_list : list of tuples, optional</span>
+<span class="sd">        slice_list : tuple or list of tuples, optional</span>
 <span class="sd">            (dimension, coordinate) pairs for slicing `data` (default is</span>
 <span class="sd">            None, which is only valid when 1D data is passed)</span>
 <span class="sd">        label : str, default=None</span>
@@ -463,6 +463,8 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">is_1d</span> <span class="o">=</span> <span class="kc">True</span>
 
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">slice_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">slice_list</span><span class="p">]</span>
 
         <span class="n">dims</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_1d</span><span class="p">:</span>
@@ -470,7 +472,7 @@
                 <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">slice_list</span><span class="p">:</span>
                     <span class="n">dims</span><span class="p">[</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected list of tuples for slicing, &#39;</span> \
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected tuple or list of tuples for slicing, &#39;</span> \
                                 <span class="sa">f</span><span class="s1">&#39;received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_vector</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
@@ -488,9 +490,9 @@
 <span class="sd">        data : DataContainer, list of DataContainer or tuple of</span>
 <span class="sd">        DataContainer</span>
 <span class="sd">            The data to be sliced and plotted</span>
-<span class="sd">        slice_list : list of tuple or list of list of tuple, optional</span>
-<span class="sd">            A list, or nested list, of (dimension, coordinate) pairs for</span>
-<span class="sd">            slicing `data` (default is None, which is only valid when 1D</span>
+<span class="sd">        slice_list : tuple, list of tuple, or list of list of tuple, optional</span>
+<span class="sd">            A (dimension, coordinate) pair or a list, or nested list, of such</span>
+<span class="sd">            pairs for slicing `data` (default is None, which is only valid when 1D</span>
 <span class="sd">            data is passed)</span>
 <span class="sd">        labels : &#39;default&#39;, str, list of str, None, default=&#39;default&#39;</span>
 <span class="sd">            Label(s) to use in the plot&#39;s legend. Use `None` to suppress legend.</span>
@@ -521,7 +523,8 @@
         <span class="n">colour_cyc</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">CB_PALETTE</span><span class="p">)</span>
         <span class="n">ls_cyc</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="s2">&quot;-&quot;</span><span class="p">,</span><span class="s2">&quot;--&quot;</span><span class="p">,</span><span class="s2">&quot;-.&quot;</span><span class="p">,</span><span class="s2">&quot;:&quot;</span><span class="p">])</span>
         <span class="n">_lbls</span> <span class="o">=</span> <span class="n">labels</span>
-        <span class="k">if</span> <span class="n">slice_list</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">slice_list</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span> 
 
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_data</span><span class="p">):</span>
                 <span class="n">_data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -558,6 +561,9 @@
                                    <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sl</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sl</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">_lbls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">line_colour</span><span class="o">=</span><span class="n">_cl</span><span class="p">,</span>
                                      <span class="n">line_style</span><span class="o">=</span><span class="n">_ls</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected type for slice_list: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)</span><span class="si">}</span><span class="s1">, expected: (tuple, list of tuples, list of list of tuples)&#39;</span><span class="p">)</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>

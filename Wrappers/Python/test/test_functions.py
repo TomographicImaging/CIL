@@ -1105,6 +1105,7 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 
     def test_WaveletNorm(self):    
+        from cil.optimisation.operators import WaveletOperator
         f1 = L1Norm()
         N, M = 2,3
         geom = ImageGeometry(N, M)
@@ -1112,11 +1113,11 @@ class TestFunction(CCPiTestClass):
 
         weights = geom.allocate(1)
 
-        I = IdentityOperator(geom)
-        f2 = WaveletNorm(I, weight=weights)
+        W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
+        f2 = WaveletNorm(W, weight=weights)
         self.WaveletNormTest(f1, f2, x)
 
-        f2 = WaveletNorm(I)
+        f2 = WaveletNorm(W)
         self.WaveletNormTest(f1, f2, x)
 
     def WaveletNormTest(self, f1, f2, x):

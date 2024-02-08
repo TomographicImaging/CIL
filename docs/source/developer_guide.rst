@@ -103,9 +103,9 @@ a HTTP server to view the documentation.
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
 #. Install packages from ``docs/docs_environment.yml`` (with 'name' changed to ENVIRONMENT_NAME) using ``conda env update -f docs_environment.yml``
-#. ``make html``
-#. Go to build directory (``build/html`` by default)
-#. Start a HTTP server to serve documentation
+#. Download the notebooks for rendering in the documentation with ``python source/add_notebooks.py``
+#. Build the documentation ``sphinx-build -b dirhtml source build``
+#. Start a HTTP server to serve documentation with ``python -m http.server --directory build``
 
 Example:
 ::
@@ -121,9 +121,19 @@ Example:
   cd ../docs/
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-  make html
-  cd build/html
-  python3 -m http.server
+  python source/add_notebooks.py
+  sphinx-build -b dirhtml source build
+  python -m http.server --directory build
+
+Notebooks rendering
+-------------------
+
+Notebooks are rendered on the documentation and added at the end of the ``example.rst`` file.
+Introduction text may be added to the top of the file, and the list and gallery of the notebooks are added to the bottom of the file.
+
+Notebooks are not part of the CIL repository and are downloaded from external URLs. 
+The URLs are stored in the ``add_notebooks.py`` file. By adding a new URL to the list, the notebook will be downloaded
+and rendered in the documentation.
 
 
 Contributions guidelines

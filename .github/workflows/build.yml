@@ -139,6 +139,11 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
       with: {python-version: 3.11}
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+        cache-version: 0
     - name: install dependencies
       run: |
         cd docs
@@ -155,17 +160,26 @@ jobs:
       with:
         path: docs/build
         ref: gh-pages
+    - id: pages
+      uses: actions/configure-pages@v5
     - name: update docs
       run: |
         cd docs
+        # landing page (jekyll)
+        bundle install
+        bundle exec jekyll build -s pages --baseurl "${{ steps.pages.outputs.base_path }}"
+        rm -rf build/.git build/assets build/index.html
+        mv _site/* build/
+        # docs pages (sphinx)
         docs_dir="${{ github.ref_name }}"
         docs_dir="${docs_dir//\//_}"
         if test "$docs_dir" = master; then docs_dir=nightly; fi
         rm -rf "build/$docs_dir"
         ./mkdemos.py
         sphinx-build -b dirhtml source "build/$docs_dir"
-        sed 's#DESTINATION#nightly#g' .redirect-template.html > build/index.html
         ./mkversions.py
+      env:
+        JEKYLL_ENV: production
     - uses: actions/upload-artifact@v4
       with:
         name: DocumentationHTML

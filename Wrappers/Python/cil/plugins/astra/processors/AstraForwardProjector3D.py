@@ -18,14 +18,19 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from typing import Optional
+from typing import Literal, Optional, Union
 
 import astra
 import numpy as np
 from astra import algorithm, astra_dict, data3d
 
 from cil.framework import AcquisitionData, DataOrder, DataProcessor
-from cil.framework.framework import AcquisitionGeometry, DataContainer, ImageData, ImageGeometry
+from cil.framework.framework import (
+    AcquisitionGeometry,
+    DataContainer,
+    ImageData,
+    ImageGeometry,
+)
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
 
@@ -41,9 +46,7 @@ class AstraForwardProjector3D(DataProcessor):
         A description of the acquisition data
     """
 
-    def __init__(self,
-                 volume_geometry:Optional[ImageGeometry]=None,
-                 sinogram_geometry:Optional[AcquisitionGeometry]=None):
+    def __init__(self, volume_geometry:Optional[ImageGeometry]=None, sinogram_geometry:Optional[AcquisitionGeometry]=None):
         kwargs = {
                   'volume_geometry'  : volume_geometry,
                   'sinogram_geometry'  : sinogram_geometry,
@@ -58,14 +61,37 @@ class AstraForwardProjector3D(DataProcessor):
 
         self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
 
-    def check_input(self, dataset:ImageData) -> bool:
+    def check_input(self, dataset:ImageData) -> Literal[True]:
+        """Check the dimension comparability of the passed dataset.
+
+        Parameters
+        ----------
+        dataset
+            Dataset to be checked
+
+        Returns
+        -------
+        bool
+            True if input checks are passed
+
+        Raises
+        ------
+        ValueError
+            Raised if input fails the dimension check
+        """
         if self.volume_geometry.shape != dataset.geometry.shape:
             raise ValueError("Dataset not compatible with geometry used to create the projector")
 
         return True
 
-    def set_ImageGeometry(self, volume_geometry):
+    def set_ImageGeometry(self, volume_geometry:ImageGeometry) -> None:
+        """Set the area/volume geometry to reconstruct.
 
+        Parameters
+        ----------
+        volume_geometry
+            Area/volume geometry
+        """
         DataOrder.check_order_for_engine('astra', volume_geometry)
 
         if len(volume_geometry.dimension_labels) > 3:
@@ -73,8 +99,14 @@ class AstraForwardProjector3D(DataProcessor):
 
         self.volume_geometry = volume_geometry.copy()
 
-    def set_AcquisitionGeometry(self, sinogram_geometry):
+    def set_AcquisitionGeometry(self, sinogram_geometry:AcquisitionGeometry) -> None:
+        """Set the acquisition geometry of the data.
 
+        Parameters
+        ----------
+        sinogram_geometry
+            Acquisition geometry of the reconstructed data.
+        """
         DataOrder.check_order_for_engine('astra', sinogram_geometry)
 
         if len(sinogram_geometry.dimension_labels) > 3:
@@ -83,8 +115,19 @@ class AstraForwardProjector3D(DataProcessor):
         self.sinogram_geometry = sinogram_geometry.copy()
 
 
-    def process(self, out=None):
+    def process(self, out:Optional[ImageData]=None) -> Optional[AcquisitionData]:
+        """Reconstruct the volume using ASTRA.
 
+        Parameters
+        ----------
+        out
+           Fills the referenced ImageData with the processed data and suppresses the return
+
+        Returns
+        -------
+        Optional[AcquisitionData]
+            Reconstructed data
+        """
         IM = self.get_input()
 
         #ASTRA expects a 3D array with shape 1, CIL removes dimensions of len 1
@@ -115,25 +158,28 @@ class AstraForwardProjector3D(DataProcessor):
         else:
             out.fill(arr_out)
 
-    def create_sino3d_gpu(self, data, proj_geom, vol_geom, returnData=True, gpuIndex=None, sino_id=None):
+    def create_sino3d_gpu(self, data:Union[np.ndarray, int], proj_geom:dict, vol_geom:dict, returnData:bool=True, gpuIndex:Optional[int]=None, sino_id:Optional[int]=None) -> Union[int, Union[int, np.ndarray]]:
         """Call to ASTRA to create a forward projection of an image (3D).
 
         Parameters
         ----------
-        data : numpy.ndarray or int
+        data
             Image data or ID.
 
-        proj_geom : dict
+        proj_geom
             Projection geometry.
 
-        vol_geom : dict
+        vol_geom
             Volume geometry.
 
-        returnData : bool
+        returnData
             If False, only return the ID of the forward projection.
 
-        gpuIndex : int, optional
+        gpuIndex
             Optional GPU index.
+
+        sino_id
+            ID of the np array linked with astra.
 
         Returns
         -------

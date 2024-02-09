@@ -19,11 +19,18 @@
 
 
 from typing import Literal, Optional
-from cil.framework import DataProcessor, ImageData
-from cil.framework.framework import AcquisitionData, AcquisitionGeometry, DataContainer, ImageGeometry
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
+
 import astra
 import numpy as np
+
+from cil.framework import DataProcessor, ImageData
+from cil.framework.framework import (
+    AcquisitionData,
+    AcquisitionGeometry,
+    DataContainer,
+    ImageGeometry,
+)
+from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
 
 class FDK_Flexible(DataProcessor):
@@ -47,8 +54,7 @@ class FDK_Flexible(DataProcessor):
     >>> from cil.plugins.astra import FDK_Flexible
     >>> fbp = FDK_Flexible(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
-
+    >>> reconstruction = fbp.get_output()
     """
 
     def __init__(self, volume_geometry:ImageGeometry, sinogram_geometry:AcquisitionGeometry):
@@ -63,8 +69,16 @@ class FDK_Flexible(DataProcessor):
 
 
 
-    def check_input(self, dataset:DataContainer) -> Literal[True]:
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
+        """Check the parameters of the input dataset.
 
+        Should raise an error if the AcquisitionData does not match expectation, e.g incorrect dimensions.
+
+        Parameters
+        ----------
+        dataset
+            Input AcquisitionData to check
+        """
         if self.sinogram_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.sinogram_geometry.channels))
@@ -76,8 +90,19 @@ class FDK_Flexible(DataProcessor):
         return True
 
 
-    def process(self, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def process(self, out:Optional[ImageData]=None) -> Optional[ImageData]:
+        """Reconstruct data and return the result.
 
+        Parameters
+        ----------
+        out
+            Fills the reference ImageData with the processed data, and suppresses the return
+
+        Returns
+        -------
+        Optional[ImageData]
+            Reconstructed data, None if out is set.
+        """
         # Get DATA
         DATA = self.get_input()
 

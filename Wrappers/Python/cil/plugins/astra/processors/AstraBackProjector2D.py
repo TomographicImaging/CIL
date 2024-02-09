@@ -24,7 +24,7 @@ import astra
 import numpy as np
 
 from cil.framework import DataProcessor, ImageData
-from cil.framework.framework import AcquisitionGeometry, DataContainer, ImageGeometry
+from cil.framework.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
 
 
@@ -80,7 +80,7 @@ class AstraBackProjector2D(DataProcessor):
         else:
             raise NotImplementedError()
 
-    def check_input(self, dataset:DataContainer) -> bool:
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
         """Check the dimension comparability of the passed dataset.
 
         Parameters
@@ -139,7 +139,7 @@ class AstraBackProjector2D(DataProcessor):
         Parameters
         ----------
         out
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced ImageData with the processed data and suppresses the return
 
         Returns
         -------

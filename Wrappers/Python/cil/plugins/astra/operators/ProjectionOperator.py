@@ -78,8 +78,7 @@ class ProjectionOperator(LinearOperator):
 
 
 class ProjectionOperator_ag(ProjectionOperator):
-    """
-    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
+    """ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
 
     Parameters
     ----------
@@ -137,7 +136,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         else:
             self.operator = operator
 
-    def direct(self, IM:ImageData, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def direct(self, IM:ImageData, out:Optional[AcquisitionData]=None) -> Optional[AcquisitionData]:
         """Apply the direct of the operator i.e. the forward projection.
 
         Parameters
@@ -155,7 +154,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         """
         return self.operator.direct(IM, out=out)
 
-    def adjoint(self, DATA:AcquisitionData, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def adjoint(self, DATA:AcquisitionData, out:Optional[ImageData]=None) -> Optional[ImageData]:
         """Apply the adjoint of the operator, i.e. the backward projection.
 
         Parameters
@@ -168,7 +167,7 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         Returns
         -------
-        DataContainer
+        ImageData
             The processed data. Suppressed if `out` is passed
         """
         return self.operator.adjoint(DATA, out=out)

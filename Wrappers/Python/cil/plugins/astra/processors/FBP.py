@@ -17,14 +17,19 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from typing import Literal, Optional
-from cil.framework import DataProcessor
-from cil.framework import DataOrder
-from cil.framework.framework import AcquisitionGeometry, DataContainer, ImageGeometry
-from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
-from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
-from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
 import logging
+from typing import Literal, Optional
+
+from cil.framework import DataOrder, DataProcessor
+from cil.framework.framework import (
+    AcquisitionGeometry,
+    DataContainer,
+    ImageData,
+    ImageGeometry,
+)
+from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU, FBP_Flexible
+from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
+
 
 class FBP(DataProcessor):
     """FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.
@@ -49,7 +54,6 @@ class FBP(DataProcessor):
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
     >>> reconstruction = fbp.get_output()
-
 
     Notes
     -----
@@ -111,7 +115,7 @@ class FBP(DataProcessor):
 
         Parameters
         ----------
-        dataset : DataContainer
+        dataset
             Input DataContainer for reconstruction
         """
         return self.processor.set_input(dataset)
@@ -131,7 +135,7 @@ class FBP(DataProcessor):
 
         Parameters
         ----------
-        out :
+        out
             Fills the referenced DataContainer with the processed data, and suppresses the return
 
         Returns
@@ -153,17 +157,17 @@ class FBP(DataProcessor):
         """
         return self.processor.check_input(dataset)
 
-    def process(self, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def process(self, out:Optional[ImageData]=None) -> Optional[ImageData]:
         """Reconstruct data and return the result.
 
         Parameters
         ----------
         out
-            Fills the reference DataContainer with the processed data, and suppresses the return
+            Fills the reference ImageData with the processed data, and suppresses the return
 
         Returns
         -------
-        Optional[DataContainer]
+        Optional[ImageData]
             Reconstructed data, None if out is set.
         """
         return self.processor.process(out=out)

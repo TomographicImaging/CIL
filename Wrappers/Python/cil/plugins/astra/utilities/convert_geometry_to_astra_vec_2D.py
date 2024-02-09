@@ -19,10 +19,12 @@
 
 
 from typing import Tuple
+
 import astra
 import numpy as np
 
 from cil.framework.framework import AcquisitionGeometry, ImageGeometry
+
 
 def convert_geometry_to_astra_vec_2D(volume_geometry:ImageGeometry, sinogram_geometry_in:AcquisitionGeometry) -> Tuple[dict, dict]:
     """Convert CIL 2D geometries to ASTRA 2D vector Geometries.

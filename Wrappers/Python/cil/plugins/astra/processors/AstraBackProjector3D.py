@@ -18,14 +18,19 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 import astra
 import numpy as np
 from astra import algorithm, astra_dict, data3d
 
 from cil.framework import DataOrder, DataProcessor, ImageData
-from cil.framework.framework import AcquisitionGeometry, DataContainer, ImageGeometry
+from cil.framework.framework import (
+    AcquisitionData,
+    AcquisitionGeometry,
+    DataContainer,
+    ImageGeometry,
+)
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
 
@@ -39,7 +44,6 @@ class AstraBackProjector3D(DataProcessor):
 
     sinogram_geometry
         A description of the acquisition data
-
     """
 
     def __init__(self,
@@ -59,7 +63,7 @@ class AstraBackProjector3D(DataProcessor):
 
         self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
 
-    def check_input(self, dataset:DataContainer):
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
         """Check the dimension comparability of the passed dataset.
 
         Parameters
@@ -81,7 +85,7 @@ class AstraBackProjector3D(DataProcessor):
             raise ValueError("Dataset not compatible with geometry used to create the projector")
         return True
 
-    def set_ImageGeometry(self, volume_geometry:ImageGeometry):
+    def set_ImageGeometry(self, volume_geometry:ImageGeometry) -> None:
         """Set the area/volume geometry to reconstruct.
 
         Parameters
@@ -96,7 +100,7 @@ class AstraBackProjector3D(DataProcessor):
 
         self.volume_geometry = volume_geometry.copy()
 
-    def set_AcquisitionGeometry(self, sinogram_geometry:AcquisitionGeometry):
+    def set_AcquisitionGeometry(self, sinogram_geometry:AcquisitionGeometry) -> None:
         """Set the acquisition geometry of the data.
 
         Parameters
@@ -111,7 +115,7 @@ class AstraBackProjector3D(DataProcessor):
 
         self.sinogram_geometry = sinogram_geometry.copy()
 
-    def process(self, out:Optional[DataContainer]=None):
+    def process(self, out:Optional[ImageData]=None) -> Optional[ImageData]:
         """Reconstruct the volume using ASTRA.
 
         Parameters

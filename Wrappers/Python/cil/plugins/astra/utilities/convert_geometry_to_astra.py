@@ -19,20 +19,22 @@
 
 
 from typing import Tuple
+
 import astra
 import numpy as np
 
 from cil.framework.framework import AcquisitionGeometry, ImageGeometry
+
 
 def convert_geometry_to_astra(volume_geometry:ImageGeometry, sinogram_geometry:AcquisitionGeometry) -> Tuple[dict, dict]:
     """Convert CIL geometries to simple ASTRA Geometries. Any offsets/rotations will be ignored.
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
     Returns

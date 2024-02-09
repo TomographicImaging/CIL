@@ -24,35 +24,34 @@ import astra
 import numpy as np
 
 from cil.framework import AcquisitionData, DataProcessor
-from cil.framework.framework import AcquisitionGeometry, DataContainer, ImageData, ImageGeometry
+from cil.framework.framework import (
+    AcquisitionGeometry,
+    DataContainer,
+    ImageData,
+    ImageGeometry,
+)
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
 
 
 class AstraForwardProjector2D(DataProcessor):
-    """
-    AstraForwardProjector2D configures an ASTRA 2D forward projector for CPU and GPU.
+    """AstraForwardProjector2D configures an ASTRA 2D forward projector for CPU and GPU.
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
-    proj_id : the ASTRA projector ID
+    proj_id
         For advances ASTRA users only. The astra_mex_projector ID of the projector, use `astra.astra_create_projector()`
 
-    device : string, default="gpu"
+    device
         The device to run on "gpu" or "cpu"
-
     """
 
-    def __init__(self,
-                 volume_geometry:Optional[ImageGeometry]=None,
-                 sinogram_geometry:Optional[AcquisitionGeometry]=None,
-                 proj_id:Optional[int]=None,
-                 device:Literal["cpu", "gpu"]="cpu"):
+    def __init__(self, volume_geometry:Optional[ImageGeometry]=None, sinogram_geometry:Optional[AcquisitionGeometry]=None, proj_id:Optional[int]=None, device:Literal["cpu", "gpu"]="cpu"):
         kwargs = {
                   "volume_geometry"  : volume_geometry,
                   "sinogram_geometry"  : sinogram_geometry,
@@ -82,7 +81,7 @@ class AstraForwardProjector2D(DataProcessor):
         else:
             raise NotImplementedError()
 
-    def check_input(self, dataset:DataContainer) -> bool:
+    def check_input(self, dataset:ImageData) -> Literal[True]:
         """Check the dimension comparability of the passed dataset.
 
         Parameters
@@ -137,13 +136,13 @@ class AstraForwardProjector2D(DataProcessor):
         """
         self.sinogram_geometry = sinogram_geometry
 
-    def process(self, out:Optional[AcquisitionData]=None) -> Optional[AcquisitionData]:
+    def process(self, out:Optional[ImageData]=None) -> Optional[AcquisitionData]:
         """Reconstruct the volume using ASTRA.
 
         Parameters
         ----------
         out
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced ImageData with the processed data and suppresses the return
 
         Returns
         -------

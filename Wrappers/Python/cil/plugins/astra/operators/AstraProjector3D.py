@@ -32,8 +32,7 @@ from cil.plugins.astra.processors import AstraBackProjector3D, AstraForwardProje
 
 
 class AstraProjector3D(LinearOperator):
-    """
-    AstraProjector3D configures and calls the ASTRA 3D Projectors for GPU. This works with 2D or 3D datasets.
+    """AstraProjector3D configures and calls the ASTRA 3D Projectors for GPU. This works with 2D or 3D datasets.
 
     It is recommended to use this via the ProjectionOperator Class.
 
@@ -63,7 +62,7 @@ class AstraProjector3D(LinearOperator):
         self.fp = AstraForwardProjector3D(volume_geometry=image_geometry, sinogram_geometry=acquisition_geometry)
         self.bp = AstraBackProjector3D(volume_geometry=image_geometry, sinogram_geometry=acquisition_geometry)
 
-    def direct(self, x:ImageData, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def direct(self, x:ImageData, out:Optional[AcquisitionData]=None) -> Optional[AcquisitionData]:
         """Apply the direct of the operator i.e. the forward projection.
 
         Parameters
@@ -72,11 +71,11 @@ class AstraProjector3D(LinearOperator):
             The image/volume to be projected.
 
         out
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced AcquisitionData with the processed data and suppresses the return
 
         Returns
         -------
-        DataContainer
+        AcquisitionData
             The processed data. Suppressed if `out` is passed
         """
         self.fp.set_input(x)
@@ -84,7 +83,7 @@ class AstraProjector3D(LinearOperator):
         self.fp.__dict__['input']= None
         return temp
 
-    def adjoint(self, x:AcquisitionData, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def adjoint(self, x:AcquisitionData, out:Optional[ImageData]=None) -> Optional[ImageData]:
         """Apply the adjoint of the operator, i.e. the backward projection.
 
         Parameters
@@ -93,11 +92,11 @@ class AstraProjector3D(LinearOperator):
             The projections/sinograms to be projected.
 
         out
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced ImageData with the processed data and suppresses the return
 
         Returns
         -------
-        DataContainer
+        ImageData
             The processed data. Suppressed if `out` is passed
         """
         self.bp.set_input(x)

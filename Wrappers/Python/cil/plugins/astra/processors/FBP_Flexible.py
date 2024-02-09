@@ -18,14 +18,20 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from typing import Literal, Optional
-from cil.framework import AcquisitionGeometry, Processor, ImageData
-from cil.framework.framework import DataContainer, ImageGeometry
-from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D, convert_geometry_to_astra
 import logging
+from typing import Literal, Optional
+
 import astra
 import numpy as np
+
+from cil.framework import AcquisitionGeometry, ImageData, Processor
+from cil.framework.framework import AcquisitionData, ImageGeometry
+from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
+from cil.plugins.astra.utilities import (
+    convert_geometry_to_astra,
+    convert_geometry_to_astra_vec_3D,
+)
+
 
 class FBP_Flexible(FDK_Flexible):
     """FBP_Flexible Filtered Back Projection performs an FBP reconstruction for 2D and 3D parallel-beam geometries.
@@ -37,10 +43,10 @@ class FBP_Flexible(FDK_Flexible):
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
     Example
@@ -84,8 +90,16 @@ class FBP_Flexible(FDK_Flexible):
 
         self.vol_geom_astra, self.proj_geom_astra = convert_geometry_to_astra_vec_3D(volume_geometry, sino_geom_cone)
 
-    def check_input(self, dataset:DataContainer) -> Literal[True]:
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
+        """Check the parameters of the input dataset.
 
+        Should raise an error if the AcquisitionData does not match expectation, e.g incorrect dimensions.
+
+        Parameters
+        ----------
+        dataset
+            Input AcquisitionData to check
+        """
         if self.sinogram_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.sinogram_geometry.channels))
@@ -98,8 +112,7 @@ class FBP_Flexible(FDK_Flexible):
 
 
 class FBP_CPU(Processor):
-    """
-    FBP_CPU Filtered Back Projection performs an FBP reconstruction for 2D parallel-beam geometries.
+    """FBP_CPU Filtered Back Projection performs an FBP reconstruction for 2D parallel-beam geometries.
 
     It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.
 
@@ -108,10 +121,10 @@ class FBP_CPU(Processor):
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
     Example
@@ -127,8 +140,17 @@ class FBP_CPU(Processor):
         super().__init__( volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry)
 
 
-    def check_input(self, dataset:DataContainer) -> Literal[True]:
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
+        """Check the parameters of the input dataset.
 
+        Should raise an error if the AcquisitionData does not match expectation, e.g incorrect dimensions.
+
+        Parameters
+        ----------
+        dataset
+            Input AcquisitionData to check
+        """
+            # todo: call super's check_input
         if self.sinogram_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.sinogram_geometry.channels))
@@ -147,8 +169,19 @@ class FBP_CPU(Processor):
         return True
 
 
-    def process(self, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+    def process(self, out:Optional[ImageData]=None) -> Optional[ImageData]:
+        """Reconstruct data and return the result.
 
+        Parameters
+        ----------
+        out
+            Fills the reference ImageData with the processed data, and suppresses the return
+
+        Returns
+        -------
+        Optional[ImageData]
+            Reconstructed data, None if out is set.
+        """
         # Get DATA
         DATA = self.get_input()
 

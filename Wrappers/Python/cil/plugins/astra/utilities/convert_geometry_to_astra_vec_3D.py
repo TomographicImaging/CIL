@@ -19,20 +19,22 @@
 
 
 from typing import Tuple
+
 import astra
 import numpy as np
 
 from cil.framework.framework import AcquisitionGeometry, ImageGeometry
+
 
 def convert_geometry_to_astra_vec_3D(volume_geometry:ImageGeometry, sinogram_geometry_in:AcquisitionGeometry) -> Tuple[dict, dict]:
     """Convert CIL 2D and 3D geometries to ASTRA 3D vector Geometries.
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
     Returns
@@ -136,19 +138,16 @@ def convert_geometry_to_astra_vec_3D(volume_geometry:ImageGeometry, sinogram_geo
     return vol_geom, proj_geom
 
 def rotation_matrix_z_from_euler(angle:float, degrees:bool) -> np.ndarray:
-
-    """
-    Returns 3D rotation matrix for z axis using direction cosine
+    """Return 3D rotation matrix for z axis using direction cosine.
 
     Parameters
     ----------
-    angle : float
+    angle
         angle or rotation around z axis
 
-    degrees : bool
-        if radian or degrees
+    degrees
+        If True, angle is in degrees. If False, use radians
     """
-
     if degrees:
         alpha = angle / 180. * np.pi
     else:

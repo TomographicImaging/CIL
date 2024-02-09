@@ -60,9 +60,6 @@ class DataOrder(TypedDict):
     TOMOPHANTOM_IG_LABELS: List[str]
 
 
-
-
-
 image_labels: ImageLabels = {"RANDOM": "random",
                              "RANDOM_INT": "random_int",
                              "CHANNEL": "channel",

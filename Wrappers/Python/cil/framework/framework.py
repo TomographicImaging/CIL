@@ -27,6 +27,8 @@ from ctypes import util
 import math
 import weakref
 import logging
+
+from .base import BaseAcquisitionGeometry
 from .label import image_labels, acquisition_labels
 
 from cil.utilities.multiprocessing import NUM_THREADS
@@ -2050,12 +2052,6 @@ class Configuration(object):
             return True
 
         return False
-
-
-class BaseAcquisitionGeometry:
-    """This class only exists to give get_order_for_engine something to typecheck for. At some point separate interface
-    stuff into here or refactor get_order_for_engine to not need it."""
-    pass
 
 
 class AcquisitionGeometry(BaseAcquisitionGeometry):

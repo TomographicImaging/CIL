@@ -17,7 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, DataOrder, image_labels
+from cil.framework import ImageData, image_labels, data_order
 import tomophantom
 from tomophantom import TomoP2D, TomoP3D
 import os
@@ -149,7 +149,7 @@ def get_ImageData(num_model, geometry):
     
     '''
     ig = geometry.copy()
-    ig.set_labels(DataOrder.TOMOPHANTOM_IG_LABELS)
+    ig.set_labels(data_order["TOMOPHANTOM_IG_LABELS"])
     num_dims = len(ig.dimension_labels)
     
     if image_labels["CHANNEL"] in ig.dimension_labels:

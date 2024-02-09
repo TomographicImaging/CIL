@@ -33,4 +33,4 @@ from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
 from .BlockDataContainer import BlockDataContainer
 from .BlockGeometry import BlockGeometry
 from .framework import Partitioner
-from .label import acquisition_labels, image_labels, DataOrder, get_order_for_engine, check_order_for_engine
+from .label import acquisition_labels, image_labels, data_order, get_order_for_engine, check_order_for_engine

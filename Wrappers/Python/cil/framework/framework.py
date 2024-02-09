@@ -30,7 +30,7 @@ import logging
 
 
 from .base import BaseAcquisitionGeometry
-from .label import image_labels, acquisition_labels, DataOrder, get_order_for_engine
+from .label import image_labels, acquisition_labels, data_order, get_order_for_engine
 
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
@@ -290,7 +290,7 @@ class ImageGeometry(object):
     @property
     def dimension_labels(self):
         
-        labels_default = DataOrder.CIL_IG_LABELS
+        labels_default = data_order["CIL_IG_LABELS"]
 
         shape_default = [   self.channels,
                             self.voxel_num_z,
@@ -315,7 +315,7 @@ class ImageGeometry(object):
         self.set_labels(val)
     
     def set_labels(self, labels):
-        labels_default = DataOrder.CIL_IG_LABELS
+        labels_default = data_order["CIL_IG_LABELS"]
 
         #check input and store. This value is not used directly
         if labels is not None:
@@ -2153,7 +2153,7 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
 
     @property
     def dimension_labels(self):
-        labels_default = DataOrder.CIL_AG_LABELS
+        labels_default = data_order["CIL_AG_LABELS"]
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,
@@ -2180,7 +2180,7 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
     @dimension_labels.setter
     def dimension_labels(self, val):
 
-        labels_default = DataOrder.CIL_AG_LABELS
+        labels_default = data_order["CIL_AG_LABELS"]
 
         #check input and store. This value is not used directly
         if val is not None:
@@ -2817,7 +2817,7 @@ class DataContainer(object):
         :type order: list, sting     
         '''
 
-        if order in DataOrder.ENGINES:
+        if order in data_order["ENGINES"]:
             order = get_order_for_engine(order, self.geometry)  
 
         try:

@@ -22,7 +22,7 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels, ImageGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -37,7 +37,7 @@ from cil.optimisation.functions import BlockFunction
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 

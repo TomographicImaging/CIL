@@ -19,7 +19,8 @@
 
 import unittest
 from utils import initialise_tests
-from cil.framework.framework import ImageGeometry,AcquisitionGeometry
+from cil.framework.framework import AcquisitionGeometry
+from cil.framework import ImageGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
 import os, sys

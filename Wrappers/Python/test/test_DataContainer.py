@@ -21,10 +21,9 @@ import unittest
 from utils import initialise_tests
 import sys
 import numpy
-from cil.framework import DataContainer
-from cil.framework import ImageData
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry
 from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry
+from cil.framework import BlockGeometry
 from cil.framework import AcquisitionGeometry
 from cil.framework import acquisition_labels, image_labels
 from timeit import default_timer as timer

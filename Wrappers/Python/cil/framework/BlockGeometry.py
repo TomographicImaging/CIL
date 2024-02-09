@@ -18,7 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import functools
-from cil.framework.BlockDataContainer import BlockDataContainer
+from .BlockDataContainer import BlockDataContainer
 
 class BlockGeometry(object):
     

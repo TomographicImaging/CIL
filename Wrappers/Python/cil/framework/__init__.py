@@ -23,11 +23,10 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from .cilacc import cilacc
-from .framework import DataContainer
-from .framework import ImageData, AcquisitionData
-from .framework import ImageGeometry, AcquisitionGeometry
-from .framework import VectorData, VectorGeometry
-from .framework import find_key, message
+from .framework import AcquisitionData
+from .framework import AcquisitionGeometry
+from .framework import find_key
+from .DataContainer import message, ImageGeometry, DataContainer, ImageData, VectorData, VectorGeometry
 from .framework import DataProcessor, Processor
 from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
 from .BlockDataContainer import BlockDataContainer

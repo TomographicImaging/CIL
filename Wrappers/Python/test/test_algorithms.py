@@ -22,10 +22,8 @@ from utils import initialise_tests
 import numpy
 import numpy as np
 from numpy import nan, inf
-from cil.framework import VectorData
-from cil.framework import ImageData
+from cil.framework import VectorData, ImageGeometry, ImageData, VectorGeometry
 from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
 from cil.framework import BlockGeometry
@@ -54,7 +52,7 @@ from cil.utilities import noise as applynoise
 import time
 import warnings
 from cil.optimisation.functions import Rosenbrock
-from cil.framework import VectorData, VectorGeometry
+from cil.framework import VectorData
 from cil.utilities.quality_measures import mae, mse, psnr
 
 

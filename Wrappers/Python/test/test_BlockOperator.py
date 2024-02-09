@@ -21,9 +21,8 @@ import unittest
 from utils import initialise_tests
 import logging
 from cil.optimisation.operators import BlockOperator, GradientOperator
-from cil.framework import BlockDataContainer
+from cil.framework import BlockDataContainer, ImageGeometry, ImageData
 from cil.optimisation.operators import IdentityOperator
-from cil.framework import ImageGeometry, ImageData
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
 

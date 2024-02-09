@@ -21,6 +21,8 @@
 
 from typing import TypedDict
 
+from .base import BaseAcquisitionGeometry
+
 
 class ImageLabels(TypedDict):
     RANDOM: str
@@ -67,3 +69,53 @@ acquisition_labels: AcquisitionLabels = {"RANDOM": "random",
                                          "CONE": "cone",
                                          "DIM2": "2D",
                                          "DIM3": "3D"}
+
+
+class DataOrder:
+
+    ENGINES = ['astra','tigre','cil']
+
+    ASTRA_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+    TIGRE_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+    ASTRA_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["VERTICAL"], acquisition_labels["ANGLE"], acquisition_labels["HORIZONTAL"]]
+    TIGRE_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["ANGLE"], acquisition_labels["VERTICAL"], acquisition_labels["HORIZONTAL"]]
+    CIL_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+    CIL_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["ANGLE"], acquisition_labels["VERTICAL"], acquisition_labels["HORIZONTAL"]]
+    TOMOPHANTOM_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
+
+
+def get_order_for_engine(engine, geometry):
+    if engine == 'astra':
+        if isinstance(geometry, BaseAcquisitionGeometry):
+            dim_order = DataOrder.ASTRA_AG_LABELS
+        else:
+            dim_order = DataOrder.ASTRA_IG_LABELS
+    elif engine == 'tigre':
+        if isinstance(geometry, BaseAcquisitionGeometry):
+            dim_order = DataOrder.TIGRE_AG_LABELS
+        else:
+            dim_order = DataOrder.TIGRE_IG_LABELS
+    elif engine == 'cil':
+        if isinstance(geometry, BaseAcquisitionGeometry):
+            dim_order = DataOrder.CIL_AG_LABELS
+        else:
+            dim_order = DataOrder.CIL_IG_LABELS
+    else:
+        raise ValueError("Unknown engine expected one of {0} got {1}".format(DataOrder.ENGINES, engine))
+
+    dimensions = []
+    for label in dim_order:
+        if label in geometry.dimension_labels:
+            dimensions.append(label)
+
+    return dimensions
+
+
+def check_order_for_engine(engine, geometry):
+    order_requested = get_order_for_engine(engine, geometry)
+
+    if order_requested == list(geometry.dimension_labels):
+        return True
+    else:
+        raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
+             .format(order_requested, list(geometry.dimension_labels), engine))

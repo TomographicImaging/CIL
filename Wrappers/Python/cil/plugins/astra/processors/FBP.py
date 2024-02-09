@@ -17,8 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import DataProcessor
-from cil.framework import check_order_for_engine
+from cil.framework import DataProcessor, check_order_for_engine
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU

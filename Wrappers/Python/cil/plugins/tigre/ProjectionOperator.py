@@ -17,8 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
-from cil.framework import acquisition_labels, check_order_for_engine
+from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry, check_order_for_engine, acquisition_labels
 from cil.framework.BlockGeometry import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.optimisation.operators import LinearOperator

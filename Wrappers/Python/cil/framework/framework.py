@@ -4226,17 +4226,17 @@ class DataOrder:
 
 def get_order_for_engine(engine, geometry):
     if engine == 'astra':
-        if isinstance(geometry, AcquisitionGeometry):
+        if isinstance(geometry, BaseAcquisitionGeometry):
             dim_order = DataOrder.ASTRA_AG_LABELS
         else:
             dim_order = DataOrder.ASTRA_IG_LABELS
     elif engine == 'tigre':
-        if isinstance(geometry, AcquisitionGeometry):
+        if isinstance(geometry, BaseAcquisitionGeometry):
             dim_order = DataOrder.TIGRE_AG_LABELS
         else:
             dim_order = DataOrder.TIGRE_IG_LABELS
     elif engine == 'cil':
-        if isinstance(geometry, AcquisitionGeometry):
+        if isinstance(geometry, BaseAcquisitionGeometry):
             dim_order = DataOrder.CIL_AG_LABELS
         else:
             dim_order = DataOrder.CIL_IG_LABELS

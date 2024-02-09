@@ -18,7 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from abc import ABCMeta
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry, AcquisitionData
 from cil.framework.framework import ImageData, ImageGeometry
@@ -128,7 +128,7 @@ class GenericFilteredBackProjection(Reconstructor, metaclass=ABCMeta):
         return self._fft_order
 
     @property
-    def preset_filters(self) -> list[str]:
+    def preset_filters(self) -> List[str]:
         """Return a list of all filter presets.
 
         Returns

@@ -1,7 +1,0 @@
-version = '@CIL_VERSION_MAJOR@.@CIL_VERSION_MINOR@.@CIL_VERSION_PATCH@'
-major = '@CIL_VERSION_MAJOR@'
-minor = '@CIL_VERSION_MINOR@'
-patch = '@CIL_VERSION_PATCH@'
-
-commit_hash = '@CIL_COMMIT_HASH@'
-num_commit = '@CIL_NUM_COMMIT@'

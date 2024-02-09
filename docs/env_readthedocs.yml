@@ -1,8 +1,0 @@
-name: readthedocs
-channels:
-  - conda-forge
-  - intel
-  - ccpi
-  - defaults
-dependencies:    
-  - cil

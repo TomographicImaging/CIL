@@ -1,4 +1,7 @@
 version: 2
-
-conda:
-  environment: docs/env_readthedocs.yml
+build:
+  os: ubuntu-22.04
+  tools: {}
+  commands:
+  - mkdir -p $READTHEDOCS_OUTPUT/html
+  - cp index.html $READTHEDOCS_OUTPUT/html

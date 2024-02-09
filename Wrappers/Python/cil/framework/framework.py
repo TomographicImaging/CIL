@@ -22,32 +22,16 @@ import numpy
 import warnings
 from functools import reduce
 from numbers import Number
-import ctypes, platform
-from ctypes import util
+import ctypes
 import math
 import weakref
 import logging
 
-
+from . import cilacc
 from .base import BaseAcquisitionGeometry
 from .label import image_labels, acquisition_labels, data_order, get_order_for_engine
-
 from cil.utilities.multiprocessing import NUM_THREADS
-# check for the extension
-
-if platform.system() == 'Linux':
-    dll = 'libcilacc.so'
-elif platform.system() == 'Windows':
-    dll_file = 'cilacc.dll'
-    dll = util.find_library(dll_file)
-elif platform.system() == 'Darwin':
-    dll = 'libcilacc.dylib'
-else:
-    raise ValueError('Not supported platform, ', platform.system())
-
-cilacc = ctypes.cdll.LoadLibrary(dll)
-
-from cil.framework.BlockGeometry import BlockGeometry
+from .BlockGeometry import BlockGeometry
 
 class Partitioner(object):
     '''Interface for AcquisitionData to be able to partition itself in a number of batches.
@@ -3264,19 +3248,19 @@ class DataContainer(object):
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the second array 
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the third array 
                                   ctypes.POINTER(ctypes.c_float),  # pointer to A
-                                  ctypes.c_int,                    # type of type of A selector (int)
+                                  ctypes.c_int,  # type of type of A selector (int)
                                   ctypes.POINTER(ctypes.c_float),  # pointer to B
-                                  ctypes.c_int,                    # type of type of B selector (int)
-                                  ctypes.c_longlong,               # type of size of first array 
+                                  ctypes.c_int,  # type of type of B selector (int)
+                                  ctypes.c_longlong,  # type of size of first array
                                   ctypes.c_int]                    # number of threads
-        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array 
-                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array 
-                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array 
-                                  ctypes.POINTER(ctypes.c_double), # type of A (c_double)
-                                  ctypes.c_int,                    # type of type of A selector (int)                                  
-                                  ctypes.POINTER(ctypes.c_double), # type of B (c_double)
-                                  ctypes.c_int,                    # type of type of B selector (int)                                  
-                                  ctypes.c_longlong,               # type of size of first array 
+        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double),  # pointer to the first array
+                                  ctypes.POINTER(ctypes.c_double),  # pointer to the second array
+                                  ctypes.POINTER(ctypes.c_double),  # pointer to the third array
+                                  ctypes.POINTER(ctypes.c_double),  # type of A (c_double)
+                                  ctypes.c_int,  # type of type of A selector (int)
+                                  ctypes.POINTER(ctypes.c_double),  # type of B (c_double)
+                                  ctypes.c_int,  # type of type of B selector (int)
+                                  ctypes.c_longlong,  # type of size of first array
                                   ctypes.c_int]                    # number of threads
 
         if f(x_p, y_p, out_p, a_p, a_vec, b_p, b_vec, ndx.size, num_threads) != 0:

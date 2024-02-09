@@ -22,7 +22,7 @@ import sys
 from datetime import timedelta, datetime
 import warnings
 from functools import reduce
-from .framework import cilacc
+from .cilacc import cilacc
 from .framework import DataContainer
 from .framework import ImageData, AcquisitionData
 from .framework import ImageGeometry, AcquisitionGeometry

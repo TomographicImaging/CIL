@@ -18,7 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
-from cil.framework import DataOrder, acquisition_labels
+from cil.framework import acquisition_labels, check_order_for_engine
 from cil.framework.BlockGeometry import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.optimisation.operators import LinearOperator
@@ -155,8 +155,8 @@ class ProjectionOperator_ag(ProjectionOperator):
                 "TIGRE projectors are GPU only. Got device = {}".format(
                     device))
 
-        DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry)
+        check_order_for_engine('tigre', image_geometry)
+        check_order_for_engine('tigre', acquisition_geometry)
 
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=acquisition_geometry)

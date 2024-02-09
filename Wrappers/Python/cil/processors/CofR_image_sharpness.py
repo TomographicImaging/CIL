@@ -17,7 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData, DataOrder
+from cil.framework import Processor, AcquisitionData, check_order_for_engine
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
@@ -143,7 +143,7 @@ class CofR_image_sharpness(Processor):
         else:
             test_geom = data.geometry
 
-        if not DataOrder.check_order_for_engine(self.backend, test_geom):
+        if not check_order_for_engine(self.backend, test_geom):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
 
         return True

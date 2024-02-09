@@ -17,8 +17,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import DataProcessor, ImageData
-from cil.framework import DataOrder
+from cil.framework import DataProcessor, ImageData, check_order_for_engine
 from cil.plugins.tigre import CIL2TIGREGeometry
 import logging
 import numpy as np
@@ -76,8 +75,8 @@ class FBP(DataProcessor):
         if device != 'gpu':
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
-        DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry) 
+        check_order_for_engine('tigre', image_geometry)
+        check_order_for_engine('tigre', acquisition_geometry) 
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -91,7 +90,7 @@ class FBP(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.acquisition_geometry.channels))  
 
-        DataOrder.check_order_for_engine('tigre', dataset.geometry)
+        check_order_for_engine('tigre', dataset.geometry)
         return True
 
     def process(self, out=None):

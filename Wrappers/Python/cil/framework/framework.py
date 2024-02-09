@@ -2815,7 +2815,7 @@ class DataContainer(object):
         '''
 
         if order in DataOrder.ENGINES:
-            order = DataOrder.get_order_for_engine(order, self.geometry)  
+            order = get_order_for_engine(order, self.geometry)  
 
         try:
             if len(order) != len(self.shape):
@@ -4204,7 +4204,8 @@ class VectorGeometry(object):
                 raise ValueError('Value {} unknown'.format(value))
         return out
 
-class DataOrder():
+
+class DataOrder:
 
     ENGINES = ['astra','tigre','cil']
 
@@ -4216,42 +4217,42 @@ class DataOrder():
     CIL_AG_LABELS = [acquisition_labels["CHANNEL"], acquisition_labels["ANGLE"], acquisition_labels["VERTICAL"], acquisition_labels["HORIZONTAL"]]
     TOMOPHANTOM_IG_LABELS = [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
     
-    @staticmethod
-    def get_order_for_engine(engine, geometry):
-        if engine == 'astra':
-            if isinstance(geometry, AcquisitionGeometry):
-                dim_order = DataOrder.ASTRA_AG_LABELS
-            else:
-                dim_order = DataOrder.ASTRA_IG_LABELS
-        elif engine == 'tigre':
-            if isinstance(geometry, AcquisitionGeometry):
-                dim_order = DataOrder.TIGRE_AG_LABELS
-            else:
-                dim_order = DataOrder.TIGRE_IG_LABELS
-        elif engine == 'cil':
-            if isinstance(geometry, AcquisitionGeometry):
-                dim_order = DataOrder.CIL_AG_LABELS
-            else:
-                dim_order = DataOrder.CIL_IG_LABELS
+
+def get_order_for_engine(engine, geometry):
+    if engine == 'astra':
+        if isinstance(geometry, AcquisitionGeometry):
+            dim_order = DataOrder.ASTRA_AG_LABELS
         else:
-            raise ValueError("Unknown engine expected one of {0} got {1}".format(DataOrder.ENGINES, engine))
-        
-        dimensions = []
-        for label in dim_order:
-            if label in geometry.dimension_labels:
-                dimensions.append(label)
-
-        return dimensions
-
-    @staticmethod
-    def check_order_for_engine(engine, geometry):
-        order_requested = DataOrder.get_order_for_engine(engine, geometry)
-
-        if order_requested == list(geometry.dimension_labels):
-            return True
+            dim_order = DataOrder.ASTRA_IG_LABELS
+    elif engine == 'tigre':
+        if isinstance(geometry, AcquisitionGeometry):
+            dim_order = DataOrder.TIGRE_AG_LABELS
         else:
-            raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
-                 .format(order_requested, list(geometry.dimension_labels), engine))
+            dim_order = DataOrder.TIGRE_IG_LABELS
+    elif engine == 'cil':
+        if isinstance(geometry, AcquisitionGeometry):
+            dim_order = DataOrder.CIL_AG_LABELS
+        else:
+            dim_order = DataOrder.CIL_IG_LABELS
+    else:
+        raise ValueError("Unknown engine expected one of {0} got {1}".format(DataOrder.ENGINES, engine))
+
+    dimensions = []
+    for label in dim_order:
+        if label in geometry.dimension_labels:
+            dimensions.append(label)
+
+    return dimensions
+
+
+def check_order_for_engine(engine, geometry):
+    order_requested = get_order_for_engine(engine, geometry)
+
+    if order_requested == list(geometry.dimension_labels):
+        return True
+    else:
+        raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
+             .format(order_requested, list(geometry.dimension_labels), engine))
 
 
 

@@ -12,25 +12,19 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-# Configuration file for the Sphinx documentation builder.
-#
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+# sphinx config; vis:
+# - http://www.sphinx-doc.org/en/master/config
+# - https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/layout.html
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
 import sys
-import re
+from os import getenv
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath('../Wrappers/Python/'))
-
-from cil import version
+try:
+    from cil import version
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent.resolve() / 'Wrappers' / 'Python'))
+    from cil import version
 
 # Project information
 project = 'CIL'
@@ -38,6 +32,7 @@ copyright = '2017-2024'
 author = 'CCPi developers'
 version = version.version
 release = version
+_baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")
 
 # min Sphinx version
 # needs_sphinx = '1.0'
@@ -67,7 +62,7 @@ pygments_style = None  # syntax highlighting
 html_theme = 'pydata_sphinx_theme'
 html_theme_options = {
     "switcher": {
-        "json_url": "/CIL/versions.json", # baseurl
+        "json_url": f"{_baseurl}versions.json",
         "version_match": version
     },
     "favicons": [{"rel": "icon", "sizes": "32x32", "href": "https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png"}],
@@ -75,6 +70,7 @@ html_theme_options = {
         "image_light": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg",
         "image_dark": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg",
     },
+    "show_version_warning_banner": True,
     "header_links_before_dropdown": 9,
     "navbar_persistent": [], # no search icon in top right
     "footer_start": ["copyright"], "footer_end": [], # clean footers

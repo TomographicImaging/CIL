@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import json
 import re
+from os import getenv
 from pathlib import Path
 from packaging import version
 
-baseurl = "/CIL/"
+baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")
 build = Path(__file__).parent / "build"
 versions = [{
     "name": str(i.name),

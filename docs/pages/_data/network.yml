@@ -1,0 +1,17 @@
+# https://github.com/Phlow/feeling-responsive/blob/gh-pages/_data/network.yml
+- menu_name: Thanks
+- name: CoSeC
+  url: "https://www.scd.stfc.ac.uk/Pages/CoSeC.aspx"
+  title: "Computational Science Centre for Research Communities"
+- name: UKRI
+  url: "https://www.ukri.org"
+  title: "UK Research and Innovation"
+- name: STFC
+  url: "https://stfc.ac.uk"
+  title: "Science and Technology Facilities Council"
+- name: EPSRC
+  url: "https://epsrc.ac.uk"
+  title: "Engineering and Physical Sciences Research Council"
+- name: Manchester
+  url: "https://www.manchester.ac.uk"
+  title: "University of Manchester"

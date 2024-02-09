@@ -8,14 +8,14 @@ from packaging import version
 baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")
 build = Path(__file__).parent / "build"
 versions = [{
-    "name": str(i.name),
+    "name": i.name,
     "version": re.search(
         "VERSION: '(.*)'",
         (i / "_static" / "documentation_options.js").read_text(),
         flags=re.M).group(1),
     "url": f"{baseurl}{i.name}/"
 }
-for i in build.glob("[a-zA-Z]*") if i.is_dir()]
+for i in build.glob("[a-zA-Z]*") if i.is_dir() if i.name != "assets"]
 
 tags = [v for v in versions if v["name"] == "v" + v["version"]]
 try:

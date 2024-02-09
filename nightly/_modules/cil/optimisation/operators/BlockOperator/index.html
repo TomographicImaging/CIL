@@ -1,0 +1,929 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.optimisation.operators.BlockOperator &#8212; CIL 23.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/operators/BlockOperator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '23.1.0';
+        </script>
+    <link rel="index" title="Index" href="../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../../../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      23.1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developer_guide/">Developers’ Guide</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">cil.optimisation.operators.BlockOperator</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for cil.optimisation.operators.BlockOperator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">,</span> <span class="n">DataContainer</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">Operator</span><span class="p">,</span> <span class="n">LinearOperator</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sirf</span> <span class="kn">import</span> <span class="n">SIRF</span>
+    <span class="kn">from</span> <span class="nn">sirf.SIRF</span> <span class="kn">import</span> <span class="n">DataContainer</span> <span class="k">as</span> <span class="n">SIRFDataContainer</span>
+    <span class="n">has_sirf</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
+    <span class="n">has_sirf</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="BlockOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator">[docs]</a><span class="k">class</span> <span class="nc">BlockOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;A Block matrix containing Operators</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *args : Operator  </span>
+<span class="sd">        Operators in the block.  </span>
+<span class="sd">    **kwargs : dict  </span>
+<span class="sd">        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.  </span>
+
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The Block Framework is a generic strategy to treat variational problems in the</span>
+<span class="sd">    following form:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">      \min Regulariser + Fidelity</span>
+
+
+<span class="sd">    BlockOperators have a generic shape M x N, and when applied on an </span>
+<span class="sd">    Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.</span>
+<span class="sd">  </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    BlockDatacontainer are only allowed to have the shape of N x 1, with</span>
+<span class="sd">    N rows and 1 column.</span>
+
+<span class="sd">    User may specify the shape of the block, by default is a row vector</span>
+
+<span class="sd">    Operators in a Block are required to have the same domain column-wise and the</span>
+<span class="sd">    same range row-wise.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    BlockOperator(op0,op1) results in a row block</span>
+
+<span class="sd">    BlockOperator(op0,op1,shape=(1,2)) results in a column block</span>
+
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="BlockOperator.__init__"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">operators</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="n">n_elements</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_elements</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span></div>
+        <span class="c1"># TODO</span>
+        <span class="c1"># until a decent way to check equality of Acquisition/Image geometries</span>
+        <span class="c1"># required to fullfil &quot;Operators in a Block are required to have the same</span>
+        <span class="c1"># domain column-wise and the same range row-wise.&quot;</span>
+        <span class="c1"># let us just not check if column/row-wise compatible, which is actually</span>
+        <span class="c1"># the same achieved by the column_wise_compatible and row_wise_compatible methods.</span>
+
+        <span class="c1"># # test if operators are compatible</span>
+        <span class="c1"># if not self.column_wise_compatible():</span>
+        <span class="c1">#     raise ValueError(&#39;Operators in each column must have the same domain&#39;)</span>
+        <span class="c1"># if not self.row_wise_compatible():</span>
+        <span class="c1">#     raise ValueError(&#39;Operators in each row must have the same range&#39;)</span>
+
+<div class="viewcode-block" id="BlockOperator.column_wise_compatible"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.column_wise_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">column_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Operators in a Block should have the same domain per column&#39;&#39;&#39;</span>
+        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">compatible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
+            <span class="n">column_compatible</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+                <span class="n">dg0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+                <span class="n">dg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg0</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg1</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">):</span>
+                    <span class="n">column_compatible</span> <span class="o">=</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">column_compatible</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">column_compatible</span> <span class="o">=</span> <span class="n">dg0</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">dg1</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">column_compatible</span>
+            <span class="n">compatible</span> <span class="o">=</span> <span class="n">compatible</span> <span class="ow">and</span> <span class="n">column_compatible</span>
+        <span class="k">return</span> <span class="n">compatible</span></div>
+
+<div class="viewcode-block" id="BlockOperator.row_wise_compatible"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.row_wise_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">row_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Operators in a Block should have the same range per row&#39;&#39;&#39;</span>
+        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">compatible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+            <span class="n">row_compatible</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+                <span class="n">dg0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+                <span class="n">dg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg0</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dg1</span><span class="p">,</span> <span class="s1">&#39;handle&#39;</span><span class="p">):</span>
+                    <span class="n">row_compatible</span> <span class="o">=</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">column_compatible</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">row_compatible</span> <span class="o">=</span> <span class="n">dg0</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">dg1</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">row_compatible</span>
+
+            <span class="n">compatible</span> <span class="o">=</span> <span class="n">compatible</span> <span class="ow">and</span> <span class="n">row_compatible</span>
+
+        <span class="k">return</span> <span class="n">compatible</span></div>
+
+<div class="viewcode-block" id="BlockOperator.get_item"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the Operator at specified row and col</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row: `int`</span>
+<span class="sd">            The row index required. </span>
+<span class="sd">        col: `int`</span>
+<span class="sd">            The column index required. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Requested row </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Requested col </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">row</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">col</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BlockOperator.norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the Euclidean norm of the norms of the individual operators in the BlockOperators &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_norms_as_list</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BlockOperator.get_norms_as_list"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_norms_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_norms_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns a list of the individual norms of the Operators in the BlockOperator</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BlockOperator.set_norms"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.set_norms">[docs]</a>    <span class="k">def</span> <span class="nf">set_norms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. </span>
+
+<span class="sd">        Parameters  </span>
+<span class="sd">        ------------  </span>
+<span class="sd">        norms: list  </span>
+<span class="sd">            A list of positive real values the same length as the number of operators in the BlockOperator.  </span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">norms</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The length of the list of norms should be equal to the number of operators in the BlockOperator&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">norms</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_norm</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlockOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Direct operation for the BlockOperator</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        BlockOperators work on BlockDataContainers, but they will also work on DataContainers</span>
+<span class="sd">        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+            <span class="n">x_b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_b</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_shape</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
+                                              <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  
+                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>       
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
+                                                      <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>                        
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">temp_out_row</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="c1"># temp_out_row points to the element in out that we are adding to  </span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
+                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> 
+                                                      <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                        <span class="n">temp_out_row</span> <span class="o">+=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
+                
+
+<div class="viewcode-block" id="BlockOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Adjoint operation for the BlockOperator</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        BlockOperator may contain both LinearOperator and Operator</span>
+<span class="sd">        This method exists in BlockOperator as it is not known what type of</span>
+<span class="sd">        Operator it will contain.</span>
+
+<span class="sd">        BlockOperators work on BlockDataContainers, but they will also work on DataContainers</span>
+<span class="sd">        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)</span>
+
+<span class="sd">        Raises: ValueError if the contained Operators are not linear</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not all operators in Block are linear.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+            <span class="n">x_b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_b</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_shape</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">adjoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
+                                              <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># the output is a single DataContainer, so we can take it out</span>
+                <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> \
+                                <span class="p">(</span><span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> \
+                                <span class="p">(</span><span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)):</span>
+                            <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+
+                            <span class="n">temp_out_col</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># out_col_operator points to the column in out that we are updating </span>
+                            <span class="n">temp_out_col</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                                                        <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                                                        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlockOperator.is_linear"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns whether all the elements of the BlockOperator are linear&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">is_linear</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlockOperator.get_output_shape"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_output_shape">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xshape</span><span class="p">,</span> <span class="n">adjoint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the shape of the output BlockDataContainer</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xshape: BlockDataContainer</span>
+
+<span class="sd">        adjoint: `bool`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        A(N,M) direct u(M,1) -&gt; N,1</span>
+<span class="sd">        </span>
+<span class="sd">        A(N,M)^T adjoint u(N,1) -&gt; M,1</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">xrows</span><span class="p">,</span> <span class="n">xcols</span> <span class="o">=</span> <span class="n">xshape</span>
+        <span class="k">if</span> <span class="n">xcols</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;BlockDataContainer cannot have more than 1 column&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">adjoint</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rows</span> <span class="o">!=</span> <span class="n">xrows</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;Incompatible shapes </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">xshape</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">xcols</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="o">!=</span> <span class="n">xrows</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Incompatible shapes </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span> <span class="n">xshape</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">xcols</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlockOperator.__rmul__"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Defines the left multiplication with a scalar. Returns a block operator with Scaled Operators inside.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+
+<span class="sd">        scalar: number or iterable containing numbers</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;dimensions of scalars and operators do not match&#39;</span><span class="p">)</span>
+            <span class="n">scalars</span> <span class="o">=</span> <span class="n">scalar</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scalars</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">]</span>
+        <span class="c1"># create a list of ScaledOperator-s</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">*</span> <span class="n">op</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scalars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)]</span>
+        <span class="c1"># return BlockScaledOperator(self, scalars ,shape=self.shape)</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">ops</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the transposed of self.</span>
+
+<span class="sd">        Recall the input list is shaped in a row-by-row fashion&#39;&#39;&#39;</span>
+        <span class="n">newshape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">oplist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">newshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">newshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">oplist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">oplist</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">newshape</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BlockOperator.domain_geometry"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the domain of the BlockOperator</span>
+
+<span class="sd">        If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.</span>
+<span class="sd">        Otherwise it is a BlockGeometry.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># column BlockOperator</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># get the geometries column wise</span>
+            <span class="c1"># we need only the geometries from the first row</span>
+            <span class="c1"># since it is compatible from __init__</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span></div>
+
+            <span class="c1"># shape = (self.shape[0], 1)</span>
+            <span class="c1"># return BlockGeometry(*[el.domain_geometry() for el in self.operators],</span>
+            <span class="c1">#        shape=self.shape)</span>
+
+<div class="viewcode-block" id="BlockOperator.range_geometry"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the range of the BlockOperator&#39;&#39;&#39;</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">sum_abs_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">sum_abs_col</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_col</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">sum_abs_col</span><span class="p">()</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BlockOperator.__getitem__"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the index-th operator in the block irrespectively of it&#39;s shape&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BlockOperator.get_as_list"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the list of operators&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span></div></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

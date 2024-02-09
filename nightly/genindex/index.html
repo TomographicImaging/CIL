@@ -1,0 +1,2397 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; CIL 23.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '23.1.0';
+        </script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      23.1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.__call__">__call__() (cil.optimisation.functions.BlockFunction method)</a>
+
+      <ul>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__">(cil.plugins.ccpi_regularisation.functions.FGP_dTV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.__call__">(cil.plugins.ccpi_regularisation.functions.TGV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.__call__">(cil.plugins.ccpi_regularisation.functions.TNV method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__delattr__">__delattr__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__delattr__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__dir__">__dir__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__dir__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__eq__">__eq__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__eq__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__format__">__format__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__format__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__ge__">__ge__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__ge__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__getattribute__">__getattribute__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__getattribute__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.__getitem__">__getitem__() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__gt__">__gt__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__gt__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__hash__">__hash__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__hash__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__iadd__">__iadd__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__idiv__">__idiv__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__imul__">__imul__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__init__">__init__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__init__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.__init__">(cil.optimisation.functions.BlockFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.__init__">(cil.optimisation.operators.BlockOperator method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__">(cil.plugins.ccpi_regularisation.functions.FGP_dTV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.__init__">(cil.plugins.ccpi_regularisation.functions.TGV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.__init__">(cil.plugins.ccpi_regularisation.functions.TNV method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__init_subclass__">__init_subclass__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__init_subclass__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__isub__">__isub__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__iter__">__iter__() (cil.framework.BlockDataContainer method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__iter__">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__iter__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__itruediv__">__itruediv__() (cil.framework.BlockDataContainer method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__le__">__le__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__le__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__lt__">__lt__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__lt__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__ne__">__ne__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__ne__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__neg__">__neg__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__new__">__new__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__new__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__next__">__next__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__next__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__radd__">__radd__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__rdiv__">__rdiv__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__reduce__">__reduce__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__reduce__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__reduce_ex__">__reduce_ex__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__reduce_ex__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__repr__">__repr__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__repr__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__rmul__">__rmul__() (cil.framework.BlockDataContainer method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.__rmul__">(cil.optimisation.functions.BlockFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.__rmul__">(cil.optimisation.operators.BlockOperator method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__">(cil.plugins.ccpi_regularisation.functions.FGP_dTV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.__rmul__">(cil.plugins.ccpi_regularisation.functions.TGV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.__rmul__">(cil.plugins.ccpi_regularisation.functions.TNV method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__rpow__">__rpow__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__rsub__">__rsub__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__rtruediv__">__rtruediv__() (cil.framework.BlockDataContainer method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__setattr__">__setattr__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__setattr__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__sizeof__">__sizeof__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__sizeof__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__str__">__str__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__str__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__subclasshook__">__subclasshook__() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__subclasshook__">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.framework.BlockDataContainer.__weakref__">__weakref__ (cil.framework.BlockDataContainer attribute)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.__weakref__">(cil.optimisation.algorithms.FISTA attribute)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.__weakref__">(cil.optimisation.algorithms.ISTA attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../processors/#cil.processors.AbsorptionTransmissionConverter">AbsorptionTransmissionConverter (class in cil.processors)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData">AcquisitionData (class in cil.framework)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry">AcquisitionGeometry (class in cil.framework)</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.add">add() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.add">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.adjoint">adjoint() (cil.optimisation.operators.BlockOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.ChannelwiseOperator.adjoint">(cil.optimisation.operators.ChannelwiseOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.CompositionOperator.adjoint">(cil.optimisation.operators.CompositionOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.DiagonalOperator.adjoint">(cil.optimisation.operators.DiagonalOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.FiniteDifferenceOperator.adjoint">(cil.optimisation.operators.FiniteDifferenceOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.GradientOperator.adjoint">(cil.optimisation.operators.GradientOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.IdentityOperator.adjoint">(cil.optimisation.operators.IdentityOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.LinearOperator.adjoint">(cil.optimisation.operators.LinearOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.MatrixOperator.adjoint">(cil.optimisation.operators.MatrixOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ScaledOperator.adjoint">(cil.optimisation.operators.ScaledOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.SumOperator.adjoint">(cil.optimisation.operators.SumOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator.adjoint">(cil.optimisation.operators.SymmetrisedGradientOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.adjoint">(cil.optimisation.operators.ZeroOperator method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm">Algorithm (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.allocate">allocate() (cil.framework.AcquisitionGeometry method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.BlockGeometry.allocate">(cil.framework.BlockGeometry method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageGeometry.allocate">(cil.framework.ImageGeometry method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.ImageData.apply_circular_mask">apply_circular_mask() (cil.framework.ImageData method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.GD.armijo_rule">armijo_rule() (cil.optimisation.algorithms.GD method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.as_array">as_array() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.as_array">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.as_array">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.as_array">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.axpby">axpby() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.axpby">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.binary_operations">binary_operations() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.binary_operations">[1]</a>
+</li>
+      <li><a href="../processors/#cil.processors.Binner">Binner (class in cil.processors)</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer">BlockDataContainer (class in cil.framework)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction">BlockFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockGeometry">BlockGeometry (class in cil.framework)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator">BlockOperator (class in cil.optimisation.operators)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.calculate_Lipschitz">calculate_Lipschitz() (cil.optimisation.functions.TotalVariation method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.ChannelwiseOperator.calculate_norm">calculate_norm() (cil.optimisation.operators.ChannelwiseOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.DiagonalOperator.calculate_norm">(cil.optimisation.operators.DiagonalOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.GradientOperator.calculate_norm">(cil.optimisation.operators.GradientOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.IdentityOperator.calculate_norm">(cil.optimisation.operators.IdentityOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.LinearOperator.calculate_norm">(cil.optimisation.operators.LinearOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.calculate_norm">(cil.optimisation.operators.Operator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.calculate_norm">(cil.optimisation.operators.ZeroOperator method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.centered_at">centered_at() (cil.optimisation.functions.ConstantFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.Function.centered_at">(cil.optimisation.functions.Function method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.centered_at">(cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.centered_at">(cil.optimisation.functions.KullbackLeibler method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.centered_at">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.centered_at">(cil.optimisation.functions.L2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.centered_at">(cil.optimisation.functions.LeastSquares method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.centered_at">(cil.optimisation.functions.MixedL11Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.centered_at">(cil.optimisation.functions.MixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.centered_at">(cil.optimisation.functions.OperatorCompositionFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.centered_at">(cil.optimisation.functions.Rosenbrock method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.centered_at">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.centered_at">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.centered_at">(cil.optimisation.functions.SumFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.centered_at">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.centered_at">(cil.optimisation.functions.TotalVariation method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction.centered_at">(cil.optimisation.functions.TranslateFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared.centered_at">(cil.optimisation.functions.WeightedL2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction.centered_at">(cil.optimisation.functions.ZeroFunction method)</a>
+</li>
+      </ul></li>
+      <li><a href="../processors/#cil.processors.CentreOfRotationCorrector">CentreOfRotationCorrector (class in cil.processors)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS">CGLS (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.ChannelwiseOperator">ChannelwiseOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.check_convergence">check_convergence() (cil.optimisation.algorithms.PDHG method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.DataProcessor.check_input">check_input() (cil.framework.DataProcessor method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.Processor.check_input">(cil.framework.Processor method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.check_input">(cil.plugins.ccpi_regularisation.functions.TNV method)</a>
+</li>
+      </ul></li>
+      <li>
+    cil.utilities.quality_measures
+
+      <ul>
+        <li><a href="../utilities/#module-cil.utilities.quality_measures">module</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.clone">clone() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.clone">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.clone">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageGeometry.clone">(cil.framework.ImageGeometry method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.clone">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.column_wise_compatible">column_wise_compatible() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.CompositionOperator">CompositionOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Padder.constant">constant() (cil.processors.Padder static method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction">ConstantFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.convex_conjugate">convex_conjugate() (cil.optimisation.functions.BlockFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.convex_conjugate">(cil.optimisation.functions.ConstantFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Function.convex_conjugate">(cil.optimisation.functions.Function method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.convex_conjugate">(cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.convex_conjugate">(cil.optimisation.functions.KullbackLeibler method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.convex_conjugate">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.convex_conjugate">(cil.optimisation.functions.L2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.convex_conjugate">(cil.optimisation.functions.LeastSquares method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.convex_conjugate">(cil.optimisation.functions.MixedL11Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.convex_conjugate">(cil.optimisation.functions.MixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.convex_conjugate">(cil.optimisation.functions.OperatorCompositionFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.convex_conjugate">(cil.optimisation.functions.Rosenbrock method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.convex_conjugate">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.convex_conjugate">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.convex_conjugate">(cil.optimisation.functions.SumFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.convex_conjugate">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.convex_conjugate">(cil.optimisation.functions.TotalVariation method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction.convex_conjugate">(cil.optimisation.functions.TranslateFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared.convex_conjugate">(cil.optimisation.functions.WeightedL2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction.convex_conjugate">(cil.optimisation.functions.ZeroFunction method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate">(cil.plugins.ccpi_regularisation.functions.FGP_dTV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate">(cil.plugins.ccpi_regularisation.functions.TGV method)</a>
+</li>
+        <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate">(cil.plugins.ccpi_regularisation.functions.TNV method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.copy">copy() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.BlockDataContainer.copy">(cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.copy">[1]</a>
+</li>
+        <li><a href="../framework/#cil.framework.DataContainer.copy">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.copy">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageGeometry.copy">(cil.framework.ImageGeometry method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.copy">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.create_Cone2D">create_Cone2D() (cil.framework.AcquisitionGeometry static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.create_Cone3D">create_Cone3D() (cil.framework.AcquisitionGeometry static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.create_Parallel2D">create_Parallel2D() (cil.framework.AcquisitionGeometry static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.create_Parallel3D">create_Parallel3D() (cil.framework.AcquisitionGeometry static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.DataContainer">DataContainer (class in cil.framework)</a>
+</li>
+      <li><a href="../framework/#cil.framework.DataOrder">DataOrder (class in cil.framework)</a>
+</li>
+      <li><a href="../framework/#cil.framework.DataProcessor">DataProcessor (class in cil.framework)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.DiagonalOperator">DiagonalOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.direct">direct() (cil.optimisation.operators.BlockOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.ChannelwiseOperator.direct">(cil.optimisation.operators.ChannelwiseOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.CompositionOperator.direct">(cil.optimisation.operators.CompositionOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.DiagonalOperator.direct">(cil.optimisation.operators.DiagonalOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.FiniteDifferenceOperator.direct">(cil.optimisation.operators.FiniteDifferenceOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.GradientOperator.direct">(cil.optimisation.operators.GradientOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.IdentityOperator.direct">(cil.optimisation.operators.IdentityOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.MatrixOperator.direct">(cil.optimisation.operators.MatrixOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.direct">(cil.optimisation.operators.Operator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ScaledOperator.direct">(cil.optimisation.operators.ScaledOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.SparseFiniteDifferenceOperator.direct">(cil.optimisation.operators.SparseFiniteDifferenceOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.SumOperator.direct">(cil.optimisation.operators.SumOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator.direct">(cil.optimisation.operators.SymmetrisedGradientOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.direct">(cil.optimisation.operators.ZeroOperator method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.divide">divide() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.divide">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.domain_geometry">domain_geometry() (cil.optimisation.operators.BlockOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.domain_geometry">(cil.optimisation.operators.Operator method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.dot">dot() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.dot">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.dot">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.dot">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.operators.LinearOperator.dot_test">dot_test() (cil.optimisation.operators.LinearOperator static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.dtype">dtype (cil.framework.AcquisitionData property)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.dtype">(cil.framework.DataContainer property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.dtype">(cil.framework.ImageData property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.dtype">(cil.framework.VectorData property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../processors/#cil.processors.Padder.edge">edge() (cil.processors.Padder static method)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Normaliser.estimate_normalised_error">estimate_normalised_error() (cil.processors.Normaliser static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.exp">exp() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.exp">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.exp">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.exp">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../recon/#cil.recon.FBP">FBP (class in cil.recon)</a>
+</li>
+      <li><a href="../recon/#cil.recon.FDK">FDK (class in cil.recon)</a>
+</li>
+      <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV">FGP_dTV (class in cil.plugins.ccpi_regularisation.functions)</a>
+</li>
+      <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_TV">FGP_TV (class in cil.plugins.ccpi_regularisation.functions)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.display.show1D.figure">figure (cil.utilities.display.show1D attribute)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.fill">fill() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.fill">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.fill">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.fill">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.FiniteDifferenceOperator">FiniteDifferenceOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA">FISTA (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.flag">flag() (cil.optimisation.algorithms.CGLS method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.from_function">from_function() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id28">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.Function">Function (class in cil.optimisation.functions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.GD">GD (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">get() (cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA class method)</a>, <a href="../utilities/#id1">[1]</a>
+
+      <ul>
+        <li><a href="../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">(cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA class method)</a>
+</li>
+        <li><a href="../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">(cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA class method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.get_as_list">get_as_list() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.get_data_axes_order">get_data_axes_order() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.get_data_axes_order">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.get_data_axes_order">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.get_data_axes_order">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.get_data_offset">get_data_offset() (cil.io.NEXUSDataReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.get_data_scale">get_data_scale() (cil.io.NEXUSDataReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.utilities.HDF5_utilities.get_dataset_metadata">get_dataset_metadata() (cil.io.utilities.HDF5_utilities static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.get_dimension_axis">get_dimension_axis() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.get_dimension_axis">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.get_dimension_axis">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.get_dimension_axis">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../recon/#cil.recon.FBP.get_filter_array">get_filter_array() (cil.recon.FBP method)</a>
+
+      <ul>
+        <li><a href="../recon/#cil.recon.FDK.get_filter_array">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.get_geometry">get_geometry() (cil.io.NEXUSDataReader method)</a>
+
+      <ul>
+        <li><a href="../io/#cil.io.NikonDataReader.get_geometry">(cil.io.NikonDataReader method)</a>
+</li>
+        <li><a href="../io/#cil.io.ZEISSDataReader.get_geometry">(cil.io.ZEISSDataReader method)</a>
+</li>
+      </ul></li>
+      <li><a href="../plugins/#cil.plugins.TomoPhantom.get_ImageData">get_ImageData() (in module cil.plugins.TomoPhantom)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.get_ImageGeometry">get_ImageGeometry() (cil.framework.AcquisitionGeometry method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.DataProcessor.get_input">get_input() (cil.framework.DataProcessor method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.Processor.get_input">(cil.framework.Processor method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.BlockGeometry.get_item">get_item() (cil.framework.BlockGeometry method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.get_item">(cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_loss">get_last_loss() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.get_last_loss">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.get_last_loss">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.get_last_loss">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.get_last_loss">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.get_last_loss">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.get_last_loss">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.get_last_loss">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.get_last_loss">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_objective">get_last_objective() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.get_last_objective">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.get_last_objective">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.get_last_objective">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.get_last_objective">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.get_last_objective">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.get_last_objective">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.get_last_objective">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.get_last_objective">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+      <li><a href="../io/#cil.io.ZEISSDataReader.get_metadata">get_metadata() (cil.io.ZEISSDataReader method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.get_norms_as_list">get_norms_as_list() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.DataProcessor.get_output">get_output() (cil.framework.DataProcessor method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.Processor.get_output">(cil.framework.Processor method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.get_output">(cil.optimisation.algorithms.Algorithm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.get_output">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.get_output">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.get_output">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.get_output">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.get_output">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.get_output">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.get_output">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.get_output">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.AbsorptionTransmissionConverter.get_output">(cil.processors.AbsorptionTransmissionConverter method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Binner.get_output">(cil.processors.Binner method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.CentreOfRotationCorrector.get_output">(cil.processors.CentreOfRotationCorrector method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Masker.get_output">(cil.processors.Masker method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.MaskGenerator.get_output">(cil.processors.MaskGenerator method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Normaliser.get_output">(cil.processors.Normaliser method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Padder.get_output">(cil.processors.Padder method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.RingRemover.get_output">(cil.processors.RingRemover method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Slicer.get_output">(cil.processors.Slicer method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.TransmissionAbsorptionConverter.get_output">(cil.processors.TransmissionAbsorptionConverter method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.get_output_shape">get_output_shape() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../io/#cil.io.NikonDataReader.get_roi">get_roi() (cil.io.NikonDataReader method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.get_samples">get_samples() (cil.optimisation.utilities.Sampler method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.utilities.SamplerRandom.get_samples">(cil.optimisation.utilities.SamplerRandom method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.get_slice">get_slice() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.AcquisitionGeometry.get_slice">(cil.framework.AcquisitionGeometry method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.DataContainer.get_slice">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.get_slice">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageGeometry.get_slice">(cil.framework.ImageGeometry method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.get_slice">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.gradient">gradient (cil.optimisation.functions.TotalVariation property)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.gradient">gradient() (cil.optimisation.functions.BlockFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.gradient">(cil.optimisation.functions.ConstantFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Function.gradient">(cil.optimisation.functions.Function method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.gradient">(cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.gradient">(cil.optimisation.functions.KullbackLeibler method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.gradient">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.gradient">(cil.optimisation.functions.L2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.gradient">(cil.optimisation.functions.LeastSquares method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.gradient">(cil.optimisation.functions.MixedL11Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.gradient">(cil.optimisation.functions.MixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.gradient">(cil.optimisation.functions.OperatorCompositionFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.gradient">(cil.optimisation.functions.Rosenbrock method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.gradient">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.gradient">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.gradient">(cil.optimisation.functions.SumFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.gradient">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction.gradient">(cil.optimisation.functions.TranslateFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared.gradient">(cil.optimisation.functions.WeightedL2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction.gradient">(cil.optimisation.functions.ZeroFunction method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.operators.GradientOperator">GradientOperator (class in cil.optimisation.operators)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../io/#cil.io.utilities.HDF5_utilities">HDF5_utilities (class in cil.io.utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.herman_meyer">herman_meyer() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id29">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.IdentityOperator">IdentityOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../processors/#cil.processors.CentreOfRotationCorrector.image_sharpness">image_sharpness() (cil.processors.CentreOfRotationCorrector static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.ImageData">ImageData (class in cil.framework)</a>
+</li>
+      <li><a href="../framework/#cil.framework.ImageGeometry">ImageGeometry (class in cil.framework)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox">IndicatorBox (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Masker.interpolate">interpolate() (cil.processors.Masker static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.is_compatible">is_compatible() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.is_compatible">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.is_linear">is_linear() (cil.optimisation.operators.BlockOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.CompositionOperator.is_linear">(cil.optimisation.operators.CompositionOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.LinearOperator.is_linear">(cil.optimisation.operators.LinearOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.is_linear">(cil.optimisation.operators.Operator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ScaledOperator.is_linear">(cil.optimisation.operators.ScaledOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.SumOperator.is_linear">(cil.optimisation.operators.SumOperator method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.is_provably_convergent">is_provably_convergent() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.is_provably_convergent">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.is_provably_convergent">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.is_provably_convergent">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.is_provably_convergent">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.is_provably_convergent">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.is_provably_convergent">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.is_provably_convergent">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.is_provably_convergent">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA">ISTA (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.iterations">iterations (cil.optimisation.algorithms.Algorithm property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.iterations">(cil.optimisation.algorithms.CGLS property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.iterations">(cil.optimisation.algorithms.FISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.iterations">(cil.optimisation.algorithms.GD property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.iterations">(cil.optimisation.algorithms.ISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.iterations">(cil.optimisation.algorithms.LADMM property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.iterations">(cil.optimisation.algorithms.PDHG property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.iterations">(cil.optimisation.algorithms.SIRT property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.iterations">(cil.optimisation.algorithms.SPDHG property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler">KullbackLeibler (class in cil.optimisation.functions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.L">L (cil.optimisation.functions.BlockFunction property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.L">(cil.optimisation.functions.ConstantFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Function.L">(cil.optimisation.functions.Function property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.L">(cil.optimisation.functions.IndicatorBox property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.L">(cil.optimisation.functions.KullbackLeibler property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.L">(cil.optimisation.functions.L1Norm property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.L">(cil.optimisation.functions.L2NormSquared property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.L">(cil.optimisation.functions.LeastSquares property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.L">(cil.optimisation.functions.MixedL11Norm property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.L">(cil.optimisation.functions.MixedL21Norm property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.L">(cil.optimisation.functions.OperatorCompositionFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.L">(cil.optimisation.functions.Rosenbrock property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.L">(cil.optimisation.functions.ScaledFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.L">(cil.optimisation.functions.SmoothMixedL21Norm property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.L">(cil.optimisation.functions.SumFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.L">(cil.optimisation.functions.SumScalarFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.L">(cil.optimisation.functions.TotalVariation property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction.L">(cil.optimisation.functions.TranslateFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared.L">(cil.optimisation.functions.WeightedL2NormSquared property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction.L">(cil.optimisation.functions.ZeroFunction property)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.L1Norm">L1Norm (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared">L2NormSquared (class in cil.optimisation.functions)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM">LADMM (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares">LeastSquares (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Padder.linear_ramp">linear_ramp() (cil.processors.Padder static method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.LinearOperator">LinearOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.Lmax">Lmax (cil.optimisation.functions.SumFunction property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.Lmax">(cil.optimisation.functions.SumScalarFunction property)</a>
+</li>
+      </ul></li>
+      <li><a href="../utilities/#cil.utilities.dataexample.TestData.load">load() (cil.utilities.dataexample.TestData method)</a>
+</li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.load_data">load_data() (cil.io.NEXUSDataReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.NikonDataReader.load_projections">load_projections() (cil.io.NikonDataReader method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.log">log() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.log">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.log">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.log">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.loss">loss (cil.optimisation.algorithms.Algorithm property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.loss">(cil.optimisation.algorithms.CGLS property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.loss">(cil.optimisation.algorithms.FISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.loss">(cil.optimisation.algorithms.GD property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.loss">(cil.optimisation.algorithms.ISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.loss">(cil.optimisation.algorithms.LADMM property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.loss">(cil.optimisation.algorithms.PDHG property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.loss">(cil.optimisation.algorithms.SIRT property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.loss">(cil.optimisation.algorithms.SPDHG property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../utilities/#cil.utilities.quality_measures.mae">mae() (in module cil.utilities.quality_measures)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Masker">Masker (class in cil.processors)</a>
+</li>
+      <li><a href="../processors/#cil.processors.MaskGenerator">MaskGenerator (class in cil.processors)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.MaskOperator">MaskOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.MatrixOperator">MatrixOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.max">max() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.max">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.max">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.max">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.max_iteration">max_iteration (cil.optimisation.algorithms.Algorithm property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.max_iteration">(cil.optimisation.algorithms.CGLS property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.max_iteration">(cil.optimisation.algorithms.FISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.max_iteration">(cil.optimisation.algorithms.GD property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.max_iteration">(cil.optimisation.algorithms.ISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.max_iteration">(cil.optimisation.algorithms.LADMM property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.max_iteration">(cil.optimisation.algorithms.PDHG property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.max_iteration">(cil.optimisation.algorithms.SIRT property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.max_iteration">(cil.optimisation.algorithms.SPDHG property)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">max_iteration_stop_criterion() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.max_iteration_stop_criterion">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.max_iteration_stop_criterion">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.max_iteration_stop_criterion">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.max_iteration_stop_criterion">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.max_iteration_stop_criterion">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.max_iteration_stop_criterion">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.max_iteration_stop_criterion">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.max_iteration_stop_criterion">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.maximum">maximum() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.maximum">[1]</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.mean">mean() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.mean">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.mean">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.mean">(cil.framework.VectorData method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Masker.mean">(cil.processors.Masker static method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.MaskGenerator.mean">(cil.processors.MaskGenerator static method)</a>
+</li>
+      </ul></li>
+      <li><a href="../processors/#cil.processors.Masker.median">median() (cil.processors.Masker static method)</a>
+
+      <ul>
+        <li><a href="../processors/#cil.processors.MaskGenerator.median">(cil.processors.MaskGenerator static method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.min">min() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.min">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.min">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.min">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.minimum">minimum() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.minimum">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm">MixedL11Norm (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm">MixedL21Norm (class in cil.optimisation.functions)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="../utilities/#module-cil.utilities.quality_measures">cil.utilities.quality_measures</a>
+</li>
+      </ul></li>
+      <li><a href="../utilities/#cil.utilities.quality_measures.mse">mse() (in module cil.utilities.quality_measures)</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.multiply">multiply() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.multiply">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.AcquisitionData.ndim">ndim (cil.framework.AcquisitionData property)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.ndim">(cil.framework.DataContainer property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.ndim">(cil.framework.ImageData property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.ndim">(cil.framework.VectorData property)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.next">next() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.next">[1]</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.next">(cil.optimisation.algorithms.Algorithm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.next">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.next">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.next">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.next">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.next">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.next">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.next">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.next">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.next">(cil.optimisation.utilities.Sampler method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../io/#cil.io.NEXUSDataReader">NEXUSDataReader (class in cil.io)</a>
+</li>
+      <li><a href="../io/#cil.io.NEXUSDataWriter">NEXUSDataWriter (class in cil.io)</a>
+</li>
+      <li><a href="../io/#cil.io.NikonDataReader">NikonDataReader (class in cil.io)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.norm">norm() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.norm">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.norm">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.norm">(cil.framework.VectorData method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.norm">(cil.optimisation.operators.BlockOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.norm">(cil.optimisation.operators.Operator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.ScaledOperator.norm">(cil.optimisation.operators.ScaledOperator method)</a>
+</li>
+      </ul></li>
+      <li><a href="../processors/#cil.processors.Normaliser">Normaliser (class in cil.processors)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.num_threads">num_threads (cil.optimisation.functions.IndicatorBox property)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.number_of_dimensions">number_of_dimensions (cil.framework.AcquisitionData property)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.number_of_dimensions">(cil.framework.DataContainer property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.number_of_dimensions">(cil.framework.ImageData property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.number_of_dimensions">(cil.framework.VectorData property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.objective">objective (cil.optimisation.algorithms.Algorithm property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.objective">(cil.optimisation.algorithms.CGLS property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.objective">(cil.optimisation.algorithms.FISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.objective">(cil.optimisation.algorithms.GD property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.objective">(cil.optimisation.algorithms.ISTA property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.objective">(cil.optimisation.algorithms.LADMM property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.objective">(cil.optimisation.algorithms.PDHG property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.objective">(cil.optimisation.algorithms.SIRT property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.objective">(cil.optimisation.algorithms.SPDHG property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.Operator">Operator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction">OperatorCompositionFunction (class in cil.optimisation.functions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../processors/#cil.processors.Padder">Padder (class in cil.processors)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.partition">partition() (cil.framework.AcquisitionData method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG">PDHG (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.power">power() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.power">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.LinearOperator.PowerMethod">PowerMethod() (cil.optimisation.operators.LinearOperator static method)</a>
+</li>
+      <li><a href="../io/#cil.io.utilities.HDF5_utilities.print_metadata">print_metadata() (cil.io.utilities.HDF5_utilities static method)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Binner.process">process() (cil.processors.Binner method)</a>
+
+      <ul>
+        <li><a href="../processors/#cil.processors.Slicer.process">(cil.processors.Slicer method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.Processor">Processor (class in cil.framework)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.proximal">proximal() (cil.optimisation.functions.BlockFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.proximal">(cil.optimisation.functions.ConstantFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Function.proximal">(cil.optimisation.functions.Function method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.proximal">(cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.proximal">(cil.optimisation.functions.KullbackLeibler method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.proximal">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.proximal">(cil.optimisation.functions.L2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.proximal">(cil.optimisation.functions.LeastSquares method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.proximal">(cil.optimisation.functions.MixedL11Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.proximal">(cil.optimisation.functions.MixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.proximal">(cil.optimisation.functions.OperatorCompositionFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.proximal">(cil.optimisation.functions.Rosenbrock method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.proximal">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.proximal">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.proximal">(cil.optimisation.functions.SumFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.proximal">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.proximal">(cil.optimisation.functions.TotalVariation method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction.proximal">(cil.optimisation.functions.TranslateFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared.proximal">(cil.optimisation.functions.WeightedL2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction.proximal">(cil.optimisation.functions.ZeroFunction method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.proximal_conjugate">proximal_conjugate() (cil.optimisation.functions.BlockFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.proximal_conjugate">(cil.optimisation.functions.ConstantFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Function.proximal_conjugate">(cil.optimisation.functions.Function method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.proximal_conjugate">(cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.proximal_conjugate">(cil.optimisation.functions.KullbackLeibler method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.proximal_conjugate">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.proximal_conjugate">(cil.optimisation.functions.L2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.proximal_conjugate">(cil.optimisation.functions.LeastSquares method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.proximal_conjugate">(cil.optimisation.functions.MixedL11Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.proximal_conjugate">(cil.optimisation.functions.MixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.proximal_conjugate">(cil.optimisation.functions.OperatorCompositionFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.proximal_conjugate">(cil.optimisation.functions.Rosenbrock method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.proximal_conjugate">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.proximal_conjugate">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.proximal_conjugate">(cil.optimisation.functions.SumFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.proximal_conjugate">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.proximal_conjugate">(cil.optimisation.functions.TotalVariation method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction.proximal_conjugate">(cil.optimisation.functions.TranslateFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared.proximal_conjugate">(cil.optimisation.functions.WeightedL2NormSquared method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction.proximal_conjugate">(cil.optimisation.functions.ZeroFunction method)</a>
+</li>
+      </ul></li>
+      <li><a href="../utilities/#cil.utilities.quality_measures.psnr">psnr() (in module cil.utilities.quality_measures)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../processors/#cil.processors.MaskGenerator.quantile">quantile() (cil.processors.MaskGenerator static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../utilities/#cil.utilities.dataexample.TestData.random_noise">random_noise() (cil.utilities.dataexample.TestData static method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_with_replacement">random_with_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id26">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_without_replacement">random_without_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id27">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.range_geometry">range_geometry() (cil.optimisation.operators.BlockOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.range_geometry">(cil.optimisation.operators.Operator method)</a>
+</li>
+      </ul></li>
+      <li><a href="../io/#cil.io.RAWFileWriter">RAWFileWriter (class in cil.io)</a>
+</li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.read">read() (cil.io.NEXUSDataReader method)</a>
+
+      <ul>
+        <li><a href="../io/#cil.io.NikonDataReader.read">(cil.io.NikonDataReader method)</a>
+</li>
+        <li><a href="../io/#cil.io.TIFFStackReader.read">(cil.io.TIFFStackReader method)</a>
+</li>
+        <li><a href="../io/#cil.io.utilities.HDF5_utilities.read">(cil.io.utilities.HDF5_utilities static method)</a>
+</li>
+        <li><a href="../io/#cil.io.ZEISSDataReader.read">(cil.io.ZEISSDataReader method)</a>
+</li>
+      </ul></li>
+      <li><a href="../io/#cil.io.TIFFStackReader.read_as_AcquisitionData">read_as_AcquisitionData() (cil.io.TIFFStackReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.TIFFStackReader.read_as_ImageData">read_as_ImageData() (cil.io.TIFFStackReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.read_as_original">read_as_original() (cil.io.NEXUSDataReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.TIFFStackReader.read_rescaled">read_rescaled() (cil.io.TIFFStackReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.TIFFStackReader.read_scale_offset">read_scale_offset() (cil.io.TIFFStackReader method)</a>
+</li>
+      <li><a href="../io/#cil.io.utilities.HDF5_utilities.read_to">read_to() (cil.io.utilities.HDF5_utilities static method)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Padder.reflect">reflect() (cil.processors.Padder static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.reorder">reorder() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.reorder">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.reorder">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.reorder">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../recon/#cil.recon.FBP.reset">reset() (cil.recon.FBP method)</a>
+
+      <ul>
+        <li><a href="../recon/#cil.recon.FDK.reset">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../processors/#cil.processors.RingRemover">RingRemover (class in cil.processors)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock">Rosenbrock (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.row_wise_compatible">row_wise_compatible() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.run">run() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.run">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.run">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.run">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.run">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.run">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.run">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.run">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.run">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+        <li><a href="../recon/#cil.recon.FBP.run">(cil.recon.FBP method)</a>
+</li>
+        <li><a href="../developer_guide/#cil.recon.FBP.FBP.run">(cil.recon.FBP.FBP method)</a>
+</li>
+        <li><a href="../recon/#cil.recon.FDK.run">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler">Sampler (class in cil.optimisation.utilities)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.SamplerRandom">SamplerRandom (class in cil.optimisation.utilities)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.sapyb">sapyb() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.BlockDataContainer.sapyb">(cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.sapyb">[1]</a>
+</li>
+        <li><a href="../framework/#cil.framework.DataContainer.sapyb">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.sapyb">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.sapyb">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../utilities/#cil.utilities.display.show1D.save">save() (cil.utilities.display.show1D method)</a>
+
+      <ul>
+        <li><a href="../utilities/#cil.utilities.display.show2D.save">(cil.utilities.display.show2D method)</a>
+</li>
+        <li><a href="../utilities/#cil.utilities.display.show_geometry.save">(cil.utilities.display.show_geometry method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction">ScaledFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.ScaledOperator">ScaledOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.dataexample.TestData.scikit_random_noise">scikit_random_noise() (cil.utilities.dataexample.TestData static method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.sequential">sequential() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id0">[1]</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.set_angles">set_angles() (cil.framework.AcquisitionGeometry method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.set_channels">set_channels() (cil.framework.AcquisitionGeometry method)</a>
+</li>
+      <li><a href="../recon/#cil.recon.FBP.set_fft_order">set_fft_order() (cil.recon.FBP method)</a>
+
+      <ul>
+        <li><a href="../recon/#cil.recon.FDK.set_fft_order">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../recon/#cil.recon.FBP.set_filter">set_filter() (cil.recon.FBP method)</a>
+
+      <ul>
+        <li><a href="../recon/#cil.recon.FDK.set_filter">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../recon/#cil.recon.FBP.set_filter_inplace">set_filter_inplace() (cil.recon.FBP method)</a>
+
+      <ul>
+        <li><a href="../recon/#cil.recon.FDK.set_filter_inplace">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.set_gamma_fconj">set_gamma_fconj() (cil.optimisation.algorithms.PDHG method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.set_gamma_g">set_gamma_g() (cil.optimisation.algorithms.PDHG method)</a>
+</li>
+      <li><a href="../recon/#cil.recon.FBP.set_image_geometry">set_image_geometry() (cil.recon.FBP method)</a>
+
+      <ul>
+        <li><a href="../recon/#cil.recon.FDK.set_image_geometry">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.DataProcessor.set_input">set_input() (cil.framework.DataProcessor method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.Processor.set_input">(cil.framework.Processor method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.AbsorptionTransmissionConverter.set_input">(cil.processors.AbsorptionTransmissionConverter method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Binner.set_input">(cil.processors.Binner method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.CentreOfRotationCorrector.set_input">(cil.processors.CentreOfRotationCorrector method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Masker.set_input">(cil.processors.Masker method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.MaskGenerator.set_input">(cil.processors.MaskGenerator method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Normaliser.set_input">(cil.processors.Normaliser method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Padder.set_input">(cil.processors.Padder method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.RingRemover.set_input">(cil.processors.RingRemover method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.Slicer.set_input">(cil.processors.Slicer method)</a>
+</li>
+        <li><a href="../processors/#cil.processors.TransmissionAbsorptionConverter.set_input">(cil.processors.TransmissionAbsorptionConverter method)</a>
+</li>
+        <li><a href="../recon/#cil.recon.FBP.set_input">(cil.recon.FBP method)</a>
+</li>
+        <li><a href="../recon/#cil.recon.FDK.set_input">(cil.recon.FDK method)</a>
+</li>
+      </ul></li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.set_labels">set_labels() (cil.framework.AcquisitionGeometry method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.Operator.set_norm">set_norm() (cil.optimisation.operators.Operator method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.set_norms">set_norms() (cil.optimisation.operators.BlockOperator method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.set_num_threads">set_num_threads() (cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionGeometry.set_panel">set_panel() (cil.framework.AcquisitionGeometry method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.set_relaxation_parameter">set_relaxation_parameter() (cil.optimisation.algorithms.SIRT method)</a>
+</li>
+      <li><a href="../recon/#cil.recon.FBP.set_split_processing">set_split_processing() (cil.recon.FBP method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.set_step_size">set_step_size() (cil.optimisation.algorithms.FISTA method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.set_step_size">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.set_step_sizes">set_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">set_suppress_evaluation() (cil.optimisation.functions.IndicatorBox method)</a>
+</li>
+      <li><a href="../io/#cil.io.NEXUSDataReader.set_up">set_up() (cil.io.NEXUSDataReader method)</a>
+
+      <ul>
+        <li><a href="../io/#cil.io.NEXUSDataWriter.set_up">(cil.io.NEXUSDataWriter method)</a>
+</li>
+        <li><a href="../io/#cil.io.ZEISSDataReader.set_up">(cil.io.ZEISSDataReader method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.set_up">(cil.optimisation.algorithms.Algorithm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.set_up">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.set_up">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.set_up">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.set_up">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.set_up">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.set_up">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.set_up">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.set_up">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.AcquisitionData.shape">shape (cil.framework.AcquisitionData property)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.shape">(cil.framework.DataContainer property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.shape">(cil.framework.ImageData property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.shape">(cil.framework.VectorData property)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.should_stop">should_stop() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.should_stop">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.should_stop">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.should_stop">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.should_stop">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.should_stop">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.should_stop">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.should_stop">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.should_stop">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+      <li><a href="../utilities/#cil.utilities.display.show1D">show1D (class in cil.utilities.display)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.display.show2D">show2D (class in cil.utilities.display)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.display.show_geometry">show_geometry (class in cil.utilities.display)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA">SIMULATED_CONE_BEAM_DATA (class in cil.utilities.dataexample)</a>, <a href="../utilities/#id0">[1]</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA">SIMULATED_PARALLEL_BEAM_DATA (class in cil.utilities.dataexample)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT">SIRT (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.size">size (cil.framework.AcquisitionData property)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.size">(cil.framework.DataContainer property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.size">(cil.framework.ImageData property)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.size">(cil.framework.VectorData property)</a>
+</li>
+      </ul></li>
+      <li><a href="../io/#cil.io.ZEISSDataReader.slice_metadata">slice_metadata() (cil.io.ZEISSDataReader method)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Slicer">Slicer (class in cil.processors)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm">SmoothMixedL21Norm (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.SparseFiniteDifferenceOperator">SparseFiniteDifferenceOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG">SPDHG (class in cil.optimisation.algorithms)</a>
+</li>
+      <li><a href="../processors/#cil.processors.MaskGenerator.special_values">special_values() (cil.processors.MaskGenerator static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.squared_norm">squared_norm() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.squared_norm">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.squared_norm">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.squared_norm">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.staggered">staggered() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id25">[1]</a>
+</li>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.subtract">subtract() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.subtract">[1]</a>
+</li>
+      <li><a href="../framework/#cil.framework.AcquisitionData.sum">sum() (cil.framework.AcquisitionData method)</a>
+
+      <ul>
+        <li><a href="../framework/#cil.framework.DataContainer.sum">(cil.framework.DataContainer method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.ImageData.sum">(cil.framework.ImageData method)</a>
+</li>
+        <li><a href="../framework/#cil.framework.VectorData.sum">(cil.framework.VectorData method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.SumFunction">SumFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.SumOperator">SumOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction">SumScalarFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Padder.symmetric">symmetric() (cil.processors.Padder static method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator">SymmetrisedGradientOperator (class in cil.optimisation.operators)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA">SYNCHROTRON_PARALLEL_BEAM_DATA (class in cil.utilities.dataexample)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.T">T (cil.optimisation.operators.BlockOperator property)</a>
+</li>
+      <li><a href="../utilities/#cil.utilities.dataexample.TestData">TestData (class in cil.utilities.dataexample)</a>
+</li>
+      <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TGV">TGV (class in cil.plugins.ccpi_regularisation.functions)</a>
+</li>
+      <li><a href="../processors/#cil.processors.MaskGenerator.threshold">threshold() (cil.processors.MaskGenerator static method)</a>
+</li>
+      <li><a href="../io/#cil.io.TIFFStackReader">TIFFStackReader (class in cil.io)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../io/#cil.io.TIFFWriter">TIFFWriter (class in cil.io)</a>
+</li>
+      <li><a href="../plugins/#cil.plugins.ccpi_regularisation.functions.TNV">TNV (class in cil.plugins.ccpi_regularisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation">TotalVariation (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.TranslateFunction">TranslateFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../processors/#cil.processors.TransmissionAbsorptionConverter">TransmissionAbsorptionConverter (class in cil.processors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../framework/#cil.framework.BlockDataContainer.unary_operations">unary_operations() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.unary_operations">[1]</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.update">update() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.update">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.update">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.update">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.update">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.update">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.update">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.update">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.update">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.update_objective">update_objective() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.update_objective">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.update_objective">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.update_objective">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.update_objective">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.update_objective">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.update_objective">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.update_objective">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.update_objective">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.update_step_sizes">update_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../processors/#cil.processors.Masker.value">value() (cil.processors.Masker static method)</a>
+</li>
+      <li><a href="../framework/#cil.framework.VectorData">VectorData (class in cil.framework)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.verbose_output">verbose_output() (cil.optimisation.algorithms.Algorithm method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.verbose_output">(cil.optimisation.algorithms.CGLS method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.verbose_output">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.GD.verbose_output">(cil.optimisation.algorithms.GD method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.verbose_output">(cil.optimisation.algorithms.ISTA method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM.verbose_output">(cil.optimisation.algorithms.LADMM method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.verbose_output">(cil.optimisation.algorithms.PDHG method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SIRT.verbose_output">(cil.optimisation.algorithms.SIRT method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.verbose_output">(cil.optimisation.algorithms.SPDHG method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared">WeightedL2NormSquared (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../processors/#cil.processors.Padder.wrap">wrap() (cil.processors.Padder static method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../io/#cil.io.NEXUSDataWriter.write">write() (cil.io.NEXUSDataWriter method)</a>
+
+      <ul>
+        <li><a href="../io/#cil.io.RAWFileWriter.write">(cil.io.RAWFileWriter method)</a>
+</li>
+        <li><a href="../io/#cil.io.TIFFWriter.write">(cil.io.TIFFWriter method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../processors/#cil.processors.CentreOfRotationCorrector.xcorrelation">xcorrelation() (cil.processors.CentreOfRotationCorrector static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../io/#cil.io.ZEISSDataReader">ZEISSDataReader (class in cil.io)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.ZeroFunction">ZeroFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator">ZeroOperator (class in cil.optimisation.operators)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

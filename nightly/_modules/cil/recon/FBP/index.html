@@ -1,0 +1,1152 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.recon.FBP &#8212; CIL 23.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/recon/FBP';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '23.1.0';
+        </script>
+    <link rel="index" title="Index" href="../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      23.1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide/">Developers’ Guide</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">cil.recon.FBP</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for cil.recon.FBP</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2021 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2021 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">cilacc</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">Reconstructor</span>
+<span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fftfreq</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">c_float_p</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">)</span>
+<span class="n">c_double_p</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span>
+    <span class="n">has_ipp</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">has_ipp</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">if</span> <span class="n">has_ipp</span><span class="p">:</span>
+    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the data array </span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the filter array</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the weights array</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int16</span><span class="p">,</span> <span class="c1">#order of the fft</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">,</span> <span class="c1">#num_proj</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">,</span> <span class="c1">#pix_v</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">]</span> <span class="c1">#pix_x</span>
+
+    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the data array </span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the filter array</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the weights array</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int16</span><span class="p">,</span> <span class="c1">#order of the fft</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">,</span> <span class="c1">#pix_v</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">,</span> <span class="c1">#num_proj</span>
+                                    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">]</span> <span class="c1">#pix_x</span>
+
+<span class="k">class</span> <span class="nc">GenericFilteredBackProjection</span><span class="p">(</span><span class="n">Reconstructor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract Base Class GenericFilteredBackProjection holding common and virtual methods for FBP and FDK</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filter_inplace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+
+        <span class="c1">#call parent initialiser</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="n">has_ipp</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;IPP libraries not found. Cannot use CIL FBP&quot;</span><span class="p">)</span>
+
+        <span class="c1">#additional check</span>
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input data cannot be multi-channel&quot;</span><span class="p">)</span>
+
+
+        <span class="c1">#define defaults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_fft_order</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_filter_inplace</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+    <span class="k">def</span> <span class="nf">set_filter_inplace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        False (default) will allocate temporary memory for filtered projections.</span>
+<span class="sd">        True will filter projections in-place.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inplace: boolean</span>
+<span class="sd">            Sets the inplace filtering of projections</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inplace</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="o">=</span> <span class="n">inplace</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;set_filter_inplace expected a boolean. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inplace</span><span class="p">)))</span>
+
+
+    <span class="k">def</span> <span class="nf">_default_fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">min_order</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">while</span> <span class="mi">2</span><span class="o">**</span><span class="n">min_order</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">pixel_num_h</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">min_order</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="n">min_order</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">min_order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">min_order</span>
+
+
+    <span class="k">def</span> <span class="nf">set_fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The width of the fourier transform N=2^order. </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        order: int, optional</span>
+<span class="sd">            The width of the fft N=2^order </span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----      </span>
+<span class="sd">        If `None` the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater</span>
+<span class="sd">        Higher orders will yield more accurate results but increase computation time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">min_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_fft_order</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fft_order</span> <span class="o">=</span> <span class="n">min_order</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fft_order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;fft order expected type `int`. Got</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">order</span><span class="p">)))</span>
+        
+        <span class="k">if</span> <span class="n">fft_order</span> <span class="o">&lt;</span> <span class="n">min_order</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Minimum fft width 2^order is order = </span><span class="si">{0}</span><span class="s2">. Got</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_order</span><span class="p">,</span><span class="n">order</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">fft_order</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span> <span class="o">=</span> <span class="n">fft_order</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="o">==</span><span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filter length changed - please update your custom filter&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#create default filter type of new length</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">preset_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;hann&#39;</span><span class="p">]</span>
+ 
+    <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the filter used by the reconstruction.</span>
+
+<span class="sd">        Pre-set filters are constructed in the frequency domain.        </span>
+<span class="sd">        Pre-set filters are: &#39;ram-lak&#39;, &#39;shepp-logan&#39;, &#39;cosine&#39;, &#39;hamming&#39;, &#39;hann&#39;</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
+<span class="sd">            Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</span>
+<span class="sd">        cutoff : float, default = 1</span>
+<span class="sd">            The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If passed a numpy array the filter must have length N = 2^self.fft_order</span>
+
+<span class="sd">        The indices of the array are interpreted as:</span>
+
+<span class="sd">        - [0] The DC frequency component</span>
+<span class="sd">        - [1:N/2] positive frequencies</span>
+<span class="sd">        - [N/2:N-1] negative frequencies</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="ow">and</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">preset_filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="nb">filter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span> <span class="o">=</span> <span class="n">cutoff</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">filter_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span> <span class="o">=</span> <span class="n">filter_array</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="s1">&#39;custom&#39;</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Custom filter not compatible with input.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Filter not recognised&quot;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">get_filter_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the filter array in the frequency domain. </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            An array containing the filter values</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The filter length N is 2^self.fft_order.</span>
+
+<span class="sd">        The indices of the array are interpreted as:</span>
+<span class="sd">        </span>
+<span class="sd">        - [0] The DC frequency component</span>
+<span class="sd">        - [1:N/2] positive frequencies</span>
+<span class="sd">        - [N/2:N-1] negative frequencies</span>
+
+<span class="sd">        The array can be modified and passed back using set_filter()</span>
+
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+
+<span class="sd">        Filter reference in frequency domain:</span>
+<span class="sd">        Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.</span>
+
+<span class="sd">        Plantagie, L. Algebraic filters for filtered backprojection, 2017</span>
+<span class="sd">        https://hdl.handle.net/1887/48289</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span>
+
+        <span class="n">filter_length</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span>
+
+        <span class="c1"># frequency bins in cycles/pixel</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">fftfreq</span><span class="p">(</span><span class="n">filter_length</span><span class="p">)</span>
+        <span class="c1"># in pi rad/pixel</span>
+        <span class="n">freq</span><span class="o">*=</span><span class="mi">2</span>
+
+        <span class="n">ramp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="n">ramp</span><span class="p">[</span><span class="n">ramp</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;ram-lak&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">freq</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;cosine&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hamming&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.54</span> <span class="o">+</span> <span class="mf">0.46</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hann&#39;</span><span class="p">:</span>
+            <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span> 
+        
+    <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+
+
+    <span class="k">def</span> <span class="nf">_pre_filtering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">acquistion_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters and weights the projections inplace</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        acquistion_data : AcquisitionData</span>
+<span class="sd">            The projections to be filtered</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        self.input is not used to allow processing in smaller chunks</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_weights</span><span class="p">(</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="c1">#horizontal</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights not compatible&quot;</span><span class="p">)</span>
+
+        <span class="n">filter_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter_array</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">filter_array</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Custom filter has length </span><span class="si">{0}</span><span class="s2"> and is not compatible with requested fft_order </span><span class="si">{1}</span><span class="s2">. Expected filter length 2^</span><span class="si">{1}</span><span class="s2">&quot;</span>\
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_array</span><span class="o">.</span><span class="n">size</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">))</span>
+
+        <span class="c1">#call ext function</span>
+        <span class="n">data_ptr</span> <span class="o">=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
+        <span class="n">filter_ptr</span> <span class="o">=</span> <span class="n">filter_array</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
+        <span class="n">weights_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
+
+        <span class="n">ag</span> <span class="o">=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span>
+        <span class="k">if</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>   
+            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>   
+            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span> 
+            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span> 
+            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">&quot;Could not determine correct function call from dimension labels&quot;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets all optional configuration parameters to their default values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_fft_order</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_filter_inplace</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_image_geometry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">NotImplementedError</span>
+
+
+<div class="viewcode-block" id="FDK"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FDK">[docs]</a><span class="k">class</span> <span class="nc">FDK</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input : AcquisitionData</span>
+<span class="sd">        The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</span>
+<span class="sd">    </span>
+<span class="sd">    image_geometry : ImageGeometry, default used if None</span>
+<span class="sd">        A description of the area/volume to reconstruct</span>
+<span class="sd">    </span>
+<span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
+<span class="sd">        The filter to be applied. Can be a string from: {&#39;`ram-lak`&#39;, &#39;`shepp-logan`&#39;, &#39;`cosine`&#39;, &#39;`hamming`&#39;, &#39;`hann`&#39;}, or a numpy array.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities.dataexample import SIMULATED_CONE_BEAM_DATA</span>
+<span class="sd">    &gt;&gt;&gt; from cil.recon import FDK</span>
+<span class="sd">    &gt;&gt;&gt; data = SIMULATED_CONE_BEAM_DATA.get()</span>
+<span class="sd">    &gt;&gt;&gt; fdk = FDK(data)</span>
+<span class="sd">    &gt;&gt;&gt; out = fdk.run()</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The reconstructor can be futher customised using additional &#39;set&#39; methods provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tigre&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">):</span>
+        <span class="c1">#call parent initialiser</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span>  <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for cone-beam data only.&quot;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
+        <span class="n">ag</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
+        <span class="n">xv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,(</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
+        <span class="n">yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,(</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_v</span>
+        <span class="p">(</span><span class="n">yy</span><span class="p">,</span> <span class="n">xx</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xv</span><span class="p">,</span> <span class="n">yv</span><span class="p">)</span>
+
+        <span class="n">principal_ray_length</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">dist_source_center</span> <span class="o">+</span> <span class="n">ag</span><span class="o">.</span><span class="n">dist_center_detector</span>
+        <span class="n">scaling</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">magnification</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">scaling</span> <span class="o">*</span> <span class="n">principal_ray_length</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">principal_ray_length</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">xx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="FDK.run"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FDK.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the configured FDK recon and returns the reconstruction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out : ImageData, optional</span>
+<span class="sd">           Fills the referenced ImageData with the reconstructed volume and suppresses the return</span>
+<span class="sd">        verbose : int, default=1</span>
+<span class="sd">           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageData</span>
+<span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;FDK&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;FDK recon</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">repres</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_data_size</span><span class="p">()</span>
+
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>    
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span> 
+
+        <span class="k">return</span> <span class="n">repres</span>   </div>
+
+<div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates an FBP reconstructor based on your parallel-beam acquisition data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input : AcquisitionData</span>
+<span class="sd">        The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</span>
+<span class="sd">        </span>
+<span class="sd">    image_geometry : ImageGeometry, default used if None</span>
+<span class="sd">        A description of the area/volume to reconstruct</span>
+<span class="sd">        </span>
+<span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
+<span class="sd">        The filter to be applied. Can be a string from: {&#39;`ram-lak`&#39;, &#39;`shepp-logan`&#39;, &#39;`cosine`&#39;, &#39;`hamming`&#39;, &#39;`hann`&#39;}, or a numpy array.</span>
+
+<span class="sd">    backend : string</span>
+<span class="sd">        The backend to use, can be &#39;astra&#39; or &#39;tigre&#39;. Data must be in the correct order for requested backend.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA</span>
+<span class="sd">    &gt;&gt;&gt; from cil.recon import FBP</span>
+<span class="sd">    &gt;&gt;&gt; data = SIMULATED_PARALLEL_BEAM_DATA.get()</span>
+<span class="sd">    &gt;&gt;&gt; fbp = FBP(data)</span>
+<span class="sd">    &gt;&gt;&gt; out = fbp.run()</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The reconstructor can be further customised using additional &#39;set&#39; methods provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="s1">&#39;astra&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">slices_per_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+      
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span>  <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">PARALLEL</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for parallel-beam data only.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FBP.set_split_processing"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP.set_split_processing">[docs]</a>    <span class="k">def</span> <span class="nf">set_split_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slices_per_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits the processing in to chunks. Default, 0 will process the data in a single call.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out : slices_per_chunk, optional</span>
+<span class="sd">            Process the data in chunks of n slices. It is recommended to use value of power-of-two.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This will reduce memory use but may increase computation time.</span>
+<span class="sd">        It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.</span>
+<span class="sd">        </span>
+<span class="sd">        This can only be used on simple and offset data-geometries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">num_slices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">slices_per_chunk</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">num_slices</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span>  <span class="n">num_slices</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">:</span>
+            <span class="n">num_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">pixel_num_v</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span> <span class="o">=</span> <span class="n">num_slices</span></div>
+        
+
+    <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
+
+        <span class="n">ag</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
+        <span class="n">scaling</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">==</span><span class="s1">&#39;astra&#39;</span><span class="p">:</span>
+            <span class="n">scaling</span> <span class="o">/=</span>  <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">,</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span><span class="p">),</span><span class="n">scaling</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_slices</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="n">num_slices</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ag_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">ag_slice</span><span class="o">.</span><span class="n">pixel_num_v</span> <span class="o">=</span> <span class="n">num_slices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ag_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                
+        <span class="n">ig_slice</span> <span class="o">=</span> <span class="n">ag_slice</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span> <span class="o">=</span> <span class="n">ag_slice</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="n">ig_slice</span><span class="p">,</span><span class="n">ag_slice</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_process_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">array</span><span class="p">[:,</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">step</span><span class="p">,:]))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="p">)</span><span class="o">.</span><span class="n">array</span>
+
+
+<div class="viewcode-block" id="FBP.run"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out : ImageData, optional</span>
+<span class="sd">           Fills the referenced ImageData with the reconstructed volume and suppresses the return</span>
+
+<span class="sd">        verbose : int, default=1</span>
+<span class="sd">           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageData</span>
+<span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">==</span> <span class="s1">&#39;advanced&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only default image geometries can be processed in chunks `set_split_processing`&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">out</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+
+            <span class="n">tot_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">pixel_num_v</span>
+            <span class="n">remainder</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
+            <span class="n">num_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">num_chunks</span><span class="p">)</span>
+
+            <span class="c1">#process dataset by requested chunk size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span> <span class="n">i</span> 
+
+                <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">#process excess rows</span>
+            <span class="k">if</span> <span class="n">remainder</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">remainder</span>
+                
+                <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">remainder</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
+
+            <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FBP.reset"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets all optional configuration parameters to their default values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;FBP recon</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">repres</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_data_size</span><span class="p">()</span>
+
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>    
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span> 
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Split processing: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">)</span> 
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">:</span>
+            <span class="n">num_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_chunks</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">repres</span> <span class="o">+=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstructing in </span><span class="si">{}</span><span class="s2"> chunk(s):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">repres</span>   </div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

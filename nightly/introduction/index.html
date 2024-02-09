@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Introduction &#8212; CIL 23.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'introduction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '23.1.0';
+        </script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Framework" href="../framework/" />
+    <link rel="prev" title="Welcome to CIL’s documentation!" href="../" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      23.1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ct-geometry">CT Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parallel-geometry">Parallel geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fan-beam-geometry">Fan-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cone-beam-geometry">Cone-beam geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#multi-channel-data">Multi channel data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#block-framework">Block Framework</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/introduction.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Introduction</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h1>
+<p>The goal of the Core Imaging Library is to allow the user to simply create iterative reconstruction methods which
+go beyond the standard filter back projection technique and which better suit the data characteristics.
+The framework comprises:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.framework</span></code> module gives the building blocks used to describe and handle the data</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.io</span></code> module which provides a number of loaders for real CT machines, e.g. Nikon. It also provides reader and writer to save to NeXuS file format.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.optimisation</span></code> module allows the user to create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.plugins</span></code> module which allows CIL to use selected functionality from ASTRA, TIGRE, TomoPhantom and the Regularisation Toolkit</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.processors</span></code> module contains tools for data manipulation and common CT pre-processing steps</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.recon</span></code> module contains an optimised FDK/FBP reconstructors, making using the both CIL accelerated libraries and the Tigre/ASTRA back-projectors</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.utilities</span></code> module contains a selection of display tools for 2D and 3D data, as well as real and simulated test datasets</p></li>
+</ul>
+<section id="ct-geometry">
+<h2>CT Geometry<a class="headerlink" href="#ct-geometry" title="Permalink to this headline">#</a></h2>
+<p>Please refer to <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/demos/1_Introduction/00_CIL_geometry.ipynb">this</a> notebook on the CIL-Demos
+repository for full description.</p>
+<p>In conventional CT systems, an object is placed between a source emitting X-rays and a detector array
+measuring the X-ray transmission images of the incident X-rays. Typically, either the object is placed
+on a rotating sample stage and rotates with respect to the source-detector assembly, or the
+source-detector gantry rotates with respect to the stationary object.
+This arrangement results in so-called circular scanning trajectory. Depending on source and detector
+types, there are three conventional data acquisition geometries:</p>
+<ul class="simple">
+<li><p>parallel geometry (2D or 3D),</p></li>
+<li><p>fan-beam geometry, and</p></li>
+<li><p>cone-beam geometry.</p></li>
+</ul>
+<section id="parallel-geometry">
+<h3>Parallel geometry<a class="headerlink" href="#parallel-geometry" title="Permalink to this headline">#</a></h3>
+<p>Parallel beams of X-rays are emitted onto 1D (single pixel row) or 2D detector array. This geometry
+is common for synchrotron sources. 2D parallel geometry is illustrated below.</p>
+<figure class="align-center" id="id1">
+<img alt="alternate text" src="../_images/parallel.png" />
+<figcaption>
+<p><span class="caption-text">2D Parallel geometry</span><a class="headerlink" href="#id1" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id2">
+<img alt="alternate text" src="../_images/parallel3d.png" />
+<figcaption>
+<p><span class="caption-text">3D Parallel geometry</span><a class="headerlink" href="#id2" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="fan-beam-geometry">
+<h3>Fan-beam geometry<a class="headerlink" href="#fan-beam-geometry" title="Permalink to this headline">#</a></h3>
+<dl class="simple">
+<dt>A single point-like X-ray source emits a cone beam onto 1D detector pixel row. Cone-beam is typically</dt><dd><p>collimated to imaging field of view. Collimation allows greatly reduce amount of scatter radiation
+reaching the detector. Fan-beam geometry is used when scattering has significant influence on image
+quality or single-slice reconstruction is sufficient.</p>
+</dd>
+</dl>
+<figure class="align-center" id="id3">
+<img alt="alternate text" src="../_images/fan.png" />
+<figcaption>
+<p><span class="caption-text">Fan beam geometry</span><a class="headerlink" href="#id3" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="cone-beam-geometry">
+<h3>Cone-beam geometry<a class="headerlink" href="#cone-beam-geometry" title="Permalink to this headline">#</a></h3>
+<p>A single point-like X-ray source emits a cone beam onto 2D detector array.
+Cone-beam geometry is mainly used in lab-based CT instruments. Depending on where the sample
+is placed between the source and the detector one can achieve a different magnification factor <span class="math notranslate nohighlight">\(F\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[F = \frac{r_1 + r_2}{r_1}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r_1\)</span> and <span class="math notranslate nohighlight">\(r_2\)</span> are the distance from the source to the center of the sample and
+the distance from the center of the sample to the detector, respectively.</p>
+<figure class="align-center" id="id4">
+<img alt="alternate text" src="../_images/cone.png" />
+<figcaption>
+<p><span class="caption-text">Cone beam geometry</span><a class="headerlink" href="#id4" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="multi-channel-data">
+<h2>Multi channel data<a class="headerlink" href="#multi-channel-data" title="Permalink to this headline">#</a></h2>
+<p>CIL is designed to work with 4D data.</p>
+<p>Both <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and <code class="code docutils literal notranslate"><span class="pre">ImageGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">ImageData</span></code>
+can be defined for multi-channel (spectral/time) CT data using <code class="code docutils literal notranslate"><span class="pre">channels</span></code> attribute.</p>
+</section>
+<section id="block-framework">
+<h2>Block Framework<a class="headerlink" href="#block-framework" title="Permalink to this headline">#</a></h2>
+<p>The block framework allows writing more advanced <a href="#id5"><span class="problematic" id="id6">`optimisation problems`_</span></a>. Consider the typical
+<a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
+<p>where,</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is the projection operator</p></li>
+<li><p><span class="math notranslate nohighlight">\(b\)</span> is the acquired data</p></li>
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is the unknown image to be solved for</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the regularisation parameter</p></li>
+<li><p><span class="math notranslate nohighlight">\(L\)</span> is a regularisation operator</p></li>
+</ul>
+<p>The first term measures the fidelity of the solution to the data. The second term measures the
+fidelity to the prior knowledge we have imposed on the system, operator <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p>This can be re-written equivalently in the block matrix form:</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}\binom{A}{\alpha L} u - \binom{b}{0}\end{Vmatrix}^2_2\]</div>
+<p>With the definitions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tilde{A} = \binom{A}{\alpha L}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{b} = \binom{b}{0}\)</span></p></li>
+</ul>
+<p>this can now be recognised as a least squares problem which can be solved by any algorithm in the <code class="code docutils literal notranslate"><span class="pre">cil.optimisation</span></code>
+which can solve least squares problem, e.g. CGLS.</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}\tilde{A} u - \tilde{b}\end{Vmatrix}^2_2\]</div>
+<p>To be able to express our optimisation problems in the matrix form above, we developed the so-called,
+Block Framework comprising 4 main actors: <code class="code docutils literal notranslate"><span class="pre">BlockGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Welcome to CIL’s documentation!</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../framework/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Framework</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

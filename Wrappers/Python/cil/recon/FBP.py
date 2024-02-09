@@ -155,6 +155,7 @@ class GenericFilteredBackProjection(Reconstructor):
     def preset_filters(self):
         return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
  
+
     def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
         Set the filter used by the reconstruction.
@@ -255,6 +256,11 @@ class GenericFilteredBackProjection(Reconstructor):
 
         return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order) 
         
+    
+    def plot_filter(self):
+        get_filter_array
+
+
     def _calculate_weights(self):
         return NotImplementedError
 

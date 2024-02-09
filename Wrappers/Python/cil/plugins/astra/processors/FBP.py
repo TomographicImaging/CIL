@@ -17,17 +17,17 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
+from typing import Literal, Optional
 from cil.framework import DataProcessor
 from cil.framework import DataOrder
+from cil.framework.framework import AcquisitionGeometry, DataContainer, ImageGeometry
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
 import logging
 
 class FBP(DataProcessor):
-
-    """
-    FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.
+    """FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.
 
     The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small angular steps.
 
@@ -43,13 +43,12 @@ class FBP(DataProcessor):
         'gpu' will run on a compatible CUDA capable device using the ASTRA FDK_CUDA algorithm
         'cpu' will run on CPU using the ASTRA FBP algorithm - see Notes for limitations
 
-
     Example
     -------
     >>> from cil.plugins.astra import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
+    >>> reconstruction = fbp.get_output()
 
 
     Notes
@@ -57,15 +56,14 @@ class FBP(DataProcessor):
     A CPU version is provided for simple 2D parallel-beam geometries only, any offsets and rotations in the acquisition geometry will be ignored.
 
     This uses the ram-lak filter only.
-
     """
 
-    
-    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs): 
-        
+    processor:DataProcessor
 
-        sinogram_geometry = kwargs.get('sinogram_geometry', None)
-        volume_geometry = kwargs.get('volume_geometry', None)
+    def __init__(self, image_geometry:Optional[ImageGeometry]=None, acquisition_geometry:Optional[AcquisitionGeometry]=None, device:Literal["gpu","cpu"]="gpu", **kwargs):
+
+        sinogram_geometry = kwargs.get("sinogram_geometry", None)
+        volume_geometry = kwargs.get("volume_geometry", None)
 
         if sinogram_geometry is not None:
             acquisition_geometry = sinogram_geometry
@@ -73,7 +71,7 @@ class FBP(DataProcessor):
 
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-            
+
         if volume_geometry is not None:
             image_geometry = volume_geometry
             logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
@@ -81,44 +79,91 @@ class FBP(DataProcessor):
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
-        DataOrder.check_order_for_engine('astra', image_geometry)
-        DataOrder.check_order_for_engine('astra', acquisition_geometry) 
+        DataOrder.check_order_for_engine("astra", image_geometry)
+        DataOrder.check_order_for_engine("astra", acquisition_geometry)
 
-        if device == 'gpu':
-            if acquisition_geometry.geom_type == 'parallel':
+        if device == "gpu":
+            if acquisition_geometry.geom_type == "parallel":
                 processor = FBP_Flexible(image_geometry, acquisition_geometry)
             else:
                 processor = FDK_Flexible(image_geometry, acquisition_geometry)
-            
+
         else:
             UserWarning("ASTRA back-projector running on CPU will not make use of enhanced geometry parameters")
 
-            if acquisition_geometry.geom_type == 'cone':
+            if acquisition_geometry.geom_type == "cone":
                 raise NotImplementedError("Cannot process cone-beam data without a GPU")
 
-            if acquisition_geometry.dimension == '2D':
-                processor = FBP_CPU(image_geometry, acquisition_geometry) 
+            if acquisition_geometry.dimension == "2D":
+                processor = FBP_CPU(image_geometry, acquisition_geometry)
             else:
                 raise NotImplementedError("Cannot process 3D data without a GPU")
 
-        if acquisition_geometry.channels > 1: 
+        if acquisition_geometry.channels > 1:
             raise NotImplementedError("Cannot process multi-channel data")
             #processor_full = ChannelwiseProcessor(processor, self.acquisition_geometry.channels, dimension='prepend')
             #self.processor = operator_full
-        
-        super(FBP, self).__init__( image_geometry=image_geometry, acquisition_geometry=acquisition_geometry, device=device, processor=processor)  
 
-    def set_input(self, dataset):       
+        super(FBP, self).__init__(image_geometry=image_geometry, acquisition_geometry=acquisition_geometry, device=device, processor=processor)
+
+    def set_input(self, dataset:DataContainer) -> None:
+        """Set the input data for reconstruction.
+
+        Parameters
+        ----------
+        dataset : DataContainer
+            Input DataContainer for reconstruction
+        """
         return self.processor.set_input(dataset)
 
-    def get_input(self):       
+    def get_input(self) -> DataContainer:
+        """Get input data used for reconstruction.
+
+        Returns
+        -------
+        DataContainer
+            Input data
+        """
         return self.processor.get_input()
 
-    def get_output(self, out=None):
+    def get_output(self, out:Optional[DataContainer]=None) -> DataContainer:
+        """Get the result of reconstruction.
+
+        Parameters
+        ----------
+        out :
+            Fills the referenced DataContainer with the processed data, and suppresses the return
+
+        Returns
+        -------
+        DataContainer
+            Reconstructed data. Suppressed if `out` is passed.
+        """
         return self.processor.get_output(out=out)
 
-    def check_input(self, dataset):       
+    def check_input(self, dataset:DataContainer) -> Literal[True]:
+        """Check the parameters of the input dataset.
+
+        Should raise an error if the DataContainer does not match expectation, e.g incorrect dimensions.
+
+        Parameters
+        ----------
+        dataset
+            Input DataContainer to check
+        """
         return self.processor.check_input(dataset)
-        
-    def process(self, out=None):
+
+    def process(self, out:Optional[DataContainer]=None) -> Optional[DataContainer]:
+        """Reconstruct data and return the result.
+
+        Parameters
+        ----------
+        out
+            Fills the reference DataContainer with the processed data, and suppresses the return
+
+        Returns
+        -------
+        Optional[DataContainer]
+            Reconstructed data, None if out is set.
+        """
         return self.processor.process(out=out)

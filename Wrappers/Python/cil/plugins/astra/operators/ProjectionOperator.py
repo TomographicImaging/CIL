@@ -17,13 +17,11 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import check_order_for_engine
-from cil.optimisation.operators import LinearOperator, ChannelwiseOperator
-from cil.framework.BlockGeometry import BlockGeometry
-from cil.optimisation.operators import BlockOperator
-from cil.plugins.astra.operators import AstraProjector3D
-from cil.plugins.astra.operators import AstraProjector2D
 import logging
+
+from cil.framework import check_order_for_engine, BlockGeometry
+from cil.optimisation.operators import BlockOperator, LinearOperator, ChannelwiseOperator
+from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
 
 
 class ProjectionOperator(LinearOperator):

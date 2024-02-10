@@ -2,7 +2,7 @@ import math
 
 import numpy
 
-from .BlockGeometry import BlockGeometry
+from .block_geometry import BlockGeometry
 
 
 class Partitioner(object):

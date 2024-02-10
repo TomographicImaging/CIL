@@ -19,6 +19,7 @@
 
 import unittest
 
+import cil.framework.AcquisitionData
 import cil.framework.DataContainer
 from utils import initialise_tests
 import numpy as np
@@ -236,9 +237,9 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
     def setUp(self):
 
         if has_sirf:
-            acq_data = mr.AcquisitionData(os.path.join
+            acq_data = cil.framework.AcquisitionData.AcquisitionData(os.path.join
                 (examples_data_path('MR'),'simulated_MR_2D_cartesian.h5')
-            )
+                                                                     )
             preprocessed_data = mr.preprocess_acquisition_data(acq_data)
             recon = mr.FullySampledReconstructor()
             recon.set_input(preprocessed_data)
@@ -481,7 +482,7 @@ class TestRegRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
 
 class TestMRRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     def setUp(self):
-        acq_data = mr.AcquisitionData(os.path.join(examples_data_path('MR'),'simulated_MR_2D_cartesian.h5'))
+        acq_data = cil.framework.AcquisitionData.AcquisitionData(os.path.join(examples_data_path('MR'), 'simulated_MR_2D_cartesian.h5'))
         preprocessed_data = mr.preprocess_acquisition_data(acq_data)
         recon = mr.FullySampledReconstructor()
         recon.set_input(preprocessed_data)

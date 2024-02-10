@@ -20,8 +20,7 @@
 import unittest
 from utils import initialise_tests
 import numpy as np
-from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData
-from cil.framework import AcquisitionData, Partitioner
+from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 

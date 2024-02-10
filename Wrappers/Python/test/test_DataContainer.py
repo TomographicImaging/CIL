@@ -21,8 +21,7 @@ import unittest
 from utils import initialise_tests
 import sys
 import numpy
-from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry
-from cil.framework import AcquisitionData
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData
 from cil.framework import BlockGeometry
 from cil.framework import AcquisitionGeometry
 from cil.framework import acquisition_labels, image_labels

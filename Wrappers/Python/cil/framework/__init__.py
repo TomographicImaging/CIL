@@ -23,7 +23,7 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from .cilacc import cilacc
-from .framework import AcquisitionData
+from .AcquisitionData import AcquisitionData
 from .framework import AcquisitionGeometry
 from .framework import find_key
 from .DataContainer import message, ImageGeometry, DataContainer, ImageData, VectorData, VectorGeometry
@@ -31,5 +31,5 @@ from .framework import DataProcessor, Processor
 from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
 from .BlockDataContainer import BlockDataContainer
 from .BlockGeometry import BlockGeometry
-from .framework import Partitioner
+from .Partitioner import Partitioner
 from .label import acquisition_labels, image_labels, data_order, get_order_for_engine, check_order_for_engine

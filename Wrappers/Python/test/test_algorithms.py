@@ -22,8 +22,7 @@ from utils import initialise_tests
 import numpy
 import numpy as np
 from numpy import nan, inf
-from cil.framework import VectorData, ImageGeometry, ImageData, VectorGeometry
-from cil.framework import AcquisitionData
+from cil.framework import VectorData, ImageGeometry, ImageData, VectorGeometry, AcquisitionData
 from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
 from cil.framework import BlockGeometry

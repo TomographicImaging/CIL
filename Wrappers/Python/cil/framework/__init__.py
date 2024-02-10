@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2019 United Kingdom Research and Innovation
-#  Copyright 2019 The University of Manchester
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Joshua DM Hellier (University of Manchester) [refactorer]
 
 from .cilacc import cilacc
 from .acquisition_data import AcquisitionData

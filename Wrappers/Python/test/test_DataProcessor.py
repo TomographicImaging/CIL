@@ -19,8 +19,7 @@
 
 import unittest
 import numpy
-from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData
-from cil.framework import AcquisitionGeometry
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 from cil.utilities import dataexample
 from timeit import default_timer as timer
 

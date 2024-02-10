@@ -21,10 +21,8 @@ import unittest
 from utils import initialise_tests
 import sys
 import numpy
-from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData
-from cil.framework import BlockGeometry
-from cil.framework import AcquisitionGeometry
-from cil.framework import acquisition_labels, image_labels
+from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
+                           AcquisitionGeometry, BlockGeometry, acquisition_labels, image_labels)
 from timeit import default_timer as timer
 import logging
 from testclass import CCPiTestClass

@@ -22,7 +22,8 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels, ImageGeometry
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels, ImageGeometry, \
+    AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -896,7 +897,7 @@ class TestFunction(CCPiTestClass):
         assert f4.L == 2 * f2.L
 
     def test_proximal_conjugate(self):
-        from cil.framework import AcquisitionGeometry, BlockGeometry
+        from cil.framework import BlockGeometry
         ag = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
 

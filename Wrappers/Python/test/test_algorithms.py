@@ -22,11 +22,8 @@ from utils import initialise_tests
 import numpy
 import numpy as np
 from numpy import nan, inf
-from cil.framework import VectorData, ImageGeometry, ImageData, VectorGeometry, AcquisitionData
-from cil.framework import AcquisitionGeometry
-from cil.framework import BlockDataContainer
-from cil.framework import BlockGeometry
-from cil.framework import image_labels
+from cil.framework import (ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry,
+                           BlockDataContainer, BlockGeometry, image_labels)
 
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator

@@ -1,7 +1,7 @@
 import numpy
 
 from .DataContainer import DataContainer
-from .Partitioner import Partitioner
+from .partitioner import Partitioner
 
 class AcquisitionData(DataContainer, Partitioner):
     '''DataContainer for holding 2D or 3D sinogram'''

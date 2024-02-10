@@ -25,5 +25,5 @@ from .DataContainer import message, ImageGeometry, DataContainer, ImageData, Vec
 from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer, find_key
 from .block_data_container import BlockDataContainer
 from .BlockGeometry import BlockGeometry
-from .Partitioner import Partitioner
+from .partitioner import Partitioner
 from .label import acquisition_labels, image_labels, data_order, get_order_for_engine, check_order_for_engine

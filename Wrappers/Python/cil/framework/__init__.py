@@ -18,7 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from .cilacc import cilacc
-from .AcquisitionData import AcquisitionData
+from .acquisition_data import AcquisitionData
 from .acquisition_geometry import AcquisitionGeometry
 from .system_configuration import SystemConfiguration
 from .DataContainer import message, ImageGeometry, DataContainer, ImageData, VectorData, VectorGeometry

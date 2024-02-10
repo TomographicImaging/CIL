@@ -19,7 +19,7 @@
 
 import unittest
 
-import cil.framework.AcquisitionData
+import cil.framework.acquisition_data
 import cil.framework.DataContainer
 from utils import initialise_tests
 import numpy as np

@@ -3,7 +3,7 @@ import math
 
 import numpy
 
-from cil.framework import acquisition_labels
+from .label import acquisition_labels
 
 
 class ComponentDescription(object):

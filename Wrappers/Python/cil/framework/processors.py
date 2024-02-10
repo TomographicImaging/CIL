@@ -20,7 +20,7 @@
 import numpy
 import weakref
 
-from .DataContainer import DataContainer
+from .data_container import DataContainer
 
 
 def find_key(dic, val):

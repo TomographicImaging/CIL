@@ -1,6 +1,6 @@
 import numpy
 
-from .DataContainer import DataContainer
+from .data_container import DataContainer
 from .partitioner import Partitioner
 
 class AcquisitionData(DataContainer, Partitioner):

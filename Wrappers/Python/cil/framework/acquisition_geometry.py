@@ -8,7 +8,7 @@ import numpy
 from .label import acquisition_labels, data_order
 from .acquisition_data import AcquisitionData
 from .base import BaseAcquisitionGeometry
-from .DataContainer import ImageGeometry
+from .data_container import ImageGeometry
 from .system_configuration import ComponentDescription, PositionVector, PositionDirectionVector, SystemConfiguration
 
 

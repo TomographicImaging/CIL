@@ -20,7 +20,7 @@
 import unittest
 
 import cil.framework.acquisition_data
-import cil.framework.DataContainer
+import cil.framework.data_container
 from utils import initialise_tests
 import numpy as np
 from numpy.linalg import norm

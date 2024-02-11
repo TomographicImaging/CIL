@@ -27,7 +27,8 @@ from cil.framework.framework import (
     ImageGeometry,
 )
 from cil.optimisation.operators import LinearOperator
-from cil.plugins.astra.processors import AstraBackProjector2D, AstraForwardProjector2D
+
+from ..processors import AstraBackProjector2D, AstraForwardProjector2D
 
 
 class AstraProjector2D(LinearOperator):

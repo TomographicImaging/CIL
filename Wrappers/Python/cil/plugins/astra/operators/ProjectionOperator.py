@@ -25,7 +25,6 @@ from cil.framework.BlockGeometry import BlockGeometry
 from cil.framework.framework import (
     AcquisitionData,
     AcquisitionGeometry,
-    DataContainer,
     ImageData,
     ImageGeometry,
 )
@@ -34,7 +33,8 @@ from cil.optimisation.operators import (
     ChannelwiseOperator,
     LinearOperator,
 )
-from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
+
+from ..operators import AstraProjector2D, AstraProjector3D
 
 
 class ProjectionOperator(LinearOperator):

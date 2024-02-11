@@ -26,11 +26,11 @@ import numpy as np
 from cil.framework import AcquisitionData, DataProcessor
 from cil.framework.framework import (
     AcquisitionGeometry,
-    DataContainer,
     ImageData,
     ImageGeometry,
 )
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
+
+from ..utilities import convert_geometry_to_astra_vec_2D
 
 
 class AstraForwardProjector2D(DataProcessor):

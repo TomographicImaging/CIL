@@ -27,11 +27,11 @@ from astra import algorithm, astra_dict, data3d
 from cil.framework import AcquisitionData, DataOrder, DataProcessor
 from cil.framework.framework import (
     AcquisitionGeometry,
-    DataContainer,
     ImageData,
     ImageGeometry,
 )
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
+
+from ..utilities import convert_geometry_to_astra_vec_3D
 
 
 class AstraForwardProjector3D(DataProcessor):

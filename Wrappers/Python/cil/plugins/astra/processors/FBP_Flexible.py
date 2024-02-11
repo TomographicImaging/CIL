@@ -26,11 +26,12 @@ import numpy as np
 
 from cil.framework import AcquisitionGeometry, ImageData, Processor
 from cil.framework.framework import AcquisitionData, ImageGeometry
-from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
-from cil.plugins.astra.utilities import (
+
+from ..utilities import (
     convert_geometry_to_astra,
     convert_geometry_to_astra_vec_3D,
 )
+from .FDK_Flexible import FDK_Flexible
 
 
 class FBP_Flexible(FDK_Flexible):

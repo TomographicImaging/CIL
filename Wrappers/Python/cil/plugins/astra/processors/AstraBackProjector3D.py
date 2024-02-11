@@ -28,10 +28,10 @@ from cil.framework import DataOrder, DataProcessor, ImageData
 from cil.framework.framework import (
     AcquisitionData,
     AcquisitionGeometry,
-    DataContainer,
     ImageGeometry,
 )
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
+
+from ..utilities import convert_geometry_to_astra_vec_3D
 
 
 class AstraBackProjector3D(DataProcessor):

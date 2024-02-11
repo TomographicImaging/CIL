@@ -25,7 +25,8 @@ import numpy as np
 
 from cil.framework import DataProcessor, ImageData
 from cil.framework.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
+
+from ..utilities import convert_geometry_to_astra_vec_2D
 
 
 class AstraBackProjector2D(DataProcessor):

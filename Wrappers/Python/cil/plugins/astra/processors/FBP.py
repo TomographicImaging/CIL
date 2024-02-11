@@ -27,8 +27,9 @@ from cil.framework.framework import (
     ImageData,
     ImageGeometry,
 )
-from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU, FBP_Flexible
-from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
+
+from .FBP_Flexible import FBP_CPU, FBP_Flexible
+from .FDK_Flexible import FDK_Flexible
 
 
 class FBP(DataProcessor):

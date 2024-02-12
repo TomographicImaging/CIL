@@ -25,7 +25,8 @@
   - Functions updated to use sapyb
   - Fix KullbackLeibler numba gradient ignoring mask
   - show1D slice_list parameter can now be of type tuple
-  - Added `utilities.callbacks`
+  - Deprecated `Algorithm`'s `max_iteration`, `log_file`, `**kwargs`, `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output`, `verbose_header`, `run(print_interval)`
+  - Added `optimisation.utilities.callbacks`
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`

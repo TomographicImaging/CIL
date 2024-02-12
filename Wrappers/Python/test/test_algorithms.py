@@ -1032,18 +1032,13 @@ class TestSPDHG(unittest.TestCase):
 
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
-        algos.append( SPDHG(f=F,g=G,operator=A,
-                    max_iteration = 1000,
-                    update_objective_interval=200, prob = prob.copy(), use_axpby=True)
-        )
+        algos.append(SPDHG(f=F, g=G, operator=A,
+                           max_iteration=1000, update_objective_interval=200, prob=prob.copy()))
         algos[0].run(1000, verbose=0)
 
-        algos.append( SPDHG(f=F,g=G,operator=A,
-                    max_iteration = 1000,
-                    update_objective_interval=200, prob = prob.copy(), use_axpby=False)
-        )
+        algos.append(SPDHG(f=F, g=G, operator=A,
+                           max_iteration=1000, update_objective_interval=200, prob=prob.copy()))
         algos[1].run(1000, verbose=0)
-
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
@@ -1106,16 +1101,12 @@ class TestSPDHG(unittest.TestCase):
         # Setup and run the PDHG algorithm
 
         algos = []
-        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
-                    max_iteration = 1000,
-                    update_objective_interval=200, use_axpby=True)
-        )
+        algos.append(PDHG(f=f, g=g, operator=operator, tau=tau, sigma=sigma,
+                          max_iteration=1000, update_objective_interval=200))
         algos[0].run(1000, verbose=0)
 
-        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
-                    max_iteration = 1000,
-                    update_objective_interval=200, use_axpby=False)
-        )
+        algos.append(PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
+                          max_iteration=1000, update_objective_interval=200))
         algos[1].run(1000, verbose=0)
 
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
@@ -1233,13 +1224,12 @@ class TestADMM(unittest.TestCase):
         F = self.F
 
         admm = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
-                    max_iteration = 100, update_objective_interval = 10)
+                     max_iteration=100, update_objective_interval=10)
         admm.run(1, verbose=0)
 
         admm_noaxpby = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
-                    max_iteration = 100, update_objective_interval = 10, use_axpby=False)
+                             max_iteration=100, update_objective_interval=10)
         admm_noaxpby.run(1, verbose=0)
-
         np.testing.assert_array_almost_equal(admm.solution.as_array(), admm_noaxpby.solution.as_array())
 
 

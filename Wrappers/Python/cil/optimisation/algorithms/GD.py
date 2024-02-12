@@ -23,14 +23,8 @@ import warnings
 import logging
 
 class GD(Algorithm):
-    '''
-
-        Gradient Descent algorithm
-
-
-    '''
-
-    def __init__(self, initial=None, objective_function=None, step_size =None, **kwargs):
+    """Gradient Descent algorithm"""
+    def __init__(self, initial=None, objective_function=None, step_size=None, alpha=1e6, beta=0.5, rtol=1e-5, atol=1e-8, **kwargs):
         '''GD algorithm creator
 
         initialisation can be done at creation time if all
@@ -47,13 +41,12 @@ class GD(Algorithm):
         :param atol: optional parameter defining the absolute tolerance comparing the
                      current objective function to 0, default 1e-8, see numpy.isclose
         '''
-        super(GD, self).__init__(**kwargs)
-
-        self.alpha = kwargs.get('alpha' , 1e6)
-        self.beta = kwargs.get('beta', 0.5)
-        self.rtol = kwargs.get('rtol', 1e-5)
-        self.atol = kwargs.get('atol', 1e-8)
-        if initial is not None and objective_function is not None :
+        super().__init__(**kwargs)
+        self.alpha = alpha
+        self.beta = beta
+        self.rtol = rtol
+        self.atol = atol
+        if initial is not None and objective_function is not None:
             self.set_up(initial=initial, objective_function=objective_function, step_size=step_size)
 
     def set_up(self, initial, objective_function, step_size):
@@ -62,11 +55,10 @@ class GD(Algorithm):
         :param initial: initial guess
         :param objective_function: objective function to be minimised
         :param step_size: step size'''
-        logging.info("{} setting up".format(self.__class__.__name__, ))
+        logging.info("%s setting up", self.__class__.__name__)
 
         self.x = initial.copy()
         self.objective_function = objective_function
-
 
         if step_size is None:
             self.k = 0
@@ -78,7 +70,6 @@ class GD(Algorithm):
             self.step_size = step_size
             self.update_step_size = False
 
-
         self.update_objective()
 
         self.x_update = initial.copy()
@@ -88,7 +79,6 @@ class GD(Algorithm):
 
     def update(self):
         '''Single iteration'''
-
         self.objective_function.gradient(self.x, out=self.x_update)
 
         if self.update_step_size:
@@ -96,7 +86,6 @@ class GD(Algorithm):
             self.step_size = self.armijo_rule()
         else:
             self.x.sapyb(1.0, self.x_update, -self.step_size, out=self.x)
-
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
@@ -143,10 +132,9 @@ class GD(Algorithm):
             if f_x_a - f_x <= - ( self.alpha/2. ) * sqnorm:
                 self.x.fill(self.x_armijo)
                 break
-            else:
-                self.k += 1.
-                # we don't want to update kmax
-                self._alpha *= self.beta
+            self.k += 1.
+            # we don't want to update kmax
+            self._alpha *= self.beta
 
         if self.k == self.kmax:
             raise ValueError('Could not find a proper step_size in {} loops. Consider increasing alpha.'.format(self.kmax))

@@ -50,6 +50,7 @@ class ProgressCallback(Callback):
         super().__init__(verbose=verbose)
         self.tqdm_class = tqdm_class
         self.tqdm_kwargs = tqdm_kwargs
+        self._obj_len = 0  # number of objective updates
 
     def __call__(self, algorithm):
         if not hasattr(self, 'pbar'):
@@ -58,7 +59,9 @@ class ProgressCallback(Callback):
             tqdm_kwargs.setdefault('disable', not self.verbose)
             tqdm_kwargs.setdefault('initial', max(0, algorithm.iteration))
             self.pbar = self.tqdm_class(**tqdm_kwargs)
-        self.pbar.set_postfix(algorithm.objective_to_dict(self.verbose>=2), refresh=False)
+        if (obj_len := len(algorithm.objective)) != self._obj_len:
+            self.pbar.set_postfix(algorithm.objective_to_dict(self.verbose>=2), refresh=False)
+            self._obj_len = obj_len
         self.pbar.update(algorithm.iteration - self.pbar.n)
 
 
@@ -67,10 +70,13 @@ class _TqdmText(tqdm_std):
 
     Parameters
     ----------
+    num_format: str
+        Format spec for postfix numbers (i.e. objective values).
     bar_format: str
         Passed to :code:`tqdm`.
     '''
-    def __init__(self, *args, bar_format="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
+    def __init__(self, *args, num_format='+8.3e', bar_format="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
+        self.num_format = num_format
         super().__init__(*args, bar_format=bar_format, mininterval=0, maxinterval=0, position=0, **kwargs)
         self._instances.remove(self)  # don't interfere with external progress bars
 
@@ -83,6 +89,18 @@ class _TqdmText(tqdm_std):
             fp_flush()
 
         return fp_write
+
+    def format_num(self, n):
+        return f'{n:{self.num_format}}'
+
+    def display(self, *args, **kwargs):
+        """
+        Clears :code:`postfix` if :code:`super().display()` succeeds
+        (if display updates are more frequent than objective updates, users should not think the objective has stabilised).
+        """
+        if (updated := super().display(*args, **kwargs)):
+            self.set_postfix_str('', refresh=False)
+        return updated
 
 
 class TextProgressCallback(ProgressCallback):

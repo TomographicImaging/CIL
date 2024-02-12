@@ -19,11 +19,14 @@
   - Updated FISTA and ISTA algorithms to allow input functions to be None
   - Bug fix in the adjoint of the Diagonal Operator for complex values
   - Update conda build action to v2 for 2.5x quicker builds
-  - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
+  - Add docker image, test & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
   - Functions updated to use sapyb
-  - Added `utilities.callbacks`
+  - Fix KullbackLeibler numba gradient ignoring mask
+  - show1D slice_list parameter can now be of type tuple
+  - Deprecated `Algorithm`'s `max_iteration`, `log_file`, `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output`, `verbose_header`, `run(print_interval)`
+  - Added `optimisation.utilities.callbacks`
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`

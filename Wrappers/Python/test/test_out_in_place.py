@@ -191,7 +191,6 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                     self.in_place_test(result, func, 'gradient',   data)
                 
     
-        
 
 class TestOperatorOutAndInPlace(CCPiTestClass):
     def setUp(self):

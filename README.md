@@ -62,7 +62,8 @@ docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:lates
 
 > [!IMPORTANT]
 > Folders can be shared with the correct (host) user permissions using
-> `--user $(id -u) --group-add users -v /local/path:/container/path`.
+> `--user $(id -u) --group-add users -v /local/path:/container/path`
+> where `/local/path` is an existing directory on your local (host) machine which will be mounted at `/container/path` in the docker container.
 
 <!-- <br/> -->
 

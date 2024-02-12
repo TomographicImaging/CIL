@@ -66,7 +66,6 @@ if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
 class TestAlgorithms(CCPiTestClass):
-
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
         initial = ig.allocate()
@@ -77,19 +76,15 @@ class TestAlgorithms(CCPiTestClass):
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
-        rate = norm2sq.L / 3.
+        step_size = norm2sq.L / 3.
 
-        alg = GD(initial=initial,
-                              objective_function=norm2sq,
-                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
+                 atol=1e-9, rtol=1e-6)
         alg.max_iteration = 1000
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial,
-                              objective_function=norm2sq,
-                              rate=rate, max_iteration=20,
-                              update_objective_interval=2,
-                              atol=1e-9, rtol=1e-6)
+        alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
+                 atol=1e-9, rtol=1e-6, max_iteration=20, update_objective_interval=2)
         alg.max_iteration = 20
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
@@ -129,17 +124,13 @@ class TestAlgorithms(CCPiTestClass):
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
-        rate = None
 
-        alg = GD(initial=initial,
-                              objective_function=norm2sq, rate=rate)
+        alg = GD(initial=initial, objective_function=norm2sq)
         alg.max_iteration = 100
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial,
-                              objective_function=norm2sq,
-                              max_iteration=20,
-                              update_objective_interval=2)
+        alg = GD(initial=initial, objective_function=norm2sq,
+                 max_iteration=20, update_objective_interval=2)
         #alg.max_iteration = 20
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)

@@ -57,3 +57,15 @@ To get the action to work I first had to:
 2. [Set the source](https://github.com/TomographicImaging/CIL/settings/pages) for our github pages to be the gh-pages branch.
 
 I followed the examples on the [sphinx build action page](https://github.com/marketplace/actions/sphinx-build), specifically this [example workflow](https://github.com/ammaraskar/sphinx-action-test/blob/master/.github/workflows/default.yml)
+
+## Building/Pushing the Docker Image: docker job
+
+This builds a docker image using the `Dockerfile` at the root of this repository.
+
+The image is also pushed to `ghcr.io/tomographicimaging/cil:TAG` (https://github.com/TomographicImaging/CIL/pkgs/container/cil), where `TAG` is given by:
+
+git ref | docker tag(s)
+--|--
+`master` branch | `master`
+`vM.m.p` tag | `M.m.p`, `M.m`, `latest`
+anything else | not pushed (only built)

@@ -11,11 +11,11 @@ labels: 'Type: bug'
 
 #### Steps to reproduce
 
-<Provide instructions for reproducing this issue.>
+<Provide CIL version and instructions for reproducing this issue.>
 
 #### Expected behaviour
 
-<Explain how the program should behave.>
+<Explain how the software should behave.>
 
 #### Current behaviour
 
@@ -23,7 +23,7 @@ labels: 'Type: bug'
 
 #### Optional: error messages
 
-<Report relevant failure logs.>
+<Report relevant failure logs or error messages.>
 
 #### Optional: screenshots
 

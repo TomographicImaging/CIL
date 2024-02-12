@@ -6,7 +6,7 @@ labels: 'Type: enhancement'
 ---
 #### Describe the new feature
 
-<Describe the enhancement and how the software should behave once it is implemented.>
+<Describe the new feature and how the software should behave once it is implemented.>
 	
 #### Motivation behind the suggestion
 
@@ -16,6 +16,6 @@ labels: 'Type: enhancement'
 	
 #### Optional: proposed solution
 
-<Describe your proposed changes to implement to new feature.>
+<Describe your proposed changes to implement the new feature.>
 <Provide links to relevant information.>
 

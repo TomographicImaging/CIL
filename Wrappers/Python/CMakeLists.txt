@@ -21,15 +21,15 @@ option (BUILD_PYTHON_WRAPPER "Build Python Wrapper" ON)
 
 if (BUILD_PYTHON_WRAPPER)
   find_package(PythonInterp REQUIRED)
-  
+
   #set(PYTHON_DEST_DIR "" CACHE PATH "Directory of the Python wrappers")
   if (PYTHON_DEST_DIR)
     set(PYTHON_DEST "${PYTHON_DEST_DIR}")
-  else() 
+  else()
     message(STATUS "python version ${PYTHON_DEST}")
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/CMake/sp_dir.py 
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/CMake/sp_dir.py
       OUTPUT_VARIABLE SP_DIR)
-    # remove trailing newline  
+    # remove trailing newline
     string(REGEX REPLACE "\n$" "" PYTHON_DEST ${SP_DIR})
     # append default site-packages
     set(PYTHON_DEST "${PYTHON_DEST}/site-packages")
@@ -43,8 +43,10 @@ if (BUILD_PYTHON_WRAPPER)
 
   message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 
-  set(CMAKE_BUILD_TYPE "Release")
-  
+  if(NOT DEFINED)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+  endif()
+
   find_package(PythonLibs)
   if (PYTHONINTERP_FOUND)
     message(STATUS "Found PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
@@ -60,7 +62,7 @@ if (BUILD_PYTHON_WRAPPER)
       set(SETUP_PY    "${CMAKE_CURRENT_SOURCE_DIR}/setup.py")
       set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/timestamp")
       file(GLOB_RECURSE DEPS ${CMAKE_CURRENT_SOURCE_DIR}/cil/*.py )
-      
+
       # adds the CIL_VERSION to the setup.py
       if (EXISTS ${SETUP_PY})
         file(REMOVE ${SETUP_PY})
@@ -77,21 +79,21 @@ if (BUILD_PYTHON_WRAPPER)
       # add to add_custom_command DEPENDS the list of python files of the project.
       # as a hack I remove ${OUTPUT}. This should trigger the new build.
       file( REMOVE ${OUTPUT} )
-      
+
       add_custom_target(pythonsetup ALL
           COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} -m pip install . -t ${PYTHON_DEST} --upgrade
           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
           COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
           DEPENDS cilacc)
-      
+
       # install the data if not a conda build. With conda the data is in the dependency package cil-data
       if (NOT CONDA_BUILD)
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
       endif()
-          
-      
+
+
       add_custom_target(PythonWrapper ALL DEPENDS pythonsetup)
-       
+
   endif()
 
 endif()

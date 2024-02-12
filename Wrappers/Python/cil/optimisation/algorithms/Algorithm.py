@@ -41,11 +41,9 @@ class Algorithm:
       method will stop when the stopping criterion is met or `StopIteration` is raised.
    '''
 
-    def __init__(self, max_iteration=0, update_objective_interval=1, **kwargs):
+    def __init__(self, max_iteration=None, update_objective_interval=1, **kwargs):
         '''Set the minimal number of parameters:
 
-        :param max_iteration: maximum number of iterations
-        :type max_iteration: int, optional, default 0
         :param update_objective_interval: the interval every which we would save the current\
                                        objective. 1 means every iteration, 2 every 2 iteration\
                                        and so forth. This is by default 1 and should be increased\
@@ -53,7 +51,11 @@ class Algorithm:
         :type update_objective_interval: int, optional, default 1
         '''
         self.iteration = -1
-        self.__max_iteration = max_iteration
+        if max_iteration is None:
+            self.__max_iteration = 1
+        else:
+            warn("use `Algorithm.run(iterations)` instead of `Algorithm(max_iteration)`", DeprecationWarning, stacklevel=2)
+            self.__max_iteration = max_iteration
         self.__loss = []
         self.memopt = False
         self.configured = False
@@ -77,13 +79,13 @@ class Algorithm:
         '''default stopping criterion: number of iterations
 
         The user can change this in concrete implementation of iterative algorithms.'''
-        return self.max_iteration_stop_criterion()
+        return self.iteration > self.max_iteration
 
     def __set_up_logger(self, *_, **__):
         warn("use `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
 
     def max_iteration_stop_criterion(self):
-        '''default stop criterion for iterative algorithm: max_iteration reached'''
+        warn("use `should_stop()` instead of `max_iteration_stop_criterion()`", DeprecationWarning, stacklevel=2)
         return self.iteration > self.max_iteration
 
     def __iter__(self):
@@ -208,7 +210,7 @@ class Algorithm:
         '''run upto :code:`iterations` with callbacks/logging.
 
         :param iterations: number of iterations to run. If not set the algorithm will
-          run until :code:`max_iteration` or until stop criterion is reached
+          run until :code:`should_stop()` is reached
         :param verbose: 0=quiet, 1=info, 2=debug
         :param callbacks: list of callables which are passed the current Algorithm
           object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
@@ -228,13 +230,15 @@ class Algorithm:
         if self.should_stop():
             print("Stop criterion has been reached.")
         if iterations is None:
+            warn("`run()` missing `iterations`", DeprecationWarning, stacklevel=2)
             iterations = self.max_iteration
 
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
 
-        # call `__next__` upto `iteration` times or until `StopIteration` is raised
-        for _ in zip(range(iterations), self):
+        # call `__next__` upto `iterations` times or until `StopIteration` is raised
+        self.max_iteration = self.iteration + iterations
+        for _ in zip(range(self.iteration, self.iteration + iterations), self):
             try:
                 for callback in callbacks:
                     callback(self)

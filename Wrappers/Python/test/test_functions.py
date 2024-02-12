@@ -22,8 +22,8 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, DataContainer
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels, ImageGeometry, \
+    AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -38,7 +38,7 @@ from cil.optimisation.functions import BlockFunction
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
@@ -79,9 +79,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        noisy_data = ag.allocate(image_labels["RANDOM"], dtype=numpy.float64)
 
-        d = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        d = ag.allocate(image_labels["RANDOM"], dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -101,8 +101,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM)
-        b = ig.allocate(ImageGeometry.RANDOM)
+        u = ig.allocate(image_labels["RANDOM"])
+        b = ig.allocate(image_labels["RANDOM"])
 
         # check grad/call no data
         f = L2NormSquared()
@@ -212,8 +212,8 @@ class TestFunction(CCPiTestClass):
 
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM, seed=1)
-        b = ig.allocate(ImageGeometry.RANDOM, seed=2)
+        u = ig.allocate(image_labels["RANDOM"], seed=1)
+        b = ig.allocate(image_labels["RANDOM"], seed=2)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -897,7 +897,7 @@ class TestFunction(CCPiTestClass):
         assert f4.L == 2 * f2.L
 
     def test_proximal_conjugate(self):
-        from cil.framework import AcquisitionGeometry, BlockGeometry
+        from cil.framework import BlockGeometry
         ag = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
 

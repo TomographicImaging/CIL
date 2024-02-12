@@ -17,11 +17,9 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import numpy as np
-from cil.framework import ImageData
+from cil.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 from cil.optimisation.operators import LinearOperator
 
-from cil.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 
 class ChannelwiseOperator(LinearOperator):
     

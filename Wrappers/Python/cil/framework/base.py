@@ -16,15 +16,9 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Joshua DM Hellier (University of Manchester) [refactorer]
+# Joshua DM Hellier (University of Manchester)
 
-from .cilacc import cilacc
-from .acquisition_data import AcquisitionData
-from .acquisition_geometry import AcquisitionGeometry
-from .system_configuration import SystemConfiguration
-from .data_container import message, ImageGeometry, DataContainer, ImageData, VectorData, VectorGeometry
-from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer, find_key
-from .block_data_container import BlockDataContainer
-from .block_geometry import BlockGeometry
-from .partitioner import Partitioner
-from .label import acquisition_labels, image_labels, data_order, get_order_for_engine, check_order_for_engine
+class BaseAcquisitionGeometry:
+    """This class only exists to give get_order_for_engine something to typecheck for. At some point separate interface
+    stuff into here or refactor get_order_for_engine to not need it."""
+    pass

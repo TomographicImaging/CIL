@@ -20,8 +20,7 @@
 
 
 #%%
-from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData
-from cil.framework import DataContainer, BlockDataContainer
+from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 import numpy as np
 import warnings
 

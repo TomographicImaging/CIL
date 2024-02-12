@@ -20,10 +20,10 @@
 import unittest
 from unittest.mock import patch
 from utils import initialise_tests
-from cil.framework import AcquisitionGeometry
+
 import numpy as np
 import os
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, acquisition_labels
 from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
@@ -98,7 +98,7 @@ class TestTXRMDataReader(unittest.TestCase):
         logging.info ("has_file {}".format(has_file))
         if has_file:
             self.reader = TXRMDataReader()
-            angle_unit = AcquisitionGeometry.RADIAN
+            angle_unit = acquisition_labels["RADIAN"]
             
             self.reader.set_up(file_name=filename, 
                                angle_unit=angle_unit)

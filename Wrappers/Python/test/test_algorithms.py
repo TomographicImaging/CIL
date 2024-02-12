@@ -223,6 +223,25 @@ class TestAlgorithms(CCPiTestClass):
 
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        #Testing g=None
+        alg = FISTA(initial=initial, f=norm2sq, g=None, max_iteration=2, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        #Testing f=None
+        alg = FISTA(initial=initial, f=None, g=L1Norm(b=b), max_iteration=2, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        #Testing f and g is None 
+        with self.assertRaises(ValueError):
+            alg = FISTA(initial=initial, f=None, g=None, max_iteration=2, update_objective_interval=2)         
+        
 
     def test_FISTA_update(self):
 

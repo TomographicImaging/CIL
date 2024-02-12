@@ -12,6 +12,7 @@
 
 - [ ] I have performed a self-review of my code
 - [ ] I have added docstrings in line with the guidance in the developer guide
+- [ ] I have updated the relevant documentation
 - [ ] I have implemented unit tests that cover any new or modified functionality
 - [ ] CHANGELOG.md has been updated with any functionality change
 - [ ] Request review from all relevant developers

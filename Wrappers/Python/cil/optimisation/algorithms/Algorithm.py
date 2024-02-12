@@ -41,7 +41,7 @@ class Algorithm:
       method will stop when the stopping criterion is met or `StopIteration` is raised.
    '''
 
-    def __init__(self, max_iteration=None, update_objective_interval=1, **kwargs):
+    def __init__(self, update_objective_interval=1, max_iteration=None, log_file=None):
         '''Set the minimal number of parameters:
 
         :param update_objective_interval: the interval every which we would save the current\
@@ -51,9 +51,8 @@ class Algorithm:
         :type update_objective_interval: int, optional, default 1
         '''
         self.iteration = -1
-        if max_iteration is None:
-            self.__max_iteration = 1
-        else:
+        self.__max_iteration = 1
+        if max_iteration is not None:
             warn("use `Algorithm.run(iterations)` instead of `Algorithm(max_iteration)`", DeprecationWarning, stacklevel=2)
             self.__max_iteration = max_iteration
         self.__loss = []
@@ -63,10 +62,10 @@ class Algorithm:
         self.update_objective_interval = update_objective_interval
         # self.x = None
         self.iter_string = 'Iter'
-        if 'log_file' in kwargs:
+        if log_file is not None:
             warn("use `run(callbacks=[LogfileCallback(log_file)])` instead of `log_file`",
                  DeprecationWarning, stacklevel=2)
-            self.__log_file = kwargs['log_file']
+            self.__log_file = log_file
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''

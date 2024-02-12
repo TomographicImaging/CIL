@@ -33,8 +33,8 @@ The fundamental components are:
 
 
 
-Algorithms
-==========
+Algorithms (Deterministic)
+==========================
 
 A number of generic algorithm implementations are provided including 
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
@@ -120,11 +120,73 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+
+
+Algorithms (Stochastic)
+========================
+
+There are a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
+This is an area of development for CIL. 
+
+
+
 SPDHG
 -----
+Stochastic PRimal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG and deals with optimisation problems of the form: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+
+by passing a sampler (e.g. of the CIL Sampler class) each iteration considers just one index of the sum reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
+
+
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
+
+
+Approximate gradient sum function 
+----------------------------------
+
+Alternatively, consider optimisation problems of the form: 
+
+.. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
+
+where :math:`n` is the number of functions.  CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
+Child classes of this abstract base class can define different approximate gradients with different mathematical properties. Combining these approximate gradients with deterministic optimisation algorithms
+leads to different stochastic optimisation algorithms. 
+
+For example in the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
+
++---------------+-------+------------+----------------+
+|               | GD    | ISTA       | FISTA          |
++---------------+-------+------------+----------------+
+| SGFunction    | SGD   | Prox-SGD   | Acc-Prox-SGD   |
++---------------+-------+------------+----------------+
+| SAGFunction   | SAG   | Prox-SAG   | Acc-Prox-SAG   |
++---------------+-------+------------+----------------+
+| SAGAFunction  | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
++---------------+-------+------------+----------------+
+| SVRGFunction  | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
++---------------+-------+------------+----------------+
+| LSVRGFunction | LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
++---------------+-------+------------+----------------+
+
+\*In development 
+
+The base class: 
+
+.. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 
+   :members:
+   :inherited-members:
+   
+
+The currently provided child-classes: 
+
+.. autoclass:: cil.optimisation.functions.SGFunction 
+   :members:
+   :inherited-members:
 
 
 

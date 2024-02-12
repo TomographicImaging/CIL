@@ -24,51 +24,51 @@ class SGFunction(ApproximateGradientSumFunction):
     Stochastic gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
    and the gradient function returns the approximate gradient :math:`n\nabla_xf_i(x)`. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic gradient descent algorithm. 
    
-   Parameters:
+    Parameters:
     -----------
     functions : `list`  of functions
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
-    sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or another class which has a `next` function implemented to output integers in {1,...,n}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
     """
   
     def __init__(self, functions, sampler=None):
         super(SGFunction, self).__init__(functions, sampler)    
         
-    
-    
 
     def approximate_gradient(self, x, function_num,  out=None):
         
-        """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function num is selected using the :meth:`~ApproximateGradientSumFunction.next_function`.
+        r""" Returns the gradient of the function at index `function_num` at :code:`x`. 
         
         Parameters
         ----------
-        x: element in the domain of the `functions`
-        
+        x : DataContainer
+        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
         function_num: `int` 
             Between 1 and the number of functions in the list  
+        Returns
+        --------
+        DataContainer
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)} or nothing if `out`  
+        """ 
         
         
-        
-        """     
-
-        # flag to return or in-place computation
-        should_return=False
+        try:
+            self.data_passes.append(
+                self.data_passes[-1] + 1./self.num_functions)
+        except IndexError:
+            self.data_passes.append(1./self.num_functions)
 
         # compute gradient of randomly selected(function_num) function
         if out is None:
             out = self.functions[function_num].gradient(x)
-            should_return=True
         else:
             self.functions[function_num].gradient(x, out = out) 
 
         # scale wrt number of functions 
         out*=self.num_functions 
         
-        if should_return:
-            return out         
+        return out         
 
 
 

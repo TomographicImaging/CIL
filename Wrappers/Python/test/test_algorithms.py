@@ -1129,15 +1129,22 @@ class TestSPDHG(unittest.TestCase):
 
 class TestCallbacks(unittest.TestCase):
     class PrintAlgo(Algorithm):
-        def __init__(self):
-            super().__init__(update_objective_interval=10, max_iteration=1000)
+        def __init__(self, update_objective_interval=10, **kwargs):
+            super().__init__(update_objective_interval=update_objective_interval, **kwargs)
             self.configured = True
 
         def update(self):
-            self.x = -self.iteration / self.max_iteration
+            self.x = -self.iteration
 
         def update_objective(self):
             self.loss.append(2 ** getattr(self, 'x', np.nan))
+
+    def test_deprecated_kwargs(self):
+        with self.assertWarnsRegex(DeprecationWarning, 'max_iteration'):
+            self.PrintAlgo(max_iteration=1000)
+
+        with self.assertWarnsRegex(DeprecationWarning, 'log_file'):
+            self.PrintAlgo(log_file="")
 
     def test_progress(self):
         algo = self.PrintAlgo()
@@ -1156,13 +1163,12 @@ class TestCallbacks(unittest.TestCase):
         with NamedTemporaryFile() as log:
             algo.run(20, callbacks=[callbacks.LogfileCallback(log.name)], callback=old_callback)
             self.assertListEqual(
-                ["64/1000", "74/1000", "83/1000", ""],
+                ["64/83", "74/83", "83/83", ""],
                 [line.lstrip().decode().split(" ", 1)[0] for line in log])
 
         its = list(range(10, 90, 10))
         self.assertListEqual([-1] + its, algo.iterations)
-        np.testing.assert_array_equal(
-            [np.nan] + [2 ** ((-i+1) / algo.max_iteration) for i in its], algo.objective)
+        np.testing.assert_array_equal([np.nan] + [2 ** (1-i) for i in its], algo.objective)
 
     def test_stopiteration(self):
         algo = self.PrintAlgo()

@@ -25,6 +25,15 @@ endif()
 
 project (cil LANGUAGES CXX)
 
+option(CONDA_BUILD "Conda build" OFF)
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+if (CONDA_BUILD)
+  if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    file(TO_CMAKE_PATH $ENV{CONDA_PREFIX} CMAKE_INSTALL_PREFIX)
+  endif()
+endif()
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+
 # If APPLE don't use @rpath
 if (APPLE)
   option(SHARED_LIBS_ABS_PATH "Force shared libraries to be installed with absolute paths (as opposed to rpaths)" ON)

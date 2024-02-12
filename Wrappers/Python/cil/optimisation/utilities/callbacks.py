@@ -67,10 +67,13 @@ class _TqdmText(tqdm_std):
 
     Parameters
     ----------
+    num_format: str
+        Format spec for postfix numbers (i.e. objective values).
     bar_format: str
         Passed to :code:`tqdm`.
     '''
-    def __init__(self, *args, bar_format="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
+    def __init__(self, *args, num_format='+8.3e', bar_format="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
+        self.num_format = num_format
         super().__init__(*args, bar_format=bar_format, mininterval=0, maxinterval=0, position=0, **kwargs)
         self._instances.remove(self)  # don't interfere with external progress bars
 
@@ -83,6 +86,9 @@ class _TqdmText(tqdm_std):
             fp_flush()
 
         return fp_write
+
+    def format_num(self, n):
+        return f'{n:{self.num_format}}'
 
 
 class TextProgressCallback(ProgressCallback):

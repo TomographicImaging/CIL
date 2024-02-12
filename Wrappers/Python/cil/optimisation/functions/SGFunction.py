@@ -35,8 +35,6 @@ class SGFunction(ApproximateGradientSumFunction):
     def __init__(self, functions, sampler=None):
         super(SGFunction, self).__init__(functions, sampler)    
         
-    
-    
 
     def approximate_gradient(self, x, function_num,  out=None):
         
@@ -55,22 +53,22 @@ class SGFunction(ApproximateGradientSumFunction):
         """ 
         
         
-
-        # flag to return or in-place computation
-        should_return=False
+        try:
+            self.data_passes.append(
+                self.data_passes[-1] + 1./self.num_functions)
+        except IndexError:
+            self.data_passes.append(1./self.num_functions)
 
         # compute gradient of randomly selected(function_num) function
         if out is None:
             out = self.functions[function_num].gradient(x)
-            should_return=True
         else:
             self.functions[function_num].gradient(x, out = out) 
 
         # scale wrt number of functions 
         out*=self.num_functions 
         
-        if should_return:
-            return out         
+        return out         
 
 
 

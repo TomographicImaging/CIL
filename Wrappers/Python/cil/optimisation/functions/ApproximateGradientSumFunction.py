@@ -74,6 +74,9 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         self.sampler = sampler
 
         self.num_functions = len(functions)
+        
+        self.data_passes=[]
+        
 
         super(ApproximateGradientSumFunction, self).__init__(*functions)
 
@@ -151,5 +154,8 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         
         if isinstance(self.function_num, numbers.Number):
             return self.approximate_gradient(x, self.function_num, out=out)
-        else:
-            raise ValueError("Batch gradient is not yet implemented")
+        raise ValueError("Batch gradient is not yet implemented")
+
+
+        
+        

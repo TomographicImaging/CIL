@@ -31,7 +31,7 @@ from cil.utilities import dataexample
 from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction
-from cil.optimisation.operators import MatrixOperator
+from cil.optimisation.operators import MatrixOperator, ProjectionOperator
 from cil.optimisation.algorithms import GD 
 from cil.framework import VectorData
 from cil.optimisation.utilities import Sampler, SamplerRandom

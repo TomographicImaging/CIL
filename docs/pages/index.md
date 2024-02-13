@@ -2,11 +2,12 @@
 # https://github.com/Phlow/feeling-responsive/blob/gh-pages/pages/pages-root-folder/index.md
 layout: frontpage
 header:
-  image_fullwidth: 2022/08/front-page-1125x800.png
+  image_fullwidth: https://ccpi.ac.uk/wp-content/uploads/2022/08/front-page-1125x800.png # ideally 600x80 pixels
+  title: '<img loading="lazy" src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" alt="CIL - Core Imaging Library">'
 widget1:
   title: Examples
   url: 'https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb'
-  image: 2022/04/walnut_training.png
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/04/walnut_training.png
   text: >
     We have a repository with a <a href="https://github.com/TomographicImaging/CIL-Demos">large collection</a> of Jupyter Notebooks which cover a wide range of topics, from basic usage to advanced reconstructions with iterative methods.
     <br/>
@@ -15,14 +16,14 @@ widget1:
 widget2:
   title: CIL Documentation
   url: '/nightly/'
-  image: 2022/11/CIL-logo-RGB.svg
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg
   text: >
     CIL has a live documentation which gets updated regularly and built nightly.
     We suggest to download and read the open access articles below, which provide very detailed information about CIL structure and usage.
 widget3:
   title: Papers
   url: 'https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II'
-  image: 2022/10/RSTA_cover.png
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/10/RSTA_cover.png
   text: >
     Jørgensen JS et al. 2021 <a href="https://doi.org/10.1098/rsta.2020.0192">Core Imaging Library – Part I: a versatile python framework for tomographic imaging</a>. Phil. Trans. R. Soc. A 20200192.
     <br/>

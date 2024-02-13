@@ -28,7 +28,7 @@ project (cil LANGUAGES CXX)
 # If APPLE don't use @rpath
 if (APPLE)
   option(SHARED_LIBS_ABS_PATH "Force shared libraries to be installed with absolute paths (as opposed to rpaths)" ON)
-  mark_as_advanced( SHARED_LIBS_ABS_PATH )  
+  mark_as_advanced( SHARED_LIBS_ABS_PATH )
   if (SHARED_LIBS_ABS_PATH)
     # Set install_name_dir as the absolute path to install_prefix/lib
     GET_FILENAME_COMPONENT(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib REALPATH)
@@ -36,12 +36,14 @@ if (APPLE)
   endif(SHARED_LIBS_ABS_PATH)
 endif(APPLE)
 
-set(CMAKE_BUILD_TYPE "Release")
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
 
 
 # CIL version TAG is determined by git describe as for the conda package
-# variable GIT_DESCRIBE_TAG 
-# https://docs.conda.io/projects/conda-build/en/stable/resources/define-metadata.html#templating-with-jinja 
+# variable GIT_DESCRIBE_TAG
+# https://docs.conda.io/projects/conda-build/en/stable/resources/define-metadata.html#templating-with-jinja
 # https://stackoverflow.com/questions/38919840/get-package-version-for-conda-meta-yaml-from-source-file
 
 find_package(Git REQUIRED)
@@ -50,7 +52,7 @@ find_package(Python COMPONENTS Interpreter REQUIRED)
 
 if (Python_FOUND)
   execute_process(COMMAND "${Python_EXECUTABLE}" ${CMAKE_CURRENT_SOURCE_DIR}/Wrappers/Python/CMake/parse_git_describe.py "${GIT_EXECUTABLE}"
-                RESULT_VARIABLE worked 
+                RESULT_VARIABLE worked
                 OUTPUT_VARIABLE CIL_VERSION
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -59,7 +61,7 @@ if (Python_FOUND)
   else()
     string(REPLACE " " ";" CIL_VERSION ${CIL_VERSION})
     list(LENGTH CIL_VERSION CIL_version_len)
-    
+
     list(GET CIL_VERSION 0 CIL_VERSION_MAJOR)
     list(GET CIL_VERSION 1 CIL_VERSION_MINOR)
     list(GET CIL_VERSION 2 CIL_VERSION_PATCH)

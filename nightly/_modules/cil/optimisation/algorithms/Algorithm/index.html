@@ -436,8 +436,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for cil.optimisation.algorithms.Algorithm</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
+<span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -454,13 +453,16 @@ document.write(`
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
-<span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span><span class="p">,</span> <span class="n">Number</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<div class="viewcode-block" id="Algorithm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm">[docs]</a><span class="k">class</span> <span class="nc">Algorithm</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.utilities.callbacks</span> <span class="kn">import</span> <span class="n">Callback</span><span class="p">,</span> <span class="n">LogfileCallback</span><span class="p">,</span> <span class="n">_OldCallback</span><span class="p">,</span> <span class="n">ProgressCallback</span>
+
+
+<div class="viewcode-block" id="Algorithm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm">[docs]</a><span class="k">class</span> <span class="nc">Algorithm</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Base class for iterative algorithms</span>
 
 <span class="sd">      provides the minimal infrastructure.</span>
@@ -469,109 +471,94 @@ document.write(`
 <span class="sd">      stop as soon as the stop criterion is met.</span>
 <span class="sd">      The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and</span>
 <span class="sd">      and :code:`update_objective` methods</span>
-<span class="sd">      </span>
+
 <span class="sd">      A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts</span>
-<span class="sd">      a :code:`callback` function that receives the current iteration number and the actual objective</span>
-<span class="sd">      value and can be used to trigger print to screens and other user interactions. The :code:`run`</span>
-<span class="sd">      method will stop when the stopping criterion is met. </span>
+<span class="sd">      a :code:`callbacks` list of callables, each of which receive the current Algorithm object</span>
+<span class="sd">      (which in turn contains the iteration number and the actual objective value)</span>
+<span class="sd">      and can be used to trigger print to screens and other user interactions. The :code:`run`</span>
+<span class="sd">      method will stop when the stopping criterion is met or `StopIteration` is raised.</span>
 <span class="sd">   &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Constructor</span>
-<span class="sd">        </span>
-<span class="sd">        Set the minimal number of parameters:</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
-<span class="sd">        :param max_iteration: maximum number of iterations</span>
-<span class="sd">        :type max_iteration: int, optional, default 0</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set the minimal number of parameters:</span>
+
 <span class="sd">        :param update_objective_interval: the interval every which we would save the current\</span>
 <span class="sd">                                       objective. 1 means every iteration, 2 every 2 iteration\</span>
 <span class="sd">                                       and so forth. This is by default 1 and should be increased\</span>
 <span class="sd">                                       when evaluating the objective is computationally expensive.</span>
 <span class="sd">        :type update_objective_interval: int, optional, default 1</span>
-<span class="sd">        :param log_file: log verbose output to file</span>
-<span class="sd">        :type log_file: str, optional, default None</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_iteration&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">max_iteration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `Algorithm.run(iterations)` instead of `Algorithm(max_iteration)`&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span> <span class="o">=</span> <span class="n">max_iteration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__loss</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">memopt</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">timing</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;update_objective_interval&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">=</span> <span class="n">update_objective_interval</span>
         <span class="c1"># self.x = None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span> <span class="o">=</span> <span class="s1">&#39;Iter&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_up_logger</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_file&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-        
+        <span class="k">if</span> <span class="n">log_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `run(callbacks=[LogfileCallback(log_file)])` instead of `log_file`&quot;</span><span class="p">,</span>
+                 <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log_file</span> <span class="o">=</span> <span class="n">log_file</span>
+
 <div class="viewcode-block" id="Algorithm.set_up"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Set up the algorithm&#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 <div class="viewcode-block" id="Algorithm.update"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;A single iteration of the algorithm&#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-    
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
 <div class="viewcode-block" id="Algorithm.should_stop"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;default stopping criterion: number of iterations</span>
-<span class="sd">        </span>
+
 <span class="sd">        The user can change this in concrete implementation of iterative algorithms.&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_criterion</span><span class="p">()</span></div>
-    
-    <span class="k">def</span> <span class="nf">__set_up_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the logger if desired&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">fname</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Will output results to: &quot;</span> <span class="o">+</span>  <span class="n">fname</span><span class="p">)</span>
-            <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;obj_fn&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
-    
-<div class="viewcode-block" id="Algorithm.max_iteration_stop_criterion"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">[docs]</a>    <span class="k">def</span> <span class="nf">max_iteration_stop_criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;default stop criterion for iterative algorithm: max_iteration reached&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span></div>
+
+    <span class="k">def</span> <span class="nf">__set_up_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `run(callbacks=[LogfileCallback(log_file)])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">max_iteration_stop_criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `should_stop()` instead of `max_iteration_stop_criterion()`&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span>
-<div class="viewcode-block" id="Algorithm.next"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable</span>
-<span class="sd">        </span>
-<span class="sd">        python2 backwards compatibility&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable</span>
-<span class="sd">        </span>
-<span class="sd">        calling this method triggers update and update_objective</span>
+
+<span class="sd">        This method triggers :code:`update()` and :code:`update_objective()`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">return</span>
-            <span class="n">time0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">configured</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Algorithm not configured correctly. Please run set_up.&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time0</span> <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
-            
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_previous_solution</span><span class="p">()</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                
-                <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span>
-            
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">configured</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Algorithm not configured correctly. Please run set_up.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_previous_solution</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>\
+            <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span>
 
     <span class="k">def</span> <span class="nf">_update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Update the previous solution with the current one</span>
-<span class="sd">        </span>
-<span class="sd">        The concrete algorithm calls update_previous_solution. Normally this would </span>
+
+<span class="sd">        The concrete algorithm calls update_previous_solution. Normally this would</span>
 <span class="sd">        entail the swapping of pointers:</span>
 
 <span class="sd">        .. highlight:: python</span>
@@ -579,17 +566,15 @@ document.write(`
 
 <span class="sd">            tmp = self.x_old</span>
 <span class="sd">            self.x_old = self.x</span>
-<span class="sd">            self.x = tmp </span>
-<span class="sd">        </span>
+<span class="sd">            self.x = tmp</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-        
+
 <div class="viewcode-block" id="Algorithm.get_output"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot; Returns the current solution. &quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span></div>
 
-    
     <span class="k">def</span> <span class="nf">_provable_convergence_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot; Convergence criterion is not implemented for this algorithm. &quot;</span><span class="p">)</span>
 
@@ -597,39 +582,30 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if the algorithm is convergent based on the provable convergence criterion.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provable_convergence_condition</span><span class="p">()</span></div>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
-    
-<div class="viewcode-block" id="Algorithm.get_last_loss"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_loss">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Algorithm.get_last_loss"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_loss">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the last stored value of the loss function</span>
-<span class="sd">        </span>
+
 <span class="sd">        if update_objective_interval is 1 it is the value of the objective at the current</span>
-<span class="sd">        iteration. If update_objective_interval &gt; 1 it is the last stored value. </span>
+<span class="sd">        iteration. If update_objective_interval &gt; 1 it is the last stored value.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">return_all</span> <span class="o">=</span>  <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;return_all&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">objective</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
-            <span class="n">objective</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="k">if</span> <span class="n">return_all</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
-        <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">return_all</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">objective</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">objective</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">return_all</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span> <span class="n">objective</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">objective</span></div>
-<div class="viewcode-block" id="Algorithm.get_last_objective"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_objective">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias to get_last_loss&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_loss</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-        
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">objective</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">objective</span> <span class="k">if</span> <span class="n">return_all</span> <span class="k">else</span> <span class="n">objective</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">objective</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="k">if</span> <span class="n">return_all</span> <span class="k">else</span> <span class="n">objective</span></div>
+
+    <span class="n">get_last_objective</span> <span class="o">=</span> <span class="n">get_last_loss</span> <span class="c1"># alias</span>
+
 <div class="viewcode-block" id="Algorithm.update_objective"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;calculates the objective with the current solution&#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -638,16 +614,13 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the list of the values of the objective during the iteration</span>
-<span class="sd">        </span>
-<span class="sd">        The length of this list may be shorter than the number of iterations run when </span>
+
+<span class="sd">        The length of this list may be shorter than the number of iterations run when</span>
 <span class="sd">        the update_objective_interval &gt; 1</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loss</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of loss&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">loss</span> <span class="c1"># alias</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -657,163 +630,75 @@ document.write(`
     <span class="nd">@max_iteration</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">max_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;sets the maximum number of iterations&#39;&#39;&#39;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">update_objective_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__update_objective_interval</span>
-    
+
     <span class="nd">@update_objective_interval</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">update_objective_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__update_objective_interval</span> <span class="o">=</span> <span class="n">value</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Update objective interval must be an integer &gt;= 0&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Update objective interval must be an integer &gt;= 0&#39;</span><span class="p">)</span>
-    
-<div class="viewcode-block" id="Algorithm.run"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;run n iterations and update the user with the callback if specified</span>
-<span class="sd">        </span>
-<span class="sd">        :param iterations: number of iterations to run. If not set the algorithm will</span>
-<span class="sd">          run until max_iteration or until stop criterion is reached</span>
-<span class="sd">        :param verbose: sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose</span>
-<span class="sd">        :param callback: is a function that receives: current iteration number, </span>
-<span class="sd">          last objective function value and the current solution and gets executed at each update_objective_interval</span>
-<span class="sd">        :param print_interval: integer, controls every how many iteration there&#39;s a print to </span>
-<span class="sd">                               screen. Notice that printing will not evaluate the objective function</span>
-<span class="sd">                               and so the print might be out of sync wrt the calculation of the objective.</span>
-<span class="sd">                               In such cases nan will be printed.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">print_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;print_interval&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">print_interval</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">:</span>
-            <span class="n">print_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">very_verbose</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;verbose should be 0, 1 or 2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span> <span class="p">(</span><span class="n">verbose</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span><span class="p">():</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Stop criterion has been reached.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
-            <span class="n">iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;interval must be an integer &gt;= 0&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_objective_interval</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_header</span><span class="p">(</span><span class="n">very_verbose</span><span class="p">))</span>
+<div class="viewcode-block" id="Algorithm.run"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Callback</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;run upto :code:`iterations` with callbacks/logging.</span>
+
+<span class="sd">        :param iterations: number of iterations to run. If not set the algorithm will</span>
+<span class="sd">          run until :code:`should_stop()` is reached</span>
+<span class="sd">        :param verbose: 0=quiet, 1=info, 2=debug</span>
+<span class="sd">        :param callbacks: list of callables which are passed the current Algorithm</span>
+<span class="sd">          object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;print_interval&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `TextProgressCallback(miniters)` instead of `run(print_interval)`&quot;</span><span class="p">,</span>
+                 <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callbacks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ProgressCallback</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)]</span>
+        <span class="c1"># transform old-style callbacks into new</span>
+        <span class="n">callback</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;callback&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_OldCallback</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__log_file&#39;</span><span class="p">):</span>
+            <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__log_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stop criterion has been reached.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;`run()` missing `iterations`&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
             <span class="n">iterations</span><span class="o">+=</span><span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_output</span><span class="p">(</span><span class="n">very_verbose</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+        <span class="c1"># call `__next__` upto `iterations` times or until `StopIteration` is raised</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+</span> <span class="n">iterations</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+</span> <span class="n">iterations</span><span class="p">),</span> <span class="bp">self</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
+                    <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-                <span class="k">break</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
-                <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(</span><span class="n">return_all</span><span class="o">=</span><span class="n">very_verbose</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">print_interval</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="n">print_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> \
-                        <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                    <span class="nb">print</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_output</span><span class="p">(</span><span class="n">very_verbose</span><span class="p">))</span>
+                <span class="k">break</span></div>
 
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># I don&#39;t understand why this</span>
-            <span class="n">bars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="mi">9</span><span class="o">+</span><span class="mi">10</span><span class="o">+</span><span class="mi">13</span><span class="o">+</span><span class="mi">20</span><span class="p">)]</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">very_verbose</span><span class="p">):</span>
-                <span class="n">bars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="mi">9</span><span class="o">+</span><span class="mi">10</span><span class="o">+</span><span class="mi">13</span><span class="o">+</span><span class="mi">13</span><span class="o">+</span><span class="mi">13</span><span class="o">+</span><span class="mi">15</span><span class="p">)]</span>
-            <span class="c1"># print a nice ---- with proper length at the end</span>
-            <span class="c1"># print (functools.reduce(lambda x,y: x+y, bars, &#39;&#39;))</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="n">bars</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">verbose_output</span><span class="p">(</span><span class="n">very_verbose</span><span class="p">),</span>
-                                        <span class="s2">&quot;Stop criterion has been reached.&quot;</span><span class="p">)</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span>
-            <span class="c1"># Print to log file if desired</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
-        
-
-<div class="viewcode-block" id="Algorithm.verbose_output"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.verbose_output">[docs]</a>    <span class="k">def</span> <span class="nf">verbose_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Creates a nice tabulated output&#39;&#39;&#39;</span>
-        <span class="n">timing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timing</span>
-        <span class="k">if</span> <span class="nb">len</span> <span class="p">(</span><span class="n">timing</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">timing</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">timing</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;9}</span><span class="s2"> </span><span class="si">{:&gt;10}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                 <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> 
-                 <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span><span class="p">,</span>
-                 <span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> 
-                 <span class="bp">self</span><span class="o">.</span><span class="n">objective_to_string</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
-               <span class="p">)</span>
-        <span class="c1"># Print to log file if desired</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">def</span> <span class="nf">objective_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(</span><span class="n">return_all</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;primal&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;primal_dual&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">objective_to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">el</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(</span><span class="n">return_all</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">el</span> <span class="o">=</span> <span class="p">[</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="n">string</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="s1">&#39; </span><span class="si">{:&gt;13s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">el</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="si">{:&gt;13.5e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39; </span><span class="si">{:&gt;13s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>    
-                <span class="n">string</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="s1">&#39; </span><span class="si">{:&gt;13.5e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">el</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&gt;15s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&gt;15.5e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">el</span><span class="p">):</span>
-                <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:&gt;20s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;20.5e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">string</span>
-    <span class="k">def</span> <span class="nf">verbose_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">el</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(</span><span class="n">return_all</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;9}</span><span class="s2"> </span><span class="si">{:&gt;10}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;15}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span><span class="p">,</span> 
-                                                      <span class="s1">&#39;Max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span><span class="p">),</span>
-                                                      <span class="s1">&#39;Time/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span><span class="p">),</span>
-                                                      <span class="s1">&#39;Primal&#39;</span> <span class="p">,</span> <span class="s1">&#39;Dual&#39;</span><span class="p">,</span> 
-                                                      <span class="s1">&#39;Primal-Dual&#39;</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:&gt;9}</span><span class="s2"> </span><span class="si">{:&gt;10}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;15}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> 
-                                                      <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                                                      <span class="s1">&#39;[s]&#39;</span><span class="p">,</span>
-                                                      <span class="s1">&#39;Objective&#39;</span> <span class="p">,</span> 
-                                                      <span class="s1">&#39;Objective&#39;</span><span class="p">,</span> 
-                                                      <span class="s1">&#39;Gap&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;9}</span><span class="s2"> </span><span class="si">{:&gt;10}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;20}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span><span class="p">,</span> 
-                                                      <span class="s1">&#39;Max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span><span class="p">),</span>
-                                                      <span class="s1">&#39;Time/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_string</span><span class="p">),</span>
-                                                      <span class="s1">&#39;Objective&#39;</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:&gt;9}</span><span class="s2"> </span><span class="si">{:&gt;10}</span><span class="s2"> </span><span class="si">{:&gt;13}</span><span class="s2"> </span><span class="si">{:&gt;20}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> 
-                                                      <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                                                      <span class="s1">&#39;[s]&#39;</span><span class="p">,</span>
-                                                      <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="c1"># Print to log file if desired</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;consider using `run(callbacks=[LogfileCallback(log_file)])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_to_dict</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">def</span> <span class="nf">verbose_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `run(callbacks=[ProgressCallback()])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">verbose_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;consider using `run(callbacks=[LogfileCallback(log_file)])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 </pre></div>
 
                 </article>

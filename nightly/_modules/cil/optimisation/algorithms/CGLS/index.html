@@ -462,23 +462,23 @@ document.write(`
 
 <div class="viewcode-block" id="CGLS"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS">[docs]</a><span class="k">class</span> <span class="nc">CGLS</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Conjugate Gradient Least Squares algorithm </span>
-<span class="sd">    </span>
-<span class="sd">    Problem:  </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Conjugate Gradient Least Squares algorithm</span>
+
+<span class="sd">    Problem:</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">      \min || A x - b ||^2_2</span>
-<span class="sd">    </span>
+
 <span class="sd">    |</span>
 
 <span class="sd">    Parameters :</span>
-<span class="sd">        </span>
+
 <span class="sd">      :parameter operator : Linear operator for the inverse problem</span>
 <span class="sd">      :parameter initial : Initial guess ( Default initial = 0)</span>
-<span class="sd">      :parameter data : Acquired data to reconstruct       </span>
+<span class="sd">      :parameter data : Acquired data to reconstruct</span>
 <span class="sd">      :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</span>
-<span class="sd">      </span>
+
 <span class="sd">    Reference:</span>
 <span class="sd">        https://web.stanford.edu/group/SOL/software/cgls/</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -487,7 +487,7 @@ document.write(`
 
 <span class="sd">        :param operator : Linear operator for the inverse problem</span>
 <span class="sd">        :param initial : Initial guess ( Default initial = 0)</span>
-<span class="sd">        :param data : Acquired data to reconstruct       </span>
+<span class="sd">        :param data : Acquired data to reconstruct</span>
 <span class="sd">        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CGLS</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -502,66 +502,65 @@ document.write(`
 
 <span class="sd">        :param operator: Linear operator for the inverse problem</span>
 <span class="sd">        :param initial: Initial guess ( Default initial = 0)</span>
-<span class="sd">        :param data: Acquired data to reconstruct       </span>
+<span class="sd">        :param data: Acquired data to reconstruct</span>
 <span class="sd">        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> setting up&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">norms0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">norms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norms0</span><span class="o">**</span><span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> configured&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span></div>
-     
 
-        
+
+
 <div class="viewcode-block" id="CGLS.update"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;single iteration&#39;&#39;&#39;</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="o">/</span><span class="n">delta</span>
-         
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="c1">#self.x += alpha * self.p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="o">-</span><span class="n">alpha</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
         <span class="c1">#self.r -= alpha * self.q</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">norms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gamma1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norms</span><span class="o">**</span><span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma1</span>
-        <span class="c1">#self.p = self.s + self.beta * self.p   </span>
+        <span class="c1">#self.p = self.s + self.beta * self.p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
-                    
-                    
+
+
 <div class="viewcode-block" id="CGLS.update_objective"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
-        
+
 <div class="viewcode-block" id="CGLS.should_stop"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;stopping criterion&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_criterion</span><span class="p">()</span></div>
- 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">should_stop</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="CGLS.flag"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.flag">[docs]</a>    <span class="k">def</span> <span class="nf">flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns whether the tolerance has been reached&#39;&#39;&#39;</span>
         <span class="n">flag</span>  <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norms</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norms0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span>
@@ -573,7 +572,6 @@ document.write(`
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tolerance is reached: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">flag</span></div></div>
- 
 </pre></div>
 
                 </article>

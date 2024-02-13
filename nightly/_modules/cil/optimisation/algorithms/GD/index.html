@@ -461,50 +461,42 @@ document.write(`
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <div class="viewcode-block" id="GD"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.GD">[docs]</a><span class="k">class</span> <span class="nc">GD</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">    </span>
-<span class="sd">        Gradient Descent algorithm</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">objective_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_size</span> <span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gradient Descent algorithm&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">objective_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;GD algorithm creator</span>
-<span class="sd">        </span>
-<span class="sd">        initialisation can be done at creation time if all </span>
+
+<span class="sd">        initialisation can be done at creation time if all</span>
 <span class="sd">        proper variables are passed or later with set_up</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param initial: initial guess</span>
 <span class="sd">        :param objective_function: objective function to be minimised</span>
 <span class="sd">        :param step_size: step size for gradient descent iteration</span>
 <span class="sd">        :param alpha: optional parameter to start the backtracking algorithm, default 1e6</span>
 <span class="sd">        :param beta: optional parameter defining the reduction of step, default 0.5.</span>
 <span class="sd">                    It&#39;s value can be in (0,1)</span>
-<span class="sd">        :param rtol: optional parameter defining the relative tolerance comparing the </span>
+<span class="sd">        :param rtol: optional parameter defining the relative tolerance comparing the</span>
 <span class="sd">                     current objective function to 0, default 1e-5, see numpy.isclose</span>
-<span class="sd">        :param atol: optional parameter defining the absolute tolerance comparing the </span>
+<span class="sd">        :param atol: optional parameter defining the absolute tolerance comparing the</span>
 <span class="sd">                     current objective function to 0, default 1e-8, see numpy.isclose</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span> <span class="p">,</span> <span class="mf">1e6</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rtol&#39;</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;atol&#39;</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">objective_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="n">rtol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="n">atol</span>
+        <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">objective_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">objective_function</span><span class="o">=</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">)</span>
-    
+
 <div class="viewcode-block" id="GD.set_up"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.GD.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;initialisation of the algorithm</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param initial: initial guess</span>
 <span class="sd">        :param objective_function: objective function to be minimised</span>
 <span class="sd">        :param step_size: step size&#39;&#39;&#39;</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> setting up&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span>
-            
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> setting up&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span> <span class="o">=</span> <span class="n">objective_function</span>
-        
 
         <span class="k">if</span> <span class="n">step_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
@@ -515,8 +507,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="n">step_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_step_size</span> <span class="o">=</span> <span class="kc">False</span>
-        
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x_update</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -526,15 +517,13 @@ document.write(`
 
 <div class="viewcode-block" id="GD.update"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.GD.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Single iteration&#39;&#39;&#39;</span>
-        
         <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_update</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_step_size</span><span class="p">:</span>
             <span class="c1"># the next update and solution are calculated within the armijo_rule</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">armijo_rule</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_update</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
-        
 
 <div class="viewcode-block" id="GD.update_objective"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.GD.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span></div>
@@ -545,20 +534,20 @@ document.write(`
 <span class="sd">        https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</span>
 
 <span class="sd">        The Armijo rule runs a while loop to find the appropriate step_size by starting</span>
-<span class="sd">        from a very large number (alpha). The step_size is found by dividing alpha by 2 </span>
-<span class="sd">        in an iterative way until a certain criterion is met. To avoid infinite loops, we </span>
-<span class="sd">        add a maximum number of times the while loop is run. </span>
+<span class="sd">        from a very large number (alpha). The step_size is found by dividing alpha by 2</span>
+<span class="sd">        in an iterative way until a certain criterion is met. To avoid infinite loops, we</span>
+<span class="sd">        add a maximum number of times the while loop is run.</span>
 
-<span class="sd">        This rule would allow to reach a minimum step_size of 10^-alpha. </span>
-<span class="sd">        </span>
+<span class="sd">        This rule would allow to reach a minimum step_size of 10^-alpha.</span>
+
 <span class="sd">        if</span>
 <span class="sd">        alpha = numpy.power(10,gamma)</span>
 <span class="sd">        delta = 3</span>
 <span class="sd">        step_size = numpy.power(10, -delta)</span>
-<span class="sd">        with armijo rule we can get to step_size from initial alpha by repeating the while loop k times </span>
-<span class="sd">        where </span>
+<span class="sd">        with armijo rule we can get to step_size from initial alpha by repeating the while loop k times</span>
+<span class="sd">        where</span>
 <span class="sd">        alpha / 2^k = step_size</span>
-<span class="sd">        10^gamma / 2^k = 10^-delta </span>
+<span class="sd">        10^gamma / 2^k = 10^-delta</span>
 <span class="sd">        2^k = 10^(gamma+delta)</span>
 <span class="sd">        k = gamma+delta / log10(2) \\approx 3.3 * (gamma+delta)</span>
 
@@ -570,26 +559,25 @@ document.write(`
         <span class="n">f_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;x_update&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x_update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-        
+
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">kmax</span><span class="p">:</span>
             <span class="c1"># self.x - alpha * self.x_update</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x_update</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
-            
+
             <span class="n">f_x_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
             <span class="n">sqnorm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_update</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">f_x_a</span> <span class="o">-</span> <span class="n">f_x</span> <span class="o">&lt;=</span> <span class="o">-</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">/</span><span class="mf">2.</span> <span class="p">)</span> <span class="o">*</span> <span class="n">sqnorm</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
                 <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+=</span> <span class="mf">1.</span>
-                <span class="c1"># we don&#39;t want to update kmax</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+=</span> <span class="mf">1.</span>
+            <span class="c1"># we don&#39;t want to update kmax</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">kmax</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not find a proper step_size in </span><span class="si">{}</span><span class="s1"> loops. Consider increasing alpha.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kmax</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span></div>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span>
@@ -598,13 +586,11 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kmax</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
 <div class="viewcode-block" id="GD.should_stop"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.GD.should_stop">[docs]</a>    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration_stop_criterion</span><span class="p">()</span> <span class="ow">or</span> \
-            <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(),</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">should_stop</span><span class="p">()</span> <span class="ow">or</span> \
+            <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(),</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span>
                 <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">equal_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
-
-
 </pre></div>
 
                 </article>

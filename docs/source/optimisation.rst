@@ -210,7 +210,13 @@ The currently provided child-classes:
    :members:
    :inherited-members:
 
+.. autoclass:: cil.optimisation.functions.SAGFunction 
+   :members:
+   :inherited-members:
 
+.. autoclass:: cil.optimisation.functions.SAGAFunction 
+   :members:
+   :inherited-members:
 
 Operators
 =========

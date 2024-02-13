@@ -163,6 +163,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         Parameters
         ----------
         value: float
+            The additional proportion of the data that has been seen 
 
         """
         try:

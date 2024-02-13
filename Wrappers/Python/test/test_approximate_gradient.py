@@ -200,6 +200,7 @@ class TestSGD(CCPiTestClass):
 
 class TestSAG(CCPiTestClass):
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5, seed=1)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -219,29 +220,38 @@ class TestSAG(CCPiTestClass):
         self.f_stochastic=SAGFunction(self.f_subsets,self.sampler)
         self.initial=ig2D.allocate(0)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
         self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=SAGFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
     
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
             SAGFunction([self.f], self.sampler)
             pass
+    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):
             SAGFunction(self.f, self.sampler)
 
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_warm_start_and_data_passes(self):
      
         f1=SAGFunction(self.f_subsets,Sampler.sequential(5))
@@ -262,7 +272,7 @@ class TestSAG(CCPiTestClass):
         
   
         
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -271,7 +281,7 @@ class TestSAG(CCPiTestClass):
         with self.assertRaises(ValueError):
            SAGFunction([self.f, self.f], bad_sampler)
   
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SAG_simulated_parallel_beam_data(self): 
 
         alg = GD(initial=self.initial, 
@@ -364,7 +374,8 @@ class TestSAG(CCPiTestClass):
 
 
 class TestSAGA(CCPiTestClass):
-
+    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5, seed=1)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -383,30 +394,38 @@ class TestSAGA(CCPiTestClass):
         self.f=LeastSquares(self.A, self.data2d)
         self.f_stochastic=SAGAFunction(self.f_subsets,self.sampler)
         self.initial=ig2D.allocate()
-
+        
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
         self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=SAGAFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
     
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
             SAGAFunction([self.f], self.sampler)
             pass
+        
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):
             SAGAFunction(self.f, self.sampler)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_warm_start_and_data_passes(self):
      
         f1=SAGAFunction(self.f_subsets,Sampler.sequential(5))
@@ -427,7 +446,7 @@ class TestSAGA(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(f1.list_stored_gradients[1].array, self.initial.array)
         
   
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -436,7 +455,7 @@ class TestSAGA(CCPiTestClass):
         with self.assertRaises(ValueError):
            SAGAFunction([self.f, self.f], bad_sampler)
   
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SAGA_simulated_parallel_beam_data(self): 
 
         alg = GD(initial=self.initial, 

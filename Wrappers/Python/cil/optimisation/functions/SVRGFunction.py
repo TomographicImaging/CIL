@@ -70,12 +70,9 @@ class SVRGFunction(ApproximateGradientSumFunction):
         """
 
 
-        if self._svrg_iter_number == 0:
-            self._stochastic_grad_difference = x.geometry.allocate(0)
+    
 
-            return self._update_full_gradient_and_return(x, out=out)
-
-        elif (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
+        if (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
 
             return self._update_full_gradient_and_return(x, out=out)
 
@@ -163,11 +160,9 @@ class SVRGFunction(ApproximateGradientSumFunction):
         self._update_data_passes(1.0)
 
         if out is None:
-            out = self._stochastic_grad_difference.sapyb(
-                self.num_functions, self._full_gradient_at_snapshot, 1.)
+            out = self._full_gradient_at_snapshot
         else:
-            self._stochastic_grad_difference.sapyb(
-                self.num_functions, self._full_gradient_at_snapshot, 1., out=out)
+            out.fill( self._full_gradient_at_snapshot)
 
         return out
 
@@ -217,14 +212,7 @@ class LSVRGFunction(SVRGFunction):
             the value of the approximate gradient of the sum function at :code:`x`
         """
 
-        
-        
-
-        if self._svrg_iter_number == 0:
-            self._stochastic_grad_difference = x.geometry.allocate(0)
-            return self._update_full_gradient_and_return(x, out=out)
-
-        elif self.generator.uniform() < self.update_prob:
+        if self._svrg_iter_number == 0 or self.generator.uniform() < self.update_prob:
 
             return self._update_full_gradient_and_return(x, out=out)
 

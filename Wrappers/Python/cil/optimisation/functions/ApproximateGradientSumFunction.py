@@ -128,7 +128,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)} or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)}
         """
         pass
 
@@ -143,7 +143,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x`  or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x`
         """
         
         self.function_num = self.sampler.next()

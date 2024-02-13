@@ -582,7 +582,7 @@ class TestLSVRG(CCPiTestClass):
         alg_stochastic = GD(initial=initial, 
                               objective_function=stochastic_objective, update_objective_interval=1000,
                               step_size=0.05, max_iteration =5000)
-        alg_stochastic.run( 100, verbose=0)
+        alg_stochastic.run( 120, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 

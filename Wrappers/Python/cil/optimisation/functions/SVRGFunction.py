@@ -26,8 +26,7 @@ import numbers
 class SVRGFunction(ApproximateGradientSumFunction):
 
     """
-    #TODO: docstrings 
-    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. #TODO: REference
+    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
 
     Parameters
     ----------
@@ -36,7 +35,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
     sampler : callable or None, optional
          A callable function to select the next function, see e.g. optimisation.utilities.sampler 
     update_frequency : int or None, optional
-        The frequency of updating the full gradient.
+        The frequency of updating the full gradient. The default is 2*len(functions)
     store_gradients : bool, default: `False`
         Flag indicating whether to store gradients for each function.
 
@@ -47,7 +46,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         # update_frequency for SVRG
         self.update_frequency = update_frequency
-        # default update frequency for SVRG is 2*n (convex cases), see  "Accelerating Stochastic Gradient Descent using Predictive Variance Reduction" #TODO: reference
+    
         if self.update_frequency is None:
             self.update_frequency = 2*self.num_functions
 
@@ -57,7 +56,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
         self._svrg_iter_number = 0
 
     def gradient(self, x, out=None):
-        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x`
+        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update frequency
 
         Parameters
         ----------
@@ -67,33 +66,49 @@ class SVRGFunction(ApproximateGradientSumFunction):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x`  or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x` 
         """
 
-        self.function_num = self.sampler.next()
 
-        if self.function_num > self.num_functions:
-            raise IndexError(
-                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
+        if self._svrg_iter_number == 0:
+            self._stochastic_grad_difference = x.geometry.allocate(0)
 
-        if isinstance(self.function_num, numbers.Number):
+            return self._update_full_gradient_and_return(x, out=out)
 
-            if self._svrg_iter_number == 0:
-                self._stochastic_grad_difference = x.geometry.allocate(0)
+        elif (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
 
-                return self._update_full_gradient_and_return(x, out=out)
+            return self._update_full_gradient_and_return(x, out=out)
 
-            elif (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
+        else:
 
-                return self._update_full_gradient_and_return(x, out=out)
+            self.function_num = self.sampler.next()
 
-            else:
+            if not isinstance(self.function_num, numbers.Number):
+                raise ValueError("Batch gradient is not yet implemented")
+            if self.function_num > self.num_functions:
+                raise IndexError(
+                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
 
-                return self.approximate_gradient(x, self.function_num, out=out)
+            return self.approximate_gradient(x, self.function_num, out=out)
 
-        raise ValueError("Batch gradient is not yet implemented")
+        
 
     def approximate_gradient(self, x, function_num, out=None):
+        """ Computes the approximate gradient for each selected function at :code:`x` given a `function_number` in {1,...,len(functions)}.
+        
+        Parameters
+        ----------
+        x : DataContainer
+        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
+        function_num: `int` 
+            Between 1 and the number of functions in the list  
+        Returns
+        --------
+        DataContainer
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)}
+        """
+        pass
+    
 
         self._svrg_iter_number += 1
 
@@ -106,12 +121,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
             self._stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
                 1., self.functions[function_num].gradient(self.snapshot), -1.)
 
-        # update the data passes
-        try:
-            self.data_passes.append(
-                self.data_passes[-1] + 1./self.num_functions)
-        except IndexError:
-            self.data_passes.append(1./self.num_functions)
+        self._update_data_passes(1./self.num_functions)
 
         # full gradient is added to the stochastic grad difference
         if out is None:
@@ -126,6 +136,16 @@ class SVRGFunction(ApproximateGradientSumFunction):
     def _update_full_gradient_and_return(self, x, out=None):
         """
         Updates the memory for full gradient computation. If :code:`store_gradients==True`, the gradient of all functions is computed and stored.
+        
+        Parameters
+        ----------
+        x : DataContainer
+        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
+
+        Returns
+        --------
+        DataContainer
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)}
         """
 
         self._svrg_iter_number += 1
@@ -140,10 +160,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
             self._full_gradient_at_snapshot = self.full_gradient(x)
             self.snapshot = x.copy()
 
-        try:
-            self.data_passes.append(self.data_passes[-1] + 1.0)
-        except IndexError:
-            self.data_passes.append(1.0)
+        self._update_data_passes(1.0)
 
         if out is None:
             out = self._stochastic_grad_difference.sapyb(
@@ -156,9 +173,8 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
 
 class LSVRGFunction(SVRGFunction):
-    # TODO: docstrings
     """""
-    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. #TODO: REference
+    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. 
 
     Parameters
     ----------
@@ -188,7 +204,7 @@ class LSVRGFunction(SVRGFunction):
         self.generator = np.random.default_rng(seed=seed)
 
     def gradient(self, x, out=None):
-        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x`
+        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update probability 
 
         Parameters
         ----------
@@ -198,27 +214,29 @@ class LSVRGFunction(SVRGFunction):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x`  or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x`
         """
 
-        self.function_num = self.sampler.next()
+        
+        
 
-        if self.function_num > self.num_functions:
-            raise IndexError(
-                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
+        if self._svrg_iter_number == 0:
+            self._stochastic_grad_difference = x.geometry.allocate(0)
+            return self._update_full_gradient_and_return(x, out=out)
 
-        if isinstance(self.function_num, numbers.Number):
+        elif self.generator.uniform() < self.update_prob:
 
-            if self._svrg_iter_number == 0:
-                self._stochastic_grad_difference = x.geometry.allocate(0)
-                return self._update_full_gradient_and_return(x, out=out)
+            return self._update_full_gradient_and_return(x, out=out)
 
-            elif self.generator.uniform() < self.update_prob:
+        else:
+            
+            self.function_num = self.sampler.next()
+            if not isinstance(self.function_num, numbers.Number):
+                raise ValueError("Batch gradient is not yet implemented")
+            if self.function_num > self.num_functions:
+                raise IndexError(
+                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
 
-                return self._update_full_gradient_and_return(x, out=out)
+            return self.approximate_gradient(x, self.function_num, out=out)
 
-            else:
-
-                return self.approximate_gradient(x, self.function_num, out=out)
-
-        raise ValueError("Batch gradient is not yet implemented")
+        

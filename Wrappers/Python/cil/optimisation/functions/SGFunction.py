@@ -49,7 +49,7 @@ class SGFunction(ApproximateGradientSumFunction):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)} or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)} 
         """ 
         
         

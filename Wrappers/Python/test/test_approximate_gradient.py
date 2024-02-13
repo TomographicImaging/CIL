@@ -70,7 +70,7 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
 
 
 class TestSGD(CCPiTestClass):
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -91,31 +91,38 @@ class TestSGD(CCPiTestClass):
         self.f_stochastic=SGFunction(self.f_subsets,self.sampler)
         self.initial=ig2D.allocate()
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
         self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=SGFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
     
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
             SGFunction([self.f], self.sampler)
             pass
+        
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):
             SGFunction(self.f, self.sampler)
 
         
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -124,6 +131,7 @@ class TestSGD(CCPiTestClass):
         with self.assertRaises(ValueError):
            SGFunction([self.f, self.f], bad_sampler)
            
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_out_of_range(self):
         bad_sampler=Sampler.sequential(10)
         f=SGFunction([self.f, self.f], bad_sampler)
@@ -133,7 +141,7 @@ class TestSGD(CCPiTestClass):
             f.gradient(self.initial)
            
   
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SGD_simulated_parallel_beam_data(self): 
 
         rate = self.f.L

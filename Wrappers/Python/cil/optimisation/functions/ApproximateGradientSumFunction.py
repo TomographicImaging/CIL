@@ -72,8 +72,6 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
             raise ValueError('The provided sampler must have a `next` method')
         
         self.sampler = sampler
-
-        self.num_functions = len(functions)
         
         self._data_passes=[]
         
@@ -175,3 +173,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     @property
     def data_passes(self):
         return self._data_passes
+    
+    @property
+    def num_functions(self):
+        return len(self.functions)

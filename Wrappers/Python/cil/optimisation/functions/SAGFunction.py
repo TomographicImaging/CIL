@@ -65,7 +65,7 @@ class SAGFunction(ApproximateGradientSumFunction):
             fi.gradient(initial) for fi in self.functions]
         self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
             
-        self._update_data_passes(1.0)
+        self._update_data_passes(1.0) #TODO - instead add this later - so the data passes always the same length - check on unit tests 
 
     def approximate_gradient(self, x, function_num,  out=None):
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 

@@ -60,7 +60,14 @@
 
       <div id="subfooter">
         <nav class="row">
-          <p style="text-align: center;">{{ site.subfooter }}</p>
+          <p style="text-align: center;">
+            {%- for network_item in site.data.network -%}
+            {%- if network_item.image -%}
+              <a href="{{ network_item.url }}" target="_blank" title="{{ network_item.title }}"><img loading="lazy" {% if network_item.image_width %}width="{{ network_item.image_width }}" {% endif %}height="64" src="{{ network_item.image }}"/></a>
+            {%- endif -%}
+            {%- endfor -%}
+            <br/>Copyright &copy; UKRI STFC
+          </p>
         </nav>
         <nav class="row">
           <section id="subfooter-left" class="small-12 medium-6 columns credits">

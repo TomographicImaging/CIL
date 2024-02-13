@@ -3,15 +3,23 @@
 - name: CoSeC
   url: "https://www.scd.stfc.ac.uk/Pages/CoSeC.aspx"
   title: "Computational Science Centre for Research Communities"
+  image: "https://ccpi.ac.uk/wp-content/uploads/2022/10/CoSec_Transparent-002.png"
+  image_width: 85
 - name: UKRI
   url: "https://www.ukri.org"
   title: "UK Research and Innovation"
 - name: STFC
   url: "https://stfc.ac.uk"
   title: "Science and Technology Facilities Council"
+  image: "https://ccpi.ac.uk/wp-content/uploads/2022/10/STFC_White_Text-2.png"
+  image_width: 249
 - name: EPSRC
   url: "https://epsrc.ac.uk"
   title: "Engineering and Physical Sciences Research Council"
+  image: "https://ccpi.ac.uk/wp-content/uploads/2022/10/epsrc.png"
+  image_width: 256
 - name: Manchester
   url: "https://www.manchester.ac.uk"
   title: "University of Manchester"
+  image: "https://ccpi.ac.uk/wp-content/uploads/2022/10/TAB_col_background_manc-300x127.png"
+  image_width: 151

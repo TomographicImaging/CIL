@@ -13,13 +13,6 @@ description: |
   The CCPi Flagship "A Reconstruction Toolkit for Multichannel CT" was funded by the
   EPSRC grant <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/P02226X/1">EP/P02226X/1</a>.
   <br/>
-subfooter: >
-  <a href="https://www.scd.stfc.ac.uk/Pages/CoSeC.aspx"><img loading="lazy" width="85" height="64" src="https://ccpi.ac.uk/wp-content/uploads/2022/10/CoSec_Transparent-002.png"/></a>
-  <a href="https://stfc.ac.uk"><img loading="lazy" width="249" height="64" src="https://ccpi.ac.uk/wp-content/uploads/2022/10/STFC_White_Text-2.png"/></a>
-  <a href="https://epsrc.ac.uk"><img loading="lazy" width="256" height="64" src="https://ccpi.ac.uk/wp-content/uploads/2022/10/epsrc.png"/></a>
-  <a href="https://www.manchester.ac.uk"><img loading="lazy" width="151" height="64" src="https://ccpi.ac.uk/wp-content/uploads/2022/10/TAB_col_background_manc-300x127.png"/></a>
-  <br/>
-  Copyright &copy; UKRI STFC SCD
 author: ccpi-devs
 url: '' # https://tomographicimaging.github.io
 baseurl: '' # /CIL

@@ -64,11 +64,8 @@ class SAGFunction(ApproximateGradientSumFunction):
         self.list_stored_gradients = [
             fi.gradient(initial) for fi in self.functions]
         self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
-        try:
-            self.data_passes.append(
-                self.data_passes[-1] + 1.0)
-        except IndexError:
-            self.data_passes.append(1.0)
+            
+        self._update_data_passes(1.0)
 
     def approximate_gradient(self, x, function_num,  out=None):
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
@@ -89,11 +86,7 @@ class SAGFunction(ApproximateGradientSumFunction):
 
         self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 
-        try:
-            self.data_passes.append(
-                self.data_passes[-1] + 1./self.num_functions)
-        except IndexError:
-            self.data_passes.append(1./self.num_functions)
+        self._update_data_passes(1./self.num_functions)
 
         self.stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
             1., self.list_stored_gradients[function_num], -1.)

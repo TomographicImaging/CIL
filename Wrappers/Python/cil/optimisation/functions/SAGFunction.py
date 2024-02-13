@@ -44,6 +44,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     def __init__(self, functions,  sampler=None):
         self.list_stored_gradients = None
         self.full_gradient_at_iterate = None
+        self._warm_start_data_pass=False
 
         super(SAGFunction, self).__init__(functions, sampler)
 
@@ -64,8 +65,8 @@ class SAGFunction(ApproximateGradientSumFunction):
         self.list_stored_gradients = [
             fi.gradient(initial) for fi in self.functions]
         self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
-            
-        self._update_data_passes(1.0) #TODO - instead add this later - so the data passes always the same length - check on unit tests 
+        self._warm_start_data_pass=True
+        
 
     def approximate_gradient(self, x, function_num,  out=None):
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
@@ -82,11 +83,16 @@ class SAGFunction(ApproximateGradientSumFunction):
         if self.list_stored_gradients is None:
             self.list_stored_gradients = [
                 x.geometry.allocate(0) for fi in self.functions]
-            self.full_gradient_at_iterate = x.geometry.allocate(0)
+            self.full_gradient_at_iterate = x.geometry.allocate(0) 
+            
 
         self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 
-        self._update_data_passes(1./self.num_functions)
+        if self._warm_start_data_pass:
+            self._update_data_passes(1.0+1./self.num_functions)
+            self._warm_start_data_pass=False 
+        else:
+            self._update_data_passes(1./self.num_functions)
 
         self.stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
             1., self.list_stored_gradients[function_num], -1.)

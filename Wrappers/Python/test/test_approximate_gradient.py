@@ -30,7 +30,7 @@ from cil.utilities import dataexample
 from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction
-from cil.optimisation.functions import SVRGFunction, LSVRGFunction
+from cil.optimisation.functions import SVRGFunction, LSVRGFunction 
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD 
 from cil.framework import VectorData
@@ -71,6 +71,7 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
 
 class TestSGD(CCPiTestClass):
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -91,31 +92,38 @@ class TestSGD(CCPiTestClass):
         self.f_stochastic=SGFunction(self.f_subsets,self.sampler)
         self.initial=ig2D.allocate()
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
         self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=SGFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
     
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
             SGFunction([self.f], self.sampler)
             pass
+        
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):
             SGFunction(self.f, self.sampler)
 
         
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -123,7 +131,9 @@ class TestSGD(CCPiTestClass):
         bad_sampler=bad_Sampler()
         with self.assertRaises(ValueError):
            SGFunction([self.f, self.f], bad_sampler)
-           
+    
+    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_out_of_range(self):
         bad_sampler=Sampler.sequential(10)
         f=SGFunction([self.f, self.f], bad_sampler)
@@ -133,7 +143,7 @@ class TestSGD(CCPiTestClass):
             f.gradient(self.initial)
            
   
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SGD_simulated_parallel_beam_data(self): 
 
         rate = self.f.L
@@ -195,7 +205,9 @@ class TestSGD(CCPiTestClass):
 
         
 class TestSVRG(CCPiTestClass):
- #TODO: test update frequency, store_gradients, set_up, doing stochastic things etc 
+
+ 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5, seed=1)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -215,27 +227,33 @@ class TestSVRG(CCPiTestClass):
         self.f_stochastic=SVRGFunction(self.f_subsets,self.sampler)
         self.initial=ig2D.allocate()
 
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=SVRGFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
             SVRGFunction([self.f], self.sampler)
             pass
+    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):
             SVRGFunction(self.f, self.sampler)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -244,6 +262,7 @@ class TestSVRG(CCPiTestClass):
         with self.assertRaises(ValueError):
            SVRGFunction([self.f, self.f], bad_sampler)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SVRG_init(self):
         self.assertEqual(self.f_stochastic.update_frequency, 2*self.f_stochastic.num_functions)
         self.assertListEqual(self.f_stochastic.data_passes, [])
@@ -257,6 +276,7 @@ class TestSVRG(CCPiTestClass):
         self.assertEqual(f2.store_gradients, True)
         
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SVRG_update_frequency_and_data_passes(self):
         objective=SVRGFunction(self.f_subsets,self.sampler)
         alg_stochastic = GD(initial=self.initial, 
@@ -287,7 +307,7 @@ class TestSVRG(CCPiTestClass):
         alg_stochastic.run(2, verbose=0)
       
       
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SVRG_store_gradients(self):
         objective=SVRGFunction(self.f_subsets,self.sampler)
         with self.assertRaises(AttributeError):
@@ -304,7 +324,7 @@ class TestSVRG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(objective._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array )
         
     
-
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SVRG_simulated_parallel_beam_data(self): 
 
         rate = self.f.L
@@ -410,7 +430,8 @@ class TestSVRG(CCPiTestClass):
 
 
 class TestLSVRG(CCPiTestClass):
- #TODO: test update frequency, store_gradients, set_up, doing stochastic things etc 
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5, seed=1)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -431,26 +452,33 @@ class TestLSVRG(CCPiTestClass):
         self.initial=ig2D.allocate()
 
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
         f=LSVRGFunction(self.f_subsets)
         self.assertTrue(isinstance( f.sampler, SamplerRandom))
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_direct(self):
         self.assertAlmostEqual(self.f_stochastic(self.initial), self.f(self.initial),1)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_full_gradient(self):
         self.assertNumpyArrayAlmostEqual(self.f_stochastic.full_gradient(self.initial).array, self.f.gradient(self.initial).array,2)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_value_error_with_only_one_function(self):
         with self.assertRaises(ValueError):
             LSVRGFunction([self.f], self.sampler)
             pass
+        
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_type_error_if_functions_not_a_list(self):
         with self.assertRaises(TypeError):
             LSVRGFunction(self.f, self.sampler)
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_LSVRG_init(self):
         self.assertEqual(self.f_stochastic.update_prob,1/5)
         self.assertListEqual(self.f_stochastic.data_passes, [])
@@ -463,7 +491,7 @@ class TestLSVRG(CCPiTestClass):
         self.assertEqual(f2.set_up_done, False)
         self.assertEqual(f2.store_gradients, True)
      
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_LSVRG_data_passes_and_update_prob_and_seed(self):
         objective=LSVRGFunction(self.f_subsets,self.sampler, update_prob=1)
         alg_stochastic = GD(initial=self.initial,  update_objective_interval=500,
@@ -480,7 +508,7 @@ class TestLSVRG(CCPiTestClass):
         alg_stochastic.run(10, verbose=0)
         self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array([1. , 2. , 2.2, 2.4, 2.6, 3.6, 3.8, 4. , 5. , 5.2]))
 
-        
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_LSVRG_store_gradients(self):
         objective=LSVRGFunction(self.f_subsets,self.sampler)
         with self.assertRaises(AttributeError):
@@ -497,6 +525,7 @@ class TestLSVRG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(objective._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array )
         
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_without_next(self):
         class bad_Sampler():
             def init(self):
@@ -506,6 +535,7 @@ class TestLSVRG(CCPiTestClass):
            SVRGFunction([self.f, self.f], bad_sampler)
 
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_LSVRG_simulated_parallel_beam_data(self): 
 
         rate = self.f.L

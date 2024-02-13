@@ -249,9 +249,8 @@ class TestSAG(CCPiTestClass):
     def test_warm_start_and_data_passes(self):
      
         f1=SAGFunction(self.f_subsets,Sampler.sequential(5))
-        self.assertFalse(f1.warm_start)
-        f=SAGFunction(self.f_subsets,Sampler.sequential(5), warm_start=True)
-        self.assertTrue(f.warm_start)
+        f=SAGFunction(self.f_subsets,Sampler.sequential(5))
+        f.warm_start(self.initial)
         f1.gradient(self.initial)
         f.gradient(self.initial)
         self.assertEqual(f.function_num, 0)
@@ -359,7 +358,8 @@ class TestSAG(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        stochastic_objective=SAGFunction(functions, sampler, warm_start=True)
+        stochastic_objective=SAGFunction(functions, sampler)
+        stochastic_objective.warm_start(initial)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         
@@ -420,11 +420,11 @@ class TestSAGA(CCPiTestClass):
     def test_warm_start_and_data_passes(self):
      
         f1=SAGAFunction(self.f_subsets,Sampler.sequential(5))
-        self.assertFalse(f1.warm_start)
-        f=SAGAFunction(self.f_subsets,Sampler.sequential(5), warm_start=True)
-        self.assertTrue(f.warm_start)
+        f=SAGAFunction(self.f_subsets,Sampler.sequential(5))
         f1.gradient(self.initial)
+        f.warm_start(self.initial)
         f.gradient(self.initial)
+        
         self.assertEqual(f.function_num, 0)
         self.assertEqual(f1.function_num, 0)
         self.assertListEqual(f1.data_passes, [1./f1.num_functions])
@@ -529,7 +529,8 @@ class TestSAGA(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        stochastic_objective=SAGAFunction(functions, sampler, warm_start=True)
+        stochastic_objective=SAGAFunction(functions, sampler)
+        stochastic_objective.warm_start(initial)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         

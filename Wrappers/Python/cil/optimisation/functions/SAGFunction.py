@@ -22,12 +22,11 @@ import numpy as np
 class SAGFunction(ApproximateGradientSumFunction):
 
     """
-
     Stochastic average gradient (SAG) function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
    and the gradient function returns the approximate gradient. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method.  
-   By incorporating a memory of previous gradient values the SAG method achieves a faster convergence rate than black-box stochastic gradient methods. #TODO:check this 
+   By incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. 
 
-   Parameters:
+    Parameters:
     -----------
     functions : `list`  of functions
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
@@ -42,14 +41,38 @@ class SAGFunction(ApproximateGradientSumFunction):
 
     """
 
-    def __init__(self, functions,  sampler=None, warm_start=False):
-        self.set_up_done = False
-        self.warm_start = warm_start
+    def __init__(self, functions,  sampler=None):
+        self.list_stored_gradients = None
+        self.full_gradient_at_iterate = None
+
         super(SAGFunction, self).__init__(functions, sampler)
+
+    def warm_start(self, initial):
+        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point.
+        
+        Parameters
+        ----------
+        initial: DataContainer,
+            The initial point to warmstart the calculation 
+            
+        Example
+        --------
+        >>> stochastic_objective= SAGFunction(list_of_functions)
+        >>> stochastic_objective.warm_start(initial_point)
+        >>> sag_algorithm=GD(initial=initial_point,  objective_function=stochastic_objective)
+        """
+        self.list_stored_gradients = [
+            fi.gradient(initial) for fi in self.functions]
+        self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
+        try:
+            self.data_passes.append(
+                self.data_passes[-1] + 1.0)
+        except IndexError:
+            self.data_passes.append(1.0)
 
     def approximate_gradient(self, x, function_num,  out=None):
         """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function num is selected using the sampler. 
+            The function_num is selected using the sampler. 
 
         Parameters
         ----------
@@ -59,8 +82,10 @@ class SAGFunction(ApproximateGradientSumFunction):
             Between 1 and the number of functions in the list  
 
         """
-        if not self.set_up_done:
-            self._set_up(x)
+        if self.list_stored_gradients is None:
+            self.list_stored_gradients = [
+                x.geometry.allocate(0) for fi in self.functions]
+            self.full_gradient_at_iterate = x.geometry.allocate(0)
 
         self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 
@@ -72,53 +97,34 @@ class SAGFunction(ApproximateGradientSumFunction):
 
         self.stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
             1., self.list_stored_gradients[function_num], -1.)
-        # flag to return or in-place computation
-        should_return = False
 
-        # compute gradient of randomly selected(function_num) function
-        if out is None:
-            res = x*0.  # for CIL/SIRF compatibility
-            # due to the convention that we follow: without the 1/n factor
-            self.stochastic_grad_difference.sapyb(
-                1., self.full_gradient_at_iterate, 1., out=res)
-            should_return = True
-        else:
-            # due to the convention that we follow: without the 1/n factor
-            self.stochastic_grad_difference.sapyb(
-                1., self.full_gradient_at_iterate, 1., out=out)
-            #  print(out.array)
+   
+        out =self._update_approx_gradient(out)
 
         self.list_stored_gradients[function_num].fill(
             self.stoch_grad_at_iterate)
         self.full_gradient_at_iterate.sapyb(
             1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)
 
-        if should_return:
-            return res
-
-    def _set_up(self, x):
-        r"""Initialize subset gradients :math:`v_{i}` and full gradient that are stored in memory.
-        The initial point is 0 by default.
-        """
-        if self.warm_start:
-            self.list_stored_gradients = [
-                fi.gradient(x) for fi in self.functions]
-            self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
-            self.data_passes = [1]
+        return out
+    
+    def _update_approx_gradient(self, out):
+        """Internal function used to differentiate between the SAG and SAGA calculations"""
+        if out is None:
+            # due to the convention that we follow: without the 1/n factor
+            out = self.stochastic_grad_difference.sapyb(
+                1., self.full_gradient_at_iterate, 1.)
         else:
-            self.list_stored_gradients = [
-                x.geometry.allocate(0) for fi in self.functions]
+            # due to the convention that we follow: without the 1/n factor
+            self.stochastic_grad_difference.sapyb(
+                1., self.full_gradient_at_iterate, 1., out=out)
 
-            self.full_gradient_at_iterate = x.geometry.allocate(0)
-            self.data_passes = []
-        self.set_up_done = True
-
+        return out 
 
 class SAGAFunction(SAGFunction):
 
     """
-    TODO:
-    Stochastic average gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
+    An accelerated version of the stochastic average gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
    and the gradient function returns the approximate gradient.  This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method. 
    SAGA improves on the theory behind SAG and SVRG, with better theoretical convergence rates.
 
@@ -136,53 +142,19 @@ class SAGAFunction(SAGFunction):
     Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
     """
 
-    def __init__(self, functions,  sampler=None, warm_start=False):
-        super(SAGAFunction, self).__init__(functions, sampler, warm_start)
+    def __init__(self, functions,  sampler=None):
+        super(SAGAFunction, self).__init__(functions, sampler)
 
-    def approximate_gradient(self, x, function_num,  out=None):
-        """ Returns the gradient of the selected function or batch of functions at :code:`x`. 
-            The function num is selected using the sampler.
 
-        Parameters
-        ----------
-        x: element in the domain of the `functions`
-
-        function_num: `int` 
-            Between 1 and the number of functions in the list  
-
-        """
-        if not self.set_up_done:
-            self._set_up(x)
-
-        self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
-
-        try:
-            self.data_passes.append(
-                self.data_passes[-1] + 1./self.num_functions)
-        except IndexError:
-            self.data_passes.append(1./self.num_functions)
-
-        self.stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
-            1., self.list_stored_gradients[function_num], -1.)
-        # flag to return or in-place computation
-        should_return = False
-
-        # compute gradient of randomly selected(function_num) function
+    def _update_approx_gradient(self, out):
+            
         if out is None:
-            res = x*0.  # for CIL/SIRF compatibility
             # due to the convention that we follow: without the 1/n factor
-            self.stochastic_grad_difference.sapyb(
-                self.num_functions, self.full_gradient_at_iterate, 1., out=res)
-            should_return = True
+            out= self.stochastic_grad_difference.sapyb(
+                self.num_functions, self.full_gradient_at_iterate, 1.)
         else:
             # due to the convention that we follow: without the 1/n factor
             self.stochastic_grad_difference.sapyb(
                 self.num_functions, self.full_gradient_at_iterate, 1., out=out)
 
-        self.list_stored_gradients[function_num].fill(
-            self.stoch_grad_at_iterate)
-        self.full_gradient_at_iterate.sapyb(
-            1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)
-
-        if should_return:
-            return res
+        return out 

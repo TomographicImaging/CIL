@@ -411,18 +411,21 @@ class show2D(show_base):
         Sets the number of columns of subplots to display
     size: tuple
         Figure size in inches
-
+    no_ticks: bool
+        If set to False the ticks on x and y axis are not displayed
+    no_colorbar: bool
+        If set to False the colorbar is not displayed
     Returns
     -------
     matplotlib.figure.Figure
         returns a matplotlib.pyplot figure object
     '''
 
-    def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
+    def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15), no_colorbar=False, no_ticks=False):
 
-        self.figure = self.__show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
+        self.figure = self.__show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size, no_colorbar=no_colorbar, no_ticks=no_ticks)
 
-    def __show2D(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
+    def __show2D(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15), no_colorbar=False, no_ticks=False):
 
         #get number of subplots, number of input datasets, or number of slices requested
         if isinstance(datacontainers, (list, BlockDataContainer)):
@@ -666,11 +669,19 @@ class show2D(show_base):
                 scale = 0.0467*im_ratio
                 pad = 0.02
 
-            plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
+            if not no_colorbar:
+                plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
     
             if subplot.range is not None:
                 sp.set_clim(subplot.range[0],subplot.range[1])
         
+        if no_ticks:
+            for ax in axes:
+                ax.set_xticks([])
+                ax.set_yticks([])
+                ax.set_xlabel('')
+                ax.set_ylabel('')
+
         fig.set_tight_layout(True)
         fig.set_facecolor('w')
 

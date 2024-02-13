@@ -159,15 +159,14 @@ A list of :code:`Callback`s to be executed each iteration can be passed to :code
 .. autoclass:: cil.utilities.callbacks.Callback
    :members:
 
-.. autoclass:: cil.utilities.callbacks.ProgressCallback
-   :members:
-
 .. autoclass:: cil.utilities.callbacks.TextProgressCallback
    :members:
 
 .. autoclass:: cil.utilities.callbacks.LogfileCallback
    :members:
    
+
+=======
 
 Approximate gradient sum function 
 ----------------------------------
@@ -210,9 +209,6 @@ The currently provided child-classes:
 .. autoclass:: cil.optimisation.functions.SGFunction 
    :members:
    :inherited-members:
-
-
-
 
 
 

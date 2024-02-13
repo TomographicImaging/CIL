@@ -146,10 +146,8 @@ class TestSGD(CCPiTestClass):
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SGD_simulated_parallel_beam_data(self): 
 
-        step_size = self.f.L
         alg = GD(initial=self.initial, 
-                              objective_function=self.f, update_objective_interval=500,
-                              step_size=step_size, alpha=1e8)
+                              objective_function=self.f, update_objective_interval=500, alpha=1e8)
         alg.max_iteration = 200
         alg.run(verbose=0)
        
@@ -178,11 +176,9 @@ class TestSGD(CCPiTestClass):
             else:
                objective+=LeastSquares(A, A.direct(b))
 
-        step_size = objective.L / 3.
     
         alg = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=1000,
-                              step_size=step_size, atol=1e-9, rtol=1e-6)
+                              objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 600
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -278,10 +274,8 @@ class TestSAG(CCPiTestClass):
 
     def test_SAG_simulated_parallel_beam_data(self): 
 
-        step_size = self.f.L
         alg = GD(initial=self.initial, 
-                              objective_function=self.f, update_objective_interval=500,
-                              step_size=step_size, alpha=1e8)
+                              objective_function=self.f, update_objective_interval=500, alpha=1e8)
         alg.max_iteration = 50
         alg.run(verbose=0)
        
@@ -311,11 +305,9 @@ class TestSAG(CCPiTestClass):
             else:
                objective+=LeastSquares(A, A.direct(b))
 
-        step_size = objective.L / 3.
     
         alg = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=1000,
-                              step_size=step_size, atol=1e-9, rtol=1e-6)
+                              objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 50
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -349,11 +341,9 @@ class TestSAG(CCPiTestClass):
             else:
                objective+=LeastSquares(A, A.direct(b))
 
-        step_size = objective.L / 3.
     
         alg = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=1000,
-                              step_size=step_size, atol=1e-9, rtol=1e-6)
+                              objective_function=objective, update_objective_interval=1000,atol=1e-9, rtol=1e-6)
         alg.max_iteration = 50
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -449,10 +439,8 @@ class TestSAGA(CCPiTestClass):
 
     def test_SAGA_simulated_parallel_beam_data(self): 
 
-        step_size = self.f.L
         alg = GD(initial=self.initial, 
-                              objective_function=self.f, update_objective_interval=500,
-                              step_size=step_size, alpha=1e8)
+                              objective_function=self.f, update_objective_interval=500, alpha=1e8)
         alg.max_iteration = 200
         alg.run(verbose=0)
        
@@ -482,11 +470,9 @@ class TestSAGA(CCPiTestClass):
             else:
                objective+=LeastSquares(A, A.direct(b))
 
-        step_size = objective.L / 3.
     
         alg = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=1000,
-                              step_size=step_size, atol=1e-9, rtol=1e-6)
+                              objective_function=objective, update_objective_interval=1000,atol=1e-9, rtol=1e-6)
         alg.max_iteration = 80
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -520,11 +506,8 @@ class TestSAGA(CCPiTestClass):
             else:
                objective+=LeastSquares(A, A.direct(b))
 
-        step_size = objective.L / 3.
-    
         alg = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=1000,
-                              step_size=step_size, atol=1e-9, rtol=1e-6)
+                              objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 80
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())

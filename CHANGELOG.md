@@ -13,7 +13,6 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-
   - Added the a `Sampler` class as a CIL optimisation utility
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator

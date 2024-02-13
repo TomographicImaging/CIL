@@ -22,13 +22,11 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-
-from cil.framework import DataContainer, ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, AcquisitionData, AcquisitionGeometry
+from cil.framework import ImageGeometry, \
+    VectorGeometry, VectorData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
-from cil.optimisation.operators import GradientOperator, BlockOperator
-
+from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
@@ -36,9 +34,6 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          Rosenbrock, IndicatorBox, TotalVariation, \
                                          WeightedL2NormSquared
 from cil.optimisation.functions import BlockFunction
-
-
-
 
 import numpy
 import scipy.special
@@ -54,9 +49,8 @@ from testclass import CCPiTestClass
 from cil.utilities.quality_measures import mae
 import cil.utilities.multiprocessing as cilmp
 
-from utils import has_ccpi_regularisation, has_tomophantom, has_numba, has_astra, initialise_tests
+from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
 import numba
-from testclass import CCPiTestClass
 from numbers import Number
 
 initialise_tests()
@@ -69,9 +63,6 @@ if has_tomophantom:
 
 if has_numba:
     from cil.optimisation.functions.MixedL21Norm import _proximal_step_numba, _proximal_step_numpy
-
-if has_astra:
-    from cil.plugins.astra import ProjectionOperator
 
 
 class TestFunction(CCPiTestClass):
@@ -2017,4 +2008,3 @@ class TestIndicatorBox(unittest.TestCase):
             N = 10
             ib.set_num_threads(N)
             assert ib.num_threads == N
-

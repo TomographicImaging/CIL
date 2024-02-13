@@ -211,9 +211,13 @@ The currently provided child-classes:
    :members:
    :inherited-members:
 
+.. autoclass:: cil.optimisation.functions.SVRGFunction 
+   :members:
+   :inherited-members:
 
-
-
+.. autoclass:: cil.optimisation.functions.LSVRGFunction 
+   :members:
+   :inherited-members:
 
 
 Operators

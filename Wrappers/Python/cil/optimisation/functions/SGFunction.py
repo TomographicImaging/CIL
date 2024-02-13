@@ -53,11 +53,7 @@ class SGFunction(ApproximateGradientSumFunction):
         """ 
         
         
-        try:
-            self.data_passes.append(
-                self.data_passes[-1] + 1./self.num_functions)
-        except IndexError:
-            self.data_passes.append(1./self.num_functions)
+        self._update_data_passes(1/self.num_functions)
 
         # compute gradient of randomly selected(function_num) function
         if out is None:

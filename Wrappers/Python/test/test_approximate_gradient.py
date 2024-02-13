@@ -70,7 +70,6 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
 
 
 class TestSGD(CCPiTestClass):
-
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5)
@@ -131,8 +130,7 @@ class TestSGD(CCPiTestClass):
         bad_sampler=bad_Sampler()
         with self.assertRaises(ValueError):
            SGFunction([self.f, self.f], bad_sampler)
-    
-    
+           
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_sampler_out_of_range(self):
         bad_sampler=Sampler.sequential(10)

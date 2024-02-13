@@ -15,7 +15,7 @@ versions = [{
         flags=re.M).group(1),
     "url": f"{baseurl}{i.name}/"
 }
-for i in build.glob("[a-zA-Z]*") if i.is_dir() if i.name != "assets"]
+for i in build.glob("[a-zA-Z0-9]*") if i.is_dir() if i.name != "assets"]
 
 tags = [v for v in versions if v["name"] == "v" + v["version"]]
 try:

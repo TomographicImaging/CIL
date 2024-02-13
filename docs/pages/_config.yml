@@ -21,11 +21,10 @@ subfooter: >
   <br/>
   Copyright &copy; UKRI STFC SCD
 author: ccpi-devs
-#url: 'https://tomographicimaging.github.io'
-baseurl: ''
+url: '' # https://tomographicimaging.github.io
+baseurl: '' # /CIL
 improve_content: https://github.com/TomographicImaging/CIL/edit/master/docs
-# e.g. ![Image Text]({{ site.urlimg }}image.jpg)
-urlimg: 'https://ccpi.ac.uk/wp-content/uploads/'
+urlimg: ''
 logo: "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg"  # ideally 600x80 pixels
 language: en-GB
 plugins:
@@ -76,10 +75,6 @@ defaults:
 #bing_webmastertools_id: ''
 #yandex_site_verification: ''
 #alexa_verify_id: ''
-
-# https://mathiasbynens.be/notes/touch-icons
-favicon-32x32: 'https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png'
-#msapplication_tilecolor: '#fabb00'
 
 # http://j.mp/fb_optimize
 og_image: 'https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg'

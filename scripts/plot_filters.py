@@ -9,12 +9,14 @@ print(filter_length)
 
 # in cycles/pixel
 freq = fftfreq(filter_length)
-#print(freq)
+print(freq)
 # in pi radians
 freq*=2
 
 ind_sorted = np.argsort(freq)
-#print(ind_sorted)
+print(ind_sorted)
+print('freq'+str(freq))
+print('freqind'+str(freq[ind_sorted]))
 ramp = abs(freq)
 
 # must be less than 1.0 
@@ -58,5 +60,6 @@ plt.xticks(theta, ['-π', '-3π/4', '-π/2', '-π/4', '0', 'π/4', 'π/2', '3π/
 plt.legend()
 plt.show()
 
-instance = FBP.GenericFilteredBackProjection(input, image_geometry=None, filter='ram-lak', backend='tigre')
-instance.get_filter_array()
+#instance = FBP.GenericFilteredBackProjection(input, image_geometry=None, filter='ram-lak', backend='tigre')
+#instance.get_filter_array()
+#print(input)

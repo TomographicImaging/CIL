@@ -144,10 +144,10 @@ class TestSGD(CCPiTestClass):
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_SGD_simulated_parallel_beam_data(self): 
 
-        rate = self.f.L
+        step_size = self.f.L
         alg = GD(initial=self.initial, 
                               objective_function=self.f, update_objective_interval=500,
-                              rate=rate, alpha=1e8)
+                              step_size=step_size, alpha=1e8)
         alg.max_iteration = 200
         alg.run(verbose=0)
        
@@ -176,11 +176,11 @@ class TestSGD(CCPiTestClass):
             else:
                objective+=LeastSquares(A, A.direct(b))
 
-        rate = objective.L / 3.
+        step_size = objective.L / 3.
     
         alg = GD(initial=initial, 
                               objective_function=objective, update_objective_interval=1000,
-                              rate=rate, atol=1e-9, rtol=1e-6)
+                              step_size=step_size, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 600
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())

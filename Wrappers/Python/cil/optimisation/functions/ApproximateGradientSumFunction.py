@@ -75,7 +75,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
         self.num_functions = len(functions)
         
-        self.data_passes=[]
+        self._data_passes=[]
         
 
         super(ApproximateGradientSumFunction, self).__init__(*functions)
@@ -157,5 +157,21 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         raise ValueError("Batch gradient is not yet implemented")
 
 
+    def _update_data_passes(self, value):
+        """ Internal function that updates the list which stores the data passes
         
+        Parameters
+        ----------
+        value: float
+            The additional proportion of the data that has been seen 
+
+        """
+        try:
+            self._data_passes.append(
+                self._data_passes[-1] + value)
+        except IndexError:
+            self._data_passes.append(value)
         
+    @property
+    def data_passes(self):
+        return self._data_passes

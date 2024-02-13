@@ -20,6 +20,7 @@
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 import numpy as np
+import numbers
 
 
 class SVRGFunction(ApproximateGradientSumFunction):
@@ -51,65 +52,83 @@ class SVRGFunction(ApproximateGradientSumFunction):
             self.update_frequency = 2*self.num_functions
 
         # compute and store the gradient of each function in the finite sum
-        # TODO: why might we want to store gradients?
         self.store_gradients = store_gradients
 
-        self.set_up_done = False
+        self._svrg_iter_number = 0
 
-        self.data_passes = []
+    def gradient(self, x, out=None):
+        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x`
+
+        Parameters
+        ----------
+        x : DataContainer
+        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
+
+        Returns
+        --------
+        DataContainer
+            the value of the approximate gradient of the sum function at :code:`x`  or nothing if `out`  
+        """
+
+        self.function_num = self.sampler.next()
+
+        if self.function_num > self.num_functions:
+            raise IndexError(
+                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
+
+        if isinstance(self.function_num, numbers.Number):
+
+            if self._svrg_iter_number == 0:
+                self._stochastic_grad_difference = x.geometry.allocate(0)
+
+                return self._update_full_gradient_and_return(x, out=out)
+
+            elif (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
+
+                return self._update_full_gradient_and_return(x, out=out)
+
+            else:
+
+                return self.approximate_gradient(x, self.function_num, out=out)
+
+        raise ValueError("Batch gradient is not yet implemented")
 
     def approximate_gradient(self, x, function_num, out=None):
 
-        if not self.set_up_done:
-            self._set_up(x)
+        self._svrg_iter_number += 1
+
+        self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
+
+        if self.store_gradients is True:
+            self._stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
+                1., self._list_stored_gradients[function_num], -1.)
         else:
+            self._stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
+                1., self.functions[function_num].gradient(self.snapshot), -1.)
 
-            # check whether to update the memory based on the first iteration or the update frequency
-            # TODO: why the infinity flag
-            if (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
+        # update the data passes
+        try:
+            self.data_passes.append(
+                self.data_passes[-1] + 1./self.num_functions)
+        except IndexError:
+            self.data_passes.append(1./self.num_functions)
 
-                # update memory
-                self._update_full_gradient(x)
-                # increment by 1, since full gradient is computed again
-                self.data_passes.append(self.data_passes[-1] + 1.)
-
-            else:
-                # implements the (L)SVRG inner loop
-
-                self.stoch_grad_at_iterate = self.functions[function_num].gradient(
-                    x)
-
-                if self.store_gradients is True:
-                    self._stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
-                        1., self._list_stored_gradients[function_num], -1.)
-                else:
-                    self._stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
-                        1., self.functions[function_num].gradient(self.snapshot), -1.)
-
-                # update the data passes
-                self.data_passes.append(
-                    self.data_passes[-1] + 1./self.num_functions)
-
-            self._svrg_iter_number += 1
         # full gradient is added to the stochastic grad difference
         if out is None:
-            return self._stochastic_grad_difference.sapyb(self.num_functions, self._full_gradient_at_snapshot, 1.)
+            out = self._stochastic_grad_difference.sapyb(
+                self.num_functions, self._full_gradient_at_snapshot, 1.)
         else:
             self._stochastic_grad_difference.sapyb(
                 self.num_functions, self._full_gradient_at_snapshot, 1., out=out)
 
-    def _set_up(self, x):
+        return out
 
-        self.data_passes.append(1)
-        self._update_full_gradient(x)
-        self._stochastic_grad_difference = x.geometry.allocate(0)
-        self._svrg_iter_number = 1
-        self.set_up_done = True
-
-    def _update_full_gradient(self, x):
+    def _update_full_gradient_and_return(self, x, out=None):
         """
         Updates the memory for full gradient computation. If :code:`store_gradients==True`, the gradient of all functions is computed and stored.
         """
+
+        self._svrg_iter_number += 1
 
         if self.store_gradients is True:
             self._list_stored_gradients = [
@@ -120,6 +139,20 @@ class SVRGFunction(ApproximateGradientSumFunction):
         else:
             self._full_gradient_at_snapshot = self.full_gradient(x)
             self.snapshot = x.copy()
+
+        try:
+            self.data_passes.append(self.data_passes[-1] + 1.0)
+        except IndexError:
+            self.data_passes.append(1.0)
+
+        if out is None:
+            out = self._stochastic_grad_difference.sapyb(
+                self.num_functions, self._full_gradient_at_snapshot, 1.)
+        else:
+            self._stochastic_grad_difference.sapyb(
+                self.num_functions, self._full_gradient_at_snapshot, 1., out=out)
+
+        return out
 
 
 class LSVRGFunction(SVRGFunction):
@@ -151,57 +184,41 @@ class LSVRGFunction(SVRGFunction):
         if self.update_prob is None:
             self.update_prob = 1./self.num_functions
 
-        # compute and store the gradient of each function in the finite sum
-        self.store_gradients = store_gradients
-
         # randomness
         self.generator = np.random.default_rng(seed=seed)
 
-        # flag for memory allocation
-        self.set_up_done = False
+    def gradient(self, x, out=None):
+        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x`
 
-        # data_passes
-        self.data_passes = []
+        Parameters
+        ----------
+        x : DataContainer
+        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
-    def approximate_gradient(self, x, function_num,  out=None):
-        # TODO: doc strings
+        Returns
+        --------
+        DataContainer
+            the value of the approximate gradient of the sum function at :code:`x`  or nothing if `out`  
+        """
 
-        # allocate memory and create new attributes to run the update and the inner SVRG loop
-        if not self.set_up_done:
-            self._set_up(x)
-        else:
+        self.function_num = self.sampler.next()
 
-            # flag to update the memory if SVRG or LSVRG is used
-            update_flag = self.generator.uniform() < self.update_prob
+        if self.function_num > self.num_functions:
+            raise IndexError(
+                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
 
-            # check whether to update the full gradient based on the first iteration or the update frequency
-            if update_flag:
+        if isinstance(self.function_num, numbers.Number):
 
-                # update full gradient
-                self._update_full_gradient(x)
+            if self._svrg_iter_number == 0:
+                self._stochastic_grad_difference = x.geometry.allocate(0)
+                return self._update_full_gradient_and_return(x, out=out)
 
-                # increment by 1, since full gradient is computed again
-                self.data_passes.append(self.data_passes[-1] + 1.)
+            elif self.generator.uniform() < self.update_prob:
+
+                return self._update_full_gradient_and_return(x, out=out)
 
             else:
-                # implements the LSVRG inner loop
-                self.stoch_grad_at_iterate = self.functions[function_num].gradient(
-                    x)
 
-                if self.store_gradients is True:
-                    self.stoch_grad_at_iterate.sapyb(
-                        1., self._list_stored_gradients[function_num], -1., out=self._stochastic_grad_difference)
-                else:
-                    self.stoch_grad_at_iterate.sapyb(1., self.functions[function_num].gradient(
-                        self.snapshot), -1., out=self._stochastic_grad_difference)
+                return self.approximate_gradient(x, self.function_num, out=out)
 
-                # only on gradient randomly selected is seen and appended it to data_passes
-                self.data_passes.append(
-                    self.data_passes[-1] + 1./self.num_functions)
-
-        # full gradient is added to the stochastic grad difference
-        if out is None:
-            return self._stochastic_grad_difference.sapyb(self.num_functions, self._full_gradient_at_snapshot, 1.)
-        else:
-            self._stochastic_grad_difference.sapyb(
-                self.num_functions, self._full_gradient_at_snapshot, 1., out=out)
+        raise ValueError("Batch gradient is not yet implemented")

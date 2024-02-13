@@ -266,13 +266,10 @@ class TestSVRG(CCPiTestClass):
     def test_SVRG_init(self):
         self.assertEqual(self.f_stochastic.update_frequency, 2*self.f_stochastic.num_functions)
         self.assertListEqual(self.f_stochastic.data_passes, [])
-        self.assertEqual(self.f_stochastic.set_up_done, False)
         self.assertEqual(self.f_stochastic.store_gradients, False)
-        
         f2=SVRGFunction(self.f_subsets, update_frequency=2, store_gradients=True)
         self.assertEqual(f2.update_frequency, 2)
         self.assertListEqual(f2.data_passes, [])
-        self.assertEqual(f2.set_up_done, False)
         self.assertEqual(f2.store_gradients, True)
         
 
@@ -482,13 +479,11 @@ class TestLSVRG(CCPiTestClass):
     def test_LSVRG_init(self):
         self.assertEqual(self.f_stochastic.update_prob,1/5)
         self.assertListEqual(self.f_stochastic.data_passes, [])
-        self.assertEqual(self.f_stochastic.set_up_done, False)
         self.assertEqual(self.f_stochastic.store_gradients, False)
         
         f2=LSVRGFunction(self.f_subsets, update_prob=1/2, store_gradients=True, seed=1)
         self.assertEqual(f2.update_prob, 1/2)
         self.assertListEqual(f2.data_passes, [])
-        self.assertEqual(f2.set_up_done, False)
         self.assertEqual(f2.store_gradients, True)
      
     @unittest.skipUnless(has_astra, "Requires ASTRA")

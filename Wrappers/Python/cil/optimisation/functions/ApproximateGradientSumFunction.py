@@ -74,7 +74,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         self.sampler = sampler
         
         self._data_passes=[]
-        
+        self._data_passes_indices=[]
 
         super(ApproximateGradientSumFunction, self).__init__(*functions)
 
@@ -164,16 +164,29 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
             The additional proportion of the data that has been seen 
 
         """
+        value=round(value, 5)
         try:
             self._data_passes.append(
                 self._data_passes[-1] + value)
         except IndexError:
             self._data_passes.append(value)
         
+    def _update_data_passes_indices(self, indices):
+        """ Internal function that updates the list of lists containing the function indices seen at each iteration. 
+        
+        Parameters
+        ----------
+        indices: list
+            List of indices seen in a given iteration
+            
+        """
+        self._data_passes_indices.append(indices)
+        
+        
     @property
     def data_passes(self):
         return self._data_passes
     
     @property
-    def num_functions(self):
-        return len(self.functions)
+    def data_passes_indices(self):
+        return self._data_passes_indices

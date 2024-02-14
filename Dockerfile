@@ -24,8 +24,7 @@ RUN sed -ri '/tigre|astra-toolbox/d' environment.yml \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \
-  && fix-permissions "${CONDA_DIR}" \
-  && fix-permissions "/home/${NB_USER}"
+  && fix-permissions "${CONDA_DIR}" /home/${NB_USER}
 
 # NB: trailing `/` is required
 ENV TENSORBOARD_PROXY_URL=/user-redirect/proxy/6006/
@@ -33,7 +32,7 @@ ENV TENSORBOARD_PROXY_URL=/user-redirect/proxy/6006/
 # build & install CIL
 COPY --chown="${NB_USER}" . src
 RUN mkdir build && cd build \
-  && cmake ../src -DCMAKE_BUILD_TYPE="Release" -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="${CONDA_DIR}" \
+  && cmake ../src -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="${CONDA_DIR}" \
   && cmake --build . --target install \
   && cd .. && rm -rf src build \
-  && fix-permissions "${CONDA_DIR}"
+  && fix-permissions "${CONDA_DIR}" /home/${NB_USER}

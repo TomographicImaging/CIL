@@ -6,7 +6,9 @@ from pathlib import Path
 from packaging import version
 
 baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")
-build = Path(__file__).parent / "build"
+docs = Path(__file__).parent
+exclude_paths = ["assets"] + [i.stem for i in (docs / "pages").glob("*.md")]
+build = docs / "build"
 versions = [{
     "name": i.name,
     "version": re.search(
@@ -15,7 +17,7 @@ versions = [{
         flags=re.M).group(1),
     "url": f"{baseurl}{i.name}/"
 }
-for i in build.glob("[a-zA-Z0-9]*") if i.is_dir() if i.name != "assets"]
+for i in build.glob("[a-zA-Z0-9]*") if i.is_dir() if i.name not in exclude_paths]
 
 tags = [v for v in versions if v["name"] == "v" + v["version"]]
 try:

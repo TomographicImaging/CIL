@@ -129,7 +129,7 @@ jobs:
         name: cil-package
         path: recipe/linux-64/cil*
   docs:
-    defaults: {run: {shell: 'bash -el {0}'}}
+    defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -146,12 +146,12 @@ jobs:
         cache-version: 0
     - name: install dependencies
       run: |
-        cd docs
         conda install -c conda-forge -yq conda-merge
         conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
         conda env update -n test
         conda list
     - name: build cil
+      working-directory: .
       run: |
         cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
         cmake --build ./build --target install
@@ -162,15 +162,17 @@ jobs:
         ref: gh-pages
     - id: pages
       uses: actions/configure-pages@v5
-    - name: update docs
+    - name: update web pages (jekyll)
+      env: {JEKYLL_ENV: production}
       run: |
-        cd docs
-        # landing page (jekyll)
         bundle install
         bundle exec jekyll build -s pages --baseurl "${{ steps.pages.outputs.base_path }}"
-        rm -rf build/.git build/assets build/index.html
+        # overwrite old files
+        ls pages/*.md | xargs -II basename I .md | xargs -II rm -rf build/I
+        rm -rf build/.git build/assets
         mv _site/* build/
-        # docs pages (sphinx)
+    - name: update docs pages (sphinx)
+      run: |
         docs_dir="${{ github.ref_name }}"
         docs_dir="${docs_dir//\//_}"
         if test "$docs_dir" = master; then docs_dir=nightly; fi
@@ -178,8 +180,6 @@ jobs:
         ./mkdemos.py
         sphinx-build -b dirhtml source "build/$docs_dir"
         ./mkversions.py
-      env:
-        JEKYLL_ENV: production
     - uses: actions/upload-artifact@v4
       with:
         name: DocumentationHTML

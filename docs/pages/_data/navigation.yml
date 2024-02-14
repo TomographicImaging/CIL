@@ -2,6 +2,9 @@
 - title: Home
   url: "/"
   side: left
+- title: About
+  url: "/about/"
+  side: left
 - title: Documentation
   url: "/nightly/"
   side: left

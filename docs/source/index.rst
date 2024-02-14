@@ -38,6 +38,11 @@ A number of demos can be found in the `CIL-Demos`_ repository.
 For detailed information refer to our articles and the repositories
 with the code to reproduce the article's results.
 
+Cite this work
+==============
+
+If you use this software please consider citing one or both of the articles below.
+
 1. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging
 https://doi.org/10.1098/rsta.2020.0192 . Phil. Trans. R. Soc. A 20200192.
 The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I
@@ -46,18 +51,11 @@ The code to reproduce the article results. https://github.com/TomographicImaging
 tomography https://doi.org/10.1098/rsta.2020.0193 Phil. Trans. R. Soc. A 20200193.
 The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II
 
-
-Cite this work
-==============
-
-If you use this software please consider citing one or both of the articles above.
-
-Software documentation Index
-****************************
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
    :name: mastertoc
 
    introduction

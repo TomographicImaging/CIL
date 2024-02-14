@@ -105,7 +105,7 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 In case of development it is useful to be able to build the software directly. You should clone this repository as
 
 ```sh
-git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+git clone --recurse-submodule git@github.com:TomographicImaging/CIL
 ```
 
 The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/TomographicImaging/CIL-Data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as

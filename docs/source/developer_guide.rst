@@ -106,7 +106,7 @@ a HTTP server to view the documentation.
 Example:
 ::
 
-  git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+  git clone --recurse-submodule git@github.com:TomographicImaging/CIL
   cd CIL
   sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
   conda activate ENVIRONMENT_NAME

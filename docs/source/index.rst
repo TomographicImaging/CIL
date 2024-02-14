@@ -86,7 +86,7 @@ Please refer to the main `CCPi website`_ for up-to-date information.
 The CCPi developers may be contacted:
 
 * by joining the `devel mailing list`_
-* on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL.git or
+* on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL or
 * on the CIL Discord channel https://discord.gg/9NTWu9MEGq
 
 .. _devel mailing list: https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL

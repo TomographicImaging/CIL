@@ -1,0 +1,14 @@
+build/*
+Wrappers/Python/build/lib/cil/*
+Wrappers/Python/cil/io/__pycache__/*
+Wrappers/Python/cil/__pycache__/*
+Wrappers/Python/cil/framework/__pycache__/*
+Wrappers/Python/cil/optimisation/__pycache__/*
+Wrappers/Python/cil/optimisation/algorithms/__pycache__/*
+Wrappers/Python/cil/optimisation/functions/__pycache__/*
+Wrappers/Python/cil/optimisation/operators/__pycache__/*
+Wrappers/Python/cil/optimisation/*
+Wrappers/Python/cil/processors/__pycache__/*
+Wrappers/Python/cil/recon/__pycache__/*
+Wrappers/Python/cil/utilities/__pycache__/*
+Wrappers/Python/cil.egg-info/*

@@ -1,5 +1,5 @@
 # jekyll config
-remote_theme: Phlow/feeling-responsive
+remote_theme: TomographicImaging/feeling-responsive # TODO: revert after https://github.com/Phlow/feeling-responsive/pull/276
 title: CIL
 slogan: The Core Imaging Library
 description: |

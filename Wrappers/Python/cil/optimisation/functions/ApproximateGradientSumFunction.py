@@ -40,7 +40,14 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
    
          
-            
+    Note
+    -----
+    We provide two ways of keeping track the amount of data you have seen: 
+        - `data_passes` is a list of floats the length of which should be the number of iterations currently run. Each entry corresponds to the proportion of data seen up to this iteration. Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches`, then this 
+        may not be correct. 
+        - `data_passes_indices` a list of lists the length of which should be the number of iterations currently run. Each entry corresponds to the indices of the function numbers seen in that iteration. 
+
+    
     Note
     ----
     The :meth:`~ApproximateGradientSumFunction.gradient` returns the approximate gradient depending on an index provided by the  :code:`sampler` method. 

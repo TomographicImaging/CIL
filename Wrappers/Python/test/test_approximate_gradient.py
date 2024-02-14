@@ -67,8 +67,6 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
         with self.assertRaises(TypeError):
             self.stochastic_objective=ApproximateGradientSumFunction(self.functions, self.sampler)
 
-        
-
 
 
 class TestSGD(CCPiTestClass):

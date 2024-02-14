@@ -32,7 +32,7 @@ class SAGFunction(ApproximateGradientSumFunction):
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
     sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
-    warm_start: Boolean, default : False
+    warm_start: Boolean, default : False #TODO: MAke this default 
         If `warm_start` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
 
     References
@@ -48,7 +48,7 @@ class SAGFunction(ApproximateGradientSumFunction):
 
         super(SAGFunction, self).__init__(functions, sampler)
 
-    def warm_start(self, initial):
+    def warm_start(self, initial): #TODO: warm_start_apporximate_gradients 
         """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point.
         
         Parameters
@@ -80,10 +80,11 @@ class SAGFunction(ApproximateGradientSumFunction):
             Between 1 and the number of functions in the list  
 
         """
-        if self.list_stored_gradients is None:
-            self.list_stored_gradients = [
-                x.geometry.allocate(0) for fi in self.functions]
-            self.full_gradient_at_iterate = x.geometry.allocate(0) 
+        if self.list_stored_gradients is None: #TODO: might not work for SIRF - multiply by 0 
+            self.warm_start(x)
+           # self.list_stored_gradients = [
+          #      x.geometry.allocate(0) for fi in self.functions]
+           # self.full_gradient_at_iterate = x.geometry.allocate(0) 
             
 
         self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)

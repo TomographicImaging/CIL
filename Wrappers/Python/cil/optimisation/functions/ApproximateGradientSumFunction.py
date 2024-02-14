@@ -41,6 +41,9 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
    
          
             
+    #TODO: NOTE about batch sizes 
+    
+    
     Note
     ----
     The :meth:`~ApproximateGradientSumFunction.gradient` returns the approximate gradient depending on an index provided by the  :code:`sampler` method. 
@@ -166,7 +169,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         """
         try:
             self._data_passes.append(
-                self._data_passes[-1] + value)
+                self._data_passes[-1] + value) #Need to do some rounding 
         except IndexError:
             self._data_passes.append(value)
         
@@ -174,6 +177,6 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     def data_passes(self):
         return self._data_passes
     
-    @property
+    @property #TODO: is this in the parent class?? 
     def num_functions(self):
         return len(self.functions)

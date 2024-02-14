@@ -66,6 +66,6 @@ preferred-citation:
   volume: 379
   journal: "Philosophical Transactions of The Royal Society A"
   year: 2021
-repository-code: "https://github.com/TomographicImaging/CIL.git"
+repository-code: "https://github.com/TomographicImaging/CIL"
 title: "CIL"
 version: 21.3.1

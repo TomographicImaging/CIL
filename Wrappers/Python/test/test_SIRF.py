@@ -17,25 +17,18 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import unittest
-
-import cil.framework.acquisition_data
-import cil.framework.data_container
-from utils import initialise_tests
-import numpy as np
-from numpy.linalg import norm
 import os
 import shutil
-from cil.framework import BlockDataContainer
-from cil.optimisation.operators import GradientOperator, LinearOperator
-from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
+import unittest
+
+import numpy as np
+
+from cil.framework import AcquisitionData, ImageData, BlockDataContainer
 from cil.optimisation.algorithms import FISTA
-
-import os
-from cil.utilities.display import show2D  
-
+from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
+from cil.optimisation.operators import GradientOperator, LinearOperator
 from testclass import CCPiTestClass
-from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
+from utils import has_ccpi_regularisation, initialise_tests
 
 initialise_tests()
 
@@ -50,7 +43,6 @@ except ImportError as ie:
     has_sirf = False
 
 if has_ccpi_regularisation:
-    from ccpi.filters import regularisers
     from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, FGP_dTV, TNV
 
 
@@ -60,7 +52,7 @@ class KullbackLeiblerSIRF(object):
     def setUp(self):
 
         if has_sirf:
-            self.image1 = cil.framework.DataContainer.ImageData(os.path.join(
+            self.image1 = ImageData(os.path.join(
                 examples_data_path('PET'),'thorax_single_slice','emission.hv')
                 )
 
@@ -151,12 +143,12 @@ class GradientSIRF(object):
 
         for i in range(len(res1)):
         
-            if isinstance(self.image1, cil.framework.DataContainer.ImageData):
-                self.assertTrue(isinstance(res1[i], cil.framework.DataContainer.ImageData))
-                self.assertTrue(isinstance(res2[i], cil.framework.DataContainer.ImageData))
+            if isinstance(self.image1, ImageData):
+                self.assertTrue(isinstance(res1[i], ImageData))
+                self.assertTrue(isinstance(res2[i], ImageData))
             else:
-                self.assertTrue(isinstance(res1[i], cil.framework.DataContainer.ImageData))
-                self.assertTrue(isinstance(res2[i], cil.framework.DataContainer.ImageData))
+                self.assertTrue(isinstance(res1[i], ImageData))
+                self.assertTrue(isinstance(res2[i], ImageData))
             # test direct with and without out
             np.testing.assert_array_almost_equal(res1[i].as_array(), res2[i].as_array())                         
 
@@ -213,7 +205,7 @@ class TestGradientPET_2D(unittest.TestCase, GradientSIRF):
     def setUp(self):
 
         if has_sirf:
-            self.image1 = cil.framework.DataContainer.ImageData(os.path.join(
+            self.image1 = ImageData(os.path.join(
                 examples_data_path('PET'),'thorax_single_slice','emission.hv')
                 )
 
@@ -225,7 +217,7 @@ class TestGradientPET_3D(unittest.TestCase, GradientSIRF):
     def setUp(self):
 
         if has_sirf:
-            self.image1 = cil.framework.DataContainer.ImageData(os.path.join(
+            self.image1 = ImageData(os.path.join(
                 examples_data_path('PET'),'brain','emission.hv')
                 )
 
@@ -237,7 +229,7 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
     def setUp(self):
 
         if has_sirf:
-            acq_data = cil.framework.AcquisitionData.AcquisitionData(os.path.join
+            acq_data = AcquisitionData(os.path.join
                 (examples_data_path('MR'),'simulated_MR_2D_cartesian.h5')
                                                                      )
             preprocessed_data = mr.preprocess_acquisition_data(acq_data)
@@ -295,8 +287,8 @@ class TestSIRFCILIntegration(CCPiTestClass):
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_divide(self):
         os.chdir(self.cwd)
-        image1 = cil.framework.DataContainer.ImageData('emission.hv')
-        image2 = cil.framework.DataContainer.ImageData('emission.hv')
+        image1 = ImageData('emission.hv')
+        image2 = ImageData('emission.hv')
         image1.fill(1.)
         image2.fill(2.)
         
@@ -318,8 +310,8 @@ class TestSIRFCILIntegration(CCPiTestClass):
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_multiply(self):
         os.chdir(self.cwd)
-        image1 = cil.framework.DataContainer.ImageData('emission.hv')
-        image2 = cil.framework.DataContainer.ImageData('emission.hv')
+        image1 = ImageData('emission.hv')
+        image2 = ImageData('emission.hv')
         image1.fill(1.)
         image2.fill(2.)
         
@@ -341,8 +333,8 @@ class TestSIRFCILIntegration(CCPiTestClass):
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_add(self):
         os.chdir(self.cwd)
-        image1 = cil.framework.DataContainer.ImageData('emission.hv')
-        image2 = cil.framework.DataContainer.ImageData('emission.hv')
+        image1 = ImageData('emission.hv')
+        image2 = ImageData('emission.hv')
         image1.fill(0)
         image2.fill(1)
         
@@ -367,8 +359,8 @@ class TestSIRFCILIntegration(CCPiTestClass):
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_subtract(self):
         os.chdir(self.cwd)
-        image1 = cil.framework.DataContainer.ImageData('emission.hv')
-        image2 = cil.framework.DataContainer.ImageData('emission.hv')
+        image1 = ImageData('emission.hv')
+        image2 = ImageData('emission.hv')
         image1.fill(2)
         image2.fill(1)
 
@@ -462,7 +454,7 @@ class CCPiRegularisationWithSIRFTests():
 class TestPETRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     skip_TNV_on_2D = True
     def setUp(self):
-        self.image1 = cil.framework.DataContainer.ImageData(os.path.join(
+        self.image1 = ImageData(os.path.join(
             examples_data_path('PET'),'thorax_single_slice','emission.hv'
             ))
         self.image2 = self.image1 * 0.5
@@ -477,12 +469,12 @@ class TestPETRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
         
 class TestRegRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     def setUp(self):
-        self.image1 = cil.framework.DataContainer.ImageData(os.path.join(examples_data_path('Registration'), 'test2.nii.gz'))
+        self.image1 = ImageData(os.path.join(examples_data_path('Registration'), 'test2.nii.gz'))
         self.image2 = self.image1 * 0.5
 
 class TestMRRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
     def setUp(self):
-        acq_data = cil.framework.AcquisitionData.AcquisitionData(os.path.join(examples_data_path('MR'), 'simulated_MR_2D_cartesian.h5'))
+        acq_data = AcquisitionData(os.path.join(examples_data_path('MR'), 'simulated_MR_2D_cartesian.h5'))
         preprocessed_data = mr.preprocess_acquisition_data(acq_data)
         recon = mr.FullySampledReconstructor()
         recon.set_input(preprocessed_data)

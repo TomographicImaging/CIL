@@ -71,6 +71,8 @@ html_theme_options = {
     "logo": {
         "image_light": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg",
         "image_dark": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg",
+        "link": "/",
+        "alt_text": "CIL - Home",
     },
     "show_version_warning_banner": True,
     "header_links_before_dropdown": 9,

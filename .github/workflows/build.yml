@@ -163,23 +163,14 @@ jobs:
     - id: pages
       uses: actions/configure-pages@v5
     - name: update web pages (jekyll)
+      run: make JEKYLLOPTS="--baseurl ${{ steps.pages.outputs.base_path }}" web-deps web
       env: {JEKYLL_ENV: production}
-      run: |
-        bundle install
-        bundle exec jekyll build -s pages --baseurl "${{ steps.pages.outputs.base_path }}"
-        # overwrite old files
-        ls pages/*.md | xargs -II basename I .md | xargs -II rm -rf build/I
-        rm -rf build/.git build/assets
-        mv _site/* build/
     - name: update docs pages (sphinx)
       run: |
         docs_dir="${{ github.ref_name }}"
         docs_dir="${docs_dir//\//_}"
         if test "$docs_dir" = master; then docs_dir=nightly; fi
-        rm -rf "build/$docs_dir"
-        ./mkdemos.py
-        sphinx-build -b dirhtml source "build/$docs_dir"
-        ./mkversions.py
+        make BUILDSUBDIR="$docs_dir" dirhtml
     - uses: actions/upload-artifact@v4
       with:
         name: DocumentationHTML

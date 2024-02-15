@@ -32,8 +32,8 @@ class SAGFunction(ApproximateGradientSumFunction):
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
     sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
-    warm_start: Boolean, default : False #TODO: MAke this default 
-        If `warm_start` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
+    warm_start_approximate_gradients: Boolean, default : True 
+        If `warm_start_approximate_gradients` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
 
     References
     ----------
@@ -41,31 +41,15 @@ class SAGFunction(ApproximateGradientSumFunction):
 
     """
 
-    def __init__(self, functions,  sampler=None):
+    def __init__(self, functions,  sampler=None, warm_start_approximate_gradients=True):
         self.list_stored_gradients = None
         self.full_gradient_at_iterate = None
-        self._warm_start_data_pass=False
+        self._warm_start= warm_start_approximate_gradients
+        self._warm_start_just_done=False
 
         super(SAGFunction, self).__init__(functions, sampler)
 
-    def warm_start(self, initial): #TODO: warm_start_apporximate_gradients 
-        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point.
-        
-        Parameters
-        ----------
-        initial: DataContainer,
-            The initial point to warmstart the calculation 
-            
-        Example
-        --------
-        >>> stochastic_objective= SAGFunction(list_of_functions)
-        >>> stochastic_objective.warm_start(initial_point)
-        >>> sag_algorithm=GD(initial=initial_point,  objective_function=stochastic_objective)
-        """
-        self.list_stored_gradients = [
-            fi.gradient(initial) for fi in self.functions]
-        self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
-        self._warm_start_data_pass=True
+
         
 
     def approximate_gradient(self, x, function_num,  out=None):
@@ -80,20 +64,24 @@ class SAGFunction(ApproximateGradientSumFunction):
             Between 1 and the number of functions in the list  
 
         """
-        if self.list_stored_gradients is None: #TODO: might not work for SIRF - multiply by 0 
-            self.warm_start(x)
-           # self.list_stored_gradients = [
-          #      x.geometry.allocate(0) for fi in self.functions]
-           # self.full_gradient_at_iterate = x.geometry.allocate(0) 
+        if self.list_stored_gradients is None: 
+            if self._warm_start: 
+                self._warm_start_approximate_gradients(x)
+            else:
+                 self.list_stored_gradients = [
+                      0*x for fi in self.functions]
+                 self.full_gradient_at_iterate = 0*x
             
 
         self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 
-        if self._warm_start_data_pass:
+        if self._warm_start_just_done:
             self._update_data_passes(1.0+1./self.num_functions)
-            self._warm_start_data_pass=False 
+            self._update_data_passes_indices(list(range(self.num_functions))+ [self.function_num])
+            self._warm_start_just_done=False 
         else:
             self._update_data_passes(1./self.num_functions)
+            self._update_data_passes_indices([self.function_num])
 
         self.stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
             1., self.list_stored_gradients[function_num], -1.)
@@ -120,6 +108,20 @@ class SAGFunction(ApproximateGradientSumFunction):
                 1., self.full_gradient_at_iterate, 1., out=out)
 
         return out 
+    
+    def _warm_start_approximate_gradients(self, initial):
+        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point.
+        
+        Parameters
+        ----------
+        initial: DataContainer,
+            The initial point to warmstart the calculation 
+        
+        """
+        self.list_stored_gradients = [
+            fi.gradient(initial) for fi in self.functions]
+        self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
+        self._warm_start_just_done=True
 
 class SAGAFunction(SAGFunction):
 
@@ -142,8 +144,8 @@ class SAGAFunction(SAGFunction):
     Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
     """
 
-    def __init__(self, functions,  sampler=None):
-        super(SAGAFunction, self).__init__(functions, sampler)
+    def __init__(self, functions,  sampler=None, warm_start_approximate_gradients=True):
+        super(SAGAFunction, self).__init__(functions, sampler, warm_start_approximate_gradients)
 
 
     def _update_approx_gradient(self, out):

@@ -196,7 +196,6 @@ class TestSGD(CCPiTestClass):
                             step_size=0.01, max_iteration=5000)
         alg_stochastic.run(600, verbose=0)
         self.assertAlmostEqual(stochastic_objective.data_passes[-1], 600/5)
-
         self.assertListEqual(stochastic_objective.data_passes_indices[-1], [stochastic_objective.function_num])
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), alg.x.as_array(), 3)
@@ -223,7 +222,7 @@ class TestSAG(CCPiTestClass):
             fi=LeastSquares(self.A_partitioned.operators[i],self. partitioned_data[i])
             self.f_subsets.append(fi)
         self.f=LeastSquares(self.A, self.data2d)
-        self.f_stochastic=SAGFunction(self.f_subsets,self.sampler)
+        self.f_stochastic=SAGFunction(self.f_subsets,self.sampler, warm_start_approximate_gradients=False)
         self.initial=ig2D.allocate(0)
 
     @unittest.skipUnless(has_astra, "Requires ASTRA")
@@ -260,15 +259,16 @@ class TestSAG(CCPiTestClass):
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_warm_start_and_data_passes(self):
      
-        f1=SAGFunction(self.f_subsets,Sampler.sequential(5))
-        f=SAGFunction(self.f_subsets,Sampler.sequential(5))
-        f.warm_start(self.initial)
+        f1=SAGFunction(self.f_subsets,Sampler.sequential(5), warm_start_approximate_gradients=False)
+        f=SAGFunction(self.f_subsets,Sampler.sequential(5), warm_start_approximate_gradients=True)
         f1.gradient(self.initial)
         f.gradient(self.initial)
         self.assertEqual(f.function_num, 0)
         self.assertEqual(f1.function_num, 0)
         self.assertListEqual(f1.data_passes, [1./f1.num_functions])
         self.assertListEqual(f.data_passes, [ 1+1./f1.num_functions])
+        self.assertListEqual(f.data_passes_indices[0], list(range(5))+ [0])
+        self.assertListEqual(f1.data_passes_indices[0], [0])
         self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, f1.list_stored_gradients[0].array)
         self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
         self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
@@ -305,7 +305,7 @@ class TestSAG(CCPiTestClass):
         
   
 
-    def test_SAG_toy_example(self): 
+    def test_SAG_toy_example_no_warm_start(self): 
         sampler=Sampler.random_with_replacement(4, seed=1)
         initial = VectorData(np.zeros(20))
         np.random.seed(3)
@@ -328,7 +328,7 @@ class TestSAG(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        stochastic_objective=SAGFunction(functions, sampler)
+        stochastic_objective=SAGFunction(functions, sampler, warm_start_approximate_gradients=False)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         
@@ -364,8 +364,7 @@ class TestSAG(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        stochastic_objective=SAGFunction(functions, sampler)
-        stochastic_objective.warm_start(initial)
+        stochastic_objective=SAGFunction(functions, sampler, warm_start_approximate_gradients=True)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         
@@ -398,7 +397,7 @@ class TestSAGA(CCPiTestClass):
             fi=LeastSquares(self.A_partitioned.operators[i],self. partitioned_data[i])
             self.f_subsets.append(fi)
         self.f=LeastSquares(self.A, self.data2d)
-        self.f_stochastic=SAGAFunction(self.f_subsets,self.sampler)
+        self.f_stochastic=SAGAFunction(self.f_subsets,self.sampler, warm_start_approximate_gradients=False)
         self.initial=ig2D.allocate()
         
     @unittest.skipUnless(has_astra, "Requires ASTRA")
@@ -434,16 +433,17 @@ class TestSAGA(CCPiTestClass):
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_warm_start_and_data_passes(self):
      
-        f1=SAGAFunction(self.f_subsets,Sampler.sequential(5))
-        f=SAGAFunction(self.f_subsets,Sampler.sequential(5))
+        f1=SAGAFunction(self.f_subsets,Sampler.sequential(5), warm_start_approximate_gradients=False)
+        f=SAGAFunction(self.f_subsets,Sampler.sequential(5), warm_start_approximate_gradients=True)
         f1.gradient(self.initial)
-        f.warm_start(self.initial)
         f.gradient(self.initial)
         
         self.assertEqual(f.function_num, 0)
         self.assertEqual(f1.function_num, 0)
         self.assertListEqual(f1.data_passes, [1./f1.num_functions])
         self.assertListEqual(f.data_passes, [1+1./f1.num_functions])
+        self.assertListEqual(f.data_passes_indices[0], list(range(5))+[0])
+        self.assertListEqual(f1.data_passes_indices[0], [0])
         self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, f1.list_stored_gradients[0].array)
         self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
         self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
@@ -479,7 +479,7 @@ class TestSAGA(CCPiTestClass):
         
   
 
-    def test_SAGA_toy_example(self): 
+    def test_SAGA_toy_example_no_warm_start(self): 
         sampler=Sampler.random_with_replacement(3, seed=1)
         initial = VectorData(np.zeros(15))
         np.random.seed(4)
@@ -502,7 +502,7 @@ class TestSAGA(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        stochastic_objective=SAGAFunction(functions, sampler)
+        stochastic_objective=SAGAFunction(functions, sampler, warm_start_approximate_gradients=False)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         
@@ -537,8 +537,7 @@ class TestSAGA(CCPiTestClass):
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
-        stochastic_objective=SAGAFunction(functions, sampler)
-        stochastic_objective.warm_start(initial)
+        stochastic_objective=SAGAFunction(functions, sampler, warm_start_approximate_gradients=True)
         self.assertAlmostEqual(stochastic_objective(initial), objective(initial))   
         self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(initial).array, objective.gradient(initial).array)
         

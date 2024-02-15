@@ -25,6 +25,10 @@ endif()
 
 project (cil LANGUAGES CXX)
 
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
+  cmake_policy(SET CMP0148 OLD)
+endif()
+
 # If APPLE don't use @rpath
 if (APPLE)
   option(SHARED_LIBS_ABS_PATH "Force shared libraries to be installed with absolute paths (as opposed to rpaths)" ON)

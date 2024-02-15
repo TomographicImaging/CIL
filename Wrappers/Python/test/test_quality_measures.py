@@ -104,31 +104,37 @@ class TestQualityMeasures(CCPiTestClass):
         res2 = peak_signal_noise_ratio(self.dc1.as_array(), self.dc2.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=3)
     
+    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_mse_mask(self):
         res1 = mse(self.id_coins_sliced, self.id_coins_noisy_sliced)
         res2 = mse(self.id_coins, self.id_coins_noisy, mask=self.mask.array)
         np.testing.assert_almost_equal(res1, res2, decimal=3)
 
+    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_mse_bool_mask(self):
         res1 = mse(self.id_coins_sliced, self.id_coins_noisy_sliced)
         res2 = mse(self.id_coins, self.id_coins_noisy, mask=self.bool_mask)
         np.testing.assert_almost_equal(res1, res2, decimal=3)
     
+    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_mse_data_container_mask(self):
         res1 = mse(self.id_coins_sliced, self.id_coins_noisy_sliced)
         res2 = mse(self.id_coins, self.id_coins_noisy, mask=self.mask)
         np.testing.assert_almost_equal(res1, res2, decimal=3)
         
+    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_psnr_mask(self):
         res1 = psnr(self.id_coins_sliced, self.id_coins_noisy_sliced)
         res2 = psnr(self.id_coins, self.id_coins_noisy, mask=self.mask)
         np.testing.assert_almost_equal(res1, res2, decimal=3)
         
+    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_mae_mask(self):
         res1 = mae(self.id_coins_sliced, self.id_coins_noisy_sliced)
         res2 = mae(self.id_coins, self.id_coins_noisy, mask=self.mask)
         np.testing.assert_almost_equal(res1, res2, decimal=3)
         
+    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_infinite_psnr(self):
         with warnings.catch_warnings(record=True) as w:
             self.assertEqual(psnr(self.id_coins_sliced, self.id_coins_sliced), np.inf)

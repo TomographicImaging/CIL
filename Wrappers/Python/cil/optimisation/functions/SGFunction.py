@@ -54,6 +54,7 @@ class SGFunction(ApproximateGradientSumFunction):
         
         
         self._update_data_passes(1/self.num_functions)
+        self._update_data_passes_indices([function_num])
 
         # compute gradient of randomly selected(function_num) function
         if out is None:

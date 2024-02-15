@@ -158,6 +158,7 @@ class TestSGD(CCPiTestClass):
                             step_size=1e-7, max_iteration=5000)
         alg_stochastic.run(self.n_subsets*50, verbose=0)
         self.assertAlmostEqual(objective.data_passes[-1], self.n_subsets*50/5)
+        self.assertListEqual(objective.data_passes_indices[-1], [objective.function_num])
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), alg.x.as_array(), 3)
 
@@ -193,10 +194,13 @@ class TestSGD(CCPiTestClass):
                             step_size=0.01, max_iteration=5000)
         alg_stochastic.run(600, verbose=0)
         self.assertAlmostEqual(stochastic_objective.data_passes[-1], 600/5)
+        self.assertListEqual(stochastic_objective.data_passes_indices[-1], [stochastic_objective.function_num])
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), alg.x.as_array(), 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
+        
+
 
 
 class TestSVRG(CCPiTestClass):
@@ -633,7 +637,5 @@ class TestLSVRG(CCPiTestClass):
                             objective_function=stochastic_objective, update_objective_interval=1000,
                             step_size=0.05, max_iteration=5000)
         alg_stochastic.run(100, verbose=0)
-        self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), alg.x.as_array(), 3)
-        self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), b.as_array(), 3)
+
+

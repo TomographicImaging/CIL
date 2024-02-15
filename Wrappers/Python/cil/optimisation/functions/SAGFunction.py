@@ -136,8 +136,8 @@ class SAGAFunction(SAGFunction):
                 A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
     sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
-    warm_start: Boolean, default : False
-        If `warm_start` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
+    warm_start_approximate_gradients: Boolean, default : True
+        If `warm_start_approximate_gradients` is True then when the gradient is first called, the full gradient for each function is computed and stored. If False, the gradients are initialised with zeros. 
 
     References
     ----------

@@ -185,8 +185,8 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         ----------
         indices: list
             List of indices seen in a given iteration
-            
         """
+        
         self._data_passes_indices.append(indices)
         
         

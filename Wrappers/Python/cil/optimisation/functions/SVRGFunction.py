@@ -119,6 +119,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
                 1., self.functions[function_num].gradient(self.snapshot), -1.)
 
         self._update_data_passes(1./self.num_functions)
+        self._update_data_passes_indices([function_num])
 
         # full gradient is added to the stochastic grad difference
         if out is None:
@@ -158,6 +159,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
             self.snapshot = x.copy()
 
         self._update_data_passes(1.0)
+        self._update_data_passes_indices(list(range(self.num_functions)))
 
         if out is None:
             out = self._full_gradient_at_snapshot

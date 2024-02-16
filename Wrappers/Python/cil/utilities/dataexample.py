@@ -25,58 +25,57 @@ import os
 import os.path 
 import sys
 from zipfile import ZipFile
-from urllib.request import urlretrieve
+from urllib.request import urlopen
+from io import BytesIO
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 
-data_dir = os.path.abspath(os.path.join(
-        os.path.dirname(__file__),
-        '../data/')
-)
-
-# this is the default location after a conda install
-data_dir = os.path.abspath(
-    os.path.join(sys.prefix, 'share','cil')
-)
+# # this is the default location after a conda install
+# data_dir = os.path.abspath(
+#     os.path.join(sys.prefix, 'share','cil')
+# )
 
 class DATA(object):
     @classmethod
     def dfile(cls):
         return None
+    
+class INTERNALDATA(DATA):
+    data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
     @classmethod
     def get(cls, size=None, scale=(0,1), **kwargs):
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', INTERNALDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
 
-class BOAT(DATA):
+class BOAT(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.BOAT
-class CAMERA(DATA):
+class CAMERA(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.CAMERA
-class PEPPERS(DATA):
+class PEPPERS(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.PEPPERS
-class RESOLUTION_CHART(DATA):
+class RESOLUTION_CHART(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.RESOLUTION_CHART
-class SIMPLE_PHANTOM_2D(DATA):
+class SIMPLE_PHANTOM_2D(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.SIMPLE_PHANTOM_2D
-class SHAPES(DATA):
+class SHAPES(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.SHAPES
-class RAINBOW(DATA):
+class RAINBOW(INTERNALDATA):
     @classmethod
     def dfile(cls):
         return TestData.RAINBOW
-class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
+class SYNCHROTRON_PARALLEL_BEAM_DATA(INTERNALDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -93,11 +92,11 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
             The DLS dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', INTERNALDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
         return loader.read()
-class SIMULATED_PARALLEL_BEAM_DATA(DATA):
+class SIMULATED_PARALLEL_BEAM_DATA(INTERNALDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -114,11 +113,11 @@ class SIMULATED_PARALLEL_BEAM_DATA(DATA):
             The simulated spheres dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', INTERNALDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_parallel_beam.nxs'))
         return loader.read()
-class SIMULATED_CONE_BEAM_DATA(DATA):
+class SIMULATED_CONE_BEAM_DATA(INTERNALDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -135,11 +134,11 @@ class SIMULATED_CONE_BEAM_DATA(DATA):
             The simulated spheres dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', INTERNALDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_cone_beam.nxs'))
         return loader.read()
-class SIMULATED_SPHERE_VOLUME(DATA):
+class SIMULATED_SPHERE_VOLUME(INTERNALDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -156,63 +155,58 @@ class SIMULATED_SPHERE_VOLUME(DATA):
             The simulated spheres volume
         '''
         
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', INTERNALDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
     
 class WALNUT(DATA):
     @classmethod
-    def get(cls, **kwargs):
-        
-        ddir = kwargs.get('data_dir', data_dir)
-        cls.retrieve_data(**kwargs)
-        loader = ZEISSDataReader(file_name=ddir+'/valnut/valnut_2014-03-21_643_28/tomo-A/valnut_tomo-A.txrm')
-        return loader.read()
+    def get(cls, data_dir):
+        WALNUT = os.path.join('valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+        try:
+            loader = ZEISSDataReader(file_name=os.path.join(data_dir,WALNUT))
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset not found in specifed data_dir: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(data_dir, cls.__name__)))
     
-    def retrieve_data(**kwargs):
-        ddir = kwargs.get('data_dir', data_dir)
-        if os.path.isdir(ddir+'/valnut') == False:
-            print('Downloading Walnut dataset to ' + ddir)
-            urlretrieve('https://zenodo.org/record/4822516/files/walnut.zip', ddir + '/walnut.zip')
-            myzip = ZipFile(ddir+'/walnut.zip', 'r')
-            myzip.extractall(path=ddir)
-            os.remove(ddir+"/walnut.zip")
-            print("Complete")
-        else:
-            print('Data folder exists at ' + ddir +'/valnut')
-
-        return ddir
+    def download_data(data_dir):
+        zip_url = 'https://zenodo.org/record/4822516/files/walnut.zip'
+        if input("Are you sure you want to download the dataset from " + zip_url + " ? (y/n)") == "y": 
+            print('Downloading Walnut dataset to ' + data_dir)
+            with urlopen(zip_url) as response:
+                with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
+                    zipfile.extractall(path = data_dir)            
+            print("Download complete")
 
 class KORN(DATA):
     @classmethod
-    def get(cls, **kwargs):
-        
-        ddir = kwargs.get('data_dir', data_dir)
-        cls.retrieve_data(**kwargs)
-        loader = NikonDataReader(file_name=ddir+'/Korn i kasse/47209 testscan korn01_recon.xtekct')
-        return loader.read()
-
-    def retrieve_data(**kwargs):
-        ddir = kwargs.get('data_dir', data_dir)
-        if os.path.isdir(ddir+'/Korn i kasse') == False:
-            print('Downloading Korn dataset to ' + ddir)
-            urlretrieve('https://zenodo.org/record/6874123/files/korn.zip', ddir + '/korn.zip')
-            myzip = ZipFile(ddir+'/korn.zip', 'r')
-            myzip.extractall(path=ddir)
-            os.remove(ddir+"/korn.zip")
-            print("Complete")
-        else:
-            print('Data folder exists at ' + ddir +'/Korn i kasse')
-        
-        return ddir
+    def get(cls, data_dir):
+        KORN = os.path.join('Korn i kasse','47209 testscan korn01_recon.xtekct')
+        try:
+            loader = ZEISSDataReader(file_name=os.path.join(data_dir,KORN))
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset not found in specifed data_dir: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(data_dir, cls.__name__)))
     
-class RemoteData(object):
-    def __init__(self, **kwargs):
-        self.data_dir = kwargs.get('data_dir', data_dir)
+    def download_data(data_dir):
+        zip_url = 'https://zenodo.org/record/6874123/files/korn.zip'
+        if input("Are you sure you want to download the dataset from " + zip_url + " ? (y/n)") == "y":
+            print('Downloading Walnut dataset to ' + data_dir)
+            with urlopen(zip_url) as response:
+                with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
+                    zipfile.extractall(path = data_dir)            
+            print("Download complete")
     
-
-
+# class RemoteData(object):
+#     WALNUT_URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
+#     WALNUT = os.path.join('valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+    
+#     KORN_URL = 'https://zenodo.org/record/6874123/files/korn.zip'
+#     KORN = '/Korn i kasse/47209 testscan korn01_recon.xtekct'
+    
 class TestData(object):
     '''Class to return test data
     
@@ -233,8 +227,8 @@ class TestData(object):
     SHAPES =  'shapes.png'
     RAINBOW =  'rainbow.png'
     
-    def __init__(self, **kwargs):
-        self.data_dir = kwargs.get('data_dir', data_dir)
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
         
     def load(self, which, size=None, scale=(0,1), **kwargs):
         '''

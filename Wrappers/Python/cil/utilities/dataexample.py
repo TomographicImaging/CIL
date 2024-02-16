@@ -24,7 +24,9 @@ from PIL import Image
 import os
 import os.path 
 import sys
-from cil.io import NEXUSDataReader
+from zipfile import ZipFile
+from urllib.request import urlretrieve
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 
 data_dir = os.path.abspath(os.path.join(
         os.path.dirname(__file__),
@@ -158,6 +160,58 @@ class SIMULATED_SPHERE_VOLUME(DATA):
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
+    
+class WALNUT(DATA):
+    @classmethod
+    def get(cls, **kwargs):
+        
+        ddir = kwargs.get('data_dir', data_dir)
+        cls.retrieve_data(**kwargs)
+        loader = ZEISSDataReader(file_name=ddir+'/valnut/valnut_2014-03-21_643_28/tomo-A/valnut_tomo-A.txrm')
+        return loader.read()
+    
+    def retrieve_data(**kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        if os.path.isdir(ddir+'/valnut') == False:
+            print('Downloading Walnut dataset to ' + ddir)
+            urlretrieve('https://zenodo.org/record/4822516/files/walnut.zip', ddir + '/walnut.zip')
+            myzip = ZipFile(ddir+'/walnut.zip', 'r')
+            myzip.extractall(path=ddir)
+            os.remove(ddir+"/walnut.zip")
+            print("Complete")
+        else:
+            print('Data folder exists at ' + ddir +'/valnut')
+
+        return ddir
+
+class KORN(DATA):
+    @classmethod
+    def get(cls, **kwargs):
+        
+        ddir = kwargs.get('data_dir', data_dir)
+        cls.retrieve_data(**kwargs)
+        loader = NikonDataReader(file_name=ddir+'/Korn i kasse/47209 testscan korn01_recon.xtekct')
+        return loader.read()
+
+    def retrieve_data(**kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        if os.path.isdir(ddir+'/Korn i kasse') == False:
+            print('Downloading Korn dataset to ' + ddir)
+            urlretrieve('https://zenodo.org/record/6874123/files/korn.zip', ddir + '/korn.zip')
+            myzip = ZipFile(ddir+'/korn.zip', 'r')
+            myzip.extractall(path=ddir)
+            os.remove(ddir+"/korn.zip")
+            print("Complete")
+        else:
+            print('Data folder exists at ' + ddir +'/Korn i kasse')
+        
+        return ddir
+    
+class RemoteData(object):
+    def __init__(self, **kwargs):
+        self.data_dir = kwargs.get('data_dir', data_dir)
+    
+
 
 class TestData(object):
     '''Class to return test data

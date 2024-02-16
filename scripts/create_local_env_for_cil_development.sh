@@ -74,7 +74,7 @@ if test $test_deps = 0; then
   conda_args+=(-c conda-forge -c intel -c defaults --override-channels)
 else
   conda_args+=(
-    astra-toolbox'>=1.9.9.dev5,<2.1'
+    astra-toolbox=2.1
     ccpi-regulariser=22.0.0
     cil-data
     cvxpy
@@ -85,6 +85,7 @@ else
     scikit-image
     tigre=2.4
     tomophantom=2.0.0
+    -c astra-toolbox
     -c conda-forge
     -c intel
     -c ccpi/label/dev

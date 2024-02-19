@@ -205,7 +205,7 @@ class Algorithm:
             raise ValueError('interval must be an integer >= 0')
         self.__update_objective_interval = value
 
-    def run(self, iterations=None, callbacks: Optional[list[Callback]]=None, verbose=1, **kwargs):
+    def run(self, iterations=None, callbacks=None, verbose=1, **kwargs):
         '''run upto :code:`iterations` with callbacks/logging.
 
         :param iterations: number of iterations to run. If not set the algorithm will

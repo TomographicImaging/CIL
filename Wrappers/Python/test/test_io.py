@@ -23,13 +23,14 @@ from utils import initialise_tests
 from cil.framework import AcquisitionGeometry
 import numpy as np
 import os
+import sys
 from cil.framework import ImageGeometry
 from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
-from cil.utilities.dataexample import data_dir
+import cil.utilities.dataexample
 from cil.utilities.quality_measures import mse
 from cil.utilities import dataexample
 import shutil
@@ -66,6 +67,10 @@ if has_astra:
 # change basedir to point to the location of the walnut dataset which can
 # be downloaded from https://zenodo.org/record/4822516
 # basedir = os.path.abspath('/home/edo/scratch/Data/Walnut/valnut_2014-03-21_643_28/tomo-A/')
+
+data_dir = os.path.abspath(
+    os.path.join(sys.prefix, 'share','cil')
+)
 basedir = data_dir
 filename = os.path.join(basedir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)

@@ -2626,9 +2626,29 @@ class TestMasker(unittest.TestCase):
         data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
-        
 
-        
+
+class TestPhaseRetriver(unittest.TestCase):       
+
+    def setUp(self):      
+        from cil.io import ZEISSDataReader
+        filename='/mnt/data/PhaseContrast/Phase_Contribution/Phase_Contribution/S5_barley_4x_1p3um_bin2_LE1_60kV_3s_1601.txrm'
+        self.data = ZEISSDataReader(file_name=filename).read()
+        self.data.reorder(order='tigre')
+
+    def test_PhaseRetriever_paganin(self): 
+
+        from cil.processors import PaganinPhaseRetriever
+        beta = 1e-4
+        delta = 1.
+        energy_eV = 30000
+
+        processor = PaganinPhaseRetriever.paganin(energy_eV, delta, beta, unit_multiplier=1, normalise=False, units_output='absorption')
+        processor.set_input(self.data)
+        phase_data = processor.get_output()
+        print(phase_data.max())
+        print(self.data.max())
+
 if __name__ == "__main__":
     
     d = TestDataProcessor()

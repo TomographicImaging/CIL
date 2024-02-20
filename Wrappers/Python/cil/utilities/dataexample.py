@@ -46,6 +46,28 @@ class INTERNALDATA(DATA):
         ddir = kwargs.get('data_dir', INTERNALDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
+    
+class REMOTEDATA(DATA):
+    PATH = ''
+    URL = ''
+
+    @classmethod
+    def download_from_url(cls, data_dir):
+        with urlopen(cls.URL) as response:
+            with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
+                zipfile.extractall(path = data_dir) 
+
+    @classmethod
+    def download_data(cls, data_dir):
+        if os.path.isfile(os.path.join(data_dir, cls.PATH)):
+            print("Dataset already exists in " + data_dir)
+        else:
+            if input("Are you sure you want to download the dataset from " + cls.URL + " ? (y/n)") == "y": 
+                print('Downloading dataset from ' + cls.URL) 
+                cls.download_from_url(data_dir)
+                print('Download complete')
+            else:
+                print('Download cancelled')
 
 class BOAT(INTERNALDATA):
     @classmethod
@@ -160,52 +182,35 @@ class SIMULATED_SPHERE_VOLUME(INTERNALDATA):
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
     
-class WALNUT(DATA):
-    @classmethod
-    def get(cls, data_dir):
-        WALNUT = os.path.join('valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
-        try:
-            loader = ZEISSDataReader(file_name=os.path.join(data_dir,WALNUT))
-            return loader.read()
-        except(FileNotFoundError):
-            raise(FileNotFoundError("Dataset not found in specifed data_dir: {} \n \
-                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(data_dir, cls.__name__)))
+class WALNUT(REMOTEDATA):
     
-    def download_data(data_dir):
-        zip_url = 'https://zenodo.org/record/4822516/files/walnut.zip'
-        if input("Are you sure you want to download the dataset from " + zip_url + " ? (y/n)") == "y": 
-            print('Downloading Walnut dataset to ' + data_dir)
-            with urlopen(zip_url) as response:
-                with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
-                    zipfile.extractall(path = data_dir)            
-            print("Download complete")
+    PATH = os.path.join('valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+    URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
 
-class KORN(DATA):
     @classmethod
     def get(cls, data_dir):
-        KORN = os.path.join('Korn i kasse','47209 testscan korn01_recon.xtekct')
         try:
-            loader = ZEISSDataReader(file_name=os.path.join(data_dir,KORN))
+            loader = ZEISSDataReader(file_name=os.path.join(data_dir,cls.PATH))
             return loader.read()
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset not found in specifed data_dir: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(data_dir, cls.__name__)))
-    
-    def download_data(data_dir):
-        zip_url = 'https://zenodo.org/record/6874123/files/korn.zip'
-        if input("Are you sure you want to download the dataset from " + zip_url + " ? (y/n)") == "y":
-            print('Downloading Walnut dataset to ' + data_dir)
-            with urlopen(zip_url) as response:
-                with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
-                    zipfile.extractall(path = data_dir)            
-            print("Download complete")
-    
-# class RemoteData(object):
-#     WALNUT_URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
-#     WALNUT = os.path.join('valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
-    
-#     KORN_URL = 'https://zenodo.org/record/6874123/files/korn.zip'
-#     KORN = '/Korn i kasse/47209 testscan korn01_recon.xtekct'
+     
+        
+
+class KORN(REMOTEDATA):
+    PATH = os.path.join('Korn i kasse','47209 testscan korn01_recon.xtekct')
+    URL = 'https://zenodo.org/record/6874123/files/korn.zip'
+
+    @classmethod
+    def get(cls, data_dir):
+        try:
+            loader = NikonDataReader(file_name=os.path.join(data_dir, cls.PATH))
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset not found in specifed data_dir: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(data_dir, cls.__name__)))
+
     
 class TestData(object):
     '''Class to return test data

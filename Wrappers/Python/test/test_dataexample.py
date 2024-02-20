@@ -26,6 +26,10 @@ import os, sys
 from testclass import CCPiTestClass
 import platform
 import numpy as np
+from unittest.mock import patch, MagicMock 
+from urllib import request
+from zipfile import ZipFile
+from io import StringIO
 
 initialise_tests()
 
@@ -149,3 +153,65 @@ class TestTestData(CCPiTestClass):
                                          .set_angles(np.linspace(0,360,300,False))
 
         self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+
+class TestRemoteData(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp_file = 'tmp.txt'
+        self.tmp_zip = 'tmp.zip'
+        with ZipFile(self.tmp_zip, 'w') as zipped_file:
+            zipped_file.writestr(self.tmp_file, np.array([1, 2, 3]))
+        with open(self.tmp_zip, 'rb') as zipped_file:
+            self.zipped_bytes = zipped_file.read()        
+    
+    def tearDown(self):
+        if os.path.exists(self.tmp_file):
+            os.remove(self.tmp_file)
+        if os.path.exists(self.tmp_zip):
+            os.remove(self.tmp_zip)
+
+    def mock_urlopen(self, mock_urlopen):
+        mock_response = MagicMock()
+        mock_response.read.return_value = self.zipped_bytes
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+    @patch('cil.utilities.dataexample.urlopen')
+    def test_unzip_remote_data(self, mock_urlopen):
+        self.mock_urlopen(mock_urlopen)
+        dataexample.REMOTEDATA.download_from_url('.')
+        self.assertTrue(os.path.isfile(self.tmp_file))
+
+    @patch('cil.utilities.dataexample.input', return_value='n')    
+    @patch('cil.utilities.dataexample.urlopen')
+    def test_download_data_input_n(self, mock_urlopen, input):
+        self.mock_urlopen(mock_urlopen)
+
+        # redirect print output
+        capturedOutput = StringIO()                 
+        sys.stdout = capturedOutput  
+
+        dataexample.WALNUT.download_data('.')
+
+        self.assertFalse(os.path.isfile(self.tmp_file))
+        self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
+        
+        # return to standard print output
+        sys.stdout = sys.__stdout__ 
+
+    @patch('cil.utilities.dataexample.input', return_value='y')    
+    @patch('cil.utilities.dataexample.urlopen')
+    def test_download_data_input_y(self, mock_urlopen, input):
+        self.mock_urlopen(mock_urlopen)
+
+        # redirect print output
+        capturedOutput = StringIO()                 
+        sys.stdout = capturedOutput  
+
+        dataexample.WALNUT.download_data('.')
+        self.assertTrue(os.path.isfile(self.tmp_file))
+        
+        # return to standard print output
+        sys.stdout = sys.__stdout__ 
+
+        

@@ -18,6 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+from os import unlink
 from tempfile import NamedTemporaryFile
 
 import numpy as np
@@ -1142,11 +1143,14 @@ class TestCallbacks(unittest.TestCase):
         def old_callback(iteration, objective, solution):
             print(f"Called {iteration} {objective} {solution}")
 
-        with NamedTemporaryFile() as log:
-            algo.run(20, callbacks=[callbacks.LogfileCallback(log.name)], callback=old_callback)
+        log = NamedTemporaryFile(delete=False)
+        log.close()
+        algo.run(20, callbacks=[callbacks.LogfileCallback(log.name)], callback=old_callback)
+        with open(log.name, 'r') as fd:
             self.assertListEqual(
                 ["64/83", "74/83", "83/83", ""],
-                [line.lstrip().decode().split(" ", 1)[0] for line in log])
+                [line.lstrip().split(" ", 1)[0] for line in fd.readlines()])
+        unlink(log.name)
 
         its = list(range(10, 90, 10))
         self.assertListEqual([-1] + its, algo.iterations)

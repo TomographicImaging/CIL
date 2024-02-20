@@ -29,11 +29,6 @@ from urllib.request import urlopen
 from io import BytesIO
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 
-# # this is the default location after a conda install
-# data_dir = os.path.abspath(
-#     os.path.join(sys.prefix, 'share','cil')
-# )
-
 class DATA(object):
     @classmethod
     def dfile(cls):
@@ -50,6 +45,10 @@ class INTERNALDATA(DATA):
 class REMOTEDATA(DATA):
     PATH = ''
     URL = ''
+
+    @classmethod
+    def get(cls, data_dir):
+        return None
 
     @classmethod
     def download_from_url(cls, data_dir):

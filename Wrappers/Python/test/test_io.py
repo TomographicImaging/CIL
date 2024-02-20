@@ -30,7 +30,6 @@ from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
-import cil.utilities.dataexample
 from cil.utilities.quality_measures import mse
 from cil.utilities import dataexample
 import shutil

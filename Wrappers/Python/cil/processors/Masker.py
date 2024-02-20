@@ -42,10 +42,6 @@ class Masker(DataProcessor):
     method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
         Interpolation method to use.
     
-    Returns
-    -------
-    DataContainer or its subclass with masked outliers
-
     '''
 
     @staticmethod

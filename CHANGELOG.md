@@ -1,5 +1,5 @@
 
-* x.x.x
+* 24.0.0
   - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
@@ -31,6 +31,7 @@
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`
+  - CIL plugin support for ASTRA-TOOLBOX version v2.1
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

@@ -2,7 +2,7 @@
 name: Feature request
 about: Request an improvement or a new feature.
 title: ''
-labels: 'Type: enhancement'
+labels: 'enhancement'
 ---
 #### Describe the new feature
 

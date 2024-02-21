@@ -1,3 +1,10 @@
+pull_request_templates:
+  - name: Template 1
+    about: Description of Template 1
+    path: .github/PULL_REQUEST_TEMPLATE/template1.md
+  - name: Template 2
+    about: Description of Template 2
+    path: .github/PULL_REQUEST_TEMPLATE/template2.md
 contact_links:
   - name: Discord CIL community
     url: https://discord.com/invite/9NTWu9MEGq

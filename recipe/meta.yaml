@@ -39,7 +39,7 @@ test:
     - tigre=2.4               # [ not osx ]
     - packaging
     - ccpi-regulariser=22.0.0 # [ not osx ]
-    - astra-toolbox=2.1       # [ not osx ]
+    - astra-toolbox=2.1=cuda* # [ not osx ]
 
   source_files:
     - ./Wrappers/Python/test # [win]

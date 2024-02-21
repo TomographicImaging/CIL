@@ -6,3 +6,9 @@ contact_links:
   - name: Contact us
     url: https://ccpi.ac.uk/cil/
     about: Contact us information in our landing page.
+  - name: Contributors PR
+    url: https://
+    about: Open a pull request as an external contributor.
+  - name: Developers PR
+    url: https://
+    about: Open a pull request as a team member.

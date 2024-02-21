@@ -4,27 +4,12 @@ about: Report an issue that you have encountered.
 title: ''
 labels: 'Type: bug'
 ---
-
 #### Summary
+<--!Please describe concisely the error you are encountering, specifying what goes wrong and what should have happened. If you get an error message, please post it completely. Consider also to post an image to illustrate more clearly if appropriate.-->
 
-<Provide information about the problem.>
+#### Additional information
 
-#### Steps to reproduce
+<--!Provide CIL version and OS version-->
+<--!e.g. import cil; print(cil.version)-->
 
-<Provide CIL version and instructions for reproducing this issue.>
 
-#### Expected behaviour
-
-<Explain how the software should behave.>
-
-#### Current behaviour
-
-<Provide information about the current behaviour.>
-
-#### Optional: error messages
-
-<Report relevant failure logs or error messages.>
-
-#### Optional: screenshots
-
-<Upload screenshots illustrating the problem.>

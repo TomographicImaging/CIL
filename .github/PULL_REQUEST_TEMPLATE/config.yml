@@ -1,8 +1,0 @@
-pull_request_templates:
-  - name: Contributor 
-    about: Open a pull request as an external contributor.
-    path: ./contributors.md
-  - name: Developer
-    about: Open a pull request as a member of our team.
-    path: ./developers.md
-

@@ -1,10 +1,7 @@
----
-name: Contributor 
-about: Open a pull request as an external contributor.
-title: ''
----
+Open a pull request as an external contributor
+----------------------------------------------
 ## Motivation behind this pull request.
-<Optional: Link any relevant issues.>
+<Optional: link any relevant issues.>
 
 ## Description of the changes you made.
 

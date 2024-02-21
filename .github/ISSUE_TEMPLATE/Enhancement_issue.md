@@ -13,7 +13,6 @@ labels: 'enhancement'
 <!--Provide information about the current behaviour and how the new feature fits into CIL.-->
 <!--Optional: provide an example showing the need of the feature.-->
 
-	
 #### Optional: proposed solution
 
 <!--Describe your proposed changes to implement the new feature.-->

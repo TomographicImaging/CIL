@@ -7,8 +7,8 @@ contact_links:
     url: https://ccpi.ac.uk/cil/
     about: Contact us information in our landing page.
   - name: Contributors PR
-    url: https://
+    url: https://github.com/TomographicImaging/CIL/
     about: Open a pull request as an external contributor.
   - name: Developers PR
-    url: https://
+    url: https://github.com/TomographicImaging/CIL/
     about: Open a pull request as a team member.

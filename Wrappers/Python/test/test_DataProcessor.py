@@ -23,6 +23,7 @@ from cil.framework import DataContainer
 from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
+from cil.utilities import quality_measures
 from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
@@ -30,7 +31,8 @@ from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinPhaseRetriever
+
 import gc
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
@@ -2628,26 +2630,27 @@ class TestMasker(unittest.TestCase):
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
 
 
-class TestPhaseRetriver(unittest.TestCase):       
+class TestPaganinPhaseRetriver(unittest.TestCase):       
 
     def setUp(self):      
         from cil.io import ZEISSDataReader
-        filename='/mnt/data/PhaseContrast/Phase_Contribution/Phase_Contribution/S5_barley_4x_1p3um_bin2_LE1_60kV_3s_1601.txrm'
-        self.data = ZEISSDataReader(file_name=filename).read()
-        self.data.reorder(order='tigre')
+        self.data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
-    def test_PhaseRetriever_paganin(self): 
+    def test_PaganinPhaseRetriever(self): 
 
-        from cil.processors import PaganinPhaseRetriever
-        beta = 1e-4
+        
+        beta = 5e-3
         delta = 1.
-        energy_eV = 30000
-
-        processor = PaganinPhaseRetriever.paganin(energy_eV, delta, beta, unit_multiplier=1, normalise=False, units_output='absorption')
+        energy_eV = 40000
+        unit_multiplier = 1e-3
+        processor = PaganinPhaseRetriever.paganin(energy_eV, delta, beta, unit_multiplier, units_output = 'absorption')
         processor.set_input(self.data)
         phase_data = processor.get_output()
-        print(phase_data.max())
-        print(self.data.max())
+        
+        absorption_data = self.data.log()*-1
+
+        self.assertLessEqual(quality_measures.mse(absorption_data, phase_data), 0.05)
+
 
 if __name__ == "__main__":
     

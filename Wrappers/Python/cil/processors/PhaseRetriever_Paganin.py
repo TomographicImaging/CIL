@@ -161,7 +161,7 @@ class PaganinPhaseRetrieval(Processor):
 
         self.filter = 1. + self.alpha*(FX**2 + FY**2)/self.magnification  
 
-    def phase_paganin(self, Image, normalise=False):
+    def phase_retrieval(self, Image, normalise=False):
         
         if normalise:
             Image /= np.mean(Image)
@@ -219,7 +219,7 @@ class PaganinPhaseRetrieval(Processor):
                 procs = []
                 for idx in range(j):
                     projection = data.get_slice(angle=i+idx).as_array()
-                    procs.append(delayed(self.phase_paganin)(projection, normalise=self.normalise))
+                    procs.append(delayed(self.phase_retrieval)(projection, normalise=self.normalise))
                 # call compute on j (< num_parallel_processes) processes concurrently
                 # this limits the amount of memory required to store the output of the 
                 # phase retrieval to j projections.

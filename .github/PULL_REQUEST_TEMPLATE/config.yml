@@ -1,8 +1,8 @@
 pull_request_templates:
-  - name: Template 1
-    about: Description of Template 1
+  - name: Contributor 
+    about: Open a pull request as an external contributor.
     path: ./contributors.md
-  - name: Template 2
-    about: Description of Template 2
+  - name: Developer
+    about: Open a pull request as a member of our team.
     path: ./developers.md
 

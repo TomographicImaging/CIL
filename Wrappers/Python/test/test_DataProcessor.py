@@ -2633,7 +2633,6 @@ class TestMasker(unittest.TestCase):
 class TestPaganinPhaseRetriver(unittest.TestCase):       
 
     def setUp(self):      
-        from cil.io import ZEISSDataReader
         self.data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
     def test_PaganinPhaseRetriever(self): 

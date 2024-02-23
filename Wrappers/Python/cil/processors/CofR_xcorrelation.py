@@ -33,12 +33,12 @@ class CofR_xcorrelation(Processor):
     Parameters
     ----------
     slice_index: int or str, optional
-        An integer defining the vertical slice to run the algorithm on or string='centre' specifying the central slice should be used
-    projection_index: int or tuple of ints, optional
+        An integer defining the vertical slice to run the algorithm on or string='centre' specifying the central slice should be used (default is 'centre')
+    projection_index: int or list of ints, optional
         An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
-        Or a tuple of ints specifying the two indices to be used for cross correlation.
+        Or a list of ints specifying the two indices to be used for cross correlation (default is 0)
     ang_tol: float, optional
-        The angular tolerance in degrees between the two input projections 180 degree gap
+        The angular tolerance in degrees between the two input projections 180 degree gap (default is 0.1)
     
     Returns
     -------
@@ -52,7 +52,8 @@ class CofR_xcorrelation(Processor):
         kwargs = {
                     'slice_index': slice_index,
                     'ang_tol': ang_tol,
-                    'projection_index': projection_index
+                    'projection_index': projection_index,
+                    '_indices' : None,
                  }
 
         super(CofR_xcorrelation, self).__init__(**kwargs)
@@ -78,52 +79,61 @@ class CofR_xcorrelation(Processor):
 
             if self.slice_index < 0 or self.slice_index >= data.get_dimension_size('vertical'):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
+              
+        # check if projection_index is either a tuple or list of length 2       
+        try:
+            len_check = False if len(self.projection_index) != 2 else True
+            index = list(self.projection_index)
+        # if projection_index does not have a length, put the object in a list
+        except:
+            len_check = True
+            index = [self.projection_index]
+        
+        if not len_check:
+            raise ValueError('Expected projection_index to be an int or list of 2 ints, got {0}'.format(self.projection_index))
+        
+        for angle in index:
+            # check if all the indices are int
+            if not isinstance(angle, int):
+                raise ValueError('Expected projection_index to be an int, got {0}'.format(type(angle)))
+            
+            # check if all the indices are in range 0 to the number of angles
+            if angle< 0  or angle>=data.geometry.config.angles.num_positions:
+                raise ValueError('projection_index is out of range. Must be between 0 and {0}. Got {1}'.format(data.geometry.config.angles.num_positions, self.projection_index))
 
-        if isinstance(self.projection_index, int):
-            if self.projection_index >= data.geometry.config.angles.num_positions:
-                    raise ValueError('projection_index is out of range. Must be less than {0}. Got {1}'.format(data.geometry.config.angles.num_positions, self.projection_index))
-        elif isinstance(self.projection_index, tuple):
-            for ind in self.projection_index:
-                if ind >= data.geometry.config.angles.num_positions:
-                    raise ValueError('projection_index is out of range. Must be less than {0}. Got {1}'.format(data.geometry.config.angles.num_positions, ind))
-        return True
-    
-    def _find_xcor_angle(self, geometry):
-        '''
-        Finds the pair of angles to use for cross correlation algorithm, by finding angle 180 degrees apart from projection_index with ang_tol
-        or using first two angles specified by projection_index tuple
-        '''
-
-        angles_deg = geometry.config.angles.angle_data.copy()
-        if geometry.config.angles.angle_unit == "radian":
+        angles_deg = data.geometry.config.angles.angle_data.copy()
+        if data.geometry.config.angles.angle_unit == "radian":
                 angles_deg *= 180/np.pi 
 
-        if isinstance(self.projection_index, int):
-            
-            # set the target projection to 0
-            angles_deg -= angles_deg[self.projection_index]
-            
-            #keep angles in range 0 to 360
-            angles_deg = angles_deg % 360
-    
-            ind = np.abs(angles_deg - 180).argmin()
-            ang_diff = abs(angles_deg[ind] - angles_deg[self.projection_index])
+        # if there is only 1 index specified, find the angle in the list closest to 180 degrees away from the index 
+        if len(index) == 1:
+            new_index = CofR_xcorrelation._return_180_index(angles_deg, self.projection_index)
+            index.append(new_index)
+        
+        # check the two angles are 180 degrees apart within the specified tolerance
+        ang_diff = (angles_deg[index[0]] - angles_deg[index[1]]) % 360
+        if abs(ang_diff-180) > self.ang_tol:
+            raise ValueError('Method requires projections 180+/-{0} degrees apart, for chosen projection angle {1} found closest angle {2}.\
+                            \nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, data.geometry.angles[index[0]], data.geometry.angles[index[1]]))
+        
+        self._indices = index
 
-            if abs(ang_diff-180) > self.ang_tol:
-                raise ValueError('Method requires projections 180+/-{0} degrees apart, for chosen projection angle {1} found closest angle {2}.\
-                                \nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, geometry.angles[self.projection_index], geometry.angles[ind]))
-            else:
-                return self.projection_index, ind
-            
-        elif isinstance(self.projection_index, tuple):
-            #keep angles in range 0 to 360
-            angles_deg = angles_deg % 360
-            angle_diff = abs(angles_deg[self.projection_index[1]]-angles_deg[self.projection_index[0]])
-            if abs(angle_diff-180) > self.ang_tol:
-                raise ValueError('Method requires projections 180+/-{0} degrees apart, found projection angles {1} and {2}.\
-                                \nPick different projection angles or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, geometry.angles[self.projection_index[1]], geometry.angles[self.projection_index[0]]))
-            else:
-                return self.projection_index
+        return True
+
+    @staticmethod
+    def _return_180_index(angles_deg, initial_index):
+        '''
+        Finds the index of the angle closest to 180 degrees from a specified initial angle, from a list of angles in degrees
+
+        '''
+        # set the target projection to 0
+        angles_deg -= angles_deg[initial_index]
+        
+        #keep angles in range 0 to 360
+        angles_deg = angles_deg % 360
+
+        return np.abs(angles_deg - 180).argmin()
+
 
 
     def process(self, out=None):
@@ -138,11 +148,10 @@ class CofR_xcorrelation(Processor):
 
         geometry = data.geometry
         
-        ind1, ind2 = self._find_xcor_angle(geometry)
         
         #cross correlate single slice with the 180deg one reversed
-        data1 = data.get_slice(angle=ind1).as_array()
-        data2 = np.flip(data.get_slice(angle=ind2).as_array())
+        data1 = data.get_slice(angle=self._indices[0]).as_array()
+        data2 = np.flip(data.get_slice(angle=self._indices[1]).as_array())
 
         border = int(data1.size * 0.05)
         lag = np.correlate(data1[border:-border],data2[border:-border],"full")

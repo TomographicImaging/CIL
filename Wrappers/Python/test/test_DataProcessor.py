@@ -29,6 +29,7 @@ from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
+from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 import gc
@@ -1431,7 +1432,126 @@ class TestSlicer(unittest.TestCase):
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
 
+class TestCofR_xcorrelation(unittest.TestCase):
+    def setUp(self):
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
 
+        self.angles_list = [numpy.array([590, 0, 2, -310.5, 1]),
+                       numpy.array([0.5, 10, 20, 180, 1]),
+                       numpy.array([-360,-300, -240, -180.5, 0]),
+                       numpy.array([-0.5, -90, -100, -179.5, 1])]
+        
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(self.angles_list[0]).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(numpy.ones([len(self.angles_list[0]), 2, 2]))
+        self.data_test = ad
+
+    def test_CofR_xcorrelation_init(self):
+        # test default values are set
+        processor = CofR_xcorrelation()
+        self.assertEqual(processor.slice_index, 'centre')
+        self.assertEqual(processor.projection_index, 0)
+        self.assertEqual(processor.ang_tol, 0.1)
+
+        # test non-default values are set
+        processor = CofR_xcorrelation(11, 12, 13)
+        self.assertEqual(processor.slice_index, 11)
+        self.assertEqual(processor.projection_index, 12)
+        self.assertEqual(processor.ang_tol, 13)
+
+    def test_CofR_xcorrelation_check_input(self):
+        
+        # test default values
+        processor = CofR_xcorrelation()
+        processor.set_input(self.data_DLS)
+        
+        # test there is no error when slice_index is specified with different values in range
+        slice_indices = [0, self.data_DLS.get_dimension_size('vertical')-1]
+        for slice_index in slice_indices:
+            processor = CofR_xcorrelation(slice_index=slice_index)
+            processor.check_input(self.data_DLS)
+
+        # test there is an error when slice index is specified with an un-recognised string, numbers out of range, or list
+        slice_indices = ['a', -10, self.data_DLS.get_dimension_size('vertical'), [0,1]]
+        for slice_index in slice_indices:
+            with self.assertRaises(ValueError):
+                processor = CofR_xcorrelation(slice_index=slice_index)
+                processor.check_input(self.data_DLS)
+        
+        # test an error is raised passing string or out of range indices to projection index 
+        projection_indices = ['a', [0, 'b'], -1, [self.data_DLS.get_dimension_size('angle'), 0]]
+        for projection_index in projection_indices:
+            with self.assertRaises(ValueError):
+                processor = CofR_xcorrelation(projection_index=projection_index)
+                processor.check_input(self.data_DLS)
+
+        # test there is no error when an angle can be found 180 degrees +/- tolerance from the projection_index,
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+        
+        # test there is an error when no angle can be found 180 degrees +/- tolerance from the projection_index  
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=0.1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+        # test there is no error when projection indices are specified as tuple 180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=[0,3], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+
+        # test there is an error when projection indices are specified as tuple >180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=[0,1], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+        # test there is an error when more than 2 projection indices are specified
+        processor = CofR_xcorrelation(projection_index=[0,3,1], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+    def test_CofR_xcorrelation_return_180_index(self):
+        # test finding angle 180 degrees apart to correlate with
+        for angles in self.angles_list:
+            index_180 = CofR_xcorrelation._return_180_index(angles, 0)
+            self.assertEqual(angles[3], angles[index_180])
+
+    def test_CofR_xcorrelation_process(self):
+        # test processor returns expected output with DLS data
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        processor.set_input(self.data_DLS)
+        data_out = processor.process()
+        self.assertAlmostEqual(6.33, data_out.geometry.config.system.rotation_axis.position[0],places=2) 
+        
+        # test processor returns expected output with DLS data using out
+        data = self.data_DLS
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        processor.set_input(data)
+        processor.process(out = data)
+        self.assertAlmostEqual(6.33, data.geometry.config.system.rotation_axis.position[0],places=2) 
+
+        # test processor returns expected (but less accurate) output with DLS data with limited angles
+        data_limited = Slicer(roi={'angle': ((abs(self.data_DLS.geometry.angles+86)).argmin(), (abs(self.data_DLS.geometry.angles-92)).argmin(), 1)})(self.data_DLS)
+        processor = CofR_xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=5)
+        processor.set_input(data_limited) 
+        processor.get_output(out=data_limited)
+        self.assertAlmostEqual(6.33, data_limited.geometry.config.system.rotation_axis.position[0],places=0) 
+
+        # test there is an error when the target angle is not within tolerance
+        processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
+        with self.assertRaises(ValueError):
+            processor.set_input(data_limited)           
+    
 class TestCentreOfRotation_parallel(unittest.TestCase):
     
     def setUp(self):
@@ -1439,49 +1559,6 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
-    def test_find_xcor_angle(self):
-
-        angles_list = [numpy.array([590, 0, 2, -310.5]),
-                       numpy.array([0.5, 10, 20, 180]),
-                       numpy.array([-360,-300, -240, -180.5, 0]),
-                       numpy.array([-0.5, -90, -100, -179.5])]
-        
-        # test finding angle 180 degrees apart to correlate with
-        for angles in angles_list:
-            ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles).set_panel((2,2))
-            ad = ag.allocate()
-            ad.fill(numpy.ones([len(angles), 2, 2]))
-
-            corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=1)
-            corr.set_input(ad)
-            ind1, ind2 = corr._find_xcor_angle(ag) 
-            self.assertEqual(angles[ind2], angles[3])
-
-            # test there is an error when the target angle is not within tolerance
-            with self.assertRaises(ValueError):
-                corr = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = (0, 3), ang_tol=0.1)
-                corr.set_input(ad)
-                corr._find_xcor_angle(ag)
-
-        # test using a tuple of projection indices
-        for angles in angles_list:
-            ag = AcquisitionGeometry.create_Parallel3D().set_angles(angles).set_panel((2,2))
-            ad = ag.allocate()
-            ad.fill(numpy.ones([len(angles), 2, 2]))
-
-            corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=(0, 3), ang_tol=1)
-            corr.set_input(ad)
-            ind1, ind2 = corr._find_xcor_angle(ag) 
-            self.assertEqual(angles[ind1], angles[0])
-            self.assertEqual(angles[ind2], angles[3])
-
-            # test there is an error when the target angle is not within tolerance
-            with self.assertRaises(ValueError):
-                corr = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=0.1)
-                corr.set_input(ad)
-                corr._find_xcor_angle(ag)
-
-        
     def test_CofR_xcorrelation(self):      
 
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
@@ -1494,18 +1571,6 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-        # test there is no error with limited angle data, and target angle below 180
-        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        data_limited = Slicer(roi={'angle': ((abs(data.geometry.angles-1)).argmin(), (abs(data.geometry.angles-179.5)).argmin(), 1)})(data)
-        processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=3)
-        processor.set_input(data_limited) 
-        processor.get_output(out=data_limited)
-
-        # test there is an error when the target angle is not within tolerance
-        with self.assertRaises(ValueError):
-            processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
-            processor.set_input(data_limited) 
-            processor.get_output(out=data_limited)
         
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):

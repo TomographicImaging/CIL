@@ -31,6 +31,8 @@
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`
+  - Allow `CentreOfRotationCorrector.xcorrelation` to accept a list of two values in `projection_index` to use for the correlation
+  - Bug fix in `CentreOfRotationCorrector.xcorrelation` finding correlation angles for limited angle data
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

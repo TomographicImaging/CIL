@@ -54,8 +54,21 @@ Finally, CIL can be run via a Jupyter Notebook enabled Docker container:
 docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:latest
 ```
 
-GPU support requires [`nvidia-container-toolkit`](https://github.com/NVIDIA/nvidia-container-toolkit) and an NVIDIA GPU.
-Omit the `--gpus all` to run without GPU support.
+> [!NOTE]
+> GPU support requires [`nvidia-container-toolkit`](https://github.com/NVIDIA/nvidia-container-toolkit) and an NVIDIA GPU.
+> Omit the `--gpus all` to run without GPU support.
+
+<!-- <br/> -->
+
+> [!IMPORTANT]
+> Folders can be shared with the correct (host) user permissions using
+> `--user $(id -u) --group-add users -v /local/path:/container/path`
+> where `/local/path` is an existing directory on your local (host) machine which will be mounted at `/container/path` in the docker container.
+
+<!-- <br/> -->
+
+> [!TIP]
+> See [jupyter-docker-stacks](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html) for more information.
 
 ## Getting Started with CIL
 
@@ -92,13 +105,13 @@ git submodule update --init --recursive
 To create a conda environment with all the dependencies for building CIL run the following shell script:
 
 ```sh
-sh scripts/create_local_env_for_cil_development.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+bash scripts/create_local_env_for_cil_development.sh
 ```
 
 Or with the CIL build and test dependencies:
 
 ```sh
-sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+bash scripts/create_local_env_for_cil_development.sh -t
 ```
 
 And then install CIL in to this environment using CMake.

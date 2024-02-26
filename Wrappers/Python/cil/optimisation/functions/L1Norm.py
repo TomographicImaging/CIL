@@ -19,7 +19,6 @@
 
 from cil.optimisation.functions import Function    
 from cil.framework import BlockDataContainer
-from cil.utilities.errors import InPlaceError
 import numpy as np
  
 def soft_shrinkage(x, tau, out=None): 

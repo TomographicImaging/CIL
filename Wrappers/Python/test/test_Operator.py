@@ -36,6 +36,8 @@ import logging
 from testclass import CCPiTestClass
 import scipy
 
+from cil.utilities.errors import InPlaceError
+
 
 
 initialise_tests()
@@ -45,9 +47,7 @@ def dt(steps):
 
 
 class TestOperator(CCPiTestClass):
-    def setUp(self):
-        numpy.random.seed(1)
-
+  
 
     def test_MatrixOperator(self):        
         m = 30

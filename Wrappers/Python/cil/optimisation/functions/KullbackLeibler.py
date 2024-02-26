@@ -190,7 +190,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
                             
         """        
         if  id(x)==id(out):
-            raise InPlaceError
+            raise InPlaceError(message="KullbackLeibler.proximal cannot be used in place")
         
         if out is None:        
             return 0.5 *( (x - self.eta - tau) + \

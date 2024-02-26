@@ -126,7 +126,7 @@ class Function(object):
 
         """
         if id(x)==id(out):
-            raise InPlaceError
+            raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
         
         try:
             tmp = x

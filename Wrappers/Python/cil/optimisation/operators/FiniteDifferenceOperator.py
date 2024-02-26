@@ -88,7 +88,7 @@ class FiniteDifferenceOperator(LinearOperator):
     def direct(self, x, out = None):
         
         if id(x)==id(out):
-            raise InPlaceError
+            raise InPlaceError(message="FiniteDifferenceOperator.direct cannot be used in place")
         
         x_asarr = x.as_array()
         

@@ -262,7 +262,7 @@ class TotalVariation(Function):
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""
 
         if id(x)==id(out):
-            raise InPlaceError
+            raise InPlaceError(message="TotalVariation.proximal cannot be used in place")
         
         
         if self.strong_convexity_constant > 0:

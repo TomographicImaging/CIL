@@ -1,5 +1,3 @@
-Open a pull request as a member of our team
--------------------------------------------
 ## Describe your changes
 
 ## Describe any testing you have performed

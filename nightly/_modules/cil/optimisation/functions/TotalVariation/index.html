@@ -463,7 +463,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-
+<span class="kn">from</span> <span class="nn">cil.utilities.errors</span> <span class="kn">import</span> <span class="n">InPlaceError</span>
 
 <div class="viewcode-block" id="TotalVariation"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.TotalVariation">[docs]</a><span class="k">class</span> <span class="nc">TotalVariation</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
@@ -660,7 +660,7 @@ document.write(`
 <span class="sd">          or initialised as the last iterate seen in the proximal calculation in the case warm_start=True .&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p2</span>
 
@@ -694,11 +694,15 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">strongly_convex_term</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="n">strongly_convex_term</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="n">strongly_convex_term</span>
 
 <div class="viewcode-block" id="TotalVariation.proximal"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.TotalVariation.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the proximal operator of the TotalVariation function at :code:`x` .&quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="nb">id</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InPlaceError</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;TotalVariation.proximal cannot be used in place&quot;</span><span class="p">)</span>
+        
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
             <span class="n">strongly_convex_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
@@ -738,7 +742,7 @@ document.write(`
         <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="c1"># dual variable - its content is overwritten during iterations</span>
-        <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_p2</span><span class="p">()</span>
         <span class="n">tmp_q</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -753,16 +757,16 @@ document.write(`
         <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
 
             <span class="n">t0</span> <span class="o">=</span> <span class="n">t</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="n">out</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">tau_reg_neg</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
 
             <span class="n">multip</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span><span class="o">/</span><span class="n">tau_reg_neg</span>
 
@@ -812,10 +816,10 @@ document.write(`
 
         <span class="c1"># Compute the Lipschitz parameter from the operator if possible</span>
         <span class="c1"># Leave it initialised to None otherwise</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">gradient_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; GradientOperator is created if it is not instantiated yet. The domain of the `_gradient`,</span>
 <span class="sd">        is created in the `__call__` and `proximal` methods. </span>
 

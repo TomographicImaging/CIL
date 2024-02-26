@@ -4263,7 +4263,7 @@ function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.functions.IndicatorBox.gradient">
-<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/IndicatorBox/#IndicatorBox.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.gradient" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/IndicatorBox/#IndicatorBox.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.IndicatorBox.gradient" title="Permalink to this definition">#</a></dt>
 <dd><p>IndicatorBox is not differentiable, so calling gradient will raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code></p>
 </dd></dl>
 
@@ -5480,6 +5480,25 @@ For more information, see <span id="id19">[<a class="reference internal" href="#
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.TotalVariation.gradient">
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span>  evaluated at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
+<div class="math notranslate nohighlight">
+\[F'(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer, the value of the gradient of the function at x or <cite>None</cite> if <cite>out</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.functions.TotalVariation.proximal_conjugate">
 <span class="sig-name descname"><span class="pre">proximal_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.proximal_conjugate" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> evaluated at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
@@ -5503,8 +5522,8 @@ For more information, see <span id="id19">[<a class="reference internal" href="#
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="cil.optimisation.functions.TotalVariation.gradient">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gradient</span></span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.gradient" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cil.optimisation.functions.TotalVariation.gradient_operator">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gradient_operator</span></span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.gradient_operator" title="Permalink to this definition">#</a></dt>
 <dd><p>GradientOperator is created if it is not instantiated yet. The domain of the <cite>_gradient</cite>,
 is created in the <cite>__call__</cite> and <cite>proximal</cite> methods.</p>
 </dd></dl>

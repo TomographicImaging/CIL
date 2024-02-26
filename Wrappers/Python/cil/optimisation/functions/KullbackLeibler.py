@@ -22,9 +22,9 @@ from cil.optimisation.functions import Function
 from numbers import Number
 import scipy.special
 import logging
-
+from cil.utilities.errors import InPlaceError
 try:
-    from numba import jit, prange
+    from numba import njit, prange
     has_numba = True
 except ImportError as ie:
     has_numba = False
@@ -189,6 +189,8 @@ class KullbackLeibler_numpy(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
                             
         """        
+        if  id(x)==id(out):
+            raise InPlaceError(message="KullbackLeibler.proximal cannot be used in place")
         
         if out is None:        
             return 0.5 *( (x - self.eta - tau) + \
@@ -236,7 +238,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
 if has_numba:
     
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal(x,b, tau, out, eta):
         for i in prange(x.size):
             X = x.flat[i]
@@ -247,7 +249,7 @@ if has_numba:
                     (4. * tau * b.flat[i]) 
                 )
             )
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_arr(x,b, tau, out, eta):
         for i in prange(x.size):
             t = tau.flat[i]
@@ -259,7 +261,7 @@ if has_numba:
                     (4. * t * b.flat[i]) 
                 )
             )
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_mask(x,b, tau, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
@@ -271,7 +273,7 @@ if has_numba:
                         (4. * tau * b.flat[i]) 
                     )
                 )
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_arr_mask(x,b, tau, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
@@ -285,7 +287,7 @@ if has_numba:
                     )
                 )
     # proximal conjugate
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_conjugate_arr(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -296,7 +298,7 @@ if has_numba:
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
                 )
         
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_conjugate(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -306,7 +308,7 @@ if has_numba:
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                 )
 
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_conjugate_arr_mask(x, b, eta, tau, out, mask):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -318,7 +320,7 @@ if has_numba:
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
                     )
         
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_proximal_conjugate_mask(x, b, eta, tau, out, mask):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
@@ -329,18 +331,18 @@ if has_numba:
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                     )
     # gradient
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_gradient(x, b, out, eta):
         for i in prange(x.size):
             out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_gradient_mask(x, b, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
                 out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
     
     # KL divergence
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_div(x, y, eta):
         accumulator = 0.
         for i in prange(x.size):
@@ -356,7 +358,7 @@ if has_numba:
                 # out.flat[i] = numpy.inf
                 return numpy.inf
         return accumulator
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_div_mask(x, y, eta, mask):
         accumulator = 0.
         for i in prange(x.size):
@@ -375,7 +377,7 @@ if has_numba:
         return accumulator
 
     # convex conjugate
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_convex_conjugate(x, b, eta):
         accumulator = 0.
         for i in prange(x.size):
@@ -389,7 +391,7 @@ if has_numba:
                 # else xlogy is 0 so it doesn't add to the accumulator
                 accumulator += eta.flat[i] * x_f
         return - accumulator
-    @jit(parallel=True, nopython=True)
+    @njit(parallel=True)
     def kl_convex_conjugate_mask(x, b, eta, mask):
         accumulator = 0.
         j = 0
@@ -455,7 +457,8 @@ class KullbackLeibler_numba(KullbackLeibler):
 
         if self.mask is not None:
             kl_gradient_mask(x.as_array(), self.b.as_array(), out_np, self.eta.as_array(), self.mask)         
-        kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())            
+        else:
+            kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())            
         out.fill(out_np)
 
         if should_return:

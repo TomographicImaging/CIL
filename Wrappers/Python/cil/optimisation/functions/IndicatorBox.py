@@ -178,7 +178,7 @@ class IndicatorBox(Function):
 
     def gradient(self, x, out=None):
         '''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''
-        raise NotImplementedError('The indicator box is not differentiable')
+        raise NotImplementedError('The IndicatorBox is not differentiable')
 
     def _proximal(self, outarr):
         raise NotImplementedError('Implement this in the derived class')

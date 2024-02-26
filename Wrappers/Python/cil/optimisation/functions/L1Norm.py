@@ -22,54 +22,53 @@ from cil.framework import BlockDataContainer
 from cil.utilities.errors import InPlaceError
 import numpy as np
  
-def soft_shrinkage(x, tau, out=None):
-    
-    r"""Returns the value of the soft-shrinkage operator at x.
-
-    Parameters
-    -----------
-    x : DataContainer
-        where to evaluate the soft-shrinkage operator.
-    tau : float, numpy ndarray, DataContainer
-    out : DataContainer, default None
-        where to store the result. If None, a new DataContainer is created.
-    
-    Returns
-    --------
-    the value of the soft-shrinkage operator at x: DataContainer.
-    """
-    if  id(x)==id(out):
-        raise InPlaceError(message="The soft_shrinkage function cannot be used in place" )
-
-    should_return = False
-    if out is None:
-        if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-            out = x * 0
-            outarr = out.as_array()
-            outarr.real = x.abs().as_array()
-            out.fill(outarr)
-        else:
-            out = x.abs()
-        should_return = True
-    else:
-        if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-            outarr = out.as_array()
-            outarr.real = x.abs().as_array()
-            outarr.imag = 0
-            out.fill(outarr)
-        else:
-            x.abs(out = out)
-    out -= tau
-    out.maximum(0, out = out)
-    if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-        out *= np.exp(1j*np.angle(x.as_array()))
-        
-    else:
-        out *= x.sign()
-    
-
-    if should_return:
-        return out        
+def soft_shrinkage(x, tau, out=None): 
+      
+     r"""Returns the value of the soft-shrinkage operator at x. 
+  
+     Parameters 
+     ----------- 
+     x : DataContainer 
+         where to evaluate the soft-shrinkage operator. 
+     tau : float, numpy ndarray, DataContainer 
+     out : DataContainer, default None 
+         where to store the result. If None, a new DataContainer is created. 
+      
+     Returns 
+     -------- 
+     the value of the soft-shrinkage operator at x: DataContainer. 
+     """ 
+  
+     should_return = False 
+     # get the sign of the input 
+     if x.dtype in [np.csingle, np.cdouble, np.clongdouble]: 
+         dsign = np.exp(1j*np.angle(x.as_array())) 
+     else: 
+         dsign = x.sign() 
+   
+     if out is None: 
+         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]: 
+             out = x * 0 
+             outarr = out.as_array() 
+             outarr.real = x.abs().as_array() 
+             out.fill(outarr) 
+         else: 
+             out = x.abs() 
+         should_return = True 
+     else: 
+         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]: 
+             outarr = out.as_array() 
+             outarr.real = x.abs().as_array() 
+             outarr.imag = 0 
+             out.fill(outarr) 
+         else: 
+             x.abs(out = out) 
+     out -= tau 
+     out.maximum(0, out = out) 
+     out *= dsign 
+      
+     if should_return: 
+         return out      
 
 class L1Norm(Function):
     r"""L1Norm function

@@ -24,7 +24,7 @@ import numpy as np
 from numbers import Number
 import warnings
 import logging
-
+from cil.utilities.errors import InPlaceError
 
 class TotalVariation(Function):
 
@@ -221,7 +221,7 @@ class TotalVariation(Function):
           or initialised as the last iterate seen in the proximal calculation in the case warm_start=True ."""
 
         if self._p2 is None:
-            return self.gradient.range_geometry().allocate(0)
+            return self.gradient_operator.range_geometry().allocate(0)
         else:
             return self._p2
 
@@ -255,11 +255,15 @@ class TotalVariation(Function):
         else:
             strongly_convex_term = 0
 
-        return self.regularisation_parameter * self.func(self.gradient.direct(x)) + strongly_convex_term
+        return self.regularisation_parameter * self.func(self.gradient_operator.direct(x)) + strongly_convex_term
 
     def proximal(self, x, tau, out=None):
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""
 
+        if id(x)==id(out):
+            raise InPlaceError(message="TotalVariation.proximal cannot be used in place")
+        
+        
         if self.strong_convexity_constant > 0:
 
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
@@ -299,7 +303,7 @@ class TotalVariation(Function):
         t = 1
 
         # dual variable - its content is overwritten during iterations
-        p1 = self.gradient.range_geometry().allocate(None)
+        p1 = self.gradient_operator.range_geometry().allocate(None)
         p2 = self._get_p2()
         tmp_q = p2.copy()
 
@@ -314,16 +318,16 @@ class TotalVariation(Function):
         should_return = False
         if out is None:
             should_return = True
-            out = self.gradient.domain_geometry().allocate(0)
+            out = self.gradient_operator.domain_geometry().allocate(0)
 
         for k in range(self.iterations):
 
             t0 = t
-            self.gradient.adjoint(tmp_q, out=out)
+            self.gradient_operator.adjoint(tmp_q, out=out)
             out.sapyb(tau_reg_neg, x, 1.0, out=out)
             self.projection_C(out, tau=None, out=out)
 
-            self.gradient.direct(out, out=p1)
+            self.gradient_operator.direct(out, out=p1)
 
             multip = (-self.L)/tau_reg_neg
 
@@ -373,10 +377,10 @@ class TotalVariation(Function):
 
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
-        self._L = (1./self.gradient.norm())**2
+        self._L = (1./self.gradient_operator.norm())**2
 
     @property
-    def gradient(self):
+    def gradient_operator(self):
         r""" GradientOperator is created if it is not instantiated yet. The domain of the `_gradient`,
         is created in the `__call__` and `proximal` methods. 
 

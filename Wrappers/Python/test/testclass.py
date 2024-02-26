@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from cil.framework import DataContainer
+from cil.framework import DataContainer, BlockDataContainer
 import numpy as np
 from utils import initialise_tests
 
@@ -59,3 +59,20 @@ class CCPiTestClass(unittest.TestCase):
     def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
         np.testing.assert_array_almost_equal(first, second, decimal)
         
+
+        
+    def assertDataArraysInContainerAllClose(self, container1, container2, rtol=1e-07, msg=None):
+        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        if isinstance(container1, BlockDataContainer):
+            for col in range(container1.shape[0]):
+                if issubclass(container1.get_item(col).__class__, DataContainer):
+                    np.testing.assert_allclose(
+                        container1.get_item(col).as_array(), 
+                        container2.get_item(col).as_array(), 
+                        rtol=rtol,
+                        err_msg=msg
+                        )
+                else:
+                    self.assertDataArraysInContainerAllClose(container1.get_item(col),container2.get_item(col), rtol=rtol,  msg=msg)
+        else:
+            np.testing.assert_allclose(container1.as_array(), container2.as_array(), rtol=rtol, err_msg=msg)

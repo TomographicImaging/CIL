@@ -19,6 +19,7 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
 from cil.framework import BlockDataContainer
+from cil.utilities.errors import InPlaceError
 from numpy import inf
 import numpy
 import logging
@@ -34,7 +35,7 @@ class SIRT(Algorithm):
 
     The SIRT algorithm is 
 
-    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) ),
+    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),
 
     where,
     :math:`M = \frac{1}{A*\mathbb{1}}`,
@@ -81,7 +82,7 @@ class SIRT(Algorithm):
 
     Examples
     --------
-    .. math:: \underset{x}{\mathrm{argmin}} \| x - d\|^{2}
+    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}
     
     >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5) 
 
@@ -197,15 +198,17 @@ class SIRT(Algorithm):
         self.operator.adjoint(self.r, out=self.tmp_x)
         self.x.sapyb(1.0, self.tmp_x, self._Dscaled, out=self.x)
 
-
         if self.constraint is not None:
-            # IndicatorBox allows inplace operation for proximal
-            self.constraint.proximal(self.x, tau=1, out=self.x)
+            try:
+                self.constraint.proximal(self.x, tau=1, out=self.x)
+            except InPlaceError:
+                self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
         r"""Returns the objective 
 
-        .. math:: \|A x - b\|^{2}
+        .. math:: \frac{1}{2}\|A x - b\|^{2}
 
         """
-        self.loss.append(self.r.squared_norm())
+        self.loss.append(0.5*self.r.squared_norm())
+     

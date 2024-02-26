@@ -21,7 +21,7 @@ from cil.optimisation.functions import Function
 from numbers import Number
 import scipy.special
 import logging
-
+from cil.utilities.errors import InPlaceError
 try:
     from numba import njit, prange
     has_numba = True
@@ -188,6 +188,8 @@ class KullbackLeibler_numpy(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
                             
         """        
+        if  id(x)==id(out):
+            raise InPlaceError(message="KullbackLeibler.proximal cannot be used in place")
         
         if out is None:        
             return 0.5 *( (x - self.eta - tau) + \

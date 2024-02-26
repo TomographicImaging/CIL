@@ -31,6 +31,8 @@
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`
+  - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
+  - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
@@ -45,6 +47,7 @@
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
   - Bug fix in the LinearOperator norm with an additional flag for the algorithm linearOperator.PowerMethod
   - Tidied up documentation in the framework folder
+  
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

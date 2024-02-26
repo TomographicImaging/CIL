@@ -1,9 +1,7 @@
-### Motivation behind this pull request.
-<!--Optional: link any relevant issues.-->
+## Description
+<!--overview of changes, reason/motivation, issue link(s), etc.-->
 
-### Description of the changes you made.
+## Example Usage
+<!--minimal working example-->
 
-### A minimal example that uses your changes. 
-<!--If possible, please provide a section of code that we can run to verify your changes.-->
-
-#### Thanks for your contribution!
+:heart: *Thanks for your contribution!*

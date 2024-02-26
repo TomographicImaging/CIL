@@ -23,7 +23,6 @@ from cil.framework import BlockDataContainer
 from numpy import inf
 import numpy
 import logging
-import matplotlib.pyplot as plt
 
 class SIRT(Algorithm):    
 

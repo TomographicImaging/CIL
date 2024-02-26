@@ -18,7 +18,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.functions import Function    
-from cil.framework import BlockDataContainer   
+from cil.framework import BlockDataContainer
+from cil.utilities.errors import InPlaceError
 import numpy as np
  
 def soft_shrinkage(x, tau, out=None):
@@ -37,6 +38,8 @@ def soft_shrinkage(x, tau, out=None):
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
     """
+    if  id(x)==id(out):
+        raise InPlaceError(message="The soft_shrinkage function cannot be used in place" )
 
     should_return = False
     if out is None:

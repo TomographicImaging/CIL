@@ -22,6 +22,7 @@ import warnings
 from numbers import Number
 import numpy as np
 from functools import reduce
+from cil.utilities.errors import InPlaceError
 
 
 class Function(object):
@@ -124,6 +125,9 @@ class Function(object):
         DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`. 
 
         """
+        if id(x)==id(out):
+            raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
+        
         try:
             tmp = x
             x.divide(tau, out=tmp)
@@ -339,8 +343,12 @@ class SumFunction(Function):
 
         """
 
-        if out is None:
-            for i, f in enumerate(self.functions):
+        if out is not None and id(x)==id(out):
+            raise InPlaceError
+        
+        if out is None:            
+            for i,f in enumerate(self.functions):
+
                 if i == 0:
                     ret = f.gradient(x)
                 else:
@@ -527,6 +535,9 @@ class ScaledFunction(Function):
         DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
 
         """
+        if out is not None and id(x)==id(out):
+            raise InPlaceError
+        
         try:
             tmp = x
             x.divide(tau, out=tmp)
@@ -809,6 +820,10 @@ class TranslateFunction(Function):
         -------
         DataContainer, the gradient of the translated function evaluated at :math:`x` or `None` if `out`.
         """
+        
+        if id(x)==id(out):
+            raise InPlaceError
+            
         try:
             x.subtract(self.center, out=x)
             tmp = x
@@ -842,8 +857,11 @@ class TranslateFunction(Function):
         Returns
         -------
         DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or `None` if `out`.
-
         """
+        
+        if id(x)==id(out):
+            raise InPlaceError
+            
         try:
             x.subtract(self.center, out=x)
             tmp = x

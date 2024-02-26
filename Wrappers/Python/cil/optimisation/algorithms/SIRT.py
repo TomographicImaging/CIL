@@ -20,6 +20,7 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
 from cil.framework import BlockDataContainer
+from cil.utilities.errors import InPlaceError
 from numpy import inf
 import numpy
 import logging
@@ -115,8 +116,7 @@ class SIRT(Algorithm):
             if lower is not None or upper is not None:
                 # IndicatorBox accepts None for lower and/or upper
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
-        self._in_place=isinstance(self.constraint, IndicatorBox)
-            
+        
         self._relaxation_parameter = 1
 
         # Set up scaling matrices D and M.
@@ -200,9 +200,9 @@ class SIRT(Algorithm):
         self.x.sapyb(1.0, self.tmp_x, self._Dscaled, out=self.x)
 
         if self.constraint is not None:
-            if self._in_place: # Can be removed once in-place calculations are checked to be safe for all functions
+            try:
                 self.constraint.proximal(self.x, tau=1, out=self.x)
-            else:
+            except InPlaceError:
                 self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):

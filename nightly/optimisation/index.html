@@ -949,7 +949,7 @@ the following problem</p>
 \[A x = b\]</div>
 <p>The SIRT algorithm is</p>
 <div class="math notranslate nohighlight">
-\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) ),\]</div>
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),\]</div>
 <p>where,
 <span class="math notranslate nohighlight">\(M = \frac{1}{A*\mathbb{1}}\)</span>,
 <span class="math notranslate nohighlight">\(D = \frac{1}{A^{T}\mathbb{1}}\)</span>,
@@ -985,7 +985,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
-\[\underset{x}{\mathrm{argmin}} \| x - d\|^{2}\]</div>
+\[\underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}\]</div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sirt</span> <span class="o">=</span> <span class="n">SIRT</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">operator</span> <span class="o">=</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1019,7 +1019,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update_objective" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the objective</p>
 <div class="math notranslate nohighlight">
-\[\|A x - b\|^{2}\]</div>
+\[\frac{1}{2}\|A x - b\|^{2}\]</div>
 </dd></dl>
 
 <dl class="py method">

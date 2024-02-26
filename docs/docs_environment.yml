@@ -32,4 +32,4 @@ dependencies:
   - nbsphinx
   - sphinx-gallery
   - sphinx-copybutton
-  - jupyter
+  - notebook

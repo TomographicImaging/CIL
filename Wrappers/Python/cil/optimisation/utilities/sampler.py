@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library (CIL) developed by CCPi
 #   (Collaborative Computational Project in Tomographic Imaging), with
 #   substantial contributions by UKRI-STFC and University of Manchester.

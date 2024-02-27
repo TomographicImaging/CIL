@@ -70,6 +70,29 @@ jobs:
         conda deactivate
         conda env remove -n "${{ steps.reqs.outputs.envname }}"
         sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
+  test:
+    defaults: {run: {shell: 'bash -el {0}'}}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+        numpy-version: [1.22]
+    steps:
+    - uses: actions/checkout@v4
+      with: {fetch-depth: 0, submodules: recursive}
+    - name: set requirements
+      run: sed -ri -e '/ python=/d' -e 's/(.* numpy=).*/\1${{ matrix.numpy-version }}/' scripts/requirements-test.yml
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        environment-file: scripts/requirements-test.yml
+        activate-environment: cil_dev
+    - name: build
+      run: |
+        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
+        cmake --build ./build --target install
+    - name: test
+      run: python -m unittest discover -v ./Wrappers/Python/test
   conda:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-latest
@@ -194,6 +217,6 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
   pass:
-    needs: [conda, docs, docker]
+    needs: [test-cuda, test, conda, docs, docker]
     runs-on: ubuntu-latest
     steps: [{run: echo success}]

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -70,7 +69,7 @@ class CentreOfRotationCorrector(DataProcessor):
 
         >>> processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)
         >>> processor.set_input(data)
-        >>> data_centred = processor.get_ouput()
+        >>> data_centred = processor.get_output()
 
 
         Note

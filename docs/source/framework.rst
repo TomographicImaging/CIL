@@ -1,5 +1,4 @@
-..     -*- coding: utf-8 -*-
-      Copyright 2019 United Kingdom Research and Innovation
+..    Copyright 2019 United Kingdom Research and Innovation
       Copyright 2019 The University of Manchester
     
       Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +21,7 @@ Framework
 
 
 AcquisitionGeometry
-==================
+===================
 
 The :code:`AcquisitionGeometry` class holds the system acquisition parameters. 
 

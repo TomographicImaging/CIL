@@ -94,4 +94,14 @@ class TestAdjointOperator(CCPiTestClass):
         np.testing.assert_allclose(lhs, rhs_b, atol=1e-3)         
 
 
-        
+    def test_adjoint_operator_and_dot(self):
+        ig = ImageGeometry(3,4,  dtype="complex")
+        G = GradientOperator(ig)
+        div = AdjointOperator(G)
+
+        x = G.domain.allocate("random_int")
+        y = G.range.allocate("random_int")
+        print(x.array)
+        res1 = G.direct(x).dot(y)
+        res2 = x.dot(div.direct(y))
+        self.assertAlmostEqual(res1,res2)

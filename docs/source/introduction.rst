@@ -1,4 +1,3 @@
-..     -*- coding: utf-8 -*-
       Copyright 2022 United Kingdom Research and Innovation
       Copyright 2022 The University of Manchester
     

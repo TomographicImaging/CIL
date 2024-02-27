@@ -14,7 +14,6 @@ class TestAdjointOperator(CCPiTestClass):
     
     def setUp(self):
         self.ig_real = ImageGeometry(3,4)
-        self.ig_complex = ImageGeometry(4,5, dtype="complex")
     
     def tearDown(self):
         pass   

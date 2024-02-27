@@ -387,6 +387,8 @@ class AdjointOperator(LinearOperator):
 
     Examples
     --------
+    :math: <\nabla x, y> = <x, \nabla^T y>
+    
     >>> ig = ImageGeometry(2,3) 
     >>> G = GradientOperator(ig)
     >>> div = AdjointOperator(G)

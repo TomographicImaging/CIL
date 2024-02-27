@@ -33,6 +33,7 @@
     - Added `Algorithm.run(callbacks: list[Callback])`
   - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
   - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
+  - Bug fix to allow safe in place calculation for the soft shrinkage algorithm
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

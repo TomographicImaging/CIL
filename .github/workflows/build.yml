@@ -36,11 +36,10 @@ on:
     - 'README.md'
 jobs:
   conda:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, python, cuda]
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      with: {fetch-depth: 0}
     - name: conda-build
       uses: TomographicImaging/conda-package-publish-action@v2
       with:

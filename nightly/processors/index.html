@@ -1135,17 +1135,37 @@ MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.processors.Masker">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">Masker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Masker/#Masker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker" title="Permalink to this definition">#</a></dt>
-<dd><p>Processor to fill missing values provided by mask. Please use the desiried method to configure a processor for your needs.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.processors.Masker.value">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Masker/#Masker.value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.value" title="Permalink to this definition">#</a></dt>
-<dd><p>This sets the masked values of the input data to the requested value.</p>
+<dd><p>Processor to fill missing values provided by mask.
+Please use the desired method to configure a processor for your needs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>value</strong> (<em>float</em><em>, </em><em>default=0</em>) – values to be assigned to missing elements</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values.
+Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
+<li><p><strong>mode</strong> (<em>{'value'</em><em>, </em><em>'mean'</em><em>, </em><em>'median'</em><em>, </em><em>'interpolate'}</em><em>, </em><em>default='value'</em>) – The method to fill in missing values</p></li>
+<li><p><strong>value</strong> (<em>float</em><em>, </em><em>default=0</em>) – Substitute all outliers with a specific value if method=’value’, otherwise discarded.</p></li>
+<li><p><strong>axis</strong> (<em>str</em><em> or </em><em>int</em>) – Specify axis as int or from ‘dimension_labels’ to calculate mean, median or interpolation
+(depending on mode) along that axis</p></li>
+<li><p><strong>method</strong> (<em>{'linear'</em><em>, </em><em>'nearest'</em><em>, </em><em>'zeros'</em><em>, </em><em>'linear'</em><em>, </em><em>'quadratic'</em><em>, </em><em>'cubic'</em><em>, </em><em>'previous'</em><em>, </em><em>'next'}</em><em>, </em><em>default='linear'</em>) – Interpolation method to use.</p></li>
 </ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.Masker.value">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Masker/#Masker.value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.value" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a Masker that sets the masked values of the input data to the requested value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values.
+Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
+<li><p><strong>value</strong> (<em>float</em><em>, </em><em>default=0</em>) – Values to be assigned to missing elements</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Masker processor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1153,13 +1173,18 @@ MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.Masker.mean">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Masker/#Masker.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.mean" title="Permalink to this definition">#</a></dt>
-<dd><p>This sets the masked values of the input data to the mean of the unmasked values across the array or axis.</p>
+<dd><p>Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – specify axis as int or from ‘dimension_labels’ to calculate mean.</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values.
+Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
+<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – Specify axis as int or from ‘dimension_labels’ to calculate mean.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Masker processor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1167,13 +1192,18 @@ MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.Masker.median">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Masker/#Masker.median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.median" title="Permalink to this definition">#</a></dt>
-<dd><p>This sets the masked values of the input data to the median of the unmasked values across the array or axis.</p>
+<dd><p>Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – specify axis as int or from ‘dimension_labels’ to calculate median.</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values.
+Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
+<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – Specify axis as int or from ‘dimension_labels’ to calculate median.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Masker processor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1181,15 +1211,19 @@ MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.Masker.interpolate">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Masker/#Masker.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.interpolate" title="Permalink to this definition">#</a></dt>
-<dd><p>This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.</p>
+<dd><p>Returns a Masker that operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – specify axis as int or from ‘dimension_labels’ to loop over and perform 1D interpolation.</p></li>
-<li><p><strong>method</strong> – One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next</p></li>
-<li><p><strong>method</strong> – str, default=’linear’</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values.
+Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
+<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – Specify axis as int or from ‘dimension_labels’ to loop over and perform 1D interpolation.</p></li>
+<li><p><strong>method</strong> (<em>{'linear'</em><em>, </em><em>'nearest'</em><em>, </em><em>'zeros'</em><em>, </em><em>'linear'</em><em>, </em><em>'quadratic'</em><em>, </em><em>'cubic'</em><em>, </em><em>'previous'</em><em>, </em><em>'next'}</em><em>, </em><em>default='linear'</em>) – Interpolation method to use.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Masker processor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1286,7 +1320,7 @@ volume (double-borders).</p>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">xcorrelation</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data_centred</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_ouput</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_centred</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1374,7 +1408,7 @@ Parameter: 2D projection with flat field (or stack)</p>
 <blockquote>
 <div><p>2D projection with dark field (or stack)</p>
 </div></blockquote>
-<p>Output: AcquisitionDataSetn</p>
+<p>Output: AcquisitionDataSet</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.Normaliser.estimate_normalised_error">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimate_normalised_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_dark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Normaliser/#Normaliser.estimate_normalised_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser.estimate_normalised_error" title="Permalink to this definition">#</a></dt>

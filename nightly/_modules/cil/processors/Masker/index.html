@@ -455,23 +455,48 @@ document.write(`
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">DataContainer</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
 
 <div class="viewcode-block" id="Masker"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker">[docs]</a><span class="k">class</span> <span class="nc">Masker</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Processor to fill missing values provided by mask. Please use the desiried method to configure a processor for your needs.</span>
+<span class="sd">    Processor to fill missing values provided by mask.</span>
+<span class="sd">    Please use the desired method to configure a processor for your needs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
+<span class="sd">        A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
+<span class="sd">        Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
+<span class="sd">        Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">    mode : {&#39;value&#39;, &#39;mean&#39;, &#39;median&#39;, &#39;interpolate&#39;}, default=&#39;value&#39;</span>
+<span class="sd">        The method to fill in missing values </span>
+<span class="sd">    value : float, default=0</span>
+<span class="sd">        Substitute all outliers with a specific value if method=&#39;value&#39;, otherwise discarded.</span>
+<span class="sd">    axis : str or int</span>
+<span class="sd">        Specify axis as int or from &#39;dimension_labels&#39; to calculate mean, median or interpolation</span>
+<span class="sd">        (depending on mode) along that axis</span>
+<span class="sd">    method : {&#39;linear&#39;, &#39;nearest&#39;, &#39;zeros&#39;, &#39;linear&#39;, &#39;quadratic&#39;, &#39;cubic&#39;, &#39;previous&#39;, &#39;next&#39;}, default=&#39;linear&#39;</span>
+<span class="sd">        Interpolation method to use.</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Masker.value"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.value">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the requested value.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the requested value.</span>
 
-<span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
-<span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
-<span class="sd">        :param value: values to be assigned to missing elements</span>
-<span class="sd">        :type value: float, default=0</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
+<span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
+<span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">        value : float, default=0</span>
+<span class="sd">            Values to be assigned to missing elements</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Masker processor</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
@@ -480,12 +505,20 @@ document.write(`
     
 <div class="viewcode-block" id="Masker.mean"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.mean">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the mean of the unmasked values across the array or axis.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.</span>
 
-<span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.  </span>
-<span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
-<span class="sd">        :param axis: specify axis as int or from &#39;dimension_labels&#39; to calculate mean. </span>
-<span class="sd">        :type axis: str, int</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
+<span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
+<span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">        axis : str, int</span>
+<span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to calculate mean.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Masker processor</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
@@ -494,12 +527,20 @@ document.write(`
     
 <div class="viewcode-block" id="Masker.median"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.median">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This sets the masked values of the input data to the median of the unmasked values across the array or axis.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.</span>
 
-<span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.  </span>
-<span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
-<span class="sd">        :param axis: specify axis as int or from &#39;dimension_labels&#39; to calculate median. </span>
-<span class="sd">        :type axis: str, int</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
+<span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
+<span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">        axis : str, int</span>
+<span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to calculate median.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Masker processor</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
@@ -508,14 +549,22 @@ document.write(`
     
 <div class="viewcode-block" id="Masker.interpolate"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.interpolate">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.</span>
 
-<span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.  </span>
-<span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
-<span class="sd">        :param axis: specify axis as int or from &#39;dimension_labels&#39; to loop over and perform 1D interpolation. </span>
-<span class="sd">        :type axis: str, int</span>
-<span class="sd">        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next</span>
-<span class="sd">        :param method: str, default=&#39;linear&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
+<span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
+<span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">        axis : str, int</span>
+<span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to loop over and perform 1D interpolation.</span>
+<span class="sd">        method : {&#39;linear&#39;, &#39;nearest&#39;, &#39;zeros&#39;, &#39;linear&#39;, &#39;quadratic&#39;, &#39;cubic&#39;, &#39;previous&#39;, &#39;next&#39;}, default=&#39;linear&#39;</span>
+<span class="sd">            Interpolation method to use.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Masker processor</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;interpolate&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
@@ -528,22 +577,6 @@ document.write(`
                  <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="n">axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to fill missing values provided by mask.</span>
-
-<span class="sd">        :param mask: A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values. Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
-<span class="sd">        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
-<span class="sd">        :param mode: a method to fill in missing values (value, mean, median, interpolate)</span>
-<span class="sd">        :type mode: str, default=value</span>
-<span class="sd">        :param value: substitute all outliers with a specific value</span>
-<span class="sd">        :type value: float, default=0</span>
-<span class="sd">        :param axis: specify axis as int or from &#39;dimension_labels&#39; to calculate mean or median in respective modes </span>
-<span class="sd">        :type axis: str or int</span>
-<span class="sd">        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next</span>
-<span class="sd">        :param method: str, default=&#39;linear&#39;</span>
-<span class="sd">        :return: DataContainer or it&#39;s subclass with masked outliers</span>
-<span class="sd">        :rtype: DataContainer or it&#39;s subclass   </span>
-<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mask&#39;</span><span class="p">:</span> <span class="n">mask</span><span class="p">,</span>
                   <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
@@ -590,11 +623,10 @@ document.write(`
         <span class="k">except</span><span class="p">:</span>
             <span class="n">mask_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">mask_invert</span> <span class="o">=</span> <span class="o">~</span><span class="n">mask_arr</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Mask expected to be a boolean array got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mask_arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
+        <span class="n">mask_arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mask_arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        
+        <span class="n">mask_invert</span> <span class="o">=</span> <span class="o">~</span><span class="n">mask_arr</span>
+            
         <span class="k">try</span><span class="p">:</span>
             <span class="n">axis_index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>             
         <span class="k">except</span><span class="p">:</span>
@@ -636,7 +668,7 @@ document.write(`
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;interpolate&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span> \
                                         <span class="s1">&#39;quadratic&#39;</span><span class="p">,</span> <span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="s1">&#39;previous&#39;</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong interpolation method, one of the follwoing is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> 
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong interpolation method, one of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> 
                                 <span class="s2">&quot;linear, nearest, zeros, linear, quadratic, cubic, previous, next&quot;</span><span class="p">)</span>
             
             <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span>

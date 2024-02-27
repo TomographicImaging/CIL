@@ -30,6 +30,8 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -40,6 +42,9 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developer_guide';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
@@ -47,6 +52,7 @@
         </script>
     <link rel="index" title="Index" href="../genindex/" />
     <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Tutorials" href="../demos/" />
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -197,6 +203,21 @@
                       </a>
                     </li>
                 
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
   </ul>
 </nav></div>
       
@@ -311,6 +332,21 @@ document.write(`
                       </a>
                     </li>
                 
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
   </ul>
 </nav></div>
         
@@ -390,11 +426,13 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#building-documentation-locally">Building documentation locally</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notebooks-gallery">Notebooks gallery</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions-guidelines">Contributions guidelines</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
 </ul>
 </div>
         <div class="sidebar-primary-item">
@@ -651,9 +689,9 @@ a HTTP server to view the documentation.</p>
 <li><p>Follow the instructions <a class="reference external" href="https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code">here</a> to create a conda environment and build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source</p></li>
 <li><p>Go to <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder</p></li>
 <li><p>Install packages from <code class="docutils literal notranslate"><span class="pre">docs/docs_environment.yml</span></code> (with ‘name’ changed to ENVIRONMENT_NAME) using <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">update</span> <span class="pre">-f</span> <span class="pre">docs_environment.yml</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code></p></li>
-<li><p>Go to build directory (<code class="docutils literal notranslate"><span class="pre">build/html</span></code> by default)</p></li>
-<li><p>Start a HTTP server to serve documentation</p></li>
+<li><p>Download the notebooks for rendering in the documentation with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">mkdemos.py</span></code></p></li>
+<li><p>Build the documentation <code class="docutils literal notranslate"><span class="pre">sphinx-build</span> <span class="pre">-b</span> <span class="pre">dirhtml</span> <span class="pre">source</span> <span class="pre">build</span></code></p></li>
+<li><p>Start a HTTP server to serve documentation with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span> <span class="pre">--directory</span> <span class="pre">build</span></code></p></li>
 </ol>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
@@ -667,11 +705,20 @@ cmake --build . --target install
 cd ../docs/
 conda update -n base -c defaults conda
 conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-make html
-cd build/html
-python3 -m http.server
+python mkdemos.py
+sphinx-build -b dirhtml source build
+python -m http.server -d build
 </pre></div>
 </div>
+</section>
+<section id="notebooks-gallery">
+<h3>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Permalink to this headline">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">mkdemos.py</span></code> script:</p>
+<ul class="simple">
+<li><p>downloads notebooks from external URLs to <code class="docutils literal notranslate"><span class="pre">source/demos/*.ipynb</span></code></p></li>
+<li><p>uses the <code class="docutils literal notranslate"><span class="pre">demos-template.rst</span></code> file to generate the gallery in <code class="docutils literal notranslate"><span class="pre">source/demos.rst</span></code></p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">nbsphinx</span></code> extension will convert the <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> files to HTML.</p>
 </section>
 </section>
 <section id="contributions-guidelines">
@@ -718,6 +765,15 @@ limitations under the License.</p>
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title">CIL Plugins</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="../demos/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div></div>
   

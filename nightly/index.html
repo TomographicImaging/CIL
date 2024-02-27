@@ -30,6 +30,8 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
     <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -40,6 +42,9 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
@@ -197,6 +202,21 @@
                       </a>
                     </li>
                 
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
   </ul>
 </nav></div>
       
@@ -311,6 +331,21 @@ document.write(`
                       </a>
                     </li>
                 
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
   </ul>
 </nav></div>
         
@@ -381,6 +416,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="utilities/">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plugins/">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos/">Tutorials</a></li>
 </ul>
 </div>
         <div class="sidebar-primary-item">
@@ -624,9 +660,27 @@ The code to reproduce the article results. <a class="github reference external" 
 <li class="toctree-l2"><a class="reference internal" href="developer_guide/#documentation">Documentation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="developer_guide/#docstrings">Docstrings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="developer_guide/#building-documentation-locally">Building documentation locally</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#notebooks-gallery">Notebooks gallery</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide/#contributions-guidelines">Contributions guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demos/">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demos/00_CIL_geometry/">A detailed look at CIL geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#The-structure-of-an-AcquisitionGeometry">The structure of an AcquisitionGeometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#Create-a-simple-AcquisitionGeometry">Create a simple AcquisitionGeometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#Create-an-offset-AcquisitionGeometry">Create an offset AcquisitionGeometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#Create-a-more-complex-AcquisitionGeometry">Create a more complex AcquisitionGeometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#The-structure-of-an-ImageGeometry">The structure of an ImageGeometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#Create-a-simple-ImageGeometry">Create a simple ImageGeometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/#Create-a-custom-ImageGeometry">Create a custom ImageGeometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/deriv2_cgls/#CIL-version-23.0.1">CIL version 23.0.1</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

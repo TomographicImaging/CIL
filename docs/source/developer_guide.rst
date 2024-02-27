@@ -1,5 +1,4 @@
-..     -*- coding: utf-8 -*-
-      Copyright 2020 United Kingdom Research and Innovation
+..    Copyright 2020 United Kingdom Research and Innovation
       Copyright 2020 The University of Manchester
     
       Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,7 +133,7 @@ Make sure that each contributed file contains the following text enclosed in the
 
 ::
 
-  Copyright 2022 United Kingdom Research and Innovation
+..Copyright 2022 United Kingdom Research and Innovation
   Copyright 2022 The University of Manchester
   Copyright [yyyy] [name of copyright owner]
 

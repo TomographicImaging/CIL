@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -23,7 +22,6 @@ from cil.framework import DataContainer
 from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
-from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
@@ -2521,15 +2519,33 @@ class TestMasker(unittest.TestCase):
         self.mask_manual = DataContainer(mask_manual, dimension_labels=self.data.dimension_labels) 
         self.mask_generated = MaskGenerator.special_values()(self.data)
 
+        # make a copy of mask_manual with 1s and 0s instead of bools:
+        mask_int_manual = mask_manual.astype(numpy.int32)
+        self.mask_int_manual = DataContainer(mask_int_manual, dimension_labels=self.data.dimension_labels)
+
+
     def test_Masker_Manual(self):
         self.Masker_check(self.mask_manual, self.data, self.data_init)
 
     def test_Masker_generated(self):
         self.Masker_check(self.mask_generated, self.data, self.data_init)
 
+    def test_Masker_with_integer_mask(self):
+        self.Masker_check(self.mask_int_manual, self.data, self.data_init)
+
+    def test_Masker_doesnt_modify_input_mask(self):
+        mask = self.mask_manual.copy()
+        self.Masker_check(self.mask_manual, self.data, self.data_init)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_manual.as_array())
+
+    def test_Masker_doesnt_modify_input_integer_mask(self):
+        mask = self.mask_int_manual.copy()
+        self.Masker_check(self.mask_int_manual, self.data, self.data_init)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_int_manual.as_array())
+
     def Masker_check(self, mask, data, data_init): 
 
-        # test vaue mode
+        # test value mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         res = m.process()

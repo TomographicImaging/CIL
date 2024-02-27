@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -38,6 +37,7 @@ else:
     
 initialise_tests()
 
+@unittest.skipIf((not has_skimage) , "Skip test with has_skimage {}".format( has_skimage))
 class TestQualityMeasures(CCPiTestClass):
     
     def setUp(self):
@@ -70,35 +70,29 @@ class TestQualityMeasures(CCPiTestClass):
             processor.set_input(id_coins_noisy )
             self.id_coins_noisy_sliced= processor.get_output()
 
-    @unittest.skipIf((not has_skimage) , "Skip test with has_skimage {}".format( has_skimage))
+    
     def test_mse1(self):
         res1 = mse(self.id_coins, self.id_coins_noisy)
         res2 = mean_squared_error(self.id_coins.as_array(), self.id_coins_noisy.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=5)
         
 
-    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_mse2(self):
         res1 = mse(self.dc1, self.dc2)
         res2 = mean_squared_error(self.dc1.as_array(), self.dc2.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=5)
     
-    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_psnr1(self):
         res1 = psnr(self.id_coins, self.id_coins_noisy, data_range = self.dc1.max())
         res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=3)
         
-    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_psnr2_default_data_range(self):
         res1 = psnr(self.id_coins, self.id_coins_noisy)
         res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
         np.testing.assert_almost_equal(res1, res2, decimal=3)
-        
-        
 
 
-    @unittest.skipIf((not has_skimage), "Skip test with  has_skimage {}".format( has_skimage))
     def test_psnr2(self):
         res1 = psnr(self.dc1, self.dc2, data_range = self.dc1.max())
         res2 = peak_signal_noise_ratio(self.dc1.as_array(), self.dc2.as_array())

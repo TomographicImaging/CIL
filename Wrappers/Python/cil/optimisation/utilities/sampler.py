@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library (CIL) developed by CCPi
 #   (Collaborative Computational Project in Tomographic Imaging), with
 #   substantial contributions by UKRI-STFC and University of Manchester.
@@ -560,6 +559,12 @@ class Sampler():
 
         Reference
         ----------
+        With thanks to Imraj Singh and Zeljko Kereta for their help with the initial implementation of the Herman Meyer sampling. Their implementation was used in:
+        
+        Singh I, et al. Deep Image Prior PET Reconstruction using a SIRF-Based Objective - IEEE MIC, NSS & RTSD 2022. https://discovery.ucl.ac.uk/id/eprint/10176077/1/MIC_Conference_Record.pdf
+        
+        The sampling method was introduced in: 
+        
         Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
 
         Returns

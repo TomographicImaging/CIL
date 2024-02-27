@@ -1,5 +1,6 @@
 
 * x.x.x
+  - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
@@ -13,15 +14,25 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  - Added the a `Sampler` class as a CIL optimisation utility 
+  - Added the a `Sampler` class as a CIL optimisation utility
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None
   - Bug fix in the adjoint of the Diagonal Operator for complex values
   - Update conda build action to v2 for 2.5x quicker builds
-  - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
+  - Add docker image, test & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
+  - Functions updated to use sapyb
+  - Fix KullbackLeibler numba gradient ignoring mask
+  - show1D slice_list parameter can now be of type tuple
+  - Deprecated `Algorithm`'s `max_iteration`, `log_file`, `**kwargs`, `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output`, `verbose_header`, `run(print_interval)`
+  - Added `optimisation.utilities.callbacks`
+    - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
+    - Deprecated `Algorithm.run(callback: Callable)`
+    - Added `Algorithm.run(callbacks: list[Callback])`
+  - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
+  - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
   - Allow Masker to take integer arrays in addition to boolean
 
 * 23.1.0
@@ -37,6 +48,7 @@
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
   - Bug fix in the LinearOperator norm with an additional flag for the algorithm linearOperator.PowerMethod
   - Tidied up documentation in the framework folder
+  
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.

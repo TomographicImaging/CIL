@@ -317,6 +317,7 @@ class TestOperator(CCPiTestClass):
             
 
     def test_PowerMethod(self):
+        numpy.random.seed(2)
         # 2x2 real matrix, dominant eigenvalue = 2
         M1 = numpy.array([[1,0],[1,2]], dtype=float)
         M1op = MatrixOperator(M1)
@@ -356,6 +357,7 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,150)
         numpy.testing.assert_almost_equal(res1, 3.1624439599276974, decimal=3) 
         res_scipy = scipy.linalg.eig(M1)
+        print(numpy.abs(res_scipy[0]).max())
         numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)        
                      
         # 2x2 non-diagonalisable nilpotent matrix

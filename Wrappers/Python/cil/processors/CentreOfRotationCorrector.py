@@ -69,7 +69,7 @@ class CentreOfRotationCorrector(DataProcessor):
 
         >>> processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)
         >>> processor.set_input(data)
-        >>> data_centred = processor.get_ouput()
+        >>> data_centred = processor.get_output()
 
 
         Note

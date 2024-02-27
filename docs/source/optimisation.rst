@@ -132,7 +132,7 @@ This is an area of development for CIL.
 
 SPDHG
 -----
-Stochastic PRimal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG and deals with optimisation problems of the form: 
+Stochastic Primal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG and deals with optimisation problems of the form: 
     
     .. math::
     
@@ -176,25 +176,28 @@ Alternatively, consider optimisation problems of the form:
 
 .. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
 
-where :math:`n` is the number of functions.  CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
-Child classes of this abstract base class can define different approximate gradients with different mathematical properties. Combining these approximate gradients with deterministic optimisation algorithms
+where :math:`n` is the number of functions.  Where there is a large number of :math:`F_i` or their gradients are expensive to calculate stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
+
+The idea for this class and its sum functions is to consider that some stochastic optimisation algorithms can be viewed as deterministic gradient descent algorithms replacing the gradient with an approximate gradient. For example Stochasstic Gradient Descent replaces the gradient in Gradient Descent with the gradient of just one of the :math:`F_i`. 
+ 
+CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation  of a sum function with an approximate gradient. Child classes of this abstract base class can define different approximate gradients with different mathematical properties. Combining these approximate gradients with deterministic optimisation algorithms
 leads to different stochastic optimisation algorithms. 
 
 For example in the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
 
-+---------------+-------+------------+----------------+
-|               | GD    | ISTA       | FISTA          |
-+---------------+-------+------------+----------------+
-| SGFunction    | SGD   | Prox-SGD   | Acc-Prox-SGD   |
-+---------------+-------+------------+----------------+
-| SAGFunction   | SAG   | Prox-SAG   | Acc-Prox-SAG   |
-+---------------+-------+------------+----------------+
-| SAGAFunction  | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
-+---------------+-------+------------+----------------+
-| SVRGFunction  | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
-+---------------+-------+------------+----------------+
-| LSVRGFunction | LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
-+---------------+-------+------------+----------------+
++----------------+-------+------------+----------------+
+|                | GD    | ISTA       | FISTA          |
++----------------+-------+------------+----------------+
+| SGFunction     | SGD   | Prox-SGD   | Acc-Prox-SGD   |
++----------------+-------+------------+----------------+
+| SAGFunction\*  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
++----------------+-------+------------+----------------+
+| SAGAFunction\* | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
++----------------+-------+------------+----------------+
+| SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
++----------------+-------+------------+----------------+
+| LSVRGFunction\*| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
++----------------+-------+------------+----------------+
 
 \*In development 
 

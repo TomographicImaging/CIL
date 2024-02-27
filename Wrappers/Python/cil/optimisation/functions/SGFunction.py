@@ -52,8 +52,6 @@ class SGFunction(ApproximateGradientSumFunction):
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)} or nothing if `out`  
         """ 
         
-        
-        self._update_data_passes(1/self.num_functions)
         self._update_data_passes_indices([function_num])
 
         # compute gradient of randomly selected(function_num) function

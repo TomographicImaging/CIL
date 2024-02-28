@@ -6,9 +6,3 @@ contact_links:
 - name: Docs
   url: https://tomographicimaging.github.io/CIL
   about: CIL documentation website
-- name: Pull Request
-  url: https://github.com/TomographicImaging/CIL/compare/master?expand=1
-  about: Open a pull request
-- name: Dev PR
-  url: https://github.com/TomographicImaging/CIL/compare/master?template=developers.md
-  about: please append `?template=developers.md` to the URL before submitting

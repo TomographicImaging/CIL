@@ -25,15 +25,15 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     r'''Processor to convert from transmission measurements to absorption
     based on the Beer-Lambert law
-    
+
     :param white_level: A float defining incidence intensity in the Beer-Lambert law.
     :type white_level: float, optional
     :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level
     :type min_intensity: float, optional
     :return: returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if 'out' is passed
     :rtype: AcquisitionData, ImageData or DataContainer
-    
-    Processor first divides by white_level (default=1) and then take negative logarithm. 
+
+    Processor first divides by white_level (default=1) and then take negative logarithm.
     Elements below threshold (after division by white_level) are set to threshold.
     '''
 
@@ -46,9 +46,9 @@ class TransmissionAbsorptionConverter(DataProcessor):
                   'white_level': white_level}
 
         super(TransmissionAbsorptionConverter, self).__init__(**kwargs)
-    
+
     def check_input(self, data):
-        
+
         if not (issubclass(type(data), DataContainer)):
             raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n' +
@@ -57,7 +57,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         if data.min() <= 0 and self.min_intensity <= 0:
             raise ValueError('Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.')
 
-        return True 
+        return True
 
     def process(self, out=None):
 
@@ -84,7 +84,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         #beer-lambert
         numpy.log(arr_in,out=arr_out)
         numpy.negative(arr_out,out=arr_out)
-        
+
         out.fill(arr_out)
 
         if return_val:

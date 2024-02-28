@@ -40,7 +40,7 @@ class CofR_xcorrelation(Processor):
     '''
 
     def __init__(self, slice_index='centre', projection_index=0, ang_tol=0.1):
-        
+
         kwargs = {
                     'slice_index': slice_index,
                     'ang_tol': ang_tol,
@@ -52,7 +52,7 @@ class CofR_xcorrelation(Processor):
     def check_input(self, data):
         if not isinstance(data, AcquisitionData):
             raise Exception('Processor supports only AcquisitionData')
-        
+
         if data.geometry == None:
             raise Exception('Geometry is not defined.')
 
@@ -75,7 +75,7 @@ class CofR_xcorrelation(Processor):
                 raise ValueError('projection_index is out of range. Must be less than {0}. Got {1}'.format(data.geometry.config.angles.num_positions, self.projection_index))
 
         return True
-    
+
     def process(self, out=None):
 
 
@@ -91,7 +91,7 @@ class CofR_xcorrelation(Processor):
         angles_deg = geometry.config.angles.angle_data.copy()
 
         if geometry.config.angles.angle_unit == "radian":
-            angles_deg *= 180/np.pi 
+            angles_deg *= 180/np.pi
 
         #keep angles in range -180 to 180
         while angles_deg.min() <=-180:
@@ -101,15 +101,15 @@ class CofR_xcorrelation(Processor):
             angles_deg[angles_deg>180] -= 360
 
         target = angles_deg[self.projection_index] + 180
-        
+
         if target <= -180:
             target += 360
         elif target > 180:
 
-            target -= 360     
+            target -= 360
 
         ind = np.abs(angles_deg - target).argmin()
-        
+
         ang_diff = abs(angles_deg[ind] - angles_deg[0])
         if abs(ang_diff-180) > self.ang_tol:
             raise ValueError('Method requires projections at 180 +/- {0} degrees interval, got {1}.\nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, ang_diff))
@@ -118,12 +118,12 @@ class CofR_xcorrelation(Processor):
         data1 = data.get_slice(angle=0).as_array()
         data2 = np.flip(data.get_slice(angle=ind).as_array())
 
-    
+
         border = int(data1.size * 0.05)
         lag = np.correlate(data1[border:-border],data2[border:-border],"full")
 
         ind = lag.argmax()
-        
+
         #fit quadratic to 3 centre points
         a = (lag[ind+1] + lag[ind-1] - 2*lag[ind]) * 0.5
         b = a + lag[ind] - lag[ind-1]
@@ -137,7 +137,7 @@ class CofR_xcorrelation(Processor):
 
         #set up new geometry
         new_geometry.config.system.rotation_axis.position[0] = shift * geometry.config.panel.pixel_size[0]
-        
+
         logger.info("Centre of rotation correction found using cross-correlation")
         logger.info("Calculated from slice: %s", str(self.slice_index))
         logger.info("Centre of rotation shift = %f pixels", shift)

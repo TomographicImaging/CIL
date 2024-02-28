@@ -27,7 +27,7 @@ initialise_tests()
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
     import astra
-    
+
 def setup_parameters(self):
 
     self.backend = 'astra'
@@ -89,7 +89,7 @@ class Test_Parallel2D_Projectors_CPU_sim(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
-        self.tolerance_fp = 0.16 
+        self.tolerance_fp = 0.16
 
 
 class Test_Parallel2D_Projectors_CPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):

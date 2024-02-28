@@ -26,4 +26,3 @@ from .AbsorptionTransmissionConverter import AbsorptionTransmissionConverter
 from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter
 from .Masker import Masker
 from .Padder import Padder
-

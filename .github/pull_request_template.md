@@ -1,9 +1,46 @@
-### Motivation behind this pull request.
-<!--Optional: link any relevant issues.-->
+## Description
+<!--overview of changes, reason/motivation, issue link(s), etc.-->
 
-### Description of the changes you made.
+## Example Usage
+<!--minimal working example-->
 
-### A minimal example that uses your changes. 
-<!--If possible, please provide a section of code that we can run to verify your changes.-->
+:heart: *Thanks for your contribution!*
 
-#### Thanks for your contribution!
+
+
+
+
+
+
+<!-- please IGNORE the below if you aren't a CIL team member
+
+blame GH for this text: https://github.com/orgs/community/discussions/81319
+
+## Changes
+
+
+## Testing you performed
+> Please add any demo scripts to https://github.com/TomographicImaging/CIL-Demos/tree/main/misc
+
+
+## Related issues/links
+
+
+## Checklist
+
+- [ ] I have performed a self-review of my code
+- [ ] I have added docstrings in line with the guidance in the developer guide
+- [ ] I have updated the relevant documentation
+- [ ] I have implemented unit tests that cover any new or modified functionality
+- [ ] CHANGELOG.md has been updated with any functionality change
+- [ ] Request review from all relevant developers
+- [ ] Change pull request label to 'Waiting for review'
+
+## Contribution Notes
+
+Please read and adhere to the [developer guide](https://tomographicimaging.github.io/CIL/nightly/developer_guide/) and local patterns and conventions.
+
+- [ ] The content of this Pull Request (the Contribution) is intentionally submitted for inclusion in CIL (the Work) under the terms and conditions of the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) License
+- [ ] I confirm that the contribution does not violate any intellectual property rights of third parties
+
+--->

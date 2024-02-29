@@ -161,14 +161,24 @@ docker build . -t ghcr.io/tomographicimaging/cil
 
 If you use CIL in your research, please include citations to **both** the software on Zenodo, and a CIL paper:
 
-[1] Pasca, E., Jørgensen, J. S., Papoutsellis, E., Ametova, E., Fardell, G., Thielemans, K., Murgatroyd, L., Duff, M., & Robarts, H. (2023). Core Imaging Library (CIL). Zenodo. https://doi.org/10.5281/zenodo.4746198
+[1] E. Pasca, J. S. Jørgensen, E. Papoutsellis, E. Ametova, G. Fardell, K. Thielemans, L. Murgatroyd, M. Duff and H. Robarts (2023)
+Core Imaging Library (CIL)
+Zenodo [software archive]
+**DOI:** https://doi.org/10.5281/zenodo.4746198
 
 
 In most cases, the first CIL paper will be the appropriate choice:
 
-[2] Jørgensen JS et al. 2021 [Core Imaging Library Part I: a versatile python framework for tomographic imaging](https://doi.org/10.1098/rsta.2020.0192). Phil. Trans. R. Soc. A 20200192. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I) [Pre-print](https://arxiv.org/abs/2102.04560)
+[2] J. S. Jørgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart and P. J. Withers (2021)
+Core Imaging Library - Part I: a versatile Python framework for tomographic imaging. 
+Phil. Trans. R. Soc. A. 379: 20200192. 
+**DOI:** https://doi.org/10.1098/rsta.2020.0192 
+**Code:** https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I
 
 However, if your work is more closely related to topics covered in our second CIL paper then please additionally or alternatively reference the second paper:
 
-[3] Papoutsellis E et al. 2021 [Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
-tomography](https://doi.org/10.1098/rsta.2020.0193). Phil. Trans. R. Soc. A 20200193. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II) [Pre-print](https://arxiv.org/abs/2102.06126)
+[3] E. Papoutsellis, E. Ametova, C. Delplancke, G. Fardell, J. S. Jørgensen, E. Pasca, M. Turner, R. Warr, W. R. B. Lionheart and P. J. Withers (2021)
+Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral tomography.
+Phil. Trans. R. Soc. A. 379: 20200193. 
+**DOI:** https://doi.org/10.1098/rsta.2020.0193)
+**Code:** https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II

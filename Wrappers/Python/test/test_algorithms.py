@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -637,7 +636,7 @@ class TestAlgorithms(CCPiTestClass):
 
 
 
-class TestSIRT(unittest.TestCase):
+class TestSIRT(CCPiTestClass):
 
 
     def setUp(self):
@@ -757,7 +756,31 @@ class TestSIRT(unittest.TestCase):
 
         self.assertFalse(np.any(sirt.D == np.inf))
 
+    def test_SIRT_with_TV(self):
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        ig = data.geometry
+        A=IdentityOperator(ig)
+        constraint=TotalVariation(warm_start=False, max_iteration=100)
+        initial=ig.allocate('random', seed=5)
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=2, constraint=constraint)
+        sirt.run(2, verbose=0)
+        f=LeastSquares(A,data, c=0.5)
+        fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
+        fista.run(100, verbose=0)
+        self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
+        
+    def test_SIRT_with_TV_warm_start(self):
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        ig = data.geometry
+        A=IdentityOperator(ig)
+        constraint=1e6*TotalVariation(warm_start=True, max_iteration=100)
+        initial=ig.allocate('random', seed=5)
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=150, constraint=constraint)
+        sirt.run(25, verbose=0)
 
+        self.assertNumpyArrayAlmostEqual(sirt.x.as_array(), ig.allocate(0.25).as_array(),3)
+        
+    
 class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")

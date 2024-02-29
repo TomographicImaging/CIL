@@ -89,7 +89,7 @@ class CofR_xcorrelation(Processor):
             index = [self.projection_index]
         
         if not len_check:
-            raise ValueError('Expected projection_index to be an int or list of 2 ints, got {0}'.format(self.projection_index))
+            raise ValueError('Expected projection_index to be an int or list/tuple of 2 ints, got {0}'.format(self.projection_index))
         
         for angle in index:
             # check if all the indices are int

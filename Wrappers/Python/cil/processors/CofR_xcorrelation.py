@@ -98,7 +98,7 @@ class CofR_xcorrelation(Processor):
             
             # check if all the indices are in range 0 to the number of angles
             if angle< 0  or angle>=data.geometry.config.angles.num_positions:
-                raise ValueError('projection_index is out of range. Must be between 0 and {0}. Got {1}'.format(data.geometry.config.angles.num_positions, self.projection_index))
+                raise ValueError('projection_index is out of range. Must be between 0 and {0}. Got {1}'.format(data.geometry.config.angles.num_positions-1, self.projection_index))
 
         angles_deg = data.geometry.config.angles.angle_data.copy()
         if data.geometry.config.angles.angle_unit == "radian":

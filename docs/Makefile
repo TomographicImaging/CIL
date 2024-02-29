@@ -1,4 +1,3 @@
-## -*- coding: utf-8 -*-
 ##  Copyright 2019 United Kingdom Research and Innovation
 ##  Copyright 2019 The University of Manchester
 ##

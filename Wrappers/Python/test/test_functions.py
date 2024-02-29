@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -22,8 +21,9 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
+from cil.utilities.errors import InPlaceError
 from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, DataContainer
+    VectorGeometry, VectorData, BlockDataContainer, DataContainer, AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -31,9 +31,9 @@ from cil.optimisation.operators import GradientOperator
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
-                                         Rosenbrock, IndicatorBox, TotalVariation, \
-                                         WeightedL2NormSquared,\
-                                         WaveletNorm
+                                         Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction
+
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -97,6 +97,8 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
+
+    
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         numpy.random.seed(1)
@@ -1104,6 +1106,7 @@ class TestFunction(CCPiTestClass):
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 
+
     def test_WaveletNorm(self):    
         from cil.optimisation.operators import WaveletOperator
         f1 = L1Norm()
@@ -1129,6 +1132,7 @@ class TestFunction(CCPiTestClass):
                                    f2.proximal(x, tau).as_array())
         
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
 
 
 class TestTotalVariation(unittest.TestCase):
@@ -1435,7 +1439,7 @@ class TestTotalVariation(unittest.TestCase):
         tv=TotalVariation(warm_start=True, max_iteration=10)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
-        checkp2=tv.gradient.range_geometry().allocate(0)
+        checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         test=tv.proximal(data, 1.)
@@ -1452,7 +1456,7 @@ class TestTotalVariation(unittest.TestCase):
         tv=TotalVariation(warm_start=False)
         self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
-        checkp2=tv.gradient.range_geometry().allocate(0)
+        checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         tv.proximal(data, 1.)
@@ -2035,3 +2039,6 @@ class TestIndicatorBox(unittest.TestCase):
             N = 10
             ib.set_num_threads(N)
             assert ib.num_threads == N
+
+
+    

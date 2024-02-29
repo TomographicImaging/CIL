@@ -1504,7 +1504,7 @@ class TestCofR_xcorrelation(unittest.TestCase):
             self.data_test.geometry.set_angles(angles)
             processor.check_input(self.data_test)
 
-        # test there is an error when projection indices are specified as tuple >180 degrees apart within tolerance
+        # test there is an error when projection indices are specified as >180 degrees apart within tolerance
         processor = CofR_xcorrelation(projection_index=[0,1], ang_tol=1)
         for angles in self.angles_list:
             self.data_test.geometry.set_angles(angles)

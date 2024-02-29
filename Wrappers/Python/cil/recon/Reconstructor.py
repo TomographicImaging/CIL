@@ -21,12 +21,12 @@ import importlib
 import weakref
 
 class Reconstructor(object):
-    
-    """ Abstract class representing a reconstructor 
+
+    """ Abstract class representing a reconstructor
     """
 
     supported_backends = ['tigre']
-    
+
     #_input is a weakreference object
     @property
     def input(self):
@@ -95,13 +95,13 @@ class Reconstructor(object):
             self._image_geometry = image_geometry.copy()
         else:
             raise TypeError("ImageGeometry type mismatch: got {0} expecting {1}"\
-                                .format(type(input), ImageGeometry))   
-           
+                                .format(type(input), ImageGeometry))
+
 
     def _configure_for_backend(self, backend='tigre'):
         """
         Configures the class for the right engine. Checks the dataorder.
-        """        
+        """
         if backend not in self.supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}".format(self.supported_backends))
 
@@ -136,7 +136,7 @@ class Reconstructor(object):
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
-        
+
         verbose : int, default=1
            Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 

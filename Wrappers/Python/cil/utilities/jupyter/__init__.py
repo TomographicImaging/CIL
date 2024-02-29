@@ -351,8 +351,8 @@ def hide_toggle(for_next=False):
     """.format(
         f_name=js_f_name,
         cell_selector=target_cell,
-        js_hide_current=js_hide_current, 
+        js_hide_current=js_hide_current,
         toggle_text=toggle_text
     )
 
-    return HTML(html)    
+    return HTML(html)

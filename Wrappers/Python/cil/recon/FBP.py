@@ -35,7 +35,7 @@ except:
     has_ipp = False
 
 if has_ipp:
-    cilacc.filter_projections_avh.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
+    cilacc.filter_projections_avh.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array
                                     ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
                                     ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
                                     ctypes.c_int16, #order of the fft
@@ -43,7 +43,7 @@ if has_ipp:
                                     ctypes.c_long, #pix_v
                                     ctypes.c_long] #pix_x
 
-    cilacc.filter_projections_vah.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
+    cilacc.filter_projections_vah.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array
                                     ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
                                     ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
                                     ctypes.c_int16, #order of the fft
@@ -116,15 +116,15 @@ class GenericFilteredBackProjection(Reconstructor):
 
     def set_fft_order(self, order=None):
         """
-        The width of the fourier transform N=2^order. 
-        
+        The width of the fourier transform N=2^order.
+
         Parameters
         ----------
         order: int, optional
-            The width of the fft N=2^order 
+            The width of the fft N=2^order
 
         Notes
-        -----      
+        -----
         If `None` the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater
         Higher orders will yield more accurate results but increase computation time.
         """
@@ -137,7 +137,7 @@ class GenericFilteredBackProjection(Reconstructor):
                 fft_order = int(order)
             except TypeError:
                 raise TypeError("fft order expected type `int`. Got{}".format(type(order)))
-        
+
         if fft_order < min_order:
             raise ValueError("Minimum fft width 2^order is order = {0}. Got{1}".format(min_order,order))
 
@@ -149,18 +149,18 @@ class GenericFilteredBackProjection(Reconstructor):
             else:
                 #create default filter type of new length
                 self.set_filter(self._filter)
-        
+
     @property
     def preset_filters(self):
         return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
- 
+
     def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
         Set the filter used by the reconstruction.
 
-        Pre-set filters are constructed in the frequency domain.        
+        Pre-set filters are constructed in the frequency domain.
         Pre-set filters are: 'ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'
-        
+
         Parameters
         ----------
         filter : string, numpy.ndarray, default='ram-lak'
@@ -187,7 +187,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
         elif type(filter)==np.ndarray:
             try:
-                filter_array = np.asarray(filter,dtype=np.float32).reshape(2**self.fft_order) 
+                filter_array = np.asarray(filter,dtype=np.float32).reshape(2**self.fft_order)
                 self._filter_array = filter_array.copy()
                 self._filter = 'custom'
             except ValueError:
@@ -198,8 +198,8 @@ class GenericFilteredBackProjection(Reconstructor):
 
     def get_filter_array(self):
         """
-        Returns the filter array in the frequency domain. 
-        
+        Returns the filter array in the frequency domain.
+
         Returns
         -------
         numpy.ndarray
@@ -210,7 +210,7 @@ class GenericFilteredBackProjection(Reconstructor):
         The filter length N is 2^self.fft_order.
 
         The indices of the array are interpreted as:
-        
+
         - [0] The DC frequency component
         - [1:N/2] positive frequencies
         - [N/2:N-1] negative frequencies
@@ -252,8 +252,8 @@ class GenericFilteredBackProjection(Reconstructor):
         elif self._filter == 'hann':
             filter_array = ramp * (0.5 + 0.5 * np.cos(freq*np.pi))
 
-        return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order) 
-        
+        return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order)
+
     def _calculate_weights(self):
         return NotImplementedError
 
@@ -289,14 +289,14 @@ class GenericFilteredBackProjection(Reconstructor):
         weights_ptr = self._weights.ctypes.data_as(c_float_p)
 
         ag = acquistion_data.geometry
-        if ag.dimension_labels == ('angle','vertical','horizontal'):   
+        if ag.dimension_labels == ('angle','vertical','horizontal'):
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
-        elif ag.dimension_labels == ('vertical','angle','horizontal'):   
+        elif ag.dimension_labels == ('vertical','angle','horizontal'):
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
-        elif ag.dimension_labels == ('angle','horizontal'): 
-            cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
-        elif ag.dimension_labels == ('vertical','horizontal'): 
-            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
+        elif ag.dimension_labels == ('angle','horizontal'):
+            cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape)
+        elif ag.dimension_labels == ('vertical','horizontal'):
+            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape)
         else:
             raise ValueError ("Could not determine correct function call from dimension labels")
 
@@ -325,10 +325,10 @@ class FDK(GenericFilteredBackProjection):
     ----------
     input : AcquisitionData
         The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
-    
+
     image_geometry : ImageGeometry, default used if None
         A description of the area/volume to reconstruct
-    
+
     filter : string, numpy.ndarray, default='ram-lak'
         The filter to be applied. Can be a string from: {'`ram-lak`', '`shepp-logan`', '`cosine`', '`hamming`', '`hann`'}, or a numpy array.
 
@@ -392,7 +392,7 @@ class FDK(GenericFilteredBackProjection):
 
         self._pre_filtering(proj_filtered)
         operator = self._PO_class(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
-        
+
         if out is None:
             return operator.adjoint(proj_filtered)
         else:
@@ -400,20 +400,20 @@ class FDK(GenericFilteredBackProjection):
 
 
     def __str__(self):
-    
+
         repres = "FDK recon\n"
 
         repres += self._str_data_size()
 
-        repres += "\nReconstruction Options:\n"    
-        repres += "\tBackend: {}\n".format(self._backend)        
+        repres += "\nReconstruction Options:\n"
+        repres += "\tBackend: {}\n".format(self._backend)
         repres += "\tFilter: {}\n".format(self._filter)
         if self._filter != 'custom':
             repres += "\tFilter cut-off frequency: {}\n".format(self._filter_cutoff)
-        repres += "\tFFT order: {}\n".format(self._fft_order)        
-        repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
+        repres += "\tFFT order: {}\n".format(self._fft_order)
+        repres += "\tFilter_inplace: {}\n".format(self._filter_inplace)
 
-        return repres   
+        return repres
 
 class FBP(GenericFilteredBackProjection):
 
@@ -424,10 +424,10 @@ class FBP(GenericFilteredBackProjection):
     ----------
     input : AcquisitionData
         The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
-        
+
     image_geometry : ImageGeometry, default used if None
         A description of the area/volume to reconstruct
-        
+
     filter : string, numpy.ndarray, default='ram-lak'
         The filter to be applied. Can be a string from: {'`ram-lak`', '`shepp-logan`', '`cosine`', '`hamming`', '`hann`'}, or a numpy array.
 
@@ -455,7 +455,7 @@ class FBP(GenericFilteredBackProjection):
 
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
-      
+
         super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 
@@ -476,7 +476,7 @@ class FBP(GenericFilteredBackProjection):
         -----
         This will reduce memory use but may increase computation time.
         It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.
-        
+
         This can only be used on simple and offset data-geometries.
         """
 
@@ -489,7 +489,7 @@ class FBP(GenericFilteredBackProjection):
             num_slices = self.acquisition_geometry.pixel_num_v
 
         self._slices_per_chunk = num_slices
-        
+
 
     def _calculate_weights(self, acquisition_geometry):
 
@@ -502,13 +502,13 @@ class FBP(GenericFilteredBackProjection):
 
 
     def _setup_PO_for_chunks(self, num_slices):
-        
+
         if num_slices > 1:
             ag_slice = self.acquisition_geometry.copy()
             ag_slice.pixel_num_v = num_slices
         else:
             ag_slice = self.acquisition_geometry.get_slice(vertical=0)
-                
+
         ig_slice = ag_slice.get_ImageGeometry()
         self.data_slice = ag_slice.allocate()
         self.operator = self._PO_class(ig_slice,ag_slice)
@@ -541,7 +541,7 @@ class FBP(GenericFilteredBackProjection):
 
         if verbose:
             print(self)
-        
+
         if self.slices_per_chunk:
 
             if self.acquisition_geometry.dimension == '2D':
@@ -575,7 +575,7 @@ class FBP(GenericFilteredBackProjection):
                     end = i + self.slices_per_chunk
                 else:
                     start = tot_slices -i - self.slices_per_chunk
-                    end = tot_slices - i 
+                    end = tot_slices - i
 
                 ret.array[start:end,:,:] = self._process_chunk(i, self.slices_per_chunk)
 
@@ -592,7 +592,7 @@ class FBP(GenericFilteredBackProjection):
                 else:
                     start = 0
                     end = remainder
-                
+
                 ret.array[start:end,:,:] = self._process_chunk(i, remainder)
 
                 if verbose:
@@ -635,14 +635,14 @@ class FBP(GenericFilteredBackProjection):
 
         repres += self._str_data_size()
 
-        repres += "\nReconstruction Options:\n"    
-        repres += "\tBackend: {}\n".format(self._backend)        
+        repres += "\nReconstruction Options:\n"
+        repres += "\tBackend: {}\n".format(self._backend)
         repres += "\tFilter: {}\n".format(self._filter)
         if self._filter != 'custom':
             repres += "\tFilter cut-off frequency: {}\n".format(self._filter_cutoff)
-        repres += "\tFFT order: {}\n".format(self._fft_order)        
-        repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
-        repres += "\tSplit processing: {}\n".format(self._slices_per_chunk) 
+        repres += "\tFFT order: {}\n".format(self._fft_order)
+        repres += "\tFilter_inplace: {}\n".format(self._filter_inplace)
+        repres += "\tSplit processing: {}\n".format(self._slices_per_chunk)
 
         if self._slices_per_chunk:
             num_chunks = int(np.ceil(self.image_geometry.shape[0] / self._slices_per_chunk))
@@ -651,5 +651,4 @@ class FBP(GenericFilteredBackProjection):
 
         repres +="\nReconstructing in {} chunk(s):\n".format(num_chunks)
 
-        return repres   
-
+        return repres

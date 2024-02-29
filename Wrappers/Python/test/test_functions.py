@@ -32,7 +32,7 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
-                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, WaveletNorm
 
 from cil.optimisation.functions import BlockFunction
 

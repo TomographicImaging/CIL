@@ -37,9 +37,6 @@ def soft_shrinkage(x, tau, out=None):
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
     """
-    if  id(x)==id(out):
-        raise InPlaceError(message="The soft_shrinkage function cannot be used in place" )
-
     should_return = False
     # get the sign of the input
     if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:

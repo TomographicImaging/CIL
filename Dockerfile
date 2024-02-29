@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 
 # CUDA-specific packages
-ARG CIL_EXTRA_PACKAGES=tigre astra-toolbox
+ARG CIL_EXTRA_PACKAGES="tigre astra-toolbox"
 # build & runtime dependencies
 # TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng _openmp_mutex pip)?
 # vis. https://github.com/TomographicImaging/CIL/pull/1590
@@ -31,8 +31,7 @@ ENV TENSORBOARD_PROXY_URL=/user-redirect/proxy/6006/
 
 # build & install CIL
 COPY --chown="${NB_USER}" . src
-RUN mkdir build && cd build \
-  && cmake ../src -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="${CONDA_DIR}" \
-  && cmake --build . --target install \
-  && cd .. && rm -rf src build \
+RUN cmake -S ./src -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="${CONDA_DIR}" \
+  && cmake --build ./build --target install \
+  && rm -rf src build \
   && fix-permissions "${CONDA_DIR}" /home/${NB_USER}

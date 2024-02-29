@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -34,6 +33,7 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
+from cil.utilities.errors import InPlaceError
 
 
 initialise_tests()
@@ -43,9 +43,7 @@ def dt(steps):
 
 
 class TestOperator(CCPiTestClass):
-    def setUp(self):
-        numpy.random.seed(1)
-
+  
 
     def test_MatrixOperator(self):        
         m = 30

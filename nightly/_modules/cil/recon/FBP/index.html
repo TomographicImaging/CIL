@@ -505,11 +505,11 @@ document.write(`
 <span class="k">try</span><span class="p">:</span>
     <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span>
     <span class="n">has_ipp</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span><span class="p">:</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
     <span class="n">has_ipp</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="k">if</span> <span class="n">has_ipp</span><span class="p">:</span>
-    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the data array </span>
+    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the data array</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the filter array</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the weights array</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int16</span><span class="p">,</span> <span class="c1">#order of the fft</span>
@@ -517,7 +517,7 @@ document.write(`
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">,</span> <span class="c1">#pix_v</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">]</span> <span class="c1">#pix_x</span>
 
-    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the data array </span>
+    <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the data array</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the filter array</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_float</span><span class="p">),</span>  <span class="c1"># pointer to the weights array</span>
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int16</span><span class="p">,</span> <span class="c1">#order of the fft</span>
@@ -546,8 +546,8 @@ document.write(`
 
         <span class="c1">#call parent initialiser</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
-                
-        <span class="k">if</span> <span class="n">has_ipp</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_ipp</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;IPP libraries not found. Cannot use CIL FBP&quot;</span><span class="p">)</span>
 
         <span class="c1">#additional check</span>
@@ -590,15 +590,15 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">set_fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The width of the fourier transform N=2^order. </span>
-<span class="sd">        </span>
+<span class="sd">        The width of the fourier transform N=2^order.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        order: int, optional</span>
-<span class="sd">            The width of the fft N=2^order </span>
+<span class="sd">            The width of the fft N=2^order</span>
 
 <span class="sd">        Notes</span>
-<span class="sd">        -----      </span>
+<span class="sd">        -----</span>
 <span class="sd">        If `None` the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater</span>
 <span class="sd">        Higher orders will yield more accurate results but increase computation time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -611,7 +611,7 @@ document.write(`
                 <span class="n">fft_order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;fft order expected type `int`. Got</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">order</span><span class="p">)))</span>
-        
+
         <span class="k">if</span> <span class="n">fft_order</span> <span class="o">&lt;</span> <span class="n">min_order</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Minimum fft width 2^order is order = </span><span class="si">{0}</span><span class="s2">. Got</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_order</span><span class="p">,</span><span class="n">order</span><span class="p">))</span>
 
@@ -623,18 +623,18 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1">#create default filter type of new length</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
-        
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">preset_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;hann&#39;</span><span class="p">]</span>
- 
+
     <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the filter used by the reconstruction.</span>
 
-<span class="sd">        Pre-set filters are constructed in the frequency domain.        </span>
+<span class="sd">        Pre-set filters are constructed in the frequency domain.</span>
 <span class="sd">        Pre-set filters are: &#39;ram-lak&#39;, &#39;shepp-logan&#39;, &#39;cosine&#39;, &#39;hamming&#39;, &#39;hann&#39;</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
@@ -661,7 +661,7 @@ document.write(`
 
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">filter_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span> 
+                <span class="n">filter_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span> <span class="o">=</span> <span class="n">filter_array</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="s1">&#39;custom&#39;</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -672,8 +672,8 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">get_filter_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the filter array in the frequency domain. </span>
-<span class="sd">        </span>
+<span class="sd">        Returns the filter array in the frequency domain.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        numpy.ndarray</span>
@@ -684,7 +684,7 @@ document.write(`
 <span class="sd">        The filter length N is 2^self.fft_order.</span>
 
 <span class="sd">        The indices of the array are interpreted as:</span>
-<span class="sd">        </span>
+
 <span class="sd">        - [0] The DC frequency component</span>
 <span class="sd">        - [1:N/2] positive frequencies</span>
 <span class="sd">        - [N/2:N-1] negative frequencies</span>
@@ -726,8 +726,8 @@ document.write(`
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hann&#39;</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span> 
-        
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="ne">NotImplementedError</span>
 
@@ -763,14 +763,14 @@ document.write(`
         <span class="n">weights_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
 
         <span class="n">ag</span> <span class="o">=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="k">if</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>   
+        <span class="k">if</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>   
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span> 
-            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span> 
-            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">&quot;Could not determine correct function call from dimension labels&quot;</span><span class="p">)</span>
 
@@ -799,10 +799,10 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    input : AcquisitionData</span>
 <span class="sd">        The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</span>
-<span class="sd">    </span>
+
 <span class="sd">    image_geometry : ImageGeometry, default used if None</span>
 <span class="sd">        A description of the area/volume to reconstruct</span>
-<span class="sd">    </span>
+
 <span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
 <span class="sd">        The filter to be applied. Can be a string from: {&#39;`ram-lak`&#39;, &#39;`shepp-logan`&#39;, &#39;`cosine`&#39;, &#39;`hamming`&#39;, &#39;`hann`&#39;}, or a numpy array.</span>
 
@@ -866,7 +866,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
         <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;FDK&#39;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -874,20 +874,20 @@ document.write(`
 
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    
+
         <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;FDK recon</span><span class="se">\n</span><span class="s2">&quot;</span>
 
         <span class="n">repres</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_data_size</span><span class="p">()</span>
 
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>    
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
             <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>        
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span> 
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">repres</span>   </div>
+        <span class="k">return</span> <span class="n">repres</span></div>
 
 <div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
 
@@ -898,10 +898,10 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    input : AcquisitionData</span>
 <span class="sd">        The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</span>
-<span class="sd">        </span>
+
 <span class="sd">    image_geometry : ImageGeometry, default used if None</span>
 <span class="sd">        A description of the area/volume to reconstruct</span>
-<span class="sd">        </span>
+
 <span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
 <span class="sd">        The filter to be applied. Can be a string from: {&#39;`ram-lak`&#39;, &#39;`shepp-logan`&#39;, &#39;`cosine`&#39;, &#39;`hamming`&#39;, &#39;`hann`&#39;}, or a numpy array.</span>
 
@@ -929,7 +929,7 @@ document.write(`
 
 
     <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
-      
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
@@ -950,7 +950,7 @@ document.write(`
 <span class="sd">        -----</span>
 <span class="sd">        This will reduce memory use but may increase computation time.</span>
 <span class="sd">        It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.</span>
-<span class="sd">        </span>
+
 <span class="sd">        This can only be used on simple and offset data-geometries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -963,7 +963,7 @@ document.write(`
             <span class="n">num_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">pixel_num_v</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span> <span class="o">=</span> <span class="n">num_slices</span></div>
-        
+
 
     <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
 
@@ -976,13 +976,13 @@ document.write(`
 
 
     <span class="k">def</span> <span class="nf">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_slices</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="n">num_slices</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">ag_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">ag_slice</span><span class="o">.</span><span class="n">pixel_num_v</span> <span class="o">=</span> <span class="n">num_slices</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ag_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                
+
         <span class="n">ig_slice</span> <span class="o">=</span> <span class="n">ag_slice</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span> <span class="o">=</span> <span class="n">ag_slice</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="n">ig_slice</span><span class="p">,</span><span class="n">ag_slice</span><span class="p">)</span>
@@ -1015,7 +1015,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
@@ -1049,7 +1049,7 @@ document.write(`
                     <span class="n">end</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
-                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span> <span class="n">i</span> 
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span> <span class="n">i</span>
 
                 <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
 
@@ -1066,7 +1066,7 @@ document.write(`
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">remainder</span>
-                
+
                 <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">remainder</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -1109,14 +1109,14 @@ document.write(`
 
         <span class="n">repres</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_data_size</span><span class="p">()</span>
 
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>    
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>        
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
             <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>        
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span> 
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Split processing: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">)</span> 
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Split processing: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">:</span>
             <span class="n">num_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">))</span>
@@ -1125,8 +1125,7 @@ document.write(`
 
         <span class="n">repres</span> <span class="o">+=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstructing in </span><span class="si">{}</span><span class="s2"> chunk(s):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">repres</span>   </div>
-
+        <span class="k">return</span> <span class="n">repres</span></div>
 </pre></div>
 
                 </article>

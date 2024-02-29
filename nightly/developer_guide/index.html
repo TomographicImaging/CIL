@@ -570,7 +570,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
@@ -604,7 +604,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
                     <span class="n">end</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
-                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span> <span class="n">i</span> 
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span> <span class="n">i</span>
 
                 <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
 
@@ -621,7 +621,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">remainder</span>
-                
+
                 <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">remainder</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>

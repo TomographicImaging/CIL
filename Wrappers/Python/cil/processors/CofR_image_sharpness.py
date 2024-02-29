@@ -157,12 +157,12 @@ class CofR_image_sharpness(Processor):
 
         #set FBPOperator class from backend
         try:
-            module = importlib.import_module('cil.plugins.'+backend)
-        except ImportError:
+            module = importlib.import_module(f'cil.plugins.{backend}')
+        except ImportError as exc:
             if backend == 'tigre':
-                raise ImportError("Cannot import the {} plugin module. Please install TIGRE or select a different backend".format(self.backend))
+                raise ImportError(f"Please install `conda install tigre` or select a different backend") from exc
             if backend == 'astra':
-                raise ImportError("Cannot import the {} plugin module. Please install ASTRA-TOOLBOX or select a different backend".format(self.backend))
+                raise ImportError(f"Please install `conda install astra-toolbox` or select a different backend") from exc
 
         return module.FBP
 

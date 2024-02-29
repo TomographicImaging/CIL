@@ -19,11 +19,8 @@
 try:
     from ccpi.filters import regularisers
     from ccpi.filters.cpu_regularisers import TV_ENERGY
-except ImportError as ie:
-    raise ImportError(ie , "\n\n", 
-                      "This plugin requires the additional package ccpi-regularisation\n" +
-                      "Please install it via conda as ccpi-regulariser from the ccpi channel\n"+
-                      "Minimal version is 20.04")
+except ImportError as exc:
+    raise ImportError('Please `conda install -c ccpi "ccpi-regulariser>=20.04"`') from exc
 
 
 from cil.framework import DataOrder

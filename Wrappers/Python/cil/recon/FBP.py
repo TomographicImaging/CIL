@@ -31,7 +31,7 @@ c_double_p = ctypes.POINTER(ctypes.c_double)
 try:
     cilacc.filter_projections_avh
     has_ipp = True
-except:
+except AttributeError:
     has_ipp = False
 
 if has_ipp:
@@ -72,8 +72,8 @@ class GenericFilteredBackProjection(Reconstructor):
 
         #call parent initialiser
         super().__init__(input, image_geometry, backend)
-                
-        if has_ipp == False:
+
+        if not has_ipp:
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
 
         #additional check

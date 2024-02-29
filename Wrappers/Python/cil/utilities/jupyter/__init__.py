@@ -21,14 +21,12 @@ try:
     from ipywidgets import interactive_output
     import ipywidgets as widgets
 except ImportError as ie:
-    raise ImportError(ie , "\n\n", 
-                      "islicer requires the additional package ipywidgets\n" +
-                      "Please install it via conda as ipywidgets from the conda-forge channel\n")
+    raise ImportError("please conda/pip install ipywidgets") from ie
 
 from packaging import version
+from warnings import warn
 if version.parse(widgets.__version__) >= version.parse('8'):
-    raise ImportError(f'{__name__} requires ipywidgets version < 8,'
-                      + f' found version {widgets.__version__}')
+    warn(ImportWarning, f'requires ipywidgets<8, found {widgets.__version__}')
 
 import matplotlib.pyplot as plt
 from matplotlib import gridspec

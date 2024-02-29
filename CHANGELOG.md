@@ -34,6 +34,7 @@
   - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
   - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
   - Allow Masker to take integer arrays in addition to boolean
+  - Add remote data class to example data to enable download of relevant datasets from remote repositories 
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

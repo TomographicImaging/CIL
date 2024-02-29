@@ -38,8 +38,9 @@ class CentreOfRotationCorrector(DataProcessor):
         slice_index : int, str='centre', default='centre'
             An integer defining the vertical slice to run the algorithm on.
 
-        projection_index : int
-            An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
+        projection_index: int or list/tuple of ints, optional
+            An integer defining the index of the first projection the cross correlation algorithm will use, where the second projection is chosen as the projection closest to 180 degrees from this.
+            Or a list/tuple of ints specifying the two indices to be used for cross correlation (default is 0)
 
         ang_tol : float, default=0.1
             The angular tolerance in degrees between the two input projections 180 degree gap

@@ -22,7 +22,7 @@ from utils import initialise_tests
 from cil.framework.framework import ImageGeometry,AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
-import os, sys
+import os, sys, shutil
 from testclass import CCPiTestClass
 import platform
 import numpy as np
@@ -157,6 +157,8 @@ class TestTestData(CCPiTestClass):
 class TestRemoteData(unittest.TestCase):
 
     def setUp(self):
+        
+        self.data_list = ['WALNUT','USB','KORN','SANDSTONE']
         self.tmp_file = 'tmp.txt'
         self.tmp_zip = 'tmp.zip'
         with ZipFile(self.tmp_zip, 'w') as zipped_file:
@@ -165,10 +167,16 @@ class TestRemoteData(unittest.TestCase):
             self.zipped_bytes = zipped_file.read()        
     
     def tearDown(self):
-        if os.path.exists(self.tmp_file):
-            os.remove(self.tmp_file)
+        for data in self.data_list:
+            test_func = getattr(dataexample, data)
+            if os.path.exists(os.path.join(test_func.FOLDER)):
+                shutil.rmtree(test_func.FOLDER)
+        
         if os.path.exists(self.tmp_zip):
             os.remove(self.tmp_zip)
+
+        if os.path.exists(self.tmp_file):
+            os.remove(self.tmp_file)
 
     def mock_urlopen(self, mock_urlopen):
         mock_response = MagicMock()
@@ -179,7 +187,7 @@ class TestRemoteData(unittest.TestCase):
     @patch('cil.utilities.dataexample.urlopen')
     def test_unzip_remote_data(self, mock_urlopen):
         self.mock_urlopen(mock_urlopen)
-        dataexample.REMOTEDATA.download_from_url('.')
+        dataexample.REMOTEDATA._download_and_extract_from_url('.')
         self.assertTrue(os.path.isfile(self.tmp_file))
 
     @patch('cil.utilities.dataexample.input', return_value='n')    
@@ -187,14 +195,16 @@ class TestRemoteData(unittest.TestCase):
     def test_download_data_input_n(self, mock_urlopen, input):
         self.mock_urlopen(mock_urlopen)
 
-        # redirect print output
-        capturedOutput = StringIO()                 
-        sys.stdout = capturedOutput  
-
-        dataexample.WALNUT.download_data('.')
-
-        self.assertFalse(os.path.isfile(self.tmp_file))
-        self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
+        data_list = ['WALNUT','USB','KORN','SANDSTONE']
+        for data in data_list:
+             # redirect print output
+            capturedOutput = StringIO()                 
+            sys.stdout = capturedOutput  
+            test_func = getattr(dataexample, data)
+            test_func.download_data('.')
+            
+            self.assertFalse(os.path.isfile(self.tmp_file))
+            self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
         
         # return to standard print output
         sys.stdout = sys.__stdout__ 
@@ -206,10 +216,13 @@ class TestRemoteData(unittest.TestCase):
 
         # redirect print output
         capturedOutput = StringIO()                 
-        sys.stdout = capturedOutput  
+        sys.stdout = capturedOutput         
 
-        dataexample.WALNUT.download_data('.')
-        self.assertTrue(os.path.isfile(self.tmp_file))
+        
+        for data in self.data_list:
+            test_func = getattr(dataexample, data)
+            test_func.download_data('.')
+            self.assertTrue(os.path.isfile(os.path.join(test_func.FOLDER,self.tmp_file)))
         
         # return to standard print output
         sys.stdout = sys.__stdout__ 

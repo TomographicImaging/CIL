@@ -42,7 +42,7 @@ class CofR_xcorrelation(Processor):
     Returns
     -------
     AcquisitionData 
-        object with an AcquisitionGeometry updated with updated centre of rotation
+        object with an AcquisitionGeometry with updated centre of rotation
 
     '''
 

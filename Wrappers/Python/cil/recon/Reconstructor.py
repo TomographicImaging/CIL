@@ -112,10 +112,9 @@ class Reconstructor(object):
         try:
             module = importlib.import_module(f'cil.plugins.{backend}')
         except ImportError as exc:
-            if backend == 'tigre':
-                raise ImportError(f"Please install `conda install tigre` or select a different backend") from exc
-            if backend == 'astra':
-                raise ImportError(f"Please install `conda install astra-toolbox` or select a different backend") from exc
+            msg = {'tigre': "TIGRE (e.g. `conda install conda-forge::tigre`)",
+                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
+            raise ImportError(f"Please install {msg} or select a different backend") from exc
 
         self._PO_class = module.ProjectionOperator
         self._backend = backend

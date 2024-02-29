@@ -20,7 +20,7 @@ try:
     from ccpi.filters import regularisers
     from ccpi.filters.cpu_regularisers import TV_ENERGY
 except ImportError as exc:
-    raise ImportError('Please `conda install -c ccpi "ccpi-regulariser>=20.04"`') from exc
+    raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=20.04"`') from exc
 
 
 from cil.framework import DataOrder

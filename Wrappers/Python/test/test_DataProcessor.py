@@ -29,7 +29,7 @@ from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinPhaseRetriever
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinPhaseProcessor
 
 import gc
 
@@ -2658,9 +2658,10 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         delta = 1.
         energy_eV = 40000
         unit_multiplier = 1e-3
-        processor = PaganinPhaseRetriever.paganin(energy_eV, delta, beta, unit_multiplier, units_output = 'absorption')
+        propagation_distance = 10
+        processor = PaganinPhaseProcessor.retrieve(energy_eV, delta, beta, unit_multiplier, propagation_distance)
         processor.set_input(self.data)
-        phase_data = processor.get_output()
+        phase_data = processor.get_output(output_type = 'attenuation')
         
         absorption_data = self.data.log()*-1
 

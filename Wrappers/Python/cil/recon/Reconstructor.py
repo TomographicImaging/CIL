@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -22,12 +21,12 @@ import importlib
 import weakref
 
 class Reconstructor(object):
-    
-    """ Abstract class representing a reconstructor 
+
+    """ Abstract class representing a reconstructor
     """
 
     supported_backends = ['tigre']
-    
+
     #_input is a weakreference object
     @property
     def input(self):
@@ -96,13 +95,13 @@ class Reconstructor(object):
             self._image_geometry = image_geometry.copy()
         else:
             raise TypeError("ImageGeometry type mismatch: got {0} expecting {1}"\
-                                .format(type(input), ImageGeometry))   
-           
+                                .format(type(input), ImageGeometry))
+
 
     def _configure_for_backend(self, backend='tigre'):
         """
         Configures the class for the right engine. Checks the dataorder.
-        """        
+        """
         if backend not in self.supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}".format(self.supported_backends))
 
@@ -111,12 +110,11 @@ class Reconstructor(object):
 
         #set ProjectionOperator class from backend
         try:
-            module = importlib.import_module('cil.plugins.'+backend)
-        except ImportError:
-            if backend == 'tigre':
-                raise ImportError("Cannot import the {} plugin module. Please install TIGRE or select a different backend".format(self.backend))
-            if backend == 'astra':
-                raise ImportError("Cannot import the {} plugin module. Please install CIL-ASTRA or select a different backend".format(self.backend))
+            module = importlib.import_module(f'cil.plugins.{backend}')
+        except ImportError as exc:
+            msg = {'tigre': "TIGRE (e.g. `conda install conda-forge::tigre`)",
+                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
+            raise ImportError(f"Please install {msg} or select a different backend") from exc
 
         self._PO_class = module.ProjectionOperator
         self._backend = backend
@@ -137,7 +135,7 @@ class Reconstructor(object):
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
-        
+
         verbose : int, default=1
            Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 

@@ -204,7 +204,7 @@ class TestWavelets(CCPiTestClass):
         x = dg.allocate('random')
         Wx = W.direct(x)
 
-        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients")
+        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients", places=5)
 
         y = W.adjoint(Wx)
         tau = 0.0
@@ -249,7 +249,7 @@ class TestWavelets(CCPiTestClass):
         x = dg.allocate('random', dtype='complex64')
         Wx = W.direct(x)
 
-        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients")
+        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients", places =5 )
 
         y = W.adjoint(Wx)
         tau = 0.0

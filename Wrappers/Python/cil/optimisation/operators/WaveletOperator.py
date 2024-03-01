@@ -28,28 +28,25 @@ from cil.framework import VectorGeometry
 class WaveletOperator(LinearOperator):
 
     r'''                  
-        Computes forward or inverse (adjoint) discrete wavelet transform of the input
+        Computes forward or inverse (adjoint) discrete wavelet transform (DWT) of the input
 
         Parameters
         ----------
         param domain_geometry: cil geometry 
             Domain geometry for the WaveletOperator
-
         param range_geometry: cil geometry, optional
-            Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywt
-
+            Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywavelets
         param level: int, optional, default= log_2(min(shape(axes)))
             integer for decomposition level. Default = log_2(min(shape(axes))), i.e. the maximum number of accurate downsamplings possible
         wname: string, optional, default='haar'
-            label for wavelet used.D
-        axes: list of ints, optional, default=None
-            Defines the dimensions to decompose along. Note that channel is the first dimension:
-            for example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
-            Default = None, meaning all dimensions are transformed. Same as axes = range(ndim)
+            label for wavelet used.
+        axes: list of ints, optional, default=`None`
+            Defines the dimensions to decompose along. Note that channel is the first dimension: for example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
+            Default = `None`, meaning all dimensions are transformed. Same as axes = range(ndim)
 
         **kwargs:
         ---------
-        correlation: str, default 'All'. Only applied if 'axes' = None!
+        correlation: str, default 'All'. Note: Only applied if `axes = None`!
             'All' will compute the wavelet decomposition on every possible dimension.
             'Space' will compute the wavelet decomposition on only the spatial dimensions. If there are multiple channels, each channel is decomposed independently.
             'Channels' will compute the wavelet decomposition on only the channels, independently for every spatial point.
@@ -60,8 +57,12 @@ class WaveletOperator(LinearOperator):
 
         Attributes
         ----------
-        moments: integer for 
-            number of vanishing moments. Known for Daubechies, None for others
+        moments: integer or `None`
+            number of vanishing moments. Known for Daubechies, `None` for others
+            
+        Note
+        -----
+        The default decomposition level is the theoretical maximum: log_2(min(input.shape)).  However, this is not always recommended and pywavelets should give a warning if the coarsest scales are too small to be meaningful.
 
      '''
 
@@ -108,9 +109,6 @@ class WaveletOperator(LinearOperator):
             self._wavelet = self._getBiortFilters(wname)
         
         if level is None:
-            # Default decomposition level is the theoretical maximum: log_2(min(input.shape)).
-            # However, this is not always recommended and pywt should give a warning if the coarsest
-            # scales are too small to be meaningful.
             level = pywt.dwtn_max_level(
             	domain_geometry.shape, wavelet=self._wavelet, axes=axes)
         self.level = int(level)
@@ -214,6 +212,7 @@ class WaveletOperator(LinearOperator):
             return ret
         else:
             out.fill(Wx) 
+            return out
 
     def adjoint(self, Wx, out=None):
         r"""Returns the value of the adjoint of the WaveletOperator applied to :math:`x`
@@ -246,9 +245,10 @@ class WaveletOperator(LinearOperator):
             return ret
         else:
             out.fill(x[org_size])
+            return out
 
     def calculate_norm(self):
-        '''Returns the norm of WaveletOperator, which is equal to 1.o if the wavelet is orthogonal
+        '''Returns the norm of WaveletOperator, which is equal to 1.0 if the wavelet is orthogonal
 
         Returns
         --------

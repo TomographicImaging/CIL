@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -18,23 +17,48 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer
-import warnings
 import numpy
 from scipy import interpolate
 
 class Masker(DataProcessor):
     r'''
-    Processor to fill missing values provided by mask. Please use the desiried method to configure a processor for your needs.
+    Processor to fill missing values provided by mask.
+    Please use the desired method to configure a processor for your needs.
+
+    Parameters
+    ----------
+    mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+        A boolean array with the same dimensions as input, where 'False' represents masked values.
+        Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+        Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+    mode : {'value', 'mean', 'median', 'interpolate'}, default='value'
+        The method to fill in missing values 
+    value : float, default=0
+        Substitute all outliers with a specific value if method='value', otherwise discarded.
+    axis : str or int
+        Specify axis as int or from 'dimension_labels' to calculate mean, median or interpolation
+        (depending on mode) along that axis
+    method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
+        Interpolation method to use.
+    
     '''
 
     @staticmethod
     def value(mask=None, value=0):
-        r'''This sets the masked values of the input data to the requested value.
+        r'''Returns a Masker that sets the masked values of the input data to the requested value.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param value: values to be assigned to missing elements
-        :type value: float, default=0
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        value : float, default=0
+            Values to be assigned to missing elements
+
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='value', mask=mask, value=value)
@@ -43,12 +67,20 @@ class Masker(DataProcessor):
     
     @staticmethod
     def mean(mask=None, axis=None):
-        r'''This sets the masked values of the input data to the mean of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param axis: specify axis as int or from 'dimension_labels' to calculate mean. 
-        :type axis: str, int
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        axis : str, int
+            Specify axis as int or from 'dimension_labels' to calculate mean.
+
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='mean', mask=mask, axis=axis)
@@ -57,12 +89,20 @@ class Masker(DataProcessor):
     
     @staticmethod
     def median(mask=None, axis=None):
-        r'''This sets the masked values of the input data to the median of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param axis: specify axis as int or from 'dimension_labels' to calculate median. 
-        :type axis: str, int
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        axis : str, int
+            Specify axis as int or from 'dimension_labels' to calculate median.
+
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='median', mask=mask, axis=axis)
@@ -71,14 +111,22 @@ class Masker(DataProcessor):
     
     @staticmethod
     def interpolate(mask=None, axis=None, method='linear'):
-        r'''This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.
+        r'''Returns a Masker that operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.
 
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param axis: specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation. 
-        :type axis: str, int
-        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
-        :param method: str, default='linear'
+        Parameters
+        ----------
+        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray
+            A boolean array with the same dimensions as input, where 'False' represents masked values.
+            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
+            Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        axis : str, int
+            Specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation.
+        method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
+            Interpolation method to use.
+        
+        Returns
+        -------
+        Masker processor
         '''
 
         processor = Masker(mode='interpolate', mask=mask, axis=axis, method=method)
@@ -91,22 +139,6 @@ class Masker(DataProcessor):
                  value = 0,
                  axis = None,
                  method = 'linear'):
-        
-        r'''Processor to fill missing values provided by mask.
-
-        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
-        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
-        :param mode: a method to fill in missing values (value, mean, median, interpolate)
-        :type mode: str, default=value
-        :param value: substitute all outliers with a specific value
-        :type value: float, default=0
-        :param axis: specify axis as int or from 'dimension_labels' to calculate mean or median in respective modes 
-        :type axis: str or int
-        :param method: One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next
-        :param method: str, default='linear'
-        :return: DataContainer or it's subclass with masked outliers
-        :rtype: DataContainer or it's subclass   
-        '''
 
         kwargs = {'mask': mask,
                   'mode': mode,
@@ -153,11 +185,10 @@ class Masker(DataProcessor):
         except:
             mask_arr = self.mask
 
-        try:
-            mask_invert = ~mask_arr
-        except TypeError:
-            raise TypeError("Mask expected to be a boolean array got {}".format(mask_arr.dtype))
-
+        mask_arr = numpy.array(mask_arr, dtype=bool)
+        
+        mask_invert = ~mask_arr
+            
         try:
             axis_index = data.dimension_labels.index(self.axis)             
         except:
@@ -199,7 +230,7 @@ class Masker(DataProcessor):
         elif self.mode == 'interpolate':
             if self.method not in ['linear', 'nearest', 'zeros', 'linear', \
                                         'quadratic', 'cubic', 'previous', 'next']:
-                raise TypeError("Wrong interpolation method, one of the follwoing is expected:\n" + 
+                raise TypeError("Wrong interpolation method, one of the following is expected:\n" + 
                                 "linear, nearest, zeros, linear, quadratic, cubic, previous, next")
             
             ndim = data.number_of_dimensions

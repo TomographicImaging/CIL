@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -18,7 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.functions import Function    
-from cil.framework import BlockDataContainer   
+from cil.framework import BlockDataContainer
+from cil.utilities.errors import InPlaceError
 import numpy as np
  
 def soft_shrinkage(x, tau, out=None):
@@ -37,7 +37,6 @@ def soft_shrinkage(x, tau, out=None):
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
     """
-
     should_return = False
     # get the sign of the input
     if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:

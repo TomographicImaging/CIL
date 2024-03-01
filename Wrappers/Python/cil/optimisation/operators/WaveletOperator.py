@@ -64,6 +64,10 @@ class WaveletOperator(LinearOperator):
         -----
         The default decomposition level is the theoretical maximum: log_2(min(input.shape)).  However, this is not always recommended and pywavelets should give a warning if the coarsest scales are too small to be meaningful.
 
+
+        Note
+        ----
+        We currently do not support non-orthogonal wavelets. 
      '''
 
     def __init__(self, domain_geometry,
@@ -103,8 +107,6 @@ class WaveletOperator(LinearOperator):
 
         self.wname = wname
         self._wavelet = pywt.Wavelet(wname)
-        self.moments = self._wavelet.vanishing_moments_psi
-        self._trueAdj = kwargs.get('true_adjoint', True)
         if all([not self._wavelet.orthogonal, self._wavelet.biorthogonal, self._trueAdj]): # True adjoint for biorthogonal wavelet
             self._wavelet = self._getBiortFilters(wname)
         
@@ -229,6 +231,10 @@ class WaveletOperator(LinearOperator):
         DataContainer, the value of the adjoint of the WaveletOperator applied to :math:`x` or `None` if `out`  
 
         """
+        
+        if not self._wavelet.orthogonal:
+            raise ValueError('CIL currently only supports orthogonal wavelets')
+            
 
         Wx_arr = Wx.as_array()
         coeffs = pywt.array_to_coeffs(Wx_arr, self._slices)

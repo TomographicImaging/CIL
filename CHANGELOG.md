@@ -1,4 +1,3 @@
-
 * x.x.x
   - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
@@ -36,6 +35,7 @@
   - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
   - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
   - Allow Masker to take integer arrays in addition to boolean
+  - Improved import error/warning messages
 
 
 * 23.1.0
@@ -51,7 +51,6 @@
   - Added warmstart capability to proximal evaluation of the CIL TotalVariation function.
   - Bug fix in the LinearOperator norm with an additional flag for the algorithm linearOperator.PowerMethod
   - Tidied up documentation in the framework folder
-  
 
 * 23.0.1
   - Fix bug with NikonReader requiring ROI to be set in constructor.
@@ -154,7 +153,7 @@
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignment fix for 2D datasets
-  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial
   - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
   - Allow use of square brackets in file paths to TIFF and Nikon datasets
 

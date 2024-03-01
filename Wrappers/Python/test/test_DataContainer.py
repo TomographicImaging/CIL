@@ -671,6 +671,13 @@ class TestDataContainer(CCPiTestClass):
         data=ig.allocate('random', dtype=numpy.complex64)
         self.assertTrue(data.array.dtype, numpy.complex64)
         self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random_int', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+        
 
     def test_AcquisitionGeometry_allocate_complex(self):
         # Detectors
@@ -685,6 +692,29 @@ class TestDataContainer(CCPiTestClass):
                                 .set_panel(detectors, pixel_size=0.1)   
 
         self.complex_allocate_geometry_test(ag)
+        
+    def test_AcquisitionGeometry_allocate_random_complex(self):
+        
+        detectors =  10
+
+        # Angles
+        angles = numpy.linspace(0,10,10, dtype='float32')
+
+        # Setup acquisition geometry
+        ag = AcquisitionGeometry.create_Parallel2D()\
+                                .set_angles(angles)\
+                                .set_panel(detectors, pixel_size=0.1)   
+                                
+                                
+        data=ag.allocate('random', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+
+        data=ag.allocate('random_int', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
 
 
     def test_VectorGeometry_allocate_complex(self):
@@ -692,6 +722,10 @@ class TestDataContainer(CCPiTestClass):
         self.complex_allocate_geometry_test(vg)
         
         data=vg.allocate('random', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+        data=vg.allocate('random_int', dtype=numpy.complex64)
         self.assertTrue(data.array.dtype, numpy.complex64)
         self.assertNotEqual(numpy.sum(data.array).imag, 0)
         

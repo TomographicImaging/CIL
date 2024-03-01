@@ -506,7 +506,7 @@ class ImageGeometry(object):
                     r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 else:
                     r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))
+                out.fill(numpy.asarray(r, dtype=dtype))
             elif value is None:
                 pass
             else:
@@ -2658,8 +2658,11 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+                else:
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))             
+           
             elif value is None:
                 pass
             else:

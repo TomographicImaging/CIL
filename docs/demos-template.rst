@@ -1,0 +1,5 @@
+Tutorials
+*********
+
+.. nbgallery::
+${notebooks}

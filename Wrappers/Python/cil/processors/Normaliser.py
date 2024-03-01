@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -30,7 +29,7 @@ class Normaliser(Processor):
     Input: AcquisitionData
     Parameter: 2D projection with flat field (or stack)
                2D projection with dark field (or stack)
-    Output: AcquisitionDataSetn
+    Output: AcquisitionDataSet
     '''
     
     def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):

@@ -96,7 +96,7 @@ class PaganinPhaseProcessor(Processor):
         Method to create a Paganin processor to filter images using the Paganin phase retrieval algorithm
         described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
 
-        To retrieve quantitative information from phase contrast images use the `PhaseRetriever.retrieve() method` instead
+        To retrieve quantitative information from phase contrast images use the `PaganinPhaseProcessor.retrieve() method` instead
 
         Parameters
         ----------
@@ -118,7 +118,7 @@ class PaganinPhaseProcessor(Processor):
             The sample to detector distance in meters. If not specified, the value in data.geometry.dist_center_detector will be used. If neither are supplied, default is 10
 
         filter_type: string (optional)
-            The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9 
+            The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9  (equation 17)
         
         Returns
         -------
@@ -130,11 +130,6 @@ class PaganinPhaseProcessor(Processor):
         >>> processor = PaganinPhaseProcessor.filter()
         >>> processor.set_input(self.data)
         >>> processor.get_output()
-
-        or to retrieve the projected thickness of the object
-        >>> processor = PaganinPhaseProcessor.filter()
-        >>> processor.set_input(self.data)
-        >>> processor.get_output(output_type='thickness')
 
         '''
         

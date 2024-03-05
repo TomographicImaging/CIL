@@ -2423,13 +2423,25 @@ A <code class="code docutils literal notranslate"><span class="pre">ScaledOperat
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.Operator.is_linear">
 <span class="sig-name descname"><span class="pre">is_linear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#Operator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.is_linear" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns if the operator is linear</p>
+<dd><p>Returns if the operator is linear
+:rtype: <cite>Bool</cite></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.Operator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#Operator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the application of the Operator on x</p>
+<dd><p>Calls the operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -2466,7 +2478,9 @@ If <cite>None</cite> is passed, the cache is cleared prompting the function to c
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.Operator.calculate_norm">
 <span class="sig-name descname"><span class="pre">calculate_norm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#Operator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the norm of the SumOperator. Note that this gives a NotImplementedError if the SumOperator is not linear.</p>
+<dd><p>Returns the norm of the Operator. Note that this gives a NotImplementedError if the SumOperator is not linear.
+:returns: <strong>Scalar</strong>
+:rtype: the norm of the Operator</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2504,8 +2518,22 @@ If <cite>None</cite> is passed, the cache is cleared prompting the function to c
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.LinearOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#LinearOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the adjoint/inverse operation</p>
-<p>only available to linear operators</p>
+<dd><p>Returns the adjoint/inverse operation evaluated at the point <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only available to linear operators</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -2658,7 +2686,7 @@ For example, <cite>CompositionOperator(left, right).direct(x)</cite> is equivale
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.CompositionOperator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#CompositionOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Calls the composition operator</p>
+<dd><p>Calls the composition operator at the point <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2666,13 +2694,16 @@ For example, <cite>CompositionOperator(left, right).direct(x)</cite> is equivale
 <li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.CompositionOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#CompositionOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Calls the adjoint of the composition operator</p>
+<dd><p>Calls the adjoint of the composition operator at the point <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2680,13 +2711,17 @@ For example, <cite>CompositionOperator(left, right).direct(x)</cite> is equivale
 <li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the adjoint of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.CompositionOperator.is_linear">
 <span class="sig-name descname"><span class="pre">is_linear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#CompositionOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.is_linear" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns if the operator is linear</p>
+<dd><p>Returns if the operator is linear
+:rtype: <cite>Bool</cite></p>
 </dd></dl>
 
 </dd></dl>
@@ -2803,13 +2838,16 @@ For example, <cite>SumOperator(left, right).direct(x)</cite> is equivalent to  <
 <li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.SumOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#SumOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SumOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Calls the adjoint of the sum operator</p>
+<dd><p>Calls the adjoint of the sum operator, evaluated at the point <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2817,13 +2855,17 @@ For example, <cite>SumOperator(left, right).direct(x)</cite> is equivalent to  <
 <li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.SumOperator.is_linear">
 <span class="sig-name descname"><span class="pre">is_linear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#SumOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SumOperator.is_linear" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns if the operator is linear</p>
+<dd><p>Returns if the operator is linear
+:rtype: <cite>Bool</cite></p>
 </dd></dl>
 
 </dd></dl>
@@ -2905,14 +2947,39 @@ Y : gm_range ( Default: Y = X )</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.MatrixOperator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/MatrixOperator/#MatrixOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MatrixOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the application of the Operator on x</p>
+<dd><p>Calls the operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.MatrixOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/MatrixOperator/#MatrixOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MatrixOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the adjoint/inverse operation</p>
-<p>only available to linear operators</p>
+<dd><p>Returns the adjoint/inverse operation evaluated at the point <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only available to linear operators</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -3048,14 +3115,39 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.FiniteDifferenceOperator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/FiniteDifferenceOperator/#FiniteDifferenceOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.FiniteDifferenceOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the application of the Operator on x</p>
+<dd><p>Calls the operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.FiniteDifferenceOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/FiniteDifferenceOperator/#FiniteDifferenceOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.FiniteDifferenceOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>returns the adjoint/inverse operation</p>
-<p>only available to linear operators</p>
+<dd><p>Returns the adjoint/inverse operation evaluated at the point <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only available to linear operators</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -3067,7 +3159,18 @@ under Neumann/Periodic boundary conditions</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.SparseFiniteDifferenceOperator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/SparseFiniteDifferenceOperator/#SparseFiniteDifferenceOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SparseFiniteDifferenceOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the application of the Operator on x</p>
+<dd><p>Calls the operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer or BlockDataContainer containing the result, or <cite>None</cite> if <cite>out</cite> is passed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

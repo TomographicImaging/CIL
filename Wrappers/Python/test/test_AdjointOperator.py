@@ -27,12 +27,12 @@ class TestAdjointOperator(CCPiTestClass):
 
         res1 = G.adjoint(y)
         res2 = G_adjoint.direct(y)
-        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-6)
 
         res3 = G.direct(x)
         res4 = G_adjoint.adjoint(x)
-        np.testing.assert_allclose(res3[0].array, res4[0].array, atol=1e-3)
-        np.testing.assert_allclose(res3[1].array, res4[1].array, atol=1e-3)
+        np.testing.assert_allclose(res3[0].array, res4[0].array, atol=1e-6)
+        np.testing.assert_allclose(res3[1].array, res4[1].array, atol=1e-6)
         
     def test_direct_adjoint_matrix_operator(self):
         
@@ -49,11 +49,11 @@ class TestAdjointOperator(CCPiTestClass):
 
         res1 = Amat.adjoint(y)
         res2 = Amat_tr.direct(y)
-        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-6)
 
         res3 = Amat.direct(x)
         res4 = Amat_tr.adjoint(x)
-        np.testing.assert_allclose(res3.array, res4.array, atol=1e-3) 
+        np.testing.assert_allclose(res3.array, res4.array, atol=1e-6) 
 
         self.assertTrue(Amat.dot_test(Amat), True)  
         self.assertTrue(Amat_tr.dot_test(Amat_tr), True)
@@ -62,8 +62,8 @@ class TestAdjointOperator(CCPiTestClass):
         lhs = res3.dot(y)
         rhs_a = x.dot(res2)
         rhs_b = x.dot(Amat.adjoint(y))
-        np.testing.assert_allclose(lhs, rhs_a, atol=1e-3) 
-        np.testing.assert_allclose(lhs, rhs_b, atol=1e-3) 
+        np.testing.assert_allclose(lhs, rhs_a, atol=1e-6) 
+        np.testing.assert_allclose(lhs, rhs_b, atol=1e-6) 
 
     def test_direct_adjoint_matrix_operator_complex(self):
         
@@ -83,15 +83,15 @@ class TestAdjointOperator(CCPiTestClass):
         # convention is to conjugate the second vector, see `dot` method in `framework`
         lhs_np = np.dot(Amat.direct(x).array,y.array.conjugate())
         rhs_np = np.dot(x.array, Amat.adjoint(y).conjugate().array)
-        np.testing.assert_allclose(lhs_np, rhs_np, atol=1e-3) 
+        np.testing.assert_allclose(lhs_np, rhs_np, atol=1e-6) 
 
         # using `dot` method from DataContainer
         lhs = Amat.direct(x).dot(y) # conjugate of y is applied in the dot method
         rhs_a = x.dot(Amat.adjoint(y)) # conjugate of y is applied in the dot method
         rhs_b = x.dot(Amat_tr.direct(y)) 
 
-        np.testing.assert_allclose(lhs, rhs_a, atol=1e-3)  
-        np.testing.assert_allclose(lhs, rhs_b, atol=1e-3)         
+        np.testing.assert_allclose(lhs, rhs_a, atol=1e-6)  
+        np.testing.assert_allclose(lhs, rhs_b, atol=1e-6)         
 
 
     def test_adjoint_operator_and_dot(self):

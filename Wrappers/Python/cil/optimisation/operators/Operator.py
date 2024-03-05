@@ -56,7 +56,7 @@ class Operator(object):
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
-            Element in the domain of the SOperator
+            Element in the domain of the Operator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
@@ -193,7 +193,7 @@ class LinearOperator(Operator):
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
-            Element in the domain of the SOperator
+            Element in the domain of the Operator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns

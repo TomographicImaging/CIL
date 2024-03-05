@@ -2646,26 +2646,26 @@ class TestMasker(unittest.TestCase):
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
 
 
-# class TestPaganinPhaseRetriver(unittest.TestCase):       
+class TestPaganinPhaseRetriver(unittest.TestCase):       
 
-#     def setUp(self):      
-#         self.data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+    def setUp(self):      
+        self.data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
-#     def test_PaganinPhaseRetriever(self): 
+    def test_PaganinPhaseRetriever(self): 
 
         
-#         beta = 5e-3
-#         delta = 1.
-#         energy_eV = 40000
-#         unit_multiplier = 1e-3
-#         propagation_distance = 10
-#         processor = PaganinPhaseProcessor.retrieve(energy_eV, delta, beta, unit_multiplier, propagation_distance)
-#         processor.set_input(self.data)
-#         phase_data = processor.get_output(output_type = 'attenuation')
+        beta = 5e-3
+        delta = 1.
+        energy_eV = 40000
+        unit_multiplier = 1e-3
+        propagation_distance = 10
+        processor = PaganinPhaseProcessor.retrieve(energy_eV, delta, beta, unit_multiplier, propagation_distance)
+        processor.set_input(self.data)
+        phase_data = processor.get_output(output_type = 'attenuation')
         
-#         absorption_data = self.data.log()*-1
+        absorption_data = self.data.log()*-1
 
-#         self.assertLessEqual(quality_measures.mse(absorption_data, phase_data), 0.05)
+        self.assertLessEqual(quality_measures.mse(absorption_data, phase_data), 0.05)
 
 
 if __name__ == "__main__":

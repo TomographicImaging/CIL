@@ -28,8 +28,8 @@ from scipy import constants
 from tqdm import tqdm
 
 import logging
-import dask
-from dask import delayed
+from dask import compute, delayed
+from multiprocessing import Process, Pool, map
 
 class PaganinPhaseProcessor(Processor):
 
@@ -149,7 +149,7 @@ class PaganinProcessor(Processor):
             'unit_multiplier' : unit_multiplier,
             'propagation_distance_user' : propagation_distance,
             'filter_type' : filter_type,
-            'output_type' : None,
+            'output_type' : 'phase',
             'mu' : None,
             'alpha' : None,
             'pixel_size' : None,
@@ -233,13 +233,17 @@ class PaganinProcessor(Processor):
                     j += 1
                 # set up j delayed computation
                 procs = []
+                
                 for idx in range(j):
                     projection = data.get_slice(angle=i+idx).as_array()
+                    
+                    process = Process(target=self.process_projection, args = projection)
+                    process.start()
                     procs.append(delayed(self.process_projection)(projection))
                 # call compute on j (< num_parallel_processes) processes concurrently
                 # this limits the amount of memory required to store the output of the 
                 # phase retrieval to j projections.
-                res = dask.compute(*procs[:j])
+                res = compute(*procs[:j])
                 
                 # copy the output in the output buffer
                 for k, el in enumerate(res):

@@ -33,7 +33,10 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 from cil.utilities import dataexample
 import logging
 from testclass import CCPiTestClass
+import scipy
+
 from cil.utilities.errors import InPlaceError
+
 
 
 initialise_tests()
@@ -72,6 +75,16 @@ class TestOperator(CCPiTestClass):
         
         A.adjoint(res1, out = out2)
         self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)
+
+        ## dot test for real and complex MatrixOperator
+        self.assertTrue(A.dot_test(A))
+
+        Amat = numpy.random.randn(m, n) + 1j*numpy.random.randn(m, n)
+        A = MatrixOperator(Amat)  
+        self.assertTrue(A.dot_test(A))      
+        
+        
+        
     
     def test_ZeroOperator(self):
         ig = ImageGeometry(10,20,30)
@@ -304,11 +317,15 @@ class TestOperator(CCPiTestClass):
             
 
     def test_PowerMethod(self):
+        numpy.random.seed(2)
         # 2x2 real matrix, dominant eigenvalue = 2
         M1 = numpy.array([[1,0],[1,2]], dtype=float)
         M1op = MatrixOperator(M1)
         res1 = M1op.PowerMethod(M1op,100)
         numpy.testing.assert_almost_equal(res1,2., decimal=4)
+
+        res_scipy = scipy.linalg.eig(M1)
+        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)
 
         # Test with the norm       
         res2 = M1op.norm()
@@ -320,31 +337,44 @@ class TestOperator(CCPiTestClass):
         M1 = numpy.array([[1.,0.,3],[1,2.,3]])
         M1op = MatrixOperator(M1)
         res1 = M1op.PowerMethod(M1op,100)
-        numpy.testing.assert_almost_equal(res1,4.711479432297657, decimal=4)        
+        numpy.testing.assert_almost_equal(res1,4.711479432297657, decimal=4)
+
+        res_scipy = scipy.linalg.eig(M1.T.conjugate()@M1)
+        numpy.testing.assert_almost_equal(res1,numpy.sqrt(numpy.abs(res_scipy[0])).max(), decimal=4)        
         
         # 2x3 complex matrix, (real eigenvalues), dominant eigenvalue = 5.417602365823937
         M1 = numpy.array([[2,1j,0],[2j,5j,0]])
         M1op = MatrixOperator(M1)
         res1 = M1op.PowerMethod(M1op,100)
-        numpy.testing.assert_almost_equal(res1,5.417602365823937, decimal=4) 
+        numpy.testing.assert_almost_equal(res1,5.531859582980837, decimal=4) 
+        res_scipy = scipy.linalg.eig(M1.T.conjugate()@M1)
+        numpy.testing.assert_almost_equal(res1,numpy.sqrt(numpy.abs(res_scipy[0])).max(), decimal=4)        
+                
 
         # 3x3 complex matrix, (real+complex eigenvalue), dominant eigenvalue = 3.1624439599276974
         M1 = numpy.array([[2,0,0],[1,2j,1j],[3, 3-1j,3]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,120)
-        numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=3) 
-
+        res1 = M1op.PowerMethod(M1op,150)
+        numpy.testing.assert_almost_equal(res1, 3.1624439599276974, decimal=3) 
+        res_scipy = scipy.linalg.eig(M1)
+        print(numpy.abs(res_scipy[0]).max())
+        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)        
+                     
         # 2x2 non-diagonalisable nilpotent matrix
         M1=numpy.array([[0.,1.], [0.,0.]])
         M1op = MatrixOperator(M1)
         res1 = M1op.PowerMethod(M1op,5)
         numpy.testing.assert_almost_equal(res1,0, decimal=4) 
+        res_scipy = scipy.linalg.eig(M1)
+        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)         
 
         # 2x2 non-diagonalisable nilpotent matrix where method="composed_with_adjoint"
         M1=numpy.array([[0.,1.], [0.,0.]])
         M1op = MatrixOperator(M1)
         res1 = M1op.PowerMethod(M1op,5, method="composed_with_adjoint")
-        numpy.testing.assert_almost_equal(res1,1, decimal=4) 
+        numpy.testing.assert_almost_equal(res1,1, decimal=4)
+        res_scipy = scipy.linalg.eig(M1.T@M1)
+        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)          
 
 
         # 2x2 matrix, max absolute eigenvalue is not unique and initial vector chosen for non-convergence

@@ -23,7 +23,7 @@ import numpy
 from cil.framework import DataContainer
 from cil.framework import ImageData
 from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, VectorData
 from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 import logging
@@ -666,6 +666,18 @@ class TestDataContainer(CCPiTestClass):
         ig = ImageGeometry(2,2)
         self.complex_allocate_geometry_test(ig)
 
+    def test_ImageGeometry_allocate_random_complex(self):
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random_int', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+        
 
     def test_AcquisitionGeometry_allocate_complex(self):
         # Detectors
@@ -680,11 +692,42 @@ class TestDataContainer(CCPiTestClass):
                                 .set_panel(detectors, pixel_size=0.1)   
 
         self.complex_allocate_geometry_test(ag)
+        
+    def test_AcquisitionGeometry_allocate_random_complex(self):
+        
+        detectors =  10
+
+        # Angles
+        angles = numpy.linspace(0,10,10, dtype='float32')
+
+        # Setup acquisition geometry
+        ag = AcquisitionGeometry.create_Parallel2D()\
+                                .set_angles(angles)\
+                                .set_panel(detectors, pixel_size=0.1)   
+                                
+                                
+        data=ag.allocate('random', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+
+        data=ag.allocate('random_int', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
 
 
     def test_VectorGeometry_allocate_complex(self):
         vg = VectorGeometry(3)
         self.complex_allocate_geometry_test(vg)
+        
+        data=vg.allocate('random', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
+        
+        data=vg.allocate('random_int', dtype=numpy.complex64)
+        self.assertTrue(data.array.dtype, numpy.complex64)
+        self.assertNotEqual(numpy.sum(data.array).imag, 0)
         
 
     def test_ImageGeometry_allocate_random_same_seed(self):
@@ -1315,3 +1358,22 @@ class TestDataContainer(CCPiTestClass):
         numpy.testing.assert_array_equal(u.get_slice(channel=1, vertical=1).as_array(), 3 * a)
 
 
+    def test_vectordata_dot_product(self):
+        x = numpy.array([1 + 1j, 2 - 5j])
+        y = numpy.array([3 - 2j, 1 + 1j])
+
+        a1 = numpy.dot(y, x.conjugate())
+        a2 = numpy.dot(x.conjugate(), y)
+        self.assertAlmostEqual( a1, a2)
+        b1 = numpy.vdot(x, y)
+        b2 = numpy.vdot(y, x).conjugate()
+        self.assertAlmostEqual( b1, b2)
+
+        print(a1, b1)
+        print(a2, b2)
+
+        xcil = VectorData(x)
+        ycil = VectorData(y)
+        self.assertAlmostEqual( ycil.dot(xcil), xcil.dot(ycil).conjugate())
+        
+    

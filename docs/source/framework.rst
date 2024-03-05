@@ -21,7 +21,7 @@ Framework
 
 
 AcquisitionGeometry
-==================
+===================
 
 The :code:`AcquisitionGeometry` class holds the system acquisition parameters. 
 

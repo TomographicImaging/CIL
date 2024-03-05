@@ -89,6 +89,7 @@ jobs:
         docs_dir="${docs_dir//\//_}"
         if test "$docs_dir" = master; then docs_dir=nightly; fi
         rm -rf "build/$docs_dir"
+        ./mkdemos.py
         sphinx-build -b dirhtml source "build/$docs_dir"
         sed 's#DESTINATION#nightly#g' .redirect-template.html > build/index.html
         ./mkversions.py

@@ -103,9 +103,9 @@ a HTTP server to view the documentation.
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
 #. Install packages from ``docs/docs_environment.yml`` (with 'name' changed to ENVIRONMENT_NAME) using ``conda env update -f docs_environment.yml``
-#. ``make html``
-#. Go to build directory (``build/html`` by default)
-#. Start a HTTP server to serve documentation
+#. Download the notebooks for rendering in the documentation with ``python mkdemos.py``
+#. Build the documentation ``sphinx-build -b dirhtml source build``
+#. Start a HTTP server to serve documentation with ``python -m http.server --directory build``
 
 Example:
 ::
@@ -121,10 +121,19 @@ Example:
   cd ../docs/
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-  make html
-  cd build/html
-  python3 -m http.server
+  python mkdemos.py
+  sphinx-build -b dirhtml source build
+  python -m http.server -d build
 
+Notebooks gallery
+-----------------
+
+The ``mkdemos.py`` script:
+
+- downloads notebooks from external URLs to ``source/demos/*.ipynb``
+- uses the ``demos-template.rst`` file to generate the gallery in ``source/demos.rst``
+
+The ``nbsphinx`` extension will convert the ``*.ipynb`` files to HTML.
 
 Contributions guidelines
 ========================

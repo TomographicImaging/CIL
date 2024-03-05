@@ -1,0 +1,7 @@
+/build/
+/Wrappers/Python/build/
+/Wrappers/Python/*.egg*/
+/Wrappers/Python/cil/version.py
+/Wrappers/Python/setup.py
+__pycache__/
+/docs/build/

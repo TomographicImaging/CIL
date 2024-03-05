@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -106,6 +105,7 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
         
         if mask is None:
             data_range = ground_truth.as_array().max()
+
             
         else:
             

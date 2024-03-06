@@ -2715,10 +2715,10 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
 
     
         processor = PaganinPhaseProcessor.retrieve(propagation_distance=10, verbose=False)
-        processor.set_input(self.data)
+        processor.set_input(self.data_parallel)
         phase_data = processor.get_output(output_type = 'attenuation')
         
-        absorption_data = self.data.log()*-1
+        absorption_data = self.data_parallel.log()*-1
 
         self.assertLessEqual(quality_measures.mse(absorption_data, phase_data), 0.05)
 

@@ -44,6 +44,7 @@ class WaveletOperator(LinearOperator):
             Defines the dimensions to decompose along. Note that channel is the first dimension: for example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
             Default = `None`, meaning all dimensions are transformed. Same as axes = range(ndim)
 
+
         **kwargs:
         ---------
         correlation: str, default 'All'. Note: Only applied if `axes = None`!
@@ -54,16 +55,15 @@ class WaveletOperator(LinearOperator):
             Most common examples are 'symmetric' (padding by mirroring edge values), 'zero' (padding with zeros), 'periodic' (wrapping values around as in circular convolution).
             Some padding methods can have unexpected effect on the wavelet coefficients at the edges.
             See https://pywavelets.readthedocs.io/en/latest/ref/signal-extension-modes.html for more details and all options.
+        true_adjoint: bool, default `True`. For biorthogonal wavelets the true mathematical adjoint should no longer produce perfect reconstructions, setting `true_adjoint`as `False` the reconstruction (using the adjoint) should be (almost) the original input.
 
-        Attributes
-        ----------
-        moments: integer or `None`
-            number of vanishing moments. Known for Daubechies, `None` for others
-            
         Note
         -----
         The default decomposition level is the theoretical maximum: log_2(min(input.shape)).  However, this is not always recommended and pywavelets should give a warning if the coarsest scales are too small to be meaningful.
 
+        Note
+        ----
+        We currently do not support wavelets that are not orthogonal or bi-orthogonal. 
      '''
 
     def __init__(self, domain_geometry,
@@ -100,24 +100,24 @@ class WaveletOperator(LinearOperator):
 
         # Convolution boundary condition i.e. padding method
         self.bnd_cond = kwargs.get('bnd_cond', 'symmetric')
+        self._trueAdj = kwargs.get('true_adjoint', True)
 
         self.wname = wname
         self._wavelet = pywt.Wavelet(wname)
-        self.moments = self._wavelet.vanishing_moments_psi
-        self._trueAdj = kwargs.get('true_adjoint', True)
-        if all([not self._wavelet.orthogonal, self._wavelet.biorthogonal, self._trueAdj]): # True adjoint for biorthogonal wavelet
+        # True adjoint for biorthogonal wavelet
+        if all([not self._wavelet.orthogonal, self._wavelet.biorthogonal, self._trueAdj]):
             self._wavelet = self._getBiortFilters(wname)
-        
+
         if level is None:
             level = pywt.dwtn_max_level(
-            	domain_geometry.shape, wavelet=self._wavelet, axes=axes)
+                domain_geometry.shape, wavelet=self._wavelet, axes=axes)
         self.level = int(level)
 
         self._shapes = pywt.wavedecn_shapes(
-        	domain_geometry.shape, wavelet=self._wavelet, level=level, axes=axes, mode=self.bnd_cond)
+            domain_geometry.shape, wavelet=self._wavelet, level=level, axes=axes, mode=self.bnd_cond)
         self.axes = axes
         self._slices = self._shape2slice()
-        
+
         # Compute the correct wavelet domain size
         range_shape = np.array(domain_geometry.shape)
         if axes is None:
@@ -170,7 +170,7 @@ class WaveletOperator(LinearOperator):
 
         _, slices = pywt.coeffs_to_array(coeff_tmp, padding=0, axes=self.axes)
         return slices
-    
+
     def _getBiortFilters(self, wname):
         """Helper function for creating a custom wavelet object.
         Using mirrored decomposition filters for reconstruction gives adjoint.
@@ -182,7 +182,7 @@ class WaveletOperator(LinearOperator):
         wavelet.orthogonal = False
         wavelet.biorthogonal = True
         return wavelet
-    
+
     def direct(self, x, out=None):
         r"""Returns the value of the WaveletOperator applied to :math:`x`
 
@@ -200,9 +200,9 @@ class WaveletOperator(LinearOperator):
         """
 
         x_arr = x.as_array()
-        
+
         coeffs = pywt.wavedecn(
-        	x_arr, wavelet=self._wavelet, level=self.level, axes=self.axes, mode=self.bnd_cond)
+            x_arr, wavelet=self._wavelet, level=self.level, axes=self.axes, mode=self.bnd_cond)
 
         Wx, _ = pywt.coeffs_to_array(coeffs, axes=self.axes)
 
@@ -211,7 +211,7 @@ class WaveletOperator(LinearOperator):
             ret.fill(Wx)
             return ret
         else:
-            out.fill(Wx) 
+            out.fill(Wx)
             return out
 
     def adjoint(self, Wx, out=None):
@@ -230,11 +230,15 @@ class WaveletOperator(LinearOperator):
 
         """
 
+        if not (self._wavelet.orthogonal or self._wavelet.biorthogonal):
+            raise ValueError(
+                'CIL currently only supports orthogonal and biorthogonal wavelets')
+
         Wx_arr = Wx.as_array()
         coeffs = pywt.array_to_coeffs(Wx_arr, self._slices)
 
         x = pywt.waverecn(
-        	coeffs, wavelet=self._wavelet, axes=self.axes, mode=self.bnd_cond)
+            coeffs, wavelet=self._wavelet, axes=self.axes, mode=self.bnd_cond)
 
         # Need to slice the output in case original size is of odd length
         org_size = tuple(slice(i) for i in self.domain_geometry().shape)

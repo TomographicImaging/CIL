@@ -14,6 +14,53 @@ def setUp(self):
     print("Seed set")
 
 class TestWavelets(CCPiTestClass):
+    
+    def test_wavelet_operator_init(self):
+        m, n=11,13
+        dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
+        W = WaveletOperator(dg)
+        self.assertEqual(W.wname, 'haar')
+        self.assertEqual(pywt.Wavelet(W.wname).filter_bank, W._wavelet.filter_bank)
+        self.assertEqual(W.correlation, None)
+        self.assertEqual(W.bnd_cond, 'symmetric')
+        self.assertEqual(W._trueAdj, True )
+        self.assertEqual(W.level,int(np.log2(min(n,m))))
+        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)
+        
+
+        dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
+        rg = ImageGeometry(voxel_num_x=n, voxel_num_y=m)
+        with self.assertRaises(AttributeError):
+            W = WaveletOperator(dg, rg)
+        
+        dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
+        
+        with self.assertWarnsRegex(UserWarning, "Level value of 100 is too high"):
+            WaveletOperator(dg, level=100)
+        
+                
+        W = WaveletOperator(dg, dg, wname='db2', level=0, axes=[0], bnd_cond='zero', true_adjoint=False)
+        self.assertEqual(W.wname, 'db2')
+        self.assertEqual(pywt.Wavelet(W.wname).filter_bank, W._wavelet.filter_bank)
+        self.assertEqual(W.correlation, None)
+        self.assertEqual(W.bnd_cond, 'zero')
+        self.assertEqual(W._trueAdj, False)
+        self.assertEqual(W.level,0)
+        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)
+        
+        
+    def test_wavelet_norm_init(self):
+        m, n=11,13
+        dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
+        W = WaveletOperator(dg)
+        Wnorm=WaveletNorm(W)
+        from cil.optimisation.functions.L1Norm import _L1Norm, _WeightedL1Norm
+        self.assertTrue(issubclass(Wnorm.l1norm.function.__class__, _L1Norm))
+        
+        Wnorm=WaveletNorm(W, weight=np.ones((13,11)))
+        self.assertTrue(issubclass(Wnorm.l1norm.function.__class__, _WeightedL1Norm))
+        self.assertNumpyArrayEqual(Wnorm.l1norm.function.weight, np.ones((13,11)))
+    
 
     def test_WaveletOperator_dimensions(self):
         m, n = 42, 47

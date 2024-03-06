@@ -500,7 +500,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">compress_and_save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compress</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Compress and save numpy array to file</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : numpy array</span>
@@ -530,7 +530,7 @@ document.write(`
 <div class="viewcode-block" id="RAWFileWriter"><a class="viewcode-back" href="../../../../io/#cil.io.RAWFileWriter">[docs]</a><span class="k">class</span> <span class="nc">RAWFileWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Writer to write DataContainer (or subclass AcquisitionData, ImageData) to disk as a binary blob</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : DataContainer, AcquisitionData or ImageData</span>
@@ -538,15 +538,15 @@ document.write(`
 <span class="sd">        file_name : string</span>
 <span class="sd">            This defines the file name prefix, i.e. the file name without the extension.</span>
 <span class="sd">        compression : str, default None. Accepted values None, &#39;uint8&#39;, &#39;uint16&#39;</span>
-<span class="sd">            The lossy compression to apply. The default None will not compress data. </span>
+<span class="sd">            The lossy compression to apply. The default None will not compress data.</span>
 <span class="sd">            &#39;uint8&#39; or &#39;unit16&#39; will compress to unsigned int 8 and 16 bit respectively.</span>
 
 
-<span class="sd">        This writer will also write a text file with the minimal information necessary to </span>
+<span class="sd">        This writer will also write a text file with the minimal information necessary to</span>
 <span class="sd">        read the data back in. This text file will need to reside in the same directory as the raw file.</span>
 
 <span class="sd">        The text file will look something like this::</span>
-<span class="sd">        </span>
+
 <span class="sd">            [MINIMAL INFO]</span>
 <span class="sd">            file_name = filename.raw</span>
 <span class="sd">            data_type = &lt;u2</span>
@@ -556,14 +556,14 @@ document.write(`
 <span class="sd">            [COMPRESSION]</span>
 <span class="sd">            scale = 550.7142857142857</span>
 <span class="sd">            offset = -0.0</span>
-<span class="sd">        </span>
+
 <span class="sd">        The ``data_type`` describes the data layout when packing and unpacking data. This can be</span>
 <span class="sd">        read as numpy dtype with ``np.dtype(&#39;&lt;u2&#39;)``.</span>
 
-<span class="sd">        </span>
+
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
-<span class="sd">        </span>
+
 <span class="sd">        Example of using the writer with compression to ``uint8``:</span>
 
 <span class="sd">        &gt;&gt;&gt; from cil.io import RAWFileWriter</span>
@@ -574,7 +574,7 @@ document.write(`
 <span class="sd">        -------</span>
 
 <span class="sd">        Example of reading the data from the ini file:</span>
-<span class="sd">        </span>
+
 <span class="sd">        &gt;&gt;&gt; config = configparser.ConfigParser()</span>
 <span class="sd">        &gt;&gt;&gt; inifname = &quot;file_name.ini&quot;</span>
 <span class="sd">        &gt;&gt;&gt; config.read(inifname)</span>
@@ -589,7 +589,7 @@ document.write(`
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 
-<span class="sd">          If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved </span>
+<span class="sd">          If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved</span>
 <span class="sd">          in the ``ini`` file in the same directory as the raw file, in the &quot;COMPRESSION&quot; section .</span>
 
 <span class="sd">          The original data can be obtained by: ``original_data = (compressed_data - offset) / scale``</span>
@@ -597,10 +597,10 @@ document.write(`
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 
-<span class="sd">          Data is always written in ‘C’ order independent of the order of the original data, </span>
-<span class="sd">          https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile, </span>
-<span class="sd">          </span>
-<span class="sd">                </span>
+<span class="sd">          Data is always written in ‘C’ order independent of the order of the original data,</span>
+<span class="sd">          https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile,</span>
+
+
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

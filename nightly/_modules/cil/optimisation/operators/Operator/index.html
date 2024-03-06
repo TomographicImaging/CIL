@@ -507,7 +507,7 @@ document.write(`
 <span class="sd">        domain of the operator</span>
 
 <span class="sd">    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None</span>
-<span class="sd">        range of the operator </span>
+<span class="sd">        range of the operator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -525,8 +525,8 @@ document.write(`
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="Operator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.Operator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calls the operator </span>
-<span class="sd">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calls the operator</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: DataContainer or BlockDataContainer</span>
@@ -535,8 +535,8 @@ document.write(`
 <span class="sd">            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. </span>
-<span class="sd">        </span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
@@ -569,8 +569,8 @@ document.write(`
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method. </span>
-<span class="sd">        If `None` is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called. </span>
+<span class="sd">        The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method.</span>
+<span class="sd">        If `None` is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -651,7 +651,7 @@ document.write(`
 <span class="sd">        domain of the operator</span>
 
 <span class="sd">    range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None</span>
-<span class="sd">        range of the operator </span>
+<span class="sd">        range of the operator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -672,7 +672,7 @@ document.write(`
 <span class="sd">            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. </span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        Only available to linear operators&#39;&#39;&#39;</span>
@@ -680,10 +680,10 @@ document.write(`
 
 <div class="viewcode-block" id="LinearOperator.PowerMethod"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.LinearOperator.PowerMethod">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>  <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Power method or Power iteration algorithm </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Power method or Power iteration algorithm</span>
 
 <span class="sd">        The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,</span>
-<span class="sd">        absolute value in the real case and modulus in the complex case.        </span>
+<span class="sd">        absolute value in the real case and modulus in the complex case.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -694,10 +694,10 @@ document.write(`
 <span class="sd">        initial: DataContainer, default = None</span>
 <span class="sd">            Starting point for the Power method.</span>
 <span class="sd">        tolerance: positive:`float`, default = 1e-5</span>
-<span class="sd">            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    </span>
+<span class="sd">            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.</span>
 <span class="sd">        return_all: `boolean`, default = False</span>
 <span class="sd">            Toggles the verbosity of the return</span>
-<span class="sd">        method: `string` one of `&quot;auto&quot;`, `&quot;composed_with_adjoint&quot;` and `&quot;direct_only&quot;`, default = `&quot;auto&quot;` </span>
+<span class="sd">        method: `string` one of `&quot;auto&quot;`, `&quot;composed_with_adjoint&quot;` and `&quot;direct_only&quot;`, default = `&quot;auto&quot;`</span>
 <span class="sd">            The default `auto` lets the code choose the method, this can be specified with `&quot;direct_only&quot;` or `&quot;composed_with_adjoint&quot;`</span>
 
 
@@ -716,12 +716,12 @@ document.write(`
 
 <span class="sd">        Note</span>
 <span class="sd">        -----</span>
-<span class="sd">        The power method contains two different algorithms chosen by the `method` flag. </span>
+<span class="sd">        The power method contains two different algorithms chosen by the `method` flag.</span>
 
-<span class="sd">        In the case `method=&quot;direct_only&quot;`, for operator, :math:`A`, the power method computes the iterations </span>
-<span class="sd">        :math:`x_{k+1} = A (x_k/\|x_{k}\|)` initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. </span>
+<span class="sd">        In the case `method=&quot;direct_only&quot;`, for operator, :math:`A`, the power method computes the iterations</span>
+<span class="sd">        :math:`x_{k+1} = A (x_k/\|x_{k}\|)` initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`.</span>
 
-<span class="sd">        In the case `method=&quot;composed_with_adjoint&quot;`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` </span>
+<span class="sd">        In the case `method=&quot;composed_with_adjoint&quot;`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A`</span>
 <span class="sd">        returning the square root of this value, i.e. the iterations:</span>
 <span class="sd">        :math:`x_{k+1} = A^TA (x_k/\|x_{k}\|)` and returning  :math:`\sqrt{\|x_k\|}`.</span>
 
@@ -729,7 +729,7 @@ document.write(`
 <span class="sd">        uses the method &quot;direct_only&quot; and if not the method &quot;composed_with_adjoint&quot;.</span>
 
 <span class="sd">        Examples</span>
-<span class="sd">        --------    </span>
+<span class="sd">        --------</span>
 
 <span class="sd">        &gt;&gt;&gt; M = np.array([[1.,0],[1.,2.]])</span>
 <span class="sd">        &gt;&gt;&gt; Mop = MatrixOperator(M)</span>
@@ -830,28 +830,28 @@ document.write(`
 <span class="sd">        Evaluates if the following equivalence holds</span>
 <span class="sd">        .. math::</span>
 <span class="sd">          Ax\times y = y \times A^Tx</span>
-<span class="sd">          </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        operator:</span>
 <span class="sd">            operator to test the dot_test</span>
 <span class="sd">        range_init:</span>
-<span class="sd">            optional initialisation container in the operator range </span>
+<span class="sd">            optional initialisation container in the operator range</span>
 <span class="sd">        domain_init:</span>
-<span class="sd">            optional initialisation container in the operator domain </span>
+<span class="sd">            optional initialisation container in the operator domain</span>
 <span class="sd">        seed: int, default = 1</span>
 <span class="sd">            Seed random generator</span>
 <span class="sd">        tolerance:float, default 1e-6</span>
 <span class="sd">            Check if the following expression is below the tolerance</span>
-<span class="sd">        .. math:: </span>
+<span class="sd">        .. math::</span>
 
 <span class="sd">            |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) &lt; tolerance</span>
 
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        boolean, True if the test is passed.       </span>
+<span class="sd">        boolean, True if the test is passed.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">seed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -867,7 +867,7 @@ document.write(`
 
         <span class="n">fx</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">by</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        
+
         <span class="n">lhs</span> <span class="o">=</span> <span class="n">fx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">rhs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
 
@@ -884,7 +884,7 @@ document.write(`
 <span class="k">class</span> <span class="nc">AdjointOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as </span>
+<span class="sd">    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as</span>
 
 <span class="sd">    .. math:: &lt;x, A^* y&gt; = &lt;Ax, y&gt;</span>
 
@@ -895,8 +895,8 @@ document.write(`
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    This example demonstrates that :math:` LHS:=&lt;Gx, y&gt; =&lt;x, G^* y&gt;=:RHS`, where :math:`G` is the gradient operator. </span>
-<span class="sd">    &gt;&gt;&gt; ig = ImageGeometry(2,3) </span>
+<span class="sd">    This example demonstrates that :math:` LHS:=&lt;Gx, y&gt; =&lt;x, G^* y&gt;=:RHS`, where :math:`G` is the gradient operator.</span>
+<span class="sd">    &gt;&gt;&gt; ig = ImageGeometry(2,3)</span>
 <span class="sd">    &gt;&gt;&gt; G = GradientOperator(ig)</span>
 <span class="sd">    &gt;&gt;&gt; div = AdjointOperator(G)</span>
 <span class="sd">    &gt;&gt;&gt; x = G.domain.allocate(&quot;random_int&quot;)</span>
@@ -904,18 +904,18 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; lhs = G.direct(x).dot(y)</span>
 <span class="sd">    &gt;&gt;&gt; rhs = x.dot(div.direct(y))</span>
 <span class="sd">    &gt;&gt;&gt; lhs == rhs # returns True</span>
-<span class="sd">    &quot;&quot;&quot;</span>    
-    
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AdjointOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">(),</span> 
-                                       <span class="n">range_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>         
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdjointOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">(),</span>
+                                       <span class="n">range_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
-                
+
     <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-        
+
     <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ScaledOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ScaledOperator">[docs]</a><span class="k">class</span> <span class="nc">ScaledOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
@@ -995,21 +995,21 @@ document.write(`
 <span class="c1">###############################################################################</span>
 
 <div class="viewcode-block" id="SumOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SumOperator">[docs]</a><span class="k">class</span> <span class="nc">SumOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sums two operators. </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sums two operators.</span>
 <span class="sd">    For example, `SumOperator(left, right).direct(x)` is equivalent to  `left.direct(x)+right.direct(x)`</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    operator1: `Operator`</span>
 <span class="sd">        The first `Operator` in the sum</span>
 <span class="sd">    operator2: `Operator`</span>
 <span class="sd">        The second `Operator` in the sum</span>
-<span class="sd">        </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">    Both operators must have the same domain and range. </span>
-<span class="sd">    </span>
+<span class="sd">    Both operators must have the same domain and range.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator1</span><span class="p">,</span> <span class="n">operator2</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span> <span class="o">=</span> <span class="n">operator1</span>
@@ -1027,8 +1027,8 @@ document.write(`
                                           <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
 
 <div class="viewcode-block" id="SumOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SumOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calls the sum operator </span>
-<span class="sd">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calls the sum operator</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: DataContainer or BlockDataContainer</span>
@@ -1037,8 +1037,8 @@ document.write(`
 <span class="sd">            If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. </span>
-<span class="sd">        </span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1047,8 +1047,8 @@ document.write(`
             <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SumOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SumOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calls the adjoint of the sum operator, evaluated at the point :math:`x`. </span>
-<span class="sd">        </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calls the adjoint of the sum operator, evaluated at the point :math:`x`.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: DataContainer or BlockDataContainer</span>
@@ -1057,9 +1057,9 @@ document.write(`
 <span class="sd">            If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. </span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1072,22 +1072,22 @@ document.write(`
 <div class="viewcode-block" id="SumOperator.is_linear"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SumOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div></div>
 
-    
+
 <span class="c1">###############################################################################</span>
 <span class="c1">################   Composition  ###########################################</span>
 <span class="c1">###############################################################################</span>
 
 
 <div class="viewcode-block" id="CompositionOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.CompositionOperator">[docs]</a><span class="k">class</span> <span class="nc">CompositionOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Composes one or more operators. </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Composes one or more operators.</span>
 <span class="sd">    For example, `CompositionOperator(left, right).direct(x)` is equivalent to `left.direct(right.direct(x))`</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    args: `Operator`s</span>
 <span class="sd">        Operators to be composed. As in mathematical notation, the operators will be applied right to left</span>
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">operators</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -1115,8 +1115,8 @@ document.write(`
 
 <div class="viewcode-block" id="CompositionOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.CompositionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls the composition operator at the point :math:`x`. </span>
-<span class="sd">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls the composition operator at the point :math:`x`.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: DataContainer or BlockDataContainer</span>
@@ -1125,8 +1125,8 @@ document.write(`
 <span class="sd">            If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. </span>
-<span class="sd">        </span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># return self.operator1.direct(self.operator2.direct(x))</span>
@@ -1174,20 +1174,20 @@ document.write(`
                 <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">step</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompositionOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.CompositionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls the adjoint of the composition operator at the point :math:`x`. </span>
-<span class="sd">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls the adjoint of the composition operator at the point :math:`x`.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: DataContainer or BlockDataContainer</span>
 <span class="sd">            Element in the range of the CompositionOperator</span>
 <span class="sd">        out: DataContainer or BlockDataContainer, default None</span>
 <span class="sd">            If out is not None the output of the adjoint of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. </span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1230,8 +1230,6 @@ document.write(`
 
 <div class="viewcode-block" id="CompositionOperator.is_linear"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.CompositionOperator.is_linear">[docs]</a>    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span></div></div>
-
-    
 </pre></div>
 
                 </article>

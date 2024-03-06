@@ -496,136 +496,136 @@ document.write(`
 
 
 <div class="viewcode-block" id="SymmetrisedGradientOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator">[docs]</a><span class="k">class</span> <span class="nc">SymmetrisedGradientOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39; The symmetrised gradient is the operator, :math:`E`, defined by :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrised Gradient and </span>
-<span class="sd">        </span>
+
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39; The symmetrised gradient is the operator, :math:`E`, defined by :math:`E: V \rightarrow W` where `V` is `BlockGeometry` and  `W` is the range of the Symmetrised Gradient and</span>
+
 <span class="sd">        .. math::</span>
-<span class="sd">        </span>
+
 <span class="sd">            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} ) \\</span>
-<span class="sd">                        </span>
-<span class="sd">        </span>
+
+
 <span class="sd">    In 2 dimensions, let :math:`v(x,y)=(v_1(x,y),v_2(x,y))` which gives</span>
-<span class="sd">        </span>
+
 <span class="sd">        .. math::</span>
-<span class="sd">        </span>
-<span class="sd">            \nabla v =\left( \begin{matrix} </span>
+
+<span class="sd">            \nabla v =\left( \begin{matrix}</span>
 <span class="sd">                \partial_{x} v_1 &amp; \partial_x v_2\\</span>
 <span class="sd">                \partial_{y}v_1 &amp; \partial_y v_2</span>
 <span class="sd">            \end{matrix}\right)</span>
-<span class="sd">        </span>
-<span class="sd">    and thus </span>
-<span class="sd">        </span>
+
+<span class="sd">    and thus</span>
+
 <span class="sd">        .. math::</span>
-<span class="sd">        </span>
-<span class="sd">            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} )       </span>
-<span class="sd">            =\left( \begin{matrix} </span>
+
+<span class="sd">            E(v) = 0.5  ( \nabla v + (\nabla v)^{T} )</span>
+<span class="sd">            =\left( \begin{matrix}</span>
 <span class="sd">                \partial_{x} v_1 &amp; 0.5  (\partial_{y} v_1 + \partial_{x} v_2) \\</span>
-<span class="sd">                0.5  (\partial_{x} v_1 + \partial_{y} v_2) &amp; \partial_{y} v_2 </span>
+<span class="sd">                0.5  (\partial_{x} v_1 + \partial_{y} v_2) &amp; \partial_{y} v_2</span>
 <span class="sd">            \end{matrix}\right)</span>
-<span class="sd">                          </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    domain_geometry: `BlockGeometry` with shape (2,1) or (3,1)</span>
-<span class="sd">        Set up the domain of the function. </span>
+<span class="sd">        Set up the domain of the function.</span>
 <span class="sd">    bnd_cond: str, optional, default :code:`Neumann`</span>
 <span class="sd">        Boundary condition either :code:`Neumann` or :code:`Periodic`</span>
 <span class="sd">    correlation: str, optional, default :code:`Channel`</span>
 <span class="sd">        Correlation either :code:`SpaceChannel` or :code:`Channel`</span>
-<span class="sd">        </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="n">CORRELATION_SPACE</span> <span class="o">=</span> <span class="s2">&quot;Space&quot;</span>
     <span class="n">CORRELATION_SPACECHANNEL</span> <span class="o">=</span> <span class="s2">&quot;SpaceChannels&quot;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">bnd_cond</span> <span class="o">=</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">=</span> <span class="n">bnd_cond</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">SymmetrisedGradientOperator</span><span class="o">.</span><span class="n">CORRELATION_SPACE</span><span class="p">)</span>
-                
+
         <span class="n">tmp_gm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">geometries</span><span class="p">)</span><span class="o">*</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">geometries</span>
-        
-        
+
+
         <span class="c1"># Define FD operator. We need one geometry from the BlockGeometry of the domain</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">FD</span> <span class="o">=</span> <span class="n">FiniteDifferenceOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">direction</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">FD</span> <span class="o">=</span> <span class="n">FiniteDifferenceOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">direction</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                              <span class="n">bnd_cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>            
-        
+            <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">SymmetrisedGradientOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-                                          <span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span> 
+                                          <span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
                                           <span class="n">range_geometry</span><span class="o">=</span><span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_gm</span><span class="p">))</span>
-        
-        
+
+
 <div class="viewcode-block" id="SymmetrisedGradientOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )` </span>
-<span class="sd">        </span>
+
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns :math:`E(v) = 0.5 * ( \nabla v + (\nabla v)^{T} )`</span>
+
 <span class="sd">        Parameters:</span>
 <span class="sd">        -------------</span>
-<span class="sd">        </span>
+
 <span class="sd">        x: BlockDataContainer</span>
 <span class="sd">        out: BlockDataContainer, default None</span>
 <span class="sd">            If out is not None the output of direct will be filled in out, otherwise a new object is instantiated and returned.</span>
-<span class="sd">        &#39;&#39;&#39;</span>        
-        
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            
+
             <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">i</span>
                     <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">j</span><span class="p">)))</span>
-                    
-            <span class="n">tmp1</span> <span class="o">=</span> <span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span><span class="p">]</span>        
-                    
-            <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tmp1</span><span class="p">)]</span>   
-                    
-            <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span> 
-    
+
+            <span class="n">tmp1</span> <span class="o">=</span> <span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span><span class="p">]</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tmp1</span><span class="p">)]</span>
+
+            <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
-            
+
             <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">i</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
-                    <span class="n">ind</span><span class="o">+=</span><span class="mi">1</span>                    
-            <span class="n">out1</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span><span class="p">])</span>          
+                    <span class="n">ind</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">out1</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_ind</span><span class="p">])</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out1</span><span class="p">)</span> <span class="p">)</span></div>
-            
-                                               
+
+
 <div class="viewcode-block" id="SymmetrisedGradientOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns the adjoint of the symmetrised gradient operator</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters:</span>
 <span class="sd">        -------------</span>
-<span class="sd">        </span>
+
 <span class="sd">        x: BlockDataContainer</span>
 <span class="sd">        out: BlockDataContainer, default None</span>
 <span class="sd">            If out is not None the output of adjoint will be filled in out, otherwise a new object is instantiated and returned.</span>
-<span class="sd">        &#39;&#39;&#39;</span>         
-       
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            
+
             <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="n">tmp1</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">j</span>
-                    <span class="n">tmp1</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>                    
+                    <span class="n">tmp1</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
-                <span class="n">tmp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp1</span>  
+                <span class="n">tmp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp1</span>
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span>
-            
+
 
         <span class="k">else</span><span class="p">:</span>
-            
-            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span> 
+
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="n">tmp1</span> <span class="o">=</span> <span class="mi">0</span>
@@ -635,8 +635,6 @@ document.write(`
                     <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
                     <span class="n">tmp1</span><span class="o">+=</span><span class="n">tmp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp1</span><span class="p">)</span></div></div>
-                    
-    
 </pre></div>
 
                 </article>

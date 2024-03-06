@@ -500,10 +500,10 @@ document.write(`
     <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_proximal_step_numba</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">abstau</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Numba implementation of a step in the calculation of the proximal of MixedL21Norm</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters:</span>
 <span class="sd">        -----------</span>
-<span class="sd">        arr : numpy array, best if contiguous memory. </span>
+<span class="sd">        arr : numpy array, best if contiguous memory.</span>
 <span class="sd">        abstau: float &gt;= 0</span>
 
 <span class="sd">        Returns:</span>
@@ -512,7 +512,7 @@ document.write(`
 
 <span class="sd">        Note:</span>
 <span class="sd">        -----</span>
-<span class="sd">        </span>
+
 <span class="sd">        Input arr should be contiguous for best performance&#39;&#39;&#39;</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -522,20 +522,20 @@ document.write(`
             <span class="n">el</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">el</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
                 <span class="n">el</span> <span class="o">=</span> <span class="mf">0.</span>
-            
-            <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">el</span> <span class="o">/</span> <span class="n">a</span> 
+
+            <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">el</span> <span class="o">/</span> <span class="n">a</span>
         <span class="k">return</span> <span class="mi">0</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">has_numba</span> <span class="o">=</span> <span class="kc">False</span>
-    
+
 
 
 <span class="k">def</span> <span class="nf">_proximal_step_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Numpy implementation of a step in the calculation of the proximal of MixedL21Norm</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
-<span class="sd">    arr : DataContainer, best if contiguous memory. </span>
+<span class="sd">    arr : DataContainer, best if contiguous memory.</span>
 <span class="sd">    tau: float, numpy array or DataContainer</span>
 
 <span class="sd">    Returns:</span>
@@ -543,14 +543,14 @@ document.write(`
 
 <span class="sd">    A DataContainer where we have substituted nan with 0.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="c1"># Note: we divide x by tau so the cases of tau both scalar and </span>
+    <span class="c1"># Note: we divide x by tau so the cases of tau both scalar and</span>
     <span class="c1"># DataContainers run</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">_exceptions</span><span class="o">.</span><span class="n">_UFuncInputCastingError</span><span class="p">:</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
-    
-    
+
+
     <span class="n">arr</span> <span class="o">/=</span> <span class="n">tmp</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">res</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
@@ -562,88 +562,88 @@ document.write(`
     <span class="n">resarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">resarray</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">res</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">resarray</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">res</span>
-    
+
 
 <div class="viewcode-block" id="MixedL21Norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL21Norm">[docs]</a><span class="k">class</span> <span class="nc">MixedL21Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; MixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}`                  </span>
-<span class="sd">    </span>
+
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; MixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}`</span>
+
 <span class="sd">        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`</span>
-<span class="sd">    </span>
-<span class="sd">    &quot;&quot;&quot;</span>      
-    
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">MixedL21Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  
-                    
-        
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL21Norm function at x. </span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MixedL21Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-<span class="sd">        :param x: :code:`BlockDataContainer`                                           </span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL21Norm function at x.</span>
+
+<span class="sd">        :param x: :code:`BlockDataContainer`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> 
-              
-        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>                                
-            
-                            
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+
 <div class="viewcode-block" id="MixedL21Norm.convex_conjugate"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL21Norm.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the MixedL21Norm function at x.</span>
-<span class="sd">        </span>
+
 <span class="sd">        This is the Indicator function of :math:`\mathbb{I}_{\{\|\cdot\|_{2,\infty}\leq1\}}(x^{*})`,</span>
-<span class="sd">        </span>
-<span class="sd">        i.e., </span>
-<span class="sd">        </span>
-<span class="sd">        .. math:: \mathbb{I}_{\{\|\cdot\|_{2, \infty}\leq1\}}(x^{*}) </span>
-<span class="sd">            = \begin{cases} </span>
+
+<span class="sd">        i.e.,</span>
+
+<span class="sd">        .. math:: \mathbb{I}_{\{\|\cdot\|_{2, \infty}\leq1\}}(x^{*})</span>
+<span class="sd">            = \begin{cases}</span>
 <span class="sd">            0, \mbox{if } \|x\|_{2, \infty}\leq1\\</span>
 <span class="sd">            \infty, \mbox{otherwise}</span>
 <span class="sd">            \end{cases}</span>
-<span class="sd">        </span>
-<span class="sd">        where, </span>
-<span class="sd">        </span>
+
+<span class="sd">        where,</span>
+
 <span class="sd">        .. math:: \|x\|_{2,\infty} = \max\{ \|x\|_{2} \} = \max\{ \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}\}</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> 
-                                        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span></div>
-                    
+
 <div class="viewcode-block" id="MixedL21Norm.proximal"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL21Norm.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL21Norm function at x.</span>
-<span class="sd">        </span>
+
 <span class="sd">        .. math :: \mathrm{prox}_{\tau F}(x) = \frac{x}{\|x\|_{2}}\max\{ \|x\|_{2} - \tau, 0 \}</span>
-<span class="sd">        </span>
+
 <span class="sd">        where the convention 0 · (0/0) = 0 is used.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-                
+
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">has_numba</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span> 
+            <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># may involve a copy if the data is not contiguous</span>
                 <span class="n">tmparr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">_proximal_step_numba</span><span class="p">(</span><span class="n">tmparr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># if numba silently crashes</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;MixedL21Norm.proximal: numba silently crashed.&#39;</span><span class="p">)</span>
-                
+
                 <span class="n">res</span> <span class="o">=</span> <span class="n">tmp</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmparr</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">_proximal_step_numpy</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">_proximal_step_numpy</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -654,57 +654,57 @@ document.write(`
             <span class="k">return</span> <span class="n">res</span></div></div>
 
 <div class="viewcode-block" id="SmoothMixedL21Norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm">[docs]</a><span class="k">class</span> <span class="nc">SmoothMixedL21Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  </span>
-<span class="sd">    </span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`</span>
+
 <span class="sd">        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`</span>
-<span class="sd">        </span>
+
 <span class="sd">        Conjugate, proximal and proximal conjugate methods no closed-form solution</span>
-<span class="sd">        </span>
-<span class="sd">    </span>
-<span class="sd">    &quot;&quot;&quot;</span>    
-        
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
-<span class="w">                </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        :param epsilon: smoothing parameter making MixedL21Norm differentiable </span>
+<span class="sd">        :param epsilon: smoothing parameter making MixedL21Norm differentiable</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">SmoothMixedL21Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span>   
-                
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;We need epsilon&gt;0. Otherwise, call &quot;MixedL21Norm&quot; &#39;</span><span class="p">)</span>
-                            
+
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the SmoothMixedL21Norm function at x.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> 
-            
-            
-        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-         
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="SmoothMixedL21Norm.gradient"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
-<span class="w">        </span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="SmoothMixedL21Norm.gradient"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the SmoothMixedL21Norm function at x.</span>
-<span class="sd">        </span>
+
 <span class="sd">        \frac{x}{|x|}</span>
-<span class="sd">                </span>
-<span class="sd">                </span>
-<span class="sd">        &quot;&quot;&quot;</span>     
-        
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> 
-                   
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
         <span class="n">denom</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">pnorm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
-                          
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">denom</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">denom</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>        </div></div>
+            <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">denom</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div></div>
 </pre></div>
 
                 </article>

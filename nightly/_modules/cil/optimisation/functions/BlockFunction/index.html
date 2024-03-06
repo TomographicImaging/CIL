@@ -495,110 +495,110 @@ document.write(`
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 
 <div class="viewcode-block" id="BlockFunction"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction">[docs]</a><span class="k">class</span> <span class="nc">BlockFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; BlockFunction represents a *separable sum* function :math:`F` defined as</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. math:: F:X_{1}\times X_{2}\cdots\times X_{m} \rightarrow (-\infty, \infty]</span>
-<span class="sd">    </span>
+
 <span class="sd">    where :math:`F` is the separable sum of functions :math:`(f_{i})_{i=1}^{m}`,</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. math:: F(x_{1}, x_{2}, \cdots, x_{m}) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ with } f_{i}: X_{i} \rightarrow (-\infty, \infty].</span>
-<span class="sd">    </span>
-<span class="sd">    A nice property (due to it&#39;s separability structure) is that the proximal operator </span>
+
+<span class="sd">    A nice property (due to it&#39;s separability structure) is that the proximal operator</span>
 <span class="sd">    can be decomposed along the proximal operators of each function :math:`f_{i}`.</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. math:: \mathrm{prox}_{\tau F}(x) = ( \mathrm{prox}_{\tau f_{i}}(x_{i}) )_{i=1}^{m}</span>
-<span class="sd">    </span>
-<span class="sd">    In addition, if :math:`\tau := (\tau_{1},\dots,\tau_{m})`, then </span>
-<span class="sd">    </span>
+
+<span class="sd">    In addition, if :math:`\tau := (\tau_{1},\dots,\tau_{m})`, then</span>
+
 <span class="sd">    .. math:: \mathrm{prox}_{\tau F}(x) = ( \mathrm{prox}_{\tau_{i} f_{i}}(x_{i}) )_{i=1}^{m}</span>
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
 <div class="viewcode-block" id="BlockFunction.__init__"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">functions</span><span class="p">):</span>
-                
+
         <span class="nb">super</span><span class="p">(</span><span class="n">BlockFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="n">functions</span>      
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="n">functions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span></div>
-       
-    <span class="nd">@property</span>        
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># compute Lipschitz constant if possible</span>
         <span class="n">tmp_L</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">func</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  
-                <span class="n">tmp_L</span> <span class="o">+=</span> <span class="n">func</span><span class="o">.</span><span class="n">L</span>                
+            <span class="k">if</span> <span class="n">func</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tmp_L</span> <span class="o">+=</span> <span class="n">func</span><span class="o">.</span><span class="n">L</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">tmp_L</span> <span class="o">=</span> <span class="kc">None</span> 
-                <span class="k">break</span> 
-        <span class="k">return</span> <span class="n">tmp_L</span>     
-                                
+                <span class="n">tmp_L</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">tmp_L</span>
+
 <div class="viewcode-block" id="BlockFunction.__call__"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the value of the BlockFunction :math:`F`</span>
-<span class="sd">        </span>
+
 <span class="sd">        .. math:: F(x) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ where } x = (x_{1}, x_{2}, \cdots, x_{m}), \quad i = 1,2,\dots,m</span>
-<span class="sd">                </span>
+
 <span class="sd">        Parameter:</span>
-<span class="sd">            </span>
+
 <span class="sd">            x : BlockDataContainer and must have as many rows as self.length</span>
 
 <span class="sd">            returns ..math:: \sum(f_i(x_i))</span>
-<span class="sd">            </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockFunction and BlockDataContainer have incompatible size&#39;</span><span class="p">)</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>                
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="n">t</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">t</span></div>
-    
+
 <div class="viewcode-block" id="BlockFunction.convex_conjugate"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the BlockFunction at :math:`x^{*}`.       </span>
-<span class="sd">        </span>
+
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the BlockFunction at :math:`x^{*}`.</span>
+
 <span class="sd">            .. math:: F^{*}(x^{*}) = \overset{m}{\underset{i=1}{\sum}}f_{i}^{*}(x^{*}_{i})</span>
-<span class="sd">            </span>
+
 <span class="sd">            Parameter:</span>
-<span class="sd">            </span>
-<span class="sd">                x : BlockDataContainer and must have as many rows as self.length            </span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>     
-        
+
+<span class="sd">                x : BlockDataContainer and must have as many rows as self.length</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockFunction and BlockDataContainer have incompatible size&#39;</span><span class="p">)</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>              
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="n">t</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">t</span>  </div>
-    
+        <span class="k">return</span> <span class="n">t</span></div>
+
 <div class="viewcode-block" id="BlockFunction.proximal"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Proximal operator of the BlockFunction at x:</span>
-<span class="sd">        </span>
+
 <span class="sd">            .. math:: \mathrm{prox}_{\tau F}(x) =  (\mathrm{prox}_{\tau f_{i}}(x_{i}))_{i=1}^{m}</span>
-<span class="sd">            </span>
+
 <span class="sd">            Parameter:</span>
-<span class="sd">            </span>
-<span class="sd">                x : BlockDataContainer and must have as many rows as self.length            </span>
+
+<span class="sd">                x : BlockDataContainer and must have as many rows as self.length</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockFunction and BlockDataContainer have incompatible size&#39;</span><span class="p">)</span>        
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockFunction and BlockDataContainer have incompatible size&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                
+
             <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tau</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
-                    <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tau</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>                        
-            
-            <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="p">)</span>  
-        
+                    <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tau</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
@@ -606,39 +606,39 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tau</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
-            
-            
-    
+
+
+
 <div class="viewcode-block" id="BlockFunction.gradient"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the BlockFunction function at x.</span>
-<span class="sd">        </span>
-<span class="sd">        .. math:: F&#39;(x) = [f_{1}&#39;(x_{1}), ... , f_{m}&#39;(x_{m})]        </span>
-<span class="sd">        </span>
+
+<span class="sd">        .. math:: F&#39;(x) = [f_{1}&#39;(x_{1}), ... , f_{m}&#39;(x_{m})]</span>
+
 <span class="sd">        Parameter:</span>
-<span class="sd">            </span>
+
 <span class="sd">            x : BlockDataContainer and must have as many rows as self.length</span>
-<span class="sd">                </span>
-<span class="sd">        &quot;&quot;&quot;</span>        
-        
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockFunction and BlockDataContainer have incompatible size&#39;</span><span class="p">)</span>        
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BlockFunction and BlockDataContainer have incompatible size&#39;</span><span class="p">)</span>
+
         <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
             <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-            
-        <span class="k">return</span>  <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="p">)</span>     </div>
+
+        <span class="k">return</span>  <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockFunction.proximal_conjugate"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.proximal_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Proximal operator of the convex conjugate of BlockFunction at x:</span>
-<span class="sd">        </span>
+
 <span class="sd">            .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}</span>
-<span class="sd">            </span>
+
 <span class="sd">            Parameter:</span>
-<span class="sd">            </span>
-<span class="sd">                x : BlockDataContainer and must have as many rows as self.length            </span>
+
+<span class="sd">                x : BlockDataContainer and must have as many rows as self.length</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
@@ -651,9 +651,9 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tau</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-            
+
         <span class="k">else</span><span class="p">:</span>
-                
+
             <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
@@ -661,25 +661,21 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tau</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-            
+
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="p">)</span></div>
-        
+
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
-        
+
 <div class="viewcode-block" id="BlockFunction.__rmul__"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.BlockFunction.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Define multiplication with a scalar</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param other: number</span>
 <span class="sd">        Returns a new `BlockFunction`_ containing the product of the scalar with all the functions in the block</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">raise</span> <span class="bp">NotImplemented</span>
         <span class="k">return</span> <span class="n">BlockFunction</span><span class="p">(</span> <span class="o">*</span> <span class="p">[</span> <span class="n">other</span> <span class="o">*</span> <span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">]</span> <span class="p">)</span></div></div>
-
-                            
-    
-    
 </pre></div>
 
                 </article>

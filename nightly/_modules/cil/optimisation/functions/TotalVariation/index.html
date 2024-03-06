@@ -516,7 +516,7 @@ document.write(`
 
 <span class="sd">    .. math:: f(u) = \|u\|_{2,1}, \Rightarrow (f\circ\nabla)(u) = f(\nabla x) = \mathrm{TV}(u)</span>
 
-<span class="sd">    In that case, the proximal operator of TV does not have an exact solution and we use an iterative </span>
+<span class="sd">    In that case, the proximal operator of TV does not have an exact solution and we use an iterative</span>
 <span class="sd">    algorithm to solve:</span>
 
 <span class="sd">    .. math:: \mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)</span>
@@ -531,24 +531,24 @@ document.write(`
 <span class="sd">    ----------</span>
 
 <span class="sd">    max_iteration : :obj:`int`, default = 5</span>
-<span class="sd">        Maximum number of iterations for the FGP algorithm to solve to solve the dual problem </span>
+<span class="sd">        Maximum number of iterations for the FGP algorithm to solve to solve the dual problem</span>
 <span class="sd">        of the Total Variation Denoising problem (ROF). If warm_start=False, this should be around 100,</span>
-<span class="sd">        or larger, with a set tolerance. </span>
+<span class="sd">        or larger, with a set tolerance.</span>
 <span class="sd">    tolerance : :obj:`float`, default = None</span>
-<span class="sd">        Stopping criterion for the FGP algorithm used to to solve the dual problem </span>
+<span class="sd">        Stopping criterion for the FGP algorithm used to to solve the dual problem</span>
 <span class="sd">        of the Total Variation Denoising problem (ROF). If the difference between iterates in the FGP algorithm is less than the tolerance</span>
-<span class="sd">        the iterations end before the max_iteration number. </span>
+<span class="sd">        the iterations end before the max_iteration number.</span>
 
 <span class="sd">        .. math:: \|x^{k+1} - x^{k}\|_{2} &lt; \mathrm{tolerance}</span>
 
 <span class="sd">    correlation : :obj:`str`, default = `Space`</span>
 <span class="sd">        Correlation between `Space` and/or `SpaceChannels` for the :class:`.GradientOperator`.</span>
-<span class="sd">    backend :  :obj:`str`, default = `c`      </span>
+<span class="sd">    backend :  :obj:`str`, default = `c`</span>
 <span class="sd">        Backend to compute the :class:`.GradientOperator`</span>
 <span class="sd">    lower : :obj:`&#39;float`, default = None</span>
 <span class="sd">        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.</span>
 <span class="sd">    upper : :obj:`&#39;float`, default = None</span>
-<span class="sd">        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.  </span>
+<span class="sd">        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.</span>
 <span class="sd">    isotropic : :obj:`boolean`, default = True</span>
 <span class="sd">        Use either isotropic or anisotropic definition of TV.</span>
 
@@ -564,23 +564,23 @@ document.write(`
 <span class="sd">        of the Total Variation Denoising problem (ROF).</span>
 
 <span class="sd">    strong_convexity_constant : :obj:`float`, default = 0</span>
-<span class="sd">        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. </span>
+<span class="sd">        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation.</span>
 <span class="sd">        Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is</span>
 
 <span class="sd">        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow</span>
 
-<span class="sd">        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) </span>
+<span class="sd">        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u)</span>
 
 <span class="sd">    warm_start : :obj:`boolean`, default = True</span>
-<span class="sd">        If set to true, the FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. </span>
-<span class="sd">        This allows the max_iteration value to be reduced to 5-10 iterations. </span>
+<span class="sd">        If set to true, the FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero.</span>
+<span class="sd">        This allows the max_iteration value to be reduced to 5-10 iterations.</span>
 
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 
-<span class="sd">    With warm_start set to the default, True, the TV function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. This increases the memory requirements. </span>
-<span class="sd">    However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated. </span>
+<span class="sd">    With warm_start set to the default, True, the TV function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. This increases the memory requirements.</span>
+<span class="sd">    However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -613,7 +613,7 @@ document.write(`
 
 <span class="sd">    &gt;&gt;&gt; alpha = 2.0</span>
 <span class="sd">    &gt;&gt;&gt; TV = TotalVariation(isotropic=False, lower=1.0, upper=2.0)</span>
-<span class="sd">    &gt;&gt;&gt; sol = TV.proximal(b, tau = alpha)    </span>
+<span class="sd">    &gt;&gt;&gt; sol = TV.proximal(b, tau = alpha)</span>
 
 
 <span class="sd">    Examples</span>
@@ -624,7 +624,7 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; alpha = 2.0</span>
 <span class="sd">    &gt;&gt;&gt; gamma = 1e-3</span>
 <span class="sd">    &gt;&gt;&gt; TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)</span>
-<span class="sd">    &gt;&gt;&gt; sol = TV.proximal(b, tau = 1.0)    </span>
+<span class="sd">    &gt;&gt;&gt; sol = TV.proximal(b, tau = 1.0)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -736,8 +736,8 @@ document.write(`
 
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="nb">id</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">InPlaceError</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;TotalVariation.proximal cannot be used in place&quot;</span><span class="p">)</span>
-        
-        
+
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
             <span class="n">strongly_convex_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
@@ -757,7 +757,7 @@ document.write(`
             <span class="k">return</span> <span class="n">solution</span></div>
 
     <span class="k">def</span> <span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem</span>
 <span class="sd">        of the Total Variation Denoising problem (ROF).</span>
 
 <span class="sd">        .. math: \max_{\|y\|_{\infty}&lt;=1.} \frac{1}{2}\|\nabla^{*} y + x \|^{2} - \frac{1}{2}\|x\|^{2}</span>
@@ -856,7 +856,7 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">gradient_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; GradientOperator is created if it is not instantiated yet. The domain of the `_gradient`,</span>
-<span class="sd">        is created in the `__call__` and `proximal` methods. </span>
+<span class="sd">        is created in the `__call__` and `proximal` methods.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

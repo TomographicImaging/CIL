@@ -499,12 +499,12 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether the data needs to be compressed and to which numpy type</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
 <span class="sd">    compression : string, int. Default is None, no compression.</span>
-<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16. </span>
-<span class="sd">    </span>
+<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
 <span class="sd">    compress : bool, True if compression is required, False otherwise</span>
@@ -513,7 +513,7 @@ document.write(`
 <span class="sd">    -----</span>
 
 <span class="sd">    The use of int is deprecated and will be removed in the future. Use string instead.</span>
-<span class="sd">    </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;get_compress: The use of int is deprecated and will be removed in the future. Use string instead.&quot;</span><span class="p">)</span>
@@ -531,7 +531,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">get_compressed_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether the data needs to be compressed and to which numpy type</span>
-<span class="sd">    </span>
+
 <span class="sd">    Given the data and the compression level, returns the numpy type to be used for compression.</span>
 
 <span class="sd">    Parameters:</span>
@@ -539,7 +539,7 @@ document.write(`
 <span class="sd">    data : DataContainer, numpy array</span>
 <span class="sd">        the data to be compressed</span>
 <span class="sd">    compression : string, int. Default is None, no compression.</span>
-<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16. </span>
+<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
@@ -560,13 +560,13 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">get_compression_scale_offset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns the scale and offset to be applied to the data to compress it</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
 <span class="sd">    data : DataContainer, numpy array</span>
 <span class="sd">        The data to be compressed</span>
 <span class="sd">    compression : string, int. Default is None, no compression.</span>
-<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16. </span>
+<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
@@ -598,7 +598,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">save_dict_to_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Save scale and offset to file</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    fname : string</span>
@@ -611,14 +611,14 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">compress_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Compress data to dtype using scale and offset</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : numpy array</span>
 <span class="sd">    scale : float</span>
 <span class="sd">    offset : float</span>
 <span class="sd">    dtype : numpy dtype</span>
-<span class="sd">    </span>
+
 <span class="sd">    returns compressed casted data&#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">data</span>
@@ -632,14 +632,14 @@ document.write(`
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tmp</span>
 
-<div class="viewcode-block" id="HDF5_utilities"><a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities">[docs]</a><span class="k">class</span> <span class="nc">HDF5_utilities</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> 
+<div class="viewcode-block" id="HDF5_utilities"><a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities">[docs]</a><span class="k">class</span> <span class="nc">HDF5_utilities</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility methods to read in from a generic HDF5 file and extract the relevant data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
-        
+
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_descend_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
@@ -702,14 +702,14 @@ document.write(`
                 <span class="n">dset</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dset_path</span><span class="p">,</span> <span class="p">)</span>
 
                 <span class="n">attribs</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s1">&#39;ndim&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
+                    <span class="s1">&#39;ndim&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;shape&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;size&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;dtype&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="s1">&#39;compression&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-                    <span class="s1">&#39;chunks&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
+                    <span class="s1">&#39;compression&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;chunks&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;is_virtual&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">}</span>
-                
+
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attribs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">attribs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
@@ -735,8 +735,8 @@ document.write(`
 <span class="sd">            The selection of slices in each source dimension to return</span>
 <span class="sd">        dtype: numpy type, default np.float32</span>
 <span class="sd">            the numpy data type for the returned array</span>
-<span class="sd">    </span>
-<span class="sd">            </span>
+
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        numpy.ndarray</span>
@@ -748,7 +748,7 @@ document.write(`
 
 <span class="sd">        This can be constructed using numpy indexing, i.e. the following lines are equivalent.</span>
 
-<span class="sd">        &gt;&gt;&gt; source_sel = (slice(2, 4, None), slice(2, 10, 2)) </span>
+<span class="sd">        &gt;&gt;&gt; source_sel = (slice(2, 4, None), slice(2, 10, 2))</span>
 
 <span class="sd">        &gt;&gt;&gt; source_sel = np.s_[2:4,2:10:2]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -761,7 +761,7 @@ document.write(`
 
             <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dset</span><span class="p">[</span><span class="n">source_sel</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">arr</span> </div>
+        <span class="k">return</span> <span class="n">arr</span></div>
 
 
 <div class="viewcode-block" id="HDF5_utilities.read_to"><a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities.read_to">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -789,7 +789,7 @@ document.write(`
 
 <span class="sd">        This can be constructed using numpy indexing, i.e. the following lines are equivalent.</span>
 
-<span class="sd">        &gt;&gt;&gt; source_sel = (slice(2, 4, None), slice(2, 10, 2)) </span>
+<span class="sd">        &gt;&gt;&gt; source_sel = (slice(2, 4, None), slice(2, 10, 2))</span>
 
 <span class="sd">        &gt;&gt;&gt; source_sel = np.s_[2:4,2:10:2]</span>
 <span class="sd">        &quot;&quot;&quot;</span>

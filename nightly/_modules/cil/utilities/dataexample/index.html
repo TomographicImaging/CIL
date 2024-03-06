@@ -495,7 +495,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">os.path</span> 
+<span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">NEXUSDataReader</span>
 
@@ -572,7 +572,7 @@ document.write(`
 <div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA.get"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME </span>
+<span class="sd">        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -593,7 +593,7 @@ document.write(`
 <div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA.get"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME </span>
+<span class="sd">        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -626,7 +626,7 @@ document.write(`
 <span class="sd">        ImageData</span>
 <span class="sd">            The simulated spheres volume</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
+
         <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
         <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_volume.nxs&#39;</span><span class="p">))</span>
@@ -634,7 +634,7 @@ document.write(`
 
 <div class="viewcode-block" id="TestData"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData">[docs]</a><span class="k">class</span> <span class="nc">TestData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to return test data</span>
-<span class="sd">    </span>
+
 <span class="sd">    provides 6 dataset:</span>
 <span class="sd">    BOAT = &#39;boat.tiff&#39;</span>
 <span class="sd">    CAMERA = &#39;camera.png&#39;</span>
@@ -651,10 +651,10 @@ document.write(`
     <span class="n">SIMPLE_PHANTOM_2D</span> <span class="o">=</span> <span class="s1">&#39;hotdog&#39;</span>
     <span class="n">SHAPES</span> <span class="o">=</span>  <span class="s1">&#39;shapes.png&#39;</span>
     <span class="n">RAINBOW</span> <span class="o">=</span>  <span class="s1">&#39;rainbow.png&#39;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
-        
+
 <div class="viewcode-block" id="TestData.load"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return a test data of the requested image</span>
@@ -673,7 +673,7 @@ document.write(`
 <span class="sd">        ImageData</span>
 <span class="sd">            The simulated spheres volume</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">which</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TestData</span><span class="o">.</span><span class="n">BOAT</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">CAMERA</span><span class="p">,</span> 
+        <span class="k">if</span> <span class="n">which</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TestData</span><span class="o">.</span><span class="n">BOAT</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">CAMERA</span><span class="p">,</span>
                          <span class="n">TestData</span><span class="o">.</span><span class="n">PEPPERS</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">RESOLUTION_CHART</span><span class="p">,</span>
                          <span class="n">TestData</span><span class="o">.</span><span class="n">SIMPLE_PHANTOM_2D</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SHAPES</span><span class="p">,</span>
                          <span class="n">TestData</span><span class="o">.</span><span class="n">RAINBOW</span><span class="p">]:</span>
@@ -703,12 +703,12 @@ document.write(`
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">N</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">M</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                
+
                 <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="n">M</span><span class="p">,</span> <span class="n">voxel_num_y</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="o">=</span><span class="p">[</span><span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_Y</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">])</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">N</span><span class="p">)))</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
-            
+
         <span class="k">else</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">which</span><span class="p">))</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
 
@@ -725,7 +725,7 @@ document.write(`
                         <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
                         <span class="n">bands</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">getbands</span><span class="p">()</span>
 
-                    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span> 
+                    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
                     <span class="n">dimension_labels</span><span class="o">=</span><span class="p">[</span><span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_Y</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">,</span><span class="n">ImageGeometry</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">])</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
                     <span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">N</span><span class="p">))))</span>
@@ -767,7 +767,7 @@ document.write(`
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> 
+            <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span>
                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestData.scikit_random_noise"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.scikit_random_noise">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -841,8 +841,8 @@ document.write(`
 <span class="sd">        To generate Poisson noise against a signed image, the signed image is</span>
 <span class="sd">        temporarily converted to an unsigned image in the floating point domain,</span>
 <span class="sd">        Poisson noise is generated, then it is returned to the original range.</span>
-<span class="sd">        </span>
-<span class="sd">        This function is adapted from scikit-image. </span>
+
+<span class="sd">        This function is adapted from scikit-image.</span>
 <span class="sd">        https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py</span>
 
 <span class="sd">        Copyright (C) 2019, the scikit-image team</span>
@@ -873,7 +873,7 @@ document.write(`
 <span class="sd">        STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="sd">        IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="sd">        POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 

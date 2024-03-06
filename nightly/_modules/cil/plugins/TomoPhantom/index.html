@@ -520,7 +520,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether a model in the TomoPhantom library is temporal</span>
-<span class="sd">    </span>
+
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
 <span class="sd">    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models</span>
 
@@ -533,7 +533,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">get_model_num_channels</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns number of temporal steps (channels) the model has</span>
-<span class="sd">    </span>
+
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
 <span class="sd">    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models</span>
 
@@ -545,12 +545,12 @@ document.write(`
 <span class="sd">    :param num_dims: dimensionality of the phantom, 2D or 3D</span>
 <span class="sd">    :type num_dims: int, default 2</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">return</span> <span class="n">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="n">num_dims</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
 
 <span class="k">def</span> <span class="nf">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns params_switch array from the C TomoPhantom library in function checkParams2D or checkParams3D</span>
-<span class="sd">    </span>
+
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
 <span class="sd">    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models</span>
 
@@ -563,7 +563,7 @@ document.write(`
 <span class="sd">    :type num_dims: int, default 2</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams2D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array </span>
+        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams2D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">,</span>                                   <span class="c1"># model number selector (int)</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_char_p</span><span class="p">]</span>                  <span class="c1"># string to the library file</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
@@ -572,16 +572,16 @@ document.write(`
         <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams2D</span><span class="p">(</span><span class="n">params_p</span><span class="p">,</span> <span class="n">num_model</span><span class="p">,</span> <span class="n">lib2d_p</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">params</span>
-        
+
     <span class="k">elif</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams3D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array </span>
+        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams3D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">,</span>                                   <span class="c1"># model number selector (int)</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_char_p</span><span class="p">]</span>                  <span class="c1"># string to the library file</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">11</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
         <span class="n">params_p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">))</span>
         <span class="n">lib2d_p</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_library3D</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams3D</span><span class="p">(</span><span class="n">params_p</span><span class="p">,</span> <span class="n">num_model</span><span class="p">,</span> <span class="n">lib2d_p</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">params</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -589,56 +589,56 @@ document.write(`
 
 <div class="viewcode-block" id="get_ImageData"><a class="viewcode-back" href="../../../../plugins/#cil.plugins.TomoPhantom.get_ImageData">[docs]</a><span class="k">def</span> <span class="nf">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns an ImageData relative to geometry with the model num_model from tomophantom</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param num_model: model number</span>
 <span class="sd">    :type num_model: int</span>
 <span class="sd">    :param geometry: geometrical info that describes the phantom</span>
 <span class="sd">    :type geometry: ImageGeometry</span>
 <span class="sd">    Example usage:</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. code-block:: python</span>
-<span class="sd">      </span>
+
 <span class="sd">      ndim = 2</span>
 <span class="sd">      N=128</span>
 <span class="sd">      angles = np.linspace(0, 360, 50, True, dtype=np.float32)</span>
 <span class="sd">      offset = 0.4</span>
 <span class="sd">      channels = 3</span>
-<span class="sd">        </span>
+
 <span class="sd">      if ndim == 2:</span>
 <span class="sd">          ag = AcquisitionGeometry.create_Cone2D((offset,-100), (offset,100))</span>
 <span class="sd">          ag.set_panel(N)</span>
-<span class="sd">            </span>
+
 <span class="sd">      else:</span>
 <span class="sd">          ag = AcquisitionGeometry.create_Cone3D((offset,-100, 0), (offset,100,0))</span>
 <span class="sd">          ag.set_panel((N,N-2))</span>
-<span class="sd">        </span>
+
 <span class="sd">      ag.set_channels(channels)</span>
 <span class="sd">      ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
+
 <span class="sd">      ig = ag.get_ImageGeometry()</span>
 <span class="sd">      num_model = 1</span>
 <span class="sd">      phantom = TomoPhantom.get_ImageData(num_model=num_model, geometry=ig)</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">ig</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">ig</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">DataOrder</span><span class="o">.</span><span class="n">TOMOPHANTOM_IG_LABELS</span><span class="p">)</span>
     <span class="n">num_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">ImageGeometry</span><span class="o">.</span><span class="n">CHANNEL</span> <span class="ow">in</span> <span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Selected model </span><span class="si">{}</span><span class="s1"> is not a temporal model, please change your selection&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_model</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="c1"># 3D+time for tomophantom</span>
-            <span class="c1"># output dimensions channel and then spatial, </span>
+            <span class="c1"># output dimensions channel and then spatial,</span>
             <span class="c1"># e.g. [ &#39;channel&#39;, &#39;vertical&#39;, &#39;horizontal_y&#39;, &#39;horizontal_x&#39; ]</span>
             <span class="n">num_model</span> <span class="o">=</span> <span class="n">num_model</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
             <span class="n">phantom_arr</span> <span class="o">=</span> <span class="n">TomoP3D</span><span class="o">.</span><span class="n">ModelTemporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">path_library3D</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="c1"># 2D+time for tomophantom</span>
-            <span class="c1"># output dimensions channel and then spatial, </span>
+            <span class="c1"># output dimensions channel and then spatial,</span>
             <span class="c1"># e.g. [ &#39;channel&#39;, &#39;horizontal_y&#39;, &#39;horizontal_x&#39; ]</span>
             <span class="n">N</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">num_model</span> <span class="o">=</span> <span class="n">num_model</span>
@@ -663,7 +663,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Wrong ImageGeometry&#39;</span><span class="p">)</span>
 
-    
+
     <span class="n">im_data</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">phantom_arr</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">im_data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">im_data</span></div>

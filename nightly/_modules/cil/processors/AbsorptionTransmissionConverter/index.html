@@ -499,13 +499,13 @@ document.write(`
 <div class="viewcode-block" id="AbsorptionTransmissionConverter"><a class="viewcode-back" href="../../../../processors/#cil.processors.AbsorptionTransmissionConverter">[docs]</a><span class="k">class</span> <span class="nc">AbsorptionTransmissionConverter</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Processor to convert from absorption measurements to transmission</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param white_level: A float defining incidence intensity in the Beer-Lambert law.</span>
 <span class="sd">    :type white_level: float, optional</span>
 <span class="sd">    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type</span>
 <span class="sd">    :rtype: AcquisitionData, ImageData or DataContainer</span>
 
-<span class="sd">    Processor first multiplies data by -1, then calculates exponent </span>
+<span class="sd">    Processor first multiplies data by -1, then calculates exponent</span>
 <span class="sd">    and scales result by white_level (default=1)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -517,18 +517,18 @@ document.write(`
         <span class="nb">super</span><span class="p">(</span><span class="n">AbsorptionTransmissionConverter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - DataContainer&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span> 
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>          
+            <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 

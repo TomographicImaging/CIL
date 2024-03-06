@@ -495,32 +495,32 @@ document.write(`
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
-    
-        
+
+
 <div class="viewcode-block" id="NikonDataReader"><a class="viewcode-back" href="../../../../io/#cil.io.NikonDataReader">[docs]</a><span class="k">class</span> <span class="nc">NikonDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Basic reader for xtekct files</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
-<span class="sd">    file_name: str </span>
+<span class="sd">    file_name: str</span>
 <span class="sd">        full path to .xtekct file</span>
-<span class="sd">        </span>
+
 <span class="sd">    roi: dict, default=None</span>
 <span class="sd">        dictionary with roi to load:</span>
-<span class="sd">        {&#39;angle&#39;: (start, end, step), </span>
-<span class="sd">            &#39;horizontal&#39;: (start, end, step), </span>
+<span class="sd">        {&#39;angle&#39;: (start, end, step),</span>
+<span class="sd">            &#39;horizontal&#39;: (start, end, step),</span>
 <span class="sd">            &#39;vertical&#39;: (start, end, step)}</span>
-<span class="sd">        </span>
+
 <span class="sd">    normalise: bool, default=True</span>
 <span class="sd">        normalises loaded projections by detector white level (I_0)</span>
-<span class="sd">                        </span>
+
 <span class="sd">    fliplr: bool, default = False,</span>
 <span class="sd">        flip projections in the left-right direction (about vertical axis)</span>
-<span class="sd">                        </span>
+
 <span class="sd">    mode: str: {&#39;bin&#39;, &#39;slice&#39;}, default=&#39;bin&#39;</span>
 <span class="sd">        In bin mode, &#39;step&#39; number of pixels is binned together,</span>
-<span class="sd">        values of resulting binned pixels are calculated as average. </span>
+<span class="sd">        values of resulting binned pixels are calculated as average.</span>
 <span class="sd">        In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
 <span class="sd">        Note: in general output array size in bin mode != output array size in slice mode</span>
 
@@ -530,21 +530,21 @@ document.write(`
 <span class="sd">    `roi` behaviour:</span>
 <span class="sd">        Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
 <span class="sd">        to row and column dimensions, respectively.</span>
-<span class="sd">        </span>
-<span class="sd">        Files are stacked in alphabetic order. </span>
-<span class="sd">        </span>
-<span class="sd">        To skip projections or to change number of projections to load, </span>
+
+<span class="sd">        Files are stacked in alphabetic order.</span>
+
+<span class="sd">        To skip projections or to change number of projections to load,</span>
 <span class="sd">        adjust &#39;angle&#39;. For instance, &#39;angle&#39;: (100, 300)</span>
 <span class="sd">        will skip first 100 projections and will load 200 projections.</span>
-<span class="sd">        </span>
+
 <span class="sd">        ``&#39;angle&#39;: -1`` is a shortcut to load all elements along axis.</span>
-<span class="sd">            </span>
+
 <span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
 <span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
 <span class="sd">        Start and end also can be negative.</span>
-<span class="sd">                </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">normalise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="n">fliplr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
@@ -560,55 +560,55 @@ document.write(`
                         <span class="n">normalise</span> <span class="o">=</span> <span class="n">normalise</span><span class="p">,</span>
                         <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="p">,</span>
                         <span class="n">fliplr</span> <span class="o">=</span> <span class="n">fliplr</span><span class="p">)</span>
-            
-    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-               <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+
+    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">normalise</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span>
                <span class="n">fliplr</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span> <span class="o">=</span> <span class="n">normalise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span> <span class="o">=</span> <span class="n">fliplr</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Path to xtekct file is required.&#39;</span><span class="p">)</span>
-        
+
         <span class="c1"># check if xtekct file exists</span>
         <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;File</span><span class="se">\n</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1"> does not exist.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;xtekct&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;This reader can only process xtekct files. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)))</span>
-            
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
-                
-        <span class="c1"># check labels     </span>
+
+        <span class="c1"># check labels</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Wrong label. One of the following is expected: angle, horizontal, vertical&quot;</span><span class="p">)</span>            
-        
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Wrong label. One of the following is expected: angle, horizontal, vertical&quot;</span><span class="p">)</span>
+
         <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
+
         <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">roi</span><span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            
+
         <span class="k">if</span> <span class="s1">&#39;horizontal&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">roi</span><span class="p">[</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        
+
         <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">roi</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-                
+
         <span class="c1"># parse xtekct file</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>    
-                
+            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
         <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">content</span><span class="p">]</span>
-        
+
         <span class="c1">#initialise parameters</span>
         <span class="n">detector_offset_h</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">detector_offset_v</span> <span class="o">=</span> <span class="mi">0</span>
@@ -652,14 +652,14 @@ document.write(`
             <span class="c1"># angular increment (in degrees)</span>
             <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;AngularStep&quot;</span><span class="p">):</span>
                 <span class="n">angular_step</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="c1"># detector offset x in units                </span>
+            <span class="c1"># detector offset x in units</span>
             <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;DetectorOffsetX&quot;</span><span class="p">):</span>
                 <span class="n">detector_offset_h</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="c1"># detector offset y in units  </span>
+            <span class="c1"># detector offset y in units</span>
             <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;DetectorOffsetY&quot;</span><span class="p">):</span>
                 <span class="n">detector_offset_v</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
             <span class="c1">#new file format rotation axis offset and angle</span>
-            <span class="c1"># object offset x in units  </span>
+            <span class="c1"># object offset x in units</span>
             <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ObjectOffsetX&quot;</span><span class="p">):</span>
                 <span class="n">object_offset_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
             <span class="c1"># object roll in degrees  (around z)</span>
@@ -673,7 +673,7 @@ document.write(`
                 <span class="n">centre_of_rotation_top</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CentreOfRotationBottom&quot;</span><span class="p">):</span>
                 <span class="n">centre_of_rotation_bottom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-          
+
             <span class="c1"># directory where data is stored</span>
             <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;InputFolderName&quot;</span><span class="p">):</span>
                 <span class="n">input_folder_name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
@@ -684,7 +684,7 @@ document.write(`
 
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_projections</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="p">,[</span><span class="mi">0</span><span class="p">,</span> <span class="n">pixel_num_v_0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">pixel_num_h_0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
-        
+
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
@@ -702,10 +702,10 @@ document.write(`
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> 
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Negative step is not allowed&quot;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;bin&#39;</span><span class="p">:</span>
             <span class="c1"># calculate number of pixels and pixel size</span>
             <span class="n">pixel_num_v</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
@@ -718,27 +718,27 @@ document.write(`
 
             <span class="n">pixel_size_v</span> <span class="o">=</span> <span class="n">pixel_size_v_0</span>
             <span class="n">pixel_size_h</span> <span class="o">=</span> <span class="n">pixel_size_h_0</span>
-        
+
         <span class="n">det_start_0</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">pixel_num_h_0</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">det_start</span> <span class="o">=</span> <span class="n">det_start_0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">det_end</span> <span class="o">=</span> <span class="n">det_start</span> <span class="o">+</span> <span class="n">pixel_num_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">det_pos_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">det_start</span> <span class="o">+</span> <span class="n">det_end</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">pixel_size_h_0</span> <span class="o">+</span> <span class="n">detector_offset_h</span>
-        
+
         <span class="n">det_start_0</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">pixel_num_v_0</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">det_start</span> <span class="o">=</span> <span class="n">det_start_0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">det_end</span> <span class="o">=</span> <span class="n">det_start</span> <span class="o">+</span> <span class="n">pixel_num_v</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">det_pos_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">det_start</span> <span class="o">+</span> <span class="n">det_end</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">pixel_size_v_0</span> <span class="o">+</span> <span class="n">detector_offset_v</span>         
+        <span class="n">det_pos_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">det_start</span> <span class="o">+</span> <span class="n">det_end</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">pixel_size_v_0</span> <span class="o">+</span> <span class="n">detector_offset_v</span>
 
         <span class="c1">#angles from xtekct ignore *.ang and _ctdata.txt as not correct</span>
         <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span> <span class="p">[</span> <span class="n">angular_step</span> <span class="o">*</span> <span class="n">proj</span> <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_projections</span><span class="p">)</span> <span class="p">]</span> <span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;bin&#39;</span><span class="p">:</span>
             <span class="n">n_elem</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_elem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
             <span class="n">angles</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">n_elem</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">angles</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_par</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])]</span>
-        
+
         <span class="c1">#convert NikonGeometry to CIL geometry</span>
         <span class="n">angles</span> <span class="o">=</span> <span class="o">-</span><span class="n">angles</span> <span class="o">-</span> <span class="n">initial_angle</span> <span class="o">+</span> <span class="mi">180</span>
 
@@ -778,9 +778,9 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">source_to_origin</span><span class="p">],</span>
                                                      <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="n">object_offset_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                                      <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="n">det_pos_h</span><span class="p">,</span> <span class="n">source_to_det</span><span class="o">-</span><span class="n">source_to_origin</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span>
                                 <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">)</span>
-            
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">pixel_num_h</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size_h</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">])</span>
@@ -789,21 +789,21 @@ document.write(`
                                                          <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="n">object_offset_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                                          <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="n">rotation_axis_direction</span><span class="p">,</span>
                                                          <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="n">det_pos_h</span><span class="p">,</span> <span class="n">source_to_det</span><span class="o">-</span><span class="n">source_to_origin</span><span class="p">,</span> <span class="n">det_pos_v</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span>
                                 <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">)</span>
-            
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">((</span><span class="n">pixel_num_h</span><span class="p">,</span> <span class="n">pixel_num_v</span><span class="p">),</span>
                                <span class="n">pixel_size</span><span class="o">=</span><span class="p">(</span><span class="n">pixel_size_h</span><span class="p">,</span> <span class="n">pixel_size_v</span><span class="p">),</span>
                                <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">)</span>
-        
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="NikonDataReader.get_geometry"><a class="viewcode-back" href="../../../../io/#cil.io.NikonDataReader.get_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return AcquisitionGeometry object</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ag</span></div>
 <div class="viewcode-block" id="NikonDataReader.get_roi"><a class="viewcode-back" href="../../../../io/#cil.io.NikonDataReader.get_roi">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the roi&#39;&#39;&#39;</span>
@@ -818,13 +818,13 @@ document.write(`
         <span class="k">return</span> <span class="n">roidict</span></div>
 
 <div class="viewcode-block" id="NikonDataReader.read"><a class="viewcode-back" href="../../../../io/#cil.io.NikonDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reads projections and returns AcquisitionData with corresponding geometry,</span>
 <span class="sd">        arranged as [&#39;angle&#39;, horizontal&#39;] if a single slice is loaded</span>
 <span class="sd">        and [&#39;vertical, &#39;angle&#39;, horizontal&#39;] if more than 1 slice is loaded.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
+
         <span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">()</span>
 
         <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_roi</span><span class="p">()</span>
@@ -833,17 +833,17 @@ document.write(`
                       <span class="n">roi</span><span class="o">=</span><span class="n">roi</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
 
         <span class="n">ad</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_as_AcquisitionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ag</span><span class="p">)</span>
-              
+
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalise</span><span class="p">):</span>
             <span class="n">ad</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">ad</span><span class="o">.</span><span class="n">array</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="c1"># cast the data read to float32</span>
             <span class="n">ad</span> <span class="o">=</span> <span class="n">ad</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_white_level</span><span class="p">)</span>
-            
-        
+
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fliplr</span><span class="p">:</span>
             <span class="n">dim</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
             <span class="n">ad</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">ad</span></div>
 
 <div class="viewcode-block" id="NikonDataReader.load_projections"><a class="viewcode-back" href="../../../../io/#cil.io.NikonDataReader.load_projections">[docs]</a>    <span class="k">def</span> <span class="nf">load_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -496,75 +496,75 @@ document.write(`
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">Operator</span>
 
 <div class="viewcode-block" id="SparseFiniteDifferenceOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SparseFiniteDifferenceOperator">[docs]</a><span class="k">class</span> <span class="nc">SparseFiniteDifferenceOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span>
+
+
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Create Sparse Matrices for the Finite Difference Operator&#39;&#39;&#39;</span>
-    
-    
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bnd_cond</span> <span class="o">=</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">):</span>
-        
+
         <span class="nb">super</span><span class="p">(</span><span class="n">SparseFiniteDifferenceOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
-                                               <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span> 
+                                               <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">=</span> <span class="n">bnd_cond</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span>
-            
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">]</span>  
-        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Gradient directions more than geometry domain&#39;</span><span class="p">)</span>         
-            
-    <span class="k">def</span> <span class="nf">matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
-        
-            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> 
-            
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Gradient directions more than geometry domain&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
+
             <span class="n">mat</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">spdiags</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]))]),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;lil&#39;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
                 <span class="n">mat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
-                <span class="n">mat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>    
-                
+                <span class="n">mat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
             <span class="n">tmpGrad</span> <span class="o">=</span> <span class="n">mat</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            
+
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">length</span><span class="p">):</span>
 
-                <span class="n">tmpGrad</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">tmpGrad</span> <span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">i</span> <span class="k">else</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="n">tmpGrad</span> <span class="p">)</span> 
-                
-            <span class="k">return</span> <span class="n">tmpGrad</span>    
-                         
-    <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+                <span class="n">tmpGrad</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">tmpGrad</span> <span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">i</span> <span class="k">else</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dims</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="n">tmpGrad</span> <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">tmpGrad</span>
+
+    <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-     
+
 <div class="viewcode-block" id="SparseFiniteDifferenceOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.SparseFiniteDifferenceOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
+
         <span class="n">x_asarr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span> <span class="o">*</span> <span class="n">x_asarr</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)(</span><span class="n">res</span><span class="p">)</span></div>
-    
+
     <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        
+
         <span class="n">x_asarr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">x_asarr</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)(</span><span class="n">res</span><span class="p">)</span> 
-    
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)(</span><span class="n">res</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">sum_abs_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">))</span>
         <span class="c1">#res[res==0]=0</span>
         <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">sum_abs_col</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">)</span> <span class="p">)</span>
         <span class="c1">#res[res==0]=0</span>
         <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>        
+    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
     <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span>
     <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random_int&#39;</span><span class="p">)</span>
@@ -572,10 +572,10 @@ document.write(`
     <span class="n">sFD_neum2</span> <span class="o">=</span> <span class="n">SparseFiniteDifferenceOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bnd_cond</span><span class="o">=</span><span class="s1">&#39;Neumann&#39;</span><span class="p">)</span>
     <span class="n">DY</span> <span class="o">=</span> <span class="n">sFD_neum1</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
     <span class="n">DX</span> <span class="o">=</span> <span class="n">sFD_neum2</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
-    
+
 
     <span class="n">rows</span> <span class="o">=</span> <span class="n">sFD_neum1</span><span class="o">.</span><span class="n">sum_abs_row</span><span class="p">()</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">sFD_neum1</span><span class="o">.</span><span class="n">sum_abs_col</span><span class="p">()</span>  
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">sFD_neum1</span><span class="o">.</span><span class="n">sum_abs_col</span><span class="p">()</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>

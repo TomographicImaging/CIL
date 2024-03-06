@@ -509,10 +509,10 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    *args : Operator  </span>
-<span class="sd">        Operators in the block.  </span>
-<span class="sd">    **kwargs : dict  </span>
-<span class="sd">        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.  </span>
+<span class="sd">    *args : Operator</span>
+<span class="sd">        Operators in the block.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.</span>
 
 
 <span class="sd">    Note</span>
@@ -525,9 +525,9 @@ document.write(`
 <span class="sd">      \min Regulariser + Fidelity</span>
 
 
-<span class="sd">    BlockOperators have a generic shape M x N, and when applied on an </span>
+<span class="sd">    BlockOperators have a generic shape M x N, and when applied on an</span>
 <span class="sd">    Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.</span>
-<span class="sd">  </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    -----</span>
 <span class="sd">    BlockDatacontainer are only allowed to have the shape of N x 1, with</span>
@@ -613,9 +613,9 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        row: `int`</span>
-<span class="sd">            The row index required. </span>
+<span class="sd">            The row index required.</span>
 <span class="sd">        col: `int`</span>
-<span class="sd">            The column index required. </span>
+<span class="sd">            The column index required.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">row</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -637,12 +637,12 @@ document.write(`
         <span class="k">return</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="BlockOperator.set_norms"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.set_norms">[docs]</a>    <span class="k">def</span> <span class="nf">set_norms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values.</span>
 
-<span class="sd">        Parameters  </span>
-<span class="sd">        ------------  </span>
-<span class="sd">        norms: list  </span>
-<span class="sd">            A list of positive real values the same length as the number of operators in the BlockOperator.  </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        norms: list</span>
+<span class="sd">            A list of positive real values the same length as the number of operators in the BlockOperator.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">norms</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
@@ -685,18 +685,18 @@ document.write(`
 
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  
-                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>       
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
                                                       <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
-                                                      <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>                        
+                                                      <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">temp_out_row</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="c1"># temp_out_row points to the element in out that we are adding to  </span>
+                        <span class="n">temp_out_row</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="c1"># temp_out_row points to the element in out that we are adding to</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
-                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> 
+                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
                                                       <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                         <span class="n">temp_out_row</span> <span class="o">+=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
-                
+
 
 <div class="viewcode-block" id="BlockOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Adjoint operation for the BlockOperator</span>
@@ -757,7 +757,7 @@ document.write(`
                                 <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
 
-                            <span class="n">temp_out_col</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># out_col_operator points to the column in out that we are updating </span>
+                            <span class="n">temp_out_col</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># out_col_operator points to the column in out that we are updating</span>
                             <span class="n">temp_out_col</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
                                                         <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
                                                         <span class="p">)</span></div>
@@ -777,7 +777,7 @@ document.write(`
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        A(N,M) direct u(M,1) -&gt; N,1</span>
-<span class="sd">        </span>
+
 <span class="sd">        A(N,M)^T adjoint u(N,1) -&gt; M,1</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>

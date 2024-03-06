@@ -490,13 +490,13 @@ document.write(`
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span>    
+<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockDataContainer</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.errors</span> <span class="kn">import</span> <span class="n">InPlaceError</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
- 
+
 <span class="k">def</span> <span class="nf">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the soft-shrinkage operator at x.</span>
 
 <span class="sd">    Parameters</span>
@@ -506,7 +506,7 @@ document.write(`
 <span class="sd">    tau : float, numpy ndarray, DataContainer</span>
 <span class="sd">    out : DataContainer, default None</span>
 <span class="sd">        where to store the result. If None, a new DataContainer is created.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    --------</span>
 <span class="sd">    the value of the soft-shrinkage operator at x: DataContainer.</span>
@@ -536,27 +536,27 @@ document.write(`
     <span class="n">out</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">csingle</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cdouble</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">clongdouble</span><span class="p">]:</span>
         <span class="n">out</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
-        
+
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">*=</span> <span class="n">x</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
-    
+
 
     <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">out</span>        
+        <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="L1Norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.L1Norm">[docs]</a><span class="k">class</span> <span class="nc">L1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Norm function</span>
-<span class="sd">            </span>
-<span class="sd">    Consider the following cases:           </span>
-<span class="sd">    </span>
+
+<span class="sd">    Consider the following cases:</span>
+
 <span class="sd">    a) .. math:: F(x) = ||x||_{1}</span>
-<span class="sd">    b) .. math:: F(x) = ||x - b||_{1}    </span>
-<span class="sd">            </span>
+<span class="sd">    b) .. math:: F(x) = ||x - b||_{1}</span>
+
 <span class="sd">    In the weighted case, :math:`w` is an array of positive weights.</span>
-<span class="sd">    </span>
+
 <span class="sd">    a) .. math:: F(x) = ||x||_{L^1(w)}</span>
 <span class="sd">    b) .. math:: F(x) = ||x - b||_{L^1(w)}</span>
-<span class="sd">        </span>
+
 <span class="sd">    with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.</span>
 
 <span class="sd">    Parameters</span>
@@ -566,7 +566,7 @@ document.write(`
 <span class="sd">            Array of positive weights. If :code:`None` returns the L1 Norm.</span>
 <span class="sd">        b: DataContainer, default None</span>
 <span class="sd">            Translation of the function.</span>
-<span class="sd">                                </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">L1Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -577,7 +577,7 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the L1Norm function at x.</span>
-<span class="sd">        </span>
+
 <span class="sd">        .. math:: f(x) = ||x - b||_{L^1(w)}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -587,24 +587,24 @@ document.write(`
 
 
 <span class="sd">    This is the indicator of the unit :math:`L^{\infty}` norm:</span>
-<span class="sd">    </span>
-<span class="sd">            </span>
-<span class="sd">    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) </span>
-<span class="sd">    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle      </span>
-<span class="sd">    </span>
 
-<span class="sd">    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) </span>
-<span class="sd">        = \begin{cases} </span>
+
+<span class="sd">    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})</span>
+<span class="sd">    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle</span>
+
+
+<span class="sd">    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})</span>
+<span class="sd">        = \begin{cases}</span>
 <span class="sd">        0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\</span>
 <span class="sd">        \infty, \mbox{otherwise}</span>
 <span class="sd">        \end{cases}</span>
 
-<span class="sd">    In the weighted case the convex conjugate is the indicator of the unit </span>
+<span class="sd">    In the weighted case the convex conjugate is the indicator of the unit</span>
 <span class="sd">    :math:`L^{\infty}` norm.</span>
 
 <span class="sd">    See:</span>
 <span class="sd">    https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight</span>
-<span class="sd">    </span>
+
 <span class="sd">    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})</span>
 <span class="sd">    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle</span>
 
@@ -620,58 +620,58 @@ document.write(`
 <span class="sd">    --------</span>
 <span class="sd">    the value of the convex conjugate of the WeightedL1Norm function at x: DataContainer.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>        
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="L1Norm.proximal"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.L1Norm.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter `tau`.</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
+
 <span class="sd">    Consider the following cases:</span>
-<span class="sd">            </span>
+
 <span class="sd">    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)</span>
-<span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b   </span>
+<span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b</span>
 
 <span class="sd">    where,</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}</span>
 
 <span class="sd">    The weighted case follows from Example 6.23 in Chapter 6 of &quot;First-Order Methods in Optimization&quot;</span>
 <span class="sd">    by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf</span>
-<span class="sd">    </span>
+
 <span class="sd">    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)</span>
 <span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 <span class="sd">    x: DataContainer</span>
 <span class="sd">    tau: float, ndarray, DataContainer</span>
 <span class="sd">    out: DataContainer, default None</span>
 <span class="sd">        If not None, the result will be stored in this object.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    --------</span>
 <span class="sd">    The value of the proximal operator of the L1 norm function at x: DataContainer.</span>
-<span class="sd">                        </span>
-<span class="sd">        &quot;&quot;&quot;</span>  
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">_L1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Norm function</span>
-<span class="sd">            </span>
-<span class="sd">        Consider the following cases:           </span>
+
+<span class="sd">        Consider the following cases:</span>
 <span class="sd">            a) .. math:: F(x) = ||x||_{1}</span>
 <span class="sd">            b) .. math:: F(x) = ||x - b||_{1}</span>
-<span class="sd">                                </span>
-<span class="sd">    &quot;&quot;&quot;</span>   
-           
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
-<span class="sd">        Cases considered (with/without data):            </span>
+<span class="sd">        Cases considered (with/without data):</span>
 <span class="sd">        a) :math:`f(x) = ||x||_{1}`</span>
 <span class="sd">        b) :math:`f(x) = ||x - b||_{1}`</span>
 
@@ -680,39 +680,39 @@ document.write(`
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
-        
+
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
-        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  
-          
-    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>        
+        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>            
+        <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="mf">0.</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
 
-                    
+
     <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>                                                
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>                                
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">+</span> <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>             
-        <span class="k">else</span><span class="p">:</span> 
-            
+                <span class="k">return</span> <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>   
+                <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_WeightedL1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span> 
+<span class="k">class</span> <span class="nc">_WeightedL1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -721,19 +721,19 @@ document.write(`
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights should be strictly positive!&quot;</span><span class="p">)</span>
-        
+
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
 
-        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> 
-          
+        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>            
+        <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -749,7 +749,7 @@ document.write(`
 <div class="viewcode-block" id="MixedL11Norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL11Norm">[docs]</a><span class="k">class</span> <span class="nc">MixedL11Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MixedL11Norm function</span>
-<span class="sd">                     </span>
+
 <span class="sd">    .. math:: F(x) = ||x||_{1,1} = \sum |x_{1}| + |x_{2}| + \cdots + |x_{n}|</span>
 
 <span class="sd">    Note</span>
@@ -762,38 +762,38 @@ document.write(`
 <span class="sd">    L1Norm, MixedL21Norm</span>
 
 
-<span class="sd">    &quot;&quot;&quot;</span>   
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MixedL11Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL11Norm function at x. </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL11Norm function at x.</span>
 
-<span class="sd">        :param x: :code:`BlockDataContainer`                                           </span>
+<span class="sd">        :param x: :code:`BlockDataContainer`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> 
-                    
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        
+
 <div class="viewcode-block" id="MixedL11Norm.proximal"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL11Norm.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL11Norm function at x.</span>
-<span class="sd">                </span>
+
 <span class="sd">        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)</span>
-<span class="sd">    </span>
+
 <span class="sd">        where,</span>
-<span class="sd">        </span>
+
 <span class="sd">        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}</span>
-<span class="sd">                            </span>
-<span class="sd">        &quot;&quot;&quot;</span>      
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>         
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
 
-        <span class="k">return</span> <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span> </div></div>
+        <span class="k">return</span> <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div></div>
 </pre></div>
 
                 </article>

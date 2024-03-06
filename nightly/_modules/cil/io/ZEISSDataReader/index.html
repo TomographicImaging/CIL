@@ -509,12 +509,12 @@ document.write(`
 
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Create a reader for ZEISS files</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    file_name: str</span>
 <span class="sd">        file name to read</span>
-<span class="sd">    roi: dict, default None </span>
+<span class="sd">    roi: dict, default None</span>
 <span class="sd">        dictionary with roi to load for each axis:</span>
 <span class="sd">        ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
 <span class="sd">        ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
@@ -525,13 +525,13 @@ document.write(`
 <span class="sd">        For ImageData to skip files or to change number of files to load,</span>
 <span class="sd">        adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
 <span class="sd">        and will load 200 files.</span>
-<span class="sd">        </span>
+
 <span class="sd">        ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
 
 <span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
 <span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
@@ -545,31 +545,31 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ZEISSDataReader.set_up"><a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+<div class="viewcode-block" id="ZEISSDataReader.set_up"><a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">file_name</span><span class="p">,</span>
                <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Set up the reader</span>
 
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file_name: str</span>
 <span class="sd">            file name to read</span>
-<span class="sd">        roi: dict, default None </span>
+<span class="sd">        roi: dict, default None</span>
 <span class="sd">            dictionary with roi to load for each axis:</span>
 <span class="sd">            ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
 <span class="sd">            ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        `roi` behaviour:           </span>
+<span class="sd">        `roi` behaviour:</span>
 <span class="sd">            ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
 
 <span class="sd">            ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
 <span class="sd">            to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
 
 <span class="sd">            **Acquisition Data**</span>
-<span class="sd">            </span>
+
 <span class="sd">            The axis labels in the `roi` dict for `AcquisitionData` will be:</span>
 <span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
 
@@ -587,7 +587,7 @@ document.write(`
         <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
-        
+
         <span class="n">file_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;txrm&#39;</span><span class="p">,</span> <span class="s1">&#39;txm&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;This reader can only process TXRM or TXM files. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)))</span>
@@ -596,9 +596,9 @@ document.write(`
 
 
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_metadata</span><span class="p">()</span>
-        <span class="n">default_roi</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;number_of_images&#39;</span><span class="p">],</span><span class="mi">1</span><span class="p">],</span> 
+        <span class="n">default_roi</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;number_of_images&#39;</span><span class="p">],</span><span class="mi">1</span><span class="p">],</span>
                         <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_height&#39;</span><span class="p">],</span><span class="mi">1</span><span class="p">],</span>
-                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_width&#39;</span><span class="p">],</span><span class="mi">1</span><span class="p">]]</span> 
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_width&#39;</span><span class="p">],</span><span class="mi">1</span><span class="p">]]</span>
 
         <span class="k">if</span> <span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data geometry&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;acquisition&#39;</span><span class="p">:</span>
@@ -608,7 +608,7 @@ document.write(`
                 <span class="n">allowed_labels</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">CIL_IG_LABELS</span>
                 <span class="n">zeiss_data_order</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertical&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;horizontal_y&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;horizontal_x&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
 
-            <span class="c1"># check roi labels and create tuple for slicing    </span>
+            <span class="c1"># check roi labels and create tuple for slicing</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_labels</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong label, got </span><span class="si">{0}</span><span class="s2">. Expected dimension labels in </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="o">**</span><span class="n">allowed_labels</span><span class="p">))</span>
@@ -623,13 +623,13 @@ document.write(`
                             <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span>
                         <span class="k">else</span><span class="p">:</span> <span class="c1">#step</span>
                             <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span>  <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
-                                
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="n">default_roi</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
-        
+
         <span class="c1">#setup geometry using metadata</span>
         <span class="k">if</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data geometry&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;acquisition&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_acq_geometry</span><span class="p">()</span>
@@ -654,7 +654,7 @@ document.write(`
 
             <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;acquisition&#39;</span>
-        
+
                 <span class="c1"># Read source to center and detector to center distances</span>
                 <span class="n">StoRADistance</span> <span class="o">=</span> <span class="n">dxchange</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">_read_ole_arr</span><span class="p">(</span><span class="n">ole</span><span class="p">,</span> \
                         <span class="s1">&#39;ImageInfo/StoRADistance&#39;</span><span class="p">,</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2">f&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;number_of_images&#39;</span><span class="p">]))</span>
@@ -674,7 +674,7 @@ document.write(`
                 <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;data geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;image&#39;</span>
 
         <span class="k">return</span> <span class="n">metadata</span>
-    
+
 <div class="viewcode-block" id="ZEISSDataReader.slice_metadata"><a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.slice_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">slice_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">metadata</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Slices metadata to configure geometry before reading data</span>
@@ -696,7 +696,7 @@ document.write(`
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">width_slc</span><span class="p">)</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;image_height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">height_slc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">metadata</span></div>
-        
+
     <span class="k">def</span> <span class="nf">_setup_acq_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup AcquisitionData container</span>
@@ -738,7 +738,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span><span class="p">:</span>
             <span class="n">slice_range</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi</span><span class="p">)</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dxchange</span><span class="o">.</span><span class="n">read_txrm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="n">slice_range</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span><span class="n">AcquisitionGeometry</span><span class="p">):</span>
             <span class="c1"># Normalise data by flatfield</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
@@ -747,7 +747,7 @@ document.write(`
                 <span class="n">data</span><span class="p">[</span><span class="n">num</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">num</span><span class="p">,:,:],</span> \
                     <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">[</span><span class="s1">&#39;x-shifts&#39;</span><span class="p">][</span><span class="n">num</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">[</span><span class="s1">&#39;y-shifts&#39;</span><span class="p">][</span><span class="n">num</span><span class="p">])),</span> \
                     <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-                
+
             <span class="n">acq_data</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">array</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span><span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">acq_data</span>
         <span class="k">else</span><span class="p">:</span>
@@ -767,7 +767,7 @@ document.write(`
 
 
 <span class="k">class</span> <span class="nc">TXRMDataReader</span><span class="p">(</span><span class="n">ZEISSDataReader</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead&#39;</span><span class="p">,</span>
               <span class="ne">DeprecationWarning</span><span class="p">)</span>

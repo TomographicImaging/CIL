@@ -496,9 +496,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">AcquisitionData</span>
 
 <div class="viewcode-block" id="RingRemover"><a class="viewcode-back" href="../../../../processors/#cil.processors.RingRemover">[docs]</a><span class="k">class</span> <span class="nc">RingRemover</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) </span>
+<span class="sd">        RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData)</span>
 <span class="sd">        using the algorithm in https://doi.org/10.1364/OE.17.008567</span>
 
 <span class="sd">        Parameters</span>
@@ -506,97 +506,97 @@ document.write(`
 <span class="sd">        decNum : int</span>
 <span class="sd">            Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal</span>
 <span class="sd">            but can alter the profile of the data</span>
-<span class="sd">        </span>
+
 <span class="sd">        wname : str</span>
-<span class="sd">            Name of wavelet filter from pywt e.g. &#39;db1&#39; -- &#39;db35&#39;, &#39;haar&#39; - increasing the wavelet filter increases the strength of </span>
+<span class="sd">            Name of wavelet filter from pywt e.g. &#39;db1&#39; -- &#39;db35&#39;, &#39;haar&#39; - increasing the wavelet filter increases the strength of</span>
 <span class="sd">            the ring removal, but also increases the computational effort</span>
-<span class="sd">    </span>
-<span class="sd">        sigma : float </span>
+
+<span class="sd">        sigma : float</span>
 <span class="sd">            Damping parameter in Fourier space - increasing sigma, increases the size of artefacts which can be removed</span>
-<span class="sd">        </span>
+
 <span class="sd">        info : boolean</span>
-<span class="sd">            Flag to enable print of ring remover end message </span>
-<span class="sd">        </span>
+<span class="sd">            Flag to enable print of ring remover end message</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataContainer</span>
-<span class="sd">            Corrected ImageData/AcquisitionData 2D, 3D, multi-spectral 2D, multi-spectral 3D </span>
+<span class="sd">            Corrected ImageData/AcquisitionData 2D, 3D, multi-spectral 2D, multi-spectral 3D</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-        
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decNum</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s1">&#39;db10&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>   
-        
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decNum</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s1">&#39;db10&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;decNum&#39;</span><span class="p">:</span> <span class="n">decNum</span><span class="p">,</span>
                   <span class="s1">&#39;wname&#39;</span><span class="p">:</span> <span class="n">wname</span><span class="p">,</span>
                   <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">sigma</span><span class="p">,</span>
                   <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">}</span>
-    
-        <span class="nb">super</span><span class="p">(</span><span class="n">RingRemover</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>            
-                          
-        
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">RingRemover</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Geometry is not defined.&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>        
-                               
+            <span class="k">return</span> <span class="kc">True</span>
+
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>                
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="n">decNum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decNum</span>
         <span class="n">wname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wname</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
-        
+
         <span class="c1"># acquisition geometry from sinogram</span>
         <span class="n">geom</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
-        
+
         <span class="c1"># get channels, vertical info</span>
-        <span class="n">channels</span> <span class="o">=</span>  <span class="n">geom</span><span class="o">.</span><span class="n">channels</span>    
+        <span class="n">channels</span> <span class="o">=</span>  <span class="n">geom</span><span class="o">.</span><span class="n">channels</span>
         <span class="n">vertical</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">pixel_num_v</span>
-        
+
         <span class="c1"># allocate datacontainer space</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">*</span><span class="n">data</span>
-        
+
         <span class="c1"># for non multichannel data</span>
-        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>        
-            
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+
             <span class="c1"># for 3D data</span>
             <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-                                
+
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertical</span><span class="p">):</span>
-                    <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> 
-                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">,</span> <span class="n">vertical</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>  
-            
+                    <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">,</span> <span class="n">vertical</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+
             <span class="c1"># for 2D data</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">)</span>        
-        
-        <span class="c1"># for multichannel data        </span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">)</span>
+
+        <span class="c1"># for multichannel data</span>
         <span class="k">else</span><span class="p">:</span>
-            
+
            <span class="c1"># for 3D data</span>
             <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-                
+
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
-                    
+
                     <span class="n">out_ch_i</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
                     <span class="n">data_ch_i</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
-                    
+
                     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertical</span><span class="p">):</span>
                         <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xRemoveStripesVertical</span><span class="p">(</span><span class="n">data_ch_i</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
                         <span class="n">out_ch_i</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">,</span> <span class="n">vertical</span> <span class="o">=</span> <span class="n">j</span><span class="p">)</span>
-                        
-                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_ch_i</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> 
-                    
+
+                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_ch_i</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+
                     <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish channel </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>                    
-                                       
-            <span class="c1"># for 2D data                        </span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish channel </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+            <span class="c1"># for 2D data</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
                         <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
@@ -604,13 +604,13 @@ document.write(`
                         <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
                             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish channel </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish Ring Remover&quot;</span><span class="p">)</span> 
-                    
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish Ring Remover&quot;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">out</span>
 
-          
+
     <span class="k">def</span> <span class="nf">_xRemoveStripesVertical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ima</span><span class="p">,</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Ring removal algorithm via combined wavelet and fourier filtering</span>
 <span class="sd">            code from https://doi.org/10.1364/OE.17.008567</span>
 <span class="sd">            translated in Python</span>
@@ -622,19 +622,19 @@ document.write(`
 <span class="sd">        decNum : int</span>
 <span class="sd">            Number of wavelet decompositions - increasing the number of decompositions, increases the strength of the ring removal</span>
 <span class="sd">            but can alter the profile of the data</span>
-<span class="sd">        </span>
+
 <span class="sd">        wname : str</span>
-<span class="sd">            Name of wavelet filter from pywt e.g. &#39;db1&#39; -- &#39;db35&#39;, &#39;haar&#39; - increasing the wavelet filter increases the strength of </span>
+<span class="sd">            Name of wavelet filter from pywt e.g. &#39;db1&#39; -- &#39;db35&#39;, &#39;haar&#39; - increasing the wavelet filter increases the strength of</span>
 <span class="sd">            the ring removal, but also increases the computational effort</span>
 
-<span class="sd">        sigma : float </span>
+<span class="sd">        sigma : float</span>
 <span class="sd">            Damping parameter in Fourier space - increasing sigma, increase the size of artefacts which can be removed</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Corrected 2D sinogram data (Numpy Array)</span>
-<span class="sd">        </span>
-<span class="sd">        &#39;&#39;&#39;</span>              
+
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">original_extent</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ima</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ima</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span><span class="p">)]</span>
 
@@ -642,31 +642,31 @@ document.write(`
         <span class="n">Ch</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">decNum</span>
         <span class="n">Cv</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">decNum</span>
         <span class="n">Cd</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">decNum</span>
-            
+
         <span class="c1"># wavelets decomposition</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">decNum</span><span class="p">):</span>
-            <span class="n">ima</span><span class="p">,</span> <span class="p">(</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Cd</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">=</span> <span class="n">pywt</span><span class="o">.</span><span class="n">dwt2</span><span class="p">(</span><span class="n">ima</span><span class="p">,</span><span class="n">wname</span><span class="p">)</span> 
-    
+            <span class="n">ima</span><span class="p">,</span> <span class="p">(</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Cd</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">=</span> <span class="n">pywt</span><span class="o">.</span><span class="n">dwt2</span><span class="p">(</span><span class="n">ima</span><span class="p">,</span><span class="n">wname</span><span class="p">)</span>
+
         <span class="c1"># FFT transform of horizontal frequency bands</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">decNum</span><span class="p">):</span>
-            
+
             <span class="c1"># use to axis=0, which correspond to the angles direction</span>
             <span class="n">fCv</span> <span class="o">=</span> <span class="n">fftshift</span><span class="p">(</span><span class="n">fft</span><span class="p">(</span><span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
             <span class="n">my</span><span class="p">,</span> <span class="n">mx</span> <span class="o">=</span> <span class="n">fCv</span><span class="o">.</span><span class="n">shape</span>
-            
+
             <span class="c1"># damping of vertical stripe information</span>
             <span class="n">damp</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">my</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">my</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span><span class="o">+</span><span class="n">my</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
             <span class="n">fCv</span> <span class="o">*=</span> <span class="n">damp</span><span class="o">.</span><span class="n">T</span>
-             
-            <span class="c1"># inverse FFT          </span>
+
+            <span class="c1"># inverse FFT</span>
             <span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ifft</span><span class="p">(</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">fCv</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-                                                                    
+
         <span class="c1"># wavelet reconstruction</span>
         <span class="n">nima</span> <span class="o">=</span> <span class="n">ima</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">decNum</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">nima</span> <span class="o">=</span> <span class="n">nima</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">:</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
             <span class="n">nima</span> <span class="o">=</span> <span class="n">pywt</span><span class="o">.</span><span class="n">idwt2</span><span class="p">((</span><span class="n">nima</span><span class="p">,(</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">Cd</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span><span class="n">wname</span><span class="p">)</span>
-        
+
         <span class="c1"># if the original input is odd, the signal reconstructed with idwt2 will have one extra sample, which can be discarded</span>
         <span class="n">nima</span> <span class="o">=</span> <span class="n">nima</span><span class="p">[</span><span class="n">original_extent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">original_extent</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
 

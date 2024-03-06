@@ -506,7 +506,7 @@ document.write(`
 <div class="viewcode-block" id="Binner"><a class="viewcode-back" href="../../../../processors/#cil.processors.Binner">[docs]</a><span class="k">class</span> <span class="nc">Binner</span><span class="p">(</span><span class="n">Slicer</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This creates a Binner processor.</span>
-<span class="sd">    </span>
+
 <span class="sd">    The processor will crop the data, and then average together n input pixels along a dimension from the starting index.</span>
 
 <span class="sd">    The output will be a data container with the data, and geometry updated to reflect the operation.</span>
@@ -528,7 +528,7 @@ document.write(`
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    </span>
+
 <span class="sd">    &gt;&gt;&gt; from cil.processors import Binner</span>
 <span class="sd">    &gt;&gt;&gt; roi = {&#39;horizontal&#39;:(10,-10,2),&#39;vertical&#39;:(10,-10,2)}</span>
 <span class="sd">    &gt;&gt;&gt; processor = Binner(roi)</span>
@@ -550,14 +550,14 @@ document.write(`
 <span class="sd">    The indices provided are start inclusive, stop exclusive.</span>
 
 <span class="sd">    All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {&#39;axis_name&#39;,-1}</span>
-<span class="sd">    </span>
+
 <span class="sd">    If only one number is provided, then it is interpreted as Stop. i.e. {&#39;axis_name1&#39;:(stop)}</span>
 <span class="sd">    If two numbers are provided, then they are interpreted as Start and Stop  i.e. {&#39;axis_name1&#39;:(start, stop)}</span>
 
 <span class="sd">    Negative indexing can be used to specify the index. i.e. {&#39;axis_name1&#39;:(10, -10)} will crop the dimension symmetrically</span>
-<span class="sd">    </span>
-<span class="sd">    If Stop - Start is not multiple of Step, then </span>
-<span class="sd">    the resulted dimension will have (Stop - Start) // Step </span>
+
+<span class="sd">    If Stop - Start is not multiple of Step, then</span>
+<span class="sd">    the resulted dimension will have (Stop - Start) // Step</span>
 <span class="sd">    elements, i.e. (Stop - Start) % Step elements will be ignored</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -574,7 +574,7 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Once the ROI has been parsed this configures the input specifically for use with Binner        </span>
+<span class="sd">        Once the ROI has been parsed this configures the input specifically for use with Binner</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1">#as binning we only include bins that are inside boundaries</span>
@@ -620,18 +620,18 @@ document.write(`
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
             <span class="c1"># reshape the data to add each &#39;bin&#39; dimensions</span>
-            <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+            <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
 
         <span class="n">shape_object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape_object</span><span class="p">)</span>
         <span class="n">slice_object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">])</span>
-      
+
         <span class="n">data_resized</span> <span class="o">=</span> <span class="n">array_in</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_in</span><span class="p">)[</span><span class="n">slice_object</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape_object</span><span class="p">)</span>
 
         <span class="n">mean_order</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
             <span class="n">data_resized</span> <span class="o">=</span> <span class="n">data_resized</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mean_order</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            
+
         <span class="n">np</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="n">array_binned</span><span class="p">,</span> <span class="n">data_resized</span><span class="p">)</span>
 
 
@@ -657,7 +657,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_acc</span><span class="p">(</span><span class="n">dc_in</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dc_out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_numpy</span><span class="p">(</span><span class="n">dc_in</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dc_out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span></div>
-
 </pre></div>
 
                 </article>

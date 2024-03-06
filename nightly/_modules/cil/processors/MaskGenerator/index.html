@@ -552,7 +552,7 @@ document.write(`
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates a MaskGenerator processor which generates a mask for values outside a multiple of standard-devaiations from the mean.</span>
 
 <span class="sd">        abs(A - mean(A)) &lt; threshold_factor * std(A).</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param threshold_factor: scale factor of standard-deviations to use as threshold</span>
 <span class="sd">        :type threshold_factor: float, default=3</span>
 <span class="sd">        :param axis: specify axis as int or from &#39;dimension_labels&#39; to calculate mean. If no axis is specified then operates over flattened array.</span>
@@ -575,7 +575,7 @@ document.write(`
 <span class="sd">        MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</span>
 
 <span class="sd">        :param threshold_factor: scale factor of MAD to use as threshold</span>
-<span class="sd">        :type threshold_factor: float, default=3        </span>
+<span class="sd">        :type threshold_factor: float, default=3</span>
 <span class="sd">        :param axis: specify axis as int or from &#39;dimension_labels&#39; to calculate mean. If no axis is specified then operates over flattened array.</span>
 <span class="sd">        :type axis: int, string</span>
 <span class="sd">        :param window: specify number of pixels to use in calculation of a rolling median</span>
@@ -597,7 +597,7 @@ document.write(`
                  <span class="n">window</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                  <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to detect outliers and return mask with 0 where outliers were detected and 1 for other pixels.</span>
-<span class="sd">                </span>
+
 <span class="sd">            :param mode: a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)</span>
 <span class="sd">            :type mode: string, default=&#39;special_values&#39;</span>
 <span class="sd">            :param threshold_value: specify lower and upper boundaries if &#39;threshold&#39; mode is selected</span>
@@ -612,35 +612,35 @@ document.write(`
 <span class="sd">            :type axis: int, string</span>
 <span class="sd">            :return: returns a DataContainer with boolean mask with 0 where outliers were detected</span>
 <span class="sd">            :rtype: DataContainer</span>
-<span class="sd">            </span>
+
 <span class="sd">        - special_values    test element-wise for both inf and nan</span>
 <span class="sd">        - nan               test element-wise for nan</span>
 <span class="sd">        - inf               test element-wise for inf</span>
 <span class="sd">        - threshold         test element-wise if array values are within boundaries</span>
-<span class="sd">                            given by threshold_values = (float,float). </span>
+<span class="sd">                            given by threshold_values = (float,float).</span>
 <span class="sd">                            You can secify only lower threshold value by setting another to None</span>
 <span class="sd">                            such as threshold_values = (float,None), then</span>
-<span class="sd">                            upper boundary will be amax(data). Similarly, to specify only upper </span>
+<span class="sd">                            upper boundary will be amax(data). Similarly, to specify only upper</span>
 <span class="sd">                            boundary, use threshold_values = (None,float). If both threshold_values</span>
 <span class="sd">                            are set to None, then original array will be returned.</span>
 <span class="sd">        - quantile          test element-wise if array values are within boundaries</span>
-<span class="sd">                            given by quantiles = (q1,q2), 0&lt;=q1,q2&lt;=1. </span>
+<span class="sd">                            given by quantiles = (q1,q2), 0&lt;=q1,q2&lt;=1.</span>
 <span class="sd">                            You can secify only lower quantile value by setting another to None</span>
 <span class="sd">                            such as quantiles = (float,q2), then</span>
-<span class="sd">                            upper boundary will be amax(data). Similarly, to specify only upper </span>
+<span class="sd">                            upper boundary will be amax(data). Similarly, to specify only upper</span>
 <span class="sd">                            boundary, use quantiles = (None,q1). If both quantiles</span>
 <span class="sd">                            are set to None, then original array will be returned.</span>
-<span class="sd">        - mean              test element-wise if </span>
+<span class="sd">        - mean              test element-wise if</span>
 <span class="sd">                            abs(A - mean(A)) &lt; threshold_factor * std(A).</span>
-<span class="sd">                            Default value of threshold_factor is 3. If no axis is specified, </span>
-<span class="sd">                            then operates over flattened array. Alternatively operates along axis specified </span>
+<span class="sd">                            Default value of threshold_factor is 3. If no axis is specified,</span>
+<span class="sd">                            then operates over flattened array. Alternatively operates along axis specified</span>
 <span class="sd">                            as dimension_label.</span>
-<span class="sd">        - median            test element-wise if </span>
+<span class="sd">        - median            test element-wise if</span>
 <span class="sd">                            abs(A - median(A)) &lt; threshold_factor * scaled MAD(A),</span>
-<span class="sd">                            scaled median absolute deviation (MAD) is defined as </span>
+<span class="sd">                            scaled median absolute deviation (MAD) is defined as</span>
 <span class="sd">                            c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</span>
-<span class="sd">                            Default value of threshold_factor is 3. If no axis is specified, </span>
-<span class="sd">                            then operates over flattened array. Alternatively operates along axis specified </span>
+<span class="sd">                            Default value of threshold_factor is 3. If no axis is specified,</span>
+<span class="sd">                            then operates over flattened array. Alternatively operates along axis specified</span>
 <span class="sd">                            as dimension_label.</span>
 <span class="sd">        - movmean           the same as mean but uses rolling mean with a specified window,</span>
 <span class="sd">                            default window value is 5</span>
@@ -685,7 +685,7 @@ document.write(`
         <span class="n">ndim</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">axis_index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>               
+            <span class="n">axis_index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
                 <span class="n">axis_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span>
@@ -694,44 +694,44 @@ document.write(`
 
         <span class="c1"># intialise mask with all ones</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        
+
         <span class="c1"># if NaN or +/-Inf</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;special_values&#39;</span><span class="p">:</span>
-            
+
             <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">arr</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;nan&#39;</span><span class="p">:</span>
-            
+
             <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;inf&#39;</span><span class="p">:</span>
-            
+
             <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">arr</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;threshold&#39;</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Threshold value must be given as a tuple containing two values,</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>\
                     <span class="s2">&quot;use None if no threshold value is given&quot;</span><span class="p">)</span>
-                
+
             <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_threshold_value</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">quantile</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            
+
             <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">arr</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arr</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;quantile&#39;</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quantiles</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Quantiles must be given as a tuple containing two values,</span><span class="se">\n</span><span class="s2"> &quot;</span> <span class="o">+</span> \
                     <span class="s2">&quot;use None if no quantile value is given&quot;</span><span class="p">)</span>
-            
+
             <span class="n">quantile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_threshold_value</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">quantile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                
+
             <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">arr</span> <span class="o">&lt;</span> <span class="n">quantile</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arr</span> <span class="o">&gt;</span> <span class="n">quantile</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-            
+
             <span class="c1"># if mean along specific axis</span>
-            <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>               
+            <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">tile_par</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">slice_obj</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
@@ -743,20 +743,20 @@ document.write(`
                         <span class="n">slice_obj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
                 <span class="n">tile_par</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">tile_par</span><span class="p">)</span>
                 <span class="n">slice_obj</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">slice_obj</span><span class="p">)</span>
-                
+
                 <span class="n">tmp_mean</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis_index</span><span class="p">))[</span><span class="n">slice_obj</span><span class="p">],</span> <span class="n">tile_par</span><span class="p">)</span>
                 <span class="n">tmp_std</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis_index</span><span class="p">))[</span><span class="n">slice_obj</span><span class="p">],</span> <span class="n">tile_par</span><span class="p">)</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">tmp_mean</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">tmp_std</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="c1"># if global mean    </span>
+            <span class="c1"># if global mean</span>
             <span class="k">else</span><span class="p">:</span>
-                
+
                  <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">arr</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;median&#39;</span><span class="p">:</span>
-            
+
             <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">erfcinv</span><span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
-            
+
             <span class="c1"># if median along specific axis</span>
             <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">tile_par</span> <span class="o">=</span> <span class="p">[]</span>
@@ -774,17 +774,17 @@ document.write(`
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis_index</span><span class="p">))[</span><span class="n">slice_obj</span><span class="p">],</span> <span class="n">tile_par</span><span class="p">))</span>
                 <span class="n">median_absolute_dev</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis_index</span><span class="p">))[</span><span class="n">slice_obj</span><span class="p">],</span> <span class="n">tile_par</span><span class="p">)</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">tmp</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">median_absolute_dev</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
             <span class="c1"># if global median</span>
             <span class="k">else</span><span class="p">:</span>
-                
+
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">tmp</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;movmean&#39;</span><span class="p">:</span>
 
-            <span class="c1"># if movmean along specific axis     </span>
-            <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>               
+            <span class="c1"># if movmean along specific axis</span>
+            <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">kernel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
                 <span class="n">kernel</span><span class="p">[</span><span class="n">axis_index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span>
                 <span class="n">kernel</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
@@ -793,21 +793,21 @@ document.write(`
                 <span class="n">std_array</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">generic_filter</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
 
                 <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">mean_array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">std_array</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
             <span class="c1"># if global movmean</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mean_array</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">generic_filter</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,)</span><span class="o">*</span><span class="n">ndim</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
                 <span class="n">std_array</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">generic_filter</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,)</span><span class="o">*</span><span class="n">ndim</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
-                
-                <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">mean_array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">std_array</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>          
-            
+
+                <span class="n">mask</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">mean_array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">std_array</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;movmedian&#39;</span><span class="p">:</span>
 
             <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">erfcinv</span><span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
-            
+
             <span class="c1"># if movmedian along specific axis</span>
             <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                                
+
                 <span class="c1"># construct filter kernel</span>
                 <span class="n">kernel_shape</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
@@ -815,27 +815,27 @@ document.write(`
                         <span class="n">kernel_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">kernel_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                
+
                 <span class="n">kernel_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">kernel_shape</span><span class="p">)</span>
-                
+
                 <span class="n">median_array</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">median_filter</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">footprint</span><span class="o">=</span><span class="n">kernel_shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
-                
+
                 <span class="n">tmp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">median_array</span><span class="p">)</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">tmp</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">median_filter</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">footprint</span><span class="o">=</span><span class="n">kernel_shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-            
+
             <span class="c1"># if global movmedian</span>
-            <span class="k">else</span><span class="p">:</span>      
+            <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># construct filter kernel</span>
                 <span class="n">kernel_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">]</span><span class="o">*</span><span class="n">ndim</span><span class="p">)</span>
                 <span class="n">median_array</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">median_filter</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">kernel_shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
-                
+
                 <span class="n">tmp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">median_array</span><span class="p">)</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">tmp</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_factor</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">median_filter</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">kernel_shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-        
+
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mode not recognised. One of the following is expected: &#39;</span> <span class="o">+</span> \
                               <span class="s1">&#39;special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian&#39;</span><span class="p">)</span>
-        
+
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
@@ -843,7 +843,7 @@ document.write(`
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">_parse_threshold_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">quantile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
         <span class="n">lower_val</span> <span class="o">=</span> <span class="kc">None</span>

@@ -499,15 +499,15 @@ document.write(`
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to convert from transmission measurements to absorption</span>
 <span class="sd">    based on the Beer-Lambert law</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param white_level: A float defining incidence intensity in the Beer-Lambert law.</span>
 <span class="sd">    :type white_level: float, optional</span>
 <span class="sd">    :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level</span>
 <span class="sd">    :type min_intensity: float, optional</span>
 <span class="sd">    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if &#39;out&#39; is passed</span>
 <span class="sd">    :rtype: AcquisitionData, ImageData or DataContainer</span>
-<span class="sd">    </span>
-<span class="sd">    Processor first divides by white_level (default=1) and then take negative logarithm. </span>
+
+<span class="sd">    Processor first divides by white_level (default=1) and then take negative logarithm.</span>
 <span class="sd">    Elements below threshold (after division by white_level) are set to threshold.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -520,9 +520,9 @@ document.write(`
                   <span class="s1">&#39;white_level&#39;</span><span class="p">:</span> <span class="n">white_level</span><span class="p">}</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
@@ -531,7 +531,7 @@ document.write(`
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="kc">True</span> 
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -558,7 +558,7 @@ document.write(`
         <span class="c1">#beer-lambert</span>
         <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
         <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
-        
+
         <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">return_val</span><span class="p">:</span>

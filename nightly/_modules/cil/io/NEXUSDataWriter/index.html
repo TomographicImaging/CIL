@@ -499,17 +499,17 @@ document.write(`
 
 <span class="n">h5pyAvailable</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">h5py</span> 
+    <span class="kn">import</span> <span class="nn">h5py</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="n">h5pyAvailable</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <div class="viewcode-block" id="NEXUSDataWriter"><a class="viewcode-back" href="../../../../io/#cil.io.NEXUSDataWriter">[docs]</a><span class="k">class</span> <span class="nc">NEXUSDataWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Create a writer for NEXUS files.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data: AcquisitionData, ImageData, </span>
+<span class="sd">    data: AcquisitionData, ImageData,</span>
 <span class="sd">        The dataset to write to file</span>
 <span class="sd">    file_name: os.path or string, default None</span>
 <span class="sd">        The file name to write</span>
@@ -517,7 +517,7 @@ document.write(`
 <span class="sd">        The lossy compression to apply, default None will not compress data.</span>
 <span class="sd">        uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
@@ -525,7 +525,7 @@ document.write(`
 
         <span class="k">if</span> <span class="p">((</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
-        
+
 <div class="viewcode-block" id="NEXUSDataWriter.set_up"><a class="viewcode-back" href="../../../../io/#cil.io.NEXUSDataWriter.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -534,7 +534,7 @@ document.write(`
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Set up the writer</span>
 
-<span class="sd">        data: AcquisitionData, ImageData, </span>
+<span class="sd">        data: AcquisitionData, ImageData,</span>
 <span class="sd">            The dataset to write to file</span>
 <span class="sd">        file_name: os.path or string, default None</span>
 <span class="sd">            The file name to write</span>
@@ -544,7 +544,7 @@ document.write(`
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Path to write file is required.&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -555,44 +555,44 @@ document.write(`
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nxs&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nex&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">+=</span><span class="s1">&#39;.nxs&#39;</span>
-        
+
         <span class="c1"># Deal with compression</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress</span>           <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span>              <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compressed_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compression</span>        <span class="o">=</span> <span class="n">compression</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Writer supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
 
-        
-        
+
+
         <span class="c1"># check that h5py library is installed</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">h5pyAvailable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;h5py is not available, cannot write NEXUS files.&#39;</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="NEXUSDataWriter.write"><a class="viewcode-back" href="../../../../io/#cil.io.NEXUSDataWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        write dataset to disk</span>
-<span class="sd">        &#39;&#39;&#39;</span>   
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># check filename and data have been set:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Path to nexus file to write to is required.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Data to write out must be set.&#39;</span><span class="p">)</span>
-        
+
         <span class="c1"># if the folder does not exist, create the folder</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compression_scale_offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">)</span>
-                
+
         <span class="c1"># create the file</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            
+
             <span class="c1"># give the file some important attributes</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;cil_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
@@ -601,7 +601,7 @@ document.write(`
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NeXus_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;4.3.0&#39;</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;HDF5_Version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">hdf5_version</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;h5py_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">version</span>
-            
+
             <span class="c1"># create the NXentry group</span>
             <span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry&#39;</span><span class="p">)</span>
             <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NX_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXentry&#39;</span>
@@ -623,76 +623,76 @@ document.write(`
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ImageData&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AcquisitionData&#39;</span>
-            
+
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">):</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dim</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)):</span> 
-                
+
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)):</span>
+
                 <span class="c1"># create group to store configuration</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config&#39;</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/source&#39;</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector&#39;</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis&#39;</span><span class="p">)</span>
-                
+
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span>   
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span>
-                
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_x&#39;</span><span class="p">,</span> 
-                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_x&#39;</span><span class="p">,</span>
+                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span>
-                
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/position&#39;</span><span class="p">,</span> 
-                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/position&#39;</span><span class="p">,</span>
+                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-                
+
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/source/position&#39;</span><span class="p">,</span> 
-                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/source/position&#39;</span><span class="p">,</span>
+                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/ray/direction&#39;</span><span class="p">,</span> 
-                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/ray/direction&#39;</span><span class="p">,</span>
+                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
-                
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis/position&#39;</span><span class="p">,</span> 
-                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis/position&#39;</span><span class="p">,</span>
+                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-                
-                
+
+
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_pixels_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;pixel_size_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;panel_origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;3D&#39;</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_y&#39;</span><span class="p">,</span> 
-                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_y&#39;</span><span class="p">,</span>
+                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="p">)</span>
-                    
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis/direction&#39;</span><span class="p">,</span> 
-                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis/direction&#39;</span><span class="p">,</span>
+                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
-                
+
                     <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_pixels_v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;pixel_size_v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                    
-                <span class="n">angles</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/angles&#39;</span><span class="p">,</span> 
-                                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
+
+                <span class="n">angles</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/angles&#39;</span><span class="p">,</span>
+                                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
                                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="p">)</span>
-                <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;angle_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_unit</span>   
+                <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;angle_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_unit</span>
                 <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;initial_angle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">initial_angle</span>
-            
+
             <span class="k">else</span><span class="p">:</span>   <span class="c1"># ImageData</span>
-                
+
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_num_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_num_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_num_z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span>

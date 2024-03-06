@@ -496,66 +496,64 @@ document.write(`
 
 
 <div class="viewcode-block" id="IdentityOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.IdentityOperator">[docs]</a><span class="k">class</span> <span class="nc">IdentityOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;IdentityOperator:  Id: X -&gt; Y,  Id(x) = x\in Y</span>
-<span class="sd">                       </span>
+
 <span class="sd">                   X : gm_domain</span>
 <span class="sd">                   Y : gm_range ( Default: Y = X )</span>
-<span class="sd">                                                                                                                                   </span>
-<span class="sd">    &#39;&#39;&#39;</span>    
-    
-    
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        
+
         <span class="k">if</span> <span class="n">range_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span>
-        
+
         <span class="nb">super</span><span class="p">(</span><span class="n">IdentityOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
                                        <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span>
-        
+
 <div class="viewcode-block" id="IdentityOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.IdentityOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns Id(x)&#39;&#39;&#39;</span>
-        
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="IdentityOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.IdentityOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns Id(x)&#39;&#39;&#39;</span>         
-        
-        
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns Id(x)&#39;&#39;&#39;</span>
+
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-        
+
 <div class="viewcode-block" id="IdentityOperator.calculate_norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.IdentityOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates operator norm of IdentityOperator&#39;&#39;&#39;</span>        
-        
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates operator norm of IdentityOperator&#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="mf">1.0</span></div>
-    
-    
+
+
     <span class="c1">###########################################################################</span>
     <span class="c1">###############  For preconditioning ######################################</span>
-    <span class="c1">###########################################################################                    </span>
+    <span class="c1">###########################################################################</span>
     <span class="k">def</span> <span class="nf">matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-    
+
     <span class="k">def</span> <span class="nf">sum_abs_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">sum_abs_col</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
-    
-    
 </pre></div>
 
                 </article>

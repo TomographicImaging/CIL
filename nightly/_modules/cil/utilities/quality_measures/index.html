@@ -503,7 +503,7 @@ document.write(`
 <span class="sd">    dc1: `DataContainer`</span>
 <span class="sd">        One image to be compared</span>
 <span class="sd">    dc2: `DataContainer`</span>
-<span class="sd">        Second image to be compared </span>
+<span class="sd">        Second image to be compared</span>
 <span class="sd">    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`</span>
 <span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero.</span>
 
@@ -513,12 +513,12 @@ document.write(`
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">dc1</span> <span class="o">=</span> <span class="n">dc1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="n">dc2</span> <span class="o">=</span> <span class="n">dc2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-    
+
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-            
+
         <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
         <span class="n">dc1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc1</span><span class="p">)</span>
         <span class="n">dc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc2</span><span class="p">)</span>
@@ -533,56 +533,56 @@ document.write(`
 <span class="sd">    dc1: `DataContainer`</span>
 <span class="sd">        One image to be compared</span>
 <span class="sd">    dc2: `DataContainer`</span>
-<span class="sd">        Second image to be compared </span>
+<span class="sd">        Second image to be compared</span>
 <span class="sd">    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`</span>
-<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero. </span>
+<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero.</span>
 
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    A number with the mean absolute error between the two images. </span>
+<span class="sd">    A number with the mean absolute error between the two images.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">dc1</span> <span class="o">=</span> <span class="n">dc1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="n">dc2</span> <span class="o">=</span> <span class="n">dc2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-            
+
         <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
         <span class="n">dc1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc1</span><span class="p">)</span>
         <span class="n">dc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc2</span><span class="p">)</span>
-        
+
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">dc1</span><span class="o">-</span><span class="n">dc2</span><span class="p">)))</span></div>
 
 
 <div class="viewcode-block" id="psnr"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.quality_measures.psnr">[docs]</a><span class="k">def</span> <span class="nf">psnr</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">,</span> <span class="n">data_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39; Calculates the Peak signal to noise ratio (PSNR) between the two images. </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Calculates the Peak signal to noise ratio (PSNR) between the two images.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    ground_truth: `DataContainer`</span>
 <span class="sd">        The reference image</span>
 <span class="sd">    corrupted: `DataContainer`</span>
-<span class="sd">        The image to be evaluated </span>
+<span class="sd">        The image to be evaluated</span>
 <span class="sd">    data_range: scalar value, default=None</span>
 <span class="sd">        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.</span>
 <span class="sd">    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`</span>
-<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero.. </span>
+<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero..</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    A number, the peak signal to noise ration between the two images.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">data_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        
+
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_range</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
-            
+
         <span class="k">else</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
                 <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
             <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ground_truth</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span>
@@ -591,7 +591,6 @@ document.write(`
     <span class="n">tmp_mse</span> <span class="o">=</span> <span class="n">mse</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">((</span><span class="n">data_range</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">tmp_mse</span><span class="p">)</span></div>
-  
 </pre></div>
 
                 </article>

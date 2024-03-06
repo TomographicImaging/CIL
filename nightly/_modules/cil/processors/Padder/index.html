@@ -503,7 +503,7 @@ document.write(`
 
 
 <span class="sd">    It is recommended to use the static methods to configure your Padder object rather than initialising this class directly. See examples for details.</span>
-<span class="sd">       </span>
+
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -519,8 +519,8 @@ document.write(`
 <span class="sd">    `pad_width` behaviour (number of pixels):</span>
 <span class="sd">        - int: Each axis will be padded with a border of this size</span>
 <span class="sd">        - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
-<span class="sd">        - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}      </span>
-<span class="sd">    </span>
+<span class="sd">        - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+
 <span class="sd">    `pad_values` behaviour:</span>
 <span class="sd">        - float: Each border will use this value</span>
 <span class="sd">        - tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)</span>
@@ -569,7 +569,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Padder processor wrapping numpy.pad with mode `constant`.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Pads the data with a constant value border. Pads in all *spatial*</span>
 <span class="sd">        dimensions unless a dictionary is passed to either `pad_width` or `constant_values`</span>
 
@@ -585,8 +585,8 @@ document.write(`
 <span class="sd">        `pad_width` behaviour (number of pixels):</span>
 <span class="sd">         - int: Each axis will be padded with a border of this size</span>
 <span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
-<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}      </span>
-<span class="sd">        </span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+
 <span class="sd">        `constant_values` behaviour (value of pixels):</span>
 <span class="sd">         - float: Each border will be set to this value</span>
 <span class="sd">         - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)</span>
@@ -594,7 +594,7 @@ document.write(`
 
 <span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
 <span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
 <span class="sd">        &gt;&gt;&gt; processor = Padder.constant(pad_width=1, constant_values=0.0)</span>
@@ -610,7 +610,7 @@ document.write(`
 <span class="sd">        [0. 3. 4. 5. 0.]</span>
 <span class="sd">        [0. 6. 7. 8. 0.]</span>
 <span class="sd">        [0. 0. 0. 0. 0.]]</span>
-<span class="sd">                    </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">pad_values</span><span class="o">=</span><span class="n">constant_values</span><span class="p">)</span>
@@ -633,11 +633,11 @@ document.write(`
 <span class="sd">        `pad_width` behaviour (number of pixels):</span>
 <span class="sd">         - int: Each axis will be padded with a border of this size</span>
 <span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
-<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}  </span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
 
 <span class="sd">        If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,</span>
-<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.    </span>
-<span class="sd">        </span>
+<span class="sd">        and the last two angles in geometry.angles. The user should ensure the output is as expected.</span>
+
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
 <span class="sd">        &gt;&gt;&gt; processor = Padder.edge(pad_width=1)</span>
@@ -653,15 +653,15 @@ document.write(`
 <span class="sd">        [3. 3. 4. 5. 5.]</span>
 <span class="sd">        [6. 6. 7. 8. 8.]</span>
 <span class="sd">        [6. 6. 7. 8. 8.]]</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 <div class="viewcode-block" id="Padder.linear_ramp"><a class="viewcode-back" href="../../../../processors/#cil.processors.Padder.linear_ramp">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">linear_ramp</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Padder processor wrapping numpy.pad with mode `linear_ramp`</span>
 
 <span class="sd">        Pads the data with values calculated from a linear ramp between the array edge</span>
 <span class="sd">        value and the set end_value. Pads in all *spatial* dimensions unless a dictionary</span>
@@ -677,7 +677,7 @@ document.write(`
 <span class="sd">        `pad_width` behaviour (number of pixels):</span>
 <span class="sd">         - int: Each axis will be padded with a border of this size</span>
 <span class="sd">         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</span>
-<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}  </span>
+<span class="sd">         - dict: Specified axes will be padded: e.g. {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
 
 <span class="sd">        `end_values` behaviour:</span>
 <span class="sd">         - float: Each border will use this end value</span>
@@ -704,11 +704,11 @@ document.write(`
 <span class="sd">        [0.  3.  6.  7.  8.  4.  0. ]</span>
 <span class="sd">        [0.  1.5 3.  3.5 4.  2.  0. ]</span>
 <span class="sd">        [0.  0.  0.  0.  0.  0.  0. ]]</span>
-<span class="sd">                    </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span> <span class="n">pad_values</span><span class="o">=</span><span class="n">end_values</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 
 <div class="viewcode-block" id="Padder.reflect"><a class="viewcode-back" href="../../../../processors/#cil.processors.Padder.reflect">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -746,11 +746,11 @@ document.write(`
 <span class="sd">        [4. 3. 4. 5. 4.]</span>
 <span class="sd">        [7. 6. 7. 8. 7.]</span>
 <span class="sd">        [4. 3. 4. 5. 4.]]</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 
 <div class="viewcode-block" id="Padder.symmetric"><a class="viewcode-back" href="../../../../processors/#cil.processors.Padder.symmetric">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">symmetric</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -790,11 +790,11 @@ document.write(`
 <span class="sd">        [3. 3. 4. 5. 5.]</span>
 <span class="sd">        [6. 6. 7. 8. 8.]</span>
 <span class="sd">        [6. 6. 7. 8. 8.]]</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;symmetric&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 
 <div class="viewcode-block" id="Padder.wrap"><a class="viewcode-back" href="../../../../processors/#cil.processors.Padder.wrap">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -835,7 +835,7 @@ document.write(`
 <span class="sd">        [5. 3. 4. 5. 3.]</span>
 <span class="sd">        [8. 6. 7. 8. 6.]</span>
 <span class="sd">        [2. 0. 1. 2. 0.]]</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wrap&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
@@ -849,8 +849,8 @@ document.write(`
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
                 <span class="s1">&#39;pad_width&#39;</span><span class="p">:</span> <span class="n">pad_width</span><span class="p">,</span>
                 <span class="s1">&#39;pad_values&#39;</span><span class="p">:</span> <span class="n">pad_values</span><span class="p">,</span>
-                <span class="s1">&#39;_data_array&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> 
-                <span class="s1">&#39;_geometry&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                <span class="s1">&#39;_data_array&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;_geometry&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s1">&#39;_shape_in&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                 <span class="s1">&#39;_shape_out&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                 <span class="s1">&#39;_labels_in&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
@@ -914,8 +914,8 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, specify pad_width&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_parse_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
-        <span class="k">return</span> <span class="kc">True</span> 
+
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_create_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -957,13 +957,13 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span><span class="o">*</span><span class="mi">4</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span><span class="o">*</span><span class="mi">4</span>
 
-        
+
         <span class="c1"># if pad_width or set_values is passed a dictionary these keys specify the axes to run over</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_values</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dictionaries must contain the same axes&#39;</span><span class="p">)</span>
-            
+
             <span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dimensions_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_width</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -994,7 +994,7 @@ document.write(`
                 <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_tuple</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`pad_width` should be a integer or a tuple of integers. Got </span><span class="si">{0}</span><span class="s2"> for axis </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>    
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`pad_width` should be a integer or a tuple of integers. Got </span><span class="si">{0}</span><span class="s2"> for axis </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
 
         <span class="c1"># get pad_values for these dimensions</span>
         <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
@@ -1007,12 +1007,12 @@ document.write(`
                 <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_tuple</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`pad_values` should be a float or a tuple of floats. Got </span><span class="si">{0}</span><span class="s2"> for axis </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>    
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`pad_values` should be a float or a tuple of floats. Got </span><span class="si">{0}</span><span class="s2"> for axis </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
 
         <span class="c1">#create list of processed axes and new_shape</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">_processed_dims</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
 
@@ -1043,10 +1043,10 @@ document.write(`
                 <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span><span class="n">end_values</span><span class="o">=</span><span class="n">end_values</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span>
-                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+                <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">shift_detector_in_plane</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
-                    
+
             <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span>
                 <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -1096,7 +1096,7 @@ document.write(`
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;linear_ramp&#39;</span><span class="p">:</span>
             <span class="n">arr_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_width_param</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> \
                 <span class="n">end_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_values_param</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-        
+
         <span class="k">return</span> <span class="n">arr_out</span>
 
 
@@ -1138,7 +1138,7 @@ document.write(`
             <span class="k">if</span> <span class="n">new_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="n">new_geometry</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry of `out` not as expected. Got </span><span class="si">{0}</span><span class="s2">, expected </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">new_geometry</span><span class="p">))</span>
-            
+
             <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 </pre></div>
 

@@ -504,9 +504,9 @@ document.write(`
 <span class="sd">    mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
 <span class="sd">        A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
 <span class="sd">        Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
-<span class="sd">        Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">        Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">    mode : {&#39;value&#39;, &#39;mean&#39;, &#39;median&#39;, &#39;interpolate&#39;}, default=&#39;value&#39;</span>
-<span class="sd">        The method to fill in missing values </span>
+<span class="sd">        The method to fill in missing values</span>
 <span class="sd">    value : float, default=0</span>
 <span class="sd">        Substitute all outliers with a specific value if method=&#39;value&#39;, otherwise discarded.</span>
 <span class="sd">    axis : str or int</span>
@@ -514,7 +514,7 @@ document.write(`
 <span class="sd">        (depending on mode) along that axis</span>
 <span class="sd">    method : {&#39;linear&#39;, &#39;nearest&#39;, &#39;zeros&#39;, &#39;linear&#39;, &#39;quadratic&#39;, &#39;cubic&#39;, &#39;previous&#39;, &#39;next&#39;}, default=&#39;linear&#39;</span>
 <span class="sd">        Interpolation method to use.</span>
-<span class="sd">    </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Masker.value"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.value">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -526,7 +526,7 @@ document.write(`
 <span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
 <span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
 <span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
-<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">        value : float, default=0</span>
 <span class="sd">            Values to be assigned to missing elements</span>
 
@@ -538,7 +538,7 @@ document.write(`
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 <div class="viewcode-block" id="Masker.mean"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.mean">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.</span>
@@ -548,7 +548,7 @@ document.write(`
 <span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
 <span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
 <span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
-<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">        axis : str, int</span>
 <span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to calculate mean.</span>
 
@@ -560,7 +560,7 @@ document.write(`
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 <div class="viewcode-block" id="Masker.median"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.median">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.</span>
@@ -570,7 +570,7 @@ document.write(`
 <span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
 <span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
 <span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
-<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">        axis : str, int</span>
 <span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to calculate median.</span>
 
@@ -582,7 +582,7 @@ document.write(`
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Masker</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">processor</span></div>
-    
+
 <div class="viewcode-block" id="Masker.interpolate"><a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.interpolate">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing values.</span>
@@ -592,12 +592,12 @@ document.write(`
 <span class="sd">        mask : DataContainer, ImageData, AcquisitionData, numpy.ndarray</span>
 <span class="sd">            A boolean array with the same dimensions as input, where &#39;False&#39; represents masked values.</span>
 <span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
-<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers. </span>
+<span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">        axis : str, int</span>
 <span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to loop over and perform 1D interpolation.</span>
 <span class="sd">        method : {&#39;linear&#39;, &#39;nearest&#39;, &#39;zeros&#39;, &#39;linear&#39;, &#39;quadratic&#39;, &#39;cubic&#39;, &#39;previous&#39;, &#39;next&#39;}, default=&#39;linear&#39;</span>
 <span class="sd">            Interpolation method to use.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Masker processor</span>
@@ -621,30 +621,30 @@ document.write(`
                   <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">method</span><span class="p">}</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">Masker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, provide a mask.&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mask and Data must have the same shape.&quot;</span> <span class="o">+</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mask and Data must have the same shape.&quot;</span> <span class="o">+</span>
                             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;dimension_labels&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mask and Data must have the same dimension labels.&quot;</span> <span class="o">+</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mask and Data must have the same dimension labels.&quot;</span> <span class="o">+</span>
                             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;interpolate&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong mode. One of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong mode. One of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                             <span class="s2">&quot;value, mean, median, interpolate&quot;</span><span class="p">)</span>
-    
-        <span class="k">return</span> <span class="kc">True</span> 
+
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
-        
+
         <span class="n">return_arr</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -652,7 +652,7 @@ document.write(`
             <span class="n">return_arr</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">arr</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-        
+
         <span class="c1">#assumes mask has &#39;as_array&#39; method, i.e. is a DataContainer or is a numpy array</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mask_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
@@ -660,29 +660,29 @@ document.write(`
             <span class="n">mask_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
 
         <span class="n">mask_arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mask_arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        
+
         <span class="n">mask_invert</span> <span class="o">=</span> <span class="o">~</span><span class="n">mask_arr</span>
-            
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">axis_index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>             
+            <span class="n">axis_index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
                 <span class="n">axis_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">axis_index</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
-            
+
             <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
-        
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;median&#39;</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                
+
                 <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span>
-                    
+
                 <span class="n">slice_obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">ndim</span>
-                            
+
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis_index</span><span class="p">]):</span>
                     <span class="n">current_slice_obj</span> <span class="o">=</span> <span class="n">slice_obj</span><span class="p">[:]</span>
                     <span class="n">current_slice_obj</span><span class="p">[</span><span class="n">axis_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
@@ -693,45 +693,45 @@ document.write(`
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">slice_data</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">slice_data</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]])</span>
                     <span class="n">arr</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]</span> <span class="o">=</span> <span class="n">slice_data</span>
-                
+
             <span class="k">else</span><span class="p">:</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-                    <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span> 
+                    <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span> 
-        
+                    <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span>
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;interpolate&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span> \
                                         <span class="s1">&#39;quadratic&#39;</span><span class="p">,</span> <span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="s1">&#39;previous&#39;</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong interpolation method, one of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> 
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong interpolation method, one of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                                 <span class="s2">&quot;linear, nearest, zeros, linear, quadratic, cubic, previous, next&quot;</span><span class="p">)</span>
-            
+
             <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
-            
+
             <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span> <span class="p">(</span><span class="s1">&#39;Currently Only 1D interpolation is available. Please specify an axis to interpolate over.&#39;</span><span class="p">)</span>
-            
+
             <span class="n">res_dim</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">axis_index</span><span class="p">:</span>
                     <span class="n">res_dim</span> <span class="o">*=</span> <span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            
+
             <span class="c1"># get axis for 1D interpolation</span>
             <span class="n">interp_axis</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">axis_index</span><span class="p">])</span>
-            
+
             <span class="c1"># loop over slice</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">res_dim</span><span class="p">):</span>
-                
+
                 <span class="n">rest_shape</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">axis_index</span><span class="p">:</span>
                         <span class="n">rest_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
                 <span class="n">rest_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">rest_shape</span><span class="p">)</span>
-                
+
                 <span class="n">rest_idx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">rest_shape</span><span class="p">)</span>
-                
+
                 <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
@@ -741,20 +741,20 @@ document.write(`
                         <span class="n">idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rest_idx</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
                         <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-                
+
                 <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask_invert</span><span class="p">[</span><span class="n">idx</span><span class="p">]):</span>
                     <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-                    <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">interp_axis</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span> <span class="n">tmp</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span> 
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">interp_axis</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span> <span class="n">tmp</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
                                             <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span>
                                             <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                             <span class="n">kind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
                     <span class="n">tmp</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
-        
+
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mode is not recognised. One of the following is expected: &#39;</span> <span class="o">+</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mode is not recognised. One of the following is expected: &#39;</span> <span class="o">+</span>
                               <span class="s1">&#39;value, mean, median, interpolate&#39;</span><span class="p">)</span>
-        
+
         <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">return_arr</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>

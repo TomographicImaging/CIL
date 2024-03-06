@@ -494,77 +494,77 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.errors</span> <span class="kn">import</span> <span class="n">InPlaceError</span>
-        
+
 <div class="viewcode-block" id="FiniteDifferenceOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.FiniteDifferenceOperator">[docs]</a><span class="k">class</span> <span class="nc">FiniteDifferenceOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
-<span class="w">    </span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;                  </span>
-<span class="sd">        Computes forward/backward/centered finite differences of a DataContainer </span>
+
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Computes forward/backward/centered finite differences of a DataContainer</span>
 <span class="sd">        under Neumann/Periodic boundary conditions</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param domain_geometry: Domain geometry for the FiniteDifferenceOperator</span>
 <span class="sd">        :param direction: Direction to evaluate finite differences</span>
 <span class="sd">        :type direction: string label from domain geometry or integer number</span>
 <span class="sd">        :param method: Method for finite differences</span>
 <span class="sd">        :type method: &#39;forward&#39;, &#39;backward&#39;, &#39;centered&#39;</span>
 <span class="sd">        :param bnd_cond: &#39;Neumann&#39;, &#39;Periodic&#39;</span>
-<span class="sd">        </span>
-<span class="sd">     &#39;&#39;&#39;</span>        
-    
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> 
-                       <span class="n">range_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                       <span class="n">direction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+
+<span class="sd">     &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span>
+                       <span class="n">range_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">direction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                        <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;forward&#39;</span><span class="p">,</span>
                        <span class="n">bnd_cond</span> <span class="o">=</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">direction</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">or</span> <span class="n">direction</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested direction is not possible. Accepted direction </span><span class="si">{}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)),</span> <span class="n">direction</span><span class="p">))</span>            
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested direction is not possible. Accepted direction </span><span class="si">{}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)),</span> <span class="n">direction</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
         <span class="k">else</span><span class="p">:</span>
-           <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>              
+           <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span>
            <span class="k">else</span><span class="p">:</span>
                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested direction is not possible. Accepted direction is </span><span class="si">{}</span><span class="s1"> or </span><span class="si">{}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)),</span>  <span class="n">direction</span><span class="p">))</span>
-                         
+
         <span class="c1">#get voxel spacing, if not use 1s</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">=</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">spacing</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">=</span> <span class="mi">1</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">=</span> <span class="n">bnd_cond</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
-                
+
         <span class="c1"># Domain Geometry = Range Geometry if not stated</span>
         <span class="k">if</span> <span class="n">range_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span> 
-            
-        <span class="nb">super</span><span class="p">(</span><span class="n">FiniteDifferenceOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span><span class="p">,</span> 
-                                         <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">range_geometry</span><span class="p">)</span>              
-            
-        <span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
-        
+            <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">FiniteDifferenceOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span><span class="p">,</span>
+                                         <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">range_geometry</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39; Need a positive voxel size &#39;</span><span class="p">)</span>                      
-                    
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39; Need a positive voxel size &#39;</span><span class="p">)</span>
+
         <span class="c1"># check direction and &quot;length&quot; of geometry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Finite differences direction </span><span class="si">{}</span><span class="s1"> larger than geometry shape length </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span><span class="p">))</span>          
-                                                 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Finite differences direction </span><span class="si">{}</span><span class="s1"> larger than geometry shape length </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span>
         <span class="n">tmp</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">tmp</span>       
+        <span class="k">return</span> <span class="n">tmp</span>
 
 <div class="viewcode-block" id="FiniteDifferenceOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.FiniteDifferenceOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="nb">id</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">InPlaceError</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;FiniteDifferenceOperator.direct cannot be used in place&quot;</span><span class="p">)</span>
-        
+
         <span class="n">x_asarr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-        
+
         <span class="n">outnone</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">outnone</span> <span class="o">=</span> <span class="kc">True</span>
@@ -572,239 +572,239 @@ document.write(`
             <span class="n">outa</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">outa</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-            <span class="n">outa</span><span class="p">[:]</span><span class="o">=</span><span class="mi">0</span>     
+            <span class="n">outa</span><span class="p">[:]</span><span class="o">=</span><span class="mi">0</span>
 
         <span class="c1">#######################################################################</span>
         <span class="c1">##################### Forward differences #############################</span>
         <span class="c1">#######################################################################</span>
-                
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>  
-            
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+
             <span class="c1"># interior nodes</span>
             <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))],</span> \
                              <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
-                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>               
+                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
-                
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span> 
-                
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>
+
+
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
-                
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>  
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>
+
                 <span class="c1"># right boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>  
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>
+
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>                
-                
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
+
         <span class="c1">#######################################################################</span>
         <span class="c1">##################### Backward differences ############################</span>
-        <span class="c1">#######################################################################                </span>
+        <span class="c1">#######################################################################</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>   
-                                   
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>
+
             <span class="c1"># interior nodes</span>
             <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
                              <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">))],</span> \
-                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>              
-            
+                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
-                    
+
                     <span class="c1"># right boundary</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))],</span> \
                                  <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
-                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))])</span> 
-                    
+                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))])</span>
+
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
-                  
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>  
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>
+
                 <span class="c1"># right boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span> 
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>
+
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>                 
-        
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
+
         <span class="c1">#######################################################################</span>
         <span class="c1">##################### Centered differences ############################</span>
         <span class="c1">#######################################################################</span>
-        
-        
+
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;centered&#39;</span><span class="p">:</span>
-            
+
             <span class="c1"># interior nodes</span>
             <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))],</span> \
                              <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">))],</span> \
-                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span> 
-            
+                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>
+
             <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))]</span> <span class="o">/=</span> <span class="mf">2.</span>
-            
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
-                            
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))],</span> \
                                  <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span> \
-                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))])</span>  
+                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))])</span>
                 <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))]</span> <span class="o">/=</span><span class="mf">2.</span>
-                
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))],</span> \
                                  <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
                                  <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))])</span>
-                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))]</span> <span class="o">/=</span><span class="mf">2.</span>                
-                
+                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))]</span> <span class="o">/=</span><span class="mf">2.</span>
+
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
                 <span class="k">pass</span>
-                
+
                <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))],</span> \
                                  <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span> \
-                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))])</span>                  
+                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))])</span>
                 <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))]</span> <span class="o">/=</span> <span class="mf">2.</span>
-                
-                
+
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))],</span> \
                                  <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
-                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))])</span> 
+                                 <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))])</span>
                 <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))]</span> <span class="o">/=</span> <span class="mf">2.</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>                 
-                
-        <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>                
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">outa</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span>  
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">outnone</span><span class="p">:</span>                  
+        <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">outa</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span>
+
+        <span class="k">if</span> <span class="n">outnone</span><span class="p">:</span>
             <span class="n">ret</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>                             </div>
-                 
-        
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="FiniteDifferenceOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.FiniteDifferenceOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="nb">id</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">InPlaceError</span>
-        
-        <span class="c1"># Adjoint operation defined as  </span>
-                      
+
+        <span class="c1"># Adjoint operation defined as</span>
+
         <span class="n">x_asarr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
-        <span class="n">outnone</span> <span class="o">=</span> <span class="kc">False</span> 
+        <span class="n">outnone</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">outnone</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="n">outa</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">outa</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>        
-            <span class="n">outa</span><span class="p">[:]</span><span class="o">=</span><span class="mi">0</span> 
-            
-            
+            <span class="n">outa</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+            <span class="n">outa</span><span class="p">[:]</span><span class="o">=</span><span class="mi">0</span>
+
+
         <span class="c1">#######################################################################</span>
         <span class="c1">##################### Forward differences #############################</span>
-        <span class="c1">#######################################################################            </span>
-            
+        <span class="c1">#######################################################################</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>    
-            
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+
             <span class="c1"># interior nodes</span>
             <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
                              <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">))],</span> \
-                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>              
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>            
+                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
 
                 <span class="c1"># left boundary</span>
-                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span> <span class="o">=</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span>                
-                
+                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span> <span class="o">=</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span>
+
                 <span class="c1"># right boundary</span>
-                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))]</span>  
-                
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>            
+                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))]</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
 
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>  
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>
                 <span class="c1"># right boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span> 
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>
+
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>                 
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
 
         <span class="c1">#######################################################################</span>
         <span class="c1">##################### Backward differences ############################</span>
-        <span class="c1">#######################################################################                </span>
-                
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span> 
-            
+        <span class="c1">#######################################################################</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>
+
             <span class="c1"># interior nodes</span>
             <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))],</span> \
                              <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span> \
-                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>             
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>             
-                
+                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
+
                 <span class="c1"># left boundary</span>
-                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span> <span class="o">=</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))]</span>                
-                
+                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span> <span class="o">=</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))]</span>
+
                 <span class="c1"># right boundary</span>
-                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> 
-                
-                
+                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span>
+
+
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
-            
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>  
-                
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>
+
                 <span class="c1"># right boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>              
-                            
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
-                
-                
+
+
         <span class="c1">#######################################################################</span>
         <span class="c1">##################### Centered differences ############################</span>
         <span class="c1">#######################################################################</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;centered&#39;</span><span class="p">:</span>
-            
+
             <span class="c1"># interior nodes</span>
             <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span> <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">))],</span> \
                              <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">))],</span> \
-                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span> 
+                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))])</span>
             <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))]</span> <span class="o">/=</span> <span class="mf">2.0</span>
-            
+
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Neumann&#39;</span><span class="p">:</span>
-                
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))],</span>
@@ -814,45 +814,41 @@ document.write(`
                 <span class="c1"># right boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>  
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>
 
-                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">/=</span> <span class="o">-</span><span class="mf">2.0</span>               
-                                                            
-                
+                <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">/=</span> <span class="o">-</span><span class="mf">2.0</span>
+
+
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_condition</span> <span class="o">==</span> <span class="s1">&#39;Periodic&#39;</span><span class="p">:</span>
-                
+
                 <span class="c1"># left boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))],</span>
                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))])</span>
                 <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span> <span class="o">/=</span> <span class="mf">2.0</span>
-                
+
                 <span class="c1"># right boundary</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span>\
                             <span class="n">x_asarr</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))],</span>
                             <span class="n">out</span> <span class="o">=</span> <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))])</span>
                 <span class="n">outa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))]</span> <span class="o">/=</span> <span class="mf">2.0</span>
-                
-                                
+
+
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span> 
-                                             
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>                  
-                               
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
+
         <span class="n">outa</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">outa</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span>                      
-            
-        <span class="k">if</span> <span class="n">outnone</span><span class="p">:</span>                  
+            <span class="n">outa</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span>
+
+        <span class="k">if</span> <span class="n">outnone</span><span class="p">:</span>
             <span class="n">ret</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>        </div></div>
-              
-        
-    
-    
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span></div></div>
 </pre></div>
 
                 </article>

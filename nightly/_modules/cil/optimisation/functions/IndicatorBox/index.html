@@ -499,14 +499,14 @@ document.write(`
 
 <div class="viewcode-block" id="IndicatorBox"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox">[docs]</a><span class="k">class</span> <span class="nc">IndicatorBox</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Indicator function for box constraint</span>
-<span class="sd">            </span>
-<span class="sd">      .. math:: </span>
-<span class="sd">         </span>
-<span class="sd">         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}  </span>
+
+<span class="sd">      .. math::</span>
+
+<span class="sd">         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}</span>
 <span class="sd">                                            0, \text{ if } x \in [a, b] \\</span>
 <span class="sd">                                            \infty, \text{otherwise}</span>
 <span class="sd">                                     \end{cases}</span>
-<span class="sd">        </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lower : float, DataContainer or numpy array, default None</span>
@@ -516,29 +516,29 @@ document.write(`
 <span class="sd">    accelerated : bool, default True</span>
 <span class="sd">        Specifies whether to use the accelerated version or not, using numba or</span>
 <span class="sd">        numpy backends respectively.</span>
-<span class="sd">    </span>
-<span class="sd">    </span>
-<span class="sd">    If ``lower`` or ``upper`` are passed a ``DataContainer`` (or derived class </span>
-<span class="sd">    such as ``ImageData`` or ``AcquisitionData``) or a ``numpy array``, the bounds </span>
+
+
+<span class="sd">    If ``lower`` or ``upper`` are passed a ``DataContainer`` (or derived class</span>
+<span class="sd">    such as ``ImageData`` or ``AcquisitionData``) or a ``numpy array``, the bounds</span>
 <span class="sd">    can be set to different values for each element.</span>
 
-<span class="sd">    In order to save computing time it is possible to suppress the evaluation of </span>
-<span class="sd">    the function. This is achieved by setting ``suppress_evaluation`` to ``True``. </span>
+<span class="sd">    In order to save computing time it is possible to suppress the evaluation of</span>
+<span class="sd">    the function. This is achieved by setting ``suppress_evaluation`` to ``True``.</span>
 <span class="sd">    ``IndicatorBox`` evaluated on any input will then return 0.</span>
 
-<span class="sd">    If ``accelerated`` is set to ``True`` (default), the Numba backend is used. </span>
-<span class="sd">    Otherwise, the Numpy backend is used. An optional parameter to set the number of </span>
+<span class="sd">    If ``accelerated`` is set to ``True`` (default), the Numba backend is used.</span>
+<span class="sd">    Otherwise, the Numpy backend is used. An optional parameter to set the number of</span>
 <span class="sd">    threads used by Numba can be set with ``set_num_threads``. Setting the number of</span>
 <span class="sd">    threads when ``accelerate`` is set to ``False`` will not have any effect.</span>
-<span class="sd">    The default number of threads is defined in the ``cil.utilities.multiprocessing`` </span>
+<span class="sd">    The default number of threads is defined in the ``cil.utilities.multiprocessing``</span>
 <span class="sd">    module, and it is equivalent to half of the CPU cores available.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">    --------</span>
-<span class="sd">    </span>
-<span class="sd">    In order to save computing time it is possible to suppress the evaluation of the </span>
+
+<span class="sd">    In order to save computing time it is possible to suppress the evaluation of the</span>
 <span class="sd">    function.</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. code-block:: python</span>
 
 <span class="sd">        ib = IndicatorBox(lower=0, upper=1)</span>
@@ -548,12 +548,12 @@ document.write(`
 
 <span class="sd">    Example:</span>
 <span class="sd">    --------</span>
-<span class="sd">    </span>
+
 <span class="sd">    Set the number of threads used in accelerated mode.</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. code-block:: python</span>
 
-<span class="sd">    </span>
+
 <span class="sd">        num_threads = 4</span>
 <span class="sd">        ib = IndicatorBox(lower=0, upper=1)</span>
 <span class="sd">        ib.set_num_threads(num_threads)</span>
@@ -591,7 +591,7 @@ document.write(`
 
 <div class="viewcode-block" id="IndicatorBox.set_suppress_evaluation"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">[docs]</a>    <span class="k">def</span> <span class="nf">set_suppress_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Suppresses the evaluation of the function</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        value : bool</span>
@@ -603,13 +603,13 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates IndicatorBox at x</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">            x : DataContainer</span>
-<span class="sd">            </span>
-<span class="sd">        Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.  </span>
+
+<span class="sd">        Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppress_evaluation</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -659,13 +659,13 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Get the optional number of threads parameter to use for the accelerated version.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Defaults to the value set in the CIL multiprocessing module.&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">cil_mp</span><span class="o">.</span><span class="n">NUM_THREADS</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_threads</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_threads</span>
 
 <div class="viewcode-block" id="IndicatorBox.set_num_threads"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox.set_num_threads">[docs]</a>    <span class="k">def</span> <span class="nf">set_num_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Set the optional number of threads parameter to use for the accelerated version.</span>
-<span class="sd">        </span>
+
 <span class="sd">        This is discarded if ``accelerated=False``.&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_threads</span> <span class="o">=</span> <span class="n">value</span></div></div>
 
@@ -910,7 +910,7 @@ document.write(`
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">acc</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Convex conjugate of IndicatorBox</span>
-<span class="sd">    </span>
+
 <span class="sd">    im.maximum(0).sum()</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>

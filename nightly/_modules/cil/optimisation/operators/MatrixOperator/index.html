@@ -497,11 +497,11 @@ document.write(`
 
 <div class="viewcode-block" id="MatrixOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator">[docs]</a><span class="k">class</span> <span class="nc">MatrixOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Matrix wrapped into a LinearOperator</span>
-<span class="sd">    </span>
-<span class="sd">    :param: a numpy matrix </span>
-<span class="sd">    </span>
+
+<span class="sd">    :param: a numpy matrix</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">A</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
@@ -514,17 +514,17 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">s1</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># Largest singular value, initially unknown</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatrixOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
                                                    <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span>
-        
-<div class="viewcode-block" id="MatrixOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>        
-                
+
+<div class="viewcode-block" id="MatrixOperator.direct"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
             <span class="k">return</span> <span class="n">tmp</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Below use of out is not working, see</span>
-            <span class="c1"># https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html            </span>
-            <span class="c1"># numpy.dot(self.A, x.as_array(), out = out.as_array())            </span>
+            <span class="c1"># https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html</span>
+            <span class="c1"># numpy.dot(self.A, x.as_array(), out = out.as_array())</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
 
 <div class="viewcode-block" id="MatrixOperator.adjoint"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -532,12 +532,11 @@ document.write(`
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
             <span class="k">return</span> <span class="n">tmp</span>
-        <span class="k">else</span><span class="p">:</span>            
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
 
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span></div>
-    
 </pre></div>
 
                 </article>

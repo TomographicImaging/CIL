@@ -494,14 +494,14 @@ document.write(`
 <span class="kn">from</span> <span class="nn">cil.framework.BlockDataContainer</span> <span class="kn">import</span> <span class="n">BlockDataContainer</span>
 
 <div class="viewcode-block" id="BlockGeometry"><a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry">[docs]</a><span class="k">class</span> <span class="nc">BlockGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    
+
     <span class="n">RANDOM</span> <span class="o">=</span> <span class="s1">&#39;random&#39;</span>
     <span class="n">RANDOM_INT</span> <span class="o">=</span> <span class="s1">&#39;random_int&#39;</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">)</span>
-<span class="w">          </span>
+
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to hold Geometry as column vector&#39;&#39;&#39;</span>
     <span class="c1">#__array_priority__ = 1</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -516,45 +516,45 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
-            
+
 <div class="viewcode-block" id="BlockGeometry.get_item"><a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the Geometry in the BlockGeometry located at position index&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>            </div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="BlockGeometry.allocate"><a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry.allocate">[docs]</a>    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Allocates a BlockDataContainer according to geometries contained in the BlockGeometry&#39;&#39;&#39;</span>
-        
-        <span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>        
+
+        <span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="n">symmetry</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-                        
-            <span class="c1"># for 2x2       </span>
+
+            <span class="c1"># for 2x2</span>
             <span class="c1"># [ ig11, ig12\</span>
             <span class="c1">#   ig21, ig22]</span>
-            
+
             <span class="c1"># Row-wise Order</span>
-            
+
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">containers</span><span class="p">)</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
                 <span class="n">containers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-            
-            <span class="c1"># for 3x3  </span>
+
+            <span class="c1"># for 3x3</span>
             <span class="c1"># [ ig11, ig12, ig13\</span>
             <span class="c1">#   ig21, ig22, ig23\</span>
-            <span class="c1">#   ig31, ig32, ig33]            </span>
-                      
+            <span class="c1">#   ig31, ig32, ig33]</span>
+
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">containers</span><span class="p">)</span><span class="o">==</span><span class="mi">9</span><span class="p">:</span>
                 <span class="n">containers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
                 <span class="n">containers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
                 <span class="n">containers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
-            
-            <span class="c1"># for 4x4  </span>
+
+            <span class="c1"># for 4x4</span>
             <span class="c1"># [ ig11, ig12, ig13, ig14\</span>
             <span class="c1">#   ig21, ig22, ig23, ig24\ c</span>
             <span class="c1">#   ig31, ig32, ig33, ig34</span>
-            <span class="c1">#   ig41, ig42, ig43, ig44]   </span>
-            
+            <span class="c1">#   ig41, ig42, ig43, ig44]</span>
+
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">containers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
                 <span class="n">containers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
                 <span class="n">containers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
@@ -564,11 +564,11 @@ document.write(`
                 <span class="n">containers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="o">=</span><span class="n">containers</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">containers</span><span class="p">)</span></div>
-           
+
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockGeometry is an iterable&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span>
-    
+
     <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockGeometry is an iterable&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">):</span>

@@ -496,31 +496,31 @@ document.write(`
 
 <div class="viewcode-block" id="Normaliser"><a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser">[docs]</a><span class="k">class</span> <span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Normalisation based on flat and dark</span>
-<span class="sd">    </span>
-<span class="sd">    This processor read in a AcquisitionData and normalises it based on </span>
+
+<span class="sd">    This processor read in a AcquisitionData and normalises it based on</span>
 <span class="sd">    the instrument reading with and without incident photons or neutrons.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Input: AcquisitionData</span>
 <span class="sd">    Parameter: 2D projection with flat field (or stack)</span>
 <span class="sd">               2D projection with dark field (or stack)</span>
 <span class="sd">    Output: AcquisitionDataSet</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dark_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">):</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
-                  <span class="s1">&#39;flat_field&#39;</span>  <span class="p">:</span> <span class="n">flat_field</span><span class="p">,</span> 
+                  <span class="s1">&#39;flat_field&#39;</span>  <span class="p">:</span> <span class="n">flat_field</span><span class="p">,</span>
                   <span class="s1">&#39;dark_field&#39;</span>  <span class="p">:</span> <span class="n">dark_field</span><span class="p">,</span>
                   <span class="c1"># very small number. Used when there is a division by zero</span>
                   <span class="s1">&#39;tolerance&#39;</span>   <span class="p">:</span> <span class="n">tolerance</span>
                   <span class="p">}</span>
-        
+
         <span class="c1">#DataProcessor.__init__(self, **kwargs)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Normaliser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flat_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_flat_field</span><span class="p">(</span><span class="n">flat_field</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dark_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_dark_field</span><span class="p">(</span><span class="n">dark_field</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span>\
            <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -528,7 +528,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input dimensions is 2 or 3, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">))</span>
-    
+
     <span class="k">def</span> <span class="nf">set_dark_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -537,7 +537,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_dark_field</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
-    
+
     <span class="k">def</span> <span class="nf">set_flat_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -546,55 +546,54 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_flat_field</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
-    
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">Normalise_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">projection</span> <span class="o">-</span> <span class="n">dark</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">-</span><span class="n">dark</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">numpy</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
             <span class="n">c</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span> <span class="o">~</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span> <span class="n">c</span> <span class="p">)]</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="c1"># set to not zero if 0/0 </span>
+            <span class="n">c</span><span class="p">[</span> <span class="o">~</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span> <span class="n">c</span> <span class="p">)]</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="c1"># set to not zero if 0/0</span>
         <span class="k">return</span> <span class="n">c</span>
-    
+
 <div class="viewcode-block" id="Normaliser.estimate_normalised_error"><a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser.estimate_normalised_error">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">estimate_normalised_error</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">delta_flat</span><span class="p">,</span> <span class="n">delta_dark</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the estimated relative error of the normalised projection</span>
-<span class="sd">        </span>
+
 <span class="sd">        n = (projection - dark) / (flat - dark)</span>
 <span class="sd">        Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)</span>
-<span class="sd">        &#39;&#39;&#39;</span> 
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">projection</span> <span class="o">-</span> <span class="n">dark</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">-</span><span class="n">dark</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">delta_flat</span> <span class="o">/</span> <span class="n">flat</span>
         <span class="n">dd</span> <span class="o">=</span> <span class="n">delta_dark</span> <span class="o">/</span> <span class="n">dark</span>
         <span class="n">rel_norm_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span> <span class="o">+</span> <span class="n">dd</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rel_norm_error</span></div>
-        
+
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="n">projections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="n">dark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span>
         <span class="n">flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span>
-        
+
         <span class="k">if</span> <span class="n">projections</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">dark</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> \
                <span class="n">projections</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">flat</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flats/Dark and projections size do not match.&#39;</span><span class="p">)</span>
-                
-                   
+
+
             <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
                     <span class="p">[</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span>
                             <span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> \
                      <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="p">]</span>
                     <span class="p">)</span>
         <span class="k">elif</span> <span class="n">projections</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> 
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span>
                                                 <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">projections</span><span class="p">)(</span> <span class="n">a</span> <span class="p">,</span> <span class="kc">True</span><span class="p">,</span> 
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">projections</span><span class="p">)(</span> <span class="n">a</span> <span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
                     <span class="n">dimension_labels</span><span class="o">=</span><span class="n">projections</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span>
                     <span class="n">geometry</span><span class="o">=</span><span class="n">projections</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">y</span></div>
-    
 </pre></div>
 
                 </article>

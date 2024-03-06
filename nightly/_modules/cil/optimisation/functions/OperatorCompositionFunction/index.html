@@ -496,18 +496,18 @@ document.write(`
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <div class="viewcode-block" id="OperatorCompositionFunction"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.OperatorCompositionFunction">[docs]</a><span class="k">class</span> <span class="nc">OperatorCompositionFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Composition of a function with an operator as : :math:`(F \otimes A)(x) = F(Ax)`</span>
-<span class="sd">    </span>
+
 <span class="sd">            :parameter function: :code:`Function` F</span>
 <span class="sd">            :parameter operator: :code:`Operator` A</span>
-<span class="sd">            </span>
-<span class="sd">            </span>
+
+
 <span class="sd">        For general operator, we have no explicit formulas for convex_conjugate,</span>
-<span class="sd">        proximal and proximal_conjugate            </span>
-<span class="sd">    </span>
+<span class="sd">        proximal and proximal_conjugate</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 
@@ -517,9 +517,9 @@ document.write(`
 <span class="sd">    :type f: :code:`Function`</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">OperatorCompositionFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>    
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>     
+        <span class="nb">super</span><span class="p">(</span><span class="n">OperatorCompositionFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
 
     <span class="nd">@property</span>
@@ -530,30 +530,29 @@ document.write(`
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ve</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
-    
+
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span>
+
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns :math:`F(Ax)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-    
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  
-    
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
 <div class="viewcode-block" id="OperatorCompositionFunction.gradient"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.OperatorCompositionFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the gradient of F(Ax), </span>
-<span class="sd">        </span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the gradient of F(Ax),</span>
+
 <span class="sd">        ..math ::  (F(Ax))&#39; = A^{T}F&#39;(Ax)</span>
-<span class="sd">            </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span> 
+        <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div></div>
-
 </pre></div>
 
                 </article>

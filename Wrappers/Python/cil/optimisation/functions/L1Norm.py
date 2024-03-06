@@ -16,13 +16,13 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.optimisation.functions import Function    
+from cil.optimisation.functions import Function
 from cil.framework import BlockDataContainer
 from cil.utilities.errors import InPlaceError
 import numpy as np
- 
+
 def soft_shrinkage(x, tau, out=None):
-    
+
     r"""Returns the value of the soft-shrinkage operator at x.
 
     Parameters
@@ -32,7 +32,7 @@ def soft_shrinkage(x, tau, out=None):
     tau : float, numpy ndarray, DataContainer
     out : DataContainer, default None
         where to store the result. If None, a new DataContainer is created.
-    
+
     Returns
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
@@ -62,27 +62,27 @@ def soft_shrinkage(x, tau, out=None):
     out.maximum(0, out = out)
     if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
         out *= np.exp(1j*np.angle(x.as_array()))
-        
+
     else:
         out *= x.sign()
-    
+
 
     if should_return:
-        return out        
+        return out
 
 class L1Norm(Function):
     r"""L1Norm function
-            
-    Consider the following cases:           
-    
+
+    Consider the following cases:
+
     a) .. math:: F(x) = ||x||_{1}
-    b) .. math:: F(x) = ||x - b||_{1}    
-            
+    b) .. math:: F(x) = ||x - b||_{1}
+
     In the weighted case, :math:`w` is an array of positive weights.
-    
+
     a) .. math:: F(x) = ||x||_{L^1(w)}
     b) .. math:: F(x) = ||x - b||_{L^1(w)}
-        
+
     with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
 
     Parameters
@@ -92,7 +92,7 @@ class L1Norm(Function):
             Array of positive weights. If :code:`None` returns the L1 Norm.
         b: DataContainer, default None
             Translation of the function.
-                                
+
     """
     def __init__(self, b=None, weight=None):
         super(L1Norm, self).__init__(L=None)
@@ -103,7 +103,7 @@ class L1Norm(Function):
 
     def __call__(self, x):
         r"""Returns the value of the L1Norm function at x.
-        
+
         .. math:: f(x) = ||x - b||_{L^1(w)}
         """
         return self.function(x)
@@ -113,24 +113,24 @@ class L1Norm(Function):
 
 
     This is the indicator of the unit :math:`L^{\infty}` norm:
-    
-            
-    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
-    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle      
-    
 
-    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
-        = \begin{cases} 
+
+    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
+    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle
+
+
+    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
+        = \begin{cases}
         0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
         \infty, \mbox{otherwise}
         \end{cases}
 
-    In the weighted case the convex conjugate is the indicator of the unit 
+    In the weighted case the convex conjugate is the indicator of the unit
     :math:`L^{\infty}` norm.
 
     See:
     https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
-    
+
     a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})
     b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle
 
@@ -146,58 +146,58 @@ class L1Norm(Function):
     --------
     the value of the convex conjugate of the WeightedL1Norm function at x: DataContainer.
 
-        """        
+        """
         return self.function.convex_conjugate(x)
 
     def proximal(self, x, tau, out=None):
         r"""Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter `tau`.
-        
-        
+
+
     Consider the following cases:
-            
+
     a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b   
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b
 
     where,
-    
+
     .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
 
     The weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
     by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
-    
+
     a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)
     b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b
 
-    
+
     Parameters
     -----------
     x: DataContainer
     tau: float, ndarray, DataContainer
     out: DataContainer, default None
         If not None, the result will be stored in this object.
-    
+
     Returns
     --------
     The value of the proximal operator of the L1 norm function at x: DataContainer.
-                        
-        """  
+
+        """
         return self.function.proximal(x, tau, out=out)
 
 
 class _L1Norm(Function):
-    
+
     r"""L1Norm function
-            
-        Consider the following cases:           
+
+        Consider the following cases:
             a) .. math:: F(x) = ||x||_{1}
             b) .. math:: F(x) = ||x - b||_{1}
-                                
-    """   
-           
+
+    """
+
     def __init__(self, **kwargs):
         '''creator
 
-        Cases considered (with/without data):            
+        Cases considered (with/without data):
         a) :math:`f(x) = ||x||_{1}`
         b) :math:`f(x) = ||x - b||_{1}`
 
@@ -206,39 +206,39 @@ class _L1Norm(Function):
         '''
         super().__init__()
         self.b = kwargs.get('b',None)
-        
+
     def __call__(self, x):
         y = x
-        if self.b is not None: 
+        if self.b is not None:
             y = x - self.b
-        return y.abs().sum()  
-          
-    def convex_conjugate(self,x):        
+        return y.abs().sum()
+
+    def convex_conjugate(self,x):
         tmp = x.abs().max() - 1
-        if tmp<=1e-5:            
+        if tmp<=1e-5:
             if self.b is not None:
                 return self.b.dot(x)
             else:
                 return 0.
         return np.inf
 
-                    
+
     def proximal(self, x, tau, out=None):
-        if out is None:                                                
-            if self.b is not None:                                
+        if out is None:
+            if self.b is not None:
                 return self.b + soft_shrinkage(x - self.b, tau)
             else:
-                return soft_shrinkage(x, tau)             
-        else: 
-            
+                return soft_shrinkage(x, tau)
+        else:
+
             if self.b is not None:
                 soft_shrinkage(x - self.b, tau, out = out)
                 out += self.b
             else:
-                soft_shrinkage(x, tau, out = out)   
+                soft_shrinkage(x, tau, out = out)
 
 
-class _WeightedL1Norm(Function): 
+class _WeightedL1Norm(Function):
 
     def __init__(self, weight, b=None):
         super().__init__()
@@ -247,19 +247,19 @@ class _WeightedL1Norm(Function):
 
         if np.min(weight) <= 0:
             raise ValueError("Weights should be strictly positive!")
-        
+
     def __call__(self, x):
         y = x*self.weight
 
-        if self.b is not None: 
+        if self.b is not None:
             y -= self.b
 
-        return y.abs().sum() 
-          
+        return y.abs().sum()
+
     def convex_conjugate(self,x):
         tmp = (x.abs()/self.weight).max() - 1
 
-        if tmp<=1e-5:            
+        if tmp<=1e-5:
             if self.b is not None:
                 return self.b.dot(x)
             else:
@@ -275,7 +275,7 @@ class _WeightedL1Norm(Function):
 class MixedL11Norm(Function):
 
     r"""MixedL11Norm function
-                     
+
     .. math:: F(x) = ||x||_{1,1} = \sum |x_{1}| + |x_{2}| + \cdots + |x_{n}|
 
     Note
@@ -288,35 +288,35 @@ class MixedL11Norm(Function):
     L1Norm, MixedL21Norm
 
 
-    """   
+    """
 
     def __init__(self, **kwargs):
         super(MixedL11Norm, self).__init__(**kwargs)
 
     def __call__(self, x):
 
-        r"""Returns the value of the MixedL11Norm function at x. 
+        r"""Returns the value of the MixedL11Norm function at x.
 
-        :param x: :code:`BlockDataContainer`                                           
+        :param x: :code:`BlockDataContainer`
         """
         if not isinstance(x, BlockDataContainer):
-            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                    
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))
+
         return x.abs().sum()
-        
+
     def proximal(self, x, tau, out = None):
 
         r"""Returns the value of the proximal operator of the MixedL11Norm function at x.
-                
+
         .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
-    
+
         where,
-        
+
         .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}
-                            
-        """      
+
+        """
 
         if not isinstance(x, BlockDataContainer):
-            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))         
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))
 
-        return soft_shrinkage(x, tau, out = out) 
+        return soft_shrinkage(x, tau, out = out)

@@ -33,7 +33,7 @@ class Operator(object):
         domain of the operator
 
     range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
-        range of the operator 
+        range of the operator
     """
 
     def __init__(self, domain_geometry, **kwargs):
@@ -51,8 +51,8 @@ class Operator(object):
         return False
 
     def direct(self, x, out=None):
-        r"""Calls the operator 
-        
+        r"""Calls the operator
+
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
@@ -61,8 +61,8 @@ class Operator(object):
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
-        
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+
         """
         raise NotImplementedError
 
@@ -95,8 +95,8 @@ class Operator(object):
 
         Note
         ----
-        The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method. 
-        If `None` is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called. 
+        The passed values are cached so that when self.norm() is called, the saved value will be returned and not calculated via the power method.
+        If `None` is passed, the cache is cleared prompting the function to call the power method to calculate the norm the next time self.norm() is called.
         '''
 
         if norm is not None:
@@ -177,7 +177,7 @@ class LinearOperator(Operator):
         domain of the operator
 
     range_geometry : ImageGeometry or AcquisitionGeometry, optional, default None
-        range of the operator 
+        range of the operator
     """
 
     def __init__(self, domain_geometry, **kwargs):
@@ -198,7 +198,7 @@ class LinearOperator(Operator):
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
         Note
         ----
         Only available to linear operators'''
@@ -206,10 +206,10 @@ class LinearOperator(Operator):
 
     @staticmethod
     def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
-        r"""Power method or Power iteration algorithm 
+        r"""Power method or Power iteration algorithm
 
         The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
-        absolute value in the real case and modulus in the complex case.        
+        absolute value in the real case and modulus in the complex case.
 
         Parameters
         ----------
@@ -220,10 +220,10 @@ class LinearOperator(Operator):
         initial: DataContainer, default = None
             Starting point for the Power method.
         tolerance: positive:`float`, default = 1e-5
-            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.
         return_all: `boolean`, default = False
             Toggles the verbosity of the return
-        method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"` 
+        method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"`
             The default `auto` lets the code choose the method, this can be specified with `"direct_only"` or `"composed_with_adjoint"`
 
 
@@ -242,12 +242,12 @@ class LinearOperator(Operator):
 
         Note
         -----
-        The power method contains two different algorithms chosen by the `method` flag. 
+        The power method contains two different algorithms chosen by the `method` flag.
 
-        In the case `method="direct_only"`, for operator, :math:`A`, the power method computes the iterations 
-        :math:`x_{k+1} = A (x_k/\|x_{k}\|)` initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`. 
+        In the case `method="direct_only"`, for operator, :math:`A`, the power method computes the iterations
+        :math:`x_{k+1} = A (x_k/\|x_{k}\|)` initialised with a random vector :math:`x_0` and returning the largest (dominant) eigenvalue in magnitude given by :math:`\|x_k\|`.
 
-        In the case `method="composed_with_adjoint"`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A` 
+        In the case `method="composed_with_adjoint"`, the algorithm computes the largest (dominant) eigenvalue of :math:`A^{T}A`
         returning the square root of this value, i.e. the iterations:
         :math:`x_{k+1} = A^TA (x_k/\|x_{k}\|)` and returning  :math:`\sqrt{\|x_k\|}`.
 
@@ -255,7 +255,7 @@ class LinearOperator(Operator):
         uses the method "direct_only" and if not the method "composed_with_adjoint".
 
         Examples
-        --------    
+        --------
 
         >>> M = np.array([[1.,0],[1.,2.]])
         >>> Mop = MatrixOperator(M)
@@ -356,28 +356,28 @@ class LinearOperator(Operator):
         Evaluates if the following equivalence holds
         .. math::
           Ax\times y = y \times A^Tx
-          
+
         Parameters
         ----------
-        
+
         operator:
             operator to test the dot_test
         range_init:
-            optional initialisation container in the operator range 
+            optional initialisation container in the operator range
         domain_init:
-            optional initialisation container in the operator domain 
+            optional initialisation container in the operator domain
         seed: int, default = 1
             Seed random generator
         tolerance:float, default 1e-6
             Check if the following expression is below the tolerance
-        .. math:: 
+        .. math::
 
             |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) < tolerance
 
-        
+
         Returns
         -------
-        boolean, True if the test is passed.       
+        boolean, True if the test is passed.
         '''
 
         seed = kwargs.get('seed', 1)
@@ -393,7 +393,7 @@ class LinearOperator(Operator):
 
         fx = operator.direct(x)
         by = operator.adjoint(y)
-        
+
         lhs = fx.dot(y)
         rhs = x.dot(by)
 
@@ -410,7 +410,7 @@ class LinearOperator(Operator):
 class AdjointOperator(LinearOperator):
 
     """
-    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as 
+    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as
 
     .. math:: <x, A^* y> = <Ax, y>
 
@@ -421,8 +421,8 @@ class AdjointOperator(LinearOperator):
 
     Examples
     --------
-    This example demonstrates that :math:` LHS:=<Gx, y> =<x, G^* y>=:RHS`, where :math:`G` is the gradient operator. 
-    >>> ig = ImageGeometry(2,3) 
+    This example demonstrates that :math:` LHS:=<Gx, y> =<x, G^* y>=:RHS`, where :math:`G` is the gradient operator.
+    >>> ig = ImageGeometry(2,3)
     >>> G = GradientOperator(ig)
     >>> div = AdjointOperator(G)
     >>> x = G.domain.allocate("random_int")
@@ -430,18 +430,18 @@ class AdjointOperator(LinearOperator):
     >>> lhs = G.direct(x).dot(y)
     >>> rhs = x.dot(div.direct(y))
     >>> lhs == rhs # returns True
-    """    
-    
+    """
+
     def __init__(self, operator):
-        super(AdjointOperator, self).__init__(domain_geometry=operator.range_geometry(), 
-                                       range_geometry=operator.domain_geometry())         
+        super(AdjointOperator, self).__init__(domain_geometry=operator.range_geometry(),
+                                       range_geometry=operator.domain_geometry())
         self.operator = operator
-                
+
     def direct(self, x, out=None):
         return self.operator.adjoint(x, out=out)
-        
+
     def adjoint(self, x, out=None):
-        return self.operator.direct(x, out=out)            
+        return self.operator.direct(x, out=out)
 
 
 class ScaledOperator(Operator):
@@ -521,21 +521,21 @@ class ScaledOperator(Operator):
 ###############################################################################
 
 class SumOperator(Operator):
-    """Sums two operators. 
+    """Sums two operators.
     For example, `SumOperator(left, right).direct(x)` is equivalent to  `left.direct(x)+right.direct(x)`
 
-    
+
     Parameters
     ----------
     operator1: `Operator`
         The first `Operator` in the sum
     operator2: `Operator`
         The second `Operator` in the sum
-        
+
     Note
     ----
-    Both operators must have the same domain and range. 
-    
+    Both operators must have the same domain and range.
+
     """
     def __init__(self, operator1, operator2):
         self.operator1 = operator1
@@ -553,8 +553,8 @@ class SumOperator(Operator):
                                           range_geometry=self.operator1.range_geometry())
 
     def direct(self, x, out=None):
-        r"""Calls the sum operator 
-        
+        r"""Calls the sum operator
+
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
@@ -563,8 +563,8 @@ class SumOperator(Operator):
             If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
-        
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+
         """
         if out is None:
             return self.operator1.direct(x) + self.operator2.direct(x)
@@ -573,8 +573,8 @@ class SumOperator(Operator):
             out.add(self.operator2.direct(x), out=out)
 
     def adjoint(self, x, out=None):
-        r"""Calls the adjoint of the sum operator, evaluated at the point :math:`x`. 
-        
+        r"""Calls the adjoint of the sum operator, evaluated at the point :math:`x`.
+
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
@@ -583,9 +583,9 @@ class SumOperator(Operator):
             If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
         """
-        
+
         if self.linear_flag:
             if out is None:
                 return self.operator1.adjoint(x) + self.operator2.adjoint(x)
@@ -598,22 +598,22 @@ class SumOperator(Operator):
     def is_linear(self):
         return self.linear_flag
 
-    
+
 ###############################################################################
 ################   Composition  ###########################################
 ###############################################################################
 
 
 class CompositionOperator(Operator):
-    """Composes one or more operators. 
+    """Composes one or more operators.
     For example, `CompositionOperator(left, right).direct(x)` is equivalent to `left.direct(right.direct(x))`
 
-    
+
     Parameters
     ----------
     args: `Operator`s
         Operators to be composed. As in mathematical notation, the operators will be applied right to left
-    
+
     """
     def __init__(self, *operators, **kwargs):
 
@@ -641,8 +641,8 @@ class CompositionOperator(Operator):
 
     def direct(self, x, out=None):
 
-        """Calls the composition operator at the point :math:`x`. 
-        
+        """Calls the composition operator at the point :math:`x`.
+
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
@@ -651,8 +651,8 @@ class CompositionOperator(Operator):
             If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
-        
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+
         """
         if out is None:
             # return self.operator1.direct(self.operator2.direct(x))
@@ -700,20 +700,20 @@ class CompositionOperator(Operator):
                 out.fill(step)
 
     def adjoint(self, x, out=None):
-        """Calls the adjoint of the composition operator at the point :math:`x`. 
-        
+        """Calls the adjoint of the composition operator at the point :math:`x`.
+
         Parameters
         ----------
         x: DataContainer or BlockDataContainer
             Element in the range of the CompositionOperator
         out: DataContainer or BlockDataContainer, default None
             If out is not None the output of the adjoint of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
-        
+
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed. 
+        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
         """
-        
+
         if self.linear_flag:
 
             if out is not None:
@@ -756,5 +756,3 @@ class CompositionOperator(Operator):
 
     def is_linear(self):
         return self.linear_flag
-
-    

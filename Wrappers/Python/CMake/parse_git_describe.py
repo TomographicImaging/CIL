@@ -39,9 +39,9 @@ if version[0] != '':
     major = version[0]
 if version[1] != '':
     minor = version[1]
-if version[2] != '': 
+if version[2] != '':
     patch = version[3]
 else:
     patch = 0
-    
+
 print (major, minor, patch, git_commit_number, git_hash)

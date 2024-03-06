@@ -17,31 +17,33 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
+from typing import Tuple
+
 import astra
 import numpy as np
 
-def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
+from cil.framework.framework import AcquisitionGeometry, ImageGeometry
 
-    """
-    Converts CIL 2D geometries to ASTRA 2D vector Geometries.
+
+def convert_geometry_to_astra_vec_2D(volume_geometry:ImageGeometry, sinogram_geometry_in:AcquisitionGeometry) -> Tuple[dict, dict]:
+    """Convert CIL 2D geometries to ASTRA 2D vector Geometries.
 
     Parameters
     ----------
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
     Returns
     -------
     astra_volume_geom, astra_projection_geom
         The ASTRA vol_geom and proj_geom
-
     """
     sinogram_geometry = sinogram_geometry_in.copy()
-    
-    #this catches behaviour modified after CIL 21.3.1 
+
+    #this catches behaviour modified after CIL 21.3.1
     try:
         sinogram_geometry.config.system.align_reference_frame('cil')
     except:
@@ -53,7 +55,7 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
     #get units
     degrees = angles.angle_unit == sinogram_geometry.DEGREE
-    
+
     #create a 2D astra geom from 2D CIL geometry, 2D astra geometry has axis flipped compared to 3D
     volume_geometry_temp = volume_geometry.copy()
 
@@ -89,8 +91,8 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
         vectors[i, 2:4] = rotation_matrix.dot(det).reshape(2)
         vectors[i, 4:6] = rotation_matrix.dot(row).reshape(2)
 
-    
-    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[0], vectors)    
+
+    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
                                     volume_geometry_temp.voxel_num_x,
                                     volume_geometry_temp.get_min_x(),
@@ -101,16 +103,15 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
     return vol_geom, proj_geom
 
-def rotation_matrix_z_from_euler(angle, degrees):
-    """
-    Returns 2D rotation matrix for z axis using direction cosine
+def rotation_matrix_z_from_euler(angle:float, degrees:bool) -> np.ndarray:
+    """Return 2D rotation matrix for z axis using direction cosine.
 
     Parameters
     ----------
-    angle : float
+    angle
         angle or rotation around z axis
 
-    degrees : bool
+    degrees
         if radian or degrees
     """
     if degrees:
@@ -123,5 +124,5 @@ def rotation_matrix_z_from_euler(angle, degrees):
     rot_matrix[0][1] = -np.sin(alpha)
     rot_matrix[1][0] = np.sin(alpha)
     rot_matrix[1][1] = np.cos(alpha)
-    
+
     return rot_matrix

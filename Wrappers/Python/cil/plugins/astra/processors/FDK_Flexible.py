@@ -17,16 +17,24 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, ImageData
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
+from typing import Literal, Optional
+
 import astra
 import numpy as np
 
+from cil.framework import DataProcessor, ImageData
+from cil.framework.framework import (
+    AcquisitionData,
+    AcquisitionGeometry,
+    ImageGeometry,
+)
+
+from ..utilities import convert_geometry_to_astra_vec_3D
+
 
 class FDK_Flexible(DataProcessor):
+    """FDK_Flexible Filtered Back Projection performs an FDK reconstruction for 2D and 3D cone-beam geometries.
 
-    """
-    FDK_Flexible Filtered Back Projection performs an FDK reconstruction for 2D and 3D cone-beam geometries.
     It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.
 
     This uses the ram-lak filter
@@ -45,15 +53,13 @@ class FDK_Flexible(DataProcessor):
     >>> from cil.plugins.astra import FDK_Flexible
     >>> fbp = FDK_Flexible(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
-
+    >>> reconstruction = fbp.get_output()
     """
 
-    def __init__(self, volume_geometry, 
-                       sinogram_geometry): 
-        
+    def __init__(self, volume_geometry:ImageGeometry, sinogram_geometry:AcquisitionGeometry):
+
         vol_geom_astra, proj_geom_astra = convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry)
- 
+
 
         super(FDK_Flexible, self).__init__( volume_geometry = volume_geometry,
                                         sinogram_geometry = sinogram_geometry,
@@ -61,22 +67,41 @@ class FDK_Flexible(DataProcessor):
                                         proj_geom_astra = proj_geom_astra)
 
 
-                          
-    def check_input(self, dataset):
-        
+
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
+        """Check the parameters of the input dataset.
+
+        Should raise an error if the AcquisitionData does not match expectation, e.g incorrect dimensions.
+
+        Parameters
+        ----------
+        dataset
+            Input AcquisitionData to check
+        """
         if self.sinogram_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
-                 .format(self.sinogram_geometry.channels))  
+                 .format(self.sinogram_geometry.channels))
 
         if self.sinogram_geometry.geom_type != 'cone':
             raise ValueError("Expected input data to be cone beam geometry , got {0}"\
-                 .format(self.sinogram_geometry.geom_type))  
+                 .format(self.sinogram_geometry.geom_type))
 
         return True
-        
 
-    def process(self, out=None):
-           
+
+    def process(self, out:Optional[ImageData]=None) -> Optional[ImageData]:
+        """Reconstruct data and return the result.
+
+        Parameters
+        ----------
+        out
+            Fills the reference ImageData with the processed data, and suppresses the return
+
+        Returns
+        -------
+        Optional[ImageData]
+            Reconstructed data, None if out is set.
+        """
         # Get DATA
         DATA = self.get_input()
 
@@ -95,12 +120,12 @@ class FDK_Flexible(DataProcessor):
         cfg['ReconstructionDataId'] = rec_id
         cfg['ProjectionDataId'] = sinogram_id
         alg_id = astra.algorithm.create(cfg)
-        
-        astra.algorithm.run(alg_id)       
+
+        astra.algorithm.run(alg_id)
         arr_out = astra.data3d.get(rec_id)
 
         astra.data3d.delete(rec_id)
-        astra.data3d.delete(sinogram_id)                    
+        astra.data3d.delete(sinogram_id)
         astra.algorithm.delete(alg_id)
 
         if pad == True:

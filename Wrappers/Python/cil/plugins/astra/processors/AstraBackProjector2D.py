@@ -17,10 +17,15 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, ImageData
-from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
+from typing import Literal, Optional
+
 import astra
 import numpy as np
+
+from cil.framework import DataProcessor, ImageData
+from cil.framework.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry
+
+from ..utilities import convert_geometry_to_astra_vec_2D
 
 
 class AstraBackProjector2D(DataProcessor):
@@ -29,73 +34,118 @@ class AstraBackProjector2D(DataProcessor):
 
     Parameters
     ----------
-
-    volume_geometry : ImageGeometry
+    volume_geometry
         A description of the area/volume to reconstruct
 
-    sinogram_geometry : AcquisitionGeometry
+    sinogram_geometry
         A description of the acquisition data
 
-    proj_id : the ASTRA projector ID
+    proj_id
         For advances ASTRA users only. The astra_mex_projector ID of the projector, use `astra.astra_create_projector()`
-        
-    device : string, default='gpu'
-        The device to run on 'gpu' or 'cpu'
 
-    """  
-        
-    def __init__(self,
-                 volume_geometry=None,
-                 sinogram_geometry=None,
-                 proj_id=None,
-                 device='cpu'):
+    device
+        The device to run on "gpu" or "cpu"
+    """
+
+    def __init__(self, volume_geometry:Optional[ImageGeometry]=None,
+                 sinogram_geometry:Optional[AcquisitionGeometry]=None,
+                 proj_id:Optional[int]=None,
+                 device:Literal["cpu", "gpu"]="gpu"):
         kwargs = {
-                  'volume_geometry'  : volume_geometry,
-                  'sinogram_geometry'  : sinogram_geometry,
-                  'proj_id'  : proj_id,
-                  'device'  : device
+                  "volume_geometry"  : volume_geometry,
+                  "sinogram_geometry"  : sinogram_geometry,
+                  "proj_id"  : proj_id,
+                  "device"  : device
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(AstraBackProjector2D, self).__init__(**kwargs)
-        
+
         self.set_ImageGeometry(volume_geometry)
         self.set_AcquisitionGeometry(sinogram_geometry)
-        
+
         vol_geom, proj_geom = convert_geometry_to_astra_vec_2D(self.volume_geometry, self.sinogram_geometry)
-        
+
         # ASTRA projector, to be stored
-        if device == 'cpu':
+        if device == "cpu":
             # Note that 'line' only one option
-            if self.sinogram_geometry.geom_type == 'parallel':
-                self.set_projector(astra.create_projector('line', proj_geom, vol_geom) )
-            elif self.sinogram_geometry.geom_type == 'cone':
-                self.set_projector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
+            if self.sinogram_geometry.geom_type == "parallel":
+                self.set_projector(astra.create_projector("line", proj_geom, vol_geom) )
+            elif self.sinogram_geometry.geom_type == "cone":
+                self.set_projector(astra.create_projector("line_fanflat", proj_geom, vol_geom) )
             else:
-                NotImplemented 
-        elif device == 'gpu':
-            self.set_projector(astra.create_projector('cuda', proj_geom, vol_geom) )
+                raise NotImplementedError()
+        elif device == "gpu":
+            self.set_projector(astra.create_projector("cuda", proj_geom, vol_geom) )
         else:
-            NotImplemented
-    
-    def check_input(self, dataset):
+            raise NotImplementedError()
+
+    def check_input(self, dataset:AcquisitionData) -> Literal[True]:
+        """Check the dimension comparability of the passed dataset.
+
+        Parameters
+        ----------
+        dataset
+            Dataset to be checked
+
+        Returns
+        -------
+        bool
+            True if input checks are passed
+
+        Raises
+        ------
+        ValueError
+            Raised if input fails the dimension check
+        """
         if dataset.number_of_dimensions == 1 or dataset.number_of_dimensions == 2:
                return True
         else:
-            raise ValueError("Expected input dimensions is 1 or 2, got {0}"\
-                             .format(dataset.number_of_dimensions))
-    
-    def set_projector(self, proj_id):
-        self.proj_id = proj_id
-        
-    def set_ImageGeometry(self, volume_geometry):
-        self.volume_geometry = volume_geometry
-        
-    def set_AcquisitionGeometry(self, sinogram_geometry):
-        self.sinogram_geometry = sinogram_geometry
-    
-    def process(self, out=None):
+            raise ValueError("Expected input dimensions is 1 or 2, got {0}".format(dataset.number_of_dimensions))
 
+    def set_projector(self, proj_id:int) -> None:
+        """For advanced users, set the astra_mex_projector ID of the projector, use `astra.astra_create_projector()`.
+
+        Parameters
+        ----------
+        proj_id : int
+            astra_mex_projector ID of the projector
+        """
+        self.proj_id = proj_id
+
+    def set_ImageGeometry(self, volume_geometry:ImageGeometry) -> None:
+        """Set the area/volume geometry to reconstruct.
+
+        Parameters
+        ----------
+        volume_geometry
+            Area/volume geometry
+        """
+        self.volume_geometry = volume_geometry
+
+    def set_AcquisitionGeometry(self, sinogram_geometry:AcquisitionGeometry) -> None:
+        """Set the acquisition geometry of the data.
+
+        Parameters
+        ----------
+        sinogram_geometry
+            Acquisition geometry of the reconstructed data.
+        """
+        self.sinogram_geometry = sinogram_geometry
+
+    def process(self, out:Optional[ImageData]=None) -> Optional[ImageData]:
+        """Reconstruct the volume using ASTRA.
+
+        Parameters
+        ----------
+        out
+           Fills the referenced ImageData with the processed data and suppresses the return
+
+        Returns
+        -------
+        Optional[ImageData]
+            Reconstructed data
+        """
         DATA = self.get_input()
 
         #ASTRA expects a 3D array with shape 1, CIL removes dimensions of len 1

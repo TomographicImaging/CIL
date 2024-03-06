@@ -17,26 +17,33 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.optimisation.operators import LinearOperator
-from cil.plugins.astra.processors import AstraForwardProjector2D, AstraBackProjector2D
+from typing import Literal, Optional
 
+from cil.framework.framework import (
+    AcquisitionData,
+    AcquisitionGeometry,
+    ImageData,
+    ImageGeometry,
+)
+from cil.optimisation.operators import LinearOperator
+
+from ..processors import AstraBackProjector2D, AstraForwardProjector2D
 
 
 class AstraProjector2D(LinearOperator):
-    """
-    AstraProjector2D configures and calls the ASTRA 2D Projectors for CPU and GPU.
+    """AstraProjector2D configures and calls the ASTRA 2D Projectors for CPU and GPU.
+
     It is recommended to use this via the ProjectionOperator Class.
 
     Parameters
     ----------
-
-    image_geometry : ImageGeometry
+    image_geometry
         A description of the area/volume to reconstruct
 
-    acquisition_geometry : AcquisitionGeometry
+    acquisition_geometry
         A description of the acquisition data
 
-    device : string, default='gpu'
+    device
         The device to run on 'gpu' or 'cpu'
 
     Example
@@ -45,58 +52,56 @@ class AstraProjector2D(LinearOperator):
     >>> PO = AstraProjector2D(image.geometry, data.geometry)
     >>> forward_projection = PO.direct(image)
     >>> backward_projection = PO.adjoint(data)
+    """
 
-    """    
-    def __init__(self, image_geometry, acquisition_geometry, device):
+    def __init__(self, image_geometry:ImageGeometry, acquisition_geometry:AcquisitionGeometry, device:Literal["cpu", "gpu"]):
 
         super(AstraProjector2D, self).__init__(image_geometry, range_geometry=acquisition_geometry)
-        
+
         self.fp = AstraForwardProjector2D(volume_geometry=image_geometry,
                                         sinogram_geometry=acquisition_geometry,
                                         proj_id = None,
                                         device=device)
-        
+
         self.bp = AstraBackProjector2D(volume_geometry = image_geometry,
                                         sinogram_geometry = acquisition_geometry,
                                         proj_id = None,
                                         device = device)
-                           
-        
-    def direct(self, x, out=None):
-        '''Applies the direct of the operator i.e. the forward projection.
-        
+
+    def direct(self, x:ImageData, out:Optional[AcquisitionData]=None) -> Optional[AcquisitionData]:
+        """Apply the direct of the operator i.e. the forward projection.
+
         Parameters
         ----------
-        x : ImageData
+        x
             The image/volume to be projected.
 
-        out : DataContainer, optional
-           Fills the referenced DataContainer with the processed data and suppresses the return
-        
+        out
+           Fills the referenced ImageData with the processed data and suppresses the return
+
         Returns
         -------
-        DataContainer
+        AcquisitionData
             The processed data. Suppressed if `out` is passed
-        '''
+        """
         self.fp.set_input(x)
         return self.fp.get_output(out = out)
 
-    def adjoint(self, x, out=None):
-        '''Applies the adjoint of the operator, i.e. the backward projection.
+    def adjoint(self, x:AcquisitionData, out:Optional[ImageData]=None) -> Optional[ImageData]:
+        """Apply the adjoint of the operator, i.e. the backward projection.
 
         Parameters
         ----------
-        x : AcquisitionData
+        x
             The projections/sinograms to be projected.
 
-        out : DataContainer, optional
+        out
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
-        DataContainer
+        ImageData
             The processed data. Suppressed if `out` is passed
-        '''
-
+        """
         self.bp.set_input(x)
         return self.bp.get_output(out = out)

@@ -16,29 +16,38 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import DataOrder
-from cil.optimisation.operators import LinearOperator, ChannelwiseOperator
-from cil.framework.BlockGeometry import BlockGeometry
-from cil.optimisation.operators import BlockOperator
-from cil.plugins.astra.operators import AstraProjector3D
-from cil.plugins.astra.operators import AstraProjector2D
 import logging
+from typing import Literal, Optional, Union
+
+from cil.framework import DataOrder
+from cil.framework.BlockGeometry import BlockGeometry
+from cil.framework.framework import (
+    AcquisitionData,
+    AcquisitionGeometry,
+    ImageData,
+    ImageGeometry,
+)
+from cil.optimisation.operators import (
+    BlockOperator,
+    ChannelwiseOperator,
+    LinearOperator,
+)
+
+from ..operators import AstraProjector2D, AstraProjector3D
 
 
 class ProjectionOperator(LinearOperator):
-    """
-    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
+    """ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
 
     Parameters
     ----------
-
-    image_geometry : ``ImageGeometry``, default used if None
+    image_geometry
         A description of the area/volume to reconstruct
 
-    acquisition_geometry : ``AcquisitionGeometry``, ``BlockGeometry``
+    acquisition_geometry
         A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.
 
-    device : string, default='gpu'
+    device
         'gpu' will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, 'cpu' will run on CPU using the ASTRA 2D CPU Projectors
 
     Example
@@ -52,38 +61,33 @@ class ProjectionOperator(LinearOperator):
     -----
     For multichannel data the ProjectionOperator will broadcast across all channels.
     """
-    def __new__(cls, image_geometry=None, acquisition_geometry=None, \
-        device='gpu', **kwargs):
+
+    def __new__(cls, image_geometry:Optional[ImageGeometry]=None, acquisition_geometry:Optional[Union[AcquisitionGeometry, BlockGeometry]]=None, device:Literal["gpu", "cpu"]="gpu", **kwargs):
         if isinstance(acquisition_geometry, BlockGeometry):
             logging.info("BlockOperator is returned.")
 
             K = []
             for ag in acquisition_geometry:
-                K.append(
-                    ProjectionOperator_ag(image_geometry=image_geometry, acquisition_geometry=ag, \
-                        device=device, **kwargs)
-                )
+                K.append(ProjectionOperator_ag(image_geometry=image_geometry, acquisition_geometry=ag, device=device, **kwargs))
+
             return BlockOperator(*K)
         else:
             logging.info("Standard Operator is returned.")
-            return super(ProjectionOperator,
-                         cls).__new__(ProjectionOperator_ag)
+            return super(ProjectionOperator, cls).__new__(ProjectionOperator_ag)
 
 
 class ProjectionOperator_ag(ProjectionOperator):
-    """
-    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
+    """ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
 
     Parameters
     ----------
-
-    image_geometry : ImageGeometry, default used if None
+    image_geometry
         A description of the area/volume to reconstruct
 
-    acquisition_geometry : AcquisitionGeometry
+    acquisition_geometry
         A description of the acquisition data
 
-    device : string, default='gpu'
+    device
         'gpu' will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, 'cpu' will run on CPU using the ASTRA 2D CPU Projectors
 
     Example
@@ -98,22 +102,15 @@ class ProjectionOperator_ag(ProjectionOperator):
     For multichannel data the ProjectionOperator will broadcast across all channels.
     """
 
-    def __init__(self,
-                 image_geometry=None,
-                 acquisition_geometry=None,
-                 device='gpu'):
+    def __init__(self, image_geometry:Optional[ImageGeometry]=None, acquisition_geometry:Optional[AcquisitionGeometry]=None, device:Literal["gpu", "cpu"]='gpu'):
 
         if acquisition_geometry is None:
-            raise TypeError(
-                "Please specify an acquisition_geometry to configure this operator"
-            )
+            raise TypeError("Please specify an acquisition_geometry to configure this operator")
 
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
-        super(ProjectionOperator_ag,
-              self).__init__(domain_geometry=image_geometry,
-                             range_geometry=acquisition_geometry)
+        super(ProjectionOperator_ag, self).__init__(domain_geometry=image_geometry, range_geometry=acquisition_geometry)
 
         DataOrder.check_order_for_engine('astra', image_geometry)
         DataOrder.check_order_for_engine('astra', acquisition_geometry)
@@ -125,64 +122,84 @@ class ProjectionOperator_ag(ProjectionOperator):
         volume_geometry_sc = image_geometry.get_slice(channel=0)
 
         if device == 'gpu':
-            operator = AstraProjector3D(volume_geometry_sc,
-                                        sinogram_geometry_sc)
+            operator = AstraProjector3D(volume_geometry_sc, sinogram_geometry_sc)
+
         elif self.sinogram_geometry.dimension == '2D':
-            operator = AstraProjector2D(volume_geometry_sc,
-                                        sinogram_geometry_sc,
-                                        device=device)
+            operator = AstraProjector2D(volume_geometry_sc, sinogram_geometry_sc, device=device)
         else:
             raise NotImplementedError("Cannot process 3D data without a GPU")
 
         if acquisition_geometry.channels > 1:
-            operator_full = ChannelwiseOperator(
-                operator, self.sinogram_geometry.channels, dimension='prepend')
+            operator_full = ChannelwiseOperator(operator, self.sinogram_geometry.channels, dimension='prepend')
             self.operator = operator_full
         else:
             self.operator = operator
 
-    def direct(self, IM, out=None):
-        '''Applies the direct of the operator i.e. the forward projection.
-        
+    def direct(self, IM:ImageData, out:Optional[AcquisitionData]=None) -> Optional[AcquisitionData]:
+        """Apply the direct of the operator i.e. the forward projection.
+
         Parameters
         ----------
-        IM : ImageData
+        IM
             The image/volume to be projected.
 
-        out : DataContainer, optional
+        out
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer
             The processed data. Suppressed if `out` is passed
-        '''
-
+        """
         return self.operator.direct(IM, out=out)
 
-    def adjoint(self, DATA, out=None):
-        '''Applies the adjoint of the operator, i.e. the backward projection.
+    def adjoint(self, DATA:AcquisitionData, out:Optional[ImageData]=None) -> Optional[ImageData]:
+        """Apply the adjoint of the operator, i.e. the backward projection.
 
         Parameters
         ----------
-        DATA : AcquisitionData
+        DATA
             The projections/sinograms to be projected.
 
-        out : DataContainer, optional
+        out
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
-        DataContainer
+        ImageData
             The processed data. Suppressed if `out` is passed
-        '''
+        """
         return self.operator.adjoint(DATA, out=out)
 
-    def calculate_norm(self):
+    def calculate_norm(self) -> float:
+        """Return the norm of the Operator.
+
+        On first call the norm will be calculated using the operator's calculate_norm method.
+        Subsequent calls will return the cached norm.
+
+        Returns
+        -------
+        float
+            Norm of the LinearOperator
+        """
         return self.operator.norm()
 
-    def domain_geometry(self):
+    def domain_geometry(self) -> ImageGeometry:
+        """Return the image geometry of the volume.
+
+        Returns
+        -------
+        ImageGeometry
+            Domain geometry of the reconstruction volume
+        """
         return self.volume_geometry
 
-    def range_geometry(self):
+    def range_geometry(self) -> AcquisitionGeometry:
+        """Return the acquisition geometry of the volume.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            Range geometry of the reconstruction volume
+        """
         return self.sinogram_geometry

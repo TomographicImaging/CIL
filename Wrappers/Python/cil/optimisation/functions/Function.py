@@ -61,7 +61,7 @@ class Function(object):
 
         Returns
         --------
-        DataContainer, the value of the gradient of the function at x or `None` if `out`  
+        DataContainer, the value of the gradient of the function at x.`  
 
         """
         raise NotImplementedError
@@ -81,7 +81,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or `None` if `out`. 
+        DataContainer, the proximal operator of the function at x with scalar :math:`\tau`. 
 
         """
         raise NotImplementedError
@@ -143,6 +143,8 @@ class Function(object):
 
         if out is None:
             return val
+        else:
+            return out
 
     # Algebra for Function Class
 
@@ -335,7 +337,7 @@ class SumFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the sum of the gradients evaluated at point :math:`x` or `None` if `out`.
+        DataContainer, the value of the sum of the gradients evaluated at point :math:`x`.
 
         """
 
@@ -352,7 +354,8 @@ class SumFunction(Function):
                     f.gradient(x, out=out)
                 else:
                     out += f.gradient(x)
-
+            return out
+        
     def __add__(self, other):
         """ Addition for the SumFunction.
 
@@ -424,7 +427,7 @@ class ScaledFunction(Function):
             raise TypeError(
                 'Expecting scalar type as a number type. Got {}'.format(type(value)))
 
-    def __call__(self, x, out=None):
+    def __call__(self, x):
         r"""Returns the value of the scaled function evaluated at :math:`x`.
 
         .. math:: G(x) = \alpha F(x)
@@ -433,11 +436,9 @@ class ScaledFunction(Function):
         ----------
         x : DataContainer
 
-        out: return DataContainer, if None a new DataContainer is returned, default None.
-
         Returns
         --------
-        DataContainer, the value of the scaled function or `None` if `out` .
+        DataContainer, the value of the scaled function.
         """
         return self.scalar * self.function(x)
 
@@ -481,7 +482,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or `None` if `out`. 
+        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x`. 
 
         """
         if out is None:
@@ -489,6 +490,7 @@ class ScaledFunction(Function):
         else:
             self.function.gradient(x, out=out)
             out *= self.scalar
+            return out 
 
     def proximal(self, x, tau, out=None):
         r"""Returns the proximal operator of the scaled function, evaluated at :math:`x`.
@@ -505,7 +507,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or `None` if `out`. 
+        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau`. 
 
         """
 
@@ -524,7 +526,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
+        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau`.
 
         """
         try:
@@ -546,6 +548,8 @@ class ScaledFunction(Function):
 
         if out is None:
             return val
+        else:
+            return out
 
 
 class SumScalarFunction(SumFunction):
@@ -602,7 +606,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or `None` if `out`. 
+        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau`. 
 
         """
         return self.function.proximal(x, tau, out=out)
@@ -646,13 +650,14 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        A DataContainer of zeros, the same size as :math:`x` or `None` if `out`  
+        A DataContainer of zeros, the same size as :math:`x`. 
 
         """
         if out is None:
             return x * 0.
         else:
             out.fill(0)
+            return out
 
     def convex_conjugate(self, x):
         r""" The convex conjugate of constant function :math:`F(x) = c\in\mathbb{R}` is
@@ -699,13 +704,14 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        DataContainer, equal to :math:`x` or `None` if `out`. 
+        DataContainer, equal to :math:`x`. 
 
         """
         if out is None:
             return x.copy()
         else:
             out.fill(x)
+            return out
 
     @property
     def constant(self):
@@ -807,7 +813,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the gradient of the translated function evaluated at :math:`x` or `None` if `out`.
+        DataContainer, the gradient of the translated function evaluated at :math:`x`.
         """
         try:
             x.subtract(self.center, out=x)
@@ -825,6 +831,8 @@ class TranslateFunction(Function):
 
         if out is None:
             return val
+        else:
+            return out
 
     def proximal(self, x, tau, out=None):
         r"""Returns the proximal operator of the translated function.
@@ -841,7 +849,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or `None` if `out`.
+        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau`.
 
         """
         try:
@@ -862,6 +870,8 @@ class TranslateFunction(Function):
 
         if out is None:
             return val
+        else:
+            return out
 
     def convex_conjugate(self, x):
         r"""Returns the convex conjugate of the translated function.

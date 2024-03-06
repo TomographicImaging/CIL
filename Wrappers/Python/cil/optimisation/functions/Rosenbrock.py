@@ -66,6 +66,7 @@ class Rosenbrock(Function):
 
         if out is not None:
             out.fill (res)
+            return out
         else:
             return VectorData(res) 
 

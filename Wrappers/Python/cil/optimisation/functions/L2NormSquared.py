@@ -83,6 +83,8 @@ class L2NormSquared(Function):
 
         if out is None:
             return ret
+        else:
+            return out
 
     def convex_conjugate(self, x):
         r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
@@ -120,6 +122,8 @@ class L2NormSquared(Function):
 
         if out is None:
             return ret
+        else:
+            return out
 
 
 class WeightedL2NormSquared(Function):
@@ -180,6 +184,7 @@ class WeightedL2NormSquared(Function):
                 out -= self.b
             self.operator_weight.direct(out, out=out)
             out *= 2
+            return out
 
         else:
 
@@ -216,3 +221,5 @@ class WeightedL2NormSquared(Function):
                 out += self.b
             else:
                 x.divide((1+2*tau*self.weight), out=out)
+            
+            return out

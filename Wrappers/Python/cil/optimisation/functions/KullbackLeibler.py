@@ -204,6 +204,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
             out.subtract(self.eta, out=out)
             out.add(x, out=out)         
             out *= 0.5             
+            return out
 
 
     def proximal_conjugate(self, x, tau, out = None):
@@ -229,6 +230,8 @@ class KullbackLeibler_numpy(KullbackLeibler):
             tmp += 2
             out += tmp
             out *= 0.5
+            
+            return out
 
 ####################################
 ## KullbackLeibler numba routines ##
@@ -446,10 +449,10 @@ class KullbackLeibler_numba(KullbackLeibler):
         
         """     
 
-        should_return = False
+    
         if out is None:
-            out = x * 0 
-            should_return = True
+            out = x * 0
+            
 
         out_np = out.as_array() 
 
@@ -459,8 +462,8 @@ class KullbackLeibler_numba(KullbackLeibler):
             kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())            
         out.fill(out_np)
 
-        if should_return:
-            return out        
+
+        return out        
         
     def proximal(self, x, tau, out = None):
 
@@ -470,10 +473,9 @@ class KullbackLeibler_numba(KullbackLeibler):
                             
         """      
 
-        should_return = False
+
         if out is None:
             out = x * 0 
-            should_return = True
 
         out_np = out.as_array() 
 
@@ -493,8 +495,8 @@ class KullbackLeibler_numba(KullbackLeibler):
                     out_np, self.eta_np)  
 
         out.fill(out_np)
-        if should_return:
-            return out                                    
+
+        return out                                    
 
 
     def proximal_conjugate(self, x, tau, out = None):
@@ -504,10 +506,9 @@ class KullbackLeibler_numba(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
         """        
 
-        should_return = False
+
         if out is None:
             out = x * 0 
-            should_return = True
 
         out_np = out.as_array()              
 
@@ -527,5 +528,5 @@ class KullbackLeibler_numba(KullbackLeibler):
                     tau.as_array(), out_np) 
 
         out.fill(out_np)
-        if should_return:
-            return out 
+
+        return out 

@@ -133,10 +133,11 @@ class BlockFunction(Function):
             else:
                 for i in range(self.length):
                     self.functions[i].proximal(x.get_item(i), tau.get_item(i), out[i])
+            return out
             
             
     
-    def gradient(self, x, out=None):
+    def gradient(self, x, out=None): #TODO: does this work with out ? 
         
         r"""Returns the value of the gradient of the BlockFunction function at x.
         
@@ -178,6 +179,8 @@ class BlockFunction(Function):
             else:
                 for i in range(self.length):
                     self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
+                    
+            return out 
             
         else:
                 

@@ -56,6 +56,7 @@ class ZeroOperator(LinearOperator):
             return self.range_geometry().allocate(value=0)
         else:
             out.fill(self.range_geometry().allocate(value=0))
+            return out
     
     def adjoint(self,x, out=None):
         
@@ -65,6 +66,7 @@ class ZeroOperator(LinearOperator):
             return self.domain_geometry().allocate(value=0)
         else:
             out.fill(self.domain_geometry().allocate(value=0))
+            return out
         
     def calculate_norm(self, **kwargs):
         

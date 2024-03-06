@@ -426,6 +426,7 @@ class ScaledOperator(Operator):
         else:
             self.operator.direct(x, out=out)
             out *= self.scalar
+            return out
 
     def adjoint(self, x, out=None):
         '''adjoint method'''
@@ -437,6 +438,7 @@ class ScaledOperator(Operator):
             else:
                 self.operator.adjoint(x, out=out)
                 out *= self.scalar
+                return out
         else:
             raise TypeError('Operator is not linear')
 
@@ -500,6 +502,7 @@ class SumOperator(Operator):
         else:
             self.operator1.direct(x, out=out)
             out.add(self.operator2.direct(x), out=out)
+            return out
 
     def adjoint(self, x, out=None):
         r"""Calls the adjoint of the sum operator 
@@ -518,6 +521,7 @@ class SumOperator(Operator):
             else:
                 self.operator1.adjoint(x, out=out)
                 out.add(self.operator2.adjoint(x), out=out)
+                return out
         else:
             raise ValueError('No adjoint operation with non-linear operators')
 
@@ -620,6 +624,7 @@ class CompositionOperator(Operator):
                     else:
                         step = operator.direct(step)
                 out.fill(step)
+            return out
 
     def adjoint(self, x, out=None):
         """Calls the adjoint of the composition operator 
@@ -657,6 +662,7 @@ class CompositionOperator(Operator):
                         else:
                             step = operator.adjoint(step)
                     out.fill(step)
+                return out
 
             else:
                 if self.preallocate:

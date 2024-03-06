@@ -80,4 +80,5 @@ class OperatorCompositionFunction(Function):
             return self.operator.adjoint(tmp)
         else: 
             self.operator.adjoint(tmp, out=out)
+            return out
 

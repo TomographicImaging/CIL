@@ -179,6 +179,8 @@ class MixedL21Norm(Function):
 
         if out is None:
             return res
+        else:
+            return out
 
 class SmoothMixedL21Norm(Function):
     
@@ -231,4 +233,5 @@ class SmoothMixedL21Norm(Function):
         if out is None:
             return x.divide(denom)
         else:
-            x.divide(denom, out=out)        
+            x.divide(denom, out=out) 
+            return out       

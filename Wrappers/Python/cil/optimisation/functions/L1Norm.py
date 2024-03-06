@@ -38,7 +38,6 @@ def soft_shrinkage(x, tau, out=None):
     the value of the soft-shrinkage operator at x: DataContainer.
     """
 
-    should_return = False
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             out = x * 0
@@ -47,7 +46,6 @@ def soft_shrinkage(x, tau, out=None):
             out.fill(outarr)
         else:
             out = x.abs()
-        should_return = True
     else:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             outarr = out.as_array()
@@ -65,8 +63,7 @@ def soft_shrinkage(x, tau, out=None):
         out *= x.sign()
     
 
-    if should_return:
-        return out        
+    return out        
 
 class L1Norm(Function):
     r"""L1Norm function
@@ -234,6 +231,7 @@ class _L1Norm(Function):
                 out += self.b
             else:
                 soft_shrinkage(x, tau, out = out)   
+            return out
 
 
 class _WeightedL1Norm(Function): 

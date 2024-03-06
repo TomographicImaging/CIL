@@ -63,6 +63,7 @@ class DiagonalOperator(LinearOperator):
             return self.diagonal * x
         else:
             self.diagonal.multiply(x,out=out)
+        return out
     
 
     def adjoint(self,x, out=None):

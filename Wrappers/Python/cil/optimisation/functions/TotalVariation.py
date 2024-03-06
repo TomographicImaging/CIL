@@ -278,6 +278,8 @@ class TotalVariation(Function):
 
         if out is None:
             return solution
+        else:
+            return out
 
     def _fista_on_dual_rof(self, x, tau, out=None):
         r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem 
@@ -312,9 +314,7 @@ class TotalVariation(Function):
             tau_reg_neg = tau
             tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
 
-        should_return = False
         if out is None:
-            should_return = True
             out = self.gradient.domain_geometry().allocate(0)
 
         for k in range(self.iterations):
@@ -362,8 +362,8 @@ class TotalVariation(Function):
         if id(tau_reg_neg) == id(tau):
             tau_reg_neg.divide(-self.regularisation_parameter, out=tau)
 
-        if should_return:
-            return out
+
+        return out
 
     def convex_conjugate(self, x):
         r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""

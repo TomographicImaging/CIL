@@ -161,9 +161,8 @@ class IndicatorBox(Function):
 
             ``tau`` is ignored but it is in the signature of the generic Function class
         '''
-        should_return = False
+
         if out is None:
-            should_return = True
             out = x.copy()
         else:
             out.fill(x)
@@ -173,8 +172,8 @@ class IndicatorBox(Function):
         self._proximal(outarr)
 
         out.fill(outarr)
-        if should_return:
-            return out
+
+        return out
 
     def gradient(self, x):
         '''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''

@@ -58,7 +58,7 @@ from utils import  initialise_tests
 initialise_tests()
 
 
-class TestFunctionOutAndInPlace(CCPiTestClass):
+class TestFunctionOutAndInPlace(CCPiTestClass): #TODO: CHECK BLOCK FUNCTION GRADIENT OUT 
 
     def setUp(self):
 
@@ -143,7 +143,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 pass
 
 
-    def out_test(self, desired_result, function, method,  x, *args, ):
+    def out_test(self, desired_result, function, method,  x, *args, ):#TODO: check that it also returns and this matches 
         input = x.copy()
         out2=0*(x.copy())
         try:
@@ -207,7 +207,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
 
         # Parameters for point spread function PSF (size and std)
-        ks          = 10;
+        ks          = 10
         ksigma      = 5.0
 
         # Create 1D PSF and 2D as outer product, then normalise.
@@ -241,7 +241,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
 
 
-    def get_result(self, operator, method, x, *args):
+    def get_result(self, operator, method, x, *args): 
         try:
             input=x.copy() #To check that it isn't changed after function calls
             if method == 'direct':
@@ -268,7 +268,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 pass
 
 
-    def out_test(self, desired_result, operator, method,  x, *args, ):
+    def out_test(self, desired_result, operator, method,  x, *args, ): #TODO: check that it also returns and this matches 
         input = x.copy()
         out2=0*(x.copy())
         try:

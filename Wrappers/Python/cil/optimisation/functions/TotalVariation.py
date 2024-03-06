@@ -318,7 +318,7 @@ class TotalVariation(Function):
             tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
 
         if out is None:
-            out = self.gradient.domain_geometry().allocate(0)
+            out = self.gradient_operator.domain_geometry().allocate(0)
 
         for k in range(self.iterations):
 

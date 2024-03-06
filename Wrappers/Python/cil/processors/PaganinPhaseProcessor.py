@@ -26,15 +26,14 @@ from scipy.fft import fftshift
 from scipy import constants
 
 from tqdm import tqdm
-
 import logging
 from dask import compute, delayed
-from multiprocessing import Process, Pool, map
+from multiprocessing.pool import ThreadPool
 
 class PaganinPhaseProcessor(Processor):
 
     @staticmethod
-    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-3, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method'):
+    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-3, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
         """
         Method to create a Paganin processor to retrieve quantitative information from phase contrast images using
         the Paganin phase retrieval algorithm described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -68,6 +67,9 @@ class PaganinPhaseProcessor(Processor):
         filter_type: string (optional)
             The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9 
         
+        verbose: boolean (optional)
+            If True print progress bar (default is True)
+
         Returns
         -------
         Processor
@@ -86,12 +88,12 @@ class PaganinPhaseProcessor(Processor):
         >>> processor.get_output(output_type='thickness')
         
         """
-        processor = PaganinPhaseRetrieval(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type)
+        processor = PaganinPhaseRetrieval(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type, verbose=verbose)
         return processor
 
 
     @staticmethod
-    def filter(energy_eV = 40000, delta = 1, beta = 1e-3, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method'):
+    def filter(energy_eV = 40000, delta = 1, beta = 1e-3, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
         '''
         Method to create a Paganin processor to filter images using the Paganin phase retrieval algorithm
         described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -120,6 +122,9 @@ class PaganinPhaseProcessor(Processor):
         filter_type: string (optional)
             The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9  (equation 17)
         
+        verbose: boolean (optional)
+            If True print progress bar (default is True)
+
         Returns
         -------
         Processor
@@ -133,14 +138,14 @@ class PaganinPhaseProcessor(Processor):
 
         '''
         
-        processor = PaganinPhaseFilter(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type)
+        processor = PaganinPhaseFilter(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type, verbose=verbose)
         return processor
     
 class PaganinProcessor(Processor):
     '''
     Parent class setting up Paganin processing
     '''
-    def __init__(self, energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance=None, filter_type='paganin_method'):
+    def __init__(self, energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance=None, filter_type='paganin_method', verbose=True):
         kwargs = {
             'energy' : energy_eV,
             'wavelength' : self.energy_to_wavelength(energy_eV),
@@ -149,6 +154,7 @@ class PaganinProcessor(Processor):
             'unit_multiplier' : unit_multiplier,
             'propagation_distance_user' : propagation_distance,
             'filter_type' : filter_type,
+            'verbose' : verbose,
             'output_type' : 'phase',
             'mu' : None,
             'alpha' : None,
@@ -217,40 +223,25 @@ class PaganinProcessor(Processor):
         if out is None:
             out = data.geometry.allocate(None)
             must_return = True
+        
+        original_data_order = data.dimension_labels
+        original_out_order = out.dimension_labels
+        data.reorder(('angle', 'vertical', 'horizontal'))
+        out.reorder(('angle', 'vertical', 'horizontal'))
 
-        # set up delayed computation and
-        # compute in parallel processes
-        i = 0
-        max_proc = len(data.geometry.angles)
-        num_parallel_processes = 6
-        # tqdm progress bar on the while loop
-        with tqdm(total=max_proc) as pbar:
-            while (i < max_proc):
-                j = 0
-                while j < num_parallel_processes:
-                    if j + i == max_proc:
-                        break
-                    j += 1
-                # set up j delayed computation
-                procs = []
-                
-                for idx in range(j):
-                    projection = data.get_slice(angle=i+idx).as_array()
-                    
-                    process = Process(target=self.process_projection, args = projection)
-                    process.start()
-                    procs.append(delayed(self.process_projection)(projection))
-                # call compute on j (< num_parallel_processes) processes concurrently
-                # this limits the amount of memory required to store the output of the 
-                # phase retrieval to j projections.
-                res = compute(*procs[:j])
-                
-                # copy the output in the output buffer
-                for k, el in enumerate(res):
-                    out.fill(el, angle=i+k)
-                    pbar.update(1)
-                i += j
+        with ThreadPool(4) as pool:
+            if self.verbose == True:
+                results = list(tqdm(pool.imap(self.process_projection, list(data.array)), total = len(list(data.array)) ))
+                out.fill(np.array(results, dtype = out.dtype))
+            else:
+                out.fill(np.array(pool.map(self.process_projection, list(data.array)), dtype = out.dtype))
             
+            pool.close()
+            pool.join()
+        
+        data.reorder(original_data_order)
+        out.reorder(original_out_order)
+
         if must_return:
             return out
         

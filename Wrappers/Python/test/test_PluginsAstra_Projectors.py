@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2022 United Kingdom Research and Innovation
 #  Copyright 2022 The University of Manchester
 #
@@ -31,7 +30,7 @@ if has_astra:
     from cil.plugins.astra.operators import ProjectionOperator
 
 class TestAstraProjectors(unittest.TestCase):
-    def setUp(self): 
+    def setUp(self):
 
         N = 128
         angles = np.linspace(0, np.pi, 180, dtype='float32')
@@ -40,10 +39,10 @@ class TestAstraProjectors(unittest.TestCase):
                                 .set_angles(angles, angle_unit='radian')\
                                 .set_panel(N, 0.1)\
                                 .set_labels(['angle', 'horizontal'])
-        
+
         self.ig = self.ag.get_ImageGeometry()
 
-        
+
         self.ag3 = AcquisitionGeometry.create_Parallel3D()\
                                 .set_angles(angles, angle_unit='radian')\
                                 .set_panel((N, N), (0.1, 0.1))\
@@ -57,10 +56,10 @@ class TestAstraProjectors(unittest.TestCase):
                                 .set_labels(['channel','angle', 'horizontal'])\
                                 .set_channels(5)
 
-        
+
         self.ig_channel = self.ag_channel.get_ImageGeometry()
 
-        
+
         self.ag3_channel = AcquisitionGeometry.create_Parallel3D()\
                                 .set_angles(angles, angle_unit='radian')\
                                 .set_panel((N, N), (0.1, 0.1))\
@@ -171,7 +170,7 @@ class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBl
         self.data = data.get_slice(vertical='centre')
         ig = self.data.geometry.get_ImageGeometry()
         self.datasplit = self.data.partition(10, 'sequential')
-        
+
 
         K = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.datasplit.geometry)
         A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)

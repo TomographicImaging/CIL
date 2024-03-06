@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -26,13 +25,13 @@ import numpy
 class AbsorptionTransmissionConverter(DataProcessor):
 
     '''Processor to convert from absorption measurements to transmission
-    
+
     :param white_level: A float defining incidence intensity in the Beer-Lambert law.
     :type white_level: float, optional
     :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
     :rtype: AcquisitionData, ImageData or DataContainer
 
-    Processor first multiplies data by -1, then calculates exponent 
+    Processor first multiplies data by -1, then calculates exponent
     and scales result by white_level (default=1)
     '''
 
@@ -44,18 +43,18 @@ class AbsorptionTransmissionConverter(DataProcessor):
         super(AbsorptionTransmissionConverter, self).__init__(**kwargs)
 
     def check_input(self, data):
-        
+
         if not (issubclass(type(data), DataContainer)):
             raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n' +
                             ' - DataContainer')
-        return True 
+        return True
 
     def process(self, out=None):
 
         data = self.get_input()
         if out is None:
-            out = data.multiply(-1.0)          
+            out = data.multiply(-1.0)
         else:
             data.multiply(-1.0, out=out)
 

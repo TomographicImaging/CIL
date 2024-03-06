@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -24,11 +23,11 @@ from cil.optimisation.operators import LinearOperator
 
 class MatrixOperator(LinearOperator):
     """ Matrix wrapped into a LinearOperator
-    
-    :param: a numpy matrix 
-    
+
+    :param: a numpy matrix
+
     """
-    
+
     def __init__(self,A):
         '''creator
 
@@ -41,24 +40,24 @@ class MatrixOperator(LinearOperator):
         self.s1 = None   # Largest singular value, initially unknown
         super(MatrixOperator, self).__init__(domain_geometry=domain_geometry,
                                                    range_geometry=range_geometry)
-        
-    def direct(self,x, out=None):        
-                
+
+    def direct(self,x, out=None):
+
         if out is None:
             tmp = self.range_geometry().allocate()
             tmp.fill(numpy.dot(self.A,x.as_array()))
             return tmp
         else:
             # Below use of out is not working, see
-            # https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html            
-            # numpy.dot(self.A, x.as_array(), out = out.as_array())            
+            # https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html
+            # numpy.dot(self.A, x.as_array(), out = out.as_array())
             out.fill(numpy.dot(self.A, x.as_array()))
             return out
 
     def adjoint(self,x, out=None):
         if out is None:
             tmp = self.domain_geometry().allocate()
-            tmp.fill(numpy.dot(self.A.transpose(),x.as_array()))
+            tmp.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return tmp
         else:            
             out.fill(numpy.dot(self.A.transpose(),x.as_array()))
@@ -66,4 +65,3 @@ class MatrixOperator(LinearOperator):
 
     def size(self):
         return self.A.shape
-    

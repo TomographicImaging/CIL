@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -24,29 +23,29 @@ from cil.optimisation.operators import LinearOperator
 from cil.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 
 class ChannelwiseOperator(LinearOperator):
-    
-    r'''ChannelwiseOperator:  takes in a single-channel operator op and the 
-    number of channels to be used, and creates a new multi-channel 
-    ChannelwiseOperator, which will apply the operator op independently on 
+
+    r'''ChannelwiseOperator:  takes in a single-channel operator op and the
+    number of channels to be used, and creates a new multi-channel
+    ChannelwiseOperator, which will apply the operator op independently on
     each channel for the number of channels specified.
-    
-    ChannelwiseOperator supports simple operators as input but not 
-    BlockOperators. Typically if such behaviour is desired, it can be achieved  
+
+    ChannelwiseOperator supports simple operators as input but not
+    BlockOperators. Typically if such behaviour is desired, it can be achieved
     by creating instead a BlockOperator of ChannelwiseOperators.
-                       
+
         :param op: Single-channel operator
         :param channels: Number of channels
         :param dimension: 'prepend' (default) or 'append' channel dimension onto existing dimensions
-                       
+
      '''
-    
+
     def __init__(self, op, channels, dimension='prepend'):
-        
+
         dom_op = op.domain_geometry()
         ran_op = op.range_geometry()
-        
+
         geom_mc = []
-        
+
         # Create multi-channel domain and range geometries: Clones of the
         # input single-channel geometries but with the specified number of
         # channels and additional dimension_label 'channel'.
@@ -58,7 +57,7 @@ class ChannelwiseOperator(LinearOperator):
             else:
                 raise Exception("dimension must be either 'prepend' or 'append'")
             if isinstance(geom, ImageGeometry):
-                
+
                 geom_channels = geom.copy()
                 geom_channels.channels = channels
                 geom_channels.dimension_labels = new_dimension_labels
@@ -70,22 +69,22 @@ class ChannelwiseOperator(LinearOperator):
                 geom_channels.dimension_labels = new_dimension_labels
 
                 geom_mc.append(geom_channels)
-                    
+
             elif isinstance(geom,BlockGeometry):
                 raise Exception("ChannelwiseOperator does not support BlockOperator as input. Consider making a BlockOperator of ChannelwiseOperators instead.")
             else:
                 pass
-        
-        super(ChannelwiseOperator, self).__init__(domain_geometry=geom_mc[0], 
+
+        super(ChannelwiseOperator, self).__init__(domain_geometry=geom_mc[0],
                                            range_geometry=geom_mc[1])
-        
+
         self.op = op
         self.channels = channels
-        
+
     def direct(self,x,out=None):
-        
+
         '''Returns D(x)'''
-        
+
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's direct method and fill into multi-channel output data set.
         if out is None:
@@ -103,9 +102,9 @@ class ChannelwiseOperator(LinearOperator):
             return out
     
     def adjoint(self,x, out=None):
-        
-        '''Returns D^{*}(y)'''        
-        
+
+        '''Returns D^{*}(y)'''
+
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's adjoint method and fill into multi-channel output data set.
         if out is None:
@@ -128,3 +127,8 @@ class ChannelwiseOperator(LinearOperator):
         
         return self.op.norm()
 
+    def calculate_norm(self, **kwargs):
+
+        '''Evaluates operator norm of DiagonalOperator'''
+
+        return self.op.norm()

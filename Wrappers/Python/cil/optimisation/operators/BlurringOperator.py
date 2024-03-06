@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -24,35 +23,35 @@ import cil
 from scipy.ndimage import convolve, correlate
 
 class BlurringOperator(LinearOperator):
-    
-    r'''BlurringOperator:  D: X -> X,  takes in a numpy array PSF representing 
-    a point spread function for blurring the image. The implementation is 
+
+    r'''BlurringOperator:  D: X -> X,  takes in a numpy array PSF representing
+    a point spread function for blurring the image. The implementation is
     generic and naive simply using convolution.
-                       
+
         :param PSF: numpy array with point spread function of blur.
         :param geometry: ImageGeometry of ImageData to work on.
-                       
+
      '''
-    
+
     def __init__(self, PSF, geometry):
-        super(BlurringOperator, self).__init__(domain_geometry=geometry, 
+        super(BlurringOperator, self).__init__(domain_geometry=geometry,
                                            range_geometry=geometry)
         if isinstance(PSF,np.ndarray):
             self.PSF = PSF
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
-        
+
         if not (isinstance(geometry,cil.framework.framework.ImageGeometry) or \
                 isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
             raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
 
-        
+
     def direct(self,x,out=None):
-        
-        '''Returns D(x). The forward mapping consists of convolution of the 
-        image with the specified PSF. Here reflective boundary conditions 
+
+        '''Returns D(x). The forward mapping consists of convolution of the
+        image with the specified PSF. Here reflective boundary conditions
         are selected.'''
-        
+
         if out is None:
             result = self.range_geometry().allocate()
             result.fill(convolve(x.as_array(),self.PSF, mode='reflect'))
@@ -64,11 +63,11 @@ class BlurringOperator(LinearOperator):
             return out
     
     def adjoint(self,x, out=None):
-        
-        '''Returns D^{*}(y). The adjoint of convolution is convolution with 
+
+        '''Returns D^{*}(y). The adjoint of convolution is convolution with
         the PSF rotated by 180 degrees, or equivalently correlation by the PSF
         itself.'''
-        
+
         if out is None:
             result = self.domain_geometry().allocate()
             result.fill(correlate(x.as_array(),self.PSF, mode='reflect'))
@@ -78,4 +77,3 @@ class BlurringOperator(LinearOperator):
             correlate(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
             return out
-

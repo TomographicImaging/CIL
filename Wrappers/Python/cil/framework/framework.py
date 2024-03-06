@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2018 United Kingdom Research and Innovation
 #  Copyright 2018 The University of Manchester
 #
@@ -47,9 +46,9 @@ from cil.framework.BlockGeometry import BlockGeometry
 
 class Partitioner(object):
     '''Interface for AcquisitionData to be able to partition itself in a number of batches.
-    
-    This class, by multiple inheritance with AcquisitionData, allows the user to partition the data, 
-    by using the method ``partition``. 
+
+    This class, by multiple inheritance with AcquisitionData, allows the user to partition the data,
+    by using the method ``partition``.
     The partitioning will generate a ``BlockDataContainer`` with appropriate ``AcquisitionData``.
 
     '''
@@ -60,7 +59,7 @@ class Partitioner(object):
 
     def _partition_indices(self, num_batches, indices, stagger=False):
         """Partition a list of indices into num_batches of indices.
-        
+
         Parameters
         ----------
         num_batches : int
@@ -112,11 +111,11 @@ class Partitioner(object):
 
     def _construct_BlockGeometry_from_indices(self, indices):
         '''Convert a list of boolean masks to a list of BlockGeometry.
-        
+
         Parameters
         ----------
           indices : list of lists of indices
-            
+
         Returns
         -------
             BlockGeometry
@@ -130,14 +129,14 @@ class Partitioner(object):
 
     def partition(self, num_batches, mode, seed=None):
         '''Partition the data into ``num_batches`` batches using the specified ``mode``.
-        
+
 
         The modes are
-        
+
         1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.
-        
+
         2. ``staggered`` - The data will be partitioned into ``num_batches`` batches of sequential indices, with stride equal to ``num_batches``.
-        
+
         3. ``random_permutation`` - The data will be partitioned into ``num_batches`` batches of random indices.
 
         Parameters
@@ -158,9 +157,9 @@ class Partitioner(object):
 
         Example
         -------
-        
+
         Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:
-    
+
         1. [[0, 1, 2], [3, 4], [5, 6], [7, 8]] with ``sequential``
         2. [[0, 4, 8], [1, 5], [2, 6], [3, 7]] with ``staggered``
         3. [[8, 2, 6], [7, 1], [0, 4], [3, 5]] with ``random_permutation`` and seed 1
@@ -177,7 +176,7 @@ class Partitioner(object):
 
     def _partition_deterministic(self, num_batches, stagger=False, indices=None):
         '''Partition the data into ``num_batches`` batches.
-        
+
         Parameters
         ----------
         num_batches : int
@@ -191,21 +190,21 @@ class Partitioner(object):
             indices = self.geometry.num_projections
         partition_indices = self._partition_indices(num_batches, indices, stagger)
         blk_geo = self._construct_BlockGeometry_from_indices(partition_indices)
-        
+
         # copy data
         out = blk_geo.allocate(None)
         out.geometry = blk_geo
         axis = self.dimension_labels.index('angle')
-            
+
         for i in range(num_batches):
             out[i].fill(
                 numpy.squeeze(
                     numpy.take(self.array, partition_indices[i], axis=axis)
                 )
             )
- 
+
         return out
-         
+
     def _partition_random_permutation(self, num_batches, seed=None):
         '''Partition the data into ``num_batches`` batches using a random permutation.
 
@@ -220,12 +219,12 @@ class Partitioner(object):
         '''
         if seed is not None:
             numpy.random.seed(seed)
-        
+
         indices = numpy.arange(self.geometry.num_projections)
         numpy.random.shuffle(indices)
 
-        indices = list(indices)            
-        
+        indices = list(indices)
+
         return self._partition_deterministic(num_batches, stagger=False, indices=indices)
 
 def find_key(dic, val):
@@ -238,7 +237,7 @@ def message(cls, msg, *args):
         msg += " {%d}" %(i+1)
     args = list(args)
     args.insert(0, cls.__name__ )
-    
+
     return msg.format(*args )
 
 class ImageGeometry(object):
@@ -248,13 +247,13 @@ class ImageGeometry(object):
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'
-    
+
     @property
     def shape(self):
 
         shape_dict = {ImageGeometry.CHANNEL: self.channels,
                      ImageGeometry.VERTICAL: self.voxel_num_z,
-                     ImageGeometry.HORIZONTAL_Y: self.voxel_num_y,        
+                     ImageGeometry.HORIZONTAL_Y: self.voxel_num_y,
                      ImageGeometry.HORIZONTAL_X: self.voxel_num_x}
 
         shape = []
@@ -272,7 +271,7 @@ class ImageGeometry(object):
 
         spacing_dict = {ImageGeometry.CHANNEL: self.channel_spacing,
                         ImageGeometry.VERTICAL: self.voxel_size_z,
-                        ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,        
+                        ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,
                         ImageGeometry.HORIZONTAL_X: self.voxel_size_x}
 
         spacing = []
@@ -291,7 +290,7 @@ class ImageGeometry(object):
 
     @property
     def dimension_labels(self):
-        
+
         labels_default = DataOrder.CIL_IG_LABELS
 
         shape_default = [   self.channels,
@@ -311,11 +310,11 @@ class ImageGeometry(object):
                 except ValueError:
                     pass #if not in custom list carry on
         return tuple(labels)
-      
+
     @dimension_labels.setter
     def dimension_labels(self, val):
         self.set_labels(val)
-    
+
     def set_labels(self, labels):
         labels_default = DataOrder.CIL_IG_LABELS
 
@@ -325,14 +324,14 @@ class ImageGeometry(object):
                 if x not in labels_default:
                     raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'\
                         .format(labels_default,labels))
-                    
+
             self._dimension_labels = tuple(labels)
-        
+
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if self.voxel_num_x == other.voxel_num_x \
             and self.voxel_num_y == other.voxel_num_y \
             and self.voxel_num_z == other.voxel_num_z \
@@ -347,7 +346,7 @@ class ImageGeometry(object):
             and self.dimension_labels == other.dimension_labels:
 
             return True
-        
+
         return False
 
     @property
@@ -356,21 +355,21 @@ class ImageGeometry(object):
 
     @dtype.setter
     def dtype(self, val):
-        self._dtype = val           
+        self._dtype = val
 
-    def __init__(self, 
-                 voxel_num_x=0, 
-                 voxel_num_y=0, 
-                 voxel_num_z=0, 
-                 voxel_size_x=1, 
-                 voxel_size_y=1, 
-                 voxel_size_z=1, 
-                 center_x=0, 
-                 center_y=0, 
-                 center_z=0, 
-                 channels=1, 
+    def __init__(self,
+                 voxel_num_x=0,
+                 voxel_num_y=0,
+                 voxel_num_z=0,
+                 voxel_size_x=1,
+                 voxel_size_y=1,
+                 voxel_size_z=1,
+                 center_x=0,
+                 center_y=0,
+                 center_z=0,
+                 channels=1,
                  **kwargs):
-        
+
         self.voxel_num_x = int(voxel_num_x)
         self.voxel_num_y = int(voxel_num_y)
         self.voxel_num_z = int(voxel_num_z)
@@ -379,7 +378,7 @@ class ImageGeometry(object):
         self.voxel_size_z = float(voxel_size_z)
         self.center_x = center_x
         self.center_y = center_y
-        self.center_z = center_z  
+        self.center_z = center_z
         self.channels = channels
         self.channel_labels = None
         self.channel_spacing = 1.0
@@ -394,7 +393,7 @@ class ImageGeometry(object):
         geometry_new = self.copy()
         if channel is not None:
             geometry_new.channels = 1
-            
+
             try:
                 geometry_new.channel_labels = [self.channel_labels[channel]]
             except:
@@ -402,7 +401,7 @@ class ImageGeometry(object):
 
         if vertical is not None:
             geometry_new.voxel_num_z = 0
-                
+
         if horizontal_y is not None:
             geometry_new.voxel_num_y = 0
 
@@ -422,28 +421,28 @@ class ImageGeometry(object):
 
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
-        
+
     def get_max_x(self):
         return self.center_x + 0.5*self.voxel_num_x*self.voxel_size_x
-        
+
     def get_min_y(self):
         return self.center_y - 0.5*self.voxel_num_y*self.voxel_size_y
-        
+
     def get_max_y(self):
         return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
-        
+
     def get_min_z(self):
         if not self.voxel_num_z == 0:
             return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
         else:
             return 0
-        
+
     def get_max_z(self):
         if not self.voxel_num_z == 0:
             return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
         else:
             return 0
-        
+
     def clone(self):
         '''returns a copy of the ImageGeometry'''
         return copy.deepcopy(self)
@@ -451,7 +450,7 @@ class ImageGeometry(object):
     def copy(self):
         '''alias of clone'''
         return self.clone()
- 
+
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -469,7 +468,7 @@ class ImageGeometry(object):
         return repres
     def allocate(self, value=0, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance
-        
+
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
         :type value: number or string, default None allocates empty memory block, default 0
         :param dtype: numerical type to allocate
@@ -481,8 +480,8 @@ class ImageGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = ImageData(geometry=self.copy(), 
-                            dtype=dtype, 
+        out = ImageData(geometry=self.copy(),
+                            dtype=dtype,
                             suppress_warning=True)
 
         if isinstance(value, Number):
@@ -496,38 +495,41 @@ class ImageGeometry(object):
                 if numpy.iscomplexobj(out.array):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
-                else: 
+                else:
                     out.fill(numpy.random.random_sample(self.shape))
             elif value == ImageGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))
+                if numpy.iscomplexobj(out.array):
+                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                else:
+                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=dtype))
             elif value is None:
                 pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
 
         return out
-    
+
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
      '''
     def __init__ (self, dof):
         self._dof = dof
 
-    @staticmethod  
+    @staticmethod
     def create_vector(val):
         try:
             vec = numpy.array(val, dtype=numpy.float64).reshape(len(val))
         except:
             raise ValueError("Can't convert to numpy array")
-   
+
         return vec
 
-    @staticmethod   
+    @staticmethod
     def create_unit_vector(val):
         vec = ComponentDescription.create_vector(val)
         dot_product = vec.dot(vec)
@@ -542,18 +544,18 @@ class ComponentDescription(object):
             val_length = len(val)
         except:
             raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self._dof,val))
-        
+
         if val_length != self._dof:
             raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self._dof,val))
 
-    @staticmethod   
+    @staticmethod
     def test_perpendicular(vector1, vector2):
         dor_prod = vector1.dot(vector2)
         if abs(dor_prod) <1e-10:
             return True
         return False
 
-    @staticmethod   
+    @staticmethod
     def test_parallel(vector1, vector2):
         '''For unit vectors only. Returns true if directions are opposite'''
         dor_prod = vector1.dot(vector2)
@@ -572,7 +574,7 @@ class PositionVector(ComponentDescription):
             raise AttributeError
 
     @position.setter
-    def position(self, val):  
+    def position(self, val):
         self.length_check(val)
         self._position = ComponentDescription.create_vector(val)
 
@@ -581,7 +583,7 @@ class DirectionVector(ComponentDescription):
     r'''This class creates a component of a tomography system with a direction attribute
      '''
     @property
-    def direction(self):      
+    def direction(self):
         try:
             return self._direction
         except:
@@ -589,10 +591,10 @@ class DirectionVector(ComponentDescription):
 
     @direction.setter
     def direction(self, val):
-        self.length_check(val)    
+        self.length_check(val)
         self._direction = ComponentDescription.create_unit_vector(val)
 
- 
+
 class PositionDirectionVector(PositionVector, DirectionVector):
     r'''This class creates a component of a tomography system with position and direction attributes
      '''
@@ -656,23 +658,23 @@ class Detector2D(PositionVector):
         if not numpy.isclose(dot_product, 0):
             raise ValueError("vectors detector.direction_x and detector.direction_y must be orthogonal")
 
-        self._direction_y = y        
+        self._direction_y = y
         self._direction_x = x
 
 class SystemConfiguration(object):
     r'''This is a generic class to hold the description of a tomography system
      '''
 
-    SYSTEM_SIMPLE = 'simple' 
-    SYSTEM_OFFSET = 'offset' 
-    SYSTEM_ADVANCED = 'advanced' 
+    SYSTEM_SIMPLE = 'simple'
+    SYSTEM_OFFSET = 'offset'
+    SYSTEM_ADVANCED = 'advanced'
 
     @property
     def dimension(self):
         if self._dimension == 2:
             return '2D'
         else:
-            return '3D'    
+            return '3D'
 
     @dimension.setter
     def dimension(self,val):
@@ -692,13 +694,13 @@ class SystemConfiguration(object):
         else:
             self._geometry = val
 
-    def __init__(self, dof, geometry, units='units'): 
+    def __init__(self, dof, geometry, units='units'):
         """Initialises the system component attributes for the acquisition type
-        """                
+        """
         self.dimension = dof
         self.geometry = geometry
         self.units = units
-        
+
         if geometry == AcquisitionGeometry.PARALLEL:
             self.ray = DirectionVector(dof)
         else:
@@ -710,21 +712,21 @@ class SystemConfiguration(object):
         else:
             self.detector = Detector2D(dof)
             self.rotation_axis = PositionDirectionVector(dof)
-    
+
     def __str__(self):
         """Implements the string representation of the system configuration
-        """   
+        """
         raise NotImplementedError
 
     def __eq__(self, other):
         """Implements the equality check of the system configuration
-        """   
+        """
         raise NotImplementedError
 
     @staticmethod
     def rotation_vec_to_y(vec):
         ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]'''
-    
+
         vec = ComponentDescription.create_unit_vector(vec)
 
         axis_rotation = numpy.eye(len(vec))
@@ -766,12 +768,12 @@ class SystemConfiguration(object):
 
         else:
             raise ValueError("Vec must have length 3, got {}".format(len(vec)))
-    
+
         return axis_rotation
 
     def update_reference_frame(self):
         r'''Transforms the system origin to the rotation_axis position
-        '''   
+        '''
         self.set_origin(self.rotation_axis.position)
 
 
@@ -779,7 +781,7 @@ class SystemConfiguration(object):
         r'''Transforms the system origin to the input origin
         '''
         translation = origin.copy()
-        if hasattr(self,'source'):              
+        if hasattr(self,'source'):
             self.source.position -= translation
 
         self.detector.position -= translation
@@ -788,7 +790,7 @@ class SystemConfiguration(object):
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
-        """        
+        """
         raise NotImplementedError
 
     def calculate_magnification(self):
@@ -799,12 +801,12 @@ class SystemConfiguration(object):
         :rtype: list
         '''
         raise NotImplementedError
-  
+
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-        '''         
+        '''
         raise NotImplementedError
 
     def copy(self):
@@ -813,7 +815,7 @@ class SystemConfiguration(object):
 
 class Parallel2D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 2D tomographic system
-                       
+
     :param ray_direction: A 2D vector describing the x-ray direction (x,y)
     :type ray_direction: list, tuple, ndarray
     :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
@@ -837,7 +839,7 @@ class Parallel2D(SystemConfiguration):
         #detector
         self.detector.position = detector_pos
         self.detector.direction_x = detector_direction_x
-        
+
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
@@ -865,7 +867,7 @@ class Parallel2D(SystemConfiguration):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-        '''       
+        '''
 
 
         rays_perpendicular_detector = ComponentDescription.test_parallel(self.ray.direction, self.detector.normal)
@@ -877,7 +879,7 @@ class Parallel2D(SystemConfiguration):
             vec_a = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position)
             rotation_axis_centred = ComponentDescription.test_parallel(self.ray.direction, vec_a)
 
-        if not rays_perpendicular_detector: 
+        if not rays_perpendicular_detector:
             config = SystemConfiguration.SYSTEM_ADVANCED
         elif not rotation_axis_centred:
             config =  SystemConfiguration.SYSTEM_OFFSET
@@ -937,7 +939,7 @@ class Parallel2D(SystemConfiguration):
     def __str__(self):
         def csv(val):
             return numpy.array2string(val, separator=', ')
-        
+
         repres = "2D Parallel-beam tomography\n"
         repres += "System configuration:\n"
         repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
@@ -950,13 +952,13 @@ class Parallel2D(SystemConfiguration):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if numpy.allclose(self.ray.direction, other.ray.direction) \
         and numpy.allclose(self.detector.position, other.detector.position)\
         and numpy.allclose(self.detector.direction_x, other.detector.direction_x)\
         and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position):
             return True
-        
+
         return False
 
     def get_centre_slice(self):
@@ -967,7 +969,7 @@ class Parallel2D(SystemConfiguration):
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
-                       
+
     :param ray_direction: A 3D vector describing the x-ray direction (x,y,z)
     :type ray_direction: list, tuple, ndarray
     :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
@@ -979,7 +981,7 @@ class Parallel3D(SystemConfiguration):
     :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z)
     :type rotation_axis_pos: list, tuple, ndarray
     :param rotation_axis_direction: A 3D vector describing the direction of the axis of rotation (x,y,z)
-    :type rotation_axis_direction: list, tuple, ndarray       
+    :type rotation_axis_direction: list, tuple, ndarray
     :param units: Label the units of distance used for the configuration
     :type units: string
     '''
@@ -988,7 +990,7 @@ class Parallel3D(SystemConfiguration):
         """Constructor method
         """
         super(Parallel3D, self).__init__(dof=3, geometry = 'parallel', units=units)
-                    
+
         #source
         self.ray.direction = ray_direction
 
@@ -1002,7 +1004,7 @@ class Parallel3D(SystemConfiguration):
 
     def align_z(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
-        '''          
+        '''
         self.set_origin(self.rotation_axis.position)
 
         #calculate rotation matrix to align rotation axis direction with z
@@ -1026,7 +1028,7 @@ class Parallel3D(SystemConfiguration):
 
         self.align_z()
         rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
-                
+
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
         new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
@@ -1038,7 +1040,7 @@ class Parallel3D(SystemConfiguration):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-        '''              
+        '''
 
 
         '''
@@ -1054,7 +1056,7 @@ class Parallel3D(SystemConfiguration):
          - rays perpendicular to rotation axis
         advanced
          - not rays perpendicular to detector (for parallel just equates to an effective pixel size change?)
-         or 
+         or
          - not rays perpendicular to rotation axis  (tilted, i.e. laminography)
         '''
 
@@ -1071,7 +1073,7 @@ class Parallel3D(SystemConfiguration):
 
         if not rays_perpendicular_detector or\
             not rays_perpendicular_rotation or\
-            not rotation_parallel_detector_y: 
+            not rotation_parallel_detector_y:
             config = SystemConfiguration.SYSTEM_ADVANCED
         elif not rotation_axis_centred:
             config =  SystemConfiguration.SYSTEM_OFFSET
@@ -1079,7 +1081,7 @@ class Parallel3D(SystemConfiguration):
             config =  SystemConfiguration.SYSTEM_SIMPLE
 
         return config
-        
+
 
     def __str__(self):
         def csv(val):
@@ -1092,23 +1094,23 @@ class Parallel3D(SystemConfiguration):
         repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
         repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
         repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
-        repres += "\tDetector direction y: {0}\n".format(csv(self.detector.direction_y))    
+        repres += "\tDetector direction y: {0}\n".format(csv(self.detector.direction_y))
         return repres
 
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if numpy.allclose(self.ray.direction, other.ray.direction) \
         and numpy.allclose(self.detector.position, other.detector.position)\
         and numpy.allclose(self.detector.direction_x, other.detector.direction_x)\
         and numpy.allclose(self.detector.direction_y, other.detector.direction_y)\
         and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
         and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
-            
+
             return True
-        
+
         return False
 
     def calculate_magnification(self):
@@ -1116,7 +1118,7 @@ class Parallel3D(SystemConfiguration):
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
-        """  
+        """
         dp1 = self.rotation_axis.direction.dot(self.ray.direction)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)
 
@@ -1198,7 +1200,7 @@ class Parallel3D(SystemConfiguration):
         #c = y1 - m * x1
         #when y is 0
         #x=-c/m
-        #x_y0 = -y1/m + x1 
+        #x_y0 = -y1/m + x1
         offset_x_y0 = x1 -y1 * (x2 - x1)/(y2-y1)
 
         angle = math.atan2(x2 - x1, y2 - y1)
@@ -1241,7 +1243,7 @@ class Parallel3D(SystemConfiguration):
 
 class Cone2D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 2D tomographic system
-                       
+
     :param source_pos: A 2D vector describing the position of the source (x,y)
     :type source_pos: list, tuple, ndarray
     :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
@@ -1291,7 +1293,7 @@ class Cone2D(SystemConfiguration):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-        '''           
+        '''
 
         vec_src2det = ComponentDescription.create_unit_vector(self.detector.position - self.source.position)
 
@@ -1322,20 +1324,20 @@ class Cone2D(SystemConfiguration):
         repres += "\tSource position: {0}\n".format(csv(self.source.position))
         repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
         repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
-        repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x)) 
-        return repres    
+        repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
+        return repres
 
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if numpy.allclose(self.source.position, other.source.position) \
         and numpy.allclose(self.detector.position, other.detector.position)\
         and numpy.allclose(self.detector.direction_x, other.detector.direction_x)\
         and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position):
             return True
-        
+
         return False
 
     def get_centre_slice(self):
@@ -1415,7 +1417,7 @@ class Cone2D(SystemConfiguration):
 
 class Cone3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
-                       
+
     :param source_pos: A 3D vector describing the position of the source (x,y,z)
     :type source_pos: list, tuple, ndarray
     :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
@@ -1423,11 +1425,11 @@ class Cone3D(SystemConfiguration):
     :param detector_direction_x: A 3D vector describing the direction of the detector_x (x,y,z)
     :type detector_direction_x: list, tuple, ndarray
     :param detector_direction_y: A 3D vector describing the direction of the detector_y (x,y,z)
-    :type detector_direction_y: list, tuple, ndarray   
+    :type detector_direction_y: list, tuple, ndarray
     :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z)
     :type rotation_axis_pos: list, tuple, ndarray
     :param rotation_axis_direction: A 3D vector describing the direction of the axis of rotation (x,y,z)
-    :type rotation_axis_direction: list, tuple, ndarray   
+    :type rotation_axis_direction: list, tuple, ndarray
     :param units: Label the units of distance used for the configuration
     :type units: string
     '''
@@ -1451,21 +1453,21 @@ class Cone3D(SystemConfiguration):
     def align_z(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''
-        self.set_origin(self.rotation_axis.position)   
+        self.set_origin(self.rotation_axis.position)
         rotation_matrix = SystemConfiguration.rotation_vec_to_z(self.rotation_axis.direction)
-    
+
         #apply transform
         self.rotation_axis.direction = [0,0,1]
         self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
-        new_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1)) 
+        new_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
 
     def align_reference_frame(self, definition='cil'):
         r'''Transforms and rotates the system to backend definitions
-        '''            
+        '''
 
         self.align_z()
 
@@ -1475,7 +1477,7 @@ class Cone3D(SystemConfiguration):
             rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
         else:
             raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
-                            
+
         self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
         new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
@@ -1487,7 +1489,7 @@ class Cone3D(SystemConfiguration):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
             \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-        '''       
+        '''
 
         vec_src2det = ComponentDescription.create_unit_vector(self.detector.position - self.source.position)
 
@@ -1504,7 +1506,7 @@ class Cone3D(SystemConfiguration):
 
         if not principal_ray_centred or\
             not centre_ray_perpendicular_rotation or\
-            not rotation_parallel_detector_y: 
+            not rotation_parallel_detector_y:
             config = SystemConfiguration.SYSTEM_ADVANCED
         elif not rotation_axis_centred:
             config =  SystemConfiguration.SYSTEM_OFFSET
@@ -1515,11 +1517,11 @@ class Cone3D(SystemConfiguration):
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
-        """ 
+        """
         #requires the rotate axis to be perpendicular to the normal of the detector, and perpendicular to detector_direction_x
         dp1 = self.rotation_axis.direction.dot(self.detector.normal)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)
-        
+
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
             temp = self.copy()
             temp.align_reference_frame()
@@ -1531,7 +1533,7 @@ class Cone3D(SystemConfiguration):
             return Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
         else:
             raise ValueError('Cannot convert geometry to 2D. Requires axis of rotation to be perpendicular to the detector.')
-        
+
     def __str__(self):
         def csv(val):
             return numpy.array2string(val, separator=', ')
@@ -1544,26 +1546,26 @@ class Cone3D(SystemConfiguration):
         repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
         repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
         repres += "\tDetector direction y: {0}\n".format(csv(self.detector.direction_y))
-        return repres   
+        return repres
 
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if numpy.allclose(self.source.position, other.source.position) \
         and numpy.allclose(self.detector.position, other.detector.position)\
         and numpy.allclose(self.detector.direction_x, other.detector.direction_x)\
         and numpy.allclose(self.detector.direction_y, other.detector.direction_y)\
         and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
         and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
-            
+
             return True
-        
+
         return False
 
     def calculate_magnification(self):
-    
+
         ab = (self.rotation_axis.position - self.source.position)
         dist_source_center = float(numpy.sqrt(ab.dot(ab)))
 
@@ -1641,7 +1643,7 @@ class Cone3D(SystemConfiguration):
         #c = y1 - m * x1
         #when y is 0
         #x=-c/m
-        #x_y0 = -y1/m + x1 
+        #x_y0 = -y1/m + x1
         offset_x_y0 = x1 -y1 * (x2 - x1)/(y2-y1)
 
         angle = math.atan2(x2 - x1, y2 - y1)
@@ -1681,14 +1683,14 @@ class Cone3D(SystemConfiguration):
 
 
 class Panel(object):
-    r'''This is a class describing the panel of the system. 
-                 
+    r'''This is a class describing the panel of the system.
+
     :param num_pixels: num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
     :type num_pixels: int, list, tuple
     :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
     :type pixel_size: int, lust, tuple
     :param origin: the position of pixel 0 (the data origin) of the panel `top-left`, `top-right`, `bottom-left`, `bottom-right`
-    :type origin: string 
+    :type origin: string
      '''
 
     @property
@@ -1717,7 +1719,7 @@ class Panel(object):
                 num_pixels_temp = [val0, val1]
             else:
                 raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
-   
+
         if num_pixels_temp[1] > 1 and self._dimension == 2:
             raise ValueError('2D acquisitions expects a 1D panel. Expected num_pixels[1] = 1. Got {}'.format(num_pixels_temp[1]))
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
@@ -1733,7 +1735,7 @@ class Panel(object):
     def pixel_size(self, val):
 
         if val is None:
-            pixel_size_temp = [1.0,1.0] 
+            pixel_size_temp = [1.0,1.0]
         else:
             try:
                 length_val = len(val)
@@ -1743,20 +1745,20 @@ class Panel(object):
                     pixel_size_temp = [temp, temp]
 
                 except:
-                    raise TypeError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))    
+                    raise TypeError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
             else:
                 if length_val == 2:
                     try:
-                        temp0 = float(val[0]) 
-                        temp1 = float(val[1]) 
+                        temp0 = float(val[0])
+                        temp1 = float(val[1])
                         pixel_size_temp = [temp0, temp1]
                     except:
                         raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
                 else:
                     raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
-    
+
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
-                raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
+                raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp))
 
         self._pixel_size = numpy.array(pixel_size_temp)
 
@@ -1773,25 +1775,25 @@ class Panel(object):
             raise ValueError('origin expected one of {0}. Got {1}'.format(allowed, val))
 
     def __str__(self):
-        repres = "Panel configuration:\n"             
+        repres = "Panel configuration:\n"
         repres += "\tNumber of pixels: {0}\n".format(self.num_pixels)
         repres += "\tPixel size: {0}\n".format(self.pixel_size)
         repres += "\tPixel origin: {0}\n".format(self.origin)
-        return repres   
+        return repres
 
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if numpy.array_equal(self.num_pixels, other.num_pixels) \
             and numpy.allclose(self.pixel_size, other.pixel_size) \
-            and self.origin == other.origin:   
+            and self.origin == other.origin:
             return True
-        
+
         return False
 
-    def __init__ (self, num_pixels, pixel_size, origin, dimension):  
+    def __init__ (self, num_pixels, pixel_size, origin, dimension):
         """Constructor method
         """
         self._dimension = dimension
@@ -1800,9 +1802,9 @@ class Panel(object):
         self.origin = origin
 
 class Channels(object):
-    r'''This is a class describing the channels of the data. 
+    r'''This is a class describing the channels of the data.
     This will be created on initialisation of AcquisitionGeometry.
-                       
+
     :param num_channels: The number of channels of data
     :type num_channels: int
     :param channel_labels: A list of channel labels
@@ -1814,7 +1816,7 @@ class Channels(object):
         return self._num_channels
 
     @num_channels.setter
-    def num_channels(self, val):      
+    def num_channels(self, val):
         try:
             val = int(val)
         except TypeError:
@@ -1830,37 +1832,37 @@ class Channels(object):
         return self._channel_labels
 
     @channel_labels.setter
-    def channel_labels(self, val):      
+    def channel_labels(self, val):
         if val is None or len(val) == self._num_channels:
-            self._channel_labels = val  
+            self._channel_labels = val
         else:
             raise ValueError('labels expected to have length {0}. Got {1}'.format(self._num_channels, len(val)))
 
     def __str__(self):
-        repres = "Channel configuration:\n"             
+        repres = "Channel configuration:\n"
         repres += "\tNumber of channels: {0}\n".format(self.num_channels)
-        
-        num_print=min(10,self.num_channels)                     
+
+        num_print=min(10,self.num_channels)
         if  hasattr(self, 'channel_labels'):
             repres += "\tChannel labels 0-{0}: {1}\n".format(num_print, self.channel_labels[0:num_print])
-        
+
         return repres
 
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if self.num_channels != other.num_channels:
             return False
 
         if hasattr(self,'channel_labels'):
             if self.channel_labels != other.channel_labels:
                 return False
-         
+
         return True
 
-    def __init__ (self, num_channels, channel_labels):  
+    def __init__ (self, num_channels, channel_labels):
         """Constructor method
         """
         self.num_channels = num_channels
@@ -1868,7 +1870,7 @@ class Channels(object):
             self.channel_labels = channel_labels
 
 class Angles(object):
-    r'''This is a class describing the angles of the data. 
+    r'''This is a class describing the angles of the data.
 
     :param angles: The angular positions of the acquisition data
     :type angles: list, ndarray
@@ -1885,7 +1887,7 @@ class Angles(object):
     @angle_data.setter
     def angle_data(self, val):
         if val is None:
-            raise ValueError('angle_data expected to be a list of floats') 
+            raise ValueError('angle_data expected to be a list of floats')
         else:
             try:
                 self.num_positions = len(val)
@@ -1898,7 +1900,7 @@ class Angles(object):
                 try:
                     self._angle_data = numpy.asarray(val, dtype=numpy.float32)
                 except:
-                    raise ValueError('angle_data expected to be a list of floats') 
+                    raise ValueError('angle_data expected to be a list of floats')
 
     @property
     def initial_angle(self):
@@ -1927,20 +1929,20 @@ class Angles(object):
     def __str__(self):
         repres = "Acquisition description:\n"
         repres += "\tNumber of positions: {0}\n".format(self.num_positions)
-        # max_num_print = 30 
+        # max_num_print = 30
         if self.num_positions < 31:
             repres += "\tAngles 0-{0} in {1}s: {2}\n".format(self.num_positions-1, self.angle_unit, numpy.array2string(self.angle_data[0:self.num_positions], separator=', '))
         else:
             repres += "\tAngles 0-9 in {0}s: {1}\n".format(self.angle_unit, numpy.array2string(self.angle_data[0:10], separator=', '))
             repres += "\tAngles {0}-{1} in {2}s: {3}\n".format(self.num_positions-10, self.num_positions-1, self.angle_unit, numpy.array2string(self.angle_data[self.num_positions-10:self.num_positions], separator=', '))
             repres += "\tFull angular array can be accessed with acquisition_data.geometry.angles\n"
-        return repres 
+        return repres
 
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if self.angle_unit != other.angle_unit:
             return False
 
@@ -1949,10 +1951,10 @@ class Angles(object):
 
         if not numpy.allclose(self.angle_data, other.angle_data):
             return False
-         
+
         return True
 
-    def __init__ (self, angles, initial_angle, angle_unit):  
+    def __init__ (self, angles, initial_angle, angle_unit):
         """Constructor method
         """
         self.angle_data = angles
@@ -1960,7 +1962,7 @@ class Angles(object):
         self.angle_unit = angle_unit
 
 class Configuration(object):
-    r'''This class holds the description of the system components. 
+    r'''This class holds the description of the system components.
      '''
 
     def __init__(self, units_distance='units distance'):
@@ -2040,11 +2042,11 @@ class Configuration(object):
             repres += str(self.angles)
 
             repres += "Distances in units: {}".format(self.units)
-        
+
         return repres
 
     def __eq__(self, other):
-        
+
         if not isinstance(other, self.__class__):
             return False
 
@@ -2059,7 +2061,7 @@ class Configuration(object):
 
 class AcquisitionGeometry(object):
     """This class holds the AcquisitionGeometry of the system.
-    
+
     Please initialise the AcquisitionGeometry using the using the static methods:
 
     `AcquisitionGeometry.create_Parallel2D()`
@@ -2092,7 +2094,7 @@ class AcquisitionGeometry(object):
 
     @property
     def num_projections(self):
-        return len(self.angles)       
+        return len(self.angles)
 
     @property
     def pixel_num_h(self):
@@ -2158,7 +2160,7 @@ class AcquisitionGeometry(object):
 
         shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
                      AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
-                     AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
+                     AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],
                      AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
         shape = []
         for label in self.dimension_labels:
@@ -2191,7 +2193,7 @@ class AcquisitionGeometry(object):
                     pass #if not in custom list carry on
 
         return tuple(labels)
-      
+
     @dimension_labels.setter
     def dimension_labels(self, val):
 
@@ -2202,7 +2204,7 @@ class AcquisitionGeometry(object):
             for x in val:
                 if x not in labels_default:
                     raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
-                    
+
             self._dimension_labels = tuple(val)
 
     @property
@@ -2219,7 +2221,7 @@ class AcquisitionGeometry(object):
 
     @dtype.setter
     def dtype(self, val):
-        self._dtype = val       
+        self._dtype = val
 
 
     def __init__(self):
@@ -2286,7 +2288,7 @@ class AcquisitionGeometry(object):
         return {'offset': (offset, offset_units), 'angle': (angle, ang_units)}
 
 
-    def set_centre_of_rotation(self, offset=0.0, distance_units='default', angle=0.0, angle_units='radian'): 
+    def set_centre_of_rotation(self, offset=0.0, distance_units='default', angle=0.0, angle_units='radian'):
         """
         Configures the system geometry to have the requested centre of rotation offset at the detector.
 
@@ -2319,7 +2321,7 @@ class AcquisitionGeometry(object):
 
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
             raise NotImplementedError()
-        
+
         if angle_units == 'radian':
             angle_rad = angle
         elif angle_units == 'degree':
@@ -2340,10 +2342,10 @@ class AcquisitionGeometry(object):
             self.config.system.set_centre_of_rotation(offset_distance, angle_rad)
 
 
-    def set_centre_of_rotation_by_slice(self, offset1, slice_index1=None, offset2=None, slice_index2=None): 
+    def set_centre_of_rotation_by_slice(self, offset1, slice_index1=None, offset2=None, slice_index2=None):
         """
         Configures the system geometry to have the requested centre of rotation offset at the detector.
-        
+
         If two slices are passed the rotation axis will be rotated to pass through both points.
 
         Note
@@ -2356,26 +2358,26 @@ class AcquisitionGeometry(object):
         ----------
         offset1: float
             The offset from the centre of the detector to the projected rotation position at slice_index_1
-        
+
         slice_index1: int, optional
             The slice number of offset1
 
         offset2: float, optional
             The offset from the centre of the detector to the projected rotation position at slice_index_2
-        
+
         slice_index2: int, optional
             The slice number of offset2
         """
-        
+
 
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
             raise NotImplementedError()
-        
+
         if self.dimension == '2D':
             if offset2 is not None:
                 logging.WARNING("Only offset1 is being used")
             self.set_centre_of_rotation(offset1)
-        
+
         if offset2 is None or offset1 == offset2:
             offset_x_y0 = offset1
             angle = 0
@@ -2390,7 +2392,7 @@ class AcquisitionGeometry(object):
 
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
-        r'''This method configures the angular information of an AcquisitionGeometry object. 
+        r'''This method configures the angular information of an AcquisitionGeometry object.
 
         :param angles: The angular positions of the acquisition data
         :type angles: list, ndarray
@@ -2399,15 +2401,15 @@ class AcquisitionGeometry(object):
         :param angle_unit: The units of the stored angles 'degree' or 'radian'
         :type angle_unit: string
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry        
+        :rtype: AcquisitionGeometry
         '''
         self.config.angles = Angles(angles, initial_angle, angle_unit)
         return self
 
     def set_panel(self, num_pixels, pixel_size=(1,1), origin='bottom-left'):
 
-        r'''This method configures the panel information of an AcquisitionGeometry object. 
-                    
+        r'''This method configures the panel information of an AcquisitionGeometry object.
+
         :param num_pixels: num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
         :type num_pixels: int, list, tuple
         :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
@@ -2415,37 +2417,37 @@ class AcquisitionGeometry(object):
         :param origin: the position of pixel 0 (the data origin) of the panel 'top-left', 'top-right', 'bottom-left', 'bottom-right'
         :type origin: string, default 'bottom-left'
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry       
-        '''        
+        :rtype: AcquisitionGeometry
+        '''
         self.config.panel = Panel(num_pixels, pixel_size, origin, self.config.system._dimension)
         return self
 
     def set_channels(self, num_channels=1, channel_labels=None):
-        r'''This method configures the channel information of an AcquisitionGeometry object. 
-                        
+        r'''This method configures the channel information of an AcquisitionGeometry object.
+
         :param num_channels: The number of channels of data
         :type num_channels: int, optional
         :param channel_labels: A list of channel labels
         :type channel_labels: list, optional
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry        
-        '''        
+        :rtype: AcquisitionGeometry
+        '''
         self.config.channels = Channels(num_channels, channel_labels)
         return self
 
     def set_labels(self, labels=None):
-        r'''This method configures the dimension labels of an AcquisitionGeometry object. 
-                        
+        r'''This method configures the dimension labels of an AcquisitionGeometry object.
+
         :param labels:  The order of the dimensions describing the data.\
                         Expects a list containing at least one of the unique labels: 'channel' 'angle' 'vertical' 'horizontal'
                         default = ['channel','angle','vertical','horizontal']
         :type labels: list, optional
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry        
-        '''           
+        :rtype: AcquisitionGeometry
+        '''
         self.dimension_labels = labels
         return self
- 
+
     @staticmethod
     def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_x=[1, 0], rotation_axis_position=[0, 0], units='units distance'):
         r'''This creates the AcquisitionGeometry for a parallel beam 2D tomographic system
@@ -2466,11 +2468,11 @@ class AcquisitionGeometry(object):
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position, units)
-        return AG    
+        return AG
 
     @staticmethod
     def create_Cone2D(source_position, detector_position, detector_direction_x=[1,0], rotation_axis_position=[0,0], units='units distance'):
-        r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system          
+        r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system
 
         :param source_position: A 2D vector describing the position of the source (x,y)
         :type source_position: list, tuple, ndarray
@@ -2483,17 +2485,17 @@ class AcquisitionGeometry(object):
         :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
         :type units: string
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry        
-     '''    
+        :rtype: AcquisitionGeometry
+     '''
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position, units)
-        return AG   
+        return AG
 
     @staticmethod
     def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
         r'''This creates the AcquisitionGeometry for a parallel beam 3D tomographic system
-                       
+
         :param ray_direction: A 3D vector describing the x-ray direction (x,y,z)
         :type ray_direction: list, tuple, ndarray, optional
         :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
@@ -2509,17 +2511,17 @@ class AcquisitionGeometry(object):
         :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
         :type units: string
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry       
+        :rtype: AcquisitionGeometry
      '''
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction, units)
-        return AG            
+        return AG
 
     @staticmethod
     def create_Cone3D(source_position, detector_position, detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
         r'''This creates the AcquisitionGeometry for a cone beam 3D tomographic system
-                        
+
         :param source_position: A 3D vector describing the position of the source (x,y,z)
         :type source_position: list, tuple, ndarray, optional
         :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
@@ -2535,7 +2537,7 @@ class AcquisitionGeometry(object):
         :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
         :type units: string
         :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry           
+        :rtype: AcquisitionGeometry
         '''
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
@@ -2570,7 +2572,7 @@ class AcquisitionGeometry(object):
 
         if self.dimension == '2D':
             return self
-              
+
         AG_2D = copy.deepcopy(self)
         AG_2D.config.system = self.config.system.get_centre_slice()
         AG_2D.config.panel.num_pixels[1] = 1
@@ -2589,7 +2591,7 @@ class AcquisitionGeometry(object):
         else:
             num_voxel_z = 0
             voxel_size_z = 1
-            
+
         return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
 
     def __str__ (self):
@@ -2609,13 +2611,13 @@ class AcquisitionGeometry(object):
 
         if angle is not None:
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
-        
+
         if vertical is not None:
             if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
-        
+
         if horizontal is not None:
             raise ValueError("Cannot calculate system geometry for a horizontal slice")
 
@@ -2623,7 +2625,7 @@ class AcquisitionGeometry(object):
 
     def allocate(self, value=0, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
-        
+
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
         :type value: number or string, default None allocates empty memory block
         :param dtype: numerical type to allocate
@@ -2634,7 +2636,7 @@ class AcquisitionGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = AcquisitionData(geometry=self.copy(), 
+        out = AcquisitionData(geometry=self.copy(),
                                 dtype=dtype,
                                 suppress_warning=True)
 
@@ -2656,18 +2658,21 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+                else:
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+
             elif value is None:
                 pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
-        
+
         return out
 
 class DataContainer(object):
     '''Generic class to hold data
-    
+
     Data is currently held in a numpy arrays'''
 
     @property
@@ -2689,7 +2694,7 @@ class DataContainer(object):
             return tuple(default_labels)
         else:
             return self._dimension_labels
-      
+
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is None:
@@ -2707,7 +2712,7 @@ class DataContainer(object):
     @property
     def ndim(self):
         '''Returns the ndim of the DataContainer'''
-        return self.array.ndim        
+        return self.array.ndim
 
     @shape.setter
     def shape(self, val):
@@ -2729,15 +2734,15 @@ class DataContainer(object):
         return self.array.size
 
     __container_priority__ = 1
-    def __init__ (self, array, deep_copy=True, dimension_labels=None, 
+    def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
         '''Holds the data'''
-        
+
         if type(array) == numpy.ndarray:
             if deep_copy:
                 self.array = array.copy()
             else:
-                self.array = array    
+                self.array = array
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
@@ -2750,10 +2755,10 @@ class DataContainer(object):
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
             try:
-                self.geometry.dtype = self.dtype            
+                self.geometry.dtype = self.dtype
             except:
-                pass    
-        
+                pass
+
     def get_dimension_size(self, dimension_label):
 
         if dimension_label in self.dimension_labels:
@@ -2762,17 +2767,17 @@ class DataContainer(object):
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels))
-    
+
     def get_dimension_axis(self, dimension_label):
         """
         Returns the axis index of the DataContainer array if the specified dimension_label(s) match
-        any dimension_labels of the DataContainer or their indices 
-        
+        any dimension_labels of the DataContainer or their indices
+
         Parameters
         ----------
         dimension_label: string or int or tuple of strings or ints
-            Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index 
-        
+            Specify dimension_label(s) or index of the DataContainer from which to check and return the axis index
+
         Returns
         -------
         int or tuple of ints
@@ -2784,12 +2789,12 @@ class DataContainer(object):
         if dimension_label in self.dimension_labels:
             return self.dimension_labels.index(dimension_label)
         elif isinstance(dimension_label, int) and dimension_label >= 0 and dimension_label < self.ndim:
-            return dimension_label 
+            return dimension_label
         else:
             raise ValueError('Unknown dimension {0}. Should be one of {1}, or an integer in range {2} - {3}'.format(dimension_label,
                             self.dimension_labels, 0, self.ndim))
 
-                        
+
     def as_array(self):
         '''Returns the pointer to the array.
         '''
@@ -2823,30 +2828,30 @@ class DataContainer(object):
             return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)
         else:
             return VectorData(new_array, dimension_labels=dimension_labels_list)
-                    
+
     def reorder(self, order=None):
         '''
         reorders the data in memory as requested.
 
         :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
-        :type order: list, sting     
+        :type order: list, sting
         '''
 
         if order in DataOrder.ENGINES:
-            order = DataOrder.get_order_for_engine(order, self.geometry)  
+            order = DataOrder.get_order_for_engine(order, self.geometry)
 
         try:
             if len(order) != len(self.shape):
                 raise ValueError('The axes list for resorting must have {0} dimensions. Got {1}'.format(len(self.shape), len(order)))
         except TypeError as ae:
             raise ValueError('The order must be an iterable with __len__ implemented, like a list or a tuple. Got {}'.format(type(order)))
-        
+
         correct = True
         for el in order:
             correct = correct and el in self.dimension_labels
         if not correct:
             raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, order))
-            
+
         new_order = [0]*len(self.shape)
         dimension_labels_new = [0]*len(self.shape)
 
@@ -2860,18 +2865,18 @@ class DataContainer(object):
             self.dimension_labels = dimension_labels_new
         else:
             self.geometry.set_labels(dimension_labels_new)
-    
+
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
-        
+
         :param array: number, numpy array or DataContainer to copy into the DataContainer
         :type array: DataContainer or subclasses, numpy array or number
         :param dimension: dictionary, optional
-        
+
         if the passed numpy array points to the same array that is contained in the DataContainer,
         it just returns
 
-        In case a DataContainer or subclass is passed, there will be a check of the geometry, 
+        In case a DataContainer or subclass is passed, there will be a check of the geometry,
         if present, and the array will be resorted if the data is not in the appropriate order.
 
         User may pass a named parameter to specify in which axis the fill should happen:
@@ -2889,9 +2894,9 @@ class DataContainer(object):
                                      self.shape,array.shape))
                 numpy.copyto(self.array, array)
             elif isinstance(array, Number):
-                self.array.fill(array) 
+                self.array.fill(array)
             elif issubclass(array.__class__ , DataContainer):
-                
+
                 try:
                     if self.dimension_labels != array.dimension_labels:
                         raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
@@ -2907,7 +2912,7 @@ class DataContainer(object):
             else:
                 raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
-            
+
             axis = [':']* self.number_of_dimensions
             dimension_labels = list(self.dimension_labels)
             for k,v in dimension.items():
@@ -2921,23 +2926,23 @@ class DataContainer(object):
                     command += ','
                 command += str(el)
                 i+=1
-            
+
             if isinstance(array, numpy.ndarray):
-                command = command + "] = array[:]" 
+                command = command + "] = array[:]"
             elif issubclass(array.__class__, DataContainer):
-                command = command + "] = array.as_array()[:]" 
+                command = command + "] = array.as_array()[:]"
             elif isinstance (array, Number):
                 command = command + "] = array"
             else:
                 raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
             exec(command)
-            
-        
+
+
     def check_dimensions(self, other):
         return self.shape == other.shape
-    
-    ## algebra 
-    
+
+    ## algebra
+
     def __add__(self, other):
         return self.add(other)
     def __mul__(self, other):
@@ -2950,21 +2955,21 @@ class DataContainer(object):
         return self.divide(other)
     def __pow__(self, other):
         return self.power(other)
-        
-    
+
+
     # reverse operand
     def __radd__(self, other):
         return self + other
     # __radd__
-    
+
     def __rsub__(self, other):
         return (-1 * self) + other
     # __rsub__
-    
+
     def __rmul__(self, other):
         return self * other
     # __rmul__
-    
+
     def __rdiv__(self, other):
         tmp = self.power(-1)
         tmp *= other
@@ -2972,43 +2977,43 @@ class DataContainer(object):
     # __rdiv__
     def __rtruediv__(self, other):
         return self.__rdiv__(other)
-    
+
     def __rpow__(self, other):
         if isinstance(other, Number) :
             fother = numpy.ones(numpy.shape(self.array)) * other
-            return type(self)(fother ** self.array , 
+            return type(self)(fother ** self.array ,
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
     # __rpow__
-    
+
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,
     # must return self
-    
+
     def __iadd__(self, other):
         kw = {'out':self}
         return self.add(other, **kw)
-    
+
     def __imul__(self, other):
         kw = {'out':self}
         return self.multiply(other, **kw)
-    
+
     def __isub__(self, other):
         kw = {'out':self}
         return self.subtract(other, **kw)
-    
+
     def __idiv__(self, other):
         kw = {'out':self}
         return self.divide(other, **kw)
-    
+
     def __itruediv__(self, other):
         kw = {'out':self}
         return self.divide(other, **kw)
-    
+
     def __neg__(self):
         '''negation operator'''
-        return -1 * self   
-    
+        return -1 * self
+
     def __str__ (self, representation=False):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
@@ -3017,13 +3022,13 @@ class DataContainer(object):
         if representation:
             repres += "Representation: \n{0}\n".format(self.array)
         return repres
-        
+
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
-        
+
         If new_order is None returns the labels of the axes as a sorted-by-key list.
         If new_order is a list of length number_of_dimensions, returns a list
-        with the indices of the axes in new_order with respect to those in 
+        with the indices of the axes in new_order with respect to those in
         self.dimension_labels: i.e.
           >>> self.dimension_labels = {0:'horizontal',1:'vertical'}
           >>> new_order = ['vertical','horizontal']
@@ -3041,7 +3046,7 @@ class DataContainer(object):
             else:
                 raise ValueError('Expecting {0} axes, got {2}'\
                                  .format(len(self.shape),len(new_order)))
-        
+
     def clone(self):
         '''returns a copy of DataContainer'''
         return copy.deepcopy(self)
@@ -3049,12 +3054,12 @@ class DataContainer(object):
     def copy(self):
         '''alias of clone'''
         return self.clone()
-    
+
     ## binary operations
-            
-    def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):    
+
+    def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):
         out = kwargs.get('out', None)
-        
+
         if out is None:
             if isinstance(x2, Number):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
@@ -3068,18 +3073,18 @@ class DataContainer(object):
             if geom is not None:
                 geom = self.geometry.copy()
             return type(self)(out,
-                   deep_copy=False, 
+                   deep_copy=False,
                    dimension_labels=self.dimension_labels,
-                   geometry= None if self.geometry is None else self.geometry.copy(), 
+                   geometry= None if self.geometry is None else self.geometry.copy(),
                    suppress_warning=True)
-            
-        
+
+
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
             if self.check_dimensions(out) and self.check_dimensions(x2):
                 kwargs['out'] = out.as_array()
                 pwop(self.as_array(), x2.as_array(), *args, **kwargs )
                 #return type(self)(out.as_array(),
-                #       deep_copy=False, 
+                #       deep_copy=False,
                 #       dimension_labels=self.dimension_labels,
                 #       geometry=self.geometry)
                 return out
@@ -3103,18 +3108,18 @@ class DataContainer(object):
                 kwargs['out'] = out
                 pwop(self.as_array(), x2, *args, **kwargs)
                 #return type(self)(out,
-                #       deep_copy=False, 
+                #       deep_copy=False,
                 #       dimension_labels=self.dimension_labels,
                 #       geometry=self.geometry)
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
-    
+
     def add(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.add(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.add, other, *args, **kwargs)
-    
+
     def subtract(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
@@ -3126,37 +3131,37 @@ class DataContainer(object):
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.multiply(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.multiply, other, *args, **kwargs)
-    
+
     def divide(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.divide(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
-    
+
     def power(self, other, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)    
-          
+        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
+
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
-    
+
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
 
     def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
         '''performs a*self + b * y. Can be done in-place
-        
+
         Parameters
         ----------
         a : multiplier for self, can be a number or a numpy array or a DataContainer
-        y : DataContainer 
+        y : DataContainer
         b : multiplier for y, can be a number or a numpy array or a DataContainer
-        out : return DataContainer, if None a new DataContainer is returned, default None. 
+        out : return DataContainer, if None a new DataContainer is returned, default None.
             out can be self or y.
         num_threads : number of threads to use during the calculation, using the CIL C library
             It will try to use the CIL C library and default to numpy operations, in case the C library does not handle the types.
-        
-        
+
+
         Example
         -------
 
@@ -3168,7 +3173,7 @@ class DataContainer(object):
         >>> out = x.sapyb(a,y,b)
         '''
         ret_out = False
-        
+
         if out is None:
             out = self * 0.
             ret_out = True
@@ -3186,19 +3191,19 @@ class DataContainer(object):
                 warnings.warn("sapyb defaulting to Python due to: {}".format(te))
             finally:
                 pass
-        
+
 
         # cannot be handled by _axpby
         ax = self * a
         y.multiply(b, out=out)
         out.add(ax, out=out)
-        
+
         if ret_out:
             return out
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
-        
+
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
 
         :param a: scalar
@@ -3273,30 +3278,30 @@ class DataContainer(object):
 
         #out = numpy.empty_like(a)
 
-        
+
         # int psaxpby(float * x, float * y, float * out, float a, float b, long size)
-        cilacc.saxpby.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the first array 
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the second array 
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the third array 
+        cilacc.saxpby.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the first array
+                                  ctypes.POINTER(ctypes.c_float),  # pointer to the second array
+                                  ctypes.POINTER(ctypes.c_float),  # pointer to the third array
                                   ctypes.POINTER(ctypes.c_float),  # pointer to A
                                   ctypes.c_int,                    # type of type of A selector (int)
                                   ctypes.POINTER(ctypes.c_float),  # pointer to B
                                   ctypes.c_int,                    # type of type of B selector (int)
-                                  ctypes.c_longlong,               # type of size of first array 
+                                  ctypes.c_longlong,               # type of size of first array
                                   ctypes.c_int]                    # number of threads
-        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array 
-                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array 
-                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array 
+        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array
                                   ctypes.POINTER(ctypes.c_double), # type of A (c_double)
-                                  ctypes.c_int,                    # type of type of A selector (int)                                  
+                                  ctypes.c_int,                    # type of type of A selector (int)
                                   ctypes.POINTER(ctypes.c_double), # type of B (c_double)
-                                  ctypes.c_int,                    # type of type of B selector (int)                                  
-                                  ctypes.c_longlong,               # type of size of first array 
+                                  ctypes.c_int,                    # type of type of B selector (int)
+                                  ctypes.c_longlong,               # type of size of first array
                                   ctypes.c_int]                    # number of threads
 
         if f(x_p, y_p, out_p, a_p, a_vec, b_p, b_vec, ndx.size, num_threads) != 0:
             raise RuntimeError('axpby execution failed')
-        
+
 
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
@@ -3304,9 +3309,9 @@ class DataContainer(object):
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
             return type(self)(out,
-                       deep_copy=False, 
+                       deep_copy=False,
                        dimension_labels=self.dimension_labels,
-                       geometry=self.geometry, 
+                       geometry=self.geometry,
                        suppress_warning=True)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
@@ -3320,13 +3325,13 @@ class DataContainer(object):
                 pwop(self.as_array(), *args, **kwargs)
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
-    
+
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
 
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
-    
+
     def sqrt(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sqrt, *args,  **kwargs)
 
@@ -3336,12 +3341,12 @@ class DataContainer(object):
     def exp(self, *args, **kwargs):
         '''Applies exp pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.exp, *args, **kwargs)
-    
+
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
-    
-    ## reductions        
+
+    ## reductions
     def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
         #shape = self.shape
@@ -3352,7 +3357,7 @@ class DataContainer(object):
     def norm(self, **kwargs):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm(**kwargs))
-    
+
     def dot(self, other, *args, **kwargs):
         '''returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.
           For complex data,  the dot method returns a.dot(b.conjugate())
@@ -3376,25 +3381,25 @@ class DataContainer(object):
                 return sf
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
-    
+
     def _directional_reduction_unary(self, reduction_function, axis=None, out=None, *args, **kwargs):
         """
         Returns the result of a unary function, considering the direction from an axis argument to the function
-        
+
         Parameters
         ----------
-        reduction_function : function 
+        reduction_function : function
             The unary function to be evaluated
         axis : string or tuple of strings or int or tuple of ints, optional
-            Specify the axis or axes to calculate 'reduction_function' along. Can be specified as 
-            string(s) of dimension_labels or int(s) of indices 
+            Specify the axis or axes to calculate 'reduction_function' along. Can be specified as
+            string(s) of dimension_labels or int(s) of indices
             Default None calculates the function over the whole array
         out: ndarray or DataContainer, optional
-            Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            Provide an object in which to place the result. The object must have the correct dimensions and
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
             `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
-        
+
         Returns
         -------
         scalar or ndarray
@@ -3422,28 +3427,28 @@ class DataContainer(object):
     def sum(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the sum of values in the DataContainer
-        
+
         Parameters
         ----------
         axis : string or tuple of strings or int or tuple of ints, optional
-            Specify the axis or axes to calculate 'sum' along. Can be specified as 
-            string(s) of dimension_labels or int(s) of indices 
+            Specify the axis or axes to calculate 'sum' along. Can be specified as
+            string(s) of dimension_labels or int(s) of indices
             Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
-            Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            Provide an object in which to place the result. The object must have the correct dimensions and
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
             `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
-        
+
         Returns
         -------
         scalar or DataContainer
             The sum as a scalar or inside a DataContainer with reduced dimension_labels
             Default is to accumulate and return data as float64 or complex128
-        """     
+        """
         if kwargs.get('dtype') is not None:
             logging.WARNING("dtype argument is ignored, using float64 or complex128")
-        
+
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64
         else:
@@ -3454,26 +3459,26 @@ class DataContainer(object):
     def min(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the minimum pixel value in the DataContainer
-        
+
         Parameters
         ----------
         axis : string or tuple of strings or int or tuple of ints, optional
-            Specify the axis or axes to calculate 'min' along. Can be specified as 
-            string(s) of dimension_labels or int(s) of indices 
+            Specify the axis or axes to calculate 'min' along. Can be specified as
+            string(s) of dimension_labels or int(s) of indices
             Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
-            Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See 
+            Provide an object in which to place the result. The object must have the correct dimensions and
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary.  See
             `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
-        
+
         Returns
         -------
         scalar or DataContainer
             The min as a scalar or inside a DataContainer with reduced dimension_labels
         """
         return self._directional_reduction_unary(numpy.min, axis=axis, out=out, *args, **kwargs)
-    
+
     def max(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the maximum pixel value in the DataContainer
@@ -3481,22 +3486,22 @@ class DataContainer(object):
         Parameters
         ----------
         axis : string or tuple of strings or int or tuple of ints, optional
-            Specify the axis or axes to calculate 'max' along. Can be specified as 
-            string(s) of dimension_labels or int(s) of indices 
+            Specify the axis or axes to calculate 'max' along. Can be specified as
+            string(s) of dimension_labels or int(s) of indices
             Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
-            Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            Provide an object in which to place the result. The object must have the correct dimensions and
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
             `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
-        
+
         Returns
         -------
-        scalar or DataContainer 
-            The max as a scalar or inside a DataContainer with reduced dimension_labels 
+        scalar or DataContainer
+            The max as a scalar or inside a DataContainer with reduced dimension_labels
         """
         return self._directional_reduction_unary(numpy.max, axis=axis, out=out, *args, **kwargs)
-        
+
     def mean(self, axis=None, out=None, *args, **kwargs):
         """
         Returns the mean pixel value of the DataContainer
@@ -3504,69 +3509,69 @@ class DataContainer(object):
         Parameters
         ----------
         axis : string or tuple of strings or int or tuple of ints, optional
-            Specify the axis or axes to calculate 'mean' along. Can be specified as 
-            string(s) of dimension_labels or int(s) of indices 
+            Specify the axis or axes to calculate 'mean' along. Can be specified as
+            string(s) of dimension_labels or int(s) of indices
             Default None calculates the function over the whole array
         out : ndarray or DataContainer, optional
-            Provide an object in which to place the result. The object must have the correct dimensions and 
-            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See 
+            Provide an object in which to place the result. The object must have the correct dimensions and
+            (for DataContainers) the correct dimension_labels, but the type will be cast if necessary. See
             `Output type determination <https://numpy.org/doc/stable/user/basics.ufuncs.html#ufuncs-output-type>`_ for more details.
             Default is None
-            
+
         Returns
         -------
         scalar or DataContainer
             The mean as a scalar or inside a DataContainer with reduced dimension_labels
             Default is to accumulate and return data as float64 or complex128
         """
-        
+
         if kwargs.get('dtype', None) is not None:
             logging.WARNING("dtype argument is ignored, using float64 or complex128")
-        
+
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64
         else:
             kwargs['dtype'] = numpy.complex128
-        
+
         return self._directional_reduction_unary(numpy.mean, axis=axis, out=out, *args, **kwargs)
 
-    # Logic operators between DataContainers and floats    
+    # Logic operators between DataContainers and floats
     def __le__(self, other):
         '''Returns boolean array of DataContainer less or equal than DataContainer/float'''
         if isinstance(other, DataContainer):
             return self.as_array()<=other.as_array()
         return self.as_array()<=other
-    
+
     def __lt__(self, other):
         '''Returns boolean array of DataContainer less than DataContainer/float'''
         if isinstance(other, DataContainer):
             return self.as_array()<other.as_array()
-        return self.as_array()<other    
-    
+        return self.as_array()<other
+
     def __ge__(self, other):
-        '''Returns boolean array of DataContainer greater or equal than DataContainer/float'''        
+        '''Returns boolean array of DataContainer greater or equal than DataContainer/float'''
         if isinstance(other, DataContainer):
             return self.as_array()>=other.as_array()
-        return self.as_array()>=other  
-    
+        return self.as_array()>=other
+
     def __gt__(self, other):
-        '''Returns boolean array of DataContainer greater than DataContainer/float'''        
+        '''Returns boolean array of DataContainer greater than DataContainer/float'''
         if isinstance(other, DataContainer):
             return self.as_array()>other.as_array()
-        return self.as_array()>other      
-    
+        return self.as_array()>other
+
     def __eq__(self, other):
-        '''Returns boolean array of DataContainer equal to DataContainer/float'''          
+        '''Returns boolean array of DataContainer equal to DataContainer/float'''
         if isinstance(other, DataContainer):
             return self.as_array()==other.as_array()
-        return self.as_array()==other  
+        return self.as_array()==other
 
     def __ne__(self, other):
-        '''Returns boolean array of DataContainer negative to DataContainer/float'''           
+        '''Returns boolean array of DataContainer negative to DataContainer/float'''
         if isinstance(other, DataContainer):
             return self.as_array()!=other.as_array()
-        return self.as_array()!=other      
-        
+        return self.as_array()!=other
+
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1
@@ -3582,30 +3587,30 @@ class ImageData(DataContainer):
     @property
     def dimension_labels(self):
         return self.geometry.dimension_labels
-      
+
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
             raise ValueError("Unable to set the dimension_labels directly. Use geometry.set_labels() instead")
 
-    def __init__(self, 
-                 array = None, 
-                 deep_copy=False, 
-                 geometry=None, 
+    def __init__(self,
+                 array = None,
+                 deep_copy=False,
+                 geometry=None,
                  **kwargs):
 
         dtype = kwargs.get('dtype', numpy.float32)
-    
+
 
         if geometry is None:
             raise AttributeError("ImageData requires a geometry")
-            
+
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        if array is None:                                   
+        if array is None:
             array = numpy.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
@@ -3613,15 +3618,15 @@ class ImageData(DataContainer):
             pass
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-            
+
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
 
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
-    
+
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
-                               
+
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
@@ -3637,13 +3642,13 @@ class ImageData(DataContainer):
 
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         if vertical == 'centre':
-            dim = self.geometry.dimension_labels.index('vertical')  
+            dim = self.geometry.dimension_labels.index('vertical')
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
             ind0 = int(numpy.floor(centre_slice_pos))
-            
+
             w2 = centre_slice_pos - ind0
             out = DataContainer.get_slice(self, channel=channel, vertical=ind0, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
-            
+
             if w2 > 0:
                 out2 = DataContainer.get_slice(self, channel=channel, vertical=ind0 + 1, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
                 out = out * (1 - w2) + out2 * w2
@@ -3653,7 +3658,7 @@ class ImageData(DataContainer):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)                            
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):
@@ -3670,7 +3675,7 @@ class ImageData(DataContainer):
 
         in_place : boolean, default True
             If `True` masks the current data, if `False` returns a new `ImageData` object.
-            
+
 
         Returns
         -------
@@ -3685,7 +3690,7 @@ class ImageData(DataContainer):
         x_range = (ig.voxel_num_x-1)/2
 
         Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
-        
+
         # use centre from geometry in units distance to account for aspect ratio of pixels
         dist_from_center = numpy.sqrt((X*ig.voxel_size_x+ ig.center_x)**2 + (Y*ig.voxel_size_y+ig.center_y)**2)
 
@@ -3759,9 +3764,9 @@ class AcquisitionData(DataContainer, Partitioner):
         if val is not None:
             raise ValueError("Unable to set the dimension_labels directly. Use geometry.set_labels() instead")
 
-    def __init__(self, 
-                 array = None, 
-                 deep_copy=True, 
+    def __init__(self,
+                 array = None,
+                 deep_copy=True,
                  geometry = None,
                  **kwargs):
 
@@ -3769,12 +3774,12 @@ class AcquisitionData(DataContainer, Partitioner):
 
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
-        
+
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        if array is None:                                   
+        if array is None:
             array = numpy.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
@@ -3782,12 +3787,12 @@ class AcquisitionData(DataContainer, Partitioner):
             pass
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-            
+
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
-    
+
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
-  
+
 
     def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
         '''
@@ -3805,12 +3810,12 @@ class AcquisitionData(DataContainer, Partitioner):
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         if vertical == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
-            
+
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
             ind0 = int(numpy.floor(centre_slice_pos))
             w2 = centre_slice_pos - ind0
             out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
-            
+
             if w2 > 0:
                 out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
                 out = out * (1 - w2) + out2 * w2
@@ -3825,7 +3830,7 @@ class AcquisitionData(DataContainer, Partitioner):
 class Processor(object):
 
     '''Defines a generic DataContainer processor
-                       
+
     accepts a DataContainer as input
     returns a DataContainer
     `__setattr__` allows additional attributes to be defined
@@ -3844,7 +3849,7 @@ class Processor(object):
 
         for key, value in attributes.items():
             self.__dict__[key] = value
-        
+
     def __setattr__(self, name, value):
         if name == 'input':
             self.set_input(value)
@@ -3856,11 +3861,11 @@ class Processor(object):
                 pass
             elif name == 'output':
                 self.__dict__['shouldRun'] = False
-            else:            
+            else:
                 self.__dict__['shouldRun'] = True
         else:
             raise KeyError('Attribute {0} not found'.format(name))
-    
+
     def set_input(self, dataset):
         """
         Set the input data to the processor
@@ -3880,16 +3885,16 @@ class Processor(object):
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
-    
+
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
-        
+
         Should raise an Error if the DataContainer does not match expectation, e.g.
         if the expected input DataContainer is 3D and the Processor expects 2D.
         '''
         raise NotImplementedError('Implement basic checks for input DataContainer')
-        
+
     def get_output(self, out=None):
         """
         Runs the configured processor and returns the processed data
@@ -3898,7 +3903,7 @@ class Processor(object):
         ----------
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer
@@ -3910,25 +3915,25 @@ class Processor(object):
             else:
                 self.process(out=out)
 
-            if self.store_output: 
+            if self.store_output:
                 self.output = out.copy()
-            
+
             return out
 
         else:
             return self.output.copy()
-            
-    
+
+
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
             self.__dict__['input'] =  weakref.ref(processor)
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(processor), DataProcessor))
-        
+
     def get_input(self):
         '''returns the input DataContainer
-        
+
         It is useful in the case the user has provided a DataProcessor as
         input
         '''
@@ -3939,16 +3944,16 @@ class Processor(object):
         else:
             dsi = self.input()
         return dsi
-        
+
     def process(self, out=None):
         raise NotImplementedError('process must be implemented')
-    
+
     def __call__(self, x, out=None):
-        
-        self.set_input(x)    
+
+        self.set_input(x)
 
         if out is None:
-            out = self.get_output()      
+            out = self.get_output()
         else:
             self.get_output(out=out)
 
@@ -3962,10 +3967,10 @@ class DataProcessor(Processor):
 class DataProcessor23D(DataProcessor):
     '''Regularizers DataProcessor
     '''
-            
+
     def check_input(self, dataset):
         '''Checks number of dimensions input DataContainer
-        
+
         Expected input is 2D or 3D
         '''
         if dataset.number_of_dimensions == 2 or \
@@ -3974,7 +3979,7 @@ class DataProcessor23D(DataProcessor):
         else:
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
-    
+
 ###### Example of DataProcessors
 
 class AX(DataProcessor):
@@ -3988,30 +3993,30 @@ class AX(DataProcessor):
 
     x a DataContainer.
     '''
-    
+
     def __init__(self):
-        kwargs = {'scalar':None, 
-                  'input':None, 
+        kwargs = {'scalar':None,
+                  'input':None,
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(AX, self).__init__(**kwargs)
-    
+
     def check_input(self, dataset):
         return True
-        
+
     def process(self, out=None):
-        
+
         dsi = self.get_input()
         a = self.scalar
         if out is None:
-            y = DataContainer( a * dsi.as_array() , True, 
+            y = DataContainer( a * dsi.as_array() , True,
                         dimension_labels=dsi.dimension_labels )
             #self.setParameter(output_dataset=y)
             return y
         else:
             out.fill(a * dsi.as_array())
-    
+
 
 ###### Example of DataProcessors
 
@@ -4026,62 +4031,62 @@ class CastDataContainer(DataProcessor):
 
     x a DataContainer.
     '''
-    
+
     def __init__(self, dtype=None):
-        kwargs = {'dtype':dtype, 
-                  'input':None, 
+        kwargs = {'dtype':dtype,
+                  'input':None,
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(CastDataContainer, self).__init__(**kwargs)
-    
+
     def check_input(self, dataset):
         return True
-        
+
     def process(self, out=None):
-        
+
         dsi = self.get_input()
         dtype = self.dtype
         if out is None:
             y = numpy.asarray(dsi.as_array(), dtype=dtype)
-            
+
             return type(dsi)(numpy.asarray(dsi.as_array(), dtype=dtype),
                                 dimension_labels=dsi.dimension_labels )
         else:
             out.fill(numpy.asarray(dsi.as_array(), dtype=dtype))
-    
+
 class PixelByPixelDataProcessor(DataProcessor):
     '''Example DataProcessor
-    
+
     This processor applies a python function to each pixel of the DataContainer
-    
+
     f is a python function
 
     x a DataSet.
     '''
-    
+
     def __init__(self):
-        kwargs = {'pyfunc':None, 
-                  'input':None, 
+        kwargs = {'pyfunc':None,
+                  'input':None,
                   }
         #DataProcessor.__init__(self, **kwargs)
         super(PixelByPixelDataProcessor, self).__init__(**kwargs)
-        
+
     def check_input(self, dataset):
         return True
-    
+
     def process(self, out=None):
-        
+
         pyfunc = self.pyfunc
         dsi = self.get_input()
-        
+
         eval_func = numpy.frompyfunc(pyfunc,1,1)
 
-        
-        y = DataContainer( eval_func( dsi.as_array() ) , True, 
+
+        y = DataContainer( eval_func( dsi.as_array() ) , True,
                     dimension_labels=dsi.dimension_labels )
         return y
-    
+
 
 class VectorData(DataContainer):
     '''DataContainer to contain 1D array'''
@@ -4105,14 +4110,14 @@ class VectorData(DataContainer):
     def dimension_labels(self, val):
         if hasattr(self,'geometry'):
             self.geometry.dimension_labels = val
-        
+
         self._dimension_labels = val
 
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)
 
         dtype = kwargs.get('dtype', numpy.float32)
-        
+
         if self.geometry is None:
             if array is None:
                 raise ValueError('Please specify either a geometry or an array')
@@ -4124,7 +4129,7 @@ class VectorData(DataContainer):
                 self.length = self.geometry.length
         else:
             self.length = self.geometry.length
-                
+
             if array is None:
                 out = numpy.zeros((self.length,), dtype=dtype)
             else:
@@ -4148,16 +4153,16 @@ class VectorGeometry(object):
 
     @dtype.setter
     def dtype(self, val):
-        self._dtype = val      
-        
-    def __init__(self, 
+        self._dtype = val
+
+    def __init__(self,
                  length, **kwargs):
-        
+
         self.length = int(length)
         self.shape = (length, )
         self.dtype = kwargs.get('dtype', numpy.float32)
         self.dimension_labels = kwargs.get('dimension_labels', None)
-        
+
     def clone(self):
         '''returns a copy of VectorGeometry'''
         return copy.deepcopy(self)
@@ -4170,7 +4175,7 @@ class VectorGeometry(object):
 
         if not isinstance(other, self.__class__):
             return False
-        
+
         if self.length == other.length \
             and self.shape == other.shape \
             and self.dimension_labels == other.dimension_labels:
@@ -4187,7 +4192,7 @@ class VectorGeometry(object):
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance
-        
+
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
         :type value: number or string, default None allocates empty memory block
         :param dtype: numerical type to allocate
@@ -4207,15 +4212,20 @@ class VectorGeometry(object):
             if value == VectorGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
-                    numpy.random.seed(seed) 
-                out.fill(numpy.random.random_sample(self.shape))
+                    numpy.random.seed(seed)
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
+                else:
+                    out.fill(numpy.random.random_sample(self.shape))
             elif value == VectorGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))             
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+                else:
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
             elif value is None:
                 pass
             else:
@@ -4231,9 +4241,9 @@ class DataOrder():
     ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
     TIGRE_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
     CIL_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-    CIL_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL] 
+    CIL_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
     TOMOPHANTOM_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-    
+
     @staticmethod
     def get_order_for_engine(engine, geometry):
         if engine == 'astra':
@@ -4253,7 +4263,7 @@ class DataOrder():
                 dim_order = DataOrder.CIL_IG_LABELS
         else:
             raise ValueError("Unknown engine expected one of {0} got {1}".format(DataOrder.ENGINES, engine))
-        
+
         dimensions = []
         for label in dim_order:
             if label in geometry.dimension_labels:
@@ -4270,7 +4280,3 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
-
-
-
-        

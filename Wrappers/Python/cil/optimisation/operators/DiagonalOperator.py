@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -23,9 +22,9 @@ from cil.optimisation.operators import LinearOperator
 
 class DiagonalOperator(LinearOperator):
 
-    r"""DiagonalOperator 
+    r"""DiagonalOperator
 
-    Performs an element-wise multiplication, i.e., `Hadamard Product <https://en.wikipedia.org/wiki/Hadamard_product_(matrices)#:~:text=In%20mathematics%2C%20the%20Hadamard%20product,elements%20i%2C%20j%20of%20the>`_ 
+    Performs an element-wise multiplication, i.e., `Hadamard Product <https://en.wikipedia.org/wiki/Hadamard_product_(matrices)#:~:text=In%20mathematics%2C%20the%20Hadamard%20product,elements%20i%2C%20j%20of%20the>`_
     of a :class:`DataContainer` `x` and :class:`DataContainer` `diagonal`, `d` .
 
     .. math:: (D\circ x) = \sum_{i,j}^{M,N} D_{i,j} x_{i, j}
@@ -33,7 +32,7 @@ class DiagonalOperator(LinearOperator):
     In matrix-vector interpretation, if `D` is a :math:`M\times N` dense matrix and is flattened, we have a :math:`M*N \times M*N` vector.
     A sparse diagonal matrix, i.e., :class:`DigaonalOperator` can be created if we add the vector above to the main diagonal.
     If the :class:`DataContainer` `x` is also flattened, we have a :math:`M*N` vector.
-    Now, matrix-vector multiplcation is allowed and results to a :math:`(M*N,1)` vector. After reshaping we recover a :math:`M\times N` :class:`DataContainer`. 
+    Now, matrix-vector multiplcation is allowed and results to a :math:`(M*N,1)` vector. After reshaping we recover a :math:`M\times N` :class:`DataContainer`.
 
     Parameters
     ----------
@@ -44,21 +43,21 @@ class DiagonalOperator(LinearOperator):
 
     """
 
-    
+
     def __init__(self, diagonal, domain_geometry=None):
 
         if domain_geometry is None:
             domain_geometry = diagonal.geometry.copy()
 
-        super(DiagonalOperator, self).__init__(domain_geometry=domain_geometry, 
+        super(DiagonalOperator, self).__init__(domain_geometry=domain_geometry,
                                     range_geometry=domain_geometry)
         self.diagonal = diagonal
 
-        
+
     def direct(self,x,out=None):
-        
+
         "Returns :math:`D\circ x` "
-        
+
         if out is None:
             return self.diagonal * x
         else:
@@ -67,16 +66,16 @@ class DiagonalOperator(LinearOperator):
     
 
     def adjoint(self,x, out=None):
-        
+
         "Returns :math:`D^*\circ x` "
-        
+
         return self.diagonal.conjugate().multiply(x,out=out)
 
-  
+
     def calculate_norm(self, **kwargs):
-        
+
         r""" Returns the operator norm of DiagonalOperator which is the :math:`\infty` norm of `diagonal`
-        
+
         .. math:: \|D\|_{\infty} = \max_{i}\{|D_{i}|\}
 
         """

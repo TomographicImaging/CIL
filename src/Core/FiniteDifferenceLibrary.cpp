@@ -1,4 +1,3 @@
-// -*- coding: utf-8 -*-
 //  Copyright 2019 United Kingdom Research and Innovation
 //  Copyright 2019 The University of Manchester
 //
@@ -581,4 +580,3 @@ DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, siz
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-

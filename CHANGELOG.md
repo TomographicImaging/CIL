@@ -1,5 +1,5 @@
-
 * x.x.x
+  - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
@@ -24,7 +24,18 @@
   - Bug fix for norm of CompositionOperator
   - Functions updated to use sapyb
   - Fix KullbackLeibler numba gradient ignoring mask
-  - show1D slice_list parameter can now be of type tuple 
+  - show1D slice_list parameter can now be of type tuple
+  - Deprecated `Algorithm`'s `max_iteration`, `log_file`, `**kwargs`, `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output`, `verbose_header`, `run(print_interval)`
+  - Added `optimisation.utilities.callbacks`
+    - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
+    - Deprecated `Algorithm.run(callback: Callable)`
+    - Added `Algorithm.run(callbacks: list[Callback])`
+  - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
+  - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
+  - Allow Masker to take integer arrays in addition to boolean
+  - Improved import error/warning messages
+  - New adjoint operator
+  - Bug fix for complex matrix adjoint
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
@@ -140,7 +151,7 @@
   - Recon.FBP allows 'astra' backend
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
-  - Geometry alignmentment fix for 2D datasets
+  - Geometry alignment fix for 2D datasets
   - CGLS update for sapyb to enable complex data, bugfix in use of initial
   - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
   - Allow use of square brackets in file paths to TIFF and Nikon datasets
@@ -183,7 +194,7 @@
   - Fixed bug in Zeiss reader geometry direction of rotation
 
 * 21.0.0
-  - Show2D now takes 4D datasets and slice infomation as input
+  - Show2D now takes 4D datasets and slice information as input
   - TIGRE reconstruction package wrapped for cone-beam tomography
   - Datacontainers have get_slice method which returns a dataset with a single slice of the data
   - Datacontainers have reorder method which reorders the data in memory as requested, or for use with 'astra' or 'tigre'

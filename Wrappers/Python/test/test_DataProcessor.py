@@ -30,8 +30,10 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinPhaseProcessor
-
+from cil.processors.PaganinPhaseProcessor import PaganinProcessor
 import gc
+
+from scipy import constants
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
 
@@ -2649,17 +2651,70 @@ class TestMasker(unittest.TestCase):
 class TestPaganinPhaseRetriver(unittest.TestCase):       
 
     def setUp(self):      
-        self.data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_PaganinProcessor_init(self):        
+        # test default values are initialised
+        processors = [PaganinProcessor(), PaganinPhaseProcessor.retrieve(), PaganinPhaseProcessor.filter()]
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta','unit_multiplier', 'propagation_distance', 'propagation_distance_user',
+                          'filter_type', 'verbose', 'mu']
+        test_value = [40000, (constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2, 1, None, None, 
+                      'paganin_method', True, 4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt))]
+        for processor in processors:
+            for i in numpy.arange(len(test_value)):
+                self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processors = [PaganinProcessor(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.retrieve(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.filter(1, 2, 3, 4, 5, 'string', False)]
+        test_value = [1, (constants.h*constants.speed_of_light)/(1*constants.electron_volt), 2, 3, 4, None, 5, 
+                      'string', False, 4.0*numpy.pi*3/((constants.h*constants.speed_of_light)/(1*constants.electron_volt))]
+        for processor in processors:
+            for i in numpy.arange(len(test_value)):
+                self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+        
+    def test_PaganinProcessor_check_input(self):
+        # check the propagation distance can be found from the geometry if there is no user input
+        processors = [PaganinPhaseProcessor.retrieve(), PaganinPhaseProcessor.filter()]
+        for processor in processors:
+            processor.check_input(self.data_cone)
+            self.assertEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector, msg=self.error_message(processor, 'propagation_distance'))
+
+        # for PaganinPhaseProcessor.retrieve check there is a value error when the data geometry does not have dist_center_detector
+        processor = PaganinPhaseProcessor.retrieve()
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_parallel)
+
+        # for PaganinPhaseProcessor.filter check a default value of 10 is used when the data geometry does not have dist_center_detector
+        processor = PaganinPhaseProcessor.filter()
+        processor.check_input(self.data_parallel)
+        self.assertEqual(processor.propagation_distance, 10, msg=self.error_message(processor, 'propagation_distance'))
+        
+        # test propagation distance user input over-rides the distance value from geometry
+        processors = [PaganinPhaseProcessor.retrieve(propagation_distance=1), PaganinPhaseProcessor.filter(propagation_distance=1)]
+        data_array = [self.data_cone, self.data_parallel]
+        for processor in processors:
+            for data in data_array:
+                processor.check_input(data)
+                self.assertEqual(processor.propagation_distance, 1, msg=self.error_message(processor, 'propagation_distance'))
+
+        # check alpha is calculated
+        alpha = 1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
+        for processor in processors:
+            for data in data_array:
+                processor.check_input(data)
+                self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+
+
+
 
     def test_PaganinPhaseRetriever(self): 
 
-        
-        beta = 5e-3
-        delta = 1.
-        energy_eV = 40000
-        unit_multiplier = 1e-3
-        propagation_distance = 10
-        processor = PaganinPhaseProcessor.retrieve(energy_eV, delta, beta, unit_multiplier, propagation_distance)
+    
+        processor = PaganinPhaseProcessor.retrieve(propagation_distance=10, verbose=False)
         processor.set_input(self.data)
         phase_data = processor.get_output(output_type = 'attenuation')
         

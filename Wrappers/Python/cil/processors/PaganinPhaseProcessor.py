@@ -33,7 +33,7 @@ from multiprocessing.pool import ThreadPool
 class PaganinPhaseProcessor(Processor):
 
     @staticmethod
-    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-3, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
+    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
         """
         Method to create a Paganin processor to retrieve quantitative information from phase contrast images using
         the Paganin phase retrieval algorithm described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -93,7 +93,7 @@ class PaganinPhaseProcessor(Processor):
 
 
     @staticmethod
-    def filter(energy_eV = 40000, delta = 1, beta = 1e-3, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
+    def filter(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
         '''
         Method to create a Paganin processor to filter images using the Paganin phase retrieval algorithm
         described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 

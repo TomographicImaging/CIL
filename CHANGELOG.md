@@ -34,6 +34,8 @@
   - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
   - Allow Masker to take integer arrays in addition to boolean
   - Improved import error/warning messages
+  - New adjoint operator
+  - Bug fix for complex matrix adjoint
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

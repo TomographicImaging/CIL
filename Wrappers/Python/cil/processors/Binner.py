@@ -32,7 +32,7 @@ except:
 class Binner(Slicer):
 
     """This creates a Binner processor.
-    
+
     The processor will crop the data, and then average together n input pixels along a dimension from the starting index.
 
     The output will be a data container with the data, and geometry updated to reflect the operation.
@@ -54,7 +54,7 @@ class Binner(Slicer):
 
     Example
     -------
-    
+
     >>> from cil.processors import Binner
     >>> roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
     >>> processor = Binner(roi)
@@ -76,14 +76,14 @@ class Binner(Slicer):
     The indices provided are start inclusive, stop exclusive.
 
     All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {'axis_name',-1}
-    
+
     If only one number is provided, then it is interpreted as Stop. i.e. {'axis_name1':(stop)}
     If two numbers are provided, then they are interpreted as Start and Stop  i.e. {'axis_name1':(start, stop)}
 
     Negative indexing can be used to specify the index. i.e. {'axis_name1':(10, -10)} will crop the dimension symmetrically
-    
-    If Stop - Start is not multiple of Step, then 
-    the resulted dimension will have (Stop - Start) // Step 
+
+    If Stop - Start is not multiple of Step, then
+    the resulted dimension will have (Stop - Start) // Step
     elements, i.e. (Stop - Start) % Step elements will be ignored
 
     """
@@ -100,7 +100,7 @@ class Binner(Slicer):
 
     def _configure(self):
         """
-        Once the ROI has been parsed this configures the input specifically for use with Binner        
+        Once the ROI has been parsed this configures the input specifically for use with Binner
         """
 
         #as binning we only include bins that are inside boundaries
@@ -146,18 +146,18 @@ class Binner(Slicer):
 
         for i in range(4):
             # reshape the data to add each 'bin' dimensions
-            shape_object.append(self._shape_out[i]) 
+            shape_object.append(self._shape_out[i])
             shape_object.append(self._roi_ordered[i].step)
 
         shape_object = tuple(shape_object)
         slice_object = tuple([slice(x.start, x.stop) for x in self._roi_ordered])
-      
+
         data_resized = array_in.reshape(self._shape_in)[slice_object].reshape(shape_object)
 
         mean_order = (-1, 1, 2, 3)
         for i in range(4):
             data_resized = data_resized.mean(mean_order[i])
-            
+
         np.copyto(array_binned, data_resized)
 
 
@@ -183,4 +183,3 @@ class Binner(Slicer):
             self._bin_array_acc(dc_in.array, dc_out.array)
         else:
             self._bin_array_numpy(dc_in.array, dc_out.array)
-

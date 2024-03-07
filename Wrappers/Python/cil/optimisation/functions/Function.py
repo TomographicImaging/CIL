@@ -26,7 +26,7 @@ from cil.utilities.errors import InPlaceError
 
 class Function(object):
 
-    r""" Abstract class representing a function 
+    r""" Abstract class representing a function
 
         Parameters
         ----------
@@ -61,13 +61,13 @@ class Function(object):
 
         Returns
         --------
-        DataContainer, the value of the gradient of the function at x or `None` if `out`  
+        DataContainer, the value of the gradient of the function at x or `None` if `out`
 
         """
         raise NotImplementedError
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the proximal operator of function :math:`\tau F`  evaluated at x        
+        r"""Returns the proximal operator of function :math:`\tau F`  evaluated at x
 
         .. math:: \text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
 
@@ -81,7 +81,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or `None` if `out`. 
+        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or `None` if `out`.
 
         """
         raise NotImplementedError
@@ -97,7 +97,7 @@ class Function(object):
 
         Returns
         -------
-        The value of the convex conjugate of the function at x. 
+        The value of the convex conjugate of the function at x.
 
         """
         raise NotImplementedError
@@ -121,12 +121,12 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`. 
+        DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`.
 
         """
         if id(x)==id(out):
             raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
-        
+
         try:
             tmp = x
             x.divide(tau, out=tmp)
@@ -185,13 +185,13 @@ class Function(object):
         return self.__rmul__(scalar)
 
     def centered_at(self, center):
-        """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
+        """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.
             TranslateFunction is :math:`F(x - b)` and the center is at point b.
 
         Parameters
         ----------
-        center: DataContainer 
-            The point to center the function at.    
+        center: DataContainer
+            The point to center the function at.
 
         Returns
         -------
@@ -333,7 +333,7 @@ class SumFunction(Function):
         Parameters
         ----------
         x : DataContainer
-            Point to evaluate the gradient at.        
+            Point to evaluate the gradient at.
         out: return DataContainer, if None a new DataContainer is returned, default None.
 
         Returns
@@ -344,8 +344,8 @@ class SumFunction(Function):
 
         if out is not None and id(x)==id(out):
             raise InPlaceError
-        
-        if out is None:            
+
+        if out is None:
             for i,f in enumerate(self.functions):
 
                 if i == 0:
@@ -389,9 +389,9 @@ class ScaledFunction(Function):
     If :math:`G(x) = \alpha F(x)` then:
 
     1. :math:`G(x) = \alpha  F(x)` ( __call__ method )
-    2. :math:`G'(x) = \alpha  F'(x)` ( gradient method ) 
-    3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )   
-    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)` ( proximal method ) 
+    2. :math:`G'(x) = \alpha  F'(x)` ( gradient method )
+    3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )
+    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{(\tau\alpha) F}(x)` ( proximal method )
 
     """
 
@@ -459,7 +459,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        The value of the convex conjugate of the scaled function. 
+        The value of the convex conjugate of the scaled function.
 
         """
         try:
@@ -483,12 +483,12 @@ class ScaledFunction(Function):
         Parameters
         ----------
         x : DataContainer
-            Point to evaluate the gradient at. 
+            Point to evaluate the gradient at.
         out: return DataContainer, if None a new DataContainer is returned, default None.
 
         Returns
         -------
-        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or `None` if `out`. 
+        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or `None` if `out`.
 
         """
         if out is None:
@@ -512,7 +512,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or `None` if `out`. 
+        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or `None` if `out`.
 
         """
 
@@ -536,7 +536,7 @@ class ScaledFunction(Function):
         """
         if out is not None and id(x)==id(out):
             raise InPlaceError
-        
+
         try:
             tmp = x
             x.divide(tau, out=tmp)
@@ -560,11 +560,11 @@ class ScaledFunction(Function):
 
 class SumScalarFunction(SumFunction):
 
-    """ SumScalarFunction represents the sum a function with a scalar. 
+    """ SumScalarFunction represents the sum a function with a scalar.
 
         .. math:: (F + scalar)(x)  = F(x) + scalar
 
-        Although SumFunction has no general expressions for 
+        Although SumFunction has no general expressions for
 
         i) convex_conjugate
         ii) proximal
@@ -592,7 +592,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        The value of the convex conjugate evaluated at :math:`x`. 
+        The value of the convex conjugate evaluated at :math:`x`.
 
         """
         return self.function.convex_conjugate(x) - self.constant
@@ -612,7 +612,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or `None` if `out`. 
+        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
 
         """
         return self.function.proximal(x, tau, out=out)
@@ -634,7 +634,7 @@ class SumScalarFunction(SumFunction):
 
 class ConstantFunction(Function):
 
-    r""" ConstantFunction: :math:`F(x) = constant, constant\in\mathbb{R}`         
+    r""" ConstantFunction: :math:`F(x) = constant, constant\in\mathbb{R}`
 
     """
 
@@ -651,12 +651,12 @@ class ConstantFunction(Function):
         Parameters
         ----------
         x : DataContainer
-            Point to evaluate the gradient at. 
+            Point to evaluate the gradient at.
         out: return DataContainer, if None a new DataContainer is returned, default None.
 
         Returns
         -------
-        A DataContainer of zeros, the same size as :math:`x` or `None` if `out`  
+        A DataContainer of zeros, the same size as :math:`x` or `None` if `out`
 
         """
         if out is None:
@@ -667,8 +667,8 @@ class ConstantFunction(Function):
     def convex_conjugate(self, x):
         r""" The convex conjugate of constant function :math:`F(x) = c\in\mathbb{R}` is
 
-        .. math:: 
-            F(x^{*}) 
+        .. math::
+            F(x^{*})
             =
             \begin{cases}
                 -c, & if x^{*} = 0\\
@@ -689,7 +689,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        The maximum of x and 0, summed over the entries of x. 
+        The maximum of x and 0, summed over the entries of x.
 
         """
         return x.maximum(0).sum()
@@ -697,7 +697,7 @@ class ConstantFunction(Function):
     def proximal(self, x, tau, out=None):
         r"""Returns the proximal operator of the constant function, which is the same element, i.e.,
 
-        .. math:: \text{prox}_{\tau F}(x) = x 
+        .. math:: \text{prox}_{\tau F}(x) = x
 
         Parameters
         ----------
@@ -709,7 +709,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        DataContainer, equal to :math:`x` or `None` if `out`. 
+        DataContainer, equal to :math:`x` or `None` if `out`.
 
         """
         if out is None:
@@ -741,7 +741,7 @@ class ConstantFunction(Function):
 
 class ZeroFunction(ConstantFunction):
 
-    """ ZeroFunction represents the zero function, :math:`F(x) = 0`        
+    """ ZeroFunction represents the zero function, :math:`F(x) = 0`
     """
 
     def __init__(self):
@@ -752,16 +752,16 @@ class TranslateFunction(Function):
 
     r""" TranslateFunction represents the translation of function F with respect to the center b.
 
-    Let a function F and consider :math:`G(x) = F(x - center)`. 
+    Let a function F and consider :math:`G(x) = F(x - center)`.
 
     Function F is centered at 0, whereas G is centered at point b.
 
     If :math:`G(x) = F(x - b)` then:
 
     1. :math:`G(x) = F(x - b)` ( __call__ method )
-    2. :math:`G'(x) = F'(x - b)` ( gradient method ) 
-    3. :math:`G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >` ( convex_conjugate method )   
-    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x - b)  + b` ( proximal method ) 
+    2. :math:`G'(x) = F'(x - b)` ( gradient method )
+    3. :math:`G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >` ( convex_conjugate method )
+    4. :math:`\text{prox}_{\tau G}(x) = \text{prox}_{\tau F}(x - b)  + b` ( proximal method )
 
     """
 
@@ -786,7 +786,7 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        The value of the translated function evaluated at :math:`x`. 
+        The value of the translated function evaluated at :math:`x`.
 
 
         """
@@ -811,7 +811,7 @@ class TranslateFunction(Function):
         Parameters
         ----------
         x : DataContainer
-            Point to evaluate the gradient at. 
+            Point to evaluate the gradient at.
 
         out: return DataContainer, if None a new DataContainer is returned, default None.
 
@@ -819,10 +819,10 @@ class TranslateFunction(Function):
         -------
         DataContainer, the gradient of the translated function evaluated at :math:`x` or `None` if `out`.
         """
-        
+
         if id(x)==id(out):
             raise InPlaceError
-            
+
         try:
             x.subtract(self.center, out=x)
             tmp = x
@@ -857,10 +857,10 @@ class TranslateFunction(Function):
         -------
         DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or `None` if `out`.
         """
-        
+
         if id(x)==id(out):
             raise InPlaceError
-            
+
         try:
             x.subtract(self.center, out=x)
             tmp = x
@@ -896,4 +896,3 @@ class TranslateFunction(Function):
         """
 
         return self.function.convex_conjugate(x) + self.center.dot(x)
-

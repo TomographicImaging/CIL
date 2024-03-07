@@ -213,6 +213,7 @@ Trivial operators are the following.
 .. autoclass:: cil.optimisation.operators.MaskOperator
    :members:
 
+
 .. autoclass:: cil.optimisation.operators.ProjectionMap
    :members:
 

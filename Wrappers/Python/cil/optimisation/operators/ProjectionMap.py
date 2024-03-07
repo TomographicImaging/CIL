@@ -25,8 +25,8 @@ class ProjectionMap(LinearOperator):
 
     r""" Projection Map or Canonical Projection (https://en.wikipedia.org/wiki/Projection_(mathematics))
 
-    Takes an element x = (x_{0},\dots,x_{i},\dots,x_{n}}) from a Cartesian product space X_{1}\times\cdots\times X_{n}\rightarrow X_{i}
-    and projects it to element x_{i} specified by the index i.
+    Takes an element :math:`x = (x_{0},\dots,x_{i},\dots,x_{n}})` from a Cartesian product space :math:`X_{1}\times\cdots\times X_{n}\rightarrow X_{i}`
+    and projects it to element :math:`x_{i}` specified by the index :math:`i`.
 
     .. math:: \pi_{i}: X_{1}\times\cdots\times X_{n}\rightarrow X_{i}
 
@@ -42,8 +42,8 @@ class ProjectionMap(LinearOperator):
     domain_geometry:`BlockGeometry`
         The domain of the `ProjectionMap`. A `BlockGeometry` is expected.
 
-    param index: int
-        Index to project to the corresponding `ImageGeometry` X_{index}.
+    index: int
+        Index to project to the corresponding `ImageGeometry`
     
     
 
@@ -74,8 +74,8 @@ class ProjectionMap(LinearOperator):
         ----------
         x: `BlockDataContainer`
         
-        out: `DataContainer`, default None
-            If out is not None the output of the adjoint of the ProjectionMap will be filled in out, otherwise a new object is instantiated and returned.
+        out: `DataContainer`, default `None`
+            If `out` is not `None` the output of the `ProjectionMap` will be filled in `out`, otherwise a new object is instantiated and returned.
         
         Returns
         --------
@@ -98,8 +98,8 @@ class ProjectionMap(LinearOperator):
         ----------
         x: `DataContainer`
         
-        out: `BlockDataContainer`, default None
-            If out is not None the output of the adjoint of the ProjectionMap will be filled in out, otherwise a new object is instantiated and returned.
+        out: `BlockDataContainer`, default `None`
+            If `out` is not `None` the output of the adjoint of the `ProjectionMap` will be filled in `out`, otherwise a new object is instantiated and returned.
         
         Returns
         --------

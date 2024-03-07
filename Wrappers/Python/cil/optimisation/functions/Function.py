@@ -61,11 +61,7 @@ class Function(object):
 
         Returns
         --------
-<<<<<<< HEAD
         DataContainer, the value of the gradient of the function at x.`  
-=======
-        DataContainer, the value of the gradient of the function at x or `None` if `out`
->>>>>>> 3231549aa969b950ee7f935b5c5724e89c0af7fe
 
         """
         raise NotImplementedError
@@ -85,11 +81,7 @@ class Function(object):
 
         Returns
         -------
-<<<<<<< HEAD
         DataContainer, the proximal operator of the function at x with scalar :math:`\tau`. 
-=======
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or `None` if `out`.
->>>>>>> 3231549aa969b950ee7f935b5c5724e89c0af7fe
 
         """
         raise NotImplementedError
@@ -497,11 +489,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-<<<<<<< HEAD
         DataContainer, the value of the gradient of the scaled function evaluated at :math:`x`. 
-=======
-        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or `None` if `out`.
->>>>>>> 3231549aa969b950ee7f935b5c5724e89c0af7fe
 
         """
         if out is None:
@@ -526,11 +514,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-<<<<<<< HEAD
         DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau`. 
-=======
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or `None` if `out`.
->>>>>>> 3231549aa969b950ee7f935b5c5724e89c0af7fe
 
         """
 
@@ -632,11 +616,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-<<<<<<< HEAD
         DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau`. 
-=======
-        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
->>>>>>> 3231549aa969b950ee7f935b5c5724e89c0af7fe
 
         """
         return self.function.proximal(x, tau, out=out)

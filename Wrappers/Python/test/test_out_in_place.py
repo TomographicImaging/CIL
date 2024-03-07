@@ -58,7 +58,7 @@ from utils import  initialise_tests
 initialise_tests()
 
 
-class TestFunctionOutAndInPlace(CCPiTestClass): #TODO: CHECK BLOCK FUNCTION GRADIENT OUT 
+class TestFunctionOutAndInPlace(CCPiTestClass):
 
     def setUp(self):
 
@@ -270,7 +270,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 pass
 
 
-    def out_test(self, desired_result, operator, method,  x, *args, ): #TODO: check that it also returns and this matches 
+    def out_test(self, desired_result, operator, method,  x, *args, ): 
         input = x.copy()
         out2=0*(x.copy())
         try:

@@ -121,11 +121,6 @@ class ChannelwiseOperator(LinearOperator):
                 out.fill(cury.as_array(),channel=k)
             return out
         
-    def calculate_norm(self, **kwargs):
-        
-        '''Evaluates operator norm of DiagonalOperator'''
-        
-        return self.op.norm()
 
     def calculate_norm(self, **kwargs):
 

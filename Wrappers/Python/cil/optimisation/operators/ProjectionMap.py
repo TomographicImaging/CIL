@@ -36,12 +36,16 @@ class ProjectionMap(LinearOperator):
 
     .. math:: \pi_{i}^{*}(x_{i}) = (0, \cdots, x_{i}, \cdots, 0)
 
-    :param domain_geometry: The domain of the Projection Map. A BlockGeometry is expected.
-    :type domain_geometry: `BlockGeometry`
-    :param index: Index to project to the corresponding ImageGeometry X_{index}.
-    :type index: int
-    :return: returns a DataContainer
-    :rtype: DataContainer
+    Parameters
+    ----------
+    
+    domain_geometry:`BlockGeometry`
+        The domain of the `ProjectionMap`. A `BlockGeometry` is expected.
+
+    param index: int
+        Index to project to the corresponding `ImageGeometry` X_{index}.
+    
+    
 
     """
 
@@ -63,17 +67,50 @@ class ProjectionMap(LinearOperator):
                                             range_geometry=range_geometry)
 
     def direct(self,x,out=None):
-
+        r"""
+        Returns the ith (`param_index`) element of the Block data container, :math:`x`
+        
+        Parameters
+        ----------
+        x: `BlockDataContainer`
+        
+        out: `DataContainer`, default None
+            If out is not None the output of the adjoint of the ProjectionMap will be filled in out, otherwise a new object is instantiated and returned.
+        
+        Returns
+        --------
+        `DataContainer`
+        
+        """
+        
+    
+    
         if out is None:
             return x[self.index].copy()
         else:
             out.fill(x[self.index])
 
     def adjoint(self,x, out=None):
-
+        r"""
+        Returns a `BlockDataContainer` of zeros with the ith (`param_index`) filled with the `DataContainer`, :math:`x`
+        
+        Parameters
+        ----------
+        x: `DataContainer`
+        
+        out: `BlockDataContainer`, default None
+            If out is not None the output of the adjoint of the ProjectionMap will be filled in out, otherwise a new object is instantiated and returned.
+        
+        Returns
+        --------
+        `BlockDataContainer`
+        
+        """
+        
         if out is None:
             tmp = self.domain_geometry().allocate(0)
             tmp[self.index].fill(x)
             return tmp
         else:
+            out*=0
             out[self.index].fill(x)

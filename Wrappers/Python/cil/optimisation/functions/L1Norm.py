@@ -38,7 +38,7 @@ def soft_shrinkage(x, tau, out=None):
     """
     should_return = False
     # get the sign of the input  
-    dsign = np.exp(1j*np.angle(x.as_array())) if issubclass(x.dtype.__class__, np.complexfloating) else x.sign() 
+    dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x.as_array()) else x.sign()
 
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:

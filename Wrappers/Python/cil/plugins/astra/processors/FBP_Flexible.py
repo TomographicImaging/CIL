@@ -54,15 +54,15 @@ class FBP_Flexible(FDK_Flexible):
     This class creates a pseudo cone-beam geometry in-order to leverage the ASTRA FDK algorithm.
     """
 
-    def __init__(self, volume_geometry, 
-                       sinogram_geometry): 
-        
+    def __init__(self, volume_geometry,
+                       sinogram_geometry):
+
         super(FBP_Flexible, self).__init__( volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry)
 
         #convert parallel geomerty to cone with large source to object
         sino_geom_cone = sinogram_geometry.copy()
-        
-        #this catches behaviour modified after CIL 21.3.1 
+
+        #this catches behaviour modified after CIL 21.3.1
         try:
             sino_geom_cone.config.system.align_reference_frame('cil')
         except:
@@ -82,19 +82,19 @@ class FBP_Flexible(FDK_Flexible):
         sino_geom_cone.config.system = tmp.config.system.copy()
 
         self.vol_geom_astra, self.proj_geom_astra = convert_geometry_to_astra_vec_3D(volume_geometry, sino_geom_cone)
-                           
+
     def check_input(self, dataset):
-        
+
         if self.sinogram_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
-                 .format(self.sinogram_geometry.channels))  
+                 .format(self.sinogram_geometry.channels))
 
         if self.sinogram_geometry.geom_type != 'parallel':
             raise ValueError("Expected input data to be parallel beam geometry , got {0}"\
-                 .format(self.sinogram_geometry.geom_type))  
+                 .format(self.sinogram_geometry.geom_type))
 
         return True
-        
+
 
 class FBP_CPU(Processor):
 
@@ -122,54 +122,54 @@ class FBP_CPU(Processor):
     """
 
 
-    def __init__(self, volume_geometry, 
-                       sinogram_geometry): 
-        
+    def __init__(self, volume_geometry,
+                       sinogram_geometry):
+
         super().__init__( volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry)
 
 
     def check_input(self, dataset):
-        
+
         if self.sinogram_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
-                 .format(self.sinogram_geometry.channels))  
+                 .format(self.sinogram_geometry.channels))
 
         if self.sinogram_geometry.geom_type != 'parallel':
             raise ValueError("Expected input data to be parallel beam geometry , got {0}"\
-                 .format(self.sinogram_geometry.geom_type))  
+                 .format(self.sinogram_geometry.geom_type))
 
         if self.sinogram_geometry.dimension != '2D':
             raise ValueError("Expected input data to be 2D , got {0}"\
                  .format(self.sinogram_geometry.dimension))
 
         if self.sinogram_geometry.system_description != 'simple':
-            logging.WARNING("The ASTRA backend FBP will use simple geometry only. Any configuration offsets or rotations may be ignored.")  
+            logging.WARNING("The ASTRA backend FBP will use simple geometry only. Any configuration offsets or rotations may be ignored.")
 
         return True
 
 
     def process(self, out=None):
-           
+
         # Get DATA
         DATA = self.get_input()
 
         vol_geom_astra, proj_geom_astra = convert_geometry_to_astra(self.volume_geometry, self.sinogram_geometry)
-                           
+
         rec_id = astra.data2d.create('-vol', vol_geom_astra)
         sinogram_id = astra.data2d.create('-sino', proj_geom_astra, DATA.as_array())
         cfg = astra.astra_dict('FBP')
         cfg['ReconstructionDataId'] = rec_id
         cfg['ProjectionDataId'] = sinogram_id
-        cfg['ProjectorId'] = astra.create_projector('line', proj_geom_astra, vol_geom_astra) 
+        cfg['ProjectorId'] = astra.create_projector('line', proj_geom_astra, vol_geom_astra)
         cfg['FilterType'] = 'ram-lak'
 
         alg_id = astra.algorithm.create(cfg)
-        
-        astra.algorithm.run(alg_id)       
+
+        astra.algorithm.run(alg_id)
         arr_out = astra.data2d.get(rec_id)
 
         astra.data2d.delete(rec_id)
-        astra.data2d.delete(sinogram_id)                    
+        astra.data2d.delete(sinogram_id)
         astra.algorithm.delete(alg_id)
 
         arr_out = np.flip(arr_out, 0)

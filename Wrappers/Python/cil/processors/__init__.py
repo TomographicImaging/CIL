@@ -27,4 +27,3 @@ from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter
 from .Masker import Masker
 from .Padder import Padder
 from .PaganinPhaseProcessor import PaganinPhaseProcessor
-

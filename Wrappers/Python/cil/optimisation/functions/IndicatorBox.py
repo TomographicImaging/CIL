@@ -25,14 +25,14 @@ import logging
 
 class IndicatorBox(Function):
     r'''Indicator function for box constraint
-            
-      .. math:: 
-         
-         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}  
+
+      .. math::
+
+         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}
                                             0, \text{ if } x \in [a, b] \\
                                             \infty, \text{otherwise}
                                      \end{cases}
-        
+
     Parameters
     ----------
     lower : float, DataContainer or numpy array, default None
@@ -42,29 +42,29 @@ class IndicatorBox(Function):
     accelerated : bool, default True
         Specifies whether to use the accelerated version or not, using numba or
         numpy backends respectively.
-    
-    
-    If ``lower`` or ``upper`` are passed a ``DataContainer`` (or derived class 
-    such as ``ImageData`` or ``AcquisitionData``) or a ``numpy array``, the bounds 
+
+
+    If ``lower`` or ``upper`` are passed a ``DataContainer`` (or derived class
+    such as ``ImageData`` or ``AcquisitionData``) or a ``numpy array``, the bounds
     can be set to different values for each element.
 
-    In order to save computing time it is possible to suppress the evaluation of 
-    the function. This is achieved by setting ``suppress_evaluation`` to ``True``. 
+    In order to save computing time it is possible to suppress the evaluation of
+    the function. This is achieved by setting ``suppress_evaluation`` to ``True``.
     ``IndicatorBox`` evaluated on any input will then return 0.
 
-    If ``accelerated`` is set to ``True`` (default), the Numba backend is used. 
-    Otherwise, the Numpy backend is used. An optional parameter to set the number of 
+    If ``accelerated`` is set to ``True`` (default), the Numba backend is used.
+    Otherwise, the Numpy backend is used. An optional parameter to set the number of
     threads used by Numba can be set with ``set_num_threads``. Setting the number of
     threads when ``accelerate`` is set to ``False`` will not have any effect.
-    The default number of threads is defined in the ``cil.utilities.multiprocessing`` 
+    The default number of threads is defined in the ``cil.utilities.multiprocessing``
     module, and it is equivalent to half of the CPU cores available.
 
     Example:
     --------
-    
-    In order to save computing time it is possible to suppress the evaluation of the 
+
+    In order to save computing time it is possible to suppress the evaluation of the
     function.
-    
+
     .. code-block:: python
 
         ib = IndicatorBox(lower=0, upper=1)
@@ -74,12 +74,12 @@ class IndicatorBox(Function):
 
     Example:
     --------
-    
+
     Set the number of threads used in accelerated mode.
-    
+
     .. code-block:: python
 
-    
+
         num_threads = 4
         ib = IndicatorBox(lower=0, upper=1)
         ib.set_num_threads(num_threads)
@@ -117,7 +117,7 @@ class IndicatorBox(Function):
 
     def set_suppress_evaluation(self, value):
         '''Suppresses the evaluation of the function
-        
+
         Parameters
         ----------
         value : bool
@@ -129,13 +129,13 @@ class IndicatorBox(Function):
 
     def __call__(self, x):
         '''Evaluates IndicatorBox at x
-        
+
         Parameters
         ----------
-        
+
             x : DataContainer
-            
-        Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.  
+
+        Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.
         '''
         if not self.suppress_evaluation:
             return self.evaluate(x)
@@ -185,13 +185,13 @@ class IndicatorBox(Function):
     @property
     def num_threads(self):
         '''Get the optional number of threads parameter to use for the accelerated version.
-        
+
         Defaults to the value set in the CIL multiprocessing module.'''
         return cil_mp.NUM_THREADS if self._num_threads is None else self._num_threads
 
     def set_num_threads(self, value):
         '''Set the optional number of threads parameter to use for the accelerated version.
-        
+
         This is discarded if ``accelerated=False``.'''
         self._num_threads = value
 
@@ -436,7 +436,7 @@ def _proximal_an(x, lower):
 @numba.jit(nopython=True, parallel=True)
 def _convex_conjugate(x, acc):
     '''Convex conjugate of IndicatorBox
-    
+
     im.maximum(0).sum()
     '''
     arr = x.ravel()

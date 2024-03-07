@@ -47,7 +47,7 @@ class CofR_xcorrelation(Processor):
     '''
 
     def __init__(self, slice_index='centre', projection_index=0, ang_tol=0.1):
-        
+
         kwargs = {
                     'slice_index': slice_index,
                     'ang_tol': ang_tol,
@@ -60,7 +60,7 @@ class CofR_xcorrelation(Processor):
     def check_input(self, data):
         if not isinstance(data, AcquisitionData):
             raise Exception('Processor supports only AcquisitionData')
-        
+
         if data.geometry == None:
             raise Exception('Geometry is not defined.')
 
@@ -133,8 +133,6 @@ class CofR_xcorrelation(Processor):
 
         return np.abs(angles_deg - 180).argmin()
 
-
-
     def process(self, out=None):
 
         data_full = self.get_input()
@@ -147,7 +145,6 @@ class CofR_xcorrelation(Processor):
 
         geometry = data.geometry
         
-        
         #cross correlate single slice with the 180deg one reversed
         data1 = data.get_slice(angle=self._indices[0]).as_array()
         data2 = np.flip(data.get_slice(angle=self._indices[1]).as_array())
@@ -156,7 +153,7 @@ class CofR_xcorrelation(Processor):
         lag = np.correlate(data1[border:-border],data2[border:-border],"full")
 
         ind = lag.argmax()
-        
+
         #fit quadratic to 3 centre points
         a = (lag[ind+1] + lag[ind-1] - 2*lag[ind]) * 0.5
         b = a + lag[ind] - lag[ind-1]
@@ -169,7 +166,7 @@ class CofR_xcorrelation(Processor):
 
         #set up new geometry
         new_geometry.config.system.rotation_axis.position[0] = shift * geometry.config.panel.pixel_size[0]
-        
+
         logger.info("Centre of rotation correction found using cross-correlation")
         logger.info("Calculated from slice: %s", str(self.slice_index))
         logger.info("Centre of rotation shift = %f pixels", shift)

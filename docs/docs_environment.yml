@@ -29,3 +29,7 @@ dependencies:
   - sphinx-copybutton
   - sphinx-panels
   - sphinxcontrib-bibtex
+  - nbsphinx
+  - sphinx-gallery
+  - sphinx-copybutton
+  - notebook

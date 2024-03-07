@@ -23,7 +23,7 @@ from cil.framework import VectorData, VectorGeometry
 class Rosenbrock(Function):
     r'''Rosenbrock function
 
-    .. math:: 
+    .. math::
 
     F(x,y) = (\alpha - x)^2 + \beta(y-x^2)^2
 
@@ -46,7 +46,7 @@ class Rosenbrock(Function):
 
     def gradient(self, x, out=None):
         r'''Gradient of the Rosenbrock function
-        
+
         .. math::
 
         \nabla f(x,y) = \left[ 2*((x-\alpha) - 2\beta x(y-x^2)) ; 2\beta (y - x^2)  \right]
@@ -66,5 +66,4 @@ class Rosenbrock(Function):
         if out is not None:
             out.fill (res)
         else:
-            return VectorData(res) 
-
+            return VectorData(res)

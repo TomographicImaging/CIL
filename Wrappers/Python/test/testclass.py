@@ -32,20 +32,20 @@ class CCPiTestClass(unittest.TestCase):
         for col in range(container1.shape[0]):
             if issubclass(container1.get_item(col).__class__, DataContainer):
                 self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
+                    container1.get_item(col).as_array(),
                     container2.get_item(col).as_array()
                     )
             else:
                 self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-    
+
+
     def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
         self.assertTrue(issubclass(container1.__class__, container2.__class__))
         for col in range(container1.shape[0]):
             if issubclass(container1.get_item(col).__class__, DataContainer):
                 self.assertNumpyArrayAlmostEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array(), 
+                    container1.get_item(col).as_array(),
+                    container2.get_item(col).as_array(),
                     decimal=decimal
                     )
             else:
@@ -54,21 +54,21 @@ class CCPiTestClass(unittest.TestCase):
 
     def assertNumpyArrayEqual(self, first, second):
         np.testing.assert_array_equal(first, second)
-        
+
 
     def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
         np.testing.assert_array_almost_equal(first, second, decimal)
-        
 
-        
+
+
     def assertDataArraysInContainerAllClose(self, container1, container2, rtol=1e-07, msg=None):
         self.assertTrue(issubclass(container1.__class__, container2.__class__))
         if isinstance(container1, BlockDataContainer):
             for col in range(container1.shape[0]):
                 if issubclass(container1.get_item(col).__class__, DataContainer):
                     np.testing.assert_allclose(
-                        container1.get_item(col).as_array(), 
-                        container2.get_item(col).as_array(), 
+                        container1.get_item(col).as_array(),
+                        container2.get_item(col).as_array(),
                         rtol=rtol,
                         err_msg=msg
                         )

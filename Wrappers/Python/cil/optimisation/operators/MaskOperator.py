@@ -21,9 +21,9 @@ import numpy as np
 from cil.optimisation.operators import DiagonalOperator
 
 class MaskOperator(DiagonalOperator):
-    
+
     r""" MaskOperator
-   
+
     Parameters
     ----------
     mask : DataContainer
@@ -31,7 +31,7 @@ class MaskOperator(DiagonalOperator):
     domain_geometry : ImageGeometry
         Specifies the geometry of the operator domain. If 'None' will use the mask geometry size and spacing as float32. default = None .
     """
-    
+
     def __init__(self, mask, domain_geometry=None):
 
         #if domain_geometry is not specified assume float32 for domain_geometry data type
@@ -41,6 +41,3 @@ class MaskOperator(DiagonalOperator):
 
         super(MaskOperator, self).__init__(mask, domain_geometry)
         self.mask = self.diagonal
-        
-        
-

@@ -27,7 +27,6 @@ from scipy import constants
 
 from tqdm import tqdm
 import logging
-from dask import compute, delayed
 from multiprocessing.pool import ThreadPool
 
 class PaganinPhaseProcessor(Processor):

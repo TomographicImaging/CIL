@@ -25,7 +25,7 @@ class ProjectionMap(LinearOperator):
 
     r""" Projection Map or Canonical Projection (https://en.wikipedia.org/wiki/Projection_(mathematics))
 
-    Takes an element :math:`x = (x_{0},\dots,x_{i},\dots,x_{n}})` from a Cartesian product space :math:`X_{1}\times\cdots\times X_{n}\rightarrow X_{i}`
+    Takes an element :math:`x = (x_{0},\dots,x_{i},\dots,x_{n})` from a Cartesian product space :math:`X_{1}\times\cdots\times X_{n}\rightarrow X_{i}`
     and projects it to element :math:`x_{i}` specified by the index :math:`i`.
 
     .. math:: \pi_{i}: X_{1}\times\cdots\times X_{n}\rightarrow X_{i}

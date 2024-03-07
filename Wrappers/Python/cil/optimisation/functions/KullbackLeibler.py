@@ -153,10 +153,9 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
         """
 
-        should_return=False
+        
         if out is None:
             out = x.add(self.eta)
-            should_return=True
         else:
             x.add(self.eta,out=out)
 
@@ -165,8 +164,8 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
         out.fill(arr)
 
-        if should_return:
-            return out
+        
+        return out
 
     def convex_conjugate(self, x):
 

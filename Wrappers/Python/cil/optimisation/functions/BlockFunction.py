@@ -136,7 +136,7 @@ class BlockFunction(Function):
             
             
     
-    def gradient(self, x, out=None): #TODO: does this work with out ? 
+    def gradient(self, x, out=None): 
         
         r"""Returns the value of the gradient of the BlockFunction function at x.
 

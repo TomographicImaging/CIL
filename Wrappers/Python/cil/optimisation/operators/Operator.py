@@ -137,7 +137,8 @@ class Operator(object):
     @property
     def range(self):
         return self.range_geometry()
-
+    
+    
     def __rmul__(self, scalar):
         '''Defines the multiplication by a scalar on the left
 

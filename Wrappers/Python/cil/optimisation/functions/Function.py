@@ -124,9 +124,12 @@ class Function(object):
         DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`.
 
         """
-        if id(x)==id(out):
-            raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
+        # if id(x)==id(out):
+        #    raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
 
+        if id(x)==id(out):
+            x=x.copy()
+        
         try:
             tmp = x
             x.divide(tau, out=tmp)
@@ -146,6 +149,7 @@ class Function(object):
 
         if out is None:
             return val
+        
 
     # Algebra for Function Class
 
@@ -534,16 +538,19 @@ class ScaledFunction(Function):
         DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
 
         """
-        if out is not None and id(x)==id(out):
-            raise InPlaceError
+        # if out is not None and id(x)==id(out):
+        #    raise InPlaceError
 
+        if id(x)==id(out):
+            x = x.copy()
+            
         try:
             tmp = x
             x.divide(tau, out=tmp)
         except TypeError:
             tmp = x.divide(tau, dtype=np.float32)
 
-        if out is None:
+        if out is None or id(x)==id(out):
             val = self.function.proximal(tmp, self.scalar/tau)
         else:
             self.function.proximal(tmp, self.scalar/tau, out=out)
@@ -556,6 +563,7 @@ class ScaledFunction(Function):
 
         if out is None:
             return val
+        out = val
 
 
 class SumScalarFunction(SumFunction):

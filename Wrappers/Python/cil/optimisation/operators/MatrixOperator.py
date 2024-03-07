@@ -60,7 +60,7 @@ class MatrixOperator(LinearOperator):
             tmp.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return tmp
         else:            
-            out.fill(numpy.dot(self.A.transpose(),x.as_array()))
+            out.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return out
 
     def size(self):

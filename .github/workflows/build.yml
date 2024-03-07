@@ -63,7 +63,7 @@ jobs:
         cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
         cmake --build ./build --target install
     - name: test
-      run: python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+      run: TESTS_FORCE_GPU=1 python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
       run: |

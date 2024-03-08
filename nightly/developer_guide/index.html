@@ -697,12 +697,10 @@ a HTTP server to view the documentation.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
 cd CIL
 sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
-mkdir build
-cd build
 conda activate ENVIRONMENT_NAME
-cmake .. -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
-cmake --build . --target install
-cd ../docs/
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+cmake --build ./build --target install
+cd docs
 conda update -n base -c defaults conda
 conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
 python mkdemos.py

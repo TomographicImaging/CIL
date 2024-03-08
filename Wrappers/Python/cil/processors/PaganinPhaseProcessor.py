@@ -39,7 +39,7 @@ class PaganinPhaseProcessor(Processor):
         The phase retrieval is valid under the following assumptions
          - it is used with paraxial propagation induced phase contrast images on single-material samples
          - using intensity data which has been flat field corrected
-         - and under the assumption that the Fresnel number = W^2/(wavelength*propagation_distance) >> 1
+         - and under the assumption that the Fresnel number = pixel size^2/(wavelength*propagation_distance) >> 1
         
         To use Paganin phase filtering without transmission to absorption conversion use the `PaganinPhaseProcessor.filter()` method
         in this case the conversion to absorption is not applied so the requirement to supply intensity data is relaxed

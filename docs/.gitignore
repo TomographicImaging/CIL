@@ -1,2 +1,9 @@
 /source/demos/
 /source/demos.rst
+/build/
+/_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata/
+/.bundle/
+/vendor/

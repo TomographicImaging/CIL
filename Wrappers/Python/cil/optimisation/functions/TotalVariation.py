@@ -42,7 +42,7 @@ class TotalVariation(Function):
 
     .. math:: f(u) = \|u\|_{2,1}, \Rightarrow (f\circ\nabla)(u) = f(\nabla x) = \mathrm{TV}(u)
 
-    In that case, the proximal operator of TV does not have an exact solution and we use an iterative 
+    In that case, the proximal operator of TV does not have an exact solution and we use an iterative
     algorithm to solve:
 
     .. math:: \mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)
@@ -57,24 +57,24 @@ class TotalVariation(Function):
     ----------
 
     max_iteration : :obj:`int`, default = 5
-        Maximum number of iterations for the FGP algorithm to solve to solve the dual problem 
+        Maximum number of iterations for the FGP algorithm to solve to solve the dual problem
         of the Total Variation Denoising problem (ROF). If warm_start=False, this should be around 100,
-        or larger, with a set tolerance. 
+        or larger, with a set tolerance.
     tolerance : :obj:`float`, default = None
-        Stopping criterion for the FGP algorithm used to to solve the dual problem 
+        Stopping criterion for the FGP algorithm used to to solve the dual problem
         of the Total Variation Denoising problem (ROF). If the difference between iterates in the FGP algorithm is less than the tolerance
-        the iterations end before the max_iteration number. 
+        the iterations end before the max_iteration number.
 
         .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
 
     correlation : :obj:`str`, default = `Space`
         Correlation between `Space` and/or `SpaceChannels` for the :class:`.GradientOperator`.
-    backend :  :obj:`str`, default = `c`      
+    backend :  :obj:`str`, default = `c`
         Backend to compute the :class:`.GradientOperator`
     lower : :obj:`'float`, default = None
         A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.
     upper : :obj:`'float`, default = None
-        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.  
+        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.
     isotropic : :obj:`boolean`, default = True
         Use either isotropic or anisotropic definition of TV.
 
@@ -90,23 +90,23 @@ class TotalVariation(Function):
         of the Total Variation Denoising problem (ROF).
 
     strong_convexity_constant : :obj:`float`, default = 0
-        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
+        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation.
         Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
 
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
 
-        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u)
 
     warm_start : :obj:`boolean`, default = True
-        If set to true, the FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero. 
-        This allows the max_iteration value to be reduced to 5-10 iterations. 
+        If set to true, the FGP algorithm used to solve the dual problem of the Total Variation Denoising problem (ROF) is initiated by the final value from the previous iteration and not at zero.
+        This allows the max_iteration value to be reduced to 5-10 iterations.
 
 
     Note
     ----
 
-    With warm_start set to the default, True, the TV function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. This increases the memory requirements. 
-    However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated. 
+    With warm_start set to the default, True, the TV function will keep in memory the range of the gradient of the image to be denoised, i.e. N times the dimensionality of the image. This increases the memory requirements.
+    However, during the evaluation of `proximal` the memory requirements will be unchanged as the same amount of memory will need to be allocated and deallocated.
 
     Note
     ----
@@ -139,7 +139,7 @@ class TotalVariation(Function):
 
     >>> alpha = 2.0
     >>> TV = TotalVariation(isotropic=False, lower=1.0, upper=2.0)
-    >>> sol = TV.proximal(b, tau = alpha)    
+    >>> sol = TV.proximal(b, tau = alpha)
 
 
     Examples
@@ -150,7 +150,7 @@ class TotalVariation(Function):
     >>> alpha = 2.0
     >>> gamma = 1e-3
     >>> TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)
-    >>> sol = TV.proximal(b, tau = 1.0)    
+    >>> sol = TV.proximal(b, tau = 1.0)
 
     """
 
@@ -262,8 +262,8 @@ class TotalVariation(Function):
 
         if id(x)==id(out):
             raise InPlaceError(message="TotalVariation.proximal cannot be used in place")
-        
-        
+
+
         if self.strong_convexity_constant > 0:
 
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
@@ -283,7 +283,7 @@ class TotalVariation(Function):
             return solution
 
     def _fista_on_dual_rof(self, x, tau, out=None):
-        r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem 
+        r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem
         of the Total Variation Denoising problem (ROF).
 
         .. math: \max_{\|y\|_{\infty}<=1.} \frac{1}{2}\|\nabla^{*} y + x \|^{2} - \frac{1}{2}\|x\|^{2}
@@ -382,7 +382,7 @@ class TotalVariation(Function):
     @property
     def gradient_operator(self):
         r""" GradientOperator is created if it is not instantiated yet. The domain of the `_gradient`,
-        is created in the `__call__` and `proximal` methods. 
+        is created in the `__call__` and `proximal` methods.
 
         """
         if self._domain is not None:

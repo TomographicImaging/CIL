@@ -37,7 +37,7 @@ def soft_shrinkage(x, tau, out=None):
     the value of the soft-shrinkage operator at x: DataContainer.
     """
     should_return = False
-    # get the sign of the input  
+    # get the sign of the input
     dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
 
     if out is None:
@@ -57,11 +57,9 @@ def soft_shrinkage(x, tau, out=None):
             out.fill(outarr)
         else:
             x.abs(out = out)
-            
     out -= tau
-    out.maximum(0, out = out)    
+    out.maximum(0, out = out)
     out *= dsign
-    
     if should_return:
         return out
 

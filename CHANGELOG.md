@@ -38,7 +38,6 @@
   - New adjoint operator
   - Bug fix for complex matrix adjoint
 
-
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object

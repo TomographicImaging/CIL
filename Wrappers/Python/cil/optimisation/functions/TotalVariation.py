@@ -270,19 +270,15 @@ class TotalVariation(Function):
             x /= strongly_convex_factor
             tau /= strongly_convex_factor
 
-        if out is None:
-            solution = self._fista_on_dual_rof(x, tau)
-        else:
-            self._fista_on_dual_rof(x, tau, out=out)
+        
+        solution = self._fista_on_dual_rof(x, tau , out = out)
+        
 
         if self.strong_convexity_constant > 0:
             x *= strongly_convex_factor
             tau *= strongly_convex_factor
 
-        if out is None:
-            return solution
-        else:
-            return out
+        return solution
 
     def _fista_on_dual_rof(self, x, tau, out=None):
         r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem

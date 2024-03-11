@@ -81,7 +81,7 @@ class CofR_xcorrelation(Processor):
               
         # check if projection_index is either a tuple or list of length 2       
         try:
-            len_check = False if len(self.projection_index) != 2 else True
+            len_check = ( len(self.projection_index) == 2 )
             index = list(self.projection_index)
         # if projection_index does not have a length, put the object in a list
         except:

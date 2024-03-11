@@ -21,7 +21,7 @@ import numpy
 import numpy as np
 from PIL import Image
 import os
-import os.path 
+import os.path
 import sys
 from zipfile import ZipFile
 from urllib.request import urlopen
@@ -132,7 +132,7 @@ class SIMULATED_PARALLEL_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
-        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME 
+        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME
 
         Parameters
         ----------
@@ -153,7 +153,7 @@ class SIMULATED_CONE_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
-        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME 
+        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME
 
         Parameters
         ----------
@@ -185,8 +185,7 @@ class SIMULATED_SPHERE_VOLUME(CILDATA):
         -------
         ImageData
             The simulated spheres volume
-        '''
-        
+        '''       
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
@@ -300,7 +299,7 @@ class SANDSTONE(REMOTEDATA):
 
 class TestData(object):
     '''Class to return test data
-    
+
     provides 6 dataset:
     BOAT = 'boat.tiff'
     CAMERA = 'camera.png'
@@ -317,7 +316,7 @@ class TestData(object):
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
     RAINBOW =  'rainbow.png'
-    
+
     def __init__(self, data_dir):
         self.data_dir = data_dir
         
@@ -339,7 +338,7 @@ class TestData(object):
         ImageData
             The simulated spheres volume
         '''
-        if which not in [TestData.BOAT, TestData.CAMERA, 
+        if which not in [TestData.BOAT, TestData.CAMERA,
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
                          TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES,
                          TestData.RAINBOW]:
@@ -369,12 +368,12 @@ class TestData(object):
                 else:
                     N = size[0]
                     M = size[1]
-                
+
                 ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                 data = ig.allocate()
                 tmp = numpy.array(f.convert('L').resize((M,N)))
                 data.fill(tmp/numpy.max(tmp))
-            
+
         else:
             with Image.open(os.path.join(self.data_dir, which)) as tmp:
 
@@ -391,7 +390,7 @@ class TestData(object):
                         tmp = tmp.convert('RGB')
                         bands = tmp.getbands()
 
-                    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands), 
+                    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands),
                     dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
@@ -433,7 +432,7 @@ class TestData(object):
             out.fill(arr)
             return out
         elif issubclass(type(image), numpy.ndarray):
-            return TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip, 
+            return TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip,
                    **kwargs)
 
     @staticmethod
@@ -507,8 +506,8 @@ class TestData(object):
         To generate Poisson noise against a signed image, the signed image is
         temporarily converted to an unsigned image in the floating point domain,
         Poisson noise is generated, then it is returned to the original range.
-        
-        This function is adapted from scikit-image. 
+
+        This function is adapted from scikit-image.
         https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py
 
         Copyright (C) 2019, the scikit-image team
@@ -539,7 +538,7 @@ class TestData(object):
         STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
         IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
         POSSIBILITY OF SUCH DAMAGE.
-        
+
         """
         mode = mode.lower()
 

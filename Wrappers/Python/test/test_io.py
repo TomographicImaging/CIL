@@ -39,7 +39,7 @@ from cil.io import utilities
 from cil.io import RAWFileWriter
 import configparser
 import tempfile
-        
+
 
 initialise_tests()
 
@@ -91,7 +91,7 @@ if not has_file:
 
 
 class TestTXRMDataReader(unittest.TestCase):
-    
+
 
     def setUp(self):
         logging.info ("has_astra {}".format(has_astra))
@@ -102,20 +102,20 @@ class TestTXRMDataReader(unittest.TestCase):
         if has_file:
             self.reader = TXRMDataReader()
             angle_unit = AcquisitionGeometry.RADIAN
-            
-            self.reader.set_up(file_name=filename, 
+
+            self.reader.set_up(file_name=filename,
                                angle_unit=angle_unit)
             data = self.reader.read()
             if data.geometry is None:
                 raise AssertionError("WTF")
             # Choose the number of voxels to reconstruct onto as number of detector pixels
             N = data.geometry.pixel_num_h
-            
+
             # Geometric magnification
             mag = (np.abs(data.geometry.dist_center_detector) + \
                 np.abs(data.geometry.dist_source_center)) / \
                 np.abs(data.geometry.dist_source_center)
-                
+
             # Voxel size is detector pixel size divided by mag
             voxel_size_h = data.geometry.pixel_size_h / mag
             voxel_size_v = data.geometry.pixel_size_v / mag
@@ -135,11 +135,11 @@ class TestTXRMDataReader(unittest.TestCase):
     def test_run_test(self):
         print("run test Zeiss Reader")
         self.assertTrue(True)
-    
+
 
     @unittest.skipIf(not has_prerequisites, "Prerequisites not met")
     def test_read_and_reconstruct_2D(self):
-        
+
         # get central slice
         data2d = self.data.subset(vertical='centre')
         # d512 = self.data.subset(vertical=512)
@@ -152,15 +152,15 @@ class TestTXRMDataReader(unittest.TestCase):
         # Construct the appropriate ImageGeometry
         ig2d = ImageGeometry(voxel_num_x=self.N,
                             voxel_num_y=self.N,
-                            voxel_size_x=self.voxel_size_h, 
+                            voxel_size_x=self.voxel_size_h,
                             voxel_size_y=self.voxel_size_h)
         if data2d.geometry is None:
             raise AssertionError('What? None?')
         fbpalg = FBP(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
-        
+
         recfbp = fbpalg.get_output()
-        
+
         wget.download('https://www.ccpi.ac.uk/sites/www.ccpi.ac.uk/files/walnut_slice512.nxs',
                       out=data_dir)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
@@ -183,13 +183,13 @@ class TestTIFF(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.TMP.cleanup()
-        
+
     def get_slice_imagedata(self, data):
         '''Returns only 2 slices of data'''
         # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
         data.dimension_labels[0]
-        roi = {data.dimension_labels[0]: (0,2,1), 
-               data.dimension_labels[1]: (None, None, None), 
+        roi = {data.dimension_labels[0]: (0,2,1),
+               data.dimension_labels[1]: (None, None, None),
                data.dimension_labels[2]: (None, None, None)}
         return Slicer(roi=roi)(data)
 
@@ -199,7 +199,7 @@ class TestTIFF(unittest.TestCase):
         data = self.get_slice_imagedata(
             dataexample.SIMULATED_SPHERE_VOLUME.get()
         )
-        
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -219,8 +219,8 @@ class TestTIFF(unittest.TestCase):
         data = self.get_slice_imagedata(
             dataexample.SIMULATED_CONE_BEAM_DATA.get()
         )
-        
-        
+
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -237,7 +237,7 @@ class TestTIFF(unittest.TestCase):
 
     def test_tiff_stack_ImageDataSlice(self):
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()
-        
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -252,7 +252,7 @@ class TestTIFF(unittest.TestCase):
         shape[2] /= 2
 
         np.testing.assert_allclose(shape, read_array.shape )
-        
+
         roi = {'axis_0': (0, 2, None), 'axis_1': -1, 'axis_2': -1}
 
         reader = TIFFStackReader(file_name=self.cwd, roi=roi, mode='slice')
@@ -266,7 +266,7 @@ class TestTIFF(unittest.TestCase):
         data = self.get_slice_imagedata(
             dataexample.SIMULATED_SPHERE_VOLUME.get()
         )
-        
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -277,7 +277,7 @@ class TestTIFF(unittest.TestCase):
             with open(el, 'w') as f:
                 f.write('BOOM')
             break
-                
+
         reader = TIFFStackReader(file_name=self.cwd)
         try:
             read_array = reader.read()
@@ -287,7 +287,7 @@ class TestTIFF(unittest.TestCase):
 
     def test_TIFF_compression3D_0(self):
         self.TIFF_compression_test(None)
-    
+
     def test_TIFF_compression3D_1(self):
         self.TIFF_compression_test('uint8')
 
@@ -297,16 +297,16 @@ class TestTIFF(unittest.TestCase):
     def test_TIFF_compression3D_3(self):
         with self.assertRaises(ValueError) as context:
             self.TIFF_compression_test('whatever_compression')
-            
+
     def test_TIFF_compression4D_0(self):
         self.TIFF_compression_test(None,2)
-        
+
     def test_TIFF_compression4D_1(self):
         self.TIFF_compression_test('uint8',2)
 
     def test_TIFF_compression4D_2(self):
         self.TIFF_compression_test('uint16',2)
-    
+
     def test_TIFF_compression4D_3(self):
         with self.assertRaises(ValueError) as context:
             self.TIFF_compression_test('whatever_compression',2)
@@ -337,7 +337,7 @@ class TestTIFF(unittest.TestCase):
         if C > 1:
             read_array = reader.read_as_ImageData(ig).array
 
-        
+
         if compress:
             tmp = data.array * scale + offset
             tmp = np.asarray(tmp, dtype=dtype)
@@ -350,7 +350,7 @@ class TestTIFF(unittest.TestCase):
             sc, of = reader.read_scale_offset()
             assert sc == scale
             assert of == offset
-            
+
             recovered_data = (read_array - of)/sc
             np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
 
@@ -365,9 +365,9 @@ class TestTIFF(unittest.TestCase):
             # if the compression is None, the scale and offset should not be written to the json file
             with self.assertRaises(OSError) as context:
                 sc, of = reader.read_scale_offset()
-        
+
         assert tmp.dtype == read_array.dtype
-        
+
         np.testing.assert_array_equal(tmp, read_array)
 
 class TestRAW(unittest.TestCase):
@@ -381,7 +381,7 @@ class TestRAW(unittest.TestCase):
 
     def test_raw_nocompression_0(self):
         self.RAW_compression_test(None,1)
-    
+
     def test_raw_compression_0(self):
         self.RAW_compression_test('uint8',1)
 
@@ -390,7 +390,7 @@ class TestRAW(unittest.TestCase):
 
     def test_raw_nocompression_1(self):
         self.RAW_compression_test(None,1)
-    
+
     def test_raw_compression_2(self):
         with self.assertRaises(ValueError) as context:
             self.RAW_compression_test(12,1)
@@ -414,7 +414,7 @@ class TestRAW(unittest.TestCase):
             assert data.ndim == 4
         raw = "unittest.raw"
         fname = os.path.join(self.cwd, raw)
-        
+
         writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
         writer.write()
 
@@ -423,7 +423,7 @@ class TestRAW(unittest.TestCase):
         config = configparser.ConfigParser()
         inifname = os.path.join(self.cwd, ini)
         config.read(inifname)
-        
+
 
         assert raw == config['MINIMAL INFO']['file_name']
 
@@ -431,7 +431,7 @@ class TestRAW(unittest.TestCase):
         read_dtype = config['MINIMAL INFO']['data_type']
         read_array = np.fromfile(fname, dtype=read_dtype)
         read_shape = eval(config['MINIMAL INFO']['shape'])
-        
+
         # reshape read in array
         read_array = read_array.reshape(read_shape)
 
@@ -450,23 +450,23 @@ class TestRAW(unittest.TestCase):
             tmp = np.asarray(tmp, dtype=dtype)
         else:
             tmp = data.array
-            
+
         assert tmp.dtype == read_array.dtype
-        
+
         np.testing.assert_array_equal(tmp, read_array)
 
 class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:
         self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
 
-        
+
         self.dset_path ='/entry1/tomo_entry/data/data'
 
 
     def test_print_metadata(self):
         devnull = open(os.devnull, 'w') #suppress stdout
         with patch('sys.stdout', devnull):
-            HDF5_utilities.print_metadata(self.path)    
+            HDF5_utilities.print_metadata(self.path)
 
 
     def test_get_dataset_metadata(self):
@@ -548,7 +548,7 @@ class TestNikonReader(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             reader = NikonDataReader(file_name='no-file')
-        
+
 
 class TestZeissReader(unittest.TestCase):
 

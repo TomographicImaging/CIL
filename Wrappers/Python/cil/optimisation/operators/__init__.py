@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
- CompositionOperator
+ CompositionOperator, AdjointOperator
 from .BlockOperator import BlockOperator
 from .SparseFiniteDifferenceOperator import SparseFiniteDifferenceOperator
 from .FiniteDifferenceOperator import FiniteDifferenceOperator
@@ -31,4 +31,3 @@ from .MaskOperator import MaskOperator
 from .ChannelwiseOperator import ChannelwiseOperator
 from .BlurringOperator import BlurringOperator
 from .ProjectionMap import ProjectionMap
-

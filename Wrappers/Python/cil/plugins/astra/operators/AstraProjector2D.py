@@ -46,25 +46,25 @@ class AstraProjector2D(LinearOperator):
     >>> forward_projection = PO.direct(image)
     >>> backward_projection = PO.adjoint(data)
 
-    """    
+    """
     def __init__(self, image_geometry, acquisition_geometry, device):
 
         super(AstraProjector2D, self).__init__(image_geometry, range_geometry=acquisition_geometry)
-        
+
         self.fp = AstraForwardProjector2D(volume_geometry=image_geometry,
                                         sinogram_geometry=acquisition_geometry,
                                         proj_id = None,
                                         device=device)
-        
+
         self.bp = AstraBackProjector2D(volume_geometry = image_geometry,
                                         sinogram_geometry = acquisition_geometry,
                                         proj_id = None,
                                         device = device)
-                           
-        
+
+
     def direct(self, x, out=None):
         '''Applies the direct of the operator i.e. the forward projection.
-        
+
         Parameters
         ----------
         x : ImageData
@@ -72,7 +72,7 @@ class AstraProjector2D(LinearOperator):
 
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer
@@ -91,7 +91,7 @@ class AstraProjector2D(LinearOperator):
 
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer

@@ -41,13 +41,13 @@ class TIFFReadWriter(unittest.TestCase):
                 k += 1
         data.fill(arr)
         self.cwd = os.getcwd()
-        # filename contains brackets to test if previous problems 
+        # filename contains brackets to test if previous problems
         # with use of glob in the tiff reader have been resolved:
         fname = os.path.join(self.cwd, 'test_tiff [0]','myfile.tif')
         self.data_dir = os.path.dirname(fname)
         writer = TIFFWriter(data=data, file_name=fname, counter_offset=0)
         writer.write()
-        
+
         self.ig = ig
         self.data = data
 
@@ -71,20 +71,20 @@ class TIFFReadWriter(unittest.TestCase):
 
     def test_read_as_ImageData1(self):
         reader = TIFFStackReader(file_name = self.data_dir)
-        
+
         img = reader.read_as_ImageData(self.ig)
         np.testing.assert_array_equal(img.as_array(), self.data.as_array())
-    
+
 
     def test_read_as_ImageData_Exceptions(self):
         igs = [ ImageGeometry(10,11,12, channels=5) ]
         igs.append( ImageGeometry(12,32) )
         reader = TIFFStackReader(file_name = self.data_dir)
-        
+
         for geom in igs:
             with self.assertRaises(ValueError):
                 img = reader.read_as_ImageData(geom)
-                
+
 
     def test_read_as_AcquisitionData1(self):
         ag = AcquisitionGeometry.create_Parallel3D()
@@ -121,7 +121,7 @@ class TIFFReadWriter(unittest.TestCase):
             reader = TIFFStackReader(file_name = self.data_dir)
             with self.assertRaises(ValueError):
                 acq = reader.read_as_AcquisitionData(ag)
-                
+
 
     def test_read_as_AcquisitionData_Exceptions2(self):
             ag = AcquisitionGeometry.create_Parallel3D()
@@ -136,4 +136,3 @@ class TIFFReadWriter(unittest.TestCase):
                 fake = Fake()
                 fake.shape = (36,11,10)
                 acq = reader.read_as_ImageData(fake)
-                

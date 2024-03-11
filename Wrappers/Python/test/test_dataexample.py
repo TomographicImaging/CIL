@@ -61,7 +61,7 @@ class TestTestData(CCPiTestClass):
         image = self.check_load(dataexample.CAMERA)
 
         ig_expected = ImageGeometry(512,512)
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_BOAT(self):
@@ -69,14 +69,14 @@ class TestTestData(CCPiTestClass):
         image = self.check_load(dataexample.BOAT)
 
         ig_expected = ImageGeometry(512,512)
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_PEPPERS(self):
         image = self.check_load(dataexample.PEPPERS)
 
         ig_expected = ImageGeometry(512,512,channels=3,dimension_labels=['channel', 'horizontal_y', 'horizontal_x'])
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_RAINBOW(self):
@@ -84,7 +84,7 @@ class TestTestData(CCPiTestClass):
         image = self.check_load(dataexample.RAINBOW)
 
         ig_expected = ImageGeometry(1194,1353,channels=3,dimension_labels=['channel', 'horizontal_y', 'horizontal_x'])
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_RESOLUTION_CHART(self):
@@ -92,7 +92,7 @@ class TestTestData(CCPiTestClass):
         image = self.check_load(dataexample.RESOLUTION_CHART)
 
         ig_expected = ImageGeometry(256,256)
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_SIMPLE_PHANTOM_2D(self):
@@ -100,7 +100,7 @@ class TestTestData(CCPiTestClass):
         image = self.check_load(dataexample.SIMPLE_PHANTOM_2D)
 
         ig_expected = ImageGeometry(512,512)
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_SHAPES(self):
@@ -108,7 +108,7 @@ class TestTestData(CCPiTestClass):
         image = self.check_load(dataexample.SHAPES)
 
         ig_expected = ImageGeometry(300,200)
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_SYNCHROTRON_PARALLEL_BEAM_DATA(self):
@@ -119,7 +119,7 @@ class TestTestData(CCPiTestClass):
                                          .set_panel((160,135),(1,1))\
                                          .set_angles(np.linspace(-88.2,91.8,91))
 
-        self.assertEqual(ag_expected.shape,image.geometry.shape,msg="Image geometry mismatch")   
+        self.assertEqual(ag_expected.shape,image.geometry.shape,msg="Image geometry mismatch")
         np.testing.assert_allclose(ag_expected.angles, image.geometry.angles,atol=0.05)
 
 
@@ -129,7 +129,7 @@ class TestTestData(CCPiTestClass):
 
         ig_expected = ImageGeometry(128,128,128,16,16,16)
 
-        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
     def test_load_SIMULATED_PARALLEL_BEAM_DATA(self):
@@ -140,7 +140,7 @@ class TestTestData(CCPiTestClass):
                                          .set_panel((128,128),(16,16))\
                                          .set_angles(np.linspace(0,360,300,False))
 
-        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")
 
 
     def test_load_SIMULATED_CONE_BEAM_DATA(self):
@@ -225,5 +225,3 @@ class TestRemoteData(unittest.TestCase):
         
         # return to standard print output
         sys.stdout = sys.__stdout__ 
-
-        

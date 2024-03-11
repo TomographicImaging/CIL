@@ -154,18 +154,16 @@ class KullbackLeibler_numpy(KullbackLeibler):
         """
 
         
-        if out is None:
-            out = x.add(self.eta)
-        else:
-            x.add(self.eta,out=out)
+        
+        res = x.add(self.eta,out=out)
 
-        arr = out.as_array()
+        arr = res.as_array()
         arr[arr>0] = 1 - self.b.as_array()[arr>0]/arr[arr>0]
 
-        out.fill(arr)
+        res.fill(arr)
 
         
-        return out
+        return res
 
     def convex_conjugate(self, x):
 

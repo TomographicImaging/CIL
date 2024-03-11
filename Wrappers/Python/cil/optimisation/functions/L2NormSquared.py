@@ -119,10 +119,7 @@ class L2NormSquared(Function):
         else:
             ret = x.sapyb(mult, self.b, (1-mult), out=out)
 
-        if out is None:
-            return ret
-        else:
-            return out
+        return ret
 
 
 class WeightedL2NormSquared(Function):

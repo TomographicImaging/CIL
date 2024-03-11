@@ -74,9 +74,8 @@ jobs:
         conda list
     - name: build cil
       run: |
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
-        cmake --build . --target install
+        cmake -S . -B ../build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
+        cmake --build ../build --target install
     - name: checkout docs
       uses: actions/checkout@v4
       with:

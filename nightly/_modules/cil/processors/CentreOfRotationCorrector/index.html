@@ -508,15 +508,15 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        slice_index: int or str, optional</span>
+<span class="sd">            An integer defining the vertical slice to run the algorithm on or string=&#39;centre&#39; specifying the central slice should be used (default is &#39;centre&#39;)</span>
 
-<span class="sd">        slice_index : int, str=&#39;centre&#39;, default=&#39;centre&#39;</span>
-<span class="sd">            An integer defining the vertical slice to run the algorithm on.</span>
+<span class="sd">        projection_index: int or list/tuple of ints, optional</span>
+<span class="sd">            An integer defining the index of the first projection the cross correlation algorithm will use, where the second projection is chosen as the projection closest to 180 degrees from this.</span>
+<span class="sd">            Or a list/tuple of ints specifying the two indices to be used for cross correlation (default is 0)</span>
 
-<span class="sd">        projection_index : int</span>
-<span class="sd">            An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.</span>
-
-<span class="sd">        ang_tol : float, default=0.1</span>
-<span class="sd">            The angular tolerance in degrees between the two input projections 180 degree gap</span>
+<span class="sd">        ang_tol: float, optional</span>
+<span class="sd">            The angular tolerance in degrees between the two input projections 180 degree gap (default is 0.1)</span>
 
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>

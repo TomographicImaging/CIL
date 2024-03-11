@@ -1326,9 +1326,10 @@ volume (double-borders).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>slice_index</strong> (<em>int</em><em>, </em><em>str='centre'</em><em>, </em><em>default='centre'</em>) – An integer defining the vertical slice to run the algorithm on.</p></li>
-<li><p><strong>projection_index</strong> (<em>int</em>) – An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.</p></li>
-<li><p><strong>ang_tol</strong> (<em>float</em><em>, </em><em>default=0.1</em>) – The angular tolerance in degrees between the two input projections 180 degree gap</p></li>
+<li><p><strong>slice_index</strong> (<em>int</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – An integer defining the vertical slice to run the algorithm on or string=’centre’ specifying the central slice should be used (default is ‘centre’)</p></li>
+<li><p><strong>projection_index</strong> (<em>int</em><em> or </em><em>list/tuple of ints</em><em>, </em><em>optional</em>) – An integer defining the index of the first projection the cross correlation algorithm will use, where the second projection is chosen as the projection closest to 180 degrees from this.
+Or a list/tuple of ints specifying the two indices to be used for cross correlation (default is 0)</p></li>
+<li><p><strong>ang_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The angular tolerance in degrees between the two input projections 180 degree gap (default is 0.1)</p></li>
 </ul>
 </dd>
 </dl>

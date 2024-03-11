@@ -112,7 +112,11 @@ class CofR_xcorrelation(Processor):
         # check the two angles are 180 degrees apart within the specified tolerance
         ang_diff = (angles_deg[index[0]] - angles_deg[index[1]]) % 360
         if abs(ang_diff-180) > self.ang_tol:
-            raise ValueError('Method requires projections 180+/-{0} degrees apart, for chosen projection angle {1} found closest angle {2}.\
+            if isinstance(self.projection_index, (list, tuple)):
+                raise ValueError('Method requires projections 180+/-{0} degrees apart. The projection angle {1} and angle {2} provided are not within this tolerance.\
+                            \nPick different projections or increase the angular tolerance ang_tol.'.format(self.ang_tol, data.geometry.angles[index[0]], data.geometry.angles[index[1]]))
+            else:
+                raise ValueError('Method requires projections 180+/-{0} degrees apart, for chosen projection angle {1} found closest angle {2}.\
                             \nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, data.geometry.angles[index[0]], data.geometry.angles[index[1]]))
         
         self._indices = index

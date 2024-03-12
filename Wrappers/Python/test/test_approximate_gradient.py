@@ -76,29 +76,6 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
 class TestSGD(CCPiTestClass):
     
     def setUp(self):
-<<<<<<< HEAD
-        self.sampler=Sampler.random_with_replacement(5, seed=1)
-        self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        self.data.reorder('astra')
-        self.data2d = self.data.get_slice(vertical='centre')
-        ag2D = self.data2d.geometry
-        ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-        ig2D = ag2D.get_ImageGeometry()
-        self.A = ProjectionOperator(ig2D, ag2D, device="cpu")
-        self.n_subsets = 5
-        self.partitioned_data = self.data2d.partition(
-            self.n_subsets, 'sequential')
-        self.A_partitioned = ProjectionOperator(
-            ig2D, self.partitioned_data.geometry, device="cpu")
-        self.f_subsets = []
-        for i in range(self.n_subsets):
-            fi = LeastSquares(
-                self.A_partitioned.operators[i], self. partitioned_data[i])
-            self.f_subsets.append(fi)
-        self.f = LeastSquares(self.A, self.data2d)
-        self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
-        self.initial = ig2D.allocate()
-=======
         
         if has_astra:
             self.sampler = Sampler.random_with_replacement(5)
@@ -141,7 +118,6 @@ class TestSGD(CCPiTestClass):
             self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
             
             
->>>>>>> SGD
 
     def test_approximate_gradient_not_equal_full(self):
         self.assertFalse((self.f_stochastic.full_gradient(
@@ -268,9 +244,47 @@ class TestSGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
 
-<<<<<<< HEAD
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    def test_with_cvxpy(self):
+        np.random.seed(10)
+        n = 300  
+        m = 100 
+        A = np.random.normal(0,1, (m, n)).astype('float32')
+        b = np.random.normal(0,1, m).astype('float32')
 
-class TestSAG(CCPiTestClass):
+        Aop = MatrixOperator(A)
+        bop = VectorData(b) 
+        n_subsets = 10
+        Ai = np.vsplit(A, n_subsets) 
+        bi = [b[i:i+int(m/n_subsets)] for i in range(0, m, int(m/n_subsets))]     
+        fi_cil = []
+        for i in range(n_subsets):   
+            Ai_cil = MatrixOperator(Ai[i])
+            bi_cil = VectorData(bi[i])
+            fi_cil.append(LeastSquares(Ai_cil, bi_cil, c = 0.5))
+        F = LeastSquares(Aop, b=bop, c = 0.5)     
+        ig = Aop.domain  
+        initial= ig.allocate(0) 
+        sampler=Sampler.random_with_replacement(n_subsets)
+        F_SG=SGFunction(fi_cil, sampler)
+        u_cvxpy = cvxpy.Variable(ig.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - bop.array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+
+        step_size = 1./F_SG.L
+
+        epochs = 200
+        sgd = GD(initial = initial, objective_function = F_SG, step_size = step_size,
+                    max_iteration = epochs * n_subsets, 
+                    update_objective_interval = epochs * n_subsets)
+        sgd.run(verbose=0)    
+
+        np.testing.assert_allclose(p.value, sgd.objective[-1], atol=1e-1)
+        np.testing.assert_allclose(u_cvxpy.value, sgd.solution.array, atol=1e-1)    
+
+
+class TestSAG(CCPiTestClass): #TODO: sort astra tests 
 
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def setUp(self):
@@ -447,7 +461,7 @@ class TestSAG(CCPiTestClass):
 
 class TestSAGA(CCPiTestClass):
     
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    @unittest.skipUnless(has_astra, "Requires ASTRA") #TODO: sort astra tests 
     def setUp(self):
         self.sampler=Sampler.random_with_replacement(5, seed=1)
         self.data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -618,44 +632,6 @@ class TestSAGA(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
        
 
-        
-=======
-    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
-    def test_with_cvxpy(self):
-        np.random.seed(10)
-        n = 300  
-        m = 100 
-        A = np.random.normal(0,1, (m, n)).astype('float32')
-        b = np.random.normal(0,1, m).astype('float32')
+        #TODO: at cvxpy tests 
 
-        Aop = MatrixOperator(A)
-        bop = VectorData(b) 
-        n_subsets = 10
-        Ai = np.vsplit(A, n_subsets) 
-        bi = [b[i:i+int(m/n_subsets)] for i in range(0, m, int(m/n_subsets))]     
-        fi_cil = []
-        for i in range(n_subsets):   
-            Ai_cil = MatrixOperator(Ai[i])
-            bi_cil = VectorData(bi[i])
-            fi_cil.append(LeastSquares(Ai_cil, bi_cil, c = 0.5))
-        F = LeastSquares(Aop, b=bop, c = 0.5)     
-        ig = Aop.domain  
-        initial= ig.allocate(0) 
-        sampler=Sampler.random_with_replacement(n_subsets)
-        F_SG=SGFunction(fi_cil, sampler)
-        u_cvxpy = cvxpy.Variable(ig.shape[0])
-        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - bop.array))
-        p = cvxpy.Problem(objective)
-        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
 
-        step_size = 1./F_SG.L
-
-        epochs = 200
-        sgd = GD(initial = initial, objective_function = F_SG, step_size = step_size,
-                    max_iteration = epochs * n_subsets, 
-                    update_objective_interval = epochs * n_subsets)
-        sgd.run(verbose=0)    
-
-        np.testing.assert_allclose(p.value, sgd.objective[-1], atol=1e-1)
-        np.testing.assert_allclose(u_cvxpy.value, sgd.solution.array, atol=1e-1)    
->>>>>>> SGD

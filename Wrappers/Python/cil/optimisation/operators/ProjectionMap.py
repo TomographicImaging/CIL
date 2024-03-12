@@ -68,7 +68,7 @@ class ProjectionMap(LinearOperator):
 
     def direct(self,x,out=None):
         r"""
-        Returns the ith (`param_index`) element of the Block data container, :math:`x`
+        Returns the ith (`index`) element of the Block data container, :math:`x`
         
         Parameters
         ----------
@@ -92,7 +92,7 @@ class ProjectionMap(LinearOperator):
 
     def adjoint(self,x, out=None):
         r"""
-        Returns a `BlockDataContainer` of zeros with the ith (`param_index`) filled with the `DataContainer`, :math:`x`
+        Returns a `BlockDataContainer` of zeros with the ith (`index`) filled with the `DataContainer`, :math:`x`
         
         Parameters
         ----------

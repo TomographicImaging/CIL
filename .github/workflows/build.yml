@@ -69,14 +69,13 @@ jobs:
       run: |
         cd docs
         conda install -c conda-forge -yq conda-merge
-        conda-merge <(sed -r '/tigre|astra-toolbox/d' ../scripts/requirements-test.yml) docs_environment.yml > environment.yml
+        conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
         conda env update -n test
         conda list
     - name: build cil
       run: |
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
-        cmake --build . --target install
+        cmake -S . -B ../build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
+        cmake --build ../build --target install
     - name: checkout docs
       uses: actions/checkout@v4
       with:

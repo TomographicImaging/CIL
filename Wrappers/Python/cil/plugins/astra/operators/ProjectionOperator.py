@@ -143,7 +143,7 @@ class ProjectionOperator_ag(ProjectionOperator):
 
     def direct(self, IM, out=None):
         '''Applies the direct of the operator i.e. the forward projection.
-        
+
         Parameters
         ----------
         IM : ImageData
@@ -151,7 +151,7 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer
@@ -170,7 +170,7 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer

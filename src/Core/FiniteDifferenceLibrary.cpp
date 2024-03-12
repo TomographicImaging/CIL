@@ -580,4 +580,3 @@ DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, siz
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-

@@ -1001,9 +1001,58 @@ for 2D geometries elevation and azimuthal cannot be changed</p>
 </section>
 <section id="islicer-interactive-display-of-2d-slices">
 <h3>islicer - interactive display of 2D slices<a class="headerlink" href="#islicer-interactive-display-of-2d-slices" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.jupyter.islicer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.jupyter.</span></span><span class="sig-name descname"><span class="pre">islicer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower-left'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">play_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/jupyter/#islicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.jupyter.islicer" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates an interactive slider that slices a 3D volume along an axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>numpy.ndarray</em>) – A 3-dimensional dataset from which 2-dimensional slices will be
+shown</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Axis to slice on. Can be 0,1,2 or the axis label, default 0</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>list of str</em><em> or </em><em>tuple of str</em><em>, </em><em>default=''</em>) – Title for the display</p></li>
+<li><p><strong>slice_number</strong> (<em>int</em><em>, </em><em>optional</em>) – Start slice number (default is None, which results in the center
+slice being shown initially)</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em> or </em><em>matplotlib.colors.Colormap</em><em>, </em><em>default='gray'</em>) – Set the colour map</p></li>
+<li><p><strong>minmax</strong> (<em>tuple</em>) – Colorbar (min, max) values, default None (uses the min, max of
+values in <cite>data</cite>)</p></li>
+<li><p><strong>size</strong> (<em>int</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – Specify the figure size in inches. If <cite>int</cite> this specifies the
+width, and scales the height in order to keep the standard
+<cite>matplotlib</cite> aspect ratio, default None (use the default matplotlib
+figure size)</p></li>
+<li><p><strong>axis_labels</strong> (<em>list of str</em><em>, </em><em>optional</em>) – The axis labels to use for each of the 3 dimensions in the data
+(default is None, resulting in labels extracted from the data, or
+[‘X’,’Y’,’Z’] if no labels are present)</p></li>
+<li><p><strong>origin</strong> (<em>{'lower-left'</em><em>, </em><em>'upper-left'</em><em>, </em><em>'lower-right'</em><em>, </em><em>'upper-right'}</em>) – Sets the display origin</p></li>
+<li><p><strong>play_interval</strong> (<em>int</em><em>, </em><em>default=500</em>) – The interval of time (in ms) a slice is selected for when iterating
+through a set of them</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>box</strong> – The top-level widget container.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ipywidgets.Box</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="link-islicer-link-islicer-objects-by-index">
 <h3>link_islicer - link islicer objects by index<a class="headerlink" href="#link-islicer-link-islicer-objects-by-index" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.jupyter.link_islicer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.jupyter.</span></span><span class="sig-name descname"><span class="pre">link_islicer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/jupyter/#link_islicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.jupyter.link_islicer" title="Permalink to this definition">#</a></dt>
+<dd><p>Links islicer’s slice-selection widgets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*args</strong> (<em>tuple of ipywidgets.Box</em>) – The widget containers returned from <cite>islicer</cite>, from which the slice
+selection sliders will be extracted and linked.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 </section>
 </section>

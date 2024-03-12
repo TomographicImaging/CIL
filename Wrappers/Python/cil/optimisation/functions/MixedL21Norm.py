@@ -171,15 +171,11 @@ class MixedL21Norm(Function):
             res = _proximal_step_numpy(tmp, tau)
 
         if out is None:
-            res = x.multiply(res)
+            return x.multiply(res)
         else:
             x.multiply(res, out = out)
-            res = out
-
-        if out is None:
-            return res
-        else:
             return out
+
 
 class SmoothMixedL21Norm(Function):
 

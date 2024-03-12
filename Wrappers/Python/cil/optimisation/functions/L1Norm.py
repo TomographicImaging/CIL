@@ -219,19 +219,14 @@ class _L1Norm(Function):
 
 
     def proximal(self, x, tau, out=None):
-        if out is None:
-            if self.b is not None:
-                return self.b + soft_shrinkage(x - self.b, tau)
-            else:
-                return soft_shrinkage(x, tau)
-        else:
 
-            if self.b is not None:
-                soft_shrinkage(x - self.b, tau, out = out)
-                out += self.b
-            else:
-                soft_shrinkage(x, tau, out = out)   
-            return out
+
+        if self.b is not None:
+            ret = soft_shrinkage(x - self.b, tau, out = out)
+            ret += self.b
+        else:
+            ret = soft_shrinkage(x, tau, out = out)   
+        return ret
 
 
 class _WeightedL1Norm(Function):

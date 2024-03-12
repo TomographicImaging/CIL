@@ -196,23 +196,13 @@ class WeightedL2NormSquared(Function):
 
     def proximal(self, x, tau, out=None):
         r"""Returns the value of the proximal operator of the WeightedL2NormSquared function at x."""
-        if out is None:
 
-            if self.b is None:
-                return x/(1+2*tau*self.weight)
-            else:
-                tmp = x.subtract(self.b)
-                tmp /= (1+2*tau*self.weight)
-                tmp += self.b
-                return tmp
 
+        if self.b is not None:
+            ret = x.subtract(self.b, out=out)
+            ret/= (1+2*tau*self.weight)
+            ret += self.b
         else:
-
-            if self.b is not None:
-                x.subtract(self.b, out=out)
-                out /= (1+2*tau*self.weight)
-                out += self.b
-            else:
-                x.divide((1+2*tau*self.weight), out=out)
-            
-            return out
+            ret = x.divide((1+2*tau*self.weight), out=out)
+        
+        return ret

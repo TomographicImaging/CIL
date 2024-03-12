@@ -88,18 +88,12 @@ class ChannelwiseOperator(LinearOperator):
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's direct method and fill into multi-channel output data set.
         if out is None:
-            output = self.range_geometry().allocate()
-            cury = self.op.range_geometry().allocate()
-            for k in range(self.channels):
-                self.op.direct(x.get_slice(channel=k),cury)
-                output.fill(cury.as_array(),channel=k)
-            return output
-        else:
-            cury = self.op.range_geometry().allocate()
-            for k in range(self.channels):
-                self.op.direct(x.get_slice(channel=k),cury)
-                out.fill(cury.as_array(),channel=k)
-            return out
+            out = self.range_geometry().allocate()
+        cury = self.op.range_geometry().allocate()
+        for k in range(self.channels):
+            self.op.direct(x.get_slice(channel=k),cury)
+            out.fill(cury.as_array(),channel=k)
+        return out
     
     def adjoint(self,x, out=None):
 
@@ -108,18 +102,13 @@ class ChannelwiseOperator(LinearOperator):
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's adjoint method and fill into multi-channel output data set.
         if out is None:
-            output = self.domain_geometry().allocate()
-            cury = self.op.domain_geometry().allocate()
-            for k in range(self.channels):
-                self.op.adjoint(x.get_slice(channel=k),cury)
-                output.fill(cury.as_array(),channel=k)
-            return output
-        else:
-            cury = self.op.domain_geometry().allocate()
-            for k in range(self.channels):
-                self.op.adjoint(x.get_slice(channel=k),cury)
-                out.fill(cury.as_array(),channel=k)
-            return out
+            out = self.domain_geometry().allocate()
+            
+        cury = self.op.domain_geometry().allocate()
+        for k in range(self.channels):
+            self.op.adjoint(x.get_slice(channel=k),cury)
+            out.fill(cury.as_array(),channel=k)
+        return out
         
 
     def calculate_norm(self, **kwargs):

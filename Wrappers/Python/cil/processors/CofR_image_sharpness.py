@@ -53,11 +53,6 @@ class CofR_image_sharpness(Processor):
     initial_binning : int
         The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
 
-    Other Parameters
-    ----------------
-    **kwargs : dict
-        FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
-
 
     Example
     -------
@@ -86,16 +81,6 @@ class CofR_image_sharpness(Processor):
     _supported_backends = ['astra', 'tigre']
 
     def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
-
-
-        FBP = kwargs.get('FBP', None)
-        if  FBP is not None:
-            logging.warning("Instantiation with an FBP class has been deprecated and will be removed in future versions.\
-                            Please pass backend='astra' or 'tigre'")
-
-            if inspect.isclass(FBP):
-                if 'astra' in str(inspect.getmodule(FBP)):
-                    backend = 'astra'
 
         FBP = self._configure_FBP(backend)
 

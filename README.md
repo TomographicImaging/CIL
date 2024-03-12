@@ -141,10 +141,8 @@ conda env create -f scripts/requirements-test.yml
 CMake and a C++ compiler are required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
 ```sh
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
-cmake --build . --target install
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory>
+cmake --build ./build --target install
 ```
 
 If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows).
@@ -154,7 +152,7 @@ If not installing to a conda environment then the user will also need to set the
 By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters:
 
 ```sh
-cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
 ```
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.

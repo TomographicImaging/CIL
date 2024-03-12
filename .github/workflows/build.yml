@@ -69,7 +69,7 @@ jobs:
       run: |
         cd docs
         conda install -c conda-forge -yq conda-merge
-        conda-merge <(sed -r '/tigre|astra-toolbox/d' ../scripts/requirements-test.yml) docs_environment.yml > environment.yml
+        conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
         conda env update -n test
         conda list
     - name: build cil

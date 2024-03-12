@@ -18,7 +18,6 @@
 
 from cil.optimisation.functions import Function
 from cil.framework import BlockDataContainer
-from cil.utilities.errors import InPlaceError
 import numpy as np
 
 def soft_shrinkage(x, tau, out=None):
@@ -37,10 +36,10 @@ def soft_shrinkage(x, tau, out=None):
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
     """
-    if  id(x)==id(out):
-        raise InPlaceError(message="The soft_shrinkage function cannot be used in place" )
-
     should_return = False
+    # get the sign of the input
+    dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
+
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             out = x * 0
@@ -60,13 +59,7 @@ def soft_shrinkage(x, tau, out=None):
             x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
-    if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-        out *= np.exp(1j*np.angle(x.as_array()))
-
-    else:
-        out *= x.sign()
-
-
+    out *= dsign
     if should_return:
         return out
 

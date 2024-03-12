@@ -80,10 +80,7 @@ class L2NormSquared(Function):
         else:
             ret = x.sapyb(2, self.b, -2, out=out)
 
-        if out is None:
-            return ret
-        else:
-            return out
+        return ret
 
     def convex_conjugate(self, x):
         r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
@@ -119,10 +116,7 @@ class L2NormSquared(Function):
         else:
             ret = x.sapyb(mult, self.b, (1-mult), out=out)
 
-        if out is None:
-            return ret
-        else:
-            return out
+        return ret
 
 
 class WeightedL2NormSquared(Function):

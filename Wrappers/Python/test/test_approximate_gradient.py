@@ -42,7 +42,12 @@ initialise_tests()
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
+from utils import has_cvxpy
 
+if has_cvxpy:
+    import cvxpy
+    
+    
 class TestApproximateGradientSumFunction(CCPiTestClass):
 
     def setUp(self):
@@ -124,7 +129,7 @@ class TestSGD(CCPiTestClass):
         self.assertEqual(f.sampler._type, 'random_with_replacement')
 
     
-    def test_direct(self):
+    def test_call(self):
         self.assertAlmostEqual(self.f_stochastic(
             self.initial), self.f(self.initial), 1)
 
@@ -236,3 +241,42 @@ class TestSGD(CCPiTestClass):
             alg_stochastic.x.as_array(), alg.x.as_array(), 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    def test_with_cvxpy(self):
+        np.random.seed(10)
+        n = 300  
+        m = 100 
+        A = np.random.normal(0,1, (m, n)).astype('float32')
+        b = np.random.normal(0,1, m).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b) 
+        n_subsets = 10
+        Ai = np.vsplit(A, n_subsets) 
+        bi = [b[i:i+int(m/n_subsets)] for i in range(0, m, int(m/n_subsets))]     
+        fi_cil = []
+        for i in range(n_subsets):   
+            Ai_cil = MatrixOperator(Ai[i])
+            bi_cil = VectorData(bi[i])
+            fi_cil.append(LeastSquares(Ai_cil, bi_cil, c = 0.5))
+        F = LeastSquares(Aop, b=bop, c = 0.5)     
+        ig = Aop.domain  
+        initial= ig.allocate(0) 
+        sampler=Sampler.random_with_replacement(n_subsets)
+        F_SG=SGFunction(fi_cil, sampler)
+        u_cvxpy = cvxpy.Variable(ig.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - bop.array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+
+        step_size = 1./F_SG.L
+
+        epochs = 200
+        sgd = GD(initial = initial, objective_function = F_SG, step_size = step_size,
+                    max_iteration = epochs * n_subsets, 
+                    update_objective_interval = epochs * n_subsets)
+        sgd.run(verbose=0)    
+
+        np.testing.assert_allclose(p.value, sgd.objective[-1], atol=1e-1)
+        np.testing.assert_allclose(u_cvxpy.value, sgd.solution.array, atol=1e-1)    

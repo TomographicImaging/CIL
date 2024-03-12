@@ -27,17 +27,17 @@ import numpy as np
 class ApproximateGradientSumFunction(SumFunction, ABC):
     r"""ApproximateGradientSumFunction represents the following sum 
 
-    .. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
+    .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})
 
-    where :math:`n` is the number of functions. The gradient method from a CIL function is overwritten and calls an approximate gradient method. 
+    where there are :math:`n` functions. The gradient method from a CIL function is overwritten and calls an approximate gradient method. 
 
     It is an abstract base class and any child classes must implement an `approximate_gradient` function.
 
     Parameters:
     -----------
     functions : `list`  of functions
-                A list of functions: :code:`[F_{1}, F_{2}, ..., F_{n}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
-    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or another class which has a `next` function implemented to output integers in {1,...,n}.
+                A list of functions: :code:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or another class which has a `next` function implemented to output integers in {0,...,n-1}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
 
 
@@ -57,13 +57,13 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     -------
     Consider the objective is to minimise: 
 
-    .. math:: \sum_{i=1}^{n} F_{i}(x) = \sum_{i=1}^{n}\|A_{i} x - b_{i}\|^{2}
+    .. math:: \sum_{i=0}^{n-1} f_{i}(x) = \sum_{i=0}^{n-1}\|A_{i} x - b_{i}\|^{2}
 
     >>> list_of_functions = [LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets))   
     >>> f = ApproximateGradientSumFunction(list_of_functions) 
 
     >>> list_of_functions = [LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets)) 
-    >>> sampler = RandomSampling.random_shuffle(len(list_of_functions))
+    >>> sampler = Sampler.random_shuffle(len(list_of_functions))
     >>> f = ApproximateGradientSumFunction(list_of_functions, sampler=sampler)   
 
 
@@ -90,7 +90,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     def __call__(self, x):
         r"""Returns the value of the sum of functions at :math:`x`.
 
-        .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
+        .. math:: (f_{0} + f_{1} + ... + f_{n-1})(x) = f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x)
 
         Parameters
         ----------
@@ -107,7 +107,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     def full_gradient(self, x, out=None):
         r"""Returns the value of the  full gradient of the sum of functions at :math:`x`.
 
-        .. math:: \nabla_x(F_{1} + F_{2} + ... + F_{n})(x) = \nabla_xF_{1}(x) + \nabla_xF_{2}(x) + ... + \nabla_xF_{n}(x)
+        .. math:: \nabla_x(f_{0} + f_{1} + ... + f_{n-1})(x) = \nabla_xf_{0}(x) + \nabla_xf_{1}(x) + ... + \nabla_xf_{n-1}(x)
 
         Parameters
         ----------
@@ -124,18 +124,18 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     @abstractmethod
     def approximate_gradient(self, x, function_num,   out=None):
-        """ Computes the approximate gradient for each selected function at :code:`x` given a `function_number` in {1,...,len(functions)}.
+        """ Computes the approximate gradient for each selected function at :code:`x` given a `function_number` in {0,...,len(functions)-1}.
 
         Parameters
         ----------
         x : DataContainer
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
         function_num: `int` 
-            Between 1 and the number of functions in the list  
+            Between 0 and the number of functions in the list  
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)} or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1} or nothing if `out`  
         """
         pass
 
@@ -157,7 +157,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
         if self.function_num > self.num_functions:
             raise IndexError(
-                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
+                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
 
         if isinstance(self.function_num, numbers.Number):
             return self.approximate_gradient(x, self.function_num, out=out)

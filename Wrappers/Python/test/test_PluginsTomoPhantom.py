@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -30,13 +29,13 @@ if has_tomophantom:
 
 class TestTomoPhantom2D(unittest.TestCase):
     def setUp(self):
-        
+
         N=128
         angles = np.linspace(0, 360, 50, True, dtype=np.float32)
         offset = 0.4
         ag = AcquisitionGeometry.create_Cone2D((offset,-100), (offset,100))
         ag.set_panel(N)
-        
+
         ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)
         ig = ag.get_ImageGeometry()
         self.ag = ag
@@ -97,13 +96,13 @@ class TestTomoPhantom2D(unittest.TestCase):
 
 class TestTomoPhantom3D(unittest.TestCase):
     def setUp(self):
-        
+
         N=128
         angles = np.linspace(0, 360, 50, True, dtype=np.float32)
         offset = 0.4
         ag = AcquisitionGeometry.create_Cone3D((offset,-100,0), (offset,100,0))
         ag.set_panel((N,N/2))
-        
+
         ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)
         ig = ag.get_ImageGeometry()
         self.ag = ag
@@ -149,7 +148,7 @@ class TestTomoPhantom3D(unittest.TestCase):
         ag.set_channels(5)
         ig = ag.get_ImageGeometry()
         phantom = TomoPhantom.get_ImageData(model, ig)
-        
+
         assert phantom.geometry.channels == ig.channels
         assert phantom.shape == ig.shape
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')

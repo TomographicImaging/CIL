@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -16,7 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
- 
+
 import unittest
 from utils import initialise_tests
 initialise_tests()
@@ -80,5 +79,3 @@ class TestModuleBase(unittest.TestCase):
             self.assertTrue(isinstance(a, str))
         except ImportError as ie:
             self.assertFalse(True, str(ie))
-        
-        

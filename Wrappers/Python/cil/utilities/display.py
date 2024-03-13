@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -50,8 +49,8 @@ def set_origin(data, origin):
     shape_h = [0, data.shape[1]]
 
     if type(data) != np.ndarray:
-        data = data.as_array() 
-            
+        data = data.as_array()
+
     data_origin='lower'
 
     if 'upper' in origin:
@@ -82,7 +81,7 @@ class show_base(object):
         format = kwargs.get('format',None)
 
         if format is None:
-            if extension == '': 
+            if extension == '':
                 extension = 'png'
         else:
             extension = format
@@ -120,7 +119,7 @@ class show1D(show_base):
     data : DataContainer, list of DataContainer, tuple of DataContainer
         Multi-dimensional data to be reduced to 1D.
     slice_list : tuple, list of tuple or list of list of tuple, default=None
-        A tuple of (dimension, coordinate) pair, or a list, or nested list, of 
+        A tuple of (dimension, coordinate) pair, or a list, or nested list, of
         such pairs for slicing `data` (default is None, which is only valid when 1D
         data is passed)
     label : 'default', str, list of str, None, default='default'
@@ -330,7 +329,7 @@ class show1D(show_base):
         ls_cyc = cycle(["-","--","-.",":"])
         _lbls = labels
 
-        if slice_list is None or isinstance(slice_list, tuple) or isinstance(slice_list[0], tuple): 
+        if slice_list is None or isinstance(slice_list, tuple) or isinstance(slice_list[0], tuple):
 
             for i in range(num_data):
                 _data = data if isinstance(data, DataContainer) else data[i]
@@ -399,7 +398,7 @@ class show2D(show_base):
     slice_list: tuple, int, list of tuples, list of ints, optional
         The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
     fix_range: boolean, tuple, list of tuples
-        Sets the display range of the data. `True` sets all plots to the global (min, max). 
+        Sets the display range of the data. `True` sets all plots to the global (min, max).
     axis_labels: tuple, list of tuples, optional
         The axis labels for each figure e.g. ('x','y')
     origin: string, list of strings
@@ -435,9 +434,9 @@ class show2D(show_base):
             elif type(slice_list) is tuple:
                 num_plots = 1
             elif dim == 4 and type(slice_list[0]) is tuple:
-                num_plots = 1  
+                num_plots = 1
             else:
-                num_plots = len(slice_list)       
+                num_plots = len(slice_list)
 
         subplots = []
 
@@ -517,7 +516,7 @@ class show2D(show_base):
 
                 subtitle = "direction: ({0},{1}), slice: ({2},{3})".format(*cut_axis, * cut_slices)
 
-                    
+
             elif len(data.shape) == 3:
                 #get slice list per subplot
                 if type(slice_list) is list:            #[(direction, ind), (direction, ind)],  [ind0, ind1, ind2] of direction0
@@ -528,10 +527,10 @@ class show2D(show_base):
                 #default axis 0, centre slice
                 cut_slice = data.shape[0]//2
                 cut_axis = 0
-                
+
                 if type(slice_requested) is int:
                     #use axis 0, slice val
-                    cut_slice = slice_requested             
+                    cut_slice = slice_requested
                 if type(slice_requested) is tuple:
                     cut_slice = slice_requested[1]
                     cut_axis = slice_requested[0]
@@ -550,7 +549,7 @@ class show2D(show_base):
                     raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
                             Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
 
-                subtitle = "direction: {0}, slice: {1}".format(cut_axis,cut_slice)  
+                subtitle = "direction: {0}, slice: {1}".format(cut_axis,cut_slice)
             else:
                 plot_data = data
                 subtitle = None
@@ -560,9 +559,9 @@ class show2D(show_base):
             if len(plot_data.shape) != 2:
                 raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
                                 Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
-        
+
             #get axis labels per subplot
-            if type(axis_labels) is list: 
+            if type(axis_labels) is list:
                 plot_axis_labels = axis_labels[i]
             else:
                 plot_axis_labels = axis_labels
@@ -606,15 +605,15 @@ class show2D(show_base):
             elif type(fix_range) is list:
                 subplot.range = fix_range[i]
             else:
-                subplot.range = (fix_range[0], fix_range[1])                
-            
+                subplot.range = (fix_range[0], fix_range[1])
+
         #create plots
         if num_plots < num_cols:
             num_cols = num_plots
-            
+
         num_rows = int(round((num_plots+0.5)/num_cols))
         fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
-        axes = ax.flatten() 
+        axes = ax.flatten()
 
         #set up plots
         for i in range(num_rows*num_cols):
@@ -627,7 +626,7 @@ class show2D(show_base):
 
             if subplot.axis_labels is not None:
                 axes[i].set_ylabel(subplot.axis_labels[1])
-                axes[i].set_xlabel(subplot.axis_labels[0])  
+                axes[i].set_xlabel(subplot.axis_labels[0])
 
             #set origin
             data, data_origin, extent = set_origin(subplot.data, subplot.origin)
@@ -649,17 +648,17 @@ class show2D(show_base):
 
                     labels_new = ["{:.2f}".format(i) for i in np.take(ang.angle_data, location_new)]
                     axes[i].set_yticks(location_new, labels=labels_new)
-                    
+
                     axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
 
                     y_axes2 = axes[i].axes.secondary_yaxis('right')
                     y_axes2.set_ylabel('angle / index')
-            
+
                     if subplot.data.shape[0] < subplot.data.shape[1]//2:
                         axes[i].set_aspect(1/im_ratio)
                         im_ratio = 1
 
-            if y_axes2: 
+            if y_axes2:
                 scale = 0.041*im_ratio
                 pad = 0.12
             else:
@@ -667,10 +666,10 @@ class show2D(show_base):
                 pad = 0.02
 
             plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
-    
+
             if subplot.range is not None:
                 sp.set_clim(subplot.range[0],subplot.range[1])
-        
+
         fig.set_tight_layout(True)
         fig.set_facecolor('w')
 
@@ -708,7 +707,7 @@ class _ShowGeometry(object):
         if acquisition_geometry.dimension == "2D":
             self.ndim = 2
             sys = acquisition_geometry.config.system
-            if acquisition_geometry.geom_type == 'cone':    
+            if acquisition_geometry.geom_type == 'cone':
                 ag_temp = AcquisitionGeometry.create_Cone3D([*sys.source.position,0], [*sys.detector.position,0], [*sys.detector.direction_x,0],[0,0,1],[*sys.rotation_axis.position,0],[0,0,1])
             else:
                 ag_temp = AcquisitionGeometry.create_Parallel3D([*sys.ray.direction,0], [*sys.detector.position,0], [*sys.detector.direction_x,0],[0,0,1],[*sys.rotation_axis.position,0],[0,0,1])
@@ -763,7 +762,7 @@ class _ShowGeometry(object):
         self.display_detector()
 
 
-        if grid is False: 
+        if grid is False:
             self.ax.set_axis_off()
 
         self.ax.view_init(elev=elev, azim=azim)
@@ -777,8 +776,8 @@ class _ShowGeometry(object):
 
         for i in range(3):
             self.handles.insert(2,l)
-            self.labels.insert(2,'')   
-    
+            self.labels.insert(2,'')
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.ax.legend(self.handles, self.labels, loc='upper left', bbox_to_anchor= (0, 1), ncol=3,
@@ -815,7 +814,7 @@ class _ShowGeometry(object):
 
             a = _Arrow3D(*zip(Oo,axis*2), mutation_scale=20,lw=1, arrowstyle="->", color="k")
             self.ax.add_artist(a)
-        
+
             self.ax.text(*(axis*2.2),labels[i], **self.text_options)
 
         self.handles.append(h)
@@ -831,8 +830,8 @@ class _ShowGeometry(object):
             det_h = det_rows_dir * det_size[0]
 
             rt = det_h + det_v + self.acquisition_geometry.config.system.detector.position
-            lt = -det_h + det_v + self.acquisition_geometry.config.system.detector.position  
-            lb = -det_h - det_v + self.acquisition_geometry.config.system.detector.position              
+            lt = -det_h + det_v + self.acquisition_geometry.config.system.detector.position
+            lb = -det_h - det_v + self.acquisition_geometry.config.system.detector.position
             rb = det_h - det_v + self.acquisition_geometry.config.system.detector.position
 
             return [rb, lb, lt, rt]
@@ -842,11 +841,11 @@ class _ShowGeometry(object):
             r = det_h  + self.acquisition_geometry.config.system.detector.position
             l = -det_h  + self.acquisition_geometry.config.system.detector.position
             return [r, l]
-        
+
 
     def display_detector(self):
 
-        do = self.acquisition_geometry.config.system.detector.position 
+        do = self.acquisition_geometry.config.system.detector.position
         det = self.detector_vertex()
 
         #mark data origin
@@ -875,9 +874,9 @@ class _ShowGeometry(object):
 
         handles=[
             self.ax.scatter3D(*do, marker='o', alpha=1,color='b',lw=1, label='detector position'),
-            mlines.Line2D([], [], color='b',linestyle='solid', markersize=12, label='detector direction'),      
+            mlines.Line2D([], [], color='b',linestyle='solid', markersize=12, label='detector direction'),
             self.ax.plot3D(*zip(*det, det[0]), color='b',ls='dotted',alpha=1, label='detector')[0],
-            self.ax.scatter3D(*pix0, marker='x', alpha=1,color='b',lw=1,s=50, label='data origin (pixel 0)'),            
+            self.ax.scatter3D(*pix0, marker='x', alpha=1,color='b',lw=1,s=50, label='data origin (pixel 0)'),
         ]
 
         for x in handles:
@@ -885,7 +884,7 @@ class _ShowGeometry(object):
             self.labels.append(x.get_label())
 
     def display_object(self):
-        
+
         ro = self.acquisition_geometry.config.system.rotation_axis.position
         h0 = self.ax.scatter3D(*ro, marker='o', alpha=1,color='r',lw=1,label='rotation axis position')
         self.handles.append(h0)
@@ -915,9 +914,9 @@ class _ShowGeometry(object):
                 ((x[1],y[1],z[1]),(x[1],y[0],z[1])),
                 ((x[1],y[0],z[1]),(x[0],y[0],z[1])),
                 ((x[0],y[0],z[0]),(x[0],y[0],z[1])),
-                ((x[0],y[1],z[0]),(x[0],y[1],z[1])),  
-                ((x[1],y[1],z[0]),(x[1],y[1],z[1])),  
-                ((x[1],y[0],z[0]),(x[1],y[0],z[1])),                                                              
+                ((x[0],y[1],z[0]),(x[0],y[1],z[1])),
+                ((x[1],y[1],z[0]),(x[1],y[1],z[1])),
+                ((x[1],y[0],z[0]),(x[1],y[0],z[1])),
             ]
 
             if np.allclose(a,[0,0,1]):
@@ -974,7 +973,7 @@ class _ShowGeometry(object):
         arrow4 = _Arrow3D(x[-2:],y[-2:],z[-2:],mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
         self.ax.add_artist(arrow4)
 
-        handles = [ 
+        handles = [
             mlines.Line2D([], [], color='r',linestyle='solid', markersize=12, label='rotation axis direction'),
             mlines.Line2D([], [], color='r',linestyle='dotted', markersize=15, label='image geometry'),
             self.ax.scatter3D(*vox0, marker='x', alpha=1,color='r',lw=1,s=50, label='data origin (voxel 0)'),
@@ -992,7 +991,7 @@ class _ShowGeometry(object):
 
         for i in range(len(det)):
             self.ax.plot3D(*zip(so,det[i]), color='#D4BD72',ls="dashed",alpha=0.4)
-        
+
         self.ax.plot3D(*zip(so,self.acquisition_geometry.config.system.detector.position), color='#D4BD72',ls="solid",alpha=1)[0],
 
         h0 = self.ax.scatter3D(*so, marker='*', alpha=1,color='#D4BD72',lw=1, label='source position', s=100)
@@ -1011,7 +1010,7 @@ class _ShowGeometry(object):
             dist = self.acquisition_geometry.config.panel.num_pixels[0] * self.acquisition_geometry.config.panel.pixel_size[0]
 
         rays = det - self.acquisition_geometry.config.system.ray.direction*dist
-        
+
         for i in range(len(rays)):
             h0 = self.ax.plot3D(*zip(rays[i],det[i]), color='#D4BD72',ls="dashed",alpha=0.4, label='ray direction')[0]
             arrow = _Arrow3D(*zip(rays[i],rays[i]+self.acquisition_geometry.config.system.ray.direction*self.scale ),mutation_scale=20,lw=1, arrowstyle="-|>", color="#D4BD72")
@@ -1030,19 +1029,19 @@ class show_geometry(show_base):
     ----------
     acquisition_geometry: AcquisitionGeometry
         CIL acquisition geometry
-    image_geometry: ImageGeometry, optional 
+    image_geometry: ImageGeometry, optional
         CIL image geometry
     elevation: float
-        Camera elevation in degrees, 3D geometries only, default=20 
+        Camera elevation in degrees, 3D geometries only, default=20
     azimuthal: float
-        Camera azimuthal in degrees, 3D geometries only, default=-35  
+        Camera azimuthal in degrees, 3D geometries only, default=-35
     view_distance: float
-        Camera view distance, default=10  
+        Camera view distance, default=10
     grid: boolean
         Show figure axis, default=False
     figsize: tuple (x, y)
-        Set figure size (inches), default (10,10)  
-    fontsize: int 
+        Set figure size (inches), default (10,10)
+    fontsize: int
         Set fontsize, default 10
 
     Returns

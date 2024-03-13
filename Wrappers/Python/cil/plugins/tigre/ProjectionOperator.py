@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -49,7 +48,7 @@ class ProjectionOperator(LinearOperator):
         Please refer to the TIGRE documentation for futher descriptions
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
-                        
+
 
         Parameters
         ----------
@@ -107,7 +106,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         Please refer to the TIGRE documentation for futher descriptions
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
-                        
+
 
         Parameters
         ----------

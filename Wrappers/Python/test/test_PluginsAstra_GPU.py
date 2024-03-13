@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2022 United Kingdom Research and Innovation
 #  Copyright 2022 The University of Manchester
 #
@@ -35,7 +34,7 @@ def setup_parameters(self):
     self.backend = 'astra'
     self.ProjectionOperator = ProjectionOperator
     self.PO_args={'device':'gpu'}
-    
+
 class Test_basic_astra(unittest.TestCase):
 
     @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA and GPU")
@@ -138,7 +137,7 @@ class Test_Parallel2D_Projectors_GPU_basic(unittest.TestCase, TestCommon_Project
         setup_parameters(self)
         self.Parallel2D()
         self.tolerance_fp=0
-        
+
 
 class Test_Parallel2D_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
 

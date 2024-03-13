@@ -1,4 +1,3 @@
-REM -*- coding: utf-8 -*-
 REM  Copyright 2019 United Kingdom Research and Innovation
 REM  Copyright 2019 The University of Manchester
 REM

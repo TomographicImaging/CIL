@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2022 United Kingdom Research and Innovation
 #  Copyright 2022 The University of Manchester
 #
@@ -145,4 +144,3 @@ class Test_Parallel2D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOpe
         self.Parallel2D()
         self.tolerance_linearity = 1e-6
         self.tolerance_norm = 1e-5
-

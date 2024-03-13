@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -34,7 +33,7 @@ def startTestRun(self):
     """Called once before any tests are executed.
     """
     #set logging
-    logging.basicConfig(level=logging.WARNING) 
+    logging.basicConfig(level=logging.WARNING)
 
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")

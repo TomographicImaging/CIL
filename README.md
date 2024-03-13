@@ -54,6 +54,19 @@ Finally, CIL can be run via a Jupyter Notebook enabled Docker container:
 docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:latest
 ```
 
+> [!TIP]
+> docker tag | CIL branch/tag
+> :---|:---
+> `latest` | [latest tag `v*.*.*`](https://github.com/TomographicImaging/CIL/releases/latest)
+> `YY.M` | latest tag `vYY.M.*`
+> `YY.M.m` | tag `vYY.M.m`
+> `master` | `master`
+> only build & test (no tag) | CI (current commit)
+>
+> See [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil) for a full list of tags.
+
+<!-- <br/> -->
+
 > [!NOTE]
 > GPU support requires [`nvidia-container-toolkit`](https://github.com/NVIDIA/nvidia-container-toolkit) and an NVIDIA GPU.
 > Omit the `--gpus all` to run without GPU support.
@@ -128,10 +141,8 @@ conda env create -f scripts/requirements-test.yml
 CMake and a C++ compiler are required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
 ```sh
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
-cmake --build . --target install
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory>
+cmake --build ./build --target install
 ```
 
 If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows).
@@ -141,10 +152,11 @@ If not installing to a conda environment then the user will also need to set the
 By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters:
 
 ```sh
-cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
 ```
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.
+
 
 ### Building with Docker
 
@@ -155,9 +167,29 @@ git submodule update --init --recursive
 docker build . -t ghcr.io/tomographicimaging/cil
 ```
 
-## References
+## Citing CIL
 
-[1] Jørgensen JS et al. 2021 [Core Imaging Library Part I: a versatile python framework for tomographic imaging](https://doi.org/10.1098/rsta.2020.0192). Phil. Trans. R. Soc. A 20200192. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I) [Pre-print](https://arxiv.org/abs/2102.04560)
 
-[2] Papoutsellis E et al. 2021 [Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
-tomography](https://doi.org/10.1098/rsta.2020.0193). Phil. Trans. R. Soc. A 20200193. [**Code.**](https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II) [Pre-print](https://arxiv.org/abs/2102.06126)
+If you use CIL in your research, please include citations to **both** the software on Zenodo, and a CIL paper:
+
+E. Pasca, J. S. Jørgensen, E. Papoutsellis, E. Ametova, G. Fardell, K. Thielemans, L. Murgatroyd, M. Duff and H. Robarts (2023) <br>
+Core Imaging Library (CIL) <br>
+Zenodo [software archive] <br>
+**DOI:** https://doi.org/10.5281/zenodo.4746198 <br>
+
+
+In most cases, the first CIL paper will be the appropriate choice:
+
+J. S. Jørgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart and P. J. Withers (2021) <br>
+Core Imaging Library - Part I: a versatile Python framework for tomographic imaging. <br>
+Phil. Trans. R. Soc. A. 379: 20200192. <br>
+**DOI:** https://doi.org/10.1098/rsta.2020.0192 <br>
+**Code:** https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I <br>
+
+However, if your work is more closely related to topics covered in our second CIL paper then please additionally or alternatively reference the second paper:
+
+E. Papoutsellis, E. Ametova, C. Delplancke, G. Fardell, J. S. Jørgensen, E. Pasca, M. Turner, R. Warr, W. R. B. Lionheart and P. J. Withers (2021) <br>
+Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral tomography. <br>
+Phil. Trans. R. Soc. A. 379: 20200193. <br>
+**DOI:** https://doi.org/10.1098/rsta.2020.0193) <br>
+**Code:** https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II <br>

@@ -648,8 +648,8 @@ class TestSAGA(CCPiTestClass):
         objective=self.f_stochastic
         alg_stochastic = GD(initial=self.initial, 
                               objective_function=objective, update_objective_interval=500, 
-                              step_size=1/self.f_stochastic.L, max_iteration =5000)
-        alg_stochastic.run( self.n_subsets*25, verbose=0)
+                              step_size=1/(10*self.f_stochastic.L), max_iteration =10000)
+        alg_stochastic.run( self.n_subsets*75, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         
   

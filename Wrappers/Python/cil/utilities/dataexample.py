@@ -33,7 +33,7 @@ class DATA(object):
     @classmethod
     def dfile(cls):
         return None
-    
+
 class CILDATA(DATA):
     data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
     @classmethod
@@ -41,9 +41,9 @@ class CILDATA(DATA):
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
-    
+
 class REMOTEDATA(DATA):
-    
+
     FOLDER = ''
     URL = ''
     FILE_SIZE = ''
@@ -56,7 +56,7 @@ class REMOTEDATA(DATA):
     def _download_and_extract_from_url(cls, data_dir):
         with urlopen(cls.URL) as response:
             with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
-                zipfile.extractall(path = data_dir) 
+                zipfile.extractall(path = data_dir)
 
     @classmethod
     def download_data(cls, data_dir):
@@ -72,8 +72,8 @@ class REMOTEDATA(DATA):
         if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
             print("Dataset already exists in " + data_dir)
         else:
-            if input("Are you sure you want to download " + cls.FILE_SIZE + " dataset from " + cls.URL + " ? (y/n)") == "y": 
-                print('Downloading dataset from ' + cls.URL) 
+            if input("Are you sure you want to download " + cls.FILE_SIZE + " dataset from " + cls.URL + " ? (y/n)") == "y":
+                print('Downloading dataset from ' + cls.URL)
                 cls._download_and_extract_from_url(os.path.join(data_dir,cls.FOLDER))
                 print('Download complete')
             else:
@@ -185,15 +185,15 @@ class SIMULATED_SPHERE_VOLUME(CILDATA):
         -------
         ImageData
             The simulated spheres volume
-        '''       
+        '''
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
-    
+
 class WALNUT(REMOTEDATA):
     '''
-    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
     '''
     FOLDER = 'walnut'
     URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
@@ -202,7 +202,7 @@ class WALNUT(REMOTEDATA):
     @classmethod
     def get(cls, data_dir):
         '''
-        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
 
         Parameters
@@ -222,19 +222,19 @@ class WALNUT(REMOTEDATA):
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset .txrm file not found in specifed data_dir: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
-     
+
 class USB(REMOTEDATA):
     '''
-    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
     '''
-    FOLDER = 'USB' 
+    FOLDER = 'USB'
     URL = 'https://zenodo.org/record/4822516/files/usb.zip'
     FILE_SIZE = '3.2 GB'
 
     @classmethod
     def get(cls, data_dir):
         '''
-        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
 
         Parameters
@@ -254,7 +254,7 @@ class USB(REMOTEDATA):
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset .txrm file not found in: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
-        
+
 class KORN(REMOTEDATA):
     '''
     A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
@@ -319,7 +319,7 @@ class TestData(object):
 
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        
+
     def load(self, which, size=None, scale=(0,1), **kwargs):
         '''
         Return a test data of the requested image

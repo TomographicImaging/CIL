@@ -25,7 +25,7 @@ import os, sys, shutil
 from testclass import CCPiTestClass
 import platform
 import numpy as np
-from unittest.mock import patch, MagicMock 
+from unittest.mock import patch, MagicMock
 from urllib import request
 from zipfile import ZipFile
 from io import StringIO
@@ -151,26 +151,26 @@ class TestTestData(CCPiTestClass):
                                          .set_panel((128,128),(64,64))\
                                          .set_angles(np.linspace(0,360,300,False))
 
-        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")
 
 class TestRemoteData(unittest.TestCase):
 
     def setUp(self):
-        
+
         self.data_list = ['WALNUT','USB','KORN','SANDSTONE']
         self.tmp_file = 'tmp.txt'
         self.tmp_zip = 'tmp.zip'
         with ZipFile(self.tmp_zip, 'w') as zipped_file:
             zipped_file.writestr(self.tmp_file, np.array([1, 2, 3]))
         with open(self.tmp_zip, 'rb') as zipped_file:
-            self.zipped_bytes = zipped_file.read()        
-    
+            self.zipped_bytes = zipped_file.read()
+
     def tearDown(self):
         for data in self.data_list:
             test_func = getattr(dataexample, data)
             if os.path.exists(os.path.join(test_func.FOLDER)):
                 shutil.rmtree(test_func.FOLDER)
-        
+
         if os.path.exists(self.tmp_zip):
             os.remove(self.tmp_zip)
 
@@ -189,7 +189,7 @@ class TestRemoteData(unittest.TestCase):
         dataexample.REMOTEDATA._download_and_extract_from_url('.')
         self.assertTrue(os.path.isfile(self.tmp_file))
 
-    @patch('cil.utilities.dataexample.input', return_value='n')    
+    @patch('cil.utilities.dataexample.input', return_value='n')
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_n(self, mock_urlopen, input):
         self.mock_urlopen(mock_urlopen)
@@ -197,31 +197,31 @@ class TestRemoteData(unittest.TestCase):
         data_list = ['WALNUT','USB','KORN','SANDSTONE']
         for data in data_list:
              # redirect print output
-            capturedOutput = StringIO()                 
-            sys.stdout = capturedOutput  
+            capturedOutput = StringIO()
+            sys.stdout = capturedOutput
             test_func = getattr(dataexample, data)
             test_func.download_data('.')
-            
+
             self.assertFalse(os.path.isfile(self.tmp_file))
             self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
-        
-        # return to standard print output
-        sys.stdout = sys.__stdout__ 
 
-    @patch('cil.utilities.dataexample.input', return_value='y')    
+        # return to standard print output
+        sys.stdout = sys.__stdout__
+
+    @patch('cil.utilities.dataexample.input', return_value='y')
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_y(self, mock_urlopen, input):
         self.mock_urlopen(mock_urlopen)
 
         # redirect print output
-        capturedOutput = StringIO()                 
-        sys.stdout = capturedOutput         
+        capturedOutput = StringIO()
+        sys.stdout = capturedOutput
 
-        
+
         for data in self.data_list:
             test_func = getattr(dataexample, data)
             test_func.download_data('.')
             self.assertTrue(os.path.isfile(os.path.join(test_func.FOLDER,self.tmp_file)))
-        
+
         # return to standard print output
-        sys.stdout = sys.__stdout__ 
+        sys.stdout = sys.__stdout__

@@ -310,7 +310,7 @@ class TestSAG(CCPiTestClass):
                     self.A_partitioned.operators[i], self. partitioned_data[i])
                 self.f_subsets.append(fi)
             self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
+            self.f_stochastic = SAGFunction(self.f_subsets, self.sampler)
             self.initial = ig2D.allocate()
 
         else:
@@ -327,7 +327,7 @@ class TestSAG(CCPiTestClass):
                 self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
             self.A=MatrixOperator(np.diag(np.ones(30)))
             self.f = LeastSquares(self.A, b)
-            self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
+            self.f_stochastic = SAGFunction(self.f_subsets, self.sampler)
 
     
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
@@ -556,7 +556,7 @@ class TestSAGA(CCPiTestClass):
                     self.A_partitioned.operators[i], self. partitioned_data[i])
                 self.f_subsets.append(fi)
             self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
+            self.f_stochastic = SAGAFunction(self.f_subsets, self.sampler)
             self.initial = ig2D.allocate()
             
         else:
@@ -573,7 +573,7 @@ class TestSAGA(CCPiTestClass):
                 self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
             self.A=MatrixOperator(np.diag(np.ones(30)))
             self.f = LeastSquares(self.A, b)
-            self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
+            self.f_stochastic = SAGAFunction(self.f_subsets, self.sampler)
         
     
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 

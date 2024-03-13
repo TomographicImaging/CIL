@@ -125,28 +125,6 @@ SPDHG
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-Callbacks
----------
-
-A list of :code:`Callback` s to be executed each iteration can be passed to :code:`Algorithm` 's :code:`run` method.
-
-.. code-block :: python
-
-   from cil.optimisation.utilities.callbacks import LogfileCallback
-   ...
-   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
-
-.. autoclass:: cil.optimisation.utilities.callbacks.Callback
-   :members:
-
-.. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
-   :members:
-
-.. autoclass:: cil.optimisation.utilities.callbacks.TextProgressCallback
-   :members:
-
-.. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
-   :members:
 
 Operators
 =========
@@ -390,11 +368,13 @@ Total variation
 
 
 Utilities
-=======
+=========
+
 Contains utilities for the CIL optimisation framework.
 
 Samplers
 --------
+
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
 The :code:`cil.optimisation.utilities.sampler` class defines a function :code:`next()` which gives the next sample. It also has utility to :code:`get_samples` to access which samples have or will be drawn.
 
@@ -424,9 +404,66 @@ In addition, we provide a random sampling class which is a child class of  `cil.
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
    :members:
 
+Callbacks
+---------
+
+A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithms`_ :code:`run` method.
+
+.. code-block :: python
+
+   from cil.optimisation.utilities.callbacks import LogfileCallback
+   ...
+   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
+
+.. autoclass:: cil.optimisation.utilities.callbacks.Callback
+   :members:
+
+Built-in callbacks include:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.TextProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
+   :members:
+
+Users can also write custom callbacks.
+
+Below is an example of a custom callback implementing early stopping.
+In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by :math:`5`. The :code:`EarlyStopping` callback terminates the algorithm when :math:`x \le -15`. The algorithm thus terminates after :math:`3` iterations.
+
+.. code:: python
+
+   from cil.optimisation.algorithms import Algorithm
+   from cil.optimisation.utilities import callbacks
+
+   class TestAlgo(Algorithm):
+       def __init__(self, *args, **kwargs):
+           self.x = 0
+           super().__init__(*args, **kwargs)
+           self.configured = True
+
+       def update(self):
+           self.x -= 5
+
+       def update_objective(self):
+           self.loss.append(2 ** self.x)
+
+   class EarlyStopping(callbacks.Callback):
+       def __call__(self, algorithm: Algorithm):
+           if algorithm.x <= -15:  # arbitrary stopping criterion
+               raise StopIteration
+
+   algo = TestAlgo()
+   algo.run(20, callbacks=[callbacks.ProgressCallback(), EarlyStopping()])
 
 
+.. code:: raw
 
+   Output:
+    15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
 
 Block Framework
 ***************

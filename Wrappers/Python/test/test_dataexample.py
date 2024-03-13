@@ -186,7 +186,7 @@ class TestRemoteData(unittest.TestCase):
     @patch('cil.utilities.dataexample.urlopen')
     def test_unzip_remote_data(self, mock_urlopen):
         self.mock_urlopen(mock_urlopen)
-        dataexample.REMOTEDATA._download_and_extract_from_url('.')
+        dataexample._REMOTE_DATA._download_and_extract_from_url('.')
         self.assertTrue(os.path.isfile(self.tmp_file))
 
     @patch('cil.utilities.dataexample.input', return_value='n')

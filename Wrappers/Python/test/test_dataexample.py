@@ -186,8 +186,12 @@ class TestRemoteData(unittest.TestCase):
     @patch('cil.utilities.dataexample.urlopen')
     def test_unzip_remote_data(self, mock_urlopen):
         self.mock_urlopen(mock_urlopen)
-        dataexample._REMOTE_DATA._download_and_extract_from_url('.')
+        self.assertFalse(os.path.isfile(self.tmp_file))
+        class RemoteData(dataexample._REMOTE_DATA):
+            URL = ''
+        RemoteData._download_and_extract_from_url('.')
         self.assertTrue(os.path.isfile(self.tmp_file))
+        os.remove(self.tmp_file)
 
     @patch('cil.utilities.dataexample.input', return_value='n')
     @patch('cil.utilities.dataexample.urlopen')
@@ -220,8 +224,11 @@ class TestRemoteData(unittest.TestCase):
 
         for data in self.data_list:
             test_func = getattr(dataexample, data)
+            fname = os.path.join(test_func.FOLDER, self.tmp_file)
+            self.assertFalse(os.path.isfile(fname))
             test_func.download_data('.')
-            self.assertTrue(os.path.isfile(os.path.join(test_func.FOLDER,self.tmp_file)))
+            self.assertTrue(os.path.isfile(fname))
+            os.remove(fname)
 
         # return to standard print output
         sys.stdout = sys.__stdout__

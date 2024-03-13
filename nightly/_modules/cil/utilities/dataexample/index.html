@@ -497,57 +497,91 @@ document.write(`
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">NEXUSDataReader</span>
-
-<span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
-        <span class="s1">&#39;../data/&#39;</span><span class="p">)</span>
-<span class="p">)</span>
-
-<span class="c1"># this is the default location after a conda install</span>
-<span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;share&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
+<span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">NEXUSDataReader</span><span class="p">,</span> <span class="n">NikonDataReader</span><span class="p">,</span> <span class="n">ZEISSDataReader</span>
 
 <span class="k">class</span> <span class="nc">DATA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
+    
+<span class="k">class</span> <span class="nc">CILDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;share&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">))</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">TestData</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">ddir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">dfile</span><span class="p">(),</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+<span class="k">class</span> <span class="nc">REMOTEDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+    
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">URL</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">FILE_SIZE</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-<span class="k">class</span> <span class="nc">BOAT</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_download_and_extract_from_url</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">urlopen</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">URL</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> <span class="k">as</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">ZipFile</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipfile</span><span class="p">:</span>
+                <span class="n">zipfile</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="n">data_dir</span><span class="p">)</span> 
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">download_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Download a dataset from a remote repository</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_dir: str, optional</span>
+<span class="sd">           The path to the data directory where the downloaded data should be stored</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset already exists in &quot;</span> <span class="o">+</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Are you sure you want to download &quot;</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FILE_SIZE</span> <span class="o">+</span> <span class="s2">&quot; dataset from &quot;</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">URL</span> <span class="o">+</span> <span class="s2">&quot; ? (y/n)&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Downloading dataset from &#39;</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">URL</span><span class="p">)</span> 
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_download_and_extract_from_url</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span><span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Download complete&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Download cancelled&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BOAT</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">BOAT</span>
-<span class="k">class</span> <span class="nc">CAMERA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">CAMERA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">CAMERA</span>
-<span class="k">class</span> <span class="nc">PEPPERS</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">PEPPERS</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">PEPPERS</span>
-<span class="k">class</span> <span class="nc">RESOLUTION_CHART</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">RESOLUTION_CHART</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">RESOLUTION_CHART</span>
-<span class="k">class</span> <span class="nc">SIMPLE_PHANTOM_2D</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SIMPLE_PHANTOM_2D</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SIMPLE_PHANTOM_2D</span>
-<span class="k">class</span> <span class="nc">SHAPES</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SHAPES</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SHAPES</span>
-<span class="k">class</span> <span class="nc">RAINBOW</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">RAINBOW</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">RAINBOW</span>
-<div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SYNCHROTRON_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SYNCHROTRON_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA.get"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -564,11 +598,11 @@ document.write(`
 <span class="sd">            The DLS dataset</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
         <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;24737_fd_normalised.nxs&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div></div>
-<div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SIMULATED_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SIMULATED_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA.get"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -585,11 +619,11 @@ document.write(`
 <span class="sd">            The simulated spheres dataset</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
         <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_parallel_beam.nxs&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div></div>
-<div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SIMULATED_CONE_BEAM_DATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA">[docs]</a><span class="k">class</span> <span class="nc">SIMULATED_CONE_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA.get"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -606,11 +640,11 @@ document.write(`
 <span class="sd">            The simulated spheres dataset</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
         <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_cone_beam.nxs&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div></div>
-<span class="k">class</span> <span class="nc">SIMULATED_SPHERE_VOLUME</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SIMULATED_SPHERE_VOLUME</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -625,12 +659,117 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The simulated spheres volume</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+<span class="sd">        &#39;&#39;&#39;</span>       
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
         <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_volume.nxs&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">WALNUT</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;walnut&#39;</span>
+    <span class="n">URL</span> <span class="o">=</span> <span class="s1">&#39;https://zenodo.org/record/4822516/files/walnut.zip&#39;</span>
+    <span class="n">FILE_SIZE</span> <span class="o">=</span> <span class="s1">&#39;6.4 GB&#39;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 </span>
+<span class="sd">        This function returns the raw projection data from the .txrm file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_dir: str</span>
+<span class="sd">           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageData</span>
+<span class="sd">            The walnut dataset</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;valnut&#39;</span><span class="p">,</span><span class="s1">&#39;valnut_2014-03-21_643_28&#39;</span><span class="p">,</span><span class="s1">&#39;tomo-A&#39;</span><span class="p">,</span><span class="s1">&#39;valnut_tomo-A.txrm&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loader</span> <span class="o">=</span> <span class="n">ZEISSDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Dataset .txrm file not found in specifed data_dir: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span>
+     
+<span class="k">class</span> <span class="nc">USB</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;USB&#39;</span> 
+    <span class="n">URL</span> <span class="o">=</span> <span class="s1">&#39;https://zenodo.org/record/4822516/files/usb.zip&#39;</span>
+    <span class="n">FILE_SIZE</span> <span class="o">=</span> <span class="s1">&#39;3.2 GB&#39;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 </span>
+<span class="sd">        This function returns the raw projection data from the .txrm file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_dir: str</span>
+<span class="sd">           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageData</span>
+<span class="sd">            The usb dataset</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;gruppe 4&#39;</span><span class="p">,</span><span class="s1">&#39;gruppe 4_2014-03-20_1404_12&#39;</span><span class="p">,</span><span class="s1">&#39;tomo-A&#39;</span><span class="p">,</span><span class="s1">&#39;gruppe 4_tomo-A.txrm&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loader</span> <span class="o">=</span> <span class="n">ZEISSDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Dataset .txrm file not found in: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span>
+        
+<span class="k">class</span> <span class="nc">KORN</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;korn&#39;</span>
+    <span class="n">URL</span> <span class="o">=</span> <span class="s1">&#39;https://zenodo.org/record/6874123/files/korn.zip&#39;</span>
+    <span class="n">FILE_SIZE</span> <span class="o">=</span> <span class="s1">&#39;2.9 GB&#39;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
+<span class="sd">        This function returns the raw projection data from the .xtekct file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_dir: str</span>
+<span class="sd">           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageData</span>
+<span class="sd">            The korn dataset</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;Korn i kasse&#39;</span><span class="p">,</span><span class="s1">&#39;47209 testscan korn01_recon.xtekct&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loader</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Dataset .xtekct file not found in: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span>
+
+
+<span class="k">class</span> <span class="nc">SANDSTONE</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435</span>
+<span class="sd">    A small subset of the data containing selected projections and 4 slices of the reconstruction</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;sandstone&#39;</span>
+    <span class="n">URL</span> <span class="o">=</span> <span class="s1">&#39;https://zenodo.org/records/4912435/files/small.zip&#39;</span>
+    <span class="n">FILE_SIZE</span> <span class="o">=</span> <span class="s1">&#39;227 MB&#39;</span>
 
 <div class="viewcode-block" id="TestData"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData">[docs]</a><span class="k">class</span> <span class="nc">TestData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to return test data</span>
@@ -652,9 +791,9 @@ document.write(`
     <span class="n">SHAPES</span> <span class="o">=</span>  <span class="s1">&#39;shapes.png&#39;</span>
     <span class="n">RAINBOW</span> <span class="o">=</span>  <span class="s1">&#39;rainbow.png&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
-
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+        
 <div class="viewcode-block" id="TestData.load"><a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return a test data of the requested image</span>

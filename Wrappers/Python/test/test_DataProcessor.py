@@ -2835,6 +2835,11 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
                 processor.check_input(data)
                 self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
 
+    def test_PaganinProcessor_get_output(self):
+        processor = PaganinPhaseProcessor.retrieve()
+        processor.set_input(self.data_cone)
+        processor.get_output()
+
     def test_PaganinPhaseRetriever(self): 
         processor = PaganinPhaseProcessor.retrieve(propagation_distance=10, verbose=False)
         processor.set_input(self.data_parallel)

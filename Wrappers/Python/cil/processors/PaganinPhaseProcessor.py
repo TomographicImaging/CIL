@@ -186,29 +186,6 @@ class PaganinProcessor(Processor):
         self.__calculate_alpha()
 
         return True
-
-    def get_output(self, out=None, output_type = 'phase'):
-        '''
-        Runs the configured processor and returns the processed data
-
-        Parameters
-        ----------
-        out : DataContainer, optional
-           Fills the referenced DataContainer with the processed data and suppresses the return
-        
-        output_type: string, optional
-            if 'attenuation', returns the attenuation of the sample corrected for phase effects, attenuation = µT 
-            if 'thickness', returns the projected thickness T of the sample projected onto the image plane 
-            if 'phase' (default), returns the phase of the beam at the material exit, phase ϕ(r⊥) = −δ T(r⊥) · 2π/λ
-        
-        Returns
-        -------
-        DataContainer
-            The processed data. Suppressed if `out` is passed
-
-        '''
-        self.output_type = output_type
-        return super().get_output(out)
     
     def process(self, out=None):
         '''
@@ -340,6 +317,29 @@ class PaganinPhaseRetrieval(PaganinProcessor):
         
         return super().check_input(data)
     
+    def get_output(self, out=None, output_type = 'phase'):
+        '''
+        Runs the configured processor and returns the processed data
+
+        Parameters
+        ----------
+        out : DataContainer, optional
+           Fills the referenced DataContainer with the processed data and suppresses the return
+        
+        output_type: string, optional
+            if 'attenuation', returns the attenuation of the sample corrected for phase effects, without scaling by mu, attenuation = µT 
+            if 'thickness', returns the projected thickness T of the sample projected onto the image plane 
+            if 'phase' (default), returns the phase of the beam at the material exit, phase ϕ(r⊥) = −δ T(r⊥) · 2π/λ
+        
+        Returns
+        -------
+        DataContainer
+            The processed data. Suppressed if `out` is passed
+
+        '''
+        self.output_type = output_type
+        return super().get_output(out)
+    
 class PaganinPhaseFilter(PaganinProcessor):
     '''
     Class for Paganin filter
@@ -352,15 +352,7 @@ class PaganinPhaseFilter(PaganinProcessor):
         
         iffI = ifft2(fftshift(fI/self.filter))
 
-        if self.output_type == 'attenuation':
-            return iffI
-        elif self.output_type == 'thickness':
-            return (1/self.mu)*iffI
-        elif self.output_type == 'phase':
-            return (-self.delta*2*np.pi/self.wavelength)*((1/self.mu)*iffI)
-        else:
-            raise ValueError("output_type not recognised: got {0} expected one of 'attenuation', 'thickness' or 'phase'"\
-                            .format(self.output_type))
+        return iffI
         
     def check_input(self, data):
         
@@ -368,8 +360,7 @@ class PaganinPhaseFilter(PaganinProcessor):
             if data.geometry.dist_center_detector is None:
                 self.propagation_distance = 10
             elif data.geometry.dist_center_detector == 0:
-                raise ValueError('Found geometry.dist_center_detector = 0, phase retrieval is not compatible with virtual magnification\
-                                 please provide a real propagation_distance as an argument or update geometry.dist_center_detector')
+                self.propagation_distance = 10
             else:
                 propagation_distance = data.geometry.dist_center_detector
                 self.propagation_distance = (propagation_distance)*self.unit_multiplier

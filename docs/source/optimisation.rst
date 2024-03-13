@@ -128,24 +128,24 @@ SPDHG
 Callbacks
 ---------
 
-A list of :code:`Callback`s to be executed each iteration can be passed to :code:`Algorithm`'s :code:`run` method.
+A list of :code:`Callback` s to be executed each iteration can be passed to :code:`Algorithm` 's :code:`run` method.
 
 .. code-block :: python
 
-   from cil.utilities.callbacks import LogfileCallback
+   from cil.optimisation.utilities.callbacks import LogfileCallback
    ...
    algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
 
-.. autoclass:: cil.utilities.callbacks.Callback
+.. autoclass:: cil.optimisation.utilities.callbacks.Callback
    :members:
 
-.. autoclass:: cil.utilities.callbacks.ProgressCallback
+.. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
    :members:
 
-.. autoclass:: cil.utilities.callbacks.TextProgressCallback
+.. autoclass:: cil.optimisation.utilities.callbacks.TextProgressCallback
    :members:
 
-.. autoclass:: cil.utilities.callbacks.LogfileCallback
+.. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
    :members:
 
 Operators
@@ -396,7 +396,7 @@ Contains utilities for the CIL optimisation framework.
 Samplers
 --------
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
-The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn.
+The :code:`cil.optimisation.utilities.sampler` class defines a function :code:`next()` which gives the next sample. It also has utility to :code:`get_samples` to access which samples have or will be drawn.
 
 For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
 
@@ -447,7 +447,7 @@ The block framework consists of:
 
 
 
-The block framework allows writing more advanced `optimisation problems`_. Consider the typical
+The block framework allows writing more advanced optimisation problems. Consider the typical
 `Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
 
 .. math::
@@ -622,9 +622,10 @@ Which in Python would be like
 
 :ref:`Return Home <mastertoc>`
 
-.. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
-.. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
-.. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+.. _BlockDataContainer: #blockdatacontainer
+.. _DataContainer: ../framework/#datacontainer
+.. _BlockFunction: #block-function
+.. _BlockOperator: #block-operator
 
 
 

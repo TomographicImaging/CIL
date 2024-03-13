@@ -26,7 +26,7 @@ import numbers
 class SVRGFunction(ApproximateGradientSumFunction):
 
     """
-    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
+    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. 
 
     Parameters
     ----------
@@ -39,6 +39,10 @@ class SVRGFunction(ApproximateGradientSumFunction):
     store_gradients : bool, default: `False`
         Flag indicating whether to store gradients for each function.
 
+    Reference
+    ---------
+    Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
+    
     """
 
     def __init__(self, functions, sampler=None, update_frequency=None, store_gradients=False):
@@ -84,25 +88,25 @@ class SVRGFunction(ApproximateGradientSumFunction):
                 raise ValueError("Batch gradient is not yet implemented")
             if self.function_num > self.num_functions:
                 raise IndexError(
-                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
+                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
 
             return self.approximate_gradient(x, self.function_num, out=out)
 
         
 
     def approximate_gradient(self, x, function_num, out=None):
-        """ Computes the approximate gradient for each selected function at :code:`x` given a `function_number` in {1,...,len(functions)}.
+        """ Computes the approximate gradient for each selected function at :code:`x` given a `function_number` in {0,...,len(functions)-1}.
         
         Parameters
         ----------
         x : DataContainer
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
         function_num: `int` 
-            Between 1 and the number of functions in the list  
+            Between 0 and the number of functions in the list  
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)}
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
         pass
     
@@ -118,7 +122,6 @@ class SVRGFunction(ApproximateGradientSumFunction):
             self._stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
                 1., self.functions[function_num].gradient(self.snapshot), -1.)
 
-        self._update_data_passes(1./self.num_functions)
         self._update_data_passes_indices([function_num])
 
         # full gradient is added to the stochastic grad difference
@@ -143,7 +146,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {1,...,len(functions)}
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
 
         self._svrg_iter_number += 1
@@ -158,7 +161,6 @@ class SVRGFunction(ApproximateGradientSumFunction):
             self._full_gradient_at_snapshot = self.full_gradient(x)
             self.snapshot = x.copy()
 
-        self._update_data_passes(1.0)
         self._update_data_passes_indices(list(range(self.num_functions)))
 
         if out is None:
@@ -183,6 +185,10 @@ class LSVRGFunction(SVRGFunction):
         The probability of updating the full gradient in loopless SVRG.
     store_gradients : bool, optional
         Flag indicating whether to store gradients for each function.
+        
+    Reference
+    ---------
+    D. Kovalev et al., “Don’t jump through hoops and remove those loops: SVRG and Katyusha are better without the outer loop,” in Algo Learn Theo, PMLR, 2020.
 
     """
 
@@ -225,7 +231,7 @@ class LSVRGFunction(SVRGFunction):
                 raise ValueError("Batch gradient is not yet implemented")
             if self.function_num > self.num_functions:
                 raise IndexError(
-                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {1,2,...,len(functions)} only.')
+                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
 
             return self.approximate_gradient(x, self.function_num, out=out)
 

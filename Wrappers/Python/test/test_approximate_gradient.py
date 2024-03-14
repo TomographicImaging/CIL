@@ -75,45 +75,21 @@ class TestSGD(CCPiTestClass):
     
     def setUp(self):
         
-        if has_astra:
-            self.sampler = Sampler.random_with_replacement(5)
-            self.data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-            self.data.reorder('astra')
-            self.data2d = self.data.get_slice(vertical='centre')
-            ag2D = self.data2d.geometry
-            ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-            ig2D = ag2D.get_ImageGeometry()
-            
-            self.A = ProjectionOperator(ig2D, ag2D, device="cpu")
-            self.n_subsets = 5
-            self.partitioned_data = self.data2d.partition(
-                self.n_subsets, 'sequential')
-            self.A_partitioned = ProjectionOperator(
-                ig2D, self.partitioned_data.geometry, device="cpu")
-            self.f_subsets = []
-            for i in range(self.n_subsets):
-                fi = LeastSquares(
-                    self.A_partitioned.operators[i], self. partitioned_data[i])
-                self.f_subsets.append(fi)
-            self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
-            self.initial = ig2D.allocate()
-            
-        else:
+        
            
-            self.sampler = Sampler.random_with_replacement(6)
-            self.initial = VectorData(np.zeros(30))
-            b = VectorData(np.array(range(30))/50)
-            self.n_subsets = 6
-            self.f_subsets = []
-            for i in range(6):
-                diagonal = np.zeros(30)
-                diagonal[5*i:5*(i+1)] = 1
-                Ai = MatrixOperator(np.diag(diagonal))
-                self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
-            self.A=MatrixOperator(np.diag(np.ones(30)))
-            self.f = LeastSquares(self.A, b)
-            self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
+        self.sampler = Sampler.random_with_replacement(6)
+        self.initial = VectorData(np.zeros(30))
+        b = VectorData(np.array(range(30))/50)
+        self.n_subsets = 6
+        self.f_subsets = []
+        for i in range(6):
+            diagonal = np.zeros(30)
+            diagonal[5*i:5*(i+1)] = 1
+            Ai = MatrixOperator(np.diag(diagonal))
+            self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
+        self.A=MatrixOperator(np.diag(np.ones(30)))
+        self.f = LeastSquares(self.A, b)
+        self.f_stochastic = SGFunction(self.f_subsets, self.sampler)
             
             
 
@@ -185,19 +161,45 @@ class TestSGD(CCPiTestClass):
             self.assertEqual(f_stochastic.data_passes[i], f_stochastic.data_passes[i-1]+a[i%self.n_subsets])
         
         
-            
+    
+    @unittest.skipUnless(has_astra, "Requires ASTRA GPU")
     def test_SGD_simulated_parallel_beam_data(self):
-        alg = GD(initial=self.initial,
-                 objective_function=self.f, update_objective_interval=500, alpha=1e8)
+        
+        sampler = Sampler.random_with_replacement(5)
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data.reorder('astra')
+        data2d = data.get_slice(vertical='centre')
+        ag2D = data2d.geometry
+        ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
+        ig2D = ag2D.get_ImageGeometry()
+        
+        A = ProjectionOperator(ig2D, ag2D, device="cpu")
+        n_subsets = 5
+        partitioned_data = data2d.partition(
+            n_subsets, 'sequential')
+        A_partitioned = ProjectionOperator(
+            ig2D, partitioned_data.geometry, device="cpu")
+        f_subsets = []
+        for i in range(n_subsets):
+            fi = LeastSquares(
+                A_partitioned.operators[i],  partitioned_data[i])
+            f_subsets.append(fi)
+        f = LeastSquares(A, data2d)
+        f_stochastic = SGFunction(f_subsets, sampler)
+        initial = ig2D.allocate()
+            
+       
+        alg = GD(initial=initial,
+                 objective_function=f, update_objective_interval=500, alpha=1e8)
         alg.max_iteration = 200
         alg.run(verbose=0)
 
-        objective = self.f_stochastic
-        alg_stochastic = GD(initial=self.initial,
+        objective = f_stochastic
+        alg_stochastic = GD(initial=initial,
                             objective_function=objective, update_objective_interval=500,
-                            step_size=1/self.f_stochastic.L, max_iteration=5000)
-        alg_stochastic.run(self.n_subsets*50, verbose=0)
-        self.assertAlmostEqual(objective.data_passes[-1], self.n_subsets*50/self.n_subsets)
+                            step_size=1/f_stochastic.L, max_iteration=5000)
+        alg_stochastic.run(n_subsets*50, verbose=0)
+        self.assertAlmostEqual(objective.data_passes[-1], n_subsets*50/n_subsets)
         self.assertListEqual(objective.data_passes_indices[-1], [objective.function_num])
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), alg.x.as_array(), 3)

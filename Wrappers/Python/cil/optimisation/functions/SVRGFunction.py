@@ -108,7 +108,6 @@ class SVRGFunction(ApproximateGradientSumFunction):
         DataContainer
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
-        pass
     
 
         self._svrg_iter_number += 1
@@ -154,10 +153,9 @@ class SVRGFunction(ApproximateGradientSumFunction):
         if self.store_gradients is True:
             self._list_stored_gradients = [
                 fi.gradient(x) for fi in self.functions]
-            self._full_gradient_at_snapshot = np.sum(
-                self._list_stored_gradients)
+            self._full_gradient_at_snapshot = sum(
+                self._list_stored_gradients, start=0*x)
 
-        else:
             self._full_gradient_at_snapshot = self.full_gradient(x)
             self.snapshot = x.copy()
 

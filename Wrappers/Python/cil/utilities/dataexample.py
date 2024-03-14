@@ -363,7 +363,6 @@ class _CIL_DATA(ABC):
         return loader.load(cls.dfile, **loader_kwargs)
 
 class _REMOTE_DATA(ABC):
-    FOLDER: str
     URL: str
     FILE_SIZE: str
 
@@ -389,12 +388,12 @@ class _REMOTE_DATA(ABC):
         data_dir: str, optional
            The path to the data directory where the downloaded data should be stored
         '''
-        if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
+        if os.path.isdir(os.path.join(data_dir, cls.__name__)):
             print(f"Dataset already exists in {data_dir}")
         else:
             if cls._prompt(f"Are you sure you want to download {cls.FILE_SIZE} dataset from {cls.URL}?"):
                 print(f"Downloading dataset from {cls.URL}")
-                cls._download_and_extract_from_url(os.path.join(data_dir,cls.FOLDER))
+                cls._download_and_extract_from_url(os.path.join(data_dir, cls.__name__))
                 print('Download complete')
             else:
                 print('Download cancelled')
@@ -444,7 +443,6 @@ class SIMULATED_SPHERE_VOLUME(_NEXUS_CIL_DATA):
 
 class WALNUT(_REMOTE_DATA):
     '''A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516'''
-    FOLDER = 'walnut'
     URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
     FILE_SIZE = '6.4 GB'
 
@@ -463,7 +461,7 @@ class WALNUT(_REMOTE_DATA):
         ImageData
             The walnut dataset
         '''
-        filepath = os.path.join(data_dir, cls.FOLDER, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+        filepath = os.path.join(data_dir, cls.__name__, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
             return loader.read()
@@ -472,7 +470,6 @@ class WALNUT(_REMOTE_DATA):
 
 class USB(_REMOTE_DATA):
     '''A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516'''
-    FOLDER = 'USB'
     URL = 'https://zenodo.org/record/4822516/files/usb.zip'
     FILE_SIZE = '3.2 GB'
 
@@ -491,7 +488,7 @@ class USB(_REMOTE_DATA):
         ImageData
             The usb dataset
         '''
-        filepath = os.path.join(data_dir, cls.FOLDER, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
+        filepath = os.path.join(data_dir, cls.__name__, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
             return loader.read()
@@ -500,7 +497,6 @@ class USB(_REMOTE_DATA):
 
 class KORN(_REMOTE_DATA):
     '''A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123'''
-    FOLDER = 'korn'
     URL = 'https://zenodo.org/record/6874123/files/korn.zip'
     FILE_SIZE = '2.9 GB'
 
@@ -519,7 +515,7 @@ class KORN(_REMOTE_DATA):
         ImageData
             The korn dataset
         '''
-        filepath = os.path.join(data_dir, cls.FOLDER, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
+        filepath = os.path.join(data_dir, cls.__name__, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
         try:
             loader = NikonDataReader(file_name=filepath)
             return loader.read()
@@ -531,6 +527,5 @@ class SANDSTONE(_REMOTE_DATA):
     A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
     A small subset of the data containing selected projections and 4 slices of the reconstruction
     '''
-    FOLDER = 'sandstone'
     URL = 'https://zenodo.org/records/4912435/files/small.zip'
     FILE_SIZE = '227 MB'

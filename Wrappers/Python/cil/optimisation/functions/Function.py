@@ -162,12 +162,9 @@ class Function(object):
 
         """
 
-        if isinstance(other, Function):
-            return SumFunction(self, other)
-        elif isinstance(other, (SumScalarFunction, ConstantFunction, Number)):
+        if isinstance(other, (SumScalarFunction, ConstantFunction, Number)):
             return SumScalarFunction(self, other)
-        else:
-            raise ValueError('Not implemented')
+        return SumFunction(self, other)
 
     def __radd__(self, other):
         """ Making addition commutative. """

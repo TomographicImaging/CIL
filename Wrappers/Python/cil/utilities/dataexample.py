@@ -28,6 +28,9 @@ from urllib.request import urlopen
 from io import BytesIO
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from abc import ABC
+from matplotlib.pyplot import imread
+from scipy.io import loadmat
+from pathlib import Path
 
 
 DEFAULT_DATA_DIR = os.path.abspath(os.path.join(sys.prefix, 'share', 'cil'))
@@ -465,11 +468,9 @@ class USB(RemoteTestData):
         '''
         self = cls(data_dir)
         filepath = os.path.join(self.data_dir, cls.__name__, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
-        try:
-            loader = ZEISSDataReader(file_name=filepath)
-            return loader.read()
-        except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}({data_dir}).download_data()`") from exc
+        self.download_data()
+        loader = ZEISSDataReader(file_name=filepath)
+        return loader.read()
 
 class KORN(RemoteTestData):
     '''A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123'''
@@ -488,12 +489,10 @@ class KORN(RemoteTestData):
         '''
         self = cls(data_dir)
         filepath = os.path.join(self.data_dir, cls.__name__, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
-        try:
-            loader = NikonDataReader(file_name=filepath)
-            return loader.read()
-        except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}({data_dir}).download_data()`") from exc
-
+        self.download_data()
+        loader = NikonDataReader(file_name=filepath)
+        return loader.read()
+        
 class SANDSTONE(RemoteTestData):
     '''
     A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
@@ -501,3 +500,30 @@ class SANDSTONE(RemoteTestData):
     '''
     URL = 'https://zenodo.org/records/4912435/files/small.zip'
     FILE_SIZE = '227 MB'
+     
+    @classmethod
+    def get(cls, filename, data_dir=DEFAULT_DATA_DIR):
+        '''
+        This function returns data from a specified file in the sandstone folder 
+        Parameters
+        ----------
+        filename : str
+            filename of the data to get, specify the filepath within the sandstone folder e.g. 'slice_0270_data.mat' or 'proj/BBii_0001.tif'
+
+        Returns
+        -------
+        DataContainer
+            Data from the sandstone dataset
+        '''
+        self = cls(data_dir)
+        filepath = os.path.join(self.data_dir, cls.__name__, filename)
+        print(filepath)
+        self.download_data()
+        if Path(filename).suffix == '.tif':
+            return imread(filepath)
+
+        elif Path(filename).suffix == '.mat':
+            return loadmat(filepath)
+
+        else: 
+            raise ValueError('{0} file type not recognised'.format( Path(filename).suffix) )              

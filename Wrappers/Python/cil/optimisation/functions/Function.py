@@ -1,3 +1,4 @@
+
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -162,7 +163,7 @@ class Function(object):
 
         """
 
-        if isinstance(other, (SumScalarFunction, ConstantFunction, Number)):
+        if isinstance(other,  Number):
             return SumScalarFunction(self, other)
         return SumFunction(self, other)
 

@@ -203,7 +203,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     @property
     def data_passes(self):
         data_passes = []
-        for el in self._data_passes_indices:
+        for el in self.data_passes_indices:
             try:
                 data_passes.append(data_passes[-1])
             except IndexError:

@@ -290,46 +290,21 @@ class TestSAG(CCPiTestClass):
 
     
     def setUp(self):
-        if has_astra:
-            self.sampler = Sampler.random_with_replacement(5)
-            self.data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-            self.data.reorder('astra')
-            self.data2d = self.data.get_slice(vertical='centre')
-            ag2D = self.data2d.geometry
-            ag2D.set_angles(ag2D.angles, initial_angle=0.2,
-                            angle_unit='radian')
-            ig2D = ag2D.get_ImageGeometry()
 
-            self.A = ProjectionOperator(ig2D, ag2D, device="cpu")
-            self.n_subsets = 5
-            self.partitioned_data = self.data2d.partition(
-                self.n_subsets, 'sequential')
-            self.A_partitioned = ProjectionOperator(
-                ig2D, self.partitioned_data.geometry, device="cpu")
-            self.f_subsets = []
-            for i in range(self.n_subsets):
-                fi = LeastSquares(
-                    self.A_partitioned.operators[i], self. partitioned_data[i])
-                self.f_subsets.append(fi)
-            self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = SAGFunction(self.f_subsets, self.sampler)
-            self.initial = ig2D.allocate()
-
-        else:
            
-            self.sampler = Sampler.random_with_replacement(6)
-            self.initial = VectorData(np.ones(30))
-            b = VectorData(np.array(range(30))/50)
-            self.n_subsets = 6
-            self.f_subsets = []
-            for i in range(6):
-                diagonal = np.zeros(30)
-                diagonal[5*i:5*(i+1)] = 1
-                Ai = MatrixOperator(np.diag(diagonal))
-                self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
-            self.A=MatrixOperator(np.diag(np.ones(30)))
-            self.f = LeastSquares(self.A, b)
-            self.f_stochastic = SAGFunction(self.f_subsets, self.sampler)
+        self.sampler = Sampler.random_with_replacement(6)
+        self.initial = VectorData(np.ones(30))
+        b = VectorData(np.array(range(30))/50)
+        self.n_subsets = 6
+        self.f_subsets = []
+        for i in range(6):
+            diagonal = np.zeros(30)
+            diagonal[5*i:5*(i+1)] = 1
+            Ai = MatrixOperator(np.diag(diagonal))
+            self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
+        self.A=MatrixOperator(np.diag(np.ones(30)))
+        self.f = LeastSquares(self.A, b)
+        self.f_stochastic = SAGFunction(self.f_subsets, self.sampler)
 
     
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
@@ -376,11 +351,11 @@ class TestSAG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(np.array(f.data_passes), np.array([ 1+1./f1.num_functions]))
         self.assertNumpyArrayAlmostEqual(np.array(f.data_passes_indices[0]), np.array(list(range(f1.num_functions))+ [0]))
         self.assertNumpyArrayAlmostEqual(np.array(f1.data_passes_indices[0]), np.array([0]))
-        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, f1.list_stored_gradients[0].array)
-        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
-        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[0].array, f1._list_stored_gradients[0].array)
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
         
-        self.assertFalse((f.list_stored_gradients[3].array== f1.list_stored_gradients[3].array).all())
+        self.assertFalse((f._list_stored_gradients[3].array== f1._list_stored_gradients[3].array).all())
         
         
   
@@ -394,20 +369,44 @@ class TestSAG(CCPiTestClass):
         with self.assertRaises(ValueError):
            SAGFunction([self.f, self.f], bad_sampler)
   
-    
+    @unittest.skipUnless(has_astra, "Requires ASTRA GPU")
     def test_SAG_simulated_parallel_beam_data(self): 
 
-        alg = GD(initial=self.initial, 
-                              objective_function=self.f, update_objective_interval=500, alpha=1e8)
+        sampler = Sampler.random_with_replacement(5)
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data.reorder('astra')
+        data2d = data.get_slice(vertical='centre')
+        ag2D = data2d.geometry
+        ag2D.set_angles(ag2D.angles, initial_angle=0.2,
+                        angle_unit='radian')
+        ig2D = ag2D.get_ImageGeometry()
+
+        A = ProjectionOperator(ig2D, ag2D, device="cpu")
+        n_subsets = 5
+        partitioned_data = data2d.partition(
+            n_subsets, 'sequential')
+        A_partitioned = ProjectionOperator(
+            ig2D, partitioned_data.geometry, device="cpu")
+        f_subsets = []
+        for i in range(n_subsets):
+            fi = LeastSquares(
+                A_partitioned.operators[i],  partitioned_data[i])
+            f_subsets.append(fi)
+        f = LeastSquares(A, data2d)
+        f_stochastic = SAGFunction(f_subsets, sampler)
+        initial = ig2D.allocate()
+            
+        alg = GD(initial=initial, 
+                              objective_function=f, update_objective_interval=500, alpha=1e8)
         alg.max_iteration = 50
         alg.run(verbose=0)
        
         
-        objective=self.f_stochastic
-        alg_stochastic = GD(initial=self.initial, 
+        objective=f_stochastic
+        alg_stochastic = GD(initial=initial, 
                               objective_function=objective, update_objective_interval=500, 
-                              step_size=1/self.f_stochastic.L, max_iteration =5000)
-        alg_stochastic.run( self.n_subsets*50, verbose=0)
+                              step_size=1/f_stochastic.L, max_iteration =5000)
+        alg_stochastic.run( n_subsets*50, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         
   
@@ -537,45 +536,21 @@ class TestSAGA(CCPiTestClass):
     
     
     def setUp(self):
-        if has_astra:
-            self.sampler = Sampler.random_with_replacement(5)
-            self.data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-            self.data.reorder('astra')
-            self.data2d = self.data.get_slice(vertical='centre')
-            ag2D = self.data2d.geometry
-            ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-            ig2D = ag2D.get_ImageGeometry()
-            
-            self.A = ProjectionOperator(ig2D, ag2D, device="cpu")
-            self.n_subsets = 5
-            self.partitioned_data = self.data2d.partition(
-                self.n_subsets, 'sequential')
-            self.A_partitioned = ProjectionOperator(
-                ig2D, self.partitioned_data.geometry, device="cpu")
-            self.f_subsets = []
-            for i in range(self.n_subsets):
-                fi = LeastSquares(
-                    self.A_partitioned.operators[i], self. partitioned_data[i])
-                self.f_subsets.append(fi)
-            self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = SAGAFunction(self.f_subsets, self.sampler)
-            self.initial = ig2D.allocate()
-            
-        else:
+        
            
-            self.sampler = Sampler.random_with_replacement(6)
-            self.initial = VectorData(np.zeros(30))
-            b = VectorData(np.array(range(30))/50)
-            self.n_subsets = 6
-            self.f_subsets = []
-            for i in range(6):
-                diagonal = np.zeros(30)
-                diagonal[5*i:5*(i+1)] = 1
-                Ai = MatrixOperator(np.diag(diagonal))
-                self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
-            self.A=MatrixOperator(np.diag(np.ones(30)))
-            self.f = LeastSquares(self.A, b)
-            self.f_stochastic = SAGAFunction(self.f_subsets, self.sampler)
+        self.sampler = Sampler.random_with_replacement(6)
+        self.initial = VectorData(np.zeros(30))
+        b = VectorData(np.array(range(30))/50)
+        self.n_subsets = 6
+        self.f_subsets = []
+        for i in range(6):
+            diagonal = np.zeros(30)
+            diagonal[5*i:5*(i+1)] = 1
+            Ai = MatrixOperator(np.diag(diagonal))
+            self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
+        self.A=MatrixOperator(np.diag(np.ones(30)))
+        self.f = LeastSquares(self.A, b)
+        self.f_stochastic = SAGAFunction(self.f_subsets, self.sampler)
         
     
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
@@ -622,12 +597,12 @@ class TestSAGA(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(np.array(f.data_passes), np.array([1+1./f1.num_functions]))
         self.assertNumpyArrayAlmostEqual(np.array(f.data_passes_indices[0]),np.array( list(range(self.n_subsets))+[0]))
         self.assertNumpyArrayAlmostEqual(np.array(f1.data_passes_indices[0]), np.array([0]))
-        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, f1.list_stored_gradients[0].array)
-        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
-        self.assertNumpyArrayAlmostEqual(f.list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[0].array, f1._list_stored_gradients[0].array)
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
         
-        self.assertFalse((f.list_stored_gradients[1].array== f1.list_stored_gradients[1].array).all())
-        self.assertNumpyArrayAlmostEqual(f1.list_stored_gradients[1].array, self.initial.array)
+        self.assertFalse((f._list_stored_gradients[1].array== f1._list_stored_gradients[1].array).all())
+        self.assertNumpyArrayAlmostEqual(f1._list_stored_gradients[1].array, self.initial.array)
         
   
     
@@ -639,19 +614,43 @@ class TestSAGA(CCPiTestClass):
         with self.assertRaises(ValueError):
            SAGAFunction([self.f, self.f], bad_sampler)
   
+    @unittest.skipUnless(has_astra, "Requires ASTRA GPU")
     def test_SAGA_simulated_parallel_beam_data(self): 
 
-        alg = GD(initial=self.initial, 
-                              objective_function=self.f, update_objective_interval=500, alpha=1e8)
+        sampler = Sampler.random_with_replacement(5)
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data.reorder('astra')
+        data2d = data.get_slice(vertical='centre')
+        ag2D = data2d.geometry
+        ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
+        ig2D = ag2D.get_ImageGeometry()
+        
+        A = ProjectionOperator(ig2D, ag2D, device="cpu")
+        n_subsets = 5
+        partitioned_data = data2d.partition(
+            n_subsets, 'sequential')
+        A_partitioned = ProjectionOperator(
+            ig2D, partitioned_data.geometry, device="cpu")
+        f_subsets = []
+        for i in range(n_subsets):
+            fi = LeastSquares(
+                A_partitioned.operators[i],  partitioned_data[i])
+            f_subsets.append(fi)
+        f = LeastSquares(A, data2d)
+        f_stochastic = SAGAFunction(f_subsets, sampler)
+        initial = ig2D.allocate()
+            
+        alg = GD(initial=initial, 
+                              objective_function=f, update_objective_interval=500, alpha=1e8)
         alg.max_iteration = 200
         alg.run(verbose=0)
        
         
-        objective=self.f_stochastic
-        alg_stochastic = GD(initial=self.initial, 
+        objective=f_stochastic
+        alg_stochastic = GD(initial=initial, 
                               objective_function=objective, update_objective_interval=500, 
-                              step_size=1/(10*self.f_stochastic.L), max_iteration =10000)
-        alg_stochastic.run( self.n_subsets*75, verbose=0)
+                              step_size=1/(10*f_stochastic.L), max_iteration =10000)
+        alg_stochastic.run( n_subsets*75, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         
   

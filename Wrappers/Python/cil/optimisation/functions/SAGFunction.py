@@ -45,10 +45,11 @@ class SAGFunction(ApproximateGradientSumFunction):
     """
 
     def __init__(self, functions,  sampler=None):
-        self.list_stored_gradients = None
-        self.full_gradient_at_iterate = None
+        self._list_stored_gradients = None
+        self._full_gradient_at_iterate = None
         self._warm_start_just_done=False
-
+        self._stoch_grad_at_iterate=None
+        
         super(SAGFunction, self).__init__(functions, sampler)
 
 
@@ -66,30 +67,27 @@ class SAGFunction(ApproximateGradientSumFunction):
             Between 0 and the number of functions in the list  
 
         """
-        if self.list_stored_gradients is None: 
-            self.list_stored_gradients = [
+        if self._list_stored_gradients is None: 
+            self._list_stored_gradients = [
                 0*x for fi in self.functions]
-            self.full_gradient_at_iterate = 0*x
+            self._full_gradient_at_iterate = 0*x
             
 
-        self.stoch_grad_at_iterate = self.functions[function_num].gradient(x)
+        self._stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 
-        if self._warm_start_just_done:
-            self._update_data_passes_indices(list(range(self.num_functions))+ [self.function_num])
-            self._warm_start_just_done=False 
-        else:
-            self._update_data_passes_indices([self.function_num])
+        
+        self._update_data_passes_indices([self.function_num])
 
-        self.stochastic_grad_difference = self.stoch_grad_at_iterate.sapyb(
-            1., self.list_stored_gradients[function_num], -1.)
+        self._stochastic_grad_difference = self._stoch_grad_at_iterate.sapyb(
+            1., self._list_stored_gradients[function_num], -1.)
 
    
         out =self._update_approx_gradient(out)
 
-        self.list_stored_gradients[function_num].fill(
-            self.stoch_grad_at_iterate)
-        self.full_gradient_at_iterate.sapyb(
-            1., self.stochastic_grad_difference, 1., out=self.full_gradient_at_iterate)
+        self._list_stored_gradients[function_num].fill(
+            self._stoch_grad_at_iterate)
+        self._full_gradient_at_iterate.sapyb(
+            1., self._stochastic_grad_difference, 1., out=self._full_gradient_at_iterate)
 
         return out
     
@@ -97,12 +95,12 @@ class SAGFunction(ApproximateGradientSumFunction):
         """Internal function used to differentiate between the SAG and SAGA calculations"""
         if out is None:
             # due to the convention that we follow: without the 1/n factor
-            out = self.stochastic_grad_difference.sapyb(
-                1., self.full_gradient_at_iterate, 1.)
+            out = self._stochastic_grad_difference.sapyb(
+                1., self._full_gradient_at_iterate, 1.)
         else:
             # due to the convention that we follow: without the 1/n factor
-            self.stochastic_grad_difference.sapyb(
-                1., self.full_gradient_at_iterate, 1., out=out)
+            self._stochastic_grad_difference.sapyb(
+                1., self._full_gradient_at_iterate, 1., out=out)
 
         return out 
     
@@ -115,11 +113,19 @@ class SAGFunction(ApproximateGradientSumFunction):
             The initial point to warmstart the calculation 
         
         """
-        self.list_stored_gradients = [
+        self._list_stored_gradients = [
             fi.gradient(initial) for fi in self.functions]
-        self.full_gradient_at_iterate = np.sum(self.list_stored_gradients)
-        self._warm_start_just_done=True
+        self._full_gradient_at_iterate = np.sum(self._list_stored_gradients)
+        self._update_data_passes_indices(list(range(self.num_functions)))
 
+    @property
+    def data_passes_indices(self):
+        ret = self._data_passes_indices[:]  
+        if len(ret[0]) == self.num_functions:  
+            a = ret.pop(1)  
+            ret[0] += a  
+        return ret
+    
 class SAGAFunction(SAGFunction):
 
     """
@@ -151,11 +157,11 @@ class SAGAFunction(SAGFunction):
             
         if out is None:
             # due to the convention that we follow: without the 1/n factor
-            out= self.stochastic_grad_difference.sapyb(
-                self.num_functions, self.full_gradient_at_iterate, 1.)
+            out= self._stochastic_grad_difference.sapyb(
+                self.num_functions, self._full_gradient_at_iterate, 1.)
         else:
             # due to the convention that we follow: without the 1/n factor
-            self.stochastic_grad_difference.sapyb(
-                self.num_functions, self.full_gradient_at_iterate, 1., out=out)
+            self._stochastic_grad_difference.sapyb(
+                self.num_functions, self._full_gradient_at_iterate, 1., out=out)
 
         return out 

@@ -26,7 +26,7 @@ except ImportError as ie:
 from packaging import version
 from warnings import warn
 if version.parse(widgets.__version__) >= version.parse('8'):
-    warn(ImportWarning, f'requires ipywidgets<8, found {widgets.__version__}')
+    warn(f'requires ipywidgets<8, found {widgets.__version__}', ImportWarning, stacklevel=2)
 
 import matplotlib.pyplot as plt
 from matplotlib import gridspec

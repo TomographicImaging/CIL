@@ -444,11 +444,9 @@ class WALNUT(RemoteTestData):
         '''
         self = cls(data_dir)
         filepath = os.path.join(self.data_dir, cls.__name__, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
-        try:
-            loader = ZEISSDataReader(file_name=filepath)
-            return loader.read()
-        except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}({data_dir}).download_data()`") from exc
+        self.download_data()
+        loader = ZEISSDataReader(file_name=filepath)
+        return loader.read()
 
 class USB(RemoteTestData):
     '''A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516'''

@@ -345,6 +345,12 @@ class TotalVariation(Function):
         if self.warm_start:
             self._p2 = p2
 
+        if self.tolerance is not None:
+            logging.info(
+                    "Stop at {} iterations with tolerance {} .".format(k, error))
+        else:
+            logging.info("Stop at {} iterations.".format(k))
+
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):
             tau_reg_neg.divide(-self.regularisation_parameter, out=tau)

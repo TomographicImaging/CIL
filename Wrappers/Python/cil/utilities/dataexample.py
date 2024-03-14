@@ -29,10 +29,11 @@ from io import BytesIO
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from abc import ABC
 
+
 DEFAULT_DATA_DIR = os.path.abspath(os.path.join(sys.prefix, 'share', 'cil'))
 
 class BaseTestData(ABC):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir=DEFAULT_DATA_DIR):
         self.data_dir = data_dir
 
 class TestData(BaseTestData):
@@ -53,6 +54,7 @@ class TestData(BaseTestData):
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES = 'shapes.png'
     RAINBOW = 'rainbow.png'
+    dfile: str
 
     @classmethod
     def _datasets(cls):
@@ -356,34 +358,36 @@ class TestData(BaseTestData):
 
         return out
 
-    def get(self, **load_kwargs):
-        return self.load(type(self).__name__, **load_kwargs)
+    @classmethod
+    def get(cls, data_dir=DEFAULT_DATA_DIR, **load_kwargs):
+        """Calls cls(data_dir).load(cls.dfile, **load_kwargs)"""
+        return cls(data_dir).load(cls.dfile, **load_kwargs)
 
 class BOAT(TestData):
-    pass
+    dfile = TestData.BOAT
 class CAMERA(TestData):
-    pass
+    dfile = TestData.CAMERA
 class PEPPERS(TestData):
-    pass
+    dfile = TestData.PEPPERS
 class RESOLUTION_CHART(TestData):
-    pass
+    dfile = TestData.RESOLUTION_CHART
 class SIMPLE_PHANTOM_2D(TestData):
-    pass
+    dfile = TestData.SIMPLE_PHANTOM_2D
 class SHAPES(TestData):
-    pass
+    dfile = TestData.SHAPES
 class RAINBOW(TestData):
-    pass
+    dfile = TestData.RAINBOW
 
-class NexusTestData(TestData):
-    dfile: str
-    def get(self):
+class NexusTestData(BaseTestData):
+    @classmethod
+    def get(cls, data_dir=DEFAULT_DATA_DIR):
         '''
         Returns
         -------
         AcquisitionData
         '''
         loader = NEXUSDataReader()
-        loader.set_up(file_name=os.path.join(self.data_dir, self.dfile))
+        loader.set_up(file_name=os.path.join(data_dir, cls.dfile))
         return loader.read()
 
 class SYNCHROTRON_PARALLEL_BEAM_DATA(NexusTestData):
@@ -431,7 +435,8 @@ class WALNUT(RemoteTestData):
     URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
     FILE_SIZE = '6.4 GB'
 
-    def get(self):
+    @classmethod
+    def get(cls, data_dir=DEFAULT_DATA_DIR):
         '''
         This function returns the raw projection data from the .txrm file
 
@@ -440,19 +445,21 @@ class WALNUT(RemoteTestData):
         ImageData
             The walnut dataset
         '''
-        filepath = os.path.join(self.data_dir, type(self).__name__, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+        self = cls(data_dir)
+        filepath = os.path.join(self.data_dir, cls.__name__, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
             return loader.read()
         except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{type(self).__name__}.download_data({self.data_dir})`") from exc
+            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}.download_data({self.data_dir})`") from exc
 
 class USB(RemoteTestData):
     '''A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516'''
     URL = 'https://zenodo.org/record/4822516/files/usb.zip'
     FILE_SIZE = '3.2 GB'
 
-    def get(self):
+    @classmethod
+    def get(cls, data_dir=DEFAULT_DATA_DIR):
         '''
         This function returns the raw projection data from the .txrm file
 
@@ -461,19 +468,21 @@ class USB(RemoteTestData):
         ImageData
             The usb dataset
         '''
-        filepath = os.path.join(self.data_dir, type(self).__name__, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
+        self = cls(data_dir)
+        filepath = os.path.join(self.data_dir, cls.__name__, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
             return loader.read()
         except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{type(self).__name__}.download_data({self.data_dir})`") from exc
+            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}.download_data({self.data_dir})`") from exc
 
 class KORN(RemoteTestData):
     '''A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123'''
     URL = 'https://zenodo.org/record/6874123/files/korn.zip'
     FILE_SIZE = '2.9 GB'
 
-    def get(self):
+    @classmethod
+    def get(cls, data_dir=DEFAULT_DATA_DIR):
         '''
         This function returns the raw projection data from the .xtekct file
 
@@ -482,12 +491,13 @@ class KORN(RemoteTestData):
         ImageData
             The korn dataset
         '''
-        filepath = os.path.join(self.data_dir, type(self).__name__, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
+        self = cls(data_dir)
+        filepath = os.path.join(self.data_dir, cls.__name__, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
         try:
             loader = NikonDataReader(file_name=filepath)
             return loader.read()
         except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{type(self).__name__}.download_data({self.data_dir})`") from exc
+            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}.download_data({self.data_dir})`") from exc
 
 class SANDSTONE(RemoteTestData):
     '''

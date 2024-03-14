@@ -31,7 +31,7 @@ from abc import ABC
 
 DEFAULT_DATA_DIR = os.path.abspath(os.path.join(sys.prefix, 'share', 'cil'))
 
-class TestData:
+class TestData(ABC):
     '''Provides 6 datasets:
 
     BOAT: 'boat.tiff'
@@ -355,12 +355,48 @@ class TestData:
 
         return out
 
-class _CIL_DATA(ABC):
+    def get(self, **load_kwargs):
+        return self.load(type(self).__name__, **load_kwargs)
+
+class BOAT(TestData):
+    pass
+class CAMERA(TestData):
+    pass
+class PEPPERS(TestData):
+    pass
+class RESOLUTION_CHART(TestData):
+    pass
+class SIMPLE_PHANTOM_2D(TestData):
+    pass
+class SHAPES(TestData):
+    pass
+class RAINBOW(TestData):
+    pass
+
+class NexusTestData(TestData):
     dfile: str
-    @classmethod
-    def get(cls, data_dir=DEFAULT_DATA_DIR, **loader_kwargs):
-        loader = TestData(data_dir)
-        return loader.load(cls.dfile, **loader_kwargs)
+    def get(self):
+        '''
+        Returns
+        -------
+        AcquisitionData
+        '''
+        loader = NEXUSDataReader()
+        loader.set_up(file_name=os.path.join(self.data_dir, self.dfile))
+        return loader.read()
+
+class SYNCHROTRON_PARALLEL_BEAM_DATA(NexusTestData):
+    '''A DLS dataset'''
+    dfile = '24737_fd_normalised.nxs'
+class SIMULATED_PARALLEL_BEAM_DATA(NexusTestData):
+    '''A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME'''
+    dfile = 'sim_parallel_beam.nxs'
+class SIMULATED_CONE_BEAM_DATA(NexusTestData):
+    '''A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME'''
+    dfile = 'sim_cone_beam.nxs'
+class SIMULATED_SPHERE_VOLUME(NexusTestData):
+    '''A simulated volume of spheres'''
+    dfile = 'sim_volume.nxs'
 
 class _REMOTE_DATA(ABC):
     URL: str
@@ -397,49 +433,6 @@ class _REMOTE_DATA(ABC):
                 print('Download complete')
             else:
                 print('Download cancelled')
-
-class BOAT(_CIL_DATA):
-    dfile = TestData.BOAT
-class CAMERA(_CIL_DATA):
-    dfile = TestData.CAMERA
-class PEPPERS(_CIL_DATA):
-    dfile = TestData.PEPPERS
-class RESOLUTION_CHART(_CIL_DATA):
-    dfile = TestData.RESOLUTION_CHART
-class SIMPLE_PHANTOM_2D(_CIL_DATA):
-    dfile = TestData.SIMPLE_PHANTOM_2D
-class SHAPES(_CIL_DATA):
-    dfile = TestData.SHAPES
-class RAINBOW(_CIL_DATA):
-    dfile = TestData.RAINBOW
-class _NEXUS_CIL_DATA(_CIL_DATA):
-    @classmethod
-    def get(cls, data_dir=DEFAULT_DATA_DIR):
-        '''
-        Parameters
-        ----------
-        data_dir: str, optional
-           The path to the data directory
-
-        Returns
-        -------
-        AcquisitionData
-        '''
-        loader = NEXUSDataReader()
-        loader.set_up(file_name=os.path.join(data_dir, cls.dfile))
-        return loader.read()
-class SYNCHROTRON_PARALLEL_BEAM_DATA(_NEXUS_CIL_DATA):
-    '''A DLS dataset'''
-    dfile = '24737_fd_normalised.nxs'
-class SIMULATED_PARALLEL_BEAM_DATA(_NEXUS_CIL_DATA):
-    '''A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME'''
-    dfile = 'sim_parallel_beam.nxs'
-class SIMULATED_CONE_BEAM_DATA(_NEXUS_CIL_DATA):
-    '''A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME'''
-    dfile = 'sim_cone_beam.nxs'
-class SIMULATED_SPHERE_VOLUME(_NEXUS_CIL_DATA):
-    '''A simulated volume of spheres'''
-    dfile = 'sim_volume.nxs'
 
 class WALNUT(_REMOTE_DATA):
     '''A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516'''

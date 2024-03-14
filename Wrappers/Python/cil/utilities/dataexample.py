@@ -413,19 +413,16 @@ class RemoteTestData(BaseTestData):
             pass
         return res == "y"
 
-    def _download_and_extract_from_url(self):
-        with urlopen(self.URL) as response:
-            with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
-                zipfile.extractall(path=self.data_dir)
-
     def download_data(self):
         '''Download a dataset from a remote repository'''
-        if os.path.isdir(os.path.join(self.data_dir, type(self).__name__)):
-            print(f"Dataset already exists in {self.data_dir}")
+        folder = os.path.join(self.data_dir, type(self).__name__)
+        if os.path.isdir(folder):
+            print(f"Dataset already exists in {folder}")
         else:
             if self._prompt(f"Are you sure you want to download {self.FILE_SIZE} dataset from {self.URL}?"):
                 print(f"Downloading dataset from {self.URL}")
-                self._download_and_extract_from_url(os.path.join(self.data_dir, type(self).__name__))
+                with urlopen(self.URL) as response, BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
+                    zipfile.extractall(path=folder)
                 print('Download complete')
             else:
                 print('Download cancelled')
@@ -451,7 +448,7 @@ class WALNUT(RemoteTestData):
             loader = ZEISSDataReader(file_name=filepath)
             return loader.read()
         except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}.download_data({self.data_dir})`") from exc
+            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}({data_dir}).download_data()`") from exc
 
 class USB(RemoteTestData):
     '''A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516'''
@@ -474,7 +471,7 @@ class USB(RemoteTestData):
             loader = ZEISSDataReader(file_name=filepath)
             return loader.read()
         except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}.download_data({self.data_dir})`") from exc
+            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}({data_dir}).download_data()`") from exc
 
 class KORN(RemoteTestData):
     '''A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123'''
@@ -497,7 +494,7 @@ class KORN(RemoteTestData):
             loader = NikonDataReader(file_name=filepath)
             return loader.read()
         except FileNotFoundError as exc:
-            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}.download_data({self.data_dir})`") from exc
+            raise ValueError(f"Specify a different data_dir or download data with `{cls.__name__}({data_dir}).download_data()`") from exc
 
 class SANDSTONE(RemoteTestData):
     '''

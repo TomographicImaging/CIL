@@ -156,7 +156,6 @@ class TestTestData(CCPiTestClass):
 class TestRemoteData(unittest.TestCase):
 
     def setUp(self):
-
         self.data_list = ['WALNUT','USB','KORN','SANDSTONE']
         self.tmp_file = 'tmp.txt'
         self.tmp_zip = 'tmp.zip'
@@ -166,10 +165,10 @@ class TestRemoteData(unittest.TestCase):
             self.zipped_bytes = zipped_file.read()
 
     def tearDown(self):
-        for data in self.data_list:
-            test_func = getattr(dataexample, data)
-            if os.path.exists(os.path.join(test_func.FOLDER)):
-                shutil.rmtree(test_func.FOLDER)
+        for data in self.data_list + ['REMOTE_TEST']:
+            folder = os.path.join(dataexample.DEFAULT_DATA_DIR, data)
+            if os.path.exists(folder):
+                shutil.rmtree(folder)
 
         if os.path.exists(self.tmp_zip):
             os.remove(self.tmp_zip)
@@ -183,28 +182,31 @@ class TestRemoteData(unittest.TestCase):
         mock_response.__enter__.return_value = mock_response
         mock_urlopen.return_value = mock_response
 
+    @patch('cil.utilities.dataexample.input', return_value='y')
     @patch('cil.utilities.dataexample.urlopen')
-    def test_unzip_remote_data(self, mock_urlopen):
+    def test_unzip_remote_data(self, mock_urlopen, input):
         self.mock_urlopen(mock_urlopen)
-        self.assertFalse(os.path.isfile(self.tmp_file))
-        class RemoteData(dataexample._REMOTE_DATA):
+        sys.stdout = StringIO()  # redirect print output
+
+        fname = os.path.join(dataexample.DEFAULT_DATA_DIR, 'REMOTE_TEST', self.tmp_file)
+        self.assertFalse(os.path.isfile(fname))
+        class REMOTE_TEST(dataexample.RemoteTestData):
             URL = ''
-        RemoteData._download_and_extract_from_url('.')
-        self.assertTrue(os.path.isfile(self.tmp_file))
-        os.remove(self.tmp_file)
+            FILE_SIZE = '0 B'
+        REMOTE_TEST().download_data()
+        self.assertTrue(os.path.isfile(fname))
+        os.remove(fname)
+
+        sys.stdout = sys.__stdout__  # return to standard print output
 
     @patch('cil.utilities.dataexample.input', return_value='n')
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_n(self, mock_urlopen, input):
         self.mock_urlopen(mock_urlopen)
-
-        data_list = ['WALNUT','USB','KORN','SANDSTONE']
-        for data in data_list:
-             # redirect print output
-            capturedOutput = StringIO()
-            sys.stdout = capturedOutput
+        for data in self.data_list:
+            sys.stdout = capturedOutput = StringIO()  # redirect print output
             test_func = getattr(dataexample, data)
-            test_func.download_data('.')
+            test_func().download_data()
 
             self.assertFalse(os.path.isfile(self.tmp_file))
             self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
@@ -216,19 +218,14 @@ class TestRemoteData(unittest.TestCase):
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_y(self, mock_urlopen, input):
         self.mock_urlopen(mock_urlopen)
-
-        # redirect print output
-        capturedOutput = StringIO()
-        sys.stdout = capturedOutput
-
+        sys.stdout = StringIO()  # redirect print output
 
         for data in self.data_list:
             test_func = getattr(dataexample, data)
-            fname = os.path.join(test_func.FOLDER, self.tmp_file)
+            fname = os.path.join(dataexample.DEFAULT_DATA_DIR, data, self.tmp_file)
             self.assertFalse(os.path.isfile(fname))
-            test_func.download_data('.')
+            test_func().download_data()
             self.assertTrue(os.path.isfile(fname))
             os.remove(fname)
 
-        # return to standard print output
-        sys.stdout = sys.__stdout__
+        sys.stdout = sys.__stdout__  # return to standard print output

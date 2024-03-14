@@ -1273,7 +1273,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(
-            iters, tolerance=None, lower=0, info=True, warm_start=False)
+            iters, tolerance=None, lower=0, warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1353,7 +1353,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=False)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=False)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
@@ -1384,7 +1384,7 @@ class TestTotalVariation(unittest.TestCase):
 
         #with warm start
         iters=10
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=True)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=True)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         for i in range(4):

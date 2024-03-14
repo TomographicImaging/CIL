@@ -1129,7 +1129,6 @@ class TestTotalVariation(unittest.TestCase):
         self.assertEquals(self.tv.upper, np.inf)
         self.assertEquals(self.tv.isotropic, True)
         self.assertEquals(self.tv.split, False)
-        self.assertEquals(self.tv.info, False)
         self.assertEquals(self.tv.strong_convexity_constant, 0)
         self.assertEquals(self.tv.tolerance, None)
 
@@ -1142,7 +1141,6 @@ class TestTotalVariation(unittest.TestCase):
                  upper = 1.,
                  isotropic = False,
                  split = True,
-                 info = True,
                  strong_convexity_constant = 1.,
                  warm_start=False)
         self.assertEquals(tv.warm_start, False)
@@ -1153,7 +1151,6 @@ class TestTotalVariation(unittest.TestCase):
         self.assertEquals(tv.upper, 1.)
         self.assertEquals(tv.isotropic, False)
         self.assertEquals(tv.split, True)
-        self.assertEquals(tv.info, True)
         self.assertEquals(tv.strong_convexity_constant, 1.)
         self.assertEquals(tv.tolerance, 1e-5)
 

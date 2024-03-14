@@ -22,6 +22,7 @@ from cil.framework import DataContainer
 from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
+from cil.utilities import quality_measures
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
@@ -29,8 +30,11 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinPhaseProcessor
+from cil.processors.PaganinPhaseProcessor import PaganinProcessor
 import gc
+
+from scipy import constants
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
 
@@ -2767,11 +2771,85 @@ class TestMasker(unittest.TestCase):
         data_test = data.copy().as_array()
         data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
         data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
 
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
 
+class TestPaganinPhaseRetriver(unittest.TestCase):       
 
+    def setUp(self):      
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
 
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_PaganinProcessor_init(self):        
+        # test default values are initialised
+        processors = [PaganinProcessor(), PaganinPhaseProcessor.retrieve(), PaganinPhaseProcessor.filter()]
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta','unit_multiplier', 'propagation_distance', 'propagation_distance_user',
+                          'filter_type', 'verbose', 'mu']
+        test_value = [40000, (constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2, 1, None, None, 
+                      'paganin_method', True, 4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt))]
+        for processor in processors:
+            for i in numpy.arange(len(test_value)):
+                self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processors = [PaganinProcessor(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.retrieve(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.filter(1, 2, 3, 4, 5, 'string', False)]
+        test_value = [1, (constants.h*constants.speed_of_light)/(1*constants.electron_volt), 2, 3, 4, None, 5, 
+                      'string', False, 4.0*numpy.pi*3/((constants.h*constants.speed_of_light)/(1*constants.electron_volt))]
+        for processor in processors:
+            for i in numpy.arange(len(test_value)):
+                self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+        
+    def test_PaganinProcessor_check_input(self):
+        # check the propagation distance can be found from the geometry if there is no user input
+        processors = [PaganinPhaseProcessor.retrieve(), PaganinPhaseProcessor.filter()]
+        for processor in processors:
+            processor.check_input(self.data_cone)
+            self.assertEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector, msg=self.error_message(processor, 'propagation_distance'))
+
+        # for PaganinPhaseProcessor.retrieve check there is a value error when the data geometry does not have dist_center_detector
+        processor = PaganinPhaseProcessor.retrieve()
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_parallel)
+
+        # for PaganinPhaseProcessor.filter check a default value of 10 is used when the data geometry does not have dist_center_detector
+        processor = PaganinPhaseProcessor.filter()
+        processor.check_input(self.data_parallel)
+        self.assertEqual(processor.propagation_distance, 10, msg=self.error_message(processor, 'propagation_distance'))
+        
+        # test propagation distance user input over-rides the distance value from geometry
+        processors = [PaganinPhaseProcessor.retrieve(propagation_distance=1), PaganinPhaseProcessor.filter(propagation_distance=1)]
+        data_array = [self.data_cone, self.data_parallel]
+        for processor in processors:
+            for data in data_array:
+                processor.check_input(data)
+                self.assertEqual(processor.propagation_distance, 1, msg=self.error_message(processor, 'propagation_distance'))
+
+        # check alpha is calculated
+        alpha = 1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
+        for processor in processors:
+            for data in data_array:
+                processor.check_input(data)
+                self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+
+    def test_PaganinProcessor_get_output(self):
+        processor = PaganinPhaseProcessor.retrieve()
+        processor.set_input(self.data_cone)
+        processor.get_output()
+
+    def test_PaganinPhaseRetriever(self): 
+        processor = PaganinPhaseProcessor.retrieve(propagation_distance=10, verbose=False)
+        processor.set_input(self.data_parallel)
+        phase_data = processor.get_output(output_type = 'attenuation')
+        
+        absorption_data = self.data_parallel.log()*-1
+
+        self.assertLessEqual(quality_measures.mse(absorption_data, phase_data), 0.05)
+
+        
 if __name__ == "__main__":
 
     d = TestDataProcessor()

@@ -2835,19 +2835,115 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
                 processor.check_input(data)
                 self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
 
-    def test_PaganinProcessor_get_output(self):
-        processor = PaganinPhaseProcessor.retrieve()
-        processor.set_input(self.data_cone)
-        processor.get_output()
+    def test_PaganinProcesor_create_filter(self):
+        
+        expected_alpha = self.data_cone.geometry.dist_center_detector*1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
+        image = self.data_cone.get_slice(angle=0).as_array()
+        Nx, Ny = image.shape
+        kx,ky = numpy.meshgrid( 
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            sparse=False, 
+            indexing='ij'
+            )
+        
+        # check default filter is created with paganin_method
+        processors = [PaganinPhaseProcessor.retrieve(), PaganinPhaseProcessor.filter()]
+        for processor in processors:
+            processor.set_input(self.data_cone)
+            # check raises warning where k*W < 1
+            with self.assertLogs(level='WARNING') as log:
+                processor.create_filter(image)
+            self.assertEqual(len(log.output), 1)
+            expected_filter =  (1. + expected_alpha*(kx**2 + ky**2)*self.data_cone.geometry.magnification)
+            numpy.testing.assert_allclose(processor.filter, expected_filter)
+
+        # check generalised_paganin_method
+        processors = [PaganinPhaseProcessor.retrieve(filter_type='generalised_paganin_method'), PaganinPhaseProcessor.filter(filter_type='generalised_paganin_method')]
+        for processor in processors:
+            processor.set_input(self.data_cone)
+            # check does not raise warning
+            with self.assertNoLogs(level='WARNING') as log:
+                processor.create_filter(image)
+            expected_filter = (1. - (2*expected_alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)/self.data_cone.geometry.magnification)
+            numpy.testing.assert_allclose(processor.filter, expected_filter)
+
+        # check unknown method raises error
+        processors = [PaganinPhaseProcessor.retrieve(filter_type='unknown_method'), PaganinPhaseProcessor.filter(filter_type='unknown_method')]
+        for processor in processors:
+            processor.set_input(self.data_cone)
+            with self.assertRaises(ValueError):
+                processor.create_filter(self.data_cone.get_slice(angle=0).as_array())
+
+    def test_PaganinProcessor_process_projection(self):
+
+        image = self.data_parallel.get_slice(angle=0).as_array()
+        absorption = -1*numpy.log(image)
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(image)
+        phase = (-1*2*numpy.pi/wavelength)*((-1/mu)*numpy.log(image))
+        
+        # check retrieve processor returns filtered image with correct scaling
+        processor = PaganinPhaseProcessor.retrieve(filter_type='generalised_paganin_method', propagation_distance = 1)
+        processor.set_input(self.data_parallel)
+        processor.create_filter(image)
+
+        processor.output_type = 'attenuation'
+        output = processor.process_projection(image)
+        self.assertLessEqual( numpy.mean((absorption - output.real)**2), 0.05)
+
+        processor.output_type = 'thickness'
+        output = processor.process_projection(image)
+        self.assertLessEqual( numpy.mean((thickness - output.real)**2), 0.05)
+
+        processor.output_type = 'phase'
+        output = processor.process_projection(image)
+        self.assertLessEqual( numpy.mean((phase - output.real)**2), 0.05)
+
+        processor.output_type = 'unknown_output'
+        with self.assertRaises(ValueError):
+            output = processor.process_projection(image)
+
+        # check filter processor returns filtered image without scaling
+        processor = PaganinPhaseProcessor.filter(filter_type='generalised_paganin_method', propagation_distance = 1)
+        processor.set_input(self.data_parallel)
+        processor.create_filter(image)
+
+        output = processor.process_projection(image)
+        self.assertLessEqual( numpy.mean((image - output.real)**2), 0.05)
+
+        output = processor.process_projection(absorption)
+        self.assertLessEqual( numpy.mean((absorption - output.real)**2), 0.05)
 
     def test_PaganinPhaseRetriever(self): 
-        processor = PaganinPhaseProcessor.retrieve(propagation_distance=10, verbose=False)
-        processor.set_input(self.data_parallel)
-        phase_data = processor.get_output(output_type = 'attenuation')
-        
-        absorption_data = self.data_parallel.log()*-1
 
-        self.assertLessEqual(quality_measures.mse(absorption_data, phase_data), 0.05)
+        absorption = -1*numpy.log(self.data_parallel)
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(self.data_parallel)
+        phase = (-1*2*numpy.pi/wavelength)*((-1/mu)*numpy.log(self.data_parallel))
+
+        # check retrieve processor returns filtered image with correct scaling
+        processor = PaganinPhaseProcessor.retrieve(propagation_distance=1, verbose=False)
+        processor.set_input(self.data_parallel)
+        
+        output = processor.get_output(output_type = 'attenuation')
+        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
+        output = processor.get_output(output_type = 'thickness')
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+        output = processor.get_output(output_type = 'phase')
+        self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
+
+        # check filter processor returns filtered image without scaling
+        processor = PaganinPhaseProcessor.filter(propagation_distance=1, verbose=False)
+        processor.set_input(self.data_parallel)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, self.data_parallel), 0.05)
+
+        processor.set_input(absorption)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
 
         
 if __name__ == "__main__":

@@ -2796,7 +2796,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
                 self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processors = [PaganinProcessor(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.retrieve(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.filter(1, 2, 3, 4, 5, 'string', False)]
+        processors = [PaganinProcessor(1, 2, 3, 4, 5, 'string', False), PaganinPhaseProcessor.retrieve(1, 2, 3, 4, 5, 'string', False),]
         test_value = [1, (constants.h*constants.speed_of_light)/(1*constants.electron_volt), 2, 3, 4, None, 5, 
                       'string', False, 4.0*numpy.pi*3/((constants.h*constants.speed_of_light)/(1*constants.electron_volt))]
         for processor in processors:
@@ -2815,13 +2815,13 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.check_input(self.data_parallel)
 
-        # for PaganinPhaseProcessor.filter check a default value of 10 is used when the data geometry does not have dist_center_detector
+        # for PaganinPhaseProcessor.filter check a default value of 1 is used when the data geometry does not have dist_center_detector
         processor = PaganinPhaseProcessor.filter()
         processor.check_input(self.data_parallel)
-        self.assertEqual(processor.propagation_distance, 10, msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.propagation_distance, 1, msg=self.error_message(processor, 'propagation_distance'))
         
         # test propagation distance user input over-rides the distance value from geometry
-        processors = [PaganinPhaseProcessor.retrieve(propagation_distance=1), PaganinPhaseProcessor.filter(propagation_distance=1)]
+        processors = [PaganinPhaseProcessor.retrieve(propagation_distance=1)]
         data_array = [self.data_cone, self.data_parallel]
         for processor in processors:
             for data in data_array:
@@ -2906,7 +2906,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             output = processor.process_projection(image)
 
         # check filter processor returns filtered image without scaling
-        processor = PaganinPhaseProcessor.filter(filter_type='generalised_paganin_method', propagation_distance = 1)
+        processor = PaganinPhaseProcessor.filter(filter_type='generalised_paganin_method')
         processor.set_input(self.data_parallel)
         processor.create_filter(image)
 
@@ -2936,7 +2936,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
 
         # check filter processor returns filtered image without scaling
-        processor = PaganinPhaseProcessor.filter(propagation_distance=1, verbose=False)
+        processor = PaganinPhaseProcessor.filter(verbose=False)
         processor.set_input(self.data_parallel)
         output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, self.data_parallel), 0.05)

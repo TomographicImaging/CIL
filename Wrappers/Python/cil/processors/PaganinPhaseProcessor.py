@@ -22,7 +22,7 @@ import numpy as np
 
 from scipy.fft import fft2
 from scipy.fft import ifft2
-from scipy.fft import fftshift
+from scipy.fft import fftshift, ifftshift
 from scipy import constants
 
 from tqdm import tqdm
@@ -92,7 +92,7 @@ class PaganinPhaseProcessor(Processor):
 
 
     @staticmethod
-    def filter(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
+    def filter(delta_beta=1e2, unit_multiplier = 1, filter_type='paganin_method', verbose=True):
         '''
         Method to create a Paganin processor to filter images using the Paganin phase retrieval algorithm
         described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -100,23 +100,13 @@ class PaganinPhaseProcessor(Processor):
         To retrieve quantitative information from phase contrast images use the `PaganinPhaseProcessor.retrieve() method` instead
 
         Parameters
-        ----------
-        energy_eV: float (optional)
-            Energy of the incident photon in eV, default is 40000
-            
-        delta: float (optional)
-            Real part of the deviation of the material refractive index from 1, where refractive index n = (1 - delta) + i beta 
-            energy-dependent refractive index information can be found at https://refractiveindex.info/ , default is 1
-        
-        beta: float (optional)
-            Complex part of the material refractive index, where refractive index n = (1 - delta) + i beta
+        ----------           
+        delta_beta: float
+            Ratio of the real and complex part of the material refractive index, where refractive index n = (1 - delta) + i beta
             energy-dependent refractive index information can be found at https://refractiveindex.info/ , default is 1e-2
 
         unit_multiplier: float (optional)
             Multiplier to convert units stored in geometry to metres, conversion applies to pixel size (and propagation distance if data.geometry.dist_center_detector is used), default is 1
-
-        propagation_distance: float (optional)
-            The sample to detector distance in meters. If not specified, the value in data.geometry.dist_center_detector will be used. If neither are supplied, default is 10
 
         filter_type: string (optional)
             The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9  (equation 17)
@@ -137,7 +127,7 @@ class PaganinPhaseProcessor(Processor):
 
         '''
         
-        processor = PaganinPhaseFilter(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type, verbose=verbose)
+        processor = PaganinPhaseFilter(delta= 1, beta = 1/delta_beta, unit_multiplier=unit_multiplier, filter_type=filter_type, verbose=verbose)
         return processor
     
 class PaganinProcessor(Processor):
@@ -177,14 +167,15 @@ class PaganinProcessor(Processor):
 
         if (geometry.pixel_size_h - geometry.pixel_size_v ) / \
             (geometry.pixel_size_h + geometry.pixel_size_v ) < 1e-5:
-            self.pixel_size = data.geometry.pixel_size_h*self.unit_multiplier
+            self.pixel_size = (data.geometry.pixel_size_h*self.unit_multiplier)/self.magnification
         else:
             raise ValueError('Panel pixel size is not homogeneous up to 1e-5: got {} {}'\
                     .format( geometry.pixel_size_h, geometry.pixel_size_v )
                 )
+        
+        self.propagation_distance = self.propagation_distance/self.magnification
 
         self.__calculate_alpha()
-
         return True
     
     def process(self, out=None):
@@ -221,26 +212,25 @@ class PaganinProcessor(Processor):
         if must_return:
             return out
         
-    def create_filter(self, image):
+    def create_filter(self, Nx, Ny):
         '''
         Function to create the Paganin filter, either using the paganin or generalised paganin method
         The filter is created on a mesh in Fourier space kx, ky
         '''
-        Nx, Ny = image.shape
-
+        
         kx,ky = np.meshgrid( 
             np.arange(-Nx/2, Nx/2, 1, dtype=np.float64) * (2*np.pi)/(Nx*self.pixel_size),
-            np.arange(-Ny/2, Ny/2, 1, dtype=np.float64) * (2*np.pi)/(Nx*self.pixel_size),
+            np.arange(-Ny/2, Ny/2, 1, dtype=np.float64) * (2*np.pi)/(Ny*self.pixel_size),
             sparse=False, 
             indexing='ij'
             )
         
         if self.filter_type == 'paganin_method':
             kW = np.abs(kx.max()*self.pixel_size)       
-            if (kW >= 1): 
+            if (kW >= 1):
                 logging.warning("This algorithm is valid for k*W << 1, found np.abs(kx.max()*self.pixel_size) = {}, results may not be accurate, \
                                 \nconsider using filter_type = 'generalised_paganin_method'".format(kW))
-            self.filter =  (1. + self.alpha*(kx**2 + ky**2)*self.magnification)
+            self.filter =  ifftshift(self.magnification/(1. + self.alpha*(kx**2 + ky**2)))
         
         elif self.filter_type == 'generalised_paganin_method':       
             kW = np.abs(kx.max()*self.pixel_size)       
@@ -285,11 +275,9 @@ class PaganinPhaseRetrieval(PaganinProcessor):
     '''
     def process_projection(self, image):
 
-        fI = fftshift(
-            fft2(self.magnification**2*image)
-            )
-        
-        iffI = ifft2(fftshift(fI/self.filter))
+        fI = fft2(self.magnification**2*image)
+            
+        iffI = ifft2(fI*self.filter)
         
         if self.output_type == 'attenuation':
             return -np.log(iffI)
@@ -328,8 +316,8 @@ class PaganinPhaseRetrieval(PaganinProcessor):
         
         output_type: string, optional
             if 'attenuation', returns the attenuation of the sample corrected for phase effects, without scaling by mu, attenuation = µT 
-            if 'thickness', returns the projected thickness T of the sample projected onto the image plane 
-            if 'phase' (default), returns the phase of the beam at the material exit, phase ϕ(r⊥) = −δ T(r⊥) · 2π/λ
+            if 'thickness' (default), returns the projected thickness T of the sample projected onto the image plane 
+            if 'phase', returns the phase of the beam at the material exit, phase ϕ(r⊥) = −δ T(r⊥) · 2π/λ
         
         Returns
         -------
@@ -346,11 +334,10 @@ class PaganinPhaseFilter(PaganinProcessor):
     '''
     def process_projection(self, image):
 
-        fI = fftshift(
-            fft2(self.magnification**2*image)
-            )
+        fI = fft2(self.magnification**2*image)
+
         
-        iffI = ifft2(fftshift(fI/self.filter))
+        iffI = ifft2(fI*self.filter)
 
         return iffI
         
@@ -358,9 +345,9 @@ class PaganinPhaseFilter(PaganinProcessor):
         
         if self.propagation_distance_user is None: 
             if data.geometry.dist_center_detector is None:
-                self.propagation_distance = 10
+                self.propagation_distance = 1
             elif data.geometry.dist_center_detector == 0:
-                self.propagation_distance = 10
+                self.propagation_distance = 1
             else:
                 propagation_distance = data.geometry.dist_center_detector
                 self.propagation_distance = (propagation_distance)*self.unit_multiplier

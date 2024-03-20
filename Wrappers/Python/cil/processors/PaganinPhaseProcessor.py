@@ -32,7 +32,7 @@ from multiprocessing.pool import ThreadPool
 class PaganinPhaseProcessor(Processor):
 
     @staticmethod
-    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method', verbose=True):
+    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method'):
         """
         Method to create a Paganin processor to retrieve quantitative information from phase contrast images using
         the Paganin phase retrieval algorithm described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -66,9 +66,6 @@ class PaganinPhaseProcessor(Processor):
         filter_type: string (optional)
             The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9 
         
-        verbose: boolean (optional)
-            If True print progress bar (default is True)
-
         Returns
         -------
         Processor
@@ -87,12 +84,12 @@ class PaganinPhaseProcessor(Processor):
         >>> processor.get_output(output_type='thickness')
         
         """
-        processor = PaganinPhaseRetrieval(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type, verbose=verbose)
+        processor = PaganinPhaseRetrieval(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type)
         return processor
 
 
     @staticmethod
-    def filter(delta_beta=1e2, unit_multiplier = 1, filter_type='paganin_method', verbose=True):
+    def filter(delta_beta=1e2, unit_multiplier = 1, filter_type='paganin_method'):
         '''
         Method to create a Paganin processor to filter images using the Paganin phase retrieval algorithm
         described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -110,9 +107,6 @@ class PaganinPhaseProcessor(Processor):
 
         filter_type: string (optional)
             The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9  (equation 17)
-        
-        verbose: boolean (optional)
-            If True print progress bar (default is True)
 
         Returns
         -------
@@ -127,14 +121,14 @@ class PaganinPhaseProcessor(Processor):
 
         '''
         
-        processor = PaganinPhaseFilter(delta= 1, beta = 1/delta_beta, unit_multiplier=unit_multiplier, filter_type=filter_type, verbose=verbose)
+        processor = PaganinPhaseFilter(delta= 1, beta = 1/delta_beta, unit_multiplier=unit_multiplier, filter_type=filter_type)
         return processor
     
 class PaganinProcessor(Processor):
     '''
     Parent class setting up Paganin processing
     '''
-    def __init__(self, energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance=None, filter_type='paganin_method', verbose=True):
+    def __init__(self, energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance=None, filter_type='paganin_method'):
         kwargs = {
             'energy' : energy_eV,
             'wavelength' : self.energy_to_wavelength(energy_eV),
@@ -143,8 +137,7 @@ class PaganinProcessor(Processor):
             'unit_multiplier' : unit_multiplier,
             'propagation_distance_user' : propagation_distance,
             'filter_type' : filter_type,
-            'verbose' : verbose,
-            'output_type' : 'phase',
+            'scaling_factor' : 1,
             'mu' : None,
             'alpha' : None,
             'pixel_size' : None,
@@ -179,36 +172,20 @@ class PaganinProcessor(Processor):
         return True
     
     def process(self, out=None):
-        '''
-        Process the Paganin for all projections using parallel processing
-        '''
+
         data  = self.get_input()
 
-        self.create_filter(data.get_slice(angle=0).as_array())
+        self.create_filter(data.get_dimension_size('vertical'), data.get_dimension_size('horizontal'))
 
         must_return = False        
         if out is None:
             out = data.geometry.allocate(None)
             must_return = True
         
-        original_data_order = data.dimension_labels
-        original_out_order = out.dimension_labels
-        data.reorder(('angle', 'vertical', 'horizontal'))
-        out.reorder(('angle', 'vertical', 'horizontal'))
-
-        with ThreadPool(4) as pool:
-            if self.verbose == True:
-                results = list(tqdm(pool.imap(self.process_projection, list(data.array)), total = len(list(data.array)) ))
-                out.fill(np.array(results, dtype = out.dtype))
-            else:
-                out.fill(np.array(pool.map(self.process_projection, list(data.array)), dtype = out.dtype))
-            
-            pool.close()
-            pool.join()
-        
-        data.reorder(original_data_order)
-        out.reorder(original_out_order)
-
+        for i in tqdm(range(len(data.geometry.angles))):
+            processed_projection = self.process_projection(data.get_slice(angle=i).as_array())
+            out.fill(processed_projection, angle = i)
+ 
         if must_return:
             return out
         
@@ -230,7 +207,7 @@ class PaganinProcessor(Processor):
             if (kW >= 1):
                 logging.warning("This algorithm is valid for k*W << 1, found np.abs(kx.max()*self.pixel_size) = {}, results may not be accurate, \
                                 \nconsider using filter_type = 'generalised_paganin_method'".format(kW))
-            self.filter =  ifftshift(self.magnification/(1. + self.alpha*(kx**2 + ky**2)))
+            self.filter =  ifftshift(1/(1. + self.alpha*(kx**2 + ky**2)/self.magnification))
         
         elif self.filter_type == 'generalised_paganin_method':       
             kW = np.abs(kx.max()*self.pixel_size)       
@@ -273,22 +250,12 @@ class PaganinPhaseRetrieval(PaganinProcessor):
     '''
     Class for retrieving phase information
     '''
-    def process_projection(self, image):
+    def process_projection(self, projection):
 
-        fI = fft2(self.magnification**2*image)
-            
+        fI = fft2(self.magnification**2*projection)
         iffI = ifft2(fI*self.filter)
-        
-        if self.output_type == 'attenuation':
-            return -np.log(iffI)
-        elif self.output_type == 'thickness':
-            return -(1/self.mu)*np.log(iffI)
-        elif self.output_type == 'phase':
-            return (-self.delta*2*np.pi/self.wavelength)*((-1/self.mu)*np.log(iffI))
-        else:
-            raise ValueError("output_type not recognised: got {0} expected one of 'attenuation', 'thickness' or 'phase'"\
-                            .format(self.output_type))
-        
+        return self.scaling_factor*np.log(iffI)
+
     def check_input(self, data):
         
         if self.propagation_distance_user is None: 
@@ -325,20 +292,25 @@ class PaganinPhaseRetrieval(PaganinProcessor):
             The processed data. Suppressed if `out` is passed
 
         '''
-        self.output_type = output_type
+        if output_type == 'attenuation':
+            self.scaling_factor = -1
+        elif output_type == 'thickness':
+            self.scaling_factor = -(1/self.mu)
+        elif output_type == 'phase':
+            self.scaling_factor = (-self.delta*2*np.pi/self.wavelength)*(-1/self.mu)
+        else:
+            raise ValueError("output_type not recognised: got {0} expected one of 'attenuation', 'thickness' or 'phase'"\
+                            .format(output_type))
         return super().get_output(out)
     
 class PaganinPhaseFilter(PaganinProcessor):
     '''
     Class for Paganin filter
     '''
-    def process_projection(self, image):
+    def process_projection(self, projection):
 
-        fI = fft2(self.magnification**2*image)
-
-        
+        fI = fft2(self.magnification**2*projection)
         iffI = ifft2(fI*self.filter)
-
         return iffI
         
     def check_input(self, data):

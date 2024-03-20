@@ -191,18 +191,20 @@ class TestRemoteData(unittest.TestCase):
         tf_name = tf.name
         zip_name = tf_name + '.zip'
         with ZipFile(zip_name, 'w') as zipped_file:
-                    zipped_file.writestr(os.path.basename(tf_name), np.array([1, 2, 3]))
+            zipped_file.writestr(os.path.basename(tf_name), np.array([1, 2, 3]))
+        
         tf.close()
+        
         with open(zip_name , 'rb') as zipped_file:
             zipped_bytes = zipped_file.read() 
+        
+        if os.path.exists(zip_name):
+            os.remove(zip_name)
         
         self.mock_urlopen(mock_urlopen, zipped_bytes)
         dataexample.REMOTEDATA._download_and_extract_from_url(os.path.dirname(tf_name))
         
         self.assertTrue(os.path.isfile(tf_name))
-
-        if os.path.exists(zip_name):
-            os.remove(zip_name)
 
         if os.path.exists(tf_name):
             os.remove(tf_name)
@@ -220,6 +222,9 @@ class TestRemoteData(unittest.TestCase):
         with open(zip_name , 'rb') as zipped_file:
             zipped_bytes = zipped_file.read() 
 
+        if os.path.exists(zip_name):
+            os.remove(zip_name)
+
         self.mock_urlopen(mock_urlopen, zipped_bytes)
 
         data_list = ['WALNUT','USB','KORN','SANDSTONE']
@@ -233,9 +238,6 @@ class TestRemoteData(unittest.TestCase):
             self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
         # return to standard print output
         sys.stdout = sys.__stdout__ 
-        
-        if os.path.exists(zip_name):
-            os.remove(zip_name)
 
         if os.path.exists(tf_name):
             shutil.rmtree(tf_name)
@@ -248,7 +250,7 @@ class TestRemoteData(unittest.TestCase):
         tf_name = tf.name
         zip_name = tf_name + '.zip'
         with ZipFile(zip_name, 'w') as zipped_file:
-                    zipped_file.writestr(os.path.basename(tf_name), np.array([1, 2, 3]))
+            zipped_file.writestr(os.path.basename(tf_name), np.array([1, 2, 3]))
         tf.close()
         with open(zip_name , 'rb') as zipped_file:
             zipped_bytes = zipped_file.read() 

@@ -29,6 +29,7 @@ from unittest.mock import patch, MagicMock
 from urllib import request
 from zipfile import ZipFile
 from io import StringIO
+from tempfile import NamedTemporaryFile
 
 initialise_tests()
 
@@ -158,70 +159,95 @@ class TestRemoteData(unittest.TestCase):
     def setUp(self):
         
         self.data_list = ['WALNUT','USB','KORN','SANDSTONE']
-        self.tmp_file = 'tmp.txt'
-        self.tmp_zip = 'tmp.zip'
-        with ZipFile(self.tmp_zip, 'w') as zipped_file:
-            zipped_file.writestr(self.tmp_file, np.array([1, 2, 3]))
-        with open(self.tmp_zip, 'rb') as zipped_file:
-            self.zipped_bytes = zipped_file.read()        
-    
-    def tearDown(self):
-        for data in self.data_list:
-            test_func = getattr(dataexample, data)
-            if os.path.exists(os.path.join(test_func.FOLDER)):
-                shutil.rmtree(test_func.FOLDER)
-        
-        if os.path.exists(self.tmp_zip):
-            os.remove(self.tmp_zip)
 
-        if os.path.exists(self.tmp_file):
-            os.remove(self.tmp_file)
-
-    def mock_urlopen(self, mock_urlopen):
+    def mock_urlopen(self, mock_urlopen, zipped_bytes):
         mock_response = MagicMock()
-        mock_response.read.return_value = self.zipped_bytes
+        mock_response.read.return_value = zipped_bytes
         mock_response.__enter__.return_value = mock_response
         mock_urlopen.return_value = mock_response
 
     @patch('cil.utilities.dataexample.urlopen')
     def test_unzip_remote_data(self, mock_urlopen):
-        self.mock_urlopen(mock_urlopen)
-        dataexample.REMOTEDATA._download_and_extract_from_url('.')
-        self.assertTrue(os.path.isfile(self.tmp_file))
+        
+        shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
+
+        with NamedTemporaryFile(suffix = '.zip') as tf:
+            tmp_path = os.path.dirname(tf.name)
+            tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
+            with ZipFile(tf.name, mode='w') as zip_file:
+                zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
+                
+            with open(tf.name, 'rb') as zip_file:
+                zipped_bytes = zip_file.read()
+        
+        self.mock_urlopen(mock_urlopen, zipped_bytes)
+        dataexample.REMOTEDATA._download_and_extract_from_url(os.path.join(tmp_path, tmp_dir))
+
+        self.assertTrue(os.path.isfile(os.path.join(tmp_path, tmp_dir, dataexample.TestData.SHAPES)))
+
+        if os.path.exists(os.path.join(tmp_path,tmp_dir)):
+            shutil.rmtree(os.path.join(tmp_path,tmp_dir)) 
+        
 
     @patch('cil.utilities.dataexample.input', return_value='n')    
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_n(self, mock_urlopen, input):
-        self.mock_urlopen(mock_urlopen)
-
-        data_list = ['WALNUT','USB','KORN','SANDSTONE']
-        for data in data_list:
-             # redirect print output
-            capturedOutput = StringIO()                 
-            sys.stdout = capturedOutput  
-            test_func = getattr(dataexample, data)
-            test_func.download_data('.')
-            
-            self.assertFalse(os.path.isfile(self.tmp_file))
-            self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
         
-        # return to standard print output
-        sys.stdout = sys.__stdout__ 
+        shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
+
+        with NamedTemporaryFile(suffix = '.zip') as tf:
+            tmp_path = os.path.dirname(tf.name)
+            tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
+            with ZipFile(tf.name, mode='w') as zip_file:
+                zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
+                
+            with open(tf.name, 'rb') as zip_file:
+                    zipped_bytes = zip_file.read()
+
+        self.mock_urlopen(mock_urlopen, zipped_bytes)
+
+        for data in self.data_list:
+            # redirect print output
+            capturedOutput = StringIO()                 
+            sys.stdout = capturedOutput 
+            test_func = getattr(dataexample, data)
+            test_func.download_data(os.path.join(tmp_path, tmp_dir))
+            self.assertFalse(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)))
+            self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
+            # return to standard print output
+            sys.stdout = sys.__stdout__ 
+
+        if os.path.exists(os.path.join(tmp_path,tmp_dir)):
+            shutil.rmtree(os.path.join(tmp_path,tmp_dir)) 
 
     @patch('cil.utilities.dataexample.input', return_value='y')    
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_y(self, mock_urlopen, input):
-        self.mock_urlopen(mock_urlopen)
+        
+        shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
+
+        with NamedTemporaryFile(suffix = '.zip') as tf:
+            tmp_path = os.path.dirname(tf.name)
+            tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
+            with ZipFile(tf.name, mode='w') as zip_file:
+                zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
+                
+            with open(tf.name, 'rb') as zip_file:
+                    zipped_bytes = zip_file.read()
+
+        self.mock_urlopen(mock_urlopen, zipped_bytes)
 
         # redirect print output
         capturedOutput = StringIO()                 
         sys.stdout = capturedOutput         
 
-        
         for data in self.data_list:
             test_func = getattr(dataexample, data)
-            test_func.download_data('.')
-            self.assertTrue(os.path.isfile(os.path.join(test_func.FOLDER,self.tmp_file)))
+            test_func.download_data(os.path.join(tmp_path, tmp_dir))
+            self.assertTrue(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)))
         
         # return to standard print output
         sys.stdout = sys.__stdout__ 
+        
+        if os.path.exists(os.path.join(tmp_path,tmp_dir)):
+            shutil.rmtree(os.path.join(tmp_path,tmp_dir))

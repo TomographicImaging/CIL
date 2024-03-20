@@ -36,9 +36,9 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     Parameters:
     -----------
     functions : `list`  of functions
-                A list of functions: :code:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
-    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or another class which has a `next` function implemented to output integers in {0,...,n-1}.
-        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
+                A list of functions: :code:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list) must be strictly greater than 1. 
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
+        This sampler is called each time gradient is called and sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
 
 
     Note
@@ -116,7 +116,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
         Returns
         --------
-        DataContainer
+        DataContainer (including ImageData and AcquisitionData)
             the value of the gradient of the sum function at x or nothing if `out`  
         """
 
@@ -124,7 +124,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     @abstractmethod
     def approximate_gradient(self, x, function_num,   out=None):
-        """ Computes the approximate gradient for each selected function at :code:`x` given a `function_number` in {0,...,len(functions)-1}.
+        """ Updates and outputs the approximate gradient at a given point :code:`x` given a `function_number` in {0,...,len(functions)-1}.
 
         Parameters
         ----------

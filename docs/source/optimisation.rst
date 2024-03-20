@@ -124,8 +124,8 @@ LADMM
 Algorithms (Stochastic)
 ========================
 
-There are a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
-This is an area of development for CIL. 
+There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
+This is an area of continued development for CIL.  
 
 
 
@@ -175,12 +175,11 @@ Alternatively, consider optimisation problems of the form:
 
 .. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
 
-where :math:`n` is the number of functions.  Where there is a large number of :math:`F_i` or their gradients are expensive to calculate stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
+where :math:`n` is the number of functions.  Where there is a large number of :math:`F_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
 
-The idea for this class and its sum functions is to consider that some stochastic optimisation algorithms can be viewed as deterministic gradient descent algorithms replacing the gradient with an approximate gradient. For example Stochasstic Gradient Descent replaces the gradient in Gradient Descent with the gradient of just one of the :math:`F_i`. 
+The idea for this class and its sum functions is to consider that some stochastic optimisation algorithms can be viewed as deterministic gradient descent algorithms replacing the gradient with an approximate gradient. For example Stochastic Gradient Descent replaces the gradient in Gradient Descent with the gradient of just one of the :math:`F_i`. 
  
-CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation  of a sum function with an approximate gradient. Child classes of this abstract base class can define different approximate gradients with different mathematical properties. Combining these approximate gradients with deterministic optimisation algorithms
-leads to different stochastic optimisation algorithms. 
+CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation  of a sum function with an approximate gradient. Child classes of this abstract base class can define different approximate gradients with different mathematical properties.
 
 For example in the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
 

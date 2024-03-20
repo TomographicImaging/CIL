@@ -80,7 +80,7 @@ class CofR_image_sharpness(Processor):
     """
     _supported_backends = ['astra', 'tigre']
 
-    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None):
 
         FBP = self._configure_FBP(backend)
 

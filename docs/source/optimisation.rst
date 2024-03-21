@@ -210,7 +210,6 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    from cil.plugins.astra.operators import ProjectionOperator
    
    # get the data  
-   sampler=Sampler.random_with_replacement(5)
    data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
    data.reorder('astra')
    data=data.get_slice(vertical='centre')

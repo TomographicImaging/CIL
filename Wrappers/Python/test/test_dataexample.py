@@ -159,6 +159,7 @@ class TestRemoteData(unittest.TestCase):
     def setUp(self):
         
         self.data_list = ['WALNUT','USB','KORN','SANDSTONE']
+        self.shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
 
     def mock_urlopen(self, mock_urlopen, zipped_bytes):
         mock_response = MagicMock()
@@ -168,14 +169,17 @@ class TestRemoteData(unittest.TestCase):
 
     @patch('cil.utilities.dataexample.urlopen')
     def test_unzip_remote_data(self, mock_urlopen):
+        '''
+        Test the _download_and_extract_data_from_url function correctly extracts files from a byte string
+        The zipped byte string is mocked using a temporary local zip file
+        '''
         
-        shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
-
+        # create a temporary zip file to test the function
         with NamedTemporaryFile(suffix = '.zip') as tf:
             tmp_path = os.path.dirname(tf.name)
             tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
             with ZipFile(tf.name, mode='w') as zip_file:
-                zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
+                zip_file.write(self.shapes_path, arcname=dataexample.TestData.SHAPES)
                 
             with open(tf.name, 'rb') as zip_file:
                 zipped_bytes = zip_file.read()
@@ -192,14 +196,17 @@ class TestRemoteData(unittest.TestCase):
     @patch('cil.utilities.dataexample.input', return_value='n')    
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_n(self, mock_urlopen, input):
+        '''
+        Test the download_data function, when the user input is 'n' to 'are you sure you want to download data'
+        The zipped byte string is mocked using a temporary local zip file
+        '''
         
-        shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
-
+        # create a temporary zip file to test the function
         with NamedTemporaryFile(suffix = '.zip') as tf:
             tmp_path = os.path.dirname(tf.name)
             tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
             with ZipFile(tf.name, mode='w') as zip_file:
-                zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
+                zip_file.write(self.shapes_path, arcname=dataexample.TestData.SHAPES)
                 
             with open(tf.name, 'rb') as zip_file:
                     zipped_bytes = zip_file.read()
@@ -212,8 +219,8 @@ class TestRemoteData(unittest.TestCase):
             sys.stdout = capturedOutput 
             test_func = getattr(dataexample, data)
             test_func.download_data(os.path.join(tmp_path, tmp_dir))
-            self.assertFalse(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)))
-            self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n')
+            self.assertFalse(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)), msg = "Failed with dataset " + data)
+            self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n', msg = "Failed with dataset " + data)
             # return to standard print output
             sys.stdout = sys.__stdout__ 
 
@@ -223,14 +230,16 @@ class TestRemoteData(unittest.TestCase):
     @patch('cil.utilities.dataexample.input', return_value='y')    
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_y(self, mock_urlopen, input):
+        '''
+        Test the download_data function, when the user input is 'y' to 'are you sure you want to download data'
+        The zipped byte string is mocked using a temporary local zip file
+        '''
         
-        shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
-
         with NamedTemporaryFile(suffix = '.zip') as tf:
             tmp_path = os.path.dirname(tf.name)
             tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
             with ZipFile(tf.name, mode='w') as zip_file:
-                zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
+                zip_file.write(self.shapes_path, arcname=dataexample.TestData.SHAPES)
                 
             with open(tf.name, 'rb') as zip_file:
                     zipped_bytes = zip_file.read()
@@ -244,10 +253,18 @@ class TestRemoteData(unittest.TestCase):
         for data in self.data_list:
             test_func = getattr(dataexample, data)
             test_func.download_data(os.path.join(tmp_path, tmp_dir))
-            self.assertTrue(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)))
+            self.assertTrue(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)), msg = "Failed with dataset " + data)
         
         # return to standard print output
         sys.stdout = sys.__stdout__ 
         
         if os.path.exists(os.path.join(tmp_path,tmp_dir)):
             shutil.rmtree(os.path.join(tmp_path,tmp_dir))
+
+
+    def test_download_data_bad_URL(self):
+        '''
+        Test an error is raised when _download_and_extract_from_url has an empty URL
+        '''
+        with self.assertRaises(ValueError):
+            dataexample.REMOTEDATA._download_and_extract_from_url('.')

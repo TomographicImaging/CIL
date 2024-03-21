@@ -210,28 +210,28 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    from cil.plugins.astra.operators import ProjectionOperator
    
    # get the data  
-   data=dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
    data.reorder('astra')
-   data=data.get_slice(vertical='centre')
+   data = data.get_slice(vertical='centre')
 
    # create the geometries 
-   ag=data.geometry 
-   ig=ag.get_ImageGeometry()
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
 
    # partition the data and build the projectors
-   n_subsets=10 
-   partitioned_data=data.partition(n_subsets, 'sequential')
+   n_subsets = 10 
+   partitioned_data = data.partition(n_subsets, 'sequential')
    A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
 
    # create the list of functions for the stochastic sum 
    list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
 
    #define the sampler and the stochastic gradient function 
-   sampler = Sampler.sequential(len(list_of_functions))
+   sampler = Sampler.staggered(len(list_of_functions))
    f = SGFunction(list_of_functions, sampler=sampler)  
    
    #set up and run the gradient descent algorithm 
-   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=0.1,  atol=1e-9, rtol=1e-6, alpha=1e8)
+   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
    alg.run(300)
 
   

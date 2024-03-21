@@ -201,7 +201,8 @@ For example in the following table, the left hand column has the approximate gra
 
 The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:
 
-.. code:: python
+.. code-block :: python
+
    from cil.optimisation.utilities import Sampler
    from cil.optimisation.algorithms import GD 
    from cil.optimisation.functions import LeastSquares, SGFunction

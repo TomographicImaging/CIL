@@ -174,14 +174,13 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         """
 
         self.function_num = self.sampler.next()
+        
+        self._update_data_passes_indices([self.function_num])
+        
 
-        if self.function_num > self.num_functions:
-            raise IndexError(
-                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
-
-        if isinstance(self.function_num, numbers.Number):
-            return self.approximate_gradient(x, self.function_num, out=out)
-        raise ValueError("Batch gradient is not yet implemented")
+        
+        return self.approximate_gradient(x, self.function_num, out=out)
+        
 
     def _update_data_passes_indices(self, indices):
         """ Internal function that updates the list of lists containing the function indices used to calculate the approximate gradient. 
@@ -217,10 +216,12 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     @property
     def data_passes_indices(self):
+        """ The property `data_passes_indices` is a list of lists. Each time `gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  """
         return self._data_passes_indices
 
     @property
     def data_passes(self):
+        """ The property `data_passes` is a list. Each time `gradient` is called an entry is appended with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
         data_passes = []
         for el in self.data_passes_indices:
             try:

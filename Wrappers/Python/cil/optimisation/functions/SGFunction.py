@@ -58,8 +58,11 @@ class SGFunction(ApproximateGradientSumFunction):
         DataContainer
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1} or nothing if `out`  
         """ 
+        if self.function_num >= self.num_functions or self.function_num<0 :
+            raise IndexError(
+                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
+
         
-        self._update_data_passes_indices([function_num])
 
         # compute gradient of the function indexed by function_num
         if out is None:

@@ -14,7 +14,14 @@
 #  limitations under the License.
 #
 # Authors:
-# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - Daniel Deidda (National Physical Laboratory, UK)
+# - Claire Delplancke (Electricite de France, Research and Development)
+# - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
+# - Zeljko Kerata (Department of Computer Science, University College London, UK)
+# - Evgueni Ovtchinnikov (STFC - UKRI)
+# - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
+
 
 
 from cil.optimisation.functions import SumFunction
@@ -29,23 +36,27 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})
 
-    where there are :math:`n` functions. The gradient method from a CIL function is overwritten and calls an approximate gradient method. 
+    where there are :math:`n` functions. This function class has two ways of calling gradient:
+    - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
+    - `gradient` calls an `approximate_gradient` function which may be less computationally expensive to calculate than the full gradient
+    
+    
 
-    It is an abstract base class and any child classes must implement an `approximate_gradient` function.
+    This class is an abstract base class and therefore is not able to be used as is. It is designed to be sub-classed with different approximate gradient implementations. 
 
     Parameters:
     -----------
     functions : `list`  of functions
                 A list of functions: :code:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list) must be strictly greater than 1. 
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
-        This sampler is called each time gradient is called and sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. 
+        This sampler is called each time `gradient` is called and sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
 
 
     Note
     -----
-    We provide two ways of keeping track the amount of data you have seen: 
-        - `data_passes_indices` a list of lists the length of which should be the number of iterations currently run. Each entry corresponds to the indices of the function numbers seen in that iteration. 
-        - `data_passes` is a list of floats the length of which should be the number of iterations currently run. Each entry corresponds to the proportion of data seen up to this iteration. Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   
+    Each time `gradient` is called the class keeps track of which functions have been used to calculate the gradient. This may be useful for debugging or plotting after using this function in an iterative algorithm:  
+        - `data_passes_indices` is a list of lists. Each time `gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  
+        - `data_passes` is a list. Each time `gradient` is called an entry is appended with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   
 
 
 
@@ -55,6 +66,8 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     Example
     -------
+    This class is an abstract base class, so we give an example using the SGFunction child class. 
+    
     Consider the objective is to minimise: 
 
     .. math:: \sum_{i=0}^{n-1} f_{i}(x) = \sum_{i=0}^{n-1}\|A_{i} x - b_{i}\|^{2}
@@ -63,8 +76,15 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     >>> f = ApproximateGradientSumFunction(list_of_functions) 
 
     >>> list_of_functions = [LeastSquares(Ai, b=bi)] for Ai,bi in zip(A_subsets, b_subsets)) 
-    >>> sampler = Sampler.random_shuffle(len(list_of_functions))
-    >>> f = ApproximateGradientSumFunction(list_of_functions, sampler=sampler)   
+    >>> sampler = Sampler.sequential(len(list_of_functions))
+    >>> f = SGFunction(list_of_functions, sampler=sampler)   
+    >>> f.full_gradient(x)
+    This will return :math:`\sum_{i=0}^{n-1} \nabla f_{i}(x)`
+    >>> f.gradient(x)
+    As per the approximate gradient implementation in the SGFunction this will return :math:`\nabla f_{0}`. The choice of the `0` index is because we chose a `sequential` sampler and this is the first time we called `gradient`. 
+    >>> f.gradient(x)
+    This will return :math:`\nabla f_{1}` because we chose  a `sequential` sampler and this is the second time we called `gradient`. 
+
 
 
     """
@@ -116,15 +136,15 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
         Returns
         --------
-        DataContainer (including ImageData and AcquisitionData)
-            the value of the gradient of the sum function at x or nothing if `out`  
+        DataContainer
+            The value of the gradient of the sum function at x or nothing if `out`  
         """
 
         return super(ApproximateGradientSumFunction, self).gradient(x, out=out)
 
     @abstractmethod
     def approximate_gradient(self, x, function_num,   out=None):
-        """ Updates and outputs the approximate gradient at a given point :code:`x` given a `function_number` in {0,...,len(functions)-1}.
+        """ Returns the approximate gradient at a given point :code:`x` given a `function_number` in {0,...,len(functions)-1}.
 
         Parameters
         ----------
@@ -164,12 +184,11 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         raise ValueError("Batch gradient is not yet implemented")
 
     def _update_data_passes_indices(self, indices):
-        """ Internal function that updates the list of lists containing the function indices seen at each iteration. 
-
+        """ Internal function that updates the list of lists containing the function indices used to calculate the approximate gradient. 
         Parameters
         ----------
         indices: list
-            List of indices seen in a given iteration
+            List of indices used to calculate the approximate gradient in a given iteration
 
         """
         self._data_passes_indices.append(indices)

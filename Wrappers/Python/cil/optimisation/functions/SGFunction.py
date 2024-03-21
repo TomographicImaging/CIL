@@ -14,7 +14,13 @@
 #  limitations under the License.
 #
 # Authors:
-# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - Daniel Deidda (National Physical Laboratory, UK)
+# - Claire Delplancke (Electricite de France, Research and Development)
+# - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
+# - Zeljko Kerata (Department of Computer Science, University College London, UK)
+# - Evgueni Ovtchinnikov (STFC - UKRI)
+# - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 from .Function import SumFunction

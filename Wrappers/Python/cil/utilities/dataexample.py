@@ -23,57 +23,91 @@ from PIL import Image
 import os
 import os.path
 import sys
-from cil.io import NEXUSDataReader
-
-data_dir = os.path.abspath(os.path.join(
-        os.path.dirname(__file__),
-        '../data/')
-)
-
-# this is the default location after a conda install
-data_dir = os.path.abspath(
-    os.path.join(sys.prefix, 'share','cil')
-)
+from zipfile import ZipFile
+from urllib.request import urlopen
+from io import BytesIO
+from scipy.io import loadmat
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 
 class DATA(object):
     @classmethod
     def dfile(cls):
         return None
+    
+class CILDATA(DATA):
+    data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
     @classmethod
     def get(cls, size=None, scale=(0,1), **kwargs):
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
+    
+class REMOTEDATA(DATA):
+    
+    FOLDER = ''
+    URL = ''
+    FILE_SIZE = ''
 
-class BOAT(DATA):
+    @classmethod
+    def get(cls, data_dir):
+        return None
+
+    @classmethod
+    def _download_and_extract_from_url(cls, data_dir):
+        with urlopen(cls.URL) as response:
+            with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
+                zipfile.extractall(path = data_dir) 
+
+    @classmethod
+    def download_data(cls, data_dir):
+        '''
+        Download a dataset from a remote repository
+
+        Parameters
+        ----------
+        data_dir: str, optional
+           The path to the data directory where the downloaded data should be stored
+
+        '''
+        if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
+            print("Dataset already exists in " + data_dir)
+        else:
+            if input("Are you sure you want to download " + cls.FILE_SIZE + " dataset from " + cls.URL + " ? (y/n)") == "y": 
+                print('Downloading dataset from ' + cls.URL) 
+                cls._download_and_extract_from_url(os.path.join(data_dir,cls.FOLDER))
+                print('Download complete')
+            else:
+                print('Download cancelled')
+
+class BOAT(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.BOAT
-class CAMERA(DATA):
+class CAMERA(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.CAMERA
-class PEPPERS(DATA):
+class PEPPERS(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.PEPPERS
-class RESOLUTION_CHART(DATA):
+class RESOLUTION_CHART(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.RESOLUTION_CHART
-class SIMPLE_PHANTOM_2D(DATA):
+class SIMPLE_PHANTOM_2D(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.SIMPLE_PHANTOM_2D
-class SHAPES(DATA):
+class SHAPES(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.SHAPES
-class RAINBOW(DATA):
+class RAINBOW(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.RAINBOW
-class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
+class SYNCHROTRON_PARALLEL_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -90,11 +124,11 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
             The DLS dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
         return loader.read()
-class SIMULATED_PARALLEL_BEAM_DATA(DATA):
+class SIMULATED_PARALLEL_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -111,11 +145,11 @@ class SIMULATED_PARALLEL_BEAM_DATA(DATA):
             The simulated spheres dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_parallel_beam.nxs'))
         return loader.read()
-class SIMULATED_CONE_BEAM_DATA(DATA):
+class SIMULATED_CONE_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -132,11 +166,11 @@ class SIMULATED_CONE_BEAM_DATA(DATA):
             The simulated spheres dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_cone_beam.nxs'))
         return loader.read()
-class SIMULATED_SPHERE_VOLUME(DATA):
+class SIMULATED_SPHERE_VOLUME(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -151,12 +185,117 @@ class SIMULATED_SPHERE_VOLUME(DATA):
         -------
         ImageData
             The simulated spheres volume
-        '''
-
-        ddir = kwargs.get('data_dir', data_dir)
+        '''       
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
+    
+class WALNUT(REMOTEDATA):
+    '''
+    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+    '''
+    FOLDER = 'walnut'
+    URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
+    FILE_SIZE = '6.4 GB'
+
+    @classmethod
+    def get(cls, data_dir):
+        '''
+        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+        This function returns the raw projection data from the .txrm file
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)
+
+        Returns
+        -------
+        ImageData
+            The walnut dataset
+        '''
+        filepath = os.path.join(data_dir, cls.FOLDER, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+        try:
+            loader = ZEISSDataReader(file_name=filepath)
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset .txrm file not found in specifed data_dir: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
+     
+class USB(REMOTEDATA):
+    '''
+    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+    '''
+    FOLDER = 'USB' 
+    URL = 'https://zenodo.org/record/4822516/files/usb.zip'
+    FILE_SIZE = '3.2 GB'
+
+    @classmethod
+    def get(cls, data_dir):
+        '''
+        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+        This function returns the raw projection data from the .txrm file
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)
+
+        Returns
+        -------
+        ImageData
+            The usb dataset
+        '''
+        filepath = os.path.join(data_dir, cls.FOLDER, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
+        try:
+            loader = ZEISSDataReader(file_name=filepath)
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset .txrm file not found in: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
+        
+class KORN(REMOTEDATA):
+    '''
+    A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+    '''
+    FOLDER = 'korn'
+    URL = 'https://zenodo.org/record/6874123/files/korn.zip'
+    FILE_SIZE = '2.9 GB'
+
+    @classmethod
+    def get(cls, data_dir):
+        '''
+        A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+        This function returns the raw projection data from the .xtekct file
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)
+
+        Returns
+        -------
+        ImageData
+            The korn dataset
+        '''
+        filepath = os.path.join(data_dir, cls.FOLDER, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
+        try:
+            loader = NikonDataReader(file_name=filepath)
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset .xtekct file not found in: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
+
+
+class SANDSTONE(REMOTEDATA):
+    '''
+    A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
+    A small subset of the data containing selected projections and 4 slices of the reconstruction
+    '''
+    FOLDER = 'sandstone'
+    URL = 'https://zenodo.org/records/4912435/files/small.zip'
+    FILE_SIZE = '227 MB'
 
 class TestData(object):
     '''Class to return test data
@@ -178,9 +317,9 @@ class TestData(object):
     SHAPES =  'shapes.png'
     RAINBOW =  'rainbow.png'
 
-    def __init__(self, **kwargs):
-        self.data_dir = kwargs.get('data_dir', data_dir)
-
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
+        
     def load(self, which, size=None, scale=(0,1), **kwargs):
         '''
         Return a test data of the requested image

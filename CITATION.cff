@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite the software itself via zenodo as below, plus a CIL article, please see the CIL README for more details: https://github.com/TomographicImaging/CIL/blob/improve_citation/README.md"
+message: "If you use this software, please cite the software itself via zenodo as below, plus a CIL article, please see the CIL README for more details: https://github.com/TomographicImaging/CIL"
 abstract: "The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging 
            with particular emphasis on reconstruction of challenging datasets. Conventional filtered 
            backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard

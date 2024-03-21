@@ -236,8 +236,6 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
 
   
 
-
-
 The base class: 
 
 .. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 

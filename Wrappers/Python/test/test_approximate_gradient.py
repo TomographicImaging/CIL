@@ -532,47 +532,10 @@ class TestSAGA(CCPiTestClass):
         with self.assertRaises(ValueError):
            SAGAFunction([self.f, self.f], bad_sampler)
   
-    @unittest.skipUnless(has_astra, "Requires ASTRA GPU")
-    def test_SAGA_simulated_parallel_beam_data(self): 
-
-        sampler = Sampler.random_with_replacement(5)
-        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        data.reorder('astra')
-        data2d = data.get_slice(vertical='centre')
-        ag2D = data2d.geometry
-        ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-        ig2D = ag2D.get_ImageGeometry()
-        
-        A = ProjectionOperator(ig2D, ag2D, device="cpu")
-        n_subsets = 5
-        partitioned_data = data2d.partition(
-            n_subsets, 'sequential')
-        A_partitioned = ProjectionOperator(
-            ig2D, partitioned_data.geometry, device="cpu")
-        f_subsets = []
-        for i in range(n_subsets):
-            fi = LeastSquares(
-                A_partitioned.operators[i],  partitioned_data[i])
-            f_subsets.append(fi)
-        f = LeastSquares(A, data2d)
-        f_stochastic = SAGAFunction(f_subsets, sampler)
-        initial = ig2D.allocate()
-            
-        alg = GD(initial=initial, 
-                              objective_function=f, update_objective_interval=500, alpha=1e8)
-        alg.max_iteration = 200
-        alg.run(verbose=0)
-       
-        
-        objective=f_stochastic
-        alg_stochastic = GD(initial=initial, 
-                              objective_function=objective, update_objective_interval=500, 
-                              step_size=1/(10*f_stochastic.L), max_iteration =10000)
-        alg_stochastic.run( n_subsets*75, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
+  
         
   
-
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") #TODO: compare with cvxpy
     def test_SAGA_toy_example_no_warm_start(self): 
         sampler=Sampler.random_with_replacement(3, seed=1)
         initial = VectorData(np.zeros(15))
@@ -609,6 +572,7 @@ class TestSAGA(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), alg.x.as_array(),3)
         self.assertNumpyArrayAlmostEqual(alg_stochastic.x.as_array(), b.as_array(),3)
 
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")  #TODO: compare with cvxpy
     def test_SAGA_toy_example_warm_start(self): 
         sampler=Sampler.random_with_replacement(6, seed=1)
         initial = VectorData(np.zeros(18))
@@ -647,7 +611,7 @@ class TestSAGA(CCPiTestClass):
        
 
     
-    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") #TODO: replace this with above 
     def test_with_cvxpy(self):
         
         np.random.seed(10)

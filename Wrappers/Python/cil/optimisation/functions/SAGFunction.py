@@ -28,10 +28,10 @@ import numpy as np
 
 class SAGFunction(ApproximateGradientSumFunction):
 
-    """
+    r"""
     Stochastic average gradient (SAG) function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_0,...,f_{n-1}}` a `SumFunction`, :math:`f_0+...+f_{n-1}` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
-   and the gradient function returns the approximate gradient. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method.  
-   By incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. See the reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. 
+    and the gradient function returns the approximate gradient. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method.  
+    By incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. See the reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. 
 
     Parameters:
     -----------
@@ -77,11 +77,15 @@ class SAGFunction(ApproximateGradientSumFunction):
                 0*x for fi in self.functions]
             self._full_gradient_at_iterate = 0*x
             
+        if self.function_num >= self.num_functions or self.function_num<0 :
+            raise IndexError(
+                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
+
+            
 
         self._stoch_grad_at_iterate = self.functions[function_num].gradient(x)
 
         
-        self._update_data_passes_indices([self.function_num])
 
         self._stochastic_grad_difference = self._stoch_grad_at_iterate.sapyb(
             1., self._list_stored_gradients[function_num], -1.)
@@ -124,7 +128,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         self._update_data_passes_indices(list(range(self.num_functions)))
 
     @property
-    def data_passes_indices(self):
+    def data_passes_indices(self): #TODO: add the description here 
         ret = self._data_passes_indices[:]  
         if len(ret[0]) == self.num_functions:  
             a = ret.pop(1)  

@@ -52,9 +52,9 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         This sampler is called each time `gradient` is called and sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
 
     Note
-    ----
+    -----
     We ensure that the approximate gradient is of a similar order of magnitude to the full gradient calculation. For example, in the `SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
-    The multiplication by `math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods with the same step-sizes. 
+    The multiplication by `math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets. 
 
     Note
     -----

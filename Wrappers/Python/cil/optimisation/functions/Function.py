@@ -1,3 +1,4 @@
+
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -159,12 +160,9 @@ class Function(object):
 
         """
 
-        if isinstance(other, Function):
-            return SumFunction(self, other)
-        elif isinstance(other, (SumScalarFunction, ConstantFunction, Number)):
+        if isinstance(other,  Number):
             return SumScalarFunction(self, other)
-        else:
-            raise ValueError('Not implemented')
+        return SumFunction(self, other)
 
     def __radd__(self, other):
         """ Making addition commutative. """

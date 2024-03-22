@@ -107,13 +107,11 @@ class SAGFunction(ApproximateGradientSumFunction):
         return out
     
     def _update_approx_gradient(self, out):
-        """Internal function used to differentiate between the SAG and SAGA calculations"""
+        """Internal function used to differentiate between the SAG and SAGA calculations. This is the SAG approximation: """
         if out is None:
-            
             out = self._stochastic_grad_difference.sapyb(
                 1., self._full_gradient_at_iterate, 1.)
         else:
-            
             self._stochastic_grad_difference.sapyb(
                 1., self._full_gradient_at_iterate, 1., out=out)
 
@@ -169,7 +167,7 @@ class SAGAFunction(SAGFunction):
 
 
     def _update_approx_gradient(self, out):
-            
+        """Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: """
         if out is None:
             # due to the convention that we follow: without the 1/n factor
             out= self._stochastic_grad_difference.sapyb(

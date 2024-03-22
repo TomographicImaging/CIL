@@ -204,45 +204,22 @@ class TestSGD(CCPiTestClass):
 class TestSVRG(CCPiTestClass):
 
     def setUp(self):
-        if has_astra:
-            self.sampler = Sampler.random_with_replacement(5)
-            self.data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-            self.data.reorder('astra')
-            self.data2d = self.data.get_slice(vertical='centre')
-            ag2D = self.data2d.geometry
-            ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-            ig2D = ag2D.get_ImageGeometry()
-            
-            self.A = ProjectionOperator(ig2D, ag2D, device="cpu")
-            self.n_subsets = 5
-            self.partitioned_data = self.data2d.partition(
-                self.n_subsets, 'sequential')
-            self.A_partitioned = ProjectionOperator(
-                ig2D, self.partitioned_data.geometry, device="cpu")
-            self.f_subsets = []
-            for i in range(self.n_subsets):
-                fi = LeastSquares(
-                    self.A_partitioned.operators[i], self. partitioned_data[i])
-                self.f_subsets.append(fi)
-            self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = SVRGFunction(self.f_subsets, self.sampler)
-            self.initial = ig2D.allocate()
-            
-        else:
+
+       
            
-            self.sampler = Sampler.random_with_replacement(5)
-            self.initial = VectorData(np.zeros(30))
-            b = VectorData(np.array(range(30))/50)
-            self.n_subsets = 5
-            self.f_subsets = []
-            for i in range(5):
-                diagonal = np.zeros(30)
-                diagonal[6*i:6*(i+1)] = 1
-                Ai = MatrixOperator(np.diag(diagonal))
-                self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
-            self.A=MatrixOperator(np.diag(np.ones(30)))
-            self.f = LeastSquares(self.A, b)
-            self.f_stochastic = SVRGFunction(self.f_subsets, self.sampler)
+        self.sampler = Sampler.random_with_replacement(5)
+        self.initial = VectorData(np.zeros(30))
+        b = VectorData(np.array(range(30))/50)
+        self.n_subsets = 5
+        self.f_subsets = []
+        for i in range(5):
+            diagonal = np.zeros(30)
+            diagonal[6*i:6*(i+1)] = 1
+            Ai = MatrixOperator(np.diag(diagonal))
+            self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
+        self.A=MatrixOperator(np.diag(np.ones(30)))
+        self.f = LeastSquares(self.A, b)
+        self.f_stochastic = SVRGFunction(self.f_subsets, self.sampler)
 
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
@@ -345,21 +322,8 @@ class TestSVRG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(
             objective._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
 
-    def test_SVRG_simulated_parallel_beam_data(self):
 
-        alg = GD(initial=self.initial,
-                 objective_function=self.f, update_objective_interval=500, alpha=1e8)
-        alg.max_iteration = 200
-        alg.run(verbose=0)
-
-        objective = self.f_stochastic
-        alg_stochastic = GD(initial=self.initial,
-                            objective_function=objective, update_objective_interval=500,
-                            step_size=1/self.f_stochastic.L, max_iteration=5000)
-        alg_stochastic.run(self.n_subsets*25, verbose=0)
-        self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), alg.x.as_array(), 3)
-
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
     def test_SVRG_toy_example_and_data_passes(self):
         sampler = Sampler.sequential(3)
         initial = VectorData(np.zeros(15))
@@ -371,38 +335,37 @@ class TestSVRG(CCPiTestClass):
             diagonal[5*i:5*(i+1)] = 1
             A = MatrixOperator(np.diag(diagonal))
             functions.append(LeastSquares(A, A.direct(b)))
-            if i == 0:
-                objective = LeastSquares(A, A.direct(b))
-            else:
-                objective += LeastSquares(A, A.direct(b))
+        Aop=MatrixOperator(np.diag(np.ones(15)))
 
-        alg = GD(initial=initial,
-                 objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
-        alg.max_iteration = 80
-        alg.run(verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-
+        u_cvxpy = cvxpy.Variable(b.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+        
+        
         stochastic_objective = SVRGFunction(functions, sampler)
-        self.assertAlmostEqual(
-            stochastic_objective(initial), objective(initial))
-        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(
-            initial).array, objective.gradient(initial).array)
 
         alg_stochastic = GD(initial=initial,
                             objective_function=stochastic_objective, update_objective_interval=1000,
-                            step_size=0.05, max_iteration=5000)
-
+                            step_size=1/stochastic_objective.L)
         alg_stochastic.run(14, verbose=0)
         self.assertNumpyArrayAlmostEqual(np.array(stochastic_objective.data_passes), np.array(
             [1.]+[4./3, 5./3, 6./3, 7./3, 8./3, 11./3, 12./3, 13./3, 14./3, 15./3., 16./3, 19./3, 20./3]), 4)
         self.assertListEqual(stochastic_objective.data_passes_indices[:3], [list(range(3)), [0], [1]])
 
         alg_stochastic.run(100, verbose=0)
+        self.assertListEqual(stochastic_objective.data_passes_indices[-1], [stochastic_objective.function_num])
+
+        np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
         self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), alg.x.as_array(), 3)
+            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
+        
 
+
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
     def test_SVRG_toy_example_store_gradients(self):
         sampler = Sampler.sequential(3)
         initial = VectorData(np.zeros(15))
@@ -414,129 +377,52 @@ class TestSVRG(CCPiTestClass):
             diagonal[5*i:5*(i+1)] = 1
             A = MatrixOperator(np.diag(diagonal))
             functions.append(LeastSquares(A, A.direct(b)))
-            if i == 0:
-                objective = LeastSquares(A, A.direct(b))
-            else:
-                objective += LeastSquares(A, A.direct(b))
+        Aop=MatrixOperator(np.diag(np.ones(15)))
 
-        alg = GD(initial=initial,
-                 objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
-
-        alg.max_iteration = 80
-        alg.run(verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-
-        stochastic_objective = SVRGFunction(
-            functions, sampler, store_gradients=True)
-        self.assertAlmostEqual(
-            stochastic_objective(initial), objective(initial))
-        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(
-            initial).array, objective.gradient(initial).array)
+        u_cvxpy = cvxpy.Variable(b.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+        
+        
+        stochastic_objective = SVRGFunction(functions, sampler, store_gradients=True)
 
         alg_stochastic = GD(initial=initial,
                             objective_function=stochastic_objective, update_objective_interval=1000,
-                            step_size=0.05, max_iteration=5000)
+                            step_size=1/stochastic_objective.L)
+
         alg_stochastic.run(10, verbose=0)
         self.assertNumpyArrayAlmostEqual(np.array(stochastic_objective.data_passes), 
            np.array( [1.]+[4./3, 5./3, 6./3, 7./3,  8./3, 11./3, 12./3, 13./3, 14./3]), 4)
         self.assertListEqual(stochastic_objective.data_passes_indices[:2], [list(range(3)), [0]])
 
         alg_stochastic.run(100, verbose=0)
+        np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
         self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), alg.x.as_array(), 3)
+            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
 
-    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
-    def test_with_cvxpy(self):
-        
-        np.random.seed(10)
-        n = 300  
-        m = 100 
-        A = np.random.normal(0,1, (m, n)).astype('float32')
-        b = np.random.normal(0,1, m).astype('float32')
-
-        Aop = MatrixOperator(A)
-        bop = VectorData(b) 
-        
-        # split data, operators, functions
-        n_subsets = 10
-
-        Ai = np.vsplit(A, n_subsets) 
-        bi = [b[i:i+int(m/n_subsets)] for i in range(0, m, int(m/n_subsets))]     
-
-        fi_cil = []
-        for i in range(n_subsets):   
-            Ai_cil = MatrixOperator(Ai[i])
-            bi_cil = VectorData(bi[i])
-            fi_cil.append(LeastSquares(Ai_cil, bi_cil, c = 0.5))
-            
-        F = LeastSquares(Aop, b=bop, c = 0.5) 
-        ig = Aop.domain
-        sampler = Sampler.random_with_replacement(n_subsets)
-        F_SAG = SVRGFunction(fi_cil, sampler)           
-
-        initial = ig.allocate()
-        
-        
-        u_cvxpy = cvxpy.Variable(ig.shape[0])
-        objective = cvxpy.Minimize( 0.5 * cvxpy.sum_squares(Aop.A @ u_cvxpy - bop.array))
-        p = cvxpy.Problem(objective)
-        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
-
-        step_size = 0.0001 
-        epochs = 100
-        sag = GD(initial = initial, objective_function = F_SAG, step_size = step_size,
-                    max_iteration = epochs * n_subsets, 
-                    update_objective_interval =  epochs * n_subsets)
-        sag.run(verbose=0)    
-
-        np.testing.assert_allclose(p.value, sag.objective[-1], atol=1e-1)
-
-        np.testing.assert_allclose(u_cvxpy.value, sag.solution.array, atol=1e-1)
+    
 
 class TestLSVRG(CCPiTestClass):
 
     def setUp(self):
-        if has_astra:
-            self.sampler = Sampler.random_with_replacement(5)
-            self.data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-            self.data.reorder('astra')
-            self.data2d = self.data.get_slice(vertical='centre')
-            ag2D = self.data2d.geometry
-            ag2D.set_angles(ag2D.angles, initial_angle=0.2, angle_unit='radian')
-            ig2D = ag2D.get_ImageGeometry()
-            
-            self.A = ProjectionOperator(ig2D, ag2D, device="cpu")
-            self.n_subsets = 5
-            self.partitioned_data = self.data2d.partition(
-                self.n_subsets, 'sequential')
-            self.A_partitioned = ProjectionOperator(
-                ig2D, self.partitioned_data.geometry, device="cpu")
-            self.f_subsets = []
-            for i in range(self.n_subsets):
-                fi = LeastSquares(
-                    self.A_partitioned.operators[i], self. partitioned_data[i])
-                self.f_subsets.append(fi)
-            self.f = LeastSquares(self.A, self.data2d)
-            self.f_stochastic = LSVRGFunction(self.f_subsets, self.sampler)
-            self.initial = ig2D.allocate()
-            
-        else:
-           
-            self.sampler = Sampler.random_with_replacement(5)
-            self.initial = VectorData(np.zeros(30))
-            b = VectorData(np.array(range(30))/50)
-            self.n_subsets = 5
-            self.f_subsets = []
-            for i in range(5):
-                diagonal = np.zeros(30)
-                diagonal[6*i:6*(i+1)] = 1
-                Ai = MatrixOperator(np.diag(diagonal))
-                self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
-            self.A=MatrixOperator(np.diag(np.ones(30)))
-            self.f = LeastSquares(self.A, b)
-            self.f_stochastic = LSVRGFunction(self.f_subsets, self.sampler)
+
+        
+        self.sampler = Sampler.random_with_replacement(5)
+        self.initial = VectorData(np.zeros(30))
+        b = VectorData(np.array(range(30))/50)
+        self.n_subsets = 5
+        self.f_subsets = []
+        for i in range(5):
+            diagonal = np.zeros(30)
+            diagonal[6*i:6*(i+1)] = 1
+            Ai = MatrixOperator(np.diag(diagonal))
+            self.f_subsets.append(LeastSquares(Ai, Ai.direct(b)))
+        self.A=MatrixOperator(np.diag(np.ones(30)))
+        self.f = LeastSquares(self.A, b)
+        self.f_stochastic = LSVRGFunction(self.f_subsets, self.sampler)
 
     def test_sampler(self):
         self.assertTrue(isinstance(self.f_stochastic.sampler, SamplerRandom))
@@ -619,23 +505,9 @@ class TestLSVRG(CCPiTestClass):
         with self.assertRaises(ValueError):
             SVRGFunction([self.f, self.f], bad_sampler)
 
-    def test_LSVRG_simulated_parallel_beam_data(self):
-
-        alg = GD(initial=self.initial,
-                 objective_function=self.f, update_objective_interval=500, alpha=1e8)
-        alg.max_iteration = 200
-        alg.run(verbose=0)
-
-        objective = self.f_stochastic
-        alg_stochastic = GD(initial=self.initial,
-                            objective_function=objective, update_objective_interval=500,
-                            step_size=1/self.f_stochastic.L, max_iteration=5000)
-        alg_stochastic.run(self.n_subsets*25, verbose=0)
-        self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), alg.x.as_array(), 3)
-
-    def test_LSVRG_toy_example(self):
-        sampler = Sampler.random_with_replacement(3, seed=1)
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    def test_LSVRG_toy_example_and_data_passes(self):
+        sampler = Sampler.sequential(3)
         initial = VectorData(np.zeros(15))
         np.random.seed(4)
         b = VectorData(np.random.normal(0, 3, 15))
@@ -645,114 +517,64 @@ class TestLSVRG(CCPiTestClass):
             diagonal[5*i:5*(i+1)] = 1
             A = MatrixOperator(np.diag(diagonal))
             functions.append(LeastSquares(A, A.direct(b)))
-            if i == 0:
-                objective = LeastSquares(A, A.direct(b))
-            else:
-                objective += LeastSquares(A, A.direct(b))
+        Aop=MatrixOperator(np.diag(np.ones(15)))
 
-        alg = GD(initial=initial,
-                 objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
-        alg.max_iteration = 80
-        alg.run(verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-
-        stochastic_objective = LSVRGFunction(functions, sampler, seed=4)
-        self.assertAlmostEqual(
-            stochastic_objective(initial), objective(initial))
-        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(
-            initial).array, objective.gradient(initial).array)
+        u_cvxpy = cvxpy.Variable(b.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
         
+        
+        stochastic_objective = LSVRGFunction(functions, sampler)
 
         alg_stochastic = GD(initial=initial,
                             objective_function=stochastic_objective, update_objective_interval=1000,
-                            step_size=0.05, max_iteration=5000)
-        alg_stochastic.run(120, verbose=0)
+                            step_size=1/stochastic_objective.L)
+
+        alg_stochastic.run(100, verbose=0)
+        self.assertListEqual(stochastic_objective.data_passes_indices[-1], [stochastic_objective.function_num])
+
+        np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
         self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), alg.x.as_array(), 3)
+            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
+        
 
-    def test_LSVRG_toy_example_store_gradients(self):
-        sampler = Sampler.random_with_replacement(3, seed=1)
-        initial = VectorData(np.zeros(15))
-        np.random.seed(4)
-        b = VectorData(np.random.normal(0, 3, 15))
-        functions = []
-        for i in range(3):
-            diagonal = np.zeros(15)
-            diagonal[5*i:5*(i+1)] = 1
-            A = MatrixOperator(np.diag(diagonal))
-            functions.append(LeastSquares(A, A.direct(b)))
-            if i == 0:
-                objective = LeastSquares(A, A.direct(b))
-            else:
-                objective += LeastSquares(A, A.direct(b))
-
-        alg = GD(initial=initial,
-                 objective_function=objective, update_objective_interval=1000, atol=1e-9, rtol=1e-6)
-        alg.max_iteration = 80
-        alg.run(verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-
-        stochastic_objective = LSVRGFunction(
-            functions, sampler, store_gradients=True, seed=3)
-        self.assertAlmostEqual(
-            stochastic_objective(initial), objective(initial))
-        self.assertNumpyArrayAlmostEqual(stochastic_objective.full_gradient(
-            initial).array, objective.gradient(initial).array)
-
-        alg_stochastic = GD(initial=initial,
-                            objective_function=stochastic_objective, update_objective_interval=1000,
-                            step_size=0.05, max_iteration=5000)
-        alg_stochastic.run(100, verbose=0)
 
 
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
-    def test_with_cvxpy(self):
-        
-        np.random.seed(10)
-        n = 300  
-        m = 100 
-        A = np.random.normal(0,1, (m, n)).astype('float32')
-        b = np.random.normal(0,1, m).astype('float32')
+    def test_LSVRG_toy_example_store_gradients(self):
+        sampler = Sampler.sequential(3)
+        initial = VectorData(np.zeros(15))
+        np.random.seed(4)
+        b = VectorData(np.random.normal(0, 3, 15))
+        functions = []
+        for i in range(3):
+            diagonal = np.zeros(15)
+            diagonal[5*i:5*(i+1)] = 1
+            A = MatrixOperator(np.diag(diagonal))
+            functions.append(LeastSquares(A, A.direct(b)))
+        Aop=MatrixOperator(np.diag(np.ones(15)))
 
-        Aop = MatrixOperator(A)
-        bop = VectorData(b) 
-        
-        # split data, operators, functions
-        n_subsets = 10
-
-        Ai = np.vsplit(A, n_subsets) 
-        bi = [b[i:i+int(m/n_subsets)] for i in range(0, m, int(m/n_subsets))]     
-
-        fi_cil = []
-        for i in range(n_subsets):   
-            Ai_cil = MatrixOperator(Ai[i])
-            bi_cil = VectorData(bi[i])
-            fi_cil.append(LeastSquares(Ai_cil, bi_cil, c = 0.5))
-            
-        F = LeastSquares(Aop, b=bop, c = 0.5) 
-        ig = Aop.domain
-        sampler = Sampler.random_with_replacement(n_subsets)
-        F_SAG = LSVRGFunction(fi_cil, sampler)           
-
-        initial = ig.allocate()
-        
-        
-        u_cvxpy = cvxpy.Variable(ig.shape[0])
-        objective = cvxpy.Minimize( 0.5 * cvxpy.sum_squares(Aop.A @ u_cvxpy - bop.array))
+        u_cvxpy = cvxpy.Variable(b.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
         p = cvxpy.Problem(objective)
         p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+        
+        
+        stochastic_objective = LSVRGFunction(functions, sampler, store_gradients=True)
 
-        step_size = 0.0001 
-        epochs = 100
-        sag = GD(initial = initial, objective_function = F_SAG, step_size = step_size,
-                    max_iteration = epochs * n_subsets, 
-                    update_objective_interval =  epochs * n_subsets)
-        sag.run(verbose=0)    
+        alg_stochastic = GD(initial=initial,
+                            objective_function=stochastic_objective, update_objective_interval=1000,
+                            step_size=1/stochastic_objective.L)
 
-        np.testing.assert_allclose(p.value, sag.objective[-1], atol=1e-1)
 
-        np.testing.assert_allclose(u_cvxpy.value, sag.solution.array, atol=1e-1)
 
+        alg_stochastic.run(100, verbose=0)
+        np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
+        self.assertNumpyArrayAlmostEqual(
+            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
+        self.assertNumpyArrayAlmostEqual(
+            alg_stochastic.x.as_array(), b.as_array(), 3)
 

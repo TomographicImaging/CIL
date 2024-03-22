@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2023 United Kingdom Research and Innovation
-#  Copyright 2023 The University of Manchester
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +14,13 @@
 #  limitations under the License.
 #
 # Authors:
-# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - Daniel Deidda (National Physical Laboratory, UK)
+# - Claire Delplancke (Electricite de France, Research and Development)
+# - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
+# - Zeljko Kerata (Department of Computer Science, University College London, UK)
+# - Evgueni Ovtchinnikov (STFC - UKRI)
+# - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
@@ -26,22 +31,20 @@ import numbers
 class SVRGFunction(ApproximateGradientSumFunction):
 
     """
-    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. 
+    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
+    
 
     Parameters
     ----------
-    functions : list
-        A list of functions to optimize.
-    sampler : callable or None, optional
-         A callable function to select the next function, see e.g. optimisation.utilities.sampler 
+     functions : `list`  of functions
+        A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1. 
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
+        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
     update_frequency : int or None, optional
         The frequency of updating the full gradient. The default is 2*len(functions)
     store_gradients : bool, default: `False`
         Flag indicating whether to store gradients for each function.
 
-    Reference
-    ---------
-    Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
     
     """
 
@@ -64,18 +67,18 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         Parameters
         ----------
-        x : DataContainer
+        x : DataContainer (e.g. ImageData object)
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
         Returns
         --------
-        DataContainer
+        DataContainer (e.g. ImageData object)
             the value of the approximate gradient of the sum function at :code:`x` 
         """
 
 
     
-
+        # For SVRG, every `update_frequency` a full gradient step is calculated, else an approximate gradient is taken. 
         if (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
 
             return self._update_full_gradient_and_return(x, out=out)
@@ -84,12 +87,10 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
             self.function_num = self.sampler.next()
 
-            if not isinstance(self.function_num, numbers.Number):
-                raise ValueError("Batch gradient is not yet implemented")
-            if self.function_num > self.num_functions:
-                raise IndexError(
-                    'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
-
+            
+            
+            if self.function_num >= self.num_functions or self.function_num<0 :
+                raise IndexError('The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
             return self.approximate_gradient(x, self.function_num, out=out)
 
         
@@ -99,13 +100,13 @@ class SVRGFunction(ApproximateGradientSumFunction):
         
         Parameters
         ----------
-        x : DataContainer
+        x : DataContainer ( e.g. ImageData)
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
         function_num: `int` 
             Between 0 and the number of functions in the list  
         Returns
         --------
-        DataContainer
+        DataContainer (e.g. ImageData)
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
     
@@ -139,12 +140,12 @@ class SVRGFunction(ApproximateGradientSumFunction):
         
         Parameters
         ----------
-        x : DataContainer
+        x : DataContainer (e.g. ImageData)
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
         Returns
         --------
-        DataContainer
+        DataContainer (e.g. ImageData)
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
 
@@ -171,22 +172,20 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
 class LSVRGFunction(SVRGFunction):
     """""
-    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. 
+    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient is calulcated randomly with a given probability. Reference: D. Kovalev et al., “Don’t jump through hoops and remove those loops: SVRG and Katyusha are better without the outer loop,” in Algo Learn Theo, PMLR, 2020.
 
     Parameters
     ----------
-    functions : list
-        A list of functions to optimize.
-    sampler : callable or None, optional
-        A callable function to select the next function, see e.g. optimisation.utilities.sampler 
+     functions : `list`  of functions
+        A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1. 
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
+        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
     update_prob : float or None, optional
         The probability of updating the full gradient in loopless SVRG.
     store_gradients : bool, optional
         Flag indicating whether to store gradients for each function.
         
-    Reference
-    ---------
-    D. Kovalev et al., “Don’t jump through hoops and remove those loops: SVRG and Katyusha are better without the outer loop,” in Algo Learn Theo, PMLR, 2020.
+   
 
     """
 
@@ -201,7 +200,7 @@ class LSVRGFunction(SVRGFunction):
         if self.update_prob is None:
             self.update_prob = 1./self.num_functions
 
-        # randomness
+        # the random generator used to decide if the gradient calculation is a full gradient or an approximate gradient 
         self.generator = np.random.default_rng(seed=seed)
 
     def gradient(self, x, out=None):
@@ -209,12 +208,12 @@ class LSVRGFunction(SVRGFunction):
 
         Parameters
         ----------
-        x : DataContainer
+        x : DataContainer ( e.g. ImageData)
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
         Returns
         --------
-        DataContainer
+        DataContainer ( e.g. ImageData)
             the value of the approximate gradient of the sum function at :code:`x`
         """
 

@@ -54,7 +54,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         self._list_stored_gradients = None
         self._full_gradient_at_iterate = None
         self._warm_start_just_done=False
-        self._stoch_grad_at_iterate=None
+        self._sampled_grad=None
         
         super(SAGFunction, self).__init__(functions, sampler)
 
@@ -72,29 +72,35 @@ class SAGFunction(ApproximateGradientSumFunction):
             Between 0 and the number of functions in the list  
 
         """
-        if self._list_stored_gradients is None: 
+        
+        
+        if self._list_stored_gradients is None: # Initialise the stored gradients on the first call of gradient unless using warm start.  
             self._list_stored_gradients = [
                 0*x for fi in self.functions]
             self._full_gradient_at_iterate = 0*x
             
-        if self.function_num >= self.num_functions or self.function_num<0 :
+        
+        if self.function_num >= self.num_functions or self.function_num<0 : #check the sampler and raise an error if needed
             raise IndexError(
                 'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
 
             
-
-        self._stoch_grad_at_iterate = self.functions[function_num].gradient(x)
+        #Calculate the gradient of the sampled function at the current iterate 
+        self._sampled_grad = self.functions[function_num].gradient(x)
 
         
-
-        self._stochastic_grad_difference = self._stoch_grad_at_iterate.sapyb(
+        #Calculate the difference between the new gradient of the sampled function and the stored one
+        self._stochastic_grad_difference = self._sampled_grad.sapyb(
             1., self._list_stored_gradients[function_num], -1.)
 
-   
+        #Calculate the  approximate gradient
         out =self._update_approx_gradient(out)
 
+        #Update the stored gradients 
         self._list_stored_gradients[function_num].fill(
-            self._stoch_grad_at_iterate)
+            self._sampled_grad)
+        
+        #Calculate the stored full gradient
         self._full_gradient_at_iterate.sapyb(
             1., self._stochastic_grad_difference, 1., out=self._full_gradient_at_iterate)
 
@@ -103,11 +109,11 @@ class SAGFunction(ApproximateGradientSumFunction):
     def _update_approx_gradient(self, out):
         """Internal function used to differentiate between the SAG and SAGA calculations"""
         if out is None:
-            # due to the convention that we follow: without the 1/n factor
+            
             out = self._stochastic_grad_difference.sapyb(
                 1., self._full_gradient_at_iterate, 1.)
         else:
-            # due to the convention that we follow: without the 1/n factor
+            
             self._stochastic_grad_difference.sapyb(
                 1., self._full_gradient_at_iterate, 1., out=out)
 
@@ -128,7 +134,8 @@ class SAGFunction(ApproximateGradientSumFunction):
         self._update_data_passes_indices(list(range(self.num_functions)))
 
     @property
-    def data_passes_indices(self): #TODO: add the description here 
+    def data_passes_indices(self): 
+        """ The property `data_passes_indices` is a list of lists. Each time `gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  """
         ret = self._data_passes_indices[:]  
         if len(ret[0]) == self.num_functions:  
             a = ret.pop(1)  

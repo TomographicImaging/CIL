@@ -30,12 +30,17 @@
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`
+  - Allow `CentreOfRotationCorrector.xcorrelation` to accept a list of two values in `projection_index` to use for the correlation
+  - Bug fix in `CentreOfRotationCorrector.xcorrelation` finding correlation angles for limited angle data
   - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
   - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
+  - Bug fix to allow safe in place calculation for the soft shrinkage algorithm
   - Allow Masker to take integer arrays in addition to boolean
+  - Add remote data class to example data to enable download of relevant datasets from remote repositories 
   - Improved import error/warning messages
   - New adjoint operator
   - Bug fix for complex matrix adjoint
+
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

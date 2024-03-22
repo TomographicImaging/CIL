@@ -124,8 +124,8 @@ LADMM
 Algorithms (Stochastic)
 ========================
 
-There are a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
-This is an area of development for CIL. 
+There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
+This is an area of continued development for CIL.  
 
 
 
@@ -173,14 +173,13 @@ Approximate gradient sum function
 
 Alternatively, consider optimisation problems of the form: 
 
-.. math:: \sum_{i=1}^{n} F_{i} = (F_{1} + F_{2} + ... + F_{n})
+.. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{1} + ... + f_{n-1})
 
-where :math:`n` is the number of functions.  Where there is a large number of :math:`F_i` or their gradients are expensive to calculate stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
+where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
 
-The idea for this class and its sum functions is to consider that some stochastic optimisation algorithms can be viewed as deterministic gradient descent algorithms replacing the gradient with an approximate gradient. For example Stochasstic Gradient Descent replaces the gradient in Gradient Descent with the gradient of just one of the :math:`F_i`. 
+The idea for this class and its sum functions is to consider that some stochastic optimisation algorithms can be viewed as deterministic gradient descent algorithms replacing the gradient with an approximate gradient. For example Stochastic Gradient Descent replaces the gradient in Gradient Descent with the gradient of just one of the :math:`f_i`. 
  
-CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation  of a sum function with an approximate gradient. Child classes of this abstract base class can define different approximate gradients with different mathematical properties. Combining these approximate gradients with deterministic optimisation algorithms
-leads to different stochastic optimisation algorithms. 
+CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation  of a sum function with an approximate gradient. Child classes of this abstract base class can define different approximate gradients with different mathematical properties.
 
 For example in the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
 
@@ -199,6 +198,43 @@ For example in the following table, the left hand column has the approximate gra
 +----------------+-------+------------+----------------+
 
 \*In development 
+
+The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:
+
+.. code-block :: python
+
+   from cil.optimisation.utilities import Sampler
+   from cil.optimisation.algorithms import GD 
+   from cil.optimisation.functions import LeastSquares, SGFunction
+   from cil.utilities import dataexample
+   from cil.plugins.astra.operators import ProjectionOperator
+   
+   # get the data  
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data.reorder('astra')
+   data = data.get_slice(vertical='centre')
+
+   # create the geometries 
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
+
+   # partition the data and build the projectors
+   n_subsets = 10 
+   partitioned_data = data.partition(n_subsets, 'sequential')
+   A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
+
+   # create the list of functions for the stochastic sum 
+   list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
+
+   #define the sampler and the stochastic gradient function 
+   sampler = Sampler.staggered(len(list_of_functions))
+   f = SGFunction(list_of_functions, sampler=sampler)  
+   
+   #set up and run the gradient descent algorithm 
+   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
+   alg.run(300)
+
+  
 
 The base class: 
 

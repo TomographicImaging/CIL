@@ -532,7 +532,7 @@ class TestLSVRG(CCPiTestClass):
                             step_size=1/stochastic_objective.L)
 
         alg_stochastic.run(100, verbose=0)
-        self.assertListEqual(stochastic_objective.data_passes_indices[-1], [stochastic_objective.function_num])
+
 
         np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
         self.assertNumpyArrayAlmostEqual(

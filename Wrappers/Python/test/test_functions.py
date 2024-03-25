@@ -1129,7 +1129,6 @@ class TestTotalVariation(unittest.TestCase):
         self.assertEquals(self.tv.upper, np.inf)
         self.assertEquals(self.tv.isotropic, True)
         self.assertEquals(self.tv.split, False)
-        self.assertEquals(self.tv.info, False)
         self.assertEquals(self.tv.strong_convexity_constant, 0)
         self.assertEquals(self.tv.tolerance, None)
 
@@ -1142,7 +1141,6 @@ class TestTotalVariation(unittest.TestCase):
                  upper = 1.,
                  isotropic = False,
                  split = True,
-                 info = True,
                  strong_convexity_constant = 1.,
                  warm_start=False)
         self.assertEquals(tv.warm_start, False)
@@ -1153,7 +1151,6 @@ class TestTotalVariation(unittest.TestCase):
         self.assertEquals(tv.upper, 1.)
         self.assertEquals(tv.isotropic, False)
         self.assertEquals(tv.split, True)
-        self.assertEquals(tv.info, True)
         self.assertEquals(tv.strong_convexity_constant, 1.)
         self.assertEquals(tv.tolerance, 1e-5)
 
@@ -1273,7 +1270,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(
-            iters, tolerance=None, lower=0, info=True, warm_start=False)
+            iters, tolerance=None, lower=0, warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1353,7 +1350,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=False)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=False)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
@@ -1384,7 +1381,7 @@ class TestTotalVariation(unittest.TestCase):
 
         #with warm start
         iters=10
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=True)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=True)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         for i in range(4):

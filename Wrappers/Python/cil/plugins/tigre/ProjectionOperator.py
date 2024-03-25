@@ -45,7 +45,7 @@ class ProjectionOperator(LinearOperator):
     """
         ProjectionOperator configures and calls TIGRE Projectors for your dataset.
 
-        Please refer to the TIGRE documentation for futher descriptions
+        Please refer to the TIGRE documentation for further descriptions
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
 
@@ -103,7 +103,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         """
         ProjectionOperator configures and calls TIGRE Projectors for your dataset.
 
-        Please refer to the TIGRE documentation for futher descriptions
+        Please refer to the TIGRE documentation for further descriptions
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
 
@@ -131,14 +131,6 @@ class ProjectionOperator_ag(ProjectionOperator):
         >>> backward_projection = PO.adjoint(data)
 
         """
-
-        acquisition_geometry_old = kwargs.get('aquisition_geometry', None)
-
-        if acquisition_geometry_old is not None:
-            acquisition_geometry = acquisition_geometry_old
-            logging.warning(
-                "aquisition_geometry has been deprecated. Please use acquisition_geometry instead."
-            )
 
         if acquisition_geometry is None:
             raise TypeError(

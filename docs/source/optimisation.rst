@@ -126,11 +126,11 @@ Algorithms (Stochastic)
 
 Consider optimisation problems that take the form of a seperable sum: 
 
-.. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i} + g = \min_{x} (f_{0} + f_{1} + ... + f_{n-1})+g
+.. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i}(x) + g(x) = \min_{x} (f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x))+g(x)
 
-where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
+where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   
 There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
-This is an area of continued development for CIL and, depending on  the properties of the :math:`f_i` and the regulariser :math:`g`, there is a range of different options. 
+This is an area of continued development for CIL and, depending on  the properties of the :math:`f_i` and the regulariser :math:`g`, there is a range of different options for the user. 
 
 
 
@@ -143,7 +143,7 @@ Stochastic Primal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG a
       \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
 
 where :math:`f_i` and the regulariser :math:`g` need only be proper, convex and lower semi-continuous ( i.e. do not need to be differentiable). 
-Each iteration considers just one index of the sum reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
+Each iteration considers just one index of the sum, potentially reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
 
 
 .. autoclass:: cil.optimisation.algorithms.SPDHG
@@ -156,7 +156,7 @@ Each iteration considers just one index of the sum reducing computational cost. 
 Approximate gradient methods
 ----------------------------------
 
-Alternatively, consider that, in addition, the :math:`f_i` are differentiable. In this case we consider stochastic methods that replace a gradient calculation in a deterministic algorithm with a, potentially cheaper to calculate, approximate gradient. 
+Alternatively, consider that, in addition to the functions :math:`f_i` and the regulariser :math:`g` being proper, convex and lower semi-continuous, the :math:`f_i` are differentiable. In this case we consider stochastic methods that replace a gradient calculation in a deterministic algorithm with a, potentially cheaper to calculate, approximate gradient. 
 For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilises iterations of the form
 
    .. math::
@@ -164,12 +164,12 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
 
 Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorith. 
 
-In addition, if :math:`g(x)\neq 0` (and may not be differentiable) one can consider ISTA iterations: 
+In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
 
    .. math::
-         x_{k+1}=\prox_{\alpha g}(x_k-\alpha \nabla f(x_k) )=\prox_{\alpha g}(x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k))
+         x_{k+1}=prox_{\alpha g}(x_k-\alpha \nabla f(x_k) )=prox_{\alpha g}(x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k))
 
-and again replacing math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
+and again replacing :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
 
 In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
 

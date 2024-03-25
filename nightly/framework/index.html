@@ -2076,12 +2076,12 @@ Default is to accumulate and return data as float64 or complex128</p>
 </section>
 <section id="blockdatacontainer">
 <h3>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h3>
-<p>A <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code> can be instantiated from a number of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> and subclasses
-represents a column vector of :code:<a href="#id16"><span class="problematic" id="id17">`</span></a>DataContainer`s.</p>
+<p>A <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code> can be instantiated from a number of <a class="reference internal" href="#datacontainer">DataContainer</a> and subclasses
+represents a column vector of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> s.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bdc</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">DataContainer0</span><span class="p">,</span> <span class="n">DataContainer1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This provide a base class that will behave as normal <code class="docutils literal notranslate"><span class="pre">DataContainer</span></code>.</p>
+<p>This provide a base class that will behave as normal <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.BlockDataContainer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">BlockDataContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/BlockDataContainer/#BlockDataContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer" title="Permalink to this definition">#</a></dt>
@@ -2089,8 +2089,8 @@ represents a column vector of :code:<a href="#id16"><span class="problematic" id
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id18"><span class="problematic" id="id19">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id20"><span class="problematic" id="id21">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id16"><span class="problematic" id="id17">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id18"><span class="problematic" id="id19">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,

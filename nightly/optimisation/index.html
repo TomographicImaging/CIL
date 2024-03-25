@@ -423,7 +423,6 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#pdhg">PDHG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ladmm">LADMM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#spdhg">SPDHG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#callbacks">Callbacks</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#operators">Operators</a><ul>
@@ -449,6 +448,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#samplers">Samplers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#callbacks">Callbacks</a></li>
 </ul>
 </li>
 </ul>
@@ -675,7 +675,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -809,7 +809,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -956,7 +956,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1117,7 +1117,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1436,7 +1436,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1742,7 +1742,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2068,7 +2068,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2186,7 +2186,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2360,7 +2360,7 @@ the update_objective_interval &gt; 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">cil.optimisation.utilities.callbacks.Callback</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">cil.optimisation.utilities.callbacks.Callback</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.run" title="Permalink to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2384,15 +2384,6 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 
 </dd></dl>
 
-</section>
-<section id="callbacks">
-<h3>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">#</a></h3>
-<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback`s</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">executed</span> <span class="pre">each</span> <span class="pre">iteration</span> <span class="pre">can</span> <span class="pre">be</span> <span class="pre">passed</span> <span class="pre">to</span> <span class="pre">:code:`Algorithm</span></code>’s <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.utilities.callbacks</span> <span class="kn">import</span> <span class="n">LogfileCallback</span>
-<span class="o">...</span>
-<span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
-</pre></div>
-</div>
 </section>
 </section>
 <section id="operators">
@@ -5678,7 +5669,7 @@ is created in the <cite>__call__</cite> and <cite>proximal</cite> methods.</p>
 <section id="samplers">
 <h3>Samplers<a class="headerlink" href="#samplers" title="Permalink to this headline">#</a></h3>
 <p>Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
-The <cite>cil.optimisation.utilities.sampler</cite> class defines a function next() which gives the next sample. It also has utility to <cite>get_samples</cite> to access which samples have or will be drawn.</p>
+The <code class="code docutils literal notranslate"><span class="pre">cil.optimisation.utilities.sampler</span></code> class defines a function <code class="code docutils literal notranslate"><span class="pre">next()</span></code> which gives the next sample. It also has utility to <code class="code docutils literal notranslate"><span class="pre">get_samples</span></code> to access which samples have or will be drawn.</p>
 <p>For ease of use we provide the following static methods in <cite>cil.optimisation.utilities.sampler</cite> that allow you to configure your sampler object rather than initialising the classes directly:</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.utilities.Sampler.from_function">
@@ -6292,6 +6283,97 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </dd></dl>
 
 </section>
+<section id="callbacks">
+<h3>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">#</a></h3>
+<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a class="reference internal" href="#algorithms">Algorithms</a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.utilities.callbacks</span> <span class="kn">import</span> <span class="n">LogfileCallback</span>
+<span class="o">...</span>
+<span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.callbacks.Callback">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.callbacks.</span></span><span class="sig-name descname"><span class="pre">Callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/callbacks/#Callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.callbacks.Callback" title="Permalink to this definition">#</a></dt>
+<dd><p>Base Callback to inherit from for use in <code class="code docutils literal notranslate"><span class="pre">Algorithm.run(callbacks:</span> <span class="pre">list[Callback])</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<em>int</em><em>, </em><em>choice of 0</em><em>,</em><em>1</em><em>,</em><em>2</em><em>, </em><em>default 1</em>) – 0=quiet, 1=info, 2=debug.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Built-in callbacks include:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.callbacks.ProgressCallback">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.callbacks.</span></span><span class="sig-name descname"><span class="pre">ProgressCallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tqdm_class=&lt;class</span> <span class="pre">'tqdm.asyncio.tqdm_asyncio'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**tqdm_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/callbacks/#ProgressCallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.callbacks.ProgressCallback" title="Permalink to this definition">#</a></dt>
+<dd><p><code class="code docutils literal notranslate"><span class="pre">tqdm</span></code>-based progress bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tqdm_class</strong> (default <code class="code docutils literal notranslate"><span class="pre">tqdm.auto.tqdm</span></code>) – </p></li>
+<li><p><strong>**tqdm_kwargs</strong> – Passed to <code class="code docutils literal notranslate"><span class="pre">tqdm_class</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.callbacks.TextProgressCallback">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.callbacks.</span></span><span class="sig-name descname"><span class="pre">TextProgressCallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tqdm_class=&lt;class</span> <span class="pre">'cil.optimisation.utilities.callbacks._TqdmText'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**tqdm_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/callbacks/#TextProgressCallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.callbacks.TextProgressCallback" title="Permalink to this definition">#</a></dt>
+<dd><p><code class="code docutils literal notranslate"><span class="pre">ProgressCallback</span></code> but printed on separate lines to screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>miniters</strong> (int, default <code class="code docutils literal notranslate"><span class="pre">Algorithm.update_objective_interval</span></code>) – Number of algorithm iterations between screen prints.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.callbacks.LogfileCallback">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.callbacks.</span></span><span class="sig-name descname"><span class="pre">LogfileCallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'a'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/callbacks/#LogfileCallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.callbacks.LogfileCallback" title="Permalink to this definition">#</a></dt>
+<dd><p><code class="code docutils literal notranslate"><span class="pre">TextProgressCallback</span></code> but to a file instead of screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_file</strong> (<em>FileDescriptorOrPath</em>) – Passed to <code class="code docutils literal notranslate"><span class="pre">open()</span></code>.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Passed to <code class="code docutils literal notranslate"><span class="pre">open()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Users can also write custom callbacks.</p>
+<p>Below is an example of a custom callback implementing early stopping.
+In each iteration of the <code class="code docutils literal notranslate"><span class="pre">TestAlgo</span></code>, the objective <span class="math notranslate nohighlight">\(x\)</span> is reduced by <span class="math notranslate nohighlight">\(5\)</span>. The <code class="code docutils literal notranslate"><span class="pre">EarlyStopping</span></code> callback terminates the algorithm when <span class="math notranslate nohighlight">\(x \le -15\)</span>. The algorithm thus terminates after <span class="math notranslate nohighlight">\(3\)</span> iterations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">Algorithm</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.utilities</span> <span class="kn">import</span> <span class="n">callbacks</span>
+
+<span class="k">class</span> <span class="nc">TestAlgo</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-=</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">15</span><span class="p">:</span>  <span class="c1"># arbitrary stopping criterion</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+<span class="n">algo</span> <span class="o">=</span> <span class="n">TestAlgo</span><span class="p">()</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">(),</span> <span class="n">EarlyStopping</span><span class="p">()])</span>
+</pre></div>
+</div>
+<div class="highlight-raw notranslate"><div class="highlight"><pre><span></span>Output:
+ 15%|███                 | 3/20 [00:00&lt;00:00, 11770.73it/s, objective=3.05e-5]
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 <section id="block-framework">
@@ -6303,11 +6385,11 @@ problems in the following form:</p>
 \[\min \text{Regulariser} + \text{Fidelity}\]</div>
 <p>The block framework consists of:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a></p></li>
-<li><p><a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a></p></li>
-<li><p><a class="reference external" href="optimisation.html#cil.optimisation.operators.BlockOperators">BlockOperator</a></p></li>
+<li><p><a class="reference internal" href="#blockdatacontainer"><span class="std std-ref">BlockDataContainer</span></a></p></li>
+<li><p><a class="reference internal" href="#block-function"><span class="std std-ref">BlockFunction</span></a></p></li>
+<li><p><a class="reference internal" href="#block-operator"><span class="std std-ref">BlockOperator</span></a></p></li>
 </ul>
-<p>The block framework allows writing more advanced <a href="#id55"><span class="problematic" id="id56">`optimisation problems`_</span></a>. Consider the typical
+<p>The block framework allows writing more advanced optimisation problems. Consider the typical
 <a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
 <div class="math notranslate nohighlight">
 \[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
@@ -6338,8 +6420,8 @@ Block Framework comprising 4 main actors: <code class="code docutils literal not
 <code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
 <section id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id57"><span class="problematic" id="id58">`DataContainer`_</span></a> as column vector. It is possible to
-do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
+<p><a class="reference internal" href="#blockdatacontainer"><span class="std std-ref">BlockDataContainer</span></a> holds <a class="reference external" href="../framework/#datacontainer">DataContainer</a> as column vector. It is possible to
+do basic algebra between <a class="reference internal" href="#blockdatacontainer"><span class="std std-ref">BlockDataContainer</span></a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
 <dl class="py class">
@@ -6637,7 +6719,7 @@ the class constant __array_priority__ must be set &gt; 0
 </section>
 <section id="block-function">
 <h2>Block Function<a class="headerlink" href="#block-function" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a> acts on <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> as a separable sum function:</p>
+<p><a class="reference internal" href="#block-function"><span class="std std-ref">BlockFunction</span></a> acts on <a class="reference internal" href="#blockdatacontainer"><span class="std std-ref">BlockDataContainer</span></a> as a separable sum function:</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}f = [f_1,...,f_n] \newline\\f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)\end{aligned}\end{align} \]</div>
@@ -6746,7 +6828,7 @@ can be decomposed along the proximal operators of each function <span class="mat
 <dd class="field-odd"><p><strong>other</strong> – number</p>
 </dd>
 </dl>
-<p>Returns a new <a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a> containing the product of the scalar with all the functions in the block</p>
+<p>Returns a new <a class="reference internal" href="#block-function"><span class="std std-ref">BlockFunction</span></a> containing the product of the scalar with all the functions in the block</p>
 </dd></dl>
 
 </dd></dl>
@@ -6754,7 +6836,7 @@ can be decomposed along the proximal operators of each function <span class="mat
 </section>
 <section id="block-operator">
 <h2>Block Operator<a class="headerlink" href="#block-operator" title="Permalink to this headline">#</a></h2>
-<p><a class="reference external" href="optimisation.html#cil.optimisation.operators.BlockOperators">BlockOperator</a> represent a block matrix with operators</p>
+<p><a class="reference internal" href="#block-operator"><span class="std std-ref">BlockOperator</span></a> represent a block matrix with operators</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}K = \begin{bmatrix}
      A_{1} &amp; A_{2} \\

@@ -25,7 +25,7 @@ from cil.utilities.errors import InPlaceError
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
 
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
-from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, WaveletNorm
+from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity
 from cil.optimisation.operators import LinearOperator, MatrixOperator  
 
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
@@ -110,7 +110,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL21Norm(), bg),
             (SmoothMixedL21Norm(epsilon=0.3), bg),
             (MixedL11Norm(), bg),
-            (WaveletNorm(WaveletOperator(ig)), ig)
+            (L1Sparsity(WaveletOperator(ig)), ig)
 
         ]
 

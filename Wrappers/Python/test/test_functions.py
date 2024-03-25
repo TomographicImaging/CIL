@@ -32,7 +32,7 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
-                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, WaveletNorm
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity
 
 from cil.optimisation.functions import BlockFunction
 
@@ -1108,7 +1108,7 @@ class TestFunction(CCPiTestClass):
 
 
 
-    def test_WaveletNorm(self):    
+    def test_L1Sparsity(self):    
         from cil.optimisation.operators import WaveletOperator
         f1 = L1Norm()
         N, M = 2,3
@@ -1118,13 +1118,13 @@ class TestFunction(CCPiTestClass):
         weights = geom.allocate(1)
 
         W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
-        f2 = WaveletNorm(W, weight=weights)
-        self.WaveletNormTest(f1, f2, x)
+        f2 = L1Sparsity(W, weight=weights)
+        self.L1SparsityTest(f1, f2, x)
 
-        f2 = WaveletNorm(W)
-        self.WaveletNormTest(f1, f2, x)
+        f2 = L1Sparsity(W)
+        self.L1SparsityTest(f1, f2, x)
 
-    def WaveletNormTest(self, f1, f2, x):
+    def L1SparsityTest(self, f1, f2, x):
         np.testing.assert_almost_equal(f1(x), f2(x))
 
         tau = 1.

@@ -124,8 +124,13 @@ LADMM
 Algorithms (Stochastic)
 ========================
 
+Consider optimisation problems that take the form of a seperable sum: 
+
+.. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i} + g = \min_{x} (f_{0} + f_{1} + ... + f_{n-1})+g
+
+where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
 There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
-This is an area of continued development for CIL.  
+This is an area of continued development for CIL and, depending on  the properties of the :math:`f_i` and the regulariser :math:`g`, there is a range of different options. 
 
 
 
@@ -137,51 +142,36 @@ Stochastic Primal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG a
     
       \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
 
-by passing a sampler (e.g. of the CIL Sampler class) each iteration considers just one index of the sum reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
+where :math:`f_i` and the regulariser :math:`g` need only be proper, convex and lower semi-continuous ( i.e. do not need to be differentiable). 
+Each iteration considers just one index of the sum reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
 
 
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-Callbacks
----------
 
-A list of :code:`Callback`s to be executed each iteration can be passed to :code:`Algorithm`'s :code:`run` method.
 
-.. code-block :: python
 
-   from cil.utilities.callbacks import LogfileCallback
-   ...
-   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
-
-.. autoclass:: cil.utilities.callbacks.Callback
-   :members:
-
-.. autoclass:: cil.utilities.callbacks.ProgressCallback
-   :members:
-
-.. autoclass:: cil.utilities.callbacks.TextProgressCallback
-   :members:
-
-.. autoclass:: cil.utilities.callbacks.LogfileCallback
-   :members:
-   
-
-Approximate gradient sum function 
+Approximate gradient methods
 ----------------------------------
 
-Alternatively, consider optimisation problems of the form: 
+Alternatively, consider that, in addition, the :math:`f_i` are differentiable. In this case we consider stochastic methods that replace a gradient calculation in a deterministic algorithm with a, potentially cheaper to calculate, approximate gradient. 
+For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilises iterations of the form
 
-.. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{1} + ... + f_{n-1})
+   .. math::
+      x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
 
-where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation with an approximate gradient. 
+Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorith. 
 
-The idea for this class and its sum functions is to consider that some stochastic optimisation algorithms can be viewed as deterministic gradient descent algorithms replacing the gradient with an approximate gradient. For example Stochastic Gradient Descent replaces the gradient in Gradient Descent with the gradient of just one of the :math:`f_i`. 
- 
-CIL provides an abstract base class which defines the sum function and overwrites the usual (full) gradient calculation  of a sum function with an approximate gradient. Child classes of this abstract base class can define different approximate gradients with different mathematical properties.
+In addition, if :math:`g(x)\neq 0` (and may not be differentiable) one can consider ISTA iterations: 
 
-For example in the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
+   .. math::
+         x_{k+1}=\prox_{\alpha g}(x_k-\alpha \nabla f(x_k) )=\prox_{\alpha g}(x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k))
+
+and again replacing math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
+
+In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
 
 +----------------+-------+------------+----------------+
 |                | GD    | ISTA       | FISTA          |
@@ -199,6 +189,10 @@ For example in the following table, the left hand column has the approximate gra
 
 \*In development 
 
+The stochastic gradient functions can be found listed under functions in the documentation. 
+
+Stochastic Gradient Descent Example
+----------------------------------
 The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:
 
 .. code-block :: python
@@ -236,26 +230,7 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
 
   
 
-The base class: 
 
-.. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 
-   :members:
-   :inherited-members:
-   
-
-The currently provided child-classes: 
-
-.. autoclass:: cil.optimisation.functions.SGFunction 
-   :members:
-   :inherited-members:
-
-.. autoclass:: cil.optimisation.functions.SVRGFunction 
-   :members:
-   :inherited-members:
-
-.. autoclass:: cil.optimisation.functions.LSVRGFunction 
-   :members:
-   :inherited-members:
 
 
 Operators
@@ -498,15 +473,46 @@ Total variation
    :members:
    :inherited-members:
 
+Approximate Gradient base class 
+--------------------------------
+
+.. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 
+   :members:
+   :inherited-members:
+   
+
+Stochastic Gradient function 
+-----------------------------
+
+.. autoclass:: cil.optimisation.functions.SGFunction 
+   :members:
+   :inherited-members:
+
+Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.SVRGFunction 
+   :members:
+   :inherited-members:
+
+
+Loopless Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.LSVRGFunction 
+   :members:
+   :inherited-members:
+
+
 
 Utilities
-=======
+=========
+
 Contains utilities for the CIL optimisation framework.
 
 Samplers
 --------
+
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
-The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn.
+The :code:`cil.optimisation.utilities.sampler` class defines a function :code:`next()` which gives the next sample. It also has utility to :code:`get_samples` to access which samples have or will be drawn.
 
 For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
 
@@ -534,9 +540,66 @@ In addition, we provide a random sampling class which is a child class of  `cil.
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
    :members:
 
+Callbacks
+---------
+
+A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithms`_ :code:`run` method.
+
+.. code-block :: python
+
+   from cil.optimisation.utilities.callbacks import LogfileCallback
+   ...
+   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
+
+.. autoclass:: cil.optimisation.utilities.callbacks.Callback
+   :members:
+
+Built-in callbacks include:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.TextProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
+   :members:
+
+Users can also write custom callbacks.
+
+Below is an example of a custom callback implementing early stopping.
+In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by :math:`5`. The :code:`EarlyStopping` callback terminates the algorithm when :math:`x \le -15`. The algorithm thus terminates after :math:`3` iterations.
+
+.. code:: python
+
+   from cil.optimisation.algorithms import Algorithm
+   from cil.optimisation.utilities import callbacks
+
+   class TestAlgo(Algorithm):
+       def __init__(self, *args, **kwargs):
+           self.x = 0
+           super().__init__(*args, **kwargs)
+           self.configured = True
+
+       def update(self):
+           self.x -= 5
+
+       def update_objective(self):
+           self.loss.append(2 ** self.x)
+
+   class EarlyStopping(callbacks.Callback):
+       def __call__(self, algorithm: Algorithm):
+           if algorithm.x <= -15:  # arbitrary stopping criterion
+               raise StopIteration
+
+   algo = TestAlgo()
+   algo.run(20, callbacks=[callbacks.ProgressCallback(), EarlyStopping()])
 
 
+.. code:: raw
 
+   Output:
+    15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
 
 Block Framework
 ***************
@@ -557,7 +620,7 @@ The block framework consists of:
 
 
 
-The block framework allows writing more advanced `optimisation problems`_. Consider the typical
+The block framework allows writing more advanced optimisation problems. Consider the typical
 `Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
 
 .. math::
@@ -732,9 +795,10 @@ Which in Python would be like
 
 :ref:`Return Home <mastertoc>`
 
-.. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
-.. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
-.. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+.. _BlockDataContainer: #blockdatacontainer
+.. _DataContainer: ../framework/#datacontainer
+.. _BlockFunction: #block-function
+.. _BlockOperator: #block-operator
 
 
 

@@ -59,7 +59,7 @@ class MatrixOperator(LinearOperator):
             tmp = self.domain_geometry().allocate()
             tmp.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return tmp
-        else:            
+        else:
             out.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return out
 

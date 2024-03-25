@@ -156,7 +156,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 ret = function.gradient(input, *args, out=out2)
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in func."+method+'(x, *args, out=data) where func is  ' + function.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case func."+method+'(data, *args, out=out) where func is  ' + function.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
-            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= "Calculation failed returning with `out` in ret = func."+method+'(x, *args, out=data) where func is  ' + function.__class__.__name__+ '. ')
+            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed returning with `out` in ret = func.{method}(x, *args, out=data) where func is {function.__class__.__name__}")
           
         except (InPlaceError, NotImplementedError):
             pass
@@ -243,7 +243,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
 
 
-    def get_result(self, operator, method, x, *args): 
+    def get_result(self, operator, method, x, *args):
         try:
             input=x.copy() #To check that it isn't changed after function calls
             if method == 'direct':
@@ -270,7 +270,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 pass
 
 
-    def out_test(self, desired_result, operator, method,  x, *args, ): 
+    def out_test(self, desired_result, operator, method,  x, *args):
         input = x.copy()
         out2=0*(x.copy())
         try:
@@ -281,7 +281,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case operator."+method+'(data, *args, out=out) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
-            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= "Calculation failed using return and `out` in ret = operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
+            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed using return and `out` in ret = operator.{method}(x, *args, out=data) where func is {operator.__class__.__name__}")
             
         except (InPlaceError, NotImplementedError):
             pass

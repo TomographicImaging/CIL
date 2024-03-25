@@ -427,7 +427,7 @@ class Gradient_C(LinearOperator):
                     j +=1
 
 
-        return out        
+        return out
 
     def adjoint(self, x, out=None):
         
@@ -464,9 +464,4 @@ class Gradient_C(LinearOperator):
                 
 
         return out        
-    
-
-
-
-      
 

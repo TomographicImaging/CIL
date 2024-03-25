@@ -377,7 +377,3 @@ class FiniteDifferenceOperator(LinearOperator):
         else:
             out.fill(outa)
             return out      
-              
-        
-    
-    

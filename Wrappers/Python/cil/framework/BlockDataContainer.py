@@ -138,7 +138,6 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer
         :param: out (optional): provides a placehold for the resul.
         '''
-        out = kwargs.get('out', None)
         
         return self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
     def subtract(self, other, *args, **kwargs):

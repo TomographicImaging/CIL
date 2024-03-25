@@ -76,7 +76,7 @@ class ProjectionOperator(LinearOperator):
     def __new__(cls, image_geometry=None, acquisition_geometry=None, \
         direct_method='interpolated',adjoint_weights='matched', **kwargs):
         if isinstance(acquisition_geometry, BlockGeometry):
-            logging.info("BlockOperator is returned.")
+            log.info("BlockOperator is returned.")
 
             K = []
             for ag in acquisition_geometry:
@@ -86,7 +86,7 @@ class ProjectionOperator(LinearOperator):
                 )
             return BlockOperator(*K)
         else:
-            logging.info("Standard Operator is returned.")
+            log.info("Standard Operator is returned.")
             return super(ProjectionOperator,
                          cls).__new__(ProjectionOperator_ag)
 

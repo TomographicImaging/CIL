@@ -90,7 +90,7 @@ class TestTranslaateFunction(TestFunction):
                 self.assertNumpyArrayAlmostEqual(out_gradient1.as_array(), out_gradient2.as_array())
 
             except NotImplementedError:
-                logging.info('Function is not differentiable')
+                log.info('Function is not differentiable')
 
             # check proximal
             func.proximal(tmp, tau, out = out_proximal1)

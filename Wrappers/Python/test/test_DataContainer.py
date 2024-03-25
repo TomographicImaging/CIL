@@ -534,7 +534,7 @@ class TestDataContainer(CCPiTestClass):
             z = ImageData(numpy.random.randint(10, size=(2,3)), geometry=ig)
             self.assertTrue(False)
         except ValueError as ve:
-            logging.info(str (ve))
+            log.info(str (ve))
             self.assertTrue(True)
 
         #vgeometry.allocate('')
@@ -568,7 +568,7 @@ class TestDataContainer(CCPiTestClass):
             z = AcquisitionData(numpy.random.randint(10, size=(2,3)), geometry=ageometry)
             self.assertTrue(False)
         except ValueError as ve:
-            logging.info(str(ve))
+            log.info(str(ve))
             self.assertTrue(True)
 
 
@@ -658,7 +658,7 @@ class TestDataContainer(CCPiTestClass):
             data1.fill(r)
             self.assertTrue(False)
         except TypeError as err:
-            logging.info(str(err))
+            log.info(str(err))
             self.assertTrue(True)
 
 
@@ -1174,7 +1174,7 @@ class TestDataContainer(CCPiTestClass):
             with self.assertRaises(numpy.core._exceptions.UFuncTypeError) as context:
                 d1.sapyb(a,d2,b, out=d2)
         except AttributeError as ae:
-            logging.info ("Probably numpy version too low: {}".format(ae))
+            log.info("Probably numpy version too low: {}".format(ae))
 
         # print ("Exception thrown:", str(context.exception))
 

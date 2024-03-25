@@ -63,14 +63,14 @@ class TestGradientOperator(unittest.TestCase):
 
     def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
 
-        logging.info( " Test Failed ")
-        logging.info( " ImageGeometry {} \n".format(geom))
-        logging.info( " Bnd Cond {} ".format(bnd))
-        logging.info( " Backend {} ".format(backend))
-        logging.info( " Method {} ".format(method))
-        logging.info( " Correlation {} ".format(corr))
+        log.info(" Test Failed ")
+        log.info(" ImageGeometry {} \n".format(geom))
+        log.info(" Bnd Cond {} ".format(bnd))
+        log.info(" Backend {} ".format(backend))
+        log.info(" Method {} ".format(method))
+        log.info(" Correlation {} ".format(corr))
         if split is not None:
-            logging.info( " Split {} ".format(split))
+            log.info(" Split {} ".format(split))
 
 
     def test_GradientOperator_linearity(self):

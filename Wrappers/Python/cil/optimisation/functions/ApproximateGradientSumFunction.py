@@ -36,18 +36,19 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})
 
-    where there are :math:`n` functions. This function class has two ways of calling gradient:
-    - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
-    - `gradient` calls an `approximate_gradient` function which may be less computationally expensive to calculate than the full gradient
+    where there are :math:`n` functions. This function class has two ways of calling gradient
+    
+        - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
+        - `gradient` calls an `approximate_gradient` function which may be less computationally expensive to calculate than the full gradient
     
     
 
     This class is an abstract class.
 
-    Parameters:
+    Parameters
     -----------
     functions : `list`  of functions
-                A list of functions: :math:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list) must be strictly greater than 1. 
+        A list of functions: :math:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list) must be strictly greater than 1. 
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a :code:`__next__` function implemented to output integers in :math:`{0,...,n-1}`.
         This sampler is called each time :code:`gradient` is called and sets the internal :code:`function_num` passed to the :code:`approximate_gradient` function.  Default is :code:`Sampler.random_with_replacement(len(functions))`. 
 
@@ -58,9 +59,10 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     Note
     -----
-    Each time :code:`gradient` is called the class keeps track of which functions have been used to calculate the gradient. This may be useful for debugging or plotting after using this function in an iterative algorithm:  
-    - :code:`data_passes_indices` is a list of lists. Each time :code:`gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  
-    - :code:`data_passes` is a list. Each time :code:`gradient` is called an entry is appended with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the :code:`set_data_partition_weights` function for this to be accurate.   
+    Each time :code:`gradient` is called the class keeps track of which functions have been used to calculate the gradient. This may be useful for debugging or plotting after using this function in an iterative algorithm.  
+    
+        - The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient. 
+        - The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.    
 
 
 
@@ -220,12 +222,12 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     @property
     def data_passes_indices(self):
-        """ The property `data_passes_indices` is a list of lists. Each time `gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  """
+        """ The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  """
         return self._data_passes_indices
 
     @property
     def data_passes(self):
-        """ The property `data_passes` is a list of floats. Each time `gradient` is called an entry is appended to this list with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
+        """ The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
         data_passes = []
         for el in self._data_passes_indices:
             try:

@@ -146,7 +146,6 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer
         :param: out (optional): provides a placeholder for the result.
         '''
-        out = kwargs.get('out', None)
         
         return self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
     def multiply(self, other, *args, **kwargs):
@@ -155,9 +154,7 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer)
         :param: out (optional): provides a placeholder for the result.
         '''
-        out = kwargs.get('out', None)
         
-        return self.binary_operations(BlockDataContainer.MULTIPLY, other, *args, **kwargs)
     def divide(self, other, *args, **kwargs):
         '''Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
@@ -167,13 +164,11 @@ class BlockDataContainer(object):
         out = kwargs.get('out', None)
         
         return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
-    def power(self, other, *args, **kwargs):
         '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
         :param: other (number, DataContainer or subclasses or BlockDataContainer
         :param: out (optional): provides a placeholder for the result.
         '''
-        out = kwargs.get('out', None)
         
         return self.binary_operations(BlockDataContainer.POWER, other, *args, **kwargs)
     def maximum(self, other, *args, **kwargs):
@@ -182,7 +177,7 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer)
         :param: out (optional): provides a placeholder for the result.
         '''
-        out = kwargs.get('out', None)
+
         
         return self.binary_operations(BlockDataContainer.MAXIMUM, other, *args, **kwargs)
     def minimum(self, other, *args, **kwargs):
@@ -191,7 +186,7 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer)
         :param: out (optional): provides a placeholder for the result.
         '''
-        out = kwargs.get('out', None)
+
         
         return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 

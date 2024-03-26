@@ -36,4 +36,5 @@ from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 from .SGFunction import SGFunction
+from .SVRGFunction import SVRGFunction, LSVRGFunction
 

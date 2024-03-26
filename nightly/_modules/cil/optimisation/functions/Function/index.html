@@ -849,8 +849,11 @@ document.write(`
             <span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="n">functions</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ScaledFunction"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.ScaledFunction">[docs]</a><span class="k">class</span> <span class="nc">ScaledFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 

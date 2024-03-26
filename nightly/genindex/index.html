@@ -740,6 +740,14 @@ document.write(`
       </ul></li>
       <li><a href="../framework/#cil.framework.ImageData.apply_circular_mask">apply_circular_mask() (cil.framework.ImageData method)</a>
 </li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.approximate_gradient">approximate_gradient() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.approximate_gradient">(cil.optimisation.functions.SGFunction method)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction">ApproximateGradientSumFunction (class in cil.optimisation.functions)</a>
+</li>
       <li><a href="../optimisation/#cil.optimisation.algorithms.GD.armijo_rule">armijo_rule() (cil.optimisation.algorithms.GD method)</a>
 </li>
       <li><a href="../framework/#cil.framework.AcquisitionData.as_array">as_array() (cil.framework.AcquisitionData method)</a>
@@ -800,9 +808,11 @@ document.write(`
       </ul></li>
       <li><a href="../optimisation/#cil.optimisation.utilities.callbacks.Callback">Callback (class in cil.optimisation.utilities.callbacks)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.centered_at">centered_at() (cil.optimisation.functions.ConstantFunction method)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.centered_at">centered_at() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.centered_at">(cil.optimisation.functions.ConstantFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.Function.centered_at">(cil.optimisation.functions.Function method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.centered_at">(cil.optimisation.functions.IndicatorBox method)</a>
@@ -824,6 +834,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.centered_at">(cil.optimisation.functions.Rosenbrock method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.centered_at">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.centered_at">(cil.optimisation.functions.SGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.centered_at">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
 </li>
@@ -885,9 +897,11 @@ document.write(`
 </li>
       <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction">ConstantFunction (class in cil.optimisation.functions)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.convex_conjugate">convex_conjugate() (cil.optimisation.functions.BlockFunction method)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.convex_conjugate">convex_conjugate() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.convex_conjugate">(cil.optimisation.functions.BlockFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.convex_conjugate">(cil.optimisation.functions.ConstantFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.Function.convex_conjugate">(cil.optimisation.functions.Function method)</a>
@@ -911,6 +925,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.convex_conjugate">(cil.optimisation.functions.Rosenbrock method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.convex_conjugate">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.convex_conjugate">(cil.optimisation.functions.SGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.convex_conjugate">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
 </li>
@@ -961,6 +977,18 @@ document.write(`
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.data_passes">data_passes (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.data_passes">(cil.optimisation.functions.SGFunction property)</a>
+</li>
+      </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.data_passes_indices">data_passes_indices (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.data_passes_indices">(cil.optimisation.functions.SGFunction property)</a>
+</li>
+      </ul></li>
       <li><a href="../framework/#cil.framework.DataContainer">DataContainer (class in cil.framework)</a>
 </li>
       <li><a href="../framework/#cil.framework.DataOrder">DataOrder (class in cil.framework)</a>
@@ -1091,8 +1119,14 @@ document.write(`
 </li>
       <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.flag">flag() (cil.optimisation.algorithms.CGLS method)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.from_function">from_function() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id28">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.from_function">from_function() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id34">[1]</a>
 </li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.full_gradient">full_gradient() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.full_gradient">(cil.optimisation.functions.SGFunction method)</a>
+</li>
+      </ul></li>
       <li><a href="../optimisation/#cil.optimisation.functions.Function">Function (class in cil.optimisation.functions)</a>
 </li>
   </ul></td>
@@ -1287,9 +1321,11 @@ document.write(`
         <li><a href="../framework/#cil.framework.VectorData.get_slice">(cil.framework.VectorData method)</a>
 </li>
       </ul></li>
-      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.gradient">gradient() (cil.optimisation.functions.BlockFunction method)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.gradient">gradient() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.gradient">(cil.optimisation.functions.BlockFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.gradient">(cil.optimisation.functions.ConstantFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.Function.gradient">(cil.optimisation.functions.Function method)</a>
@@ -1313,6 +1349,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.gradient">(cil.optimisation.functions.Rosenbrock method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.gradient">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.gradient">(cil.optimisation.functions.SGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.gradient">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
 </li>
@@ -1343,7 +1381,7 @@ document.write(`
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.herman_meyer">herman_meyer() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id29">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.herman_meyer">herman_meyer() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id35">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1439,9 +1477,11 @@ document.write(`
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.L">L (cil.optimisation.functions.BlockFunction property)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.L">L (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.L">(cil.optimisation.functions.BlockFunction property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.L">(cil.optimisation.functions.ConstantFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.Function.L">(cil.optimisation.functions.Function property)</a>
@@ -1465,6 +1505,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.L">(cil.optimisation.functions.Rosenbrock property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.L">(cil.optimisation.functions.ScaledFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.L">(cil.optimisation.functions.SGFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.L">(cil.optimisation.functions.SmoothMixedL21Norm property)</a>
 </li>
@@ -1497,9 +1539,13 @@ document.write(`
 </li>
       <li><a href="../utilities/#cil.utilities.jupyter.link_islicer">link_islicer (class in cil.utilities.jupyter)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.Lmax">Lmax (cil.optimisation.functions.SumFunction property)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.Lmax">Lmax (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.Lmax">(cil.optimisation.functions.SGFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.Lmax">(cil.optimisation.functions.SumFunction property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.Lmax">(cil.optimisation.functions.SumScalarFunction property)</a>
 </li>
       </ul></li>
@@ -1764,9 +1810,11 @@ document.write(`
         <li><a href="../plugins/#cil.plugins.tigre.ProjectionOperator">(class in cil.plugins.tigre)</a>
 </li>
       </ul></li>
-      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.proximal">proximal() (cil.optimisation.functions.BlockFunction method)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.proximal">proximal() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.proximal">(cil.optimisation.functions.BlockFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.proximal">(cil.optimisation.functions.ConstantFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.Function.proximal">(cil.optimisation.functions.Function method)</a>
@@ -1791,6 +1839,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.proximal">(cil.optimisation.functions.ScaledFunction method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.proximal">(cil.optimisation.functions.SGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.proximal">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.proximal">(cil.optimisation.functions.SumFunction method)</a>
@@ -1808,9 +1858,11 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.proximal_conjugate">proximal_conjugate() (cil.optimisation.functions.BlockFunction method)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.proximal_conjugate">proximal_conjugate() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.BlockFunction.proximal_conjugate">(cil.optimisation.functions.BlockFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction.proximal_conjugate">(cil.optimisation.functions.ConstantFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.Function.proximal_conjugate">(cil.optimisation.functions.Function method)</a>
@@ -1834,6 +1886,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.Rosenbrock.proximal_conjugate">(cil.optimisation.functions.Rosenbrock method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction.proximal_conjugate">(cil.optimisation.functions.ScaledFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.proximal_conjugate">(cil.optimisation.functions.SGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SmoothMixedL21Norm.proximal_conjugate">(cil.optimisation.functions.SmoothMixedL21Norm method)</a>
 </li>
@@ -1868,9 +1922,9 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="../utilities/#cil.utilities.dataexample.TestData.random_noise">random_noise() (cil.utilities.dataexample.TestData static method)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_with_replacement">random_with_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id26">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_with_replacement">random_with_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id32">[1]</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_without_replacement">random_without_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id27">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_without_replacement">random_without_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id33">[1]</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.range_geometry">range_geometry() (cil.optimisation.operators.BlockOperator method)</a>
 
@@ -1998,6 +2052,12 @@ document.write(`
 </li>
       <li><a href="../framework/#cil.framework.AcquisitionGeometry.set_channels">set_channels() (cil.framework.AcquisitionGeometry method)</a>
 </li>
+      <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.set_data_partition_weights">set_data_partition_weights() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.set_data_partition_weights">(cil.optimisation.functions.SGFunction method)</a>
+</li>
+      </ul></li>
       <li><a href="../recon/#cil.recon.FBP.set_fft_order">set_fft_order() (cil.recon.FBP method)</a>
 
       <ul>
@@ -2112,6 +2172,8 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.SGFunction">SGFunction (class in cil.optimisation.functions)</a>
+</li>
       <li><a href="../framework/#cil.framework.AcquisitionData.shape">shape (cil.framework.AcquisitionData property)</a>
 
       <ul>
@@ -2186,7 +2248,7 @@ document.write(`
         <li><a href="../framework/#cil.framework.VectorData.squared_norm">(cil.framework.VectorData method)</a>
 </li>
       </ul></li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.staggered">staggered() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id25">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.staggered">staggered() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id31">[1]</a>
 </li>
       <li><a href="../framework/#cil.framework.BlockDataContainer.subtract">subtract() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.subtract">[1]</a>
 </li>

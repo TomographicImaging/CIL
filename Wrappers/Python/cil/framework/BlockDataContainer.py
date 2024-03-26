@@ -161,7 +161,6 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer)
         :param: out (optional): provides a placeholder for the result.
         '''
-        out = kwargs.get('out', None)
         
         return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
         '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer

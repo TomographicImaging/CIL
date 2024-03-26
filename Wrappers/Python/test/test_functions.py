@@ -32,7 +32,8 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
-                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity
+
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -95,6 +96,7 @@ class TestFunction(CCPiTestClass):
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
+
 
 
 
@@ -1104,6 +1106,43 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
+
+
+
+    def test_L1Sparsity(self):    
+        from cil.optimisation.operators import WaveletOperator
+        f1 = L1Norm()
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate('random', seed=1)
+        b = geom.allocate('random', seed=2)
+        f3=L1Norm(b=b)
+        weights = geom.allocate(1)
+
+        W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
+        f2 = L1Sparsity(W, weight=weights)
+        self.L1SparsityTest(f1, f2, x)
+        
+        f2 = L1Sparsity(W, b=b, weight=weights)
+        self.L1SparsityTest(f3, f2, x)
+
+        f2 = L1Sparsity(W)
+        self.L1SparsityTest(f1, f2, x)
+        
+        f2 = L1Sparsity(W, b=b)
+        self.L1SparsityTest(f3, f2, x)
+        
+        
+
+    def L1SparsityTest(self, f1, f2, x):
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+        
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
 
 

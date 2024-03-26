@@ -80,3 +80,11 @@ class IdentityOperator(LinearOperator):
     def sum_abs_col(self):
 
         return self.gm_domain.allocate(1)
+    
+    def is_orthogonal(self):
+        '''Returns if the operator is orthogonal
+        Returns
+        -------
+        `Bool`
+        '''
+        return True 

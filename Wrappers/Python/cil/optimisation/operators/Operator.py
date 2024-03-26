@@ -49,6 +49,15 @@ class Operator(object):
         `Bool`
         '''
         return False
+    
+    def is_orthogonal(self):
+        '''Returns if the operator is orthogonal
+        Returns
+        -------
+        `Bool`
+        '''
+        return False
+    
 
     def direct(self, x, out=None):
         r"""Calls the operator

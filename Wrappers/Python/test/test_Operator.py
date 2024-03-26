@@ -240,6 +240,12 @@ class TestOperator(CCPiTestClass):
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
+                
+        #Check is_linear
+        self.assertTrue(Id.is_linear())
+        
+        #Check is_orthogonal
+        self.assertTrue(Id.is_orthogonal())
 
     def test_FiniteDifference(self):
         N, M = 2, 3

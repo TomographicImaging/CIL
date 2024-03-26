@@ -37,8 +37,8 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})
 
     where there are :math:`n` functions. This function class has two ways of calling gradient:
-        - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
-        - `gradient` calls an `approximate_gradient` function which may be less computationally expensive to calculate than the full gradient
+    - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
+    - `gradient` calls an `approximate_gradient` function which may be less computationally expensive to calculate than the full gradient
     
     
 
@@ -53,14 +53,14 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     Note
     -----
-    We ensure that the approximate gradient is of a similar order of magnitude to the full gradient calculation. For example, in the `SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
-    The multiplication by `math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets. 
+    We ensure that the approximate gradient is of a similar order of magnitude to the full gradient calculation. For example, in the :code:`SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
+    The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets. 
 
     Note
     -----
     Each time :code:`gradient` is called the class keeps track of which functions have been used to calculate the gradient. This may be useful for debugging or plotting after using this function in an iterative algorithm:  
-        - :code:`data_passes_indices` is a list of lists. Each time :code:`gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  
-        - :code:`data_passes` is a list. Each time :code:`gradient` is called an entry is appended with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the :code:`set_data_partition_weights` function for this to be accurate.   
+    - :code:`data_passes_indices` is a list of lists. Each time :code:`gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  
+    - :code:`data_passes` is a list. Each time :code:`gradient` is called an entry is appended with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the :code:`set_data_partition_weights` function for this to be accurate.   
 
 
 
@@ -159,7 +159,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1} or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1} 
         """
         pass
 
@@ -174,7 +174,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
         Returns
         --------
         DataContainer
-            the value of the approximate gradient of the sum function at :code:`x`  or nothing if `out`  
+            the value of the approximate gradient of the sum function at :code:`x`   
         """
 
         self.function_num = self.sampler.next()
@@ -225,7 +225,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     @property
     def data_passes(self):
-        """ The property `data_passes` is a list. Each time `gradient` is called an entry is appended with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
+        """ The property `data_passes` is a list of floats. Each time `gradient` is called an entry is appended to this list with  the proportion of the data used when calculating the approximate gradient  since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
         data_passes = []
         for el in self._data_passes_indices:
             try:

@@ -1116,7 +1116,7 @@ class TestFunction(CCPiTestClass):
         geom = ImageGeometry(N, M)
         x = geom.allocate('random', seed=1)
         b = geom.allocate('random', seed=2)
-
+        f3=L1Norm(b=b)
         weights = geom.allocate(1)
 
         W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
@@ -1124,13 +1124,13 @@ class TestFunction(CCPiTestClass):
         self.L1SparsityTest(f1, f2, x)
         
         f2 = L1Sparsity(W, b=b, weight=weights)
-        self.L1SparsityTest(f1, f2, x)
+        self.L1SparsityTest(f3, f2, x)
 
         f2 = L1Sparsity(W)
         self.L1SparsityTest(f1, f2, x)
         
         f2 = L1Sparsity(W, b=b)
-        self.L1SparsityTest(f1, f2, x)
+        self.L1SparsityTest(f3, f2, x)
         
         
 

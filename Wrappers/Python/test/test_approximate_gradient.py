@@ -577,4 +577,3 @@ class TestLSVRG(CCPiTestClass):
             alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
-

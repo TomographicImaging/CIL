@@ -31,7 +31,7 @@ class SGFunction(ApproximateGradientSumFunction):
     Stochastic gradient function, a child class of :code:`ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_0,...,f_{n-1}}` a `SumFunction`, :math:`f_0+...+f_{n-1}` where each time the `gradient` is called, the :code:`sampler` provides an index, :math:`i \in {0,...,n-1}` 
     and the :code:`gradient` method returns the approximate gradient :math:`n \nabla_x f_i(x)`. This can be used with the :code:`cil.optimisation.algorithms` algorithm :code:`GD` to give a stochastic gradient descent algorithm. 
    
-    Parameters:
+    Parameters
     -----------
     functions : `list`  of functions
         A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. Although CIL does not define a domain of a :code:`Function`, all functions are supposed to have the same domain. The number of functions must be strictly greater than 1. 

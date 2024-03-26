@@ -40,6 +40,7 @@
   - Improved import error/warning messages
   - New adjoint operator
   - Bug fix for complex matrix adjoint
+  - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
 
 
 * 23.1.0

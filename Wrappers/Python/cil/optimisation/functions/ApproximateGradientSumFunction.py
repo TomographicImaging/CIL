@@ -36,7 +36,6 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})
 
-
     where there are :math:`n` functions. This function class has two ways of calling gradient
     
         - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
@@ -230,7 +229,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     def data_passes(self):
         """ The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
         data_passes = []
-        for el in self._data_passes_indices:
+        for el in self.data_passes_indices:
             try:
                 data_passes.append(data_passes[-1])
             except IndexError:

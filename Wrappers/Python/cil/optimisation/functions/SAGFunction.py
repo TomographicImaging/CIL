@@ -133,7 +133,7 @@ class SAGFunction(ApproximateGradientSumFunction):
 
     @property
     def data_passes_indices(self): 
-        """ The property `data_passes_indices` is a list of lists. Each time `gradient` is called a list is appended with with the indices of the functions have been used to calculate the gradient.  """
+        """ The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.   """
         ret = self._data_passes_indices[:]  
         if len(ret[0]) == self.num_functions:  
             a = ret.pop(1)  

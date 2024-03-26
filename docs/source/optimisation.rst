@@ -300,6 +300,8 @@ Trivial operators are the following.
    :members:
 
 
+.. autoclass:: cil.optimisation.operators.ProjectionMap
+   :members:
 
 GradientOperator
 -----------------

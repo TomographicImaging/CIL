@@ -52,11 +52,10 @@ if has_cvxpy:
 class TestApproximateGradientSumFunction(CCPiTestClass):
 
     def setUp(self):
-        self.sampler=Sampler.random_with_replacement(5, seed=1)
+        self.sampler = Sampler.random_with_replacement(5)
         self.initial = VectorData(np.zeros(10))
-        np.random.seed(4)
-        self.b =  VectorData(np.random.normal(0,1,10))
-        self.functions=[]
+        self.b = VectorData(np.random.normal(0, 1, 10))
+        self.functions = []
         for i in range(5):
             diagonal = np.zeros(10)
             diagonal[2*i:2*(i+1)] = 1
@@ -200,7 +199,6 @@ class TestSGD(CCPiTestClass):
             alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
-
 
 
 
@@ -508,4 +506,3 @@ class TestSAGA(CCPiTestClass):
             alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
-

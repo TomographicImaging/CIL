@@ -124,7 +124,7 @@ LADMM
 Algorithms (Stochastic)
 ========================
 
-Consider optimisation problems that take the form of a seperable sum: 
+Consider optimisation problems that take the form of a separable sum: 
 
 .. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i}(x) + g(x) = \min_{x} (f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x))+g(x)
 
@@ -162,7 +162,7 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
    .. math::
       x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
 
-Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorith. 
+Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
 
 In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
 
@@ -171,7 +171,7 @@ In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be d
 
 and again replacing :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
 
-In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, the header row has the optimisation algorithm and the body of the table has the resulting stochastic algorithm.
+In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, :ref:`Approximate Gradient base class` the header row has one of CIL's deterministic optimisation algorithm and the body of the table has the resulting stochastic algorithm.
 
 +----------------+-------+------------+----------------+
 |                | GD    | ISTA       | FISTA          |

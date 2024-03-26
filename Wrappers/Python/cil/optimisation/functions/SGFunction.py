@@ -28,15 +28,15 @@ from .Function import SumFunction
 class SGFunction(ApproximateGradientSumFunction):
 
     r"""
-    Stochastic gradient function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_0,...,f_{n-1}}` a `SumFunction`, :math:`f_0+...+f_{n-1}` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {0,...,n-1}` 
-    and the gradient function returns the approximate gradient :math:`n \nabla_x f_i(x)`. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic gradient descent algorithm. 
+    Stochastic gradient function, a child class of :code:`ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_0,...,f_{n-1}}` a `SumFunction`, :math:`f_0+...+f_{n-1}` where each time the :code:`gradient` is called, the :code:`sampler` provides an index, :math:`i \in {0,...,n-1}` 
+    and the gradient function returns the approximate gradient :math:`n \nabla_x f_i(x)`. This can be used with the :code:`cil.optimisation.algorithms` algorithm GD to give a stochastic gradient descent algorithm. 
    
     Parameters:
     -----------
     functions : `list`  of functions
         A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1. 
-    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
-        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a :code:`__next__` function implemented to output integers in {0,...,n-1}.
+        This sampler is called each time gradient is called and  sets the internal :code:`function_num` passed to the :code:`approximate_gradient` function.  Default is :code:`Sampler.random_with_replacement(len(functions))`. 
     """
   
     def __init__(self, functions, sampler=None):

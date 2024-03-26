@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -137,7 +136,7 @@ class Test_reorder(unittest.TestCase):
             assert False, "Unit test should have failed! Expecting len to be implemented"
         except ValueError as ve:
             assert True, ve
-        
+
     def test_reorder_with_repeated_label(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
@@ -199,7 +198,7 @@ class TestSubset(unittest.TestCase):
     def setUp(self):
         self.ig = ImageGeometry(2,3,4,channels=5)
         angles = numpy.asarray([90.,0.,-90.], dtype=numpy.float32)
-        
+
         self.ag_cone = AcquisitionGeometry.create_Cone3D([0,-500,0],[0,500,0])\
                                     .set_panel((20,2))\
                                     .set_angles(angles)\
@@ -220,14 +219,14 @@ class TestSubset(unittest.TestCase):
     def test_ImageDataAllocate1b(self):
         data = self.ig.allocate()
         self.assertTrue( data.shape == (5,4,3,2))
-        
+
     def test_ImageDataAllocate2a(self):
         non_default_dimension_labels = [ ImageGeometry.HORIZONTAL_X, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         self.assertTrue( non_default_dimension_labels == list(data.dimension_labels) )
-        
+
     def test_ImageDataAllocate2b(self):
         non_default_dimension_labels = [ ImageGeometry.HORIZONTAL_X, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL]
@@ -308,7 +307,7 @@ class TestSubset(unittest.TestCase):
 
 
         self.assertTrue(  non_default_dimension_labels == list(data.dimension_labels) )
-        
+
     def test_AcquisitionDataAllocate2b(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
          AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
@@ -324,7 +323,7 @@ class TestSubset(unittest.TestCase):
         #self.assertTrue( data.shape == (4,20,2,3))
         sub = data.get_slice(vertical = 0)
         self.assertTrue( sub.shape == (4,20,3))
-    
+
     def test_AcquisitionDataSubset1b(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
          AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
@@ -362,28 +361,28 @@ class TestSubset(unittest.TestCase):
         sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
     def test_AcquisitionDataSubset1f(self):
-        
+
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sliceme = 1
         sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
-        
+
     def test_AcquisitionDataSubset1g(self):
-        
+
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.get_slice(angle = sliceme)
-        self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])       
+        self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
 
     def test_AcquisitionDataSubset1h(self):
-        
+
         data = self.ag_cone.allocate()
         sub = data.get_slice(vertical = 'centre')
-        self.assertTrue( sub.geometry.shape == (4,3,20))       
+        self.assertTrue( sub.geometry.shape == (4,3,20))
 
     def test_AcquisitionDataSubset1i(self):
-        
+
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.get_slice(vertical = sliceme, force=True)
@@ -397,4 +396,3 @@ class TestSubset(unittest.TestCase):
         sub = sub.get_slice(horizontal = 0, force=True)
 
         self.assertTrue( sub.shape == (4,))
-

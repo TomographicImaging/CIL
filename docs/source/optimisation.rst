@@ -151,8 +151,6 @@ Each iteration considers just one index of the sum, potentially reducing computa
    :inherited-members: run, update_objective_interval, max_iteration
 
 
-
-
 Approximate gradient methods
 ----------------------------------
 
@@ -161,7 +159,8 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
 
    .. math::
       x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
-
+:math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorith. 
+=======
 Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
 
 In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
@@ -229,11 +228,6 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    alg.run(300)
 
   
-
-
-
-
-
 Operators
 =========
 The two most important methods are :code:`direct` and :code:`adjoint`
@@ -488,6 +482,21 @@ Stochastic Gradient function
 .. autoclass:: cil.optimisation.functions.SGFunction 
    :members:
    :inherited-members:
+
+SAG function
+-------------
+
+.. autoclass:: cil.optimisation.functions.SAGFunction 
+   :members:
+   :inherited-members:
+
+SAGA function
+--------------
+
+.. autoclass:: cil.optimisation.functions.SAGAFunction 
+   :members:
+   :inherited-members:
+
 
 
 Utilities

@@ -16,6 +16,5 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-
 from .sampler import Sampler
 from .sampler import SamplerRandom

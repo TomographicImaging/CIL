@@ -167,6 +167,17 @@ git submodule update --init --recursive
 docker build . -t ghcr.io/tomographicimaging/cil
 ```
 
+
+### Testing
+
+One installed, CIL functionality can be tested using the following command:
+
+```sh
+export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
+python -m unittest discover -v ./Wrappers/Python/test
+```
+
+
 ## Citing CIL
 
 

@@ -32,8 +32,8 @@ The fundamental components are:
 
 
 
-Algorithms
-==========
+Algorithms (Deterministic)
+==========================
 
 A number of generic algorithm implementations are provided including
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
@@ -119,11 +119,119 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+
+
+Algorithms (Stochastic)
+========================
+
+Consider optimisation problems that take the form of a separable sum: 
+
+.. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i}(x) + g(x) = \min_{x} (f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x))+g(x)
+
+where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   
+There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
+This is an area of continued development for CIL and, depending on  the properties of the :math:`f_i` and the regulariser :math:`g`, there is a range of different options for the user. 
+
+
+
 SPDHG
 -----
+Stochastic Primal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG and deals with optimisation problems of the form: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+
+where :math:`f_i` and the regulariser :math:`g` need only be proper, convex and lower semi-continuous ( i.e. do not need to be differentiable). 
+Each iteration considers just one index of the sum, potentially reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
+
+
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
+
+
+
+
+Approximate gradient methods
+----------------------------------
+
+Alternatively, consider that, in addition to the functions :math:`f_i` and the regulariser :math:`g` being proper, convex and lower semi-continuous, the :math:`f_i` are differentiable. In this case we consider stochastic methods that replace a gradient calculation in a deterministic algorithm with a, potentially cheaper to calculate, approximate gradient. 
+For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilises iterations of the form
+
+   .. math::
+      x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
+
+Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
+In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
+
+   .. math::
+         x_{k+1}=prox_{\alpha g}(x_k-\alpha \nabla f(x_k) )=prox_{\alpha g}(x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k))
+
+and again replacing :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
+
+In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, :ref:`Approximate Gradient base class` the header row has one of CIL's deterministic optimisation algorithm and the body of the table has the resulting stochastic algorithm.
+
++----------------+-------+------------+----------------+
+|                | GD    | ISTA       | FISTA          |
++----------------+-------+------------+----------------+
+| SGFunction     | SGD   | Prox-SGD   | Acc-Prox-SGD   |
++----------------+-------+------------+----------------+
+| SAGFunction\*  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
++----------------+-------+------------+----------------+
+| SAGAFunction\* | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
++----------------+-------+------------+----------------+
+| SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
++----------------+-------+------------+----------------+
+| LSVRGFunction\*| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
++----------------+-------+------------+----------------+
+
+\*In development 
+
+The stochastic gradient functions can be found listed under functions in the documentation. 
+
+Stochastic Gradient Descent Example
+----------------------------------
+The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:
+
+.. code-block :: python
+
+   from cil.optimisation.utilities import Sampler
+   from cil.optimisation.algorithms import GD 
+   from cil.optimisation.functions import LeastSquares, SGFunction
+   from cil.utilities import dataexample
+   from cil.plugins.astra.operators import ProjectionOperator
+   
+   # get the data  
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data.reorder('astra')
+   data = data.get_slice(vertical='centre')
+
+   # create the geometries 
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
+
+   # partition the data and build the projectors
+   n_subsets = 10 
+   partitioned_data = data.partition(n_subsets, 'sequential')
+   A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
+
+   # create the list of functions for the stochastic sum 
+   list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
+
+   #define the sampler and the stochastic gradient function 
+   sampler = Sampler.staggered(len(list_of_functions))
+   f = SGFunction(list_of_functions, sampler=sampler)  
+   
+   #set up and run the gradient descent algorithm 
+   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
+   alg.run(300)
+
+  
+
+
+
 
 
 Operators
@@ -363,6 +471,21 @@ Total variation
 ---------------
 
 .. autoclass:: cil.optimisation.functions.TotalVariation
+   :members:
+   :inherited-members:
+
+Approximate Gradient base class 
+--------------------------------
+
+.. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 
+   :members:
+   :inherited-members:
+   
+
+Stochastic Gradient function 
+-----------------------------
+
+.. autoclass:: cil.optimisation.functions.SGFunction 
    :members:
    :inherited-members:
 

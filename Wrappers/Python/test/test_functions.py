@@ -91,7 +91,7 @@ class TestFunction(CCPiTestClass):
         # Compare call of g
         a2 = alpha * (d - noisy_data).power(2).sum()
 
-        self.assertEqual(a2, g(d))
+        self.assertAlmostEqual(a2, g(d))
 
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)

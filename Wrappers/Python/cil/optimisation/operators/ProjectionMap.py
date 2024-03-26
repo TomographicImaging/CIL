@@ -68,7 +68,8 @@ class ProjectionMap(LinearOperator):
             return x[self.index].copy()
         else:
             out.fill(x[self.index])
-
+            return out
+    
     def adjoint(self,x, out=None):
 
         if out is None:
@@ -77,3 +78,5 @@ class ProjectionMap(LinearOperator):
             return tmp
         else:
             out[self.index].fill(x)
+            return out 
+

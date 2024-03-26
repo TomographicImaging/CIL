@@ -153,20 +153,18 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
         """
 
-        should_return=False
-        if out is None:
-            out = x.add(self.eta)
-            should_return=True
-        else:
-            x.add(self.eta,out=out)
+        
+        
+        ret= x.add(self.eta, out=out)
+        
 
-        arr = out.as_array()
+        arr = ret.as_array()
         arr[arr>0] = 1 - self.b.as_array()[arr>0]/arr[arr>0]
 
-        out.fill(arr)
+        ret.fill(arr)
 
-        if should_return:
-            return out
+        
+        return ret
 
     def convex_conjugate(self, x):
 
@@ -203,8 +201,9 @@ class KullbackLeibler_numpy(KullbackLeibler):
             out.sqrt(out=out)
             out.subtract(tau, out=out)
             out.subtract(self.eta, out=out)
-            out.add(x, out=out)
-            out *= 0.5
+            out.add(x, out=out)         
+            out *= 0.5             
+            return out
 
 
     def proximal_conjugate(self, x, tau, out = None):
@@ -230,6 +229,8 @@ class KullbackLeibler_numpy(KullbackLeibler):
             tmp += 2
             out += tmp
             out *= 0.5
+            
+            return out
 
 ####################################
 ## KullbackLeibler numba routines ##
@@ -447,10 +448,10 @@ class KullbackLeibler_numba(KullbackLeibler):
 
         """
 
-        should_return = False
+    
         if out is None:
             out = x * 0
-            should_return = True
+            
 
         out_np = out.as_array()
 
@@ -460,9 +461,9 @@ class KullbackLeibler_numba(KullbackLeibler):
             kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
         out.fill(out_np)
 
-        if should_return:
-            return out
 
+        return out        
+        
     def proximal(self, x, tau, out = None):
 
         r"""Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.
@@ -471,10 +472,9 @@ class KullbackLeibler_numba(KullbackLeibler):
 
         """
 
-        should_return = False
+
         if out is None:
-            out = x * 0
-            should_return = True
+            out = x * 0 
 
         out_np = out.as_array()
 
@@ -494,8 +494,8 @@ class KullbackLeibler_numba(KullbackLeibler):
                     out_np, self.eta_np)
 
         out.fill(out_np)
-        if should_return:
-            return out
+
+        return out                                    
 
 
     def proximal_conjugate(self, x, tau, out = None):
@@ -505,10 +505,9 @@ class KullbackLeibler_numba(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
         """
 
-        should_return = False
+
         if out is None:
-            out = x * 0
-            should_return = True
+            out = x * 0 
 
         out_np = out.as_array()
 
@@ -528,5 +527,5 @@ class KullbackLeibler_numba(KullbackLeibler):
                     tau.as_array(), out_np)
 
         out.fill(out_np)
-        if should_return:
-            return out
+
+        return out 

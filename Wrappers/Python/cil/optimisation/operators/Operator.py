@@ -61,7 +61,7 @@ class Operator(object):
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
 
         """
         raise NotImplementedError
@@ -198,7 +198,7 @@ class LinearOperator(Operator):
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result, or `None.
         Note
         ----
         Only available to linear operators'''
@@ -486,24 +486,20 @@ class ScaledOperator(Operator):
 
     def direct(self, x, out=None):
         '''direct method'''
-        if out is None:
-            tmp = self.operator.direct(x)
-            tmp *= self.scalar
-            return tmp
-        else:
-            self.operator.direct(x, out=out)
-            out *= self.scalar
+        
+        tmp = self.operator.direct(x, out = out)
+        tmp *= self.scalar
+        return tmp
+
 
     def adjoint(self, x, out=None):
         '''adjoint method'''
         if self.operator.is_linear():
-            if out is None:
-                tmp = self.operator.adjoint(x)
-                tmp *= self.scalar
-                return tmp
-            else:
-                self.operator.adjoint(x, out=out)
-                out *= self.scalar
+            
+            tmp = self.operator.adjoint(x, out = out)
+            tmp *= self.scalar
+            return tmp
+            
         else:
             raise TypeError('Operator is not linear')
 
@@ -563,14 +559,13 @@ class SumOperator(Operator):
             If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
 
         """
-        if out is None:
-            return self.operator1.direct(x) + self.operator2.direct(x)
-        else:
-            self.operator1.direct(x, out=out)
-            out.add(self.operator2.direct(x), out=out)
+
+        ret = self.operator1.direct(x, out=out)
+        ret.add(self.operator2.direct(x), out=ret)
+        return ret
 
     def adjoint(self, x, out=None):
         r"""Calls the adjoint of the sum operator, evaluated at the point :math:`x`.
@@ -583,15 +578,14 @@ class SumOperator(Operator):
             If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
         """
 
         if self.linear_flag:
-            if out is None:
-                return self.operator1.adjoint(x) + self.operator2.adjoint(x)
-            else:
-                self.operator1.adjoint(x, out=out)
-                out.add(self.operator2.adjoint(x), out=out)
+            
+            ret = self.operator1.adjoint(x, out=out)
+            ret.add(self.operator2.adjoint(x), out=ret)
+            return ret
         else:
             raise ValueError('No adjoint operation with non-linear operators')
 
@@ -651,7 +645,7 @@ class CompositionOperator(Operator):
             If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result
 
         """
         if out is None:
@@ -698,6 +692,7 @@ class CompositionOperator(Operator):
                     else:
                         step = operator.direct(step)
                 out.fill(step)
+            return out
 
     def adjoint(self, x, out=None):
         """Calls the adjoint of the composition operator at the point :math:`x`.
@@ -711,7 +706,7 @@ class CompositionOperator(Operator):
 
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result
         """
 
         if self.linear_flag:
@@ -739,7 +734,7 @@ class CompositionOperator(Operator):
                         else:
                             step = operator.adjoint(step)
                     out.fill(step)
-
+                return out
             else:
                 if self.preallocate:
                     pass

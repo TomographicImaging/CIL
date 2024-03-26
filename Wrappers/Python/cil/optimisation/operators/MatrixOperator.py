@@ -52,6 +52,7 @@ class MatrixOperator(LinearOperator):
             # https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html
             # numpy.dot(self.A, x.as_array(), out = out.as_array())
             out.fill(numpy.dot(self.A, x.as_array()))
+            return out
 
     def adjoint(self,x, out=None):
         if out is None:
@@ -60,6 +61,7 @@ class MatrixOperator(LinearOperator):
             return tmp
         else:
             out.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
+            return out
 
     def size(self):
         return self.A.shape

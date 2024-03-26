@@ -170,14 +170,10 @@ class MixedL21Norm(Function):
         else:
             res = _proximal_step_numpy(tmp, tau)
 
-        if out is None:
-            res = x.multiply(res)
-        else:
-            x.multiply(res, out = out)
-            res = out
+        
+        return x.multiply(res, out=out)
+        
 
-        if out is None:
-            return res
 
 class SmoothMixedL21Norm(Function):
 
@@ -227,7 +223,6 @@ class SmoothMixedL21Norm(Function):
 
         denom = (x.pnorm(2).power(2) + self.epsilon**2).sqrt()
 
-        if out is None:
-            return x.divide(denom)
-        else:
-            x.divide(denom, out=out)
+        
+        return x.divide(denom, out=out) 
+             

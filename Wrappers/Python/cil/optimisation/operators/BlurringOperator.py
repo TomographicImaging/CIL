@@ -60,7 +60,8 @@ class BlurringOperator(LinearOperator):
             outarr = out.as_array()
             convolve(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
-
+            return out
+    
     def adjoint(self,x, out=None):
 
         '''Returns D^{*}(y). The adjoint of convolution is convolution with
@@ -75,3 +76,4 @@ class BlurringOperator(LinearOperator):
             outarr = out.as_array()
             correlate(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
+            return out

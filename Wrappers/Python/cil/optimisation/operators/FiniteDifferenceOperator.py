@@ -225,8 +225,9 @@ class FiniteDifferenceOperator(LinearOperator):
             return ret
         else:
             out.fill(outa)
-
-
+            return out                             
+                 
+        
     def adjoint(self, x, out=None):
 
         if id(x)==id(out):
@@ -375,3 +376,4 @@ class FiniteDifferenceOperator(LinearOperator):
             return ret
         else:
             out.fill(outa)
+            return out      

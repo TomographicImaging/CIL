@@ -36,9 +36,11 @@ def soft_shrinkage(x, tau, out=None):
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
     """
-    should_return = False
+
+    
     # get the sign of the input
     dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
+
 
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
@@ -48,7 +50,6 @@ def soft_shrinkage(x, tau, out=None):
             out.fill(outarr)
         else:
             out = x.abs()
-        should_return = True
     else:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             outarr = out.as_array()
@@ -59,9 +60,10 @@ def soft_shrinkage(x, tau, out=None):
             x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
+
     out *= dsign
-    if should_return:
-        return out
+    return out
+
 
 class L1Norm(Function):
     r"""L1Norm function
@@ -217,18 +219,14 @@ class _L1Norm(Function):
 
 
     def proximal(self, x, tau, out=None):
-        if out is None:
-            if self.b is not None:
-                return self.b + soft_shrinkage(x - self.b, tau)
-            else:
-                return soft_shrinkage(x, tau)
-        else:
 
-            if self.b is not None:
-                soft_shrinkage(x - self.b, tau, out = out)
-                out += self.b
-            else:
-                soft_shrinkage(x, tau, out = out)
+
+        if self.b is not None:
+            ret = soft_shrinkage(x - self.b, tau, out = out)
+            ret += self.b
+        else:
+            ret = soft_shrinkage(x, tau, out = out)   
+        return ret
 
 
 class _WeightedL1Norm(Function):

@@ -270,4 +270,4 @@ class WaveletOperator(LinearOperator):
         -------
         `Bool`
         '''
-        return self._wavelet.orthogonal #TODO: need to unit test this 
+        return self._wavelet.orthogonal 

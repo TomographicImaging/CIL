@@ -25,9 +25,14 @@ class TestWavelets(CCPiTestClass):
         self.assertEqual(W.bnd_cond, 'symmetric')
         self.assertEqual(W._trueAdj, True )
         self.assertEqual(W.level,int(np.log2(min(n,m))))
-        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)
+        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)    
+                
+        #Check is_linear
+        self.assertTrue(W.is_linear())
         
-
+        #Check is_orthogonal
+        self.assertEqual(W.is_orthogonal(), W._wavelet.orthogonal)
+    
         dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
         rg = ImageGeometry(voxel_num_x=n, voxel_num_y=m)
         with self.assertRaises(AttributeError):
@@ -124,6 +129,9 @@ class TestWavelets(CCPiTestClass):
 
                     self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
                     self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
+                    
+                    #Check is_not_orthogonal
+                    self.assertEqual(W.is_orthogonal(), False)
 
                     # Reconstruction should be imperfect
                     self.assertLess(0, (x - y).norm(), msg="Biorthogonal wavelets with true adjoint should no longer produce perfect reconstructions")
@@ -282,6 +290,7 @@ class TestWavelets(CCPiTestClass):
         for true_adjoint in [True, False]:
             with self.subTest(msg=f"Failed for biorthogonal wavelet with true_adjoint set to {true_adjoint}"):
                 W = WaveletOperator(dg, wname='bior3.5', level=1, true_adjoint=true_adjoint)
+                self.assertEqual(W.is_orthogonal(), False)
                 self.assertRaises(AttributeError, L1Sparsity, W) # This should always give error no matter which adjoint setting
     
     def test_L1Sparsity_complex_input(self):
@@ -291,6 +300,7 @@ class TestWavelets(CCPiTestClass):
 
         dg = VectorGeometry(n)
         W = WaveletOperator(dg, wname=wname, level=level)
+        self.assertEqual(W.is_orthogonal(), True)
         WN = L1Sparsity(W)
 
         x = dg.allocate('random', dtype='complex64')

@@ -99,6 +99,7 @@ class TestFunction(CCPiTestClass):
 
 
 
+
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         numpy.random.seed(1)
@@ -1114,15 +1115,24 @@ class TestFunction(CCPiTestClass):
         N, M = 2,3
         geom = ImageGeometry(N, M)
         x = geom.allocate('random', seed=1)
+        b = geom.allocate('random', seed=2)
 
         weights = geom.allocate(1)
 
         W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
         f2 = L1Sparsity(W, weight=weights)
         self.L1SparsityTest(f1, f2, x)
+        
+        f2 = L1Sparsity(W, b=b, weight=weights)
+        self.L1SparsityTest(f1, f2, x)
 
         f2 = L1Sparsity(W)
         self.L1SparsityTest(f1, f2, x)
+        
+        f2 = L1Sparsity(W, b=b)
+        self.L1SparsityTest(f1, f2, x)
+        
+        
 
     def L1SparsityTest(self, f1, f2, x):
         np.testing.assert_almost_equal(f1(x), f2(x))

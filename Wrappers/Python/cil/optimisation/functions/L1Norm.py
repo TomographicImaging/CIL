@@ -38,7 +38,6 @@ def soft_shrinkage(x, tau, out=None):
     """
     should_return = False
     # get the sign of the input
-
     dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
 
     if out is None:
@@ -60,13 +59,9 @@ def soft_shrinkage(x, tau, out=None):
             x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
-
-
     out *= dsign
-    
     if should_return:
-        return out              
-
+        return out
 
 class L1Norm(Function):
     r"""L1Norm function
@@ -153,8 +148,8 @@ class L1Norm(Function):
 
     Consider the following cases:
 
-    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b
+    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x) + b
 
     where,
 

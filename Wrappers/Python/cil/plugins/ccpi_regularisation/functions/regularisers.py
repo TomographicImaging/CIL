@@ -18,7 +18,7 @@
 
 try:
     from ccpi.filters import regularisers
-    from ccpi.filters.cpu_regularisers import TV_ENERGY
+    from ccpi.filters.TV import TV_ENERGY
 except ImportError as exc:
     raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=20.04"`') from exc
 
@@ -229,14 +229,17 @@ class FGP_TV(TV_Base):
 
         """
 
-        res , info = regularisers.FGP_TV(\
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\
               self.max_iteration,\
               self.tolerance,\
               self.methodTV,\
               self.nonnegativity,\
-              self.device)
+              infovector = info,
+              device = self.device)
 
         return res, info
 
@@ -315,14 +318,18 @@ class TGV(RegulariserFunction):
         return 1.
 
     def proximal_numpy(self, in_arr, tau):
-        res , info = regularisers.TGV(in_arr,
+
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.TGV(in_arr,
               self.alpha * tau,
               self.alpha1,
               self.alpha2,
               self.max_iteration,
               self.LipshitzConstant,
               self.tolerance,
-              self.device)
+              infovector = info,
+              device = self.device)
 
         # info: return number of iteration and reached tolerance
         # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_CPU/TGV_core.c#L168
@@ -400,7 +407,10 @@ class FGP_dTV(RegulariserFunction):
         return np.nan
 
     def proximal_numpy(self, in_arr, tau):
-        res , info = regularisers.FGP_dTV(\
+        
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.FGP_dTV(\
                 in_arr,\
                 self.reference,\
                 self.alpha * tau,\
@@ -409,7 +419,8 @@ class FGP_dTV(RegulariserFunction):
                 self.eta,\
                 self.methodTV,\
                 self.nonnegativity,\
-                self.device)
+                infovector = info,
+                device = self.device)
         return res, info
 
     def convex_conjugate(self, x):
@@ -454,7 +465,7 @@ class TNV(RegulariserFunction):
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
         in_arr = np.squeeze(in_arr)
-
+    
         res = regularisers.TNV(in_arr,
               self.alpha * tau,
               self.max_iteration,

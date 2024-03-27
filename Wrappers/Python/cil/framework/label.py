@@ -59,6 +59,32 @@ class DataOrder(TypedDict):
     CIL_AG_LABELS: List[str]
     TOMOPHANTOM_IG_LABELS: List[str]
 
+    @staticmethod
+    def get_order_for_engine(engine, geometry):
+        if engine == 'astra':
+            if isinstance(geometry, BaseAcquisitionGeometry):
+                dim_order = data_order["ASTRA_AG_LABELS"]
+            else:
+                dim_order = data_order["ASTRA_IG_LABELS"]
+        elif engine == 'tigre':
+            if isinstance(geometry, BaseAcquisitionGeometry):
+                dim_order = data_order["TIGRE_AG_LABELS"]
+            else:
+                dim_order = data_order["TIGRE_IG_LABELS"]
+        elif engine == 'cil':
+            if isinstance(geometry, BaseAcquisitionGeometry):
+                dim_order = data_order["CIL_AG_LABELS"]
+            else:
+                dim_order = data_order["CIL_IG_LABELS"]
+        else:
+            raise ValueError("Unknown engine expected one of {0} got {1}".format(data_order["ENGINES"], engine))
+
+        dimensions = []
+        for label in dim_order:
+            if label in geometry.dimension_labels:
+                dimensions.append(label)
+
+        return dimensions
 
 image_labels: ImageLabels = {"RANDOM": "random",
                              "RANDOM_INT": "random_int",
@@ -92,32 +118,7 @@ data_order: DataOrder = \
      "TOMOPHANTOM_IG_LABELS": [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
     }
 
-
-def get_order_for_engine(engine, geometry):
-    if engine == 'astra':
-        if isinstance(geometry, BaseAcquisitionGeometry):
-            dim_order = data_order["ASTRA_AG_LABELS"]
-        else:
-            dim_order = data_order["ASTRA_IG_LABELS"]
-    elif engine == 'tigre':
-        if isinstance(geometry, BaseAcquisitionGeometry):
-            dim_order = data_order["TIGRE_AG_LABELS"]
-        else:
-            dim_order = data_order["TIGRE_IG_LABELS"]
-    elif engine == 'cil':
-        if isinstance(geometry, BaseAcquisitionGeometry):
-            dim_order = data_order["CIL_AG_LABELS"]
-        else:
-            dim_order = data_order["CIL_IG_LABELS"]
-    else:
-        raise ValueError("Unknown engine expected one of {0} got {1}".format(data_order["ENGINES"], engine))
-
-    dimensions = []
-    for label in dim_order:
-        if label in geometry.dimension_labels:
-            dimensions.append(label)
-
-    return dimensions
+get_order_for_engine = DataOrder.get_order_for_engine
 
 
 def check_order_for_engine(engine, geometry):

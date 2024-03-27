@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -33,21 +32,21 @@ class L2NormSquared(Function):
 
     Parameters
     ----------
-    
+
     b:`DataContainer`, optional
         Translation of the function
-                
-        
+
+
     Note
     -----
-    
+
     For case b) we can use :code:`F = L2NormSquared().centered_at(b)`, see *TranslateFunction*.
 
     Example
     -------
 
         >>> F = L2NormSquared()
-        >>> F = L2NormSquared(b=b) 
+        >>> F = L2NormSquared(b=b)
         >>> F = L2NormSquared().centered_at(b)
 
     """
@@ -89,7 +88,7 @@ class L2NormSquared(Function):
 
         Consider the following cases:
 
-                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} 
+                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2}
                 b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + \langle x^{*}, b\rangle
 
         """
@@ -107,7 +106,7 @@ class L2NormSquared(Function):
         Consider the following cases:
 
                 a) .. math:: \text{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
-                b) .. math:: \text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
+                b) .. math:: \text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b
 
         """
 

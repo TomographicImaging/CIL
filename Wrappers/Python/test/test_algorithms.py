@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -637,7 +636,7 @@ class TestAlgorithms(CCPiTestClass):
 
 
 
-class TestSIRT(unittest.TestCase):
+class TestSIRT(CCPiTestClass):
 
 
     def setUp(self):
@@ -756,6 +755,30 @@ class TestSIRT(unittest.TestCase):
             self.assertFalse(np.any(el == np.inf))
 
         self.assertFalse(np.any(sirt.D == np.inf))
+
+    def test_SIRT_with_TV(self):
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        ig = data.geometry
+        A=IdentityOperator(ig)
+        constraint=TotalVariation(warm_start=False, max_iteration=100)
+        initial=ig.allocate('random', seed=5)
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=2, constraint=constraint)
+        sirt.run(2, verbose=0)
+        f=LeastSquares(A,data, c=0.5)
+        fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
+        fista.run(100, verbose=0)
+        self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
+
+    def test_SIRT_with_TV_warm_start(self):
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        ig = data.geometry
+        A=IdentityOperator(ig)
+        constraint=1e6*TotalVariation(warm_start=True, max_iteration=100)
+        initial=ig.allocate('random', seed=5)
+        sirt = SIRT(initial = initial, operator=A, data=data, max_iteration=150, constraint=constraint)
+        sirt.run(25, verbose=0)
+
+        self.assertNumpyArrayAlmostEqual(sirt.x.as_array(), ig.allocate(0.25).as_array(),3)
 
 
 class TestSPDHG(unittest.TestCase):
@@ -954,160 +977,6 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()),
         1.68590e-05, decimal=3)
 
-
-    @unittest.skipUnless(has_astra, "ccpi-astra not available")
-    def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=np.float32)
-
-        ig = data.geometry
-        ig.voxel_size_x = 0.1
-        ig.voxel_size_y = 0.1
-
-        detectors = ig.shape[0]
-        angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
-        dev = 'cpu'
-
-        Aop = ProjectionOperator(ig, ag, dev)
-
-        sin = Aop.direct(data)
-        # Create noisy data. Apply Gaussian noise
-        noises = ['gaussian', 'poisson']
-        noise = noises[1]
-        if noise == 'poisson':
-            np.random.seed(10)
-            scale = 5
-            eta = 0
-            noisy_data = AcquisitionData(np.asarray(
-                                            np.random.poisson( scale * (eta + sin.as_array()))/scale,
-                                            dtype=np.float32
-                                            ),
-                                         geometry=ag
-            )
-        elif noise == 'gaussian':
-            np.random.seed(10)
-            n1 = np.asarray(np.random.normal(0, 0.1, size = ag.shape), dtype=np.float32)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
-
-        else:
-            raise ValueError('Unsupported Noise ', noise)
-
-        #%% 'explicit' SPDHG, scalar step-sizes
-        subsets = 10
-        size_of_subsets = int(len(angles)/subsets)
-        # create GradientOperator operator
-        op1 = GradientOperator(ig)
-        # take angles and create uniform subsets in uniform+sequential setting
-        list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
-        # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry.create_Parallel2D().set_angles(list_angles[i],angle_unit='radian').set_panel(detectors, 0.1)
-                        for i in range(len(list_angles))]
-        # create with operators as many as the subsets
-        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
-        ## number of subsets
-        #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
-        #
-        ## acquisisiton data
-        ## acquisisiton data
-        AD_list = []
-        for sub_num in range(subsets):
-            for i in range(0, len(angles), size_of_subsets):
-                arr = noisy_data.as_array()[i:i+size_of_subsets,:]
-                AD_list.append(AcquisitionData(arr, geometry=list_geoms[sub_num]))
-
-        g = BlockDataContainer(*AD_list)
-
-        alpha = 0.5
-        ## block function
-        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]])
-        G = IndicatorBox(lower=0)
-
-        prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
-        algos = []
-        algos.append(SPDHG(f=F, g=G, operator=A,
-                           max_iteration=1000, update_objective_interval=200, prob=prob.copy()))
-        algos[0].run(1000, verbose=0)
-
-        algos.append(SPDHG(f=F, g=G, operator=A,
-                           max_iteration=1000, update_objective_interval=200, prob=prob.copy()))
-        algos[1].run(1000, verbose=0)
-
-        # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
-        qm = (mae(algos[0].get_output(), algos[1].get_output()),
-            mse(algos[0].get_output(), algos[1].get_output()),
-            psnr(algos[0].get_output(), algos[1].get_output())
-            )
-        logging.info ("Quality measures {}".format(qm))
-        assert qm[0] < 0.005
-        assert qm[1] < 3.e-05
-
-
-    @unittest.skipUnless(has_astra, "ccpi-astra not available")
-    def test_PDHG_vs_PDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
-        ig = data.geometry
-        ig.voxel_size_x = 0.1
-        ig.voxel_size_y = 0.1
-
-        detectors = ig.shape[0]
-        angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles,angle_unit='radian').set_panel(detectors, 0.1)
-
-        dev = 'cpu'
-
-        Aop = ProjectionOperator(ig, ag, dev)
-
-        sin = Aop.direct(data)
-
-        # Create noisy data. Apply Gaussian noise
-        noises = ['gaussian', 'poisson']
-        noise = noises[1]
-        if noise == 'poisson':
-            np.random.seed(10)
-            scale = 5
-            eta = 0
-            noisy_data = AcquisitionData(np.asarray(np.random.poisson( scale * (eta + sin.as_array())),dtype=np.float32)/scale, geometry=ag)
-
-        elif noise == 'gaussian':
-            np.random.seed(10)
-            n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(np.asarray(n1 + sin.as_array(), dtype=np.float32), geometry=ag)
-
-        else:
-            raise ValueError('Unsupported Noise ', noise)
-
-
-        alpha = 0.5
-        op1 = GradientOperator(ig)
-        op2 = Aop
-        # Create BlockOperator
-        operator = BlockOperator(op1, op2, shape=(2,1) )
-        f2 = KullbackLeibler(b=noisy_data)
-        g =  IndicatorBox(lower=0)
-        normK = operator.norm()
-        sigma = 1./normK
-        tau = 1./normK
-
-        f1 = alpha * MixedL21Norm()
-        f = BlockFunction(f1, f2)
-        # Setup and run the PDHG algorithm
-
-        algos = []
-        algos.append(PDHG(f=f, g=g, operator=operator, tau=tau, sigma=sigma,
-                          max_iteration=1000, update_objective_interval=200))
-        algos[0].run(1000, verbose=0)
-
-        algos.append(PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
-                          max_iteration=1000, update_objective_interval=200))
-        algos[1].run(1000, verbose=0)
-
-        qm = (mae(algos[0].get_output(), algos[1].get_output()),
-            mse(algos[0].get_output(), algos[1].get_output()),
-            psnr(algos[0].get_output(), algos[1].get_output())
-            )
-        logging.info ("Quality measures {}".format(qm))
-        np.testing.assert_array_less( qm[0], 0.005 )
-        np.testing.assert_array_less( qm[1], 3e-05)
 
 
 class TestCallbacks(unittest.TestCase):

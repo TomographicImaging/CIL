@@ -38,7 +38,9 @@ dependencies:
   - matplotlib
   - h5py
   - pillow
-  - libgcc-ng
+  - libgcc-ng     # [linux]
+  - libstdcxx-ng  # [linux]
+  - _openmp_mutex # [linux]
   - dxchange
   - olefile
   - pywavelets

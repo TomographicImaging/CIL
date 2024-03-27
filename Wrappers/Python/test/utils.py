@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -34,7 +33,7 @@ def startTestRun(self):
     """Called once before any tests are executed.
     """
     #set logging
-    logging.basicConfig(level=logging.WARNING) 
+    logging.basicConfig(level=logging.WARNING)
 
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")
@@ -58,12 +57,16 @@ try:
     subprocess.check_output('nvidia-smi')
     has_nvidia = True
 except:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_nvidia = False
 system_state['has_nvidia']=has_nvidia
 
 #astra
 module_info = importlib.util.find_spec("astra")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_astra = False
 else:
     has_astra = True
@@ -72,6 +75,8 @@ system_state['has_astra']=has_astra
 #tigre
 module_info = importlib.util.find_spec("tigre")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_tigre = False
 else:
     has_tigre = True

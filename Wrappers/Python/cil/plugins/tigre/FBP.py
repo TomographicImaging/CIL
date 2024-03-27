@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -36,24 +35,24 @@ class FBP(DataProcessor):
 
     This uses the ram-lak filter
     This is provided for simple and offset parallel-beam geometries only
-   
+
     acquisition_geometry : AcquisitionGeometry
         A description of the acquisition data
-    
+
     image_geometry : ImageGeometry, default used if None
         A description of the area/volume to reconstruct
-                             
+
     Example
     -------
     >>> from cil.plugins.tigre import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()                       
+    >>> reconstruction = fbp.get_ouput()
 
     '''
-    
-    def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs): 
-        
+
+    def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs):
+
 
         sinogram_geometry = kwargs.get('sinogram_geometry', None)
         volume_geometry = kwargs.get('volume_geometry', None)
@@ -77,7 +76,7 @@ class FBP(DataProcessor):
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
         DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry) 
+        DataOrder.check_order_for_engine('tigre', acquisition_geometry)
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -86,16 +85,16 @@ class FBP(DataProcessor):
 
 
     def check_input(self, dataset):
-        
+
         if self.acquisition_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
-                 .format(self.acquisition_geometry.channels))  
+                 .format(self.acquisition_geometry.channels))
 
         DataOrder.check_order_for_engine('tigre', dataset.geometry)
         return True
 
     def process(self, out=None):
-        
+
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 
@@ -115,4 +114,3 @@ class FBP(DataProcessor):
             return out
         else:
             out.fill(arr_out)
-            

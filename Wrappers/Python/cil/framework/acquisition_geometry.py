@@ -21,6 +21,7 @@
 import copy
 import logging
 import math
+import warnings
 from numbers import Number
 
 import numpy
@@ -1299,6 +1300,36 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
 
 
     #for backwards compatibility
+    @property
+    def ANGLE(self):
+        warnings.warn("use acquisition_labels['ANGLE'] instead", DeprecationWarning, stacklevel=2)
+        return acquisition_labels['ANGLE']
+
+    @property
+    def CHANNEL(self):
+        warnings.warn("use acquisition_labels['CHANNEL'] instead", DeprecationWarning, stacklevel=2)
+        return acquisition_labels['CHANNEL']
+
+    @property
+    def DEGREE(self):
+        warnings.warn("use acquisition_labels['DEGREE'] instead", DeprecationWarning, stacklevel=2)
+        return acquisition_labels['DEGREE']
+
+    @property
+    def HORIZONTAL(self):
+        warnings.warn("use acquisition_labels['HORIZONTAL'] instead", DeprecationWarning, stacklevel=2)
+        return acquisition_labels['HORIZONTAL']
+
+    @property
+    def RADIAN(self):
+        warnings.warn("use acquisition_labels['RADIAN'] instead", DeprecationWarning, stacklevel=2)
+        return acquisition_labels['RADIAN']
+
+    @property
+    def VERTICAL(self):
+        warnings.warn("use acquisition_labels['VERTICAL'] instead", DeprecationWarning, stacklevel=2)
+        return acquisition_labels['VERTICAL']
+
     @property
     def geom_type(self):
         return self.config.system.geometry

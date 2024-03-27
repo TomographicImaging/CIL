@@ -43,6 +43,35 @@ def message(cls, msg, *args):
 
 
 class ImageGeometry(object):
+    @property
+    def CHANNEL(self):
+        warnings.warn("use image_labels['CHANNEL'] instead", DeprecationWarning, stacklevel=2)
+        return image_labels['CHANNEL']
+
+    @property
+    def HORIZONTAL_X(self):
+        warnings.warn("use image_labels['HORIZONTAL_X'] instead", DeprecationWarning, stacklevel=2)
+        return image_labels['HORIZONTAL_X']
+
+    @property
+    def HORIZONTAL_Y(self):
+        warnings.warn("use image_labels['HORIZONTAL_Y'] instead", DeprecationWarning, stacklevel=2)
+        return image_labels['HORIZONTAL_Y']
+
+    @property
+    def RANDOM(self):
+        warnings.warn("use image_labels['RANDOM'] instead", DeprecationWarning, stacklevel=2)
+        return image_labels['RANDOM']
+
+    @property
+    def RANDOM_INT(self):
+        warnings.warn("use image_labels['RANDOM_INT'] instead", DeprecationWarning, stacklevel=2)
+        return image_labels['RANDOM_INT']
+
+    @property
+    def VERTICAL(self):
+        warnings.warn("use image_labels['VERTICAL'] instead", DeprecationWarning, stacklevel=2)
+        return image_labels['VERTICAL']
 
     @property
     def shape(self):

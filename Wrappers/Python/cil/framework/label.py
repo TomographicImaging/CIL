@@ -59,7 +59,7 @@ class DataOrder(TypedDict):
     CIL_AG_LABELS: List[str]
     TOMOPHANTOM_IG_LABELS: List[str]
 
-    @staticmethod
+    @staticmethod  # type: ignore[misc]
     def get_order_for_engine(engine, geometry):
         if engine == 'astra':
             if isinstance(geometry, BaseAcquisitionGeometry):
@@ -118,7 +118,7 @@ data_order: DataOrder = \
      "TOMOPHANTOM_IG_LABELS": [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
     }
 
-get_order_for_engine = DataOrder.get_order_for_engine
+get_order_for_engine = DataOrder.get_order_for_engine  # type: ignore[attr-defined]
 
 
 def check_order_for_engine(engine, geometry):

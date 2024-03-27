@@ -376,14 +376,14 @@ class DataContainer(object):
         '''Returns the shape of the DataContainer'''
         return self.array.shape
 
+    @shape.setter
+    def shape(self, val):
+        print("Deprecated - shape will be set automatically")
+
     @property
     def ndim(self):
         '''Returns the ndim of the DataContainer'''
         return self.array.ndim
-
-    @shape.setter
-    def shape(self, val):
-        print("Deprecated - shape will be set automatically")
 
     @property
     def number_of_dimensions(self):
@@ -711,8 +711,7 @@ class DataContainer(object):
                     axes_order[i] = self.dimension_labels.index(axis)
                 return axes_order
             else:
-                raise ValueError('Expecting {0} axes, got {2}'\
-                                 .format(len(self.shape),len(new_order)))
+                raise ValueError(f"Expecting {len(self.shape)} axes, got {len(new_order)}")
 
     def clone(self):
         '''returns a copy of DataContainer'''

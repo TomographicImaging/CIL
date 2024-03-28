@@ -41,6 +41,7 @@
   - New adjoint operator
   - Bug fix for complex matrix adjoint
   - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
+  - CIL plugin support for TIGRE version v2.6
 
 
 * 23.1.0

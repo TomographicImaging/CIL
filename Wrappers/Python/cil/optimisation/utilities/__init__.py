@@ -19,3 +19,4 @@
 
 from .sampler import Sampler
 from .sampler import SamplerRandom
+from .StepSizeMethods import ConstantStepSize, ArmijoStepSize

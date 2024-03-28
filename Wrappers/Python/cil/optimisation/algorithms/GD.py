@@ -20,7 +20,7 @@ import numpy
 from cil.optimisation.algorithms import Algorithm
 import warnings
 import logging
-from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSize
+from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSize, AdaptiveSensitivity, Sensitivity
 
 class GD(Algorithm):
     """Gradient Descent algorithm
@@ -35,13 +35,15 @@ class GD(Algorithm):
         Step size for gradient descent iteration if you want to use a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. 
     step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
         This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
+    precondition: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies se
+    
     rtol: positive float, default 1e-5
         optional parameter defining the relative tolerance comparing the current objective function to 0, default 1e-5, see numpy.isclose
     atol: positive float, default 1e-8
         optional parameter defining the absolute tolerance comparing the current objective function to 0, default 1e-8, see numpy.isclose
     
     """
-    def __init__(self, initial=None, objective_function=None, step_size=None, alpha=1e6, beta=0.5, rtol=1e-5, atol=1e-8, step_size_rule= None, **kwargs):
+    def __init__(self, initial=None, objective_function=None, step_size=None, alpha=1e6, beta=0.5, rtol=1e-5, atol=1e-8, step_size_rule= None, preconditioner=None, **kwargs):
         '''GD algorithm creator
         '''
         super().__init__(**kwargs)
@@ -50,11 +52,11 @@ class GD(Algorithm):
         self.rtol = rtol
         self.atol = atol
         if initial is not None and objective_function is not None:
-            self.set_up(initial=initial, objective_function=objective_function, step_size=step_size, step_size_rule=step_size_rule)
+            self.set_up(initial=initial, objective_function=objective_function, step_size=step_size, step_size_rule=step_size_rule, preconditioner=preconditioner)
             
         
 
-    def set_up(self, initial, objective_function, step_size, step_size_rule):
+    def set_up(self, initial, objective_function, step_size, step_size_rule, preconditioner):
         '''initialisation of the algorithm
 
         Parameters
@@ -91,11 +93,16 @@ class GD(Algorithm):
         
         self.step_size_rule=step_size_rule
         
+        self.preconditioner = preconditioner 
+        
         logging.info("{} configured".format(self.__class__.__name__, ))
 
     def update(self):
         '''Performs a single iteration of the gradient descent algorithm'''
         self.objective_function.gradient(self.x, out=self.x_update)
+        
+        if self.preconditioner is not None:
+            self.preconditioner(self)
 
         step_size = self.step_size_rule(self)
 

@@ -1,19 +1,18 @@
-..     -*- coding: utf-8 -*-
-      Copyright 2019 United Kingdom Research and Innovation
+..    Copyright 2019 United Kingdom Research and Innovation
       Copyright 2019 The University of Manchester
-    
+
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
       You may obtain a copy of the License at
-    
+
           http://www.apache.org/licenses/LICENSE-2.0
-    
+
       Unless required by applicable law or agreed to in writing, software
       distributed under the License is distributed on an "AS IS" BASIS,
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
       See the License for the specific language governing permissions and
       limitations under the License.
-    
+
      Authors:
      CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
@@ -23,7 +22,7 @@ This package allows rapid prototyping of optimisation-based reconstruction probl
 
 Firstly, it provides an object-oriented framework for defining mathematical operators and functions as well a collection of useful example operators and functions. Both smooth and non-smooth functions can be used.
 
-Further, it provides a number of high-level generic implementations of optimisation algorithms to solve genericlly formulated optimisation problems constructed from operator and function objects.
+Further, it provides a number of high-level generic implementations of optimisation algorithms to solve generically formulated optimisation problems constructed from operator and function objects.
 
 The fundamental components are:
 
@@ -33,29 +32,29 @@ The fundamental components are:
 
 
 
-Algorithms
-==========
+Algorithms (Deterministic)
+==========================
 
-A number of generic algorithm implementations are provided including 
-Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
-Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
+A number of generic algorithm implementations are provided including
+Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
+Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
 Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
 and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
-An algorithm is designed for a particular generic optimisation problem accepts and number of 
-instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to 
+An algorithm is designed for a particular generic optimisation problem accepts and number of
+instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to
 define a specific instance of the generic optimisation problem to be solved.
-They are iterable objects which can be run in a for loop. 
+They are iterable objects which can be run in a for loop.
 The user can provide a stopping criterion different than the default max_iteration.
 
-New algorithms can be easily created by extending the :code:`Algorithm` class. 
+New algorithms can be easily created by extending the :code:`Algorithm` class.
 The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
 
 + :code:`set_up` and :code:`__init__` are used to configure the algorithm
 + :code:`update` is the actual iteration updating the solution
 + :code:`update_objective` defines how the objective is calculated.
 
-For example, the implementation of the update of the Gradient Descent 
+For example, the implementation of the update of the Gradient Descent
 algorithm to minimise a Function will only be:
 
 .. code-block :: python
@@ -65,8 +64,8 @@ algorithm to minimise a Function will only be:
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
 
-The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the 
-objective function in subsequent iterations, the time for each iteration, and to provide a nice 
+The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the
+objective function in subsequent iterations, the time for each iteration, and to provide a nice
 print to screen of the status of the optimisation.
 
 Base class
@@ -84,7 +83,7 @@ GD
 CGLS
 ----
 .. autoclass:: cil.optimisation.algorithms.CGLS
-   :members: 
+   :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 SIRT
@@ -99,7 +98,7 @@ ISTA
    :members:
    :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
-   
+
 FISTA
 -----
 .. autoclass:: cil.optimisation.algorithms.FISTA
@@ -120,21 +119,128 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+
+
+Algorithms (Stochastic)
+========================
+
+Consider optimisation problems that take the form of a separable sum: 
+
+.. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i}(x) + g(x) = \min_{x} (f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x))+g(x)
+
+where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   
+There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
+This is an area of continued development for CIL and, depending on  the properties of the :math:`f_i` and the regulariser :math:`g`, there is a range of different options for the user. 
+
+
+
 SPDHG
 -----
+Stochastic Primal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG and deals with optimisation problems of the form: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+
+where :math:`f_i` and the regulariser :math:`g` need only be proper, convex and lower semi-continuous ( i.e. do not need to be differentiable). 
+Each iteration considers just one index of the sum, potentially reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
+
+
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 
 
+
+Approximate gradient methods
+----------------------------------
+
+Alternatively, consider that, in addition to the functions :math:`f_i` and the regulariser :math:`g` being proper, convex and lower semi-continuous, the :math:`f_i` are differentiable. In this case we consider stochastic methods that replace a gradient calculation in a deterministic algorithm with a, potentially cheaper to calculate, approximate gradient. 
+For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilises iterations of the form
+
+   .. math::
+      x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
+
+Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
+In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
+
+   .. math::
+         x_{k+1}=prox_{\alpha g}(x_k-\alpha \nabla f(x_k) )=prox_{\alpha g}(x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k))
+
+and again replacing :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
+
+In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, :ref:`Approximate Gradient base class` the header row has one of CIL's deterministic optimisation algorithm and the body of the table has the resulting stochastic algorithm.
+
++----------------+-------+------------+----------------+
+|                | GD    | ISTA       | FISTA          |
++----------------+-------+------------+----------------+
+| SGFunction     | SGD   | Prox-SGD   | Acc-Prox-SGD   |
++----------------+-------+------------+----------------+
+| SAGFunction\*  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
++----------------+-------+------------+----------------+
+| SAGAFunction\* | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
++----------------+-------+------------+----------------+
+| SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
++----------------+-------+------------+----------------+
+| LSVRGFunction\*| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
++----------------+-------+------------+----------------+
+
+\*In development 
+
+The stochastic gradient functions can be found listed under functions in the documentation. 
+
+Stochastic Gradient Descent Example
+----------------------------------
+The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:
+
+.. code-block :: python
+
+   from cil.optimisation.utilities import Sampler
+   from cil.optimisation.algorithms import GD 
+   from cil.optimisation.functions import LeastSquares, SGFunction
+   from cil.utilities import dataexample
+   from cil.plugins.astra.operators import ProjectionOperator
+   
+   # get the data  
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data.reorder('astra')
+   data = data.get_slice(vertical='centre')
+
+   # create the geometries 
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
+
+   # partition the data and build the projectors
+   n_subsets = 10 
+   partitioned_data = data.partition(n_subsets, 'sequential')
+   A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
+
+   # create the list of functions for the stochastic sum 
+   list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
+
+   #define the sampler and the stochastic gradient function 
+   sampler = Sampler.staggered(len(list_of_functions))
+   f = SGFunction(list_of_functions, sampler=sampler)  
+   
+   #set up and run the gradient descent algorithm 
+   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
+   alg.run(300)
+
+  
+
+
+
+
+
 Operators
 =========
-The two most important methods are :code:`direct` and :code:`adjoint` 
-methods that describe the result of applying the operator, and its 
-adjoint respectively, onto a compatible :code:`DataContainer` input. 
-The output is another :code:`DataContainer` object or subclass 
-hereof. An important special case is to represent the tomographic 
+The two most important methods are :code:`direct` and :code:`adjoint`
+methods that describe the result of applying the operator, and its
+adjoint respectively, onto a compatible :code:`DataContainer` input.
+The output is another :code:`DataContainer` object or subclass
+hereof. An important special case is to represent the tomographic
 forward and backprojection operations.
 
 
@@ -171,7 +277,7 @@ A :code:`ScaledOperator` represents the multiplication of any operator with a sc
 
 .. autoclass:: cil.optimisation.operators.SumOperator
    :members:
-  
+
 
 Trivial operators
 -----------------
@@ -195,7 +301,7 @@ Trivial operators are the following.
 
 
 
-GradientOperator 
+GradientOperator
 -----------------
 
 .. autoclass:: cil.optimisation.operators.GradientOperator
@@ -220,17 +326,17 @@ GradientOperator
 Functions
 =========
 
-A :code:`Function` represents a mathematical function of one or more inputs 
-and is intended to accept :code:`DataContainers` as input as well as any 
-additional parameters. 
+A :code:`Function` represents a mathematical function of one or more inputs
+and is intended to accept :code:`DataContainers` as input as well as any
+additional parameters.
 
-Fixed parameters can be passed in during the creation of the function object. 
+Fixed parameters can be passed in during the creation of the function object.
 The methods of the function reflect the properties of it, for example, if the function
-represented is differentiable the function should contain a method :code:`gradient` 
-which should return the gradient of the function evaluated at an input point. 
-If the function is not differentiable but allows a simple proximal operator, 
+represented is differentiable the function should contain a method :code:`gradient`
+which should return the gradient of the function evaluated at an input point.
+If the function is not differentiable but allows a simple proximal operator,
 the method :code:`proximal` should return the proximal operator evaluated at an
-input point. The function value is evaluated by calling the function itself, 
+input point. The function value is evaluated by calling the function itself,
 e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 
 
@@ -251,12 +357,12 @@ Base classes
 
 .. autoclass:: cil.optimisation.functions.SumScalarFunction
    :members:
-   :inherited-members: 
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.functions.TranslateFunction
    :members:
    :inherited-members:
-   
+
 Simple functions
 ----------------
 .. autoclass:: cil.optimisation.functions.ConstantFunction
@@ -281,7 +387,7 @@ This class allows the user to write a function which does the following:
   F ( x ) = G ( Ax )
 
 where :math:`A` is an operator. For instance the least squares function l2norm_ :code:`Norm2Sq` can
-be expressed as 
+be expressed as
 
 .. math::
 
@@ -306,7 +412,7 @@ Indicator box
    :inherited-members:
 
 
-KullbackLeibler 
+KullbackLeibler
 ---------------
 
 .. autoclass:: cil.optimisation.functions.KullbackLeibler
@@ -331,7 +437,7 @@ L2 Norm Squared
 .. autoclass:: cil.optimisation.functions.WeightedL2NormSquared
    :members:
    :inherited-members:
-   
+
 
 Least Squares
 -------------
@@ -346,7 +452,7 @@ Mixed L21 norm
 .. autoclass:: cil.optimisation.functions.MixedL21Norm
    :members:
    :inherited-members:
-   
+
 Smooth Mixed L21 norm
 ---------------------
 
@@ -359,7 +465,7 @@ Mixed L11 norm
 
 .. autoclass:: cil.optimisation.functions.MixedL11Norm
    :members:
-   :inherited-members:     
+   :inherited-members:
 
 Total variation
 ---------------
@@ -368,15 +474,32 @@ Total variation
    :members:
    :inherited-members:
 
+Approximate Gradient base class 
+--------------------------------
+
+.. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 
+   :members:
+   :inherited-members:
+   
+
+Stochastic Gradient function 
+-----------------------------
+
+.. autoclass:: cil.optimisation.functions.SGFunction 
+   :members:
+   :inherited-members:
+
 
 Utilities
-=======
-Contains utilities for the CIL optimisation framework. 
+=========
+
+Contains utilities for the CIL optimisation framework.
 
 Samplers
 --------
+
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
-The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn. 
+The :code:`cil.optimisation.utilities.sampler` class defines a function :code:`next()` which gives the next sample. It also has utility to :code:`get_samples` to access which samples have or will be drawn.
 
 For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
 
@@ -393,30 +516,87 @@ For ease of use we provide the following static methods in `cil.optimisation.uti
 .. automethod:: cil.optimisation.utilities.Sampler.random_without_replacement
 
 
-They will all instantiate a Sampler defined in the following class: 
+They will all instantiate a Sampler defined in the following class:
 
 .. autoclass:: cil.optimisation.utilities.Sampler
    :members:
 
 
-In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement: 
+In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement:
 
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
    :members:
 
+Callbacks
+---------
+
+A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithms`_ :code:`run` method.
+
+.. code-block :: python
+
+   from cil.optimisation.utilities.callbacks import LogfileCallback
+   ...
+   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
+
+.. autoclass:: cil.optimisation.utilities.callbacks.Callback
+   :members:
+
+Built-in callbacks include:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.TextProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
+   :members:
+
+Users can also write custom callbacks.
+
+Below is an example of a custom callback implementing early stopping.
+In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by :math:`5`. The :code:`EarlyStopping` callback terminates the algorithm when :math:`x \le -15`. The algorithm thus terminates after :math:`3` iterations.
+
+.. code:: python
+
+   from cil.optimisation.algorithms import Algorithm
+   from cil.optimisation.utilities import callbacks
+
+   class TestAlgo(Algorithm):
+       def __init__(self, *args, **kwargs):
+           self.x = 0
+           super().__init__(*args, **kwargs)
+           self.configured = True
+
+       def update(self):
+           self.x -= 5
+
+       def update_objective(self):
+           self.loss.append(2 ** self.x)
+
+   class EarlyStopping(callbacks.Callback):
+       def __call__(self, algorithm: Algorithm):
+           if algorithm.x <= -15:  # arbitrary stopping criterion
+               raise StopIteration
+
+   algo = TestAlgo()
+   algo.run(20, callbacks=[callbacks.ProgressCallback(), EarlyStopping()])
 
 
+.. code:: raw
 
+   Output:
+    15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
 
 Block Framework
 ***************
 
 To be able to express more advanced optimisation problems we developed the
-`Block Framework`_, which provides a generic strategy to treat variational 
+`Block Framework`_, which provides a generic strategy to treat variational
 problems in the following form:
 
 .. math::
-    \min \text{Regulariser} + \text{Fidelity} 
+    \min \text{Regulariser} + \text{Fidelity}
 
 The block framework consists of:
 
@@ -427,10 +607,10 @@ The block framework consists of:
 
 
 
-The block framework allows writing more advanced `optimisation problems`_. Consider the typical 
+The block framework allows writing more advanced optimisation problems. Consider the typical
 `Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
 
-.. math:: 
+.. math::
 
   \underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2
 
@@ -442,8 +622,8 @@ where,
 * :math:`\alpha` is the regularisation parameter
 * :math:`L` is a regularisation operator
 
-The first term measures the fidelity of the solution to the data. The second term measures the 
-fidelity to the prior knowledge we have imposed on the system, operator :math:`L`.  
+The first term measures the fidelity of the solution to the data. The second term measures the
+fidelity to the prior knowledge we have imposed on the system, operator :math:`L`.
 
 This can be re-written equivalently in the block matrix form:
 
@@ -458,12 +638,12 @@ With the definitions:
 this can now be recognised as a least squares problem which can be solved by any algorithm in the :code:`cil.optimisation`
 which can solve least squares problem, e.g. CGLS.
 
-.. math:: 
+.. math::
 
   \underset{u}{\mathrm{argmin}}\begin{Vmatrix}\tilde{A} u - \tilde{b}\end{Vmatrix}^2_2
 
-To be able to express our optimisation problems in the matrix form above, we developed the so-called, 
-Block Framework comprising 4 main actors: :code:`BlockGeometry`, :code:`BlockDataContainer`, 
+To be able to express our optimisation problems in the matrix form above, we developed the so-called,
+Block Framework comprising 4 main actors: :code:`BlockGeometry`, :code:`BlockDataContainer`,
 :code:`BlockFunction` and :code:`BlockOperator`.
 
 
@@ -471,10 +651,10 @@ Block Framework comprising 4 main actors: :code:`BlockGeometry`, :code:`BlockDat
 BlockDataContainer
 ==================
 
-`BlockDataContainer`_ holds `DataContainer`_ as column vector. It is possible to 
-do basic algebra between `BlockDataContainer`_ s and with numbers, list or numpy arrays. 
+`BlockDataContainer`_ holds `DataContainer`_ as column vector. It is possible to
+do basic algebra between `BlockDataContainer`_ s and with numbers, list or numpy arrays.
 
-.. math:: 
+.. math::
 
   x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})
 
@@ -486,12 +666,12 @@ do basic algebra between `BlockDataContainer`_ s and with numbers, list or numpy
    :special-members:
 
 
-Block Function  
+Block Function
 ==============
 
 `BlockFunction`_ acts on `BlockDataContainer`_ as a separable sum function:
-    
-      .. math:: 
+
+      .. math::
 
           f = [f_1,...,f_n] \newline
 
@@ -499,7 +679,7 @@ Block Function
 
 
 .. math::
-  
+
   Y = \begin{bmatrix}
   y_{1}\\
   y_{2}\\
@@ -518,7 +698,7 @@ Block Operator
 
 `BlockOperator`_ represent a block matrix with operators
 
-.. math:: 
+.. math::
   K = \begin{bmatrix}
       A_{1} & A_{2} \\
       A_{3} & A_{4} \\
@@ -543,7 +723,7 @@ Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`
 .. math::
  K : (X_{1}\times X_{2}) \rightarrow (Y_{1}\times Y_{2} \times Y_{3})
 
-:math:`A_{1}, A_{3}, A_{5}`: share the same domain :math:`X_{1}` and 
+:math:`A_{1}, A_{3}, A_{5}`: share the same domain :math:`X_{1}` and
 :math:`A_{2}, A_{4}, A_{6}`: share the same domain :math:`X_{2}`
 
 .. math::
@@ -551,19 +731,19 @@ Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`
  A_{1}: X_{1} \rightarrow Y_{1} \\
  A_{3}: X_{1} \rightarrow Y_{2} \\
  A_{5}: X_{1} \rightarrow Y_{3} \\
- A_{2}: X_{2} \rightarrow Y_{1} \\ 
+ A_{2}: X_{2} \rightarrow Y_{1} \\
  A_{4}: X_{2} \rightarrow Y_{2} \\
  A_{6}: X_{2} \rightarrow Y_{3}
 
-For instance with these ingredients one may write the following objective 
+For instance with these ingredients one may write the following objective
 function,
 
 .. math::
    \alpha ||\nabla u||_{2,1} + ||u - g||_2^2
 
 where :math:`g` represent the measured values, :math:`u` the solution
-:math:`\nabla` is the gradient operator, :math:`|| ~~ ||_{2,1}` is a norm for 
-the output of the gradient operator and :math:`|| x-g ||^2_2` is 
+:math:`\nabla` is the gradient operator, :math:`|| ~~ ||_{2,1}` is a norm for
+the output of the gradient operator and :math:`|| x-g ||^2_2` is
 least squares fidelity function as
 
 .. math::
@@ -573,7 +753,7 @@ least squares fidelity function as
          \end{bmatrix}
 
  F(x) = \Big[ \alpha \lVert ~x~ \rVert_{2,1} ~~ , ~~ || x - g||_2^2 \Big]
- 
+
  w = [ u ]
 
 Then we have rewritten the problem as
@@ -591,20 +771,21 @@ Which in Python would be like
    # Create BlockOperator
    K = BlockOperator(op1, op2, shape=(2,1) )
 
-   # Create functions      
+   # Create functions
    F = BlockFunction(alpha * MixedL21Norm(), 0.5 * L2NormSquared(b=noisy_data))
 
 
 .. autoclass:: cil.optimisation.operators.BlockOperator
    :members:
-   :special-members: 
+   :special-members:
 
 
 :ref:`Return Home <mastertoc>`
 
-.. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
-.. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
-.. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+.. _BlockDataContainer: #blockdatacontainer
+.. _DataContainer: ../framework/#datacontainer
+.. _BlockFunction: #block-function
+.. _BlockOperator: #block-operator
 
 
 
@@ -612,4 +793,4 @@ Which in Python would be like
 References
 ----------
 
-.. bibliography::    
+.. bibliography::

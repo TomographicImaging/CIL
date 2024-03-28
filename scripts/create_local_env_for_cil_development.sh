@@ -83,7 +83,7 @@ else
     python-wget
     setuptools
     scikit-image
-    tigre=2.4
+    tigre=2.6
     tomophantom=2.0.0
     -c conda-forge
     -c intel

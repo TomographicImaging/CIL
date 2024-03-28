@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 
 # CUDA-specific packages
-ARG CIL_EXTRA_PACKAGES="tigre=2.4 astra-toolbox<2.1"
+ARG CIL_EXTRA_PACKAGES="tigre=2.6 astra-toolbox<2.1"
 # build & runtime dependencies
 # TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng _openmp_mutex pip)?
 # vis. https://github.com/TomographicImaging/CIL/pull/1590

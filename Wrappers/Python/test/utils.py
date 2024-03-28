@@ -100,12 +100,13 @@ system_state['has_ipp']=has_ipp
 #ccpi-regularisation toolkit
 module_info = importlib.util.find_spec("ccpi")
 if module_info != None:
-    module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
+    module_info = importlib.util.find_spec("ccpi.filters.regularisers")
 
 if module_info is None:
     has_ccpi_regularisation = False
 else:
     has_ccpi_regularisation = True
+
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
 
 

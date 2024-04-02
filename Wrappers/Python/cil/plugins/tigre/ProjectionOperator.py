@@ -25,6 +25,8 @@ from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
 import logging
 
+log = logging.getLogger(__name__)
+
 try:
     from _Atb import _Atb_ext as Atb
     from _Ax import _Ax_ext as Ax

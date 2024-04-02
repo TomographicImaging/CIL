@@ -24,6 +24,8 @@ from cil.plugins.astra.operators import AstraProjector3D
 from cil.plugins.astra.operators import AstraProjector2D
 import logging
 
+log = logging.getLogger(__name__)
+
 
 class ProjectionOperator(LinearOperator):
     """

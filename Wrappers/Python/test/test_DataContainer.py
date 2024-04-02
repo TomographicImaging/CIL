@@ -30,15 +30,17 @@ import logging
 from testclass import CCPiTestClass
 import functools
 
+log = logging.getLogger(__name__)
 initialise_tests()
+
 
 def dt(steps):
     return steps[-1] - steps[-2]
-def aid(x):
-    # This function returns the memory
-    # block address of an array.
-    return x.__array_interface__['data'][0]
 
+
+def aid(x):
+    """returns the memory block address of an array"""
+    return x.__array_interface__['data'][0]
 
 
 class TestDataContainer(CCPiTestClass):
@@ -534,7 +536,7 @@ class TestDataContainer(CCPiTestClass):
             z = ImageData(numpy.random.randint(10, size=(2,3)), geometry=ig)
             self.assertTrue(False)
         except ValueError as ve:
-            log.info(str (ve))
+            log.info(str(ve))
             self.assertTrue(True)
 
         #vgeometry.allocate('')
@@ -1174,7 +1176,7 @@ class TestDataContainer(CCPiTestClass):
             with self.assertRaises(numpy.core._exceptions.UFuncTypeError) as context:
                 d1.sapyb(a,d2,b, out=d2)
         except AttributeError as ae:
-            log.info("Probably numpy version too low: {}".format(ae))
+            log.info("Probably numpy version too low: %s", ae)
 
         # print ("Exception thrown:", str(context.exception))
 

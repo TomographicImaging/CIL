@@ -24,6 +24,9 @@ import logging
 import astra
 import numpy as np
 
+log = logging.getLogger(__name__)
+
+
 class FBP_Flexible(FDK_Flexible):
 
     """
@@ -143,7 +146,7 @@ class FBP_CPU(Processor):
                  .format(self.sinogram_geometry.dimension))
 
         if self.sinogram_geometry.system_description != 'simple':
-            logging.WARNING("The ASTRA backend FBP will use simple geometry only. Any configuration offsets or rotations may be ignored.")
+            log.warning("The ASTRA backend FBP will use simple geometry only. Any configuration offsets or rotations may be ignored.")
 
         return True
 

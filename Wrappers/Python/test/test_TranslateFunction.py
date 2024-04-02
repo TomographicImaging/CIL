@@ -28,6 +28,7 @@ import numpy as np
 import logging
 from testclass import CCPiTestClass as TestFunction
 
+log = logging.getLogger(__name__)
 initialise_tests()
 
 ''' Here we test SumFunction class for different function

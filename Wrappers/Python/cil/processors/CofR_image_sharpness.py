@@ -24,6 +24,7 @@ import inspect
 import logging
 import math
 import importlib
+import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -90,9 +91,7 @@ class CofR_image_sharpness(Processor):
 
         FBP = kwargs.get('FBP', None)
         if  FBP is not None:
-            logging.warning("Instantiation with an FBP class has been deprecated and will be removed in future versions.\
-                            Please pass backend='astra' or 'tigre'")
-
+            warnings.warn("Please pass backend='astra' or 'tigre'", DeprecationWarning, stacklevel=2)
             if inspect.isclass(FBP):
                 if 'astra' in str(inspect.getmodule(FBP)):
                     backend = 'astra'

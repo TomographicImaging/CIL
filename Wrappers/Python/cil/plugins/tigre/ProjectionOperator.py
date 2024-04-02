@@ -24,6 +24,7 @@ from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
 import logging
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -138,14 +139,11 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         if acquisition_geometry_old is not None:
             acquisition_geometry = acquisition_geometry_old
-            logging.warning(
-                "aquisition_geometry has been deprecated. Please use acquisition_geometry instead."
-            )
-
+            warnings.warn(
+                "aquisition_geometry has been deprecated. Please use acquisition_geometry instead.",
+                DeprecationWarning, stacklevel=2)
         if acquisition_geometry is None:
-            raise TypeError(
-                "Please specify an acquisition_geometry to configure this operator"
-            )
+            raise TypeError("Please specify an acquisition_geometry to configure this operator")
 
         if image_geometry == None:
             image_geometry = acquisition_geometry.get_ImageGeometry()

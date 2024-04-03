@@ -101,7 +101,7 @@ class FBP(DataProcessor):
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 
             if self.acquisition_geometry.geom_type == 'cone':
-                # supress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
+                # suppress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
                 with contextlib.redirect_stdout(io.StringIO()):
                     arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             else:

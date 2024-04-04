@@ -24,6 +24,9 @@ from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
 import logging
+import warnings
+
+log = logging.getLogger(__name__)
 
 try:
     from _Atb import _Atb_ext as Atb
@@ -76,7 +79,7 @@ class ProjectionOperator(LinearOperator):
     def __new__(cls, image_geometry=None, acquisition_geometry=None, \
         direct_method='interpolated',adjoint_weights='matched', **kwargs):
         if isinstance(acquisition_geometry, BlockGeometry):
-            logging.info("BlockOperator is returned.")
+            log.info("BlockOperator is returned.")
 
             K = []
             for ag in acquisition_geometry:
@@ -86,7 +89,7 @@ class ProjectionOperator(LinearOperator):
                 )
             return BlockOperator(*K)
         else:
-            logging.info("Standard Operator is returned.")
+            log.info("Standard Operator is returned.")
             return super(ProjectionOperator,
                          cls).__new__(ProjectionOperator_ag)
 
@@ -133,9 +136,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         """
 
         if acquisition_geometry is None:
-            raise TypeError(
-                "Please specify an acquisition_geometry to configure this operator"
-            )
+            raise TypeError("Please specify an acquisition_geometry to configure this operator")
 
         if image_geometry == None:
             image_geometry = acquisition_geometry.get_ImageGeometry()

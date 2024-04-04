@@ -29,7 +29,6 @@ dxchange_logger.setLevel(logging.ERROR)
 import dxchange
 import warnings
 
-logger = logging.getLogger(__name__)
 
 class ZEISSDataReader(object):
 

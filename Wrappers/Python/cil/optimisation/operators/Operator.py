@@ -17,9 +17,13 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from numbers import Number
+from textwrap import dedent
 import numpy
 import functools
 import logging
+import warnings
+
+log = logging.getLogger(__name__)
 
 
 class Operator(object):
@@ -76,8 +80,9 @@ class Operator(object):
         '''
 
         if len(kwargs) != 0:
-            logging.warning('norm: the norm method does not use any parameters.\n\
-                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it')
+            warnings.warn(dedent("""\
+                norm: the norm method does not use any parameters.
+                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it"""), DeprecationWarning, stacklevel=2)
 
         if self._norm is None:
             self._norm = self.calculate_norm()
@@ -322,8 +327,8 @@ class LinearOperator(Operator):
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm = x0.norm()
             if x0_norm < tolerance:
-                logging.warning(
-                    'The operator has at least one zero eigenvector and is likely to be nilpotent')
+                log.warning(
+                    "The operator has at least one zero eigenvector and is likely to be nilpotent")
                 eig_new = 0.
                 break
             x0 /= x0_norm

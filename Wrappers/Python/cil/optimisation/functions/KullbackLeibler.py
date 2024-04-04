@@ -28,8 +28,10 @@ try:
 except ImportError as ie:
     has_numba = False
 
-class KullbackLeibler(Function):
+log = logging.getLogger(__name__)
 
+
+class KullbackLeibler(Function):
     r""" Kullback Leibler
 
     .. math:: F(u, v)
@@ -97,10 +99,10 @@ class KullbackLeibler(Function):
             if not has_numba:
                 raise ValueError("Numba is not installed.")
             else:
-                logging.info("Numba backend is used.")
+                log.info("Numba backend is used.")
                 return super(KullbackLeibler, cls).__new__(KullbackLeibler_numba)
         else:
-            logging.info("Numpy backend is used.")
+            log.info("Numpy backend is used.")
             return super(KullbackLeibler, cls).__new__(KullbackLeibler_numpy)
 
     def __init__(self, b, eta = None, mask = None, backend = 'numba'):

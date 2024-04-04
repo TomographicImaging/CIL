@@ -19,7 +19,7 @@
 from cil.framework import DataProcessor, ImageData
 from cil.framework import DataOrder
 from cil.plugins.tigre import CIL2TIGREGeometry
-import logging
+import warnings
 import numpy as np
 
 try:

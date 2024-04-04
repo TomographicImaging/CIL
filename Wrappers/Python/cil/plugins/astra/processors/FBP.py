@@ -21,7 +21,8 @@ from cil.framework import DataOrder
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
-import logging
+import warnings
+
 
 class FBP(DataProcessor):
 
@@ -61,7 +62,6 @@ class FBP(DataProcessor):
 
 
     def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
-
 
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")

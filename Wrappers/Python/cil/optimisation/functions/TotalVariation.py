@@ -26,7 +26,8 @@ import warnings
 import logging
 from cil.utilities.errors import InPlaceError
 
-logger = logging.getLogger(__name__) 
+log = logging.getLogger(__name__)
+
 
 class TotalVariation(Function):
 
@@ -348,10 +349,9 @@ class TotalVariation(Function):
             self._p2 = p2
 
         if self.tolerance is not None:
-            logger.info(
-                    "Stop at {} iterations with tolerance {} .".format(k, error))
+            log.info("Stop at %d iterations with tolerance %r", k, error)
         else:
-            logger.info("Stop at {} iterations.".format(k))
+            log.info("Stop at %d iterations.", k)
 
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):

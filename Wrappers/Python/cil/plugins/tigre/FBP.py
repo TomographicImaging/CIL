@@ -47,7 +47,7 @@ class FBP(DataProcessor):
     >>> from cil.plugins.tigre import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
+    >>> reconstruction = fbp.get_output()
 
     '''
 

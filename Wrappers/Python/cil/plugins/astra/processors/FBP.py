@@ -48,7 +48,7 @@ class FBP(DataProcessor):
     >>> from cil.plugins.astra import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
+    >>> reconstruction = fbp.get_output()
 
 
     Notes
@@ -60,7 +60,7 @@ class FBP(DataProcessor):
     """
 
 
-    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs):
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
 
 
         if acquisition_geometry is None:

@@ -495,7 +495,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Flexible</span> <span class="kn">import</span> <span class="n">FBP_Flexible</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FDK_Flexible</span> <span class="kn">import</span> <span class="n">FDK_Flexible</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Flexible</span> <span class="kn">import</span> <span class="n">FBP_CPU</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
 
 <div class="viewcode-block" id="FBP"><a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.astra.FBP">[docs]</a><span class="k">class</span> <span class="nc">FBP</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
@@ -542,14 +543,14 @@ document.write(`
 
         <span class="k">if</span> <span class="n">sinogram_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">acquisition_geometry</span> <span class="o">=</span> <span class="n">sinogram_geometry</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;sinogram_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sinogram_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this processor&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">volume_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">volume_geometry</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;volume_geometry has been deprecated. Please use image_geometry instead.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;volume_geometry has been deprecated. Please use image_geometry instead.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">image_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>

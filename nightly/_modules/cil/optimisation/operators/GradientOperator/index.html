@@ -504,6 +504,8 @@ document.write(`
 <span class="n">NUMPY</span> <span class="o">=</span> <span class="s1">&#39;numpy&#39;</span>
 <span class="n">CORRELATION_SPACE</span> <span class="o">=</span> <span class="s2">&quot;Space&quot;</span>
 <span class="n">CORRELATION_SPACECHANNEL</span> <span class="o">=</span> <span class="s2">&quot;SpaceChannels&quot;</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="GradientOperator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.GradientOperator">[docs]</a><span class="k">class</span> <span class="nc">GradientOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 
@@ -574,13 +576,13 @@ document.write(`
         <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">C</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span> <span class="o">==</span> <span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend cannot use correlation=&#39;Space&#39; on multi-channel dataset - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend cannot use correlation=&#39;Space&#39; on multi-channel dataset - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
                 <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend is only for arrays of datatype float32 - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend is only for arrays of datatype float32 - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
                 <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend is only implemented for forward differences - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;C backend is only implemented for forward differences - defaulting to `numpy` backend&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">NUMPY</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">Gradient_numpy</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">bnd_cond</span><span class="o">=</span><span class="n">bnd_cond</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -703,7 +705,7 @@ document.write(`
         <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_numpy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span><span class="p">,</span>
                                              <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">range_geometry</span><span class="p">)</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with numpy backend&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with numpy backend&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
          <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -846,7 +848,7 @@ document.write(`
 
         <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_C</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
                                          <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with </span><span class="si">{}</span><span class="s2"> threads&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">)))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with </span><span class="si">%d</span><span class="s2"> threads&quot;</span><span class="p">,</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">))</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">datacontainer_as_c_pointer</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>

@@ -500,6 +500,9 @@ document.write(`
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.errors</span> <span class="kn">import</span> <span class="n">InPlaceError</span>
 
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="TotalVariation"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.TotalVariation">[docs]</a><span class="k">class</span> <span class="nc">TotalVariation</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total variation Function</span>
@@ -672,7 +675,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot; `info` is deprecate. Please use logging instead.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use logging instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># splitting Gradient</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
@@ -830,10 +833,9 @@ document.write(`
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations with tolerance </span><span class="si">{}</span><span class="s2"> .&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">%d</span><span class="s2"> iterations with tolerance </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">%d</span><span class="s2"> iterations.&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
         <span class="c1"># return tau to its original state if it was modified</span>
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau_reg_neg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau</span><span class="p">):</span>

@@ -498,6 +498,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">CIL2TIGREGeometry</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">_Atb</span> <span class="kn">import</span> <span class="n">_Atb_ext</span> <span class="k">as</span> <span class="n">Atb</span>
@@ -550,7 +553,7 @@ document.write(`
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
         <span class="n">direct_method</span><span class="o">=</span><span class="s1">&#39;interpolated&#39;</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;matched&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">BlockGeometry</span><span class="p">):</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;BlockOperator is returned.&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;BlockOperator is returned.&quot;</span><span class="p">)</span>
 
             <span class="n">K</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">ag</span> <span class="ow">in</span> <span class="n">acquisition_geometry</span><span class="p">:</span>
@@ -560,7 +563,7 @@ document.write(`
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Standard Operator is returned.&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Standard Operator is returned.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span>
                          <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">ProjectionOperator_ag</span><span class="p">)</span></div>
 
@@ -610,14 +613,11 @@ document.write(`
 
         <span class="k">if</span> <span class="n">acquisition_geometry_old</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">acquisition_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry_old</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;aquisition_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span>
-            <span class="p">)</span>
-
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;aquisition_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">image_geometry</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>

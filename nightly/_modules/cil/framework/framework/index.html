@@ -518,6 +518,9 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">cil.framework.BlockGeometry</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
 
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
 <span class="k">class</span> <span class="nc">Partitioner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Interface for AcquisitionData to be able to partition itself in a number of batches.</span>
 
@@ -2849,7 +2852,7 @@ document.write(`
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">offset2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">(</span><span class="s2">&quot;Only offset1 is being used&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Only offset1 is being used&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="n">offset1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">offset2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">offset1</span> <span class="o">==</span> <span class="n">offset2</span><span class="p">:</span>
@@ -3921,7 +3924,7 @@ document.write(`
 <span class="sd">            Default is to accumulate and return data as float64 or complex128</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">(</span><span class="s2">&quot;dtype argument is ignored, using float64 or complex128&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;dtype argument is ignored, using float64 or complex128&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isrealobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
@@ -4000,7 +4003,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">(</span><span class="s2">&quot;dtype argument is ignored, using float64 or complex128&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;dtype argument is ignored, using float64 or complex128&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isrealobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>

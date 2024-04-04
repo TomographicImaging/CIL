@@ -503,7 +503,6 @@ document.write(`
 <span class="kn">import</span> <span class="nn">dxchange</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZEISSDataReader"><a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader">[docs]</a><span class="k">class</span> <span class="nc">ZEISSDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
@@ -767,11 +766,8 @@ document.write(`
 
 
 <span class="k">class</span> <span class="nc">TXRMDataReader</span><span class="p">(</span><span class="n">ZEISSDataReader</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead&#39;</span><span class="p">,</span>
-              <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use ZEISSDataReader instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 

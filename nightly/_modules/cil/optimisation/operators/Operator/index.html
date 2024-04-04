@@ -491,9 +491,13 @@ document.write(`
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Operator"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.Operator">[docs]</a><span class="k">class</span> <span class="nc">Operator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -550,8 +554,9 @@ document.write(`
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;norm: the norm method does not use any parameters.</span><span class="se">\n\</span>
-<span class="s1">                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it&#39;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">                norm: the norm method does not use any parameters.</span>
+<span class="s2">                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it&quot;&quot;&quot;</span><span class="p">),</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_norm</span><span class="p">()</span>
@@ -796,8 +801,8 @@ document.write(`
             <span class="c1"># Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization</span>
             <span class="n">x0_norm</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">x0_norm</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s1">&#39;The operator has at least one zero eigenvector and is likely to be nilpotent&#39;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The operator has at least one zero eigenvector and is likely to be nilpotent&quot;</span><span class="p">)</span>
                 <span class="n">eig_new</span> <span class="o">=</span> <span class="mf">0.</span>
                 <span class="k">break</span>
             <span class="n">x0</span> <span class="o">/=</span> <span class="n">x0_norm</span>

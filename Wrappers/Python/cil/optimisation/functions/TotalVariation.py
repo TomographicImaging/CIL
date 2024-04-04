@@ -26,6 +26,9 @@ import warnings
 import logging
 from cil.utilities.errors import InPlaceError
 
+log = logging.getLogger(__name__)
+
+
 class TotalVariation(Function):
 
     r""" Total variation Function
@@ -198,7 +201,7 @@ class TotalVariation(Function):
 
         self.info = info
         if self.info:
-            warnings.warn(" `info` is deprecate. Please use logging instead.")
+            warnings.warn("Use logging instead", DeprecationWarning, stacklevel=2)
 
         # splitting Gradient
         self.split = split
@@ -356,10 +359,9 @@ class TotalVariation(Function):
 
         if self.info:
             if self.tolerance is not None:
-                logging.info(
-                    "Stop at {} iterations with tolerance {} .".format(k, error))
+                log.info("Stop at %d iterations with tolerance %r", k, error)
             else:
-                logging.info("Stop at {} iterations.".format(k))
+                log.info("Stop at %d iterations.", k)
 
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):

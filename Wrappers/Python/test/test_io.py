@@ -79,26 +79,25 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
 logging.basicConfig(level=logging.WARNING)
-
-logging.info ("has_astra {}".format(has_astra))
-logging.info ("has_wget {}".format(has_wget))
-logging.info ("has_olefile {}".format(has_olefile))
-logging.info ("has_dxchange {}".format(has_dxchange))
-logging.info ("has_file {}".format(has_file))
-
+log = logging.getLogger(__name__)
+log.info("has_astra %s", has_astra)
+log.info("has_wget %s", has_wget)
+log.info("has_olefile %s", has_olefile)
+log.info("has_dxchange %s", has_dxchange)
+log.info("has_file %s", has_file)
 if not has_file:
-    logging.info("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+    log.info("This unittest requires the walnut Zeiss dataset saved in %s", data_dir)
 
 
 class TestTXRMDataReader(unittest.TestCase):
 
 
     def setUp(self):
-        logging.info ("has_astra {}".format(has_astra))
-        logging.info ("has_wget {}".format(has_wget))
-        logging.info ("has_olefile {}".format(has_olefile))
-        logging.info ("has_dxchange {}".format(has_dxchange))
-        logging.info ("has_file {}".format(has_file))
+        log.info("has_astra %s", has_astra)
+        log.info("has_wget %s", has_wget)
+        log.info("has_olefile %s", has_olefile)
+        log.info("has_dxchange %s", has_dxchange)
+        log.info("has_file %s", has_file)
         if has_file:
             self.reader = TXRMDataReader()
             angle_unit = AcquisitionGeometry.RADIAN
@@ -169,7 +168,7 @@ class TestTXRMDataReader(unittest.TestCase):
         gt = reader.read()
 
         qm = mse(gt, recfbp)
-        logging.info ("MSE {}".format(qm) )
+        log.info("MSE %r", qm)
 
         np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')

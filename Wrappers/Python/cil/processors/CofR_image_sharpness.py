@@ -24,8 +24,9 @@ import inspect
 import logging
 import math
 import importlib
+import warnings
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class CofR_image_sharpness(Processor):
 
@@ -90,9 +91,7 @@ class CofR_image_sharpness(Processor):
 
         FBP = kwargs.get('FBP', None)
         if  FBP is not None:
-            logging.warning("Instantiation with an FBP class has been deprecated and will be removed in future versions.\
-                            Please pass backend='astra' or 'tigre'")
-
+            warnings.warn("Please pass backend='astra' or 'tigre'", DeprecationWarning, stacklevel=2)
             if inspect.isclass(FBP):
                 if 'astra' in str(inspect.getmodule(FBP)):
                     backend = 'astra'
@@ -169,7 +168,7 @@ class CofR_image_sharpness(Processor):
     def gss(self, data, ig, search_range, tolerance, binning):
         '''Golden section search'''
         # intervals c:cr:c where r = φ − 1=0.619... and c = 1 − r = 0.381..., φ
-        logger.debug("GSS between %f and %f", *search_range)
+        log.debug("GSS between %f and %f", *search_range)
         phi = (1 + math.sqrt(5))*0.5
         r = phi - 1
         #1/(r+2)
@@ -225,8 +224,8 @@ class CofR_image_sharpness(Processor):
 
             count +=1
 
-        logger.info("evaluated %d points",len(all_data))
-        if logger.isEnabledFor(logging.DEBUG):
+        log.info("evaluated %d points",len(all_data))
+        if log.isEnabledFor(logging.DEBUG):
             keys, values = zip(*all_data.items())
             self.plot(keys, values, ig.voxel_size_x/binning)
 
@@ -285,9 +284,9 @@ class CofR_image_sharpness(Processor):
         if self.initial_binning is None:
             self.initial_binning = min(int(np.ceil(width / 128)),16)
 
-        logger.debug("Initial search:")
-        logger.debug("search range is %d", self.search_range)
-        logger.debug("initial binning is %d", self.initial_binning)
+        log.debug("Initial search:")
+        log.debug("search range is %d", self.search_range)
+        log.debug("initial binning is %d", self.initial_binning)
 
         #filter full projections
         data_filtered = data.copy()
@@ -334,7 +333,7 @@ class CofR_image_sharpness(Processor):
         for offset in offsets:
             obj_vals.append(self.calculate(data_processed, ig, offset))
 
-        if logger.isEnabledFor(logging.DEBUG):
+        if log.isEnabledFor(logging.DEBUG):
             self.plot(offsets,obj_vals,ig.voxel_size_x / self.initial_binning)
 
         ind = np.argmin(obj_vals)
@@ -345,13 +344,13 @@ class CofR_image_sharpness(Processor):
 
         if self.initial_binning > 8:
             #binned search continued
-            logger.debug("binned search starting at %f", centre)
+            log.debug("binned search starting at %f", centre)
             a = centre - ig.voxel_size_x *2
             b = centre + ig.voxel_size_x *2
             centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x, self.initial_binning )
 
         #fine search
-        logger.debug("fine search starting at %f", centre)
+        log.debug("fine search starting at %f", centre)
         data_processed = data_filtered
         ig = data_processed.geometry.get_ImageGeometry()
         a = centre - ig.voxel_size_x *2
@@ -361,12 +360,12 @@ class CofR_image_sharpness(Processor):
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
 
-        logger.info("Centre of rotation correction found using image_sharpness")
-        logger.info("backend FBP/FDK {}".format(self.backend))
-        logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
-        logger.info("Centre of rotation shift = %f units at the object", centre)
-        logger.info("Return new dataset with centred geometry")
+        log.info("Centre of rotation correction found using image_sharpness")
+        log.info("backend FBP/FDK {}".format(self.backend))
+        log.info("Calculated from slice: %s", str(self.slice_index))
+        log.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
+        log.info("Centre of rotation shift = %f units at the object", centre)
+        log.info("Return new dataset with centred geometry")
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)

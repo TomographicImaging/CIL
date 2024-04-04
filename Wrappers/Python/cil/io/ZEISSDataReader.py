@@ -29,7 +29,6 @@ dxchange_logger.setLevel(logging.ERROR)
 import dxchange
 import warnings
 
-logger = logging.getLogger(__name__)
 
 class ZEISSDataReader(object):
 
@@ -293,9 +292,6 @@ class ZEISSDataReader(object):
 
 
 class TXRMDataReader(ZEISSDataReader):
-    def __init__(self,
-                 **kwargs):
-        warnings.warn('TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead',
-              DeprecationWarning)
-        logger.warning('TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead')
+    def __init__(self, **kwargs):
+        warnings.warn("Use ZEISSDataReader instead", DeprecationWarning, stacklevel=2)
         super().__init__(**kwargs)

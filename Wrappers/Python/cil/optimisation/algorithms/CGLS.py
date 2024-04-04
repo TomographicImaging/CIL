@@ -18,8 +18,10 @@
 
 from cil.optimisation.algorithms import Algorithm
 import numpy
-import warnings
 import logging
+
+log = logging.getLogger(__name__)
+
 
 class CGLS(Algorithm):
 
@@ -66,8 +68,7 @@ class CGLS(Algorithm):
         :param data: Acquired data to reconstruct
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
-        logging.info("{} setting up".format(self.__class__.__name__, ))
-
+        log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.operator = operator
         self.tolerance = tolerance
@@ -85,8 +86,7 @@ class CGLS(Algorithm):
         self.normx = self.x.norm()
 
         self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
-
+        log.info("%s configured", self.__class__.__name__)
 
 
     def update(self):

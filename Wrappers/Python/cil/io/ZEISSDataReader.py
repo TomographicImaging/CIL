@@ -290,8 +290,3 @@ class ZEISSDataReader(object):
         '''return the metadata of the file'''
         return self._metadata
 
-
-class TXRMDataReader(ZEISSDataReader):
-    def __init__(self, **kwargs):
-        warnings.warn("Use ZEISSDataReader instead", DeprecationWarning, stacklevel=2)
-        super().__init__(**kwargs)

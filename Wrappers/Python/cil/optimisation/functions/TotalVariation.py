@@ -26,6 +26,9 @@ import warnings
 import logging
 from cil.utilities.errors import InPlaceError
 
+log = logging.getLogger(__name__)
+
+
 class TotalVariation(Function):
 
     r""" Total variation Function
@@ -84,10 +87,6 @@ class TotalVariation(Function):
 
     split : :obj:`boolean`, default = False
         Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.
-
-    info : :obj:`boolean`, default = False
-        Information is printed for the stopping criterion of the FGP algorithm used to solve the dual problem
-        of the Total Variation Denoising problem (ROF).
 
     strong_convexity_constant : :obj:`float`, default = 0
         A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation.
@@ -163,7 +162,6 @@ class TotalVariation(Function):
                  upper=None,
                  isotropic=True,
                  split=False,
-                 info=False,
                  strong_convexity_constant=0,
                  warm_start=True):
 
@@ -195,10 +193,6 @@ class TotalVariation(Function):
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__
         self._gradient = None
         self._domain = None
-
-        self.info = info
-        if self.info:
-            warnings.warn(" `info` is deprecate. Please use logging instead.")
 
         # splitting Gradient
         self.split = split
@@ -354,12 +348,10 @@ class TotalVariation(Function):
         if self.warm_start:
             self._p2 = p2
 
-        if self.info:
-            if self.tolerance is not None:
-                logging.info(
-                    "Stop at {} iterations with tolerance {} .".format(k, error))
-            else:
-                logging.info("Stop at {} iterations.".format(k))
+        if self.tolerance is not None:
+            log.info("Stop at %d iterations with tolerance %r", k, error)
+        else:
+            log.info("Stop at %d iterations.", k)
 
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):

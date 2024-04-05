@@ -24,7 +24,7 @@ import numpy as np
 import os
 import sys
 from cil.framework import ImageGeometry
-from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
@@ -89,8 +89,7 @@ if not has_file:
     log.info("This unittest requires the walnut Zeiss dataset saved in %s", data_dir)
 
 
-class TestTXRMDataReader(unittest.TestCase):
-
+class TestZeissDataReader(unittest.TestCase):
 
     def setUp(self):
         log.info("has_astra %s", has_astra)
@@ -99,7 +98,7 @@ class TestTXRMDataReader(unittest.TestCase):
         log.info("has_dxchange %s", has_dxchange)
         log.info("has_file %s", has_file)
         if has_file:
-            self.reader = TXRMDataReader()
+            self.reader = ZEISSDataReader()
             angle_unit = AcquisitionGeometry.RADIAN
 
             self.reader.set_up(file_name=filename,
@@ -173,6 +172,10 @@ class TestTXRMDataReader(unittest.TestCase):
         np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         os.remove(fname)
+    
+    def test_file_not_found_error(self):
+        with self.assertRaises(FileNotFoundError):
+            reader = ZEISSDataReader(file_name='no-file')
 
 
 class TestTIFF(unittest.TestCase):
@@ -548,13 +551,3 @@ class TestNikonReader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             reader = NikonDataReader(file_name='no-file')
 
-
-class TestZeissReader(unittest.TestCase):
-
-    def test_setup(self):
-
-        reader = ZEISSDataReader()
-        self.assertEqual(reader.file_name, None)
-
-        with self.assertRaises(FileNotFoundError):
-            reader = ZEISSDataReader(file_name='no-file')

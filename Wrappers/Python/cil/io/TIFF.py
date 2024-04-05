@@ -34,7 +34,7 @@ import json
 
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 def save_scale_offset(fname, scale, offset):
     '''Save scale and offset to file
@@ -110,8 +110,8 @@ class TIFFWriter(object):
             )[0]
 
         self.dir_name = os.path.dirname(file_name)
-        logger.info ("dir_name {}".format(self.dir_name))
-        logger.info ("file_name {}".format(self.file_name))
+        log.info("dir_name %s", self.dir_name)
+        log.info("file_name %s", self.file_name)
         self.counter_offset = counter_offset
 
         if not ((isinstance(self.data_container, ImageData)) or

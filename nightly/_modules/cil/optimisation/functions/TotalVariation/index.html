@@ -562,10 +562,6 @@ document.write(`
 <span class="sd">    split : :obj:`boolean`, default = False</span>
 <span class="sd">        Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.</span>
 
-<span class="sd">    info : :obj:`boolean`, default = False</span>
-<span class="sd">        Information is printed for the stopping criterion of the FGP algorithm used to solve the dual problem</span>
-<span class="sd">        of the Total Variation Denoising problem (ROF).</span>
-
 <span class="sd">    strong_convexity_constant : :obj:`float`, default = 0</span>
 <span class="sd">        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation.</span>
 <span class="sd">        Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is</span>
@@ -640,7 +636,6 @@ document.write(`
                  <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">split</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">info</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
@@ -672,10 +667,6 @@ document.write(`
         <span class="c1"># Setup GradientOperator as None. This is to avoid domain argument in the __init__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use logging instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># splitting Gradient</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
@@ -831,11 +822,10 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_p2</span> <span class="o">=</span> <span class="n">p2</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">%d</span><span class="s2"> iterations with tolerance </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">%d</span><span class="s2"> iterations.&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">%d</span><span class="s2"> iterations with tolerance </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">%d</span><span class="s2"> iterations.&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
         <span class="c1"># return tau to its original state if it was modified</span>
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau_reg_neg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau</span><span class="p">):</span>

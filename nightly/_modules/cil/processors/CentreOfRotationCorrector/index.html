@@ -558,7 +558,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="CentreOfRotationCorrector.image_sharpness"><a class="viewcode-back" href="../../../../processors/#cil.processors.CentreOfRotationCorrector.image_sharpness">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This creates a CentreOfRotationCorrector processor.</span>
 
 <span class="sd">        The processor will find the centre offset by maximising the sharpness of a reconstructed slice.</span>
@@ -582,11 +582,6 @@ document.write(`
 
 <span class="sd">        initial_binning : int</span>
 <span class="sd">            The size of the bins for the initial search. If `None` will bin the image to a step corresponding to &lt;128 pixels. The fine search will be on unbinned data.</span>
-
-<span class="sd">        Other Parameters</span>
-<span class="sd">        ----------------</span>
-<span class="sd">        **kwargs : dict</span>
-<span class="sd">            FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use &#39;backend&#39; instead</span>
 
 
 <span class="sd">        Example</span>
@@ -613,7 +608,7 @@ document.write(`
 <span class="sd">        This method is unreliable on half-scan data with &#39;tuning-fork&#39; style artifacts.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">processor</span> <span class="o">=</span> <span class="n">CofR_image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="n">slice_index</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="n">search_range</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="n">initial_binning</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">CofR_image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="n">slice_index</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="n">search_range</span><span class="p">,</span> <span class="n">initial_binning</span><span class="o">=</span><span class="n">initial_binning</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div></div>
 </pre></div>
 

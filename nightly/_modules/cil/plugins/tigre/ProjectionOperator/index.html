@@ -522,7 +522,7 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ProjectionOperator configures and calls TIGRE Projectors for your dataset.</span>
 
-<span class="sd">        Please refer to the TIGRE documentation for futher descriptions</span>
+<span class="sd">        Please refer to the TIGRE documentation for further descriptions</span>
 <span class="sd">        https://github.com/CERN/TIGRE</span>
 <span class="sd">        https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010</span>
 
@@ -580,7 +580,7 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ProjectionOperator configures and calls TIGRE Projectors for your dataset.</span>
 
-<span class="sd">        Please refer to the TIGRE documentation for futher descriptions</span>
+<span class="sd">        Please refer to the TIGRE documentation for further descriptions</span>
 <span class="sd">        https://github.com/CERN/TIGRE</span>
 <span class="sd">        https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010</span>
 
@@ -609,13 +609,6 @@ document.write(`
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">acquisition_geometry_old</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;aquisition_geometry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">acquisition_geometry_old</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">acquisition_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry_old</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;aquisition_geometry has been deprecated. Please use acquisition_geometry instead.&quot;</span><span class="p">,</span>
-                <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this operator&quot;</span><span class="p">)</span>
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -41,15 +40,15 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         The ASTRA vol_geom and proj_geom
 
     """
- 
+
     sinogram_geometry = sinogram_geometry_in.copy()
-    
-    #this catches behaviour modified after CIL 21.3.1 
+
+    #this catches behaviour modified after CIL 21.3.1
     try:
         sinogram_geometry.config.system.align_reference_frame('cil')
     except:
         sinogram_geometry.config.system.update_reference_frame()
-        
+
 
     angles = sinogram_geometry.config.angles
     system = sinogram_geometry.config.system
@@ -57,7 +56,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     #get units
     degrees = angles.angle_unit == acquisition_labels["DEGREE"]
-    
+
     if sinogram_geometry.dimension == '2D':
         #create a 3D astra geom from 2D CIL geometry
         volume_geometry_temp = volume_geometry.copy()
@@ -92,7 +91,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     else:
         volume_geometry_temp = volume_geometry.copy()
- 
+
         row = panel.pixel_size[0] * system.detector.direction_x.reshape(3,1)
         col = panel.pixel_size[1] * system.detector.direction_y.reshape(3,1)
         det = system.detector.position.reshape(3, 1)
@@ -121,8 +120,8 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         vectors[i, 3:6] = rotation_matrix.dot(det).reshape(3)
         vectors[i, 6:9] = rotation_matrix.dot(row).reshape(3)
         vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)
-    
-    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)    
+
+    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
                                     volume_geometry_temp.voxel_num_x,
                                     volume_geometry_temp.voxel_num_z,
@@ -162,5 +161,5 @@ def rotation_matrix_z_from_euler(angle, degrees):
     rot_matrix[1][0] = np.sin(alpha)
     rot_matrix[1][1] = np.cos(alpha)
     rot_matrix[2][2] = 1
-    
+
     return rot_matrix

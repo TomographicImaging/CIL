@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -30,7 +29,7 @@ def mse(dc1, dc2, mask=None):
     dc1: `DataContainer`
         One image to be compared
     dc2: `DataContainer`
-        Second image to be compared 
+        Second image to be compared
     mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`
         The pixelwise operation only considers values where the mask is True or NonZero.
 
@@ -40,12 +39,12 @@ def mse(dc1, dc2, mask=None):
     '''
     dc1 = dc1.as_array()
     dc2 = dc2.as_array()
-    
+
     if mask is not None:
-        
+
         if isinstance(mask, DataContainer):
             mask = mask.as_array()
-            
+
         mask = mask.astype('bool')
         dc1 = np.extract(mask, dc1)
         dc2 = np.extract(mask, dc2)
@@ -60,56 +59,56 @@ def mae(dc1, dc2, mask=None):
     dc1: `DataContainer`
         One image to be compared
     dc2: `DataContainer`
-        Second image to be compared 
+        Second image to be compared
     mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`
-        The pixelwise operation only considers values where the mask is True or NonZero. 
+        The pixelwise operation only considers values where the mask is True or NonZero.
 
 
     Returns
     -------
-    A number with the mean absolute error between the two images. 
+    A number with the mean absolute error between the two images.
     '''
     dc1 = dc1.as_array()
     dc2 = dc2.as_array()
 
     if mask is not None:
-        
+
         if isinstance(mask, DataContainer):
             mask = mask.as_array()
-            
+
         mask = mask.astype('bool')
         dc1 = np.extract(mask, dc1)
         dc2 = np.extract(mask, dc2)
-        
+
     return np.mean(np.abs((dc1-dc2)))
 
 
 def psnr(ground_truth, corrupted, data_range=None, mask=None):
-    ''' Calculates the Peak signal to noise ratio (PSNR) between the two images. 
+    ''' Calculates the Peak signal to noise ratio (PSNR) between the two images.
 
     Parameters
     ----------
     ground_truth: `DataContainer`
         The reference image
     corrupted: `DataContainer`
-        The image to be evaluated 
+        The image to be evaluated
     data_range: scalar value, default=None
         PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.
     mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`
-        The pixelwise operation only considers values where the mask is True or NonZero.. 
+        The pixelwise operation only considers values where the mask is True or NonZero..
 
     Returns
     -------
     A number, the peak signal to noise ration between the two images.
     '''
     if data_range is None:
-        
+
         if mask is None:
             data_range = ground_truth.as_array().max()
 
-            
+
         else:
-            
+
             if isinstance(mask, DataContainer):
                 mask = mask.as_array()
             data_range = np.max(ground_truth.as_array(),
@@ -118,4 +117,3 @@ def psnr(ground_truth, corrupted, data_range=None, mask=None):
     tmp_mse = mse(ground_truth, corrupted, mask=mask)
 
     return 10 * np.log10((data_range ** 2) / tmp_mse)
-  

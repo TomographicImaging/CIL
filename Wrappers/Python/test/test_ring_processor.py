@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -51,7 +50,7 @@ class TestL1NormRR(unittest.TestCase):
         path = os.path.dirname(tomophantom.__file__)
         path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
 
-        phantom_2D = TomoP2D.Model(model, N, path_library2D)    
+        phantom_2D = TomoP2D.Model(model, N, path_library2D)
         # data = ImageData(phantom_2D)
         ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
         data = ig.allocate(None)
@@ -77,14 +76,14 @@ class TestL1NormRR(unittest.TestCase):
 
         error = (ring_recon - sin).abs().as_array().mean()
         np.testing.assert_almost_equal(error, 83.20592, 4)
-        
+
 class TestRingRemover(CCPiTestClass):
     def add_defect_pixels(self, data, N_columns, N_defects, seed):
 
         data_corrupted = data.copy()
-        rng = np.random.RandomState(seed=seed) 
+        rng = np.random.RandomState(seed=seed)
         columns = rng.randint(0, data.shape[1], size=N_columns)
-        
+
         pixel_values = rng.uniform(low=np.amin(data.as_array()), high=np.amax(data.as_array()), size=N_defects)
 
         for i in range(N_columns):
@@ -97,9 +96,9 @@ class TestRingRemover(CCPiTestClass):
             data_corrupted.as_array()[defect_row[i], defect_col[i]] = pixel_values[i]
 
         return data_corrupted
-    
+
     def test_ring_remover(self):
-        
+
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical=80)
         data_test = TransmissionAbsorptionConverter()(data)
 
@@ -123,4 +122,3 @@ class TestRingRemover(CCPiTestClass):
 
         self.assertEqual(data_corrupted_odd.shape, data_corrected_odd.shape)
         self.assertLessEqual(mse(data_test, data_corrected_odd), 0.05)
-        

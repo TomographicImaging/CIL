@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2018 United Kingdom Research and Innovation
 #  Copyright 2018 The University of Manchester
 #
@@ -39,7 +38,7 @@ class AstraBackProjector3D(DataProcessor):
     sinogram_geometry : AcquisitionGeometry
         A description of the acquisition data
 
-    """  
+    """
     def __init__(self,
                  volume_geometry=None,
                  sinogram_geometry=None):
@@ -48,29 +47,29 @@ class AstraBackProjector3D(DataProcessor):
                   'sinogram_geometry'  : sinogram_geometry,
                   'proj_geom'  : None,
                   'vol_geom'  : None}
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(AstraBackProjector3D, self).__init__(**kwargs)
-        
+
         self.set_ImageGeometry(volume_geometry)
         self.set_AcquisitionGeometry(sinogram_geometry)
-        
+
         self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
-        
-    
+
+
     def check_input(self, dataset):
 
         if self.sinogram_geometry.shape != dataset.geometry.shape:
-            raise ValueError("Dataset not compatible with geometry used to create the projector")  
-    
+            raise ValueError("Dataset not compatible with geometry used to create the projector")
+
         return True
-    
+
     def set_ImageGeometry(self, volume_geometry):
 
         check_order_for_engine('astra', volume_geometry)
 
         if len(volume_geometry.dimension_labels) > 3:
-            raise ValueError("Supports 2D and 3D data only, got {0}".format(volume_geometry.number_of_dimensions))  
+            raise ValueError("Supports 2D and 3D data only, got {0}".format(volume_geometry.number_of_dimensions))
 
         self.volume_geometry = volume_geometry.copy()
 
@@ -79,7 +78,7 @@ class AstraBackProjector3D(DataProcessor):
         check_order_for_engine('astra', sinogram_geometry)
 
         if len(sinogram_geometry.dimension_labels) > 3:
-            raise ValueError("Supports 2D and 3D data only, got {0}".format(sinogram_geometry.number_of_dimensions))  
+            raise ValueError("Supports 2D and 3D data only, got {0}".format(sinogram_geometry.number_of_dimensions))
 
         self.sinogram_geometry = sinogram_geometry.copy()
 
@@ -105,7 +104,7 @@ class AstraBackProjector3D(DataProcessor):
 
         # delete the GPU copy
         astra.data3d.delete(rec_id)
-        
+
         arr_out = np.squeeze(arr_out)
 
         if out is None:

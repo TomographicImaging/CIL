@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -17,10 +16,14 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
+import contextlib
+import io
+import warnings
+
+import numpy as np
+
 from cil.framework import DataProcessor, ImageData, check_order_for_engine
 from cil.plugins.tigre import CIL2TIGREGeometry
-import logging
-import numpy as np
 
 try:
     from tigre.algorithms import fdk, fbp
@@ -35,38 +38,32 @@ class FBP(DataProcessor):
 
     This uses the ram-lak filter
     This is provided for simple and offset parallel-beam geometries only
-   
+
     acquisition_geometry : AcquisitionGeometry
         A description of the acquisition data
-    
+
     image_geometry : ImageGeometry, default used if None
         A description of the area/volume to reconstruct
-                             
+
     Example
     -------
     >>> from cil.plugins.tigre import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()                       
+    >>> reconstruction = fbp.get_output()
 
     '''
-    
     def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs): 
-        
-
         sinogram_geometry = kwargs.get('sinogram_geometry', None)
-        volume_geometry = kwargs.get('volume_geometry', None)
-
         if sinogram_geometry is not None:
             acquisition_geometry = sinogram_geometry
-            logging.warning("sinogram_geometry has been deprecated. Please use acquisition_geometry instead.")
-
-        if acquisition_geometry is None:
-            raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
+            warnings.warn("Use acquisition_geometry instead of sinogram_geometry", DeprecationWarning, stacklevel=2)
+        volume_geometry = kwargs.get('volume_geometry', None)
         if volume_geometry is not None:
             image_geometry = volume_geometry
-            logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
+            warnings.warn("Use image_geometry instead of volume_geometry", DeprecationWarning, stacklevel=2)
+        if acquisition_geometry is None:
+            raise TypeError("Please specify an acquisition_geometry to configure this processor")
 
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
@@ -76,7 +73,7 @@ class FBP(DataProcessor):
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
         check_order_for_engine('tigre', image_geometry)
-        check_order_for_engine('tigre', acquisition_geometry) 
+        check_order_for_engine('tigre', acquisition_geometry)
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -85,21 +82,23 @@ class FBP(DataProcessor):
 
 
     def check_input(self, dataset):
-        
+
         if self.acquisition_geometry.channels != 1:
             raise ValueError("Expected input data to be single channel, got {0}"\
-                 .format(self.acquisition_geometry.channels))  
+                 .format(self.acquisition_geometry.channels))
 
         check_order_for_engine('tigre', dataset.geometry)
         return True
 
     def process(self, out=None):
-        
+
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 
             if self.acquisition_geometry.geom_type == 'cone':
-                arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
+                # suppress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
+                with contextlib.redirect_stdout(io.StringIO()):
+                    arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             else:
                 arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)
@@ -114,4 +113,3 @@ class FBP(DataProcessor):
             return out
         else:
             out.fill(arr_out)
-            

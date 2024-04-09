@@ -46,6 +46,9 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
+    'nbsphinx',
+    'sphinx_gallery.load_style',
+    'sphinx_copybutton',
 ]
 
 templates_path = ['_templates']
@@ -56,7 +59,6 @@ language = 'en'
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
-pygments_style = None  # syntax highlighting
 
 # HTML config
 html_theme = 'pydata_sphinx_theme'

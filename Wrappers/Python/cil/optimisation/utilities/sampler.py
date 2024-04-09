@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library (CIL) developed by CCPi
 #   (Collaborative Computational Project in Tomographic Imaging), with
 #   substantial contributions by UKRI-STFC and University of Manchester.
@@ -24,12 +23,12 @@ import numbers
 
 class Sampler():
     # TODO: Work out how to make the examples testable
-    """     
+    """
     Initialises a sampler that returns and then increments indices from a sequence defined by a function.
-    
-    Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement. 
 
-    
+    Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement.
+
+
 
 
     Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.
@@ -45,18 +44,18 @@ class Sampler():
     num_indices: int
         The sampler will select from a range of indices 0 to num_indices.
 
-    sampling_type:str, optional,  default = None 
-        The sampling type used. This is recorded for reference and printed when `print` is called. 
+    sampling_type:str, optional,  default = None
+        The sampling type used. This is recorded for reference and printed when `print` is called.
 
-    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices 
-        Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 
+    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices
+        Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.
 
     Returns
     -------
     Sampler
         An instance of the Sampler class representing the desired configuration.
 
-    Example  
+    Example
     -------
     >>> sampler = Sampler.random_with_replacement(5)
     >>> print(sampler.get_samples(20))
@@ -95,13 +94,13 @@ class Sampler():
 
     Example
     --------
-    This example creates a sampler that outputs sequential indices, starting from 1.  
+    This example creates a sampler that outputs sequential indices, starting from 1.
 
     >>> num_indices=10
     >>>
     >>> def my_sampling_function(iteration_number):
     >>>     return (iteration_number+1)%10
-    >>>    
+    >>>
     >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function)
     >>> print(list(sampler.get_samples(25)))
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]
@@ -111,14 +110,14 @@ class Sampler():
     Note
     -----
     The optimal choice of sampler depends on the data and the number of calls to the sampler.  Note that a low number of calls to a random sampler won't give an even distribution.
-    For a small number of samples (e.g. `<5*num_indices`) the user may wish to consider another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.  
+    For a small number of samples (e.g. `<5*num_indices`) the user may wish to consider another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.
         """
 
     def __init__(self, num_indices, function,  sampling_type=None, prob_weights=None):
 
         self._type = sampling_type
 
-        if isinstance (num_indices, numbers.Integral):  
+        if isinstance (num_indices, numbers.Integral):
             self._num_indices = num_indices
         else:
             raise ValueError('`num_indices` should be an integer. ')
@@ -154,7 +153,7 @@ class Sampler():
         return self._iteration_number
 
     def next(self):
-        """ 
+        """
         Returns a sample from the list of indices `{0, 1, …, N-1}, where N is the number of indices and increments the sampler.
         """
 
@@ -178,7 +177,7 @@ class Sampler():
         Returns
         --------
         List
-            The first `num_samples" output by the sampler.  
+            The first `num_samples" output by the sampler.
         """
         save_last_index = self._iteration_number
         self._iteration_number = 0
@@ -201,17 +200,17 @@ class Sampler():
     @staticmethod
     def sequential(num_indices):
         """
-        Instantiates a sampler that outputs sequential indices. 
+        Instantiates a sampler that outputs sequential indices.
 
         Parameters
         ----------
         num_indices: int
             The sampler will select from a range of indices 0 to num_indices.
 
-        Returns  
-        -------  
-        Sampler  
-            An instance of the Sampler class that will generate indices sequentially. 
+        Returns
+        -------
+        Sampler
+            An instance of the Sampler class that will generate indices sequentially.
 
         Example
         -------
@@ -244,7 +243,7 @@ class Sampler():
             The stride between returned indices. The stride should be less than the num_indices.
 
         iter_number: int
-            The current iteration number of the sampler.         
+            The current iteration number of the sampler.
 
         Returns
         -------
@@ -271,7 +270,7 @@ class Sampler():
     @staticmethod
     def staggered(num_indices, stride):
         """
-        Instantiates a sampler which outputs in a staggered order. 
+        Instantiates a sampler which outputs in a staggered order.
 
         Parameters
         ----------
@@ -281,14 +280,14 @@ class Sampler():
         stride: int
             The stride between returned indices. The stride should be less than the num_indices.
 
-        Returns  
-        -------  
-        Sampler  
-            An instance of the Sampler class that will generate indices in a staggered pattern. 
+        Returns
+        -------
+        Sampler
+            An instance of the Sampler class that will generate indices in a staggered pattern.
 
 
         Example
-        -------    
+        -------
         >>> sampler = Sampler.staggered(num_indices=21, stride=4)
         >>> print(next(sampler))
         0
@@ -297,7 +296,7 @@ class Sampler():
         >>> print(sampler.get_samples(5))
         [ 0  4  8 12 16]
         Example
-        -------    
+        -------
         >>> sampler = Sampler.staggered(num_indices=17, stride=8)
         >>> print(next(sampler))
         0
@@ -328,15 +327,15 @@ class Sampler():
         num_indices: int
             The sampler will select from a range of indices 0 to num_indices
 
-        prob: list of floats, optional 
+        prob: list of floats, optional
             The probability for each index to be selected by the 'next' operation. If not provided, the indices will be sampled uniformly. The list should have a length equal to num_indices, and the values should sum to 1
 
         seed:int, optional
             Used to initialise the random number generator where repeatability is required.
 
-        Returns  
-        -------  
-        `RandomSampler`  
+        Returns
+        -------
+        `RandomSampler`
             An instance of the `RandomSampler` class that will generate indices randomly with replacement
 
         Example
@@ -374,12 +373,12 @@ class Sampler():
             The sampler will select from a range of indices 0 to num_indices.
 
         seed: int, optional
-            Used to initialise the random number generator where repeatability is required.  
+            Used to initialise the random number generator where repeatability is required.
 
-        Returns  
-        -------  
-        `RandomSampler`  
-            An instance of the `RandomSampler` class that will generate indices randomly without replacement 
+        Returns
+        -------
+        `RandomSampler`
+            An instance of the `RandomSampler` class that will generate indices randomly without replacement
 
         Example
         -------
@@ -410,8 +409,8 @@ class Sampler():
     function : callable
         A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -> int
 
-        prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices 
-            Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 
+        prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices
+            Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.
 
         Returns
         -------
@@ -421,13 +420,13 @@ class Sampler():
 
         Example
         --------
-        This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform. 
+        This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform.
 
         >>> num_indices=3
         >>>
         >>> def my_sampling_function(iteration_number):
         >>>     return 2
-        >>>    
+        >>>
         >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function, prob_weights=[0, 0, 1])
         >>> print(list(sampler.get_samples(12)))
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
@@ -435,13 +434,13 @@ class Sampler():
 
         Example
         --------
-        This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform. 
+        This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform.
 
         >>> num_indices=10
         >>>
         >>> def my_sampling_function(iteration_number):
         >>>     return (iteration_number+1)%10
-        >>>    
+        >>>
         >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function)
         >>> print(list(sampler.get_samples(25)))
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]
@@ -449,24 +448,24 @@ class Sampler():
 
         Example
         -------
-        This example creates a sampler that samples in order from a custom list. The num_indices  is 6, although note that the index 5 is never output by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list. 
-        The probability weights are passed to the sampler as they are not uniform. 
+        This example creates a sampler that samples in order from a custom list. The num_indices  is 6, although note that the index 5 is never output by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list.
+        The probability weights are passed to the sampler as they are not uniform.
 
         >>> custom_list = [0,0,0,0,0,0,3,2,1,4]
         >>> num_indices = 6
-        >>> 
+        >>>
         >>> def my_sampling_function(iteration_number, custom_list=custom_list]):
         >>>    return(custom_list[iteration_number%len(custom_list)])
-        >>> 
+        >>>
         >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function, prob_weights=[0.6, 0.1, 0.1, 0.1, 0.1, 0.0])
         >>> print(list(sampler.get_samples(25)))
         [0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0]
         >>> print(sampler)
-        Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. 
-        Type : from_function 
+        Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices.
+        Type : from_function
         Current iteration number : 0
         number of indices : 6
-        Probability weights : [0.6, 0.1, 0.1, 0.1, 0.1, 0.0] 
+        Probability weights : [0.6, 0.1, 0.1, 0.1, 0.1, 0.0]
 
         """
 
@@ -556,22 +555,22 @@ class Sampler():
         Parameters
         ----------
         num_indices: int
-            The sampler will select from a range of indices 0 to num_indices. For Herman-Meyer sampling this number should not be prime. 
+            The sampler will select from a range of indices 0 to num_indices. For Herman-Meyer sampling this number should not be prime.
 
         Reference
         ----------
         With thanks to Imraj Singh and Zeljko Kereta for their help with the initial implementation of the Herman Meyer sampling. Their implementation was used in:
-        
+
         Singh I, et al. Deep Image Prior PET Reconstruction using a SIRF-Based Objective - IEEE MIC, NSS & RTSD 2022. https://discovery.ucl.ac.uk/id/eprint/10176077/1/MIC_Conference_Record.pdf
-        
-        The sampling method was introduced in: 
-        
+
+        The sampling method was introduced in:
+
         Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
 
         Returns
         -------
         Sampler
-            An instance of the Sampler class which outputs in a Herman Meyer order. 
+            An instance of the Sampler class which outputs in a Herman Meyer order.
 
         Example
         -------
@@ -580,7 +579,7 @@ class Sampler():
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
         """
 
-        if not isinstance (num_indices, numbers.Integral):  
+        if not isinstance (num_indices, numbers.Integral):
             raise ValueError('`num_indices` should be an integer. ')
 
         factors = Sampler._prime_factorisation(num_indices)
@@ -616,12 +615,12 @@ class Sampler():
 
 
 class SamplerRandom(Sampler):
-    """     
+    """
     The user is recommended to not instantiate this class  directly but instead use one of the static methods  in the parent Sampler class that will return instances of different samplers.
 
     This class produces Samplers that output random samples with and without replacement from the set {0, 1, …, N-1} where N=num_indices.
 
-    Custom random samplers can be created by subclassing this sampler class. 
+    Custom random samplers can be created by subclassing this sampler class.
 
     Parameters
     ----------
@@ -630,16 +629,16 @@ class SamplerRandom(Sampler):
         The sampler will select from a range of indices 0 to num_indices.
 
     sampling_type:str, optional,  default = 'random_with_replacement"
-        The sampling type used. This is recorded for reference and printed when `print` is called. 
+        The sampling type used. This is recorded for reference and printed when `print` is called.
 
     prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices
-        Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1. 
+        Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.
 
-    replace: bool, default is True 
+    replace: bool, default is True
         If True, sample with replace, otherwise sample without replacement
 
     seed:int, optional
-        Used to initialise the random number generator where repeatability is required.  
+        Used to initialise the random number generator where repeatability is required.
 
     Returns
     -------
@@ -697,11 +696,11 @@ class SamplerRandom(Sampler):
         Parameters
         ----------
         num_samples: int
-            The number of samples to return. 
+            The number of samples to return.
         Returns
         -------
         list
-            The first `num_samples` produced by the sampler 
+            The first `num_samples` produced by the sampler
         """
         save_last_index = self._iteration_number
         self._iteration_number = 0

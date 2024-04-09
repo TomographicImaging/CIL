@@ -39,7 +39,8 @@ test:
     - tigre=2.4               # [ not osx ]
     - packaging
     - ccpi-regulariser=22.0.0 # [ not osx ]
-    - astra-toolbox=2.1=cuda* # [ not osx ]
+    - astra-toolbox=2.1=cuda* # [ __cuda ]
+    - astra-toolbox=2.1       # [ not __cuda ] 
 
   source_files:
     - ./Wrappers/Python/test # [win]
@@ -91,8 +92,8 @@ requirements:
   #optional packages with version dependancies
   run_constrained:
     - tomophantom=2.0.0
-    - astra-toolbox=2.1
-    - tigre=2.4
+    - astra-toolbox>=1.9.9.dev5,<=2.1
+    - tigre>=2.4,<=2.6
     - ccpi-regulariser=22.0.0
     - ipywidgets <8
 

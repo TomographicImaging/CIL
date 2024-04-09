@@ -28,6 +28,12 @@ from urllib.request import urlopen
 from io import BytesIO
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
+import requests
+import hashlib
+
+def check_hash(filename, checksum):
+    
+    return value, digest
 
 class DATA(object):
     @classmethod
@@ -70,14 +76,67 @@ class REMOTEDATA(DATA):
 
         '''
         if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
-            print("Dataset already exists in " + data_dir)
+            print("Dataset folder already exists in " + data_dir)
         else:
-            if input("Are you sure you want to download " + cls.FILE_SIZE + " dataset from " + cls.URL + " ? (y/n)") == "y": 
-                print('Downloading dataset from ' + cls.URL) 
-                cls._download_and_extract_from_url(os.path.join(data_dir,cls.FOLDER))
-                print('Download complete')
+            record_url = 'https://zenodo.org/record/{}'.format(cls.RECORD)
+            file_url = 'https://zenodo.org/record/{}/files/{}'.format(cls.RECORD, cls.FILE)
+            
+            # get dataset metadata
+            with requests.get(record_url, timeout=15) as request:
+                if request.ok:
+                    files = request.json()['files']
+                    for f in files:
+                        fname = (f.get('filename') or f['key'])
+                        if fname == cls.FILE:
+                            file_size = f.get('filesize') or f['size'] 
+                            file_checksum = f['checksum'].split(':')[-1]
+                            break
+
+                else:
+                    print('Request metadata failed')
+                    return
+
+            # get user confirmation for download
+            if input("Are you sure you want to download {:.1f} MB dataset from {} ? (y/n)").format(file_size/(2**20), file_url) == "y": 
+                print('Downloading dataset from ' + file_url) 
+                
+                # get dataset
+                with requests.get(file_url, stream=True) as request:
+                    if request.ok:
+                        # download zipfile
+                        zip_file = os.path.join(data_dir, cls.FILE)
+                        with open(zip_file, 'wb') as f:
+                            for chunk in request.iter_content(chunk_size=512):
+                                f.write(chunk)
+
+                        # check the hash
+                        hash = hashlib.new('md5')
+                        with open(zip_file, 'rb') as f:
+                            while True:
+                                data = f.read(4096)
+                                if not data:
+                                    break
+                                hash.update(data)
+            
+                        if file_checksum.strip() == hash.hexdigest():
+                            # unzip file
+                            with ZipFile(zip_file, 'r') as zip_ref:
+                                zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
+                                print('Download complete')
+                        else:
+                            # remove zipfile if hash is incorrect
+                            os.remove(zip_file)
+                            print('Checksum is incorrect, file deleted')
+                            return
+
+                    else:
+                        print('Request data failed')
+                        
+
+                
             else:
                 print('Download cancelled')
+                return
 
 class BOAT(CILDATA):
     @classmethod
@@ -228,7 +287,8 @@ class USB(REMOTEDATA):
     A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
     '''
     FOLDER = 'USB' 
-    URL = 'https://zenodo.org/record/4822516/files/usb.zip'
+    RECORD = '4822516'
+    FILE = 'usb.zip'
     FILE_SIZE = '3.2 GB'
 
     @classmethod

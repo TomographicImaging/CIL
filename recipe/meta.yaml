@@ -36,7 +36,7 @@ test:
     - cvxpy                   # [ linux ]
     - scikit-image
     - tomophantom=2.0.0       # [ linux ]
-    - tigre=2.6               # [ not osx ]
+    - tigre=2.6               # [ __cuda ]
     - packaging
     - ccpi-regulariser=22.0.0 # [ not osx ]
     - astra-toolbox>=1.9.9.dev5,<2.1

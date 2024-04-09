@@ -20,7 +20,6 @@
 
 import copy
 import ctypes
-import logging
 import warnings
 from functools import reduce
 from numbers import Number
@@ -327,8 +326,10 @@ class ImageGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+                else:
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
             elif value is None:
                 pass
             else:
@@ -1113,7 +1114,7 @@ class DataContainer(object):
             Default is to accumulate and return data as float64 or complex128
         """
         if kwargs.get('dtype') is not None:
-            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+            warnings.warn("dtype is ignored (auto-using float64 or complex128)", DeprecationWarning, stacklevel=2)
 
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64
@@ -1191,8 +1192,8 @@ class DataContainer(object):
             Default is to accumulate and return data as float64 or complex128
         """
 
-        if kwargs.get('dtype', None) is not None:
-            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+        if kwargs.get('dtype') is not None:
+            warnings.warn("dtype is ignored (auto-using float64 or complex128)", DeprecationWarning, stacklevel=2)
 
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64
@@ -1535,7 +1536,10 @@ class VectorGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                out.fill(numpy.random.random_sample(self.shape))
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
+                else:
+                    out.fill(numpy.random.random_sample(self.shape))
             elif value == VectorGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:

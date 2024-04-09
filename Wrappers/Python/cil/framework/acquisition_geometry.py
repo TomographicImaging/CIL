@@ -19,7 +19,6 @@
 # Joshua DM Hellier (University of Manchester) [refactorer]
 
 import copy
-import logging
 import math
 import warnings
 from numbers import Number
@@ -277,7 +276,7 @@ class Parallel3D(SystemConfiguration):
          - rays perpendicular to rotation axis
         advanced
          - not rays perpendicular to detector (for parallel just equates to an effective pixel size change?)
-         or 
+         or
          - not rays perpendicular to rotation axis  (tilted, i.e. laminography)
         '''
 
@@ -1617,7 +1616,7 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
 
         if self.dimension == '2D':
             if offset2 is not None:
-                logging.WARNING("Only offset1 is being used")
+                warnings.warn("2D so offset2 is ingored", UserWarning, stacklevel=2)
             self.set_centre_of_rotation(offset1)
 
         if offset2 is None or offset1 == offset2:
@@ -1900,8 +1899,11 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=self.dtype))
+                if numpy.iscomplexobj(out.array):
+                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                else:
+                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=dtype))
             elif value is None:
                 pass
             else:

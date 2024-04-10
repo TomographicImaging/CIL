@@ -16,6 +16,7 @@ channels:
   - conda-forge
   - intel
   - ccpi
+  - nvidia
   - defaults
 dependencies:
   # base (vis. recipe/conda_build_config.yaml)

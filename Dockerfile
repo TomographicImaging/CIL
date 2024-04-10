@@ -20,7 +20,7 @@ COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
 RUN sed -ri '/tigre|astra-toolbox/d' environment.yml \
   && for pkg in jupyter-server-proxy $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
   && conda config --env --set channel_priority strict \
-  && for ch in defaults ccpi intel conda-forge; do conda config --env --add channels $ch; done \
+  && for ch in defaults nvidia ccpi intel conda-forge; do conda config --env --add channels $ch; done \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \

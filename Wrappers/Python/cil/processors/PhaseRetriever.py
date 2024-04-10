@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#  Copyright 2020 United Kingdom Research and Innovation
-#  Copyright 2020 The University of Manchester
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ import numpy as np
 
 from scipy.fft import fft2
 from scipy.fft import ifft2
-from scipy.fft import fftshift, ifftshift
+from scipy.fft import ifftshift
 from scipy import constants
 
 from tqdm import tqdm
 import logging
 from multiprocessing.pool import ThreadPool
 
-class PaganinPhaseProcessor(Processor):
+class PhaseRetriever(Processor):
 
     @staticmethod
-    def retrieve(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance = None, filter_type='paganin_method'):
+    def Paganin(energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance=None, magnification=None, filter_type='paganin_method'):
         """
         Method to create a Paganin processor to retrieve quantitative information from phase contrast images using
         the Paganin phase retrieval algorithm described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -41,8 +41,8 @@ class PaganinPhaseProcessor(Processor):
          - using intensity data which has been flat field corrected
          - and under the assumption that the Fresnel number = pixel size^2/(wavelength*propagation_distance) >> 1
         
-        To use Paganin phase filtering without transmission to absorption conversion use the `PaganinPhaseProcessor.filter()` method
-        in this case the conversion to absorption is not applied so the requirement to supply intensity data is relaxed
+        To filter images using the Paganin method use the `Filter.Paganin()` method in this case the conversion to absorption is not applied so 
+        the requirement to supply flat field corrected intensity data is relaxed
         
         Parameters
         ----------
@@ -62,6 +62,9 @@ class PaganinPhaseProcessor(Processor):
 
         propagation_distance: float (optional)
             The sample to detector distance in meters. If not specified, the value in data.geometry.dist_center_detector will be used
+
+        magnification: float (optional)
+            The optical magnification at the detector. If not specified, the value in data.geometry.magnification will be used
 
         filter_type: string (optional)
             The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9 
@@ -84,51 +87,13 @@ class PaganinPhaseProcessor(Processor):
         >>> processor.get_output(output_type='thickness')
         
         """
-        processor = PaganinPhaseRetrieval(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, filter_type=filter_type)
+        processor = PaganinPhaseRetriever(energy_eV=energy_eV, delta=delta, beta=beta, unit_multiplier=unit_multiplier, propagation_distance=propagation_distance, magnification=magnification, filter_type=filter_type)
         return processor
 
-
-    @staticmethod
-    def filter(delta_beta=1e2, unit_multiplier = 1, filter_type='paganin_method'):
-        '''
-        Method to create a Paganin processor to filter images using the Paganin phase retrieval algorithm
-        described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
-
-        To retrieve quantitative information from phase contrast images use the `PaganinPhaseProcessor.retrieve() method` instead
-
-        Parameters
-        ----------           
-        delta_beta: float
-            Ratio of the real and complex part of the material refractive index, where refractive index n = (1 - delta) + i beta
-            energy-dependent refractive index information can be found at https://refractiveindex.info/ , default is 1e-2
-
-        unit_multiplier: float (optional)
-            Multiplier to convert units stored in geometry to metres, conversion applies to pixel size (and propagation distance if data.geometry.dist_center_detector is used), default is 1
-
-        filter_type: string (optional)
-            The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9  (equation 17)
-
-        Returns
-        -------
-        Processor
-            Paganin phase filter processor
-                    
-        Example
-        -------
-        >>> processor = PaganinPhaseProcessor.filter()
-        >>> processor.set_input(self.data)
-        >>> processor.get_output()
-
-        '''
-        
-        processor = PaganinPhaseFilter(delta= 1, beta = 1/delta_beta, unit_multiplier=unit_multiplier, filter_type=filter_type)
-        return processor
     
-class PaganinProcessor(Processor):
-    '''
-    Parent class setting up Paganin processing
-    '''
-    def __init__(self, energy_eV = 40000, delta = 1, beta = 1e-2, unit_multiplier = 1, propagation_distance=None, filter_type='paganin_method'):
+class PaganinPhaseRetriever(PhaseRetriever):
+
+    def __init__(self, energy_eV, delta, beta, unit_multiplier, propagation_distance, magnification, filter_type):
         kwargs = {
             'energy' : energy_eV,
             'wavelength' : self.energy_to_wavelength(energy_eV),
@@ -136,6 +101,7 @@ class PaganinProcessor(Processor):
             'beta': beta,
             'unit_multiplier' : unit_multiplier,
             'propagation_distance_user' : propagation_distance,
+            'magnification_user' : magnification,
             'filter_type' : filter_type,
             'scaling_factor' : 1,
             'mu' : None,
@@ -143,20 +109,37 @@ class PaganinProcessor(Processor):
             'pixel_size' : None,
             'propagation_distance' : None,
             'magnification' : None,
-            'filter' : None
+            'filter' : None,
+            'output_type' : 'thickness'
             }
         
-        super(PaganinProcessor, self).__init__(**kwargs)
-        
-        self.__calculate_mu()
-        
+        super(PhaseRetriever, self).__init__(**kwargs)
+
     def check_input(self, data):
         geometry = data.geometry
 
-        if geometry.magnification == None:
-            self.magnification = 1
+        # if propagation_distance is not specified by the user, use the value in geometry
+        if self.propagation_distance_user is None: 
+            if data.geometry.dist_center_detector is None:
+                raise ValueError('Propagation distance not found, please provide propagation_distance as an argument or update geometry.dist_center_detector')
+            elif data.geometry.dist_center_detector == 0:
+                raise ValueError('Found geometry.dist_center_detector = 0, phase retrieval is not compatible with virtual magnification\
+                                 please provide a real propagation_distance as an argument or update geometry.dist_center_detector')
+            else:
+                propagation_distance = geometry.dist_center_detector
+                self.propagation_distance = (propagation_distance)*self.unit_multiplier
         else:
-            self.magnification = geometry.magnification
+            self.propagation_distance = self.propagation_distance_user
+        
+        # if magnification is not specified by the user, use the value in geometry
+        if self.magnification_user is None:
+            if geometry.magnification == None:
+                # if there is no value in the geometry, assume parallel beam and magnification = 1
+                self.magnification = 1
+            else:
+                self.magnification = geometry.magnification
+        else:
+            self.magnification = self.magnification_user
 
         if (geometry.pixel_size_h - geometry.pixel_size_v ) / \
             (geometry.pixel_size_h + geometry.pixel_size_v ) < 1e-5:
@@ -166,28 +149,9 @@ class PaganinProcessor(Processor):
                     .format( geometry.pixel_size_h, geometry.pixel_size_v )
                 )
         
-        self.propagation_distance = self.propagation_distance/self.magnification
+        self.propagation_distance = self.propagation_distance
 
-        self.__calculate_alpha()
         return True
-    
-    def process(self, out=None):
-
-        data  = self.get_input()
-
-        self.create_filter(data.get_dimension_size('vertical'), data.get_dimension_size('horizontal'))
-
-        must_return = False        
-        if out is None:
-            out = data.geometry.allocate(None)
-            must_return = True
-        
-        for i in tqdm(range(len(data.geometry.angles))):
-            processed_projection = self.process_projection(data.get_slice(angle=i).as_array())
-            out.fill(processed_projection, angle = i)
- 
-        if must_return:
-            return out
         
     def create_filter(self, Nx, Ny):
         '''
@@ -195,6 +159,9 @@ class PaganinProcessor(Processor):
         The filter is created on a mesh in Fourier space kx, ky
         '''
         
+        self.__calculate_mu()
+        self.__calculate_alpha()
+
         kx,ky = np.meshgrid( 
             np.arange(-Nx/2, Nx/2, 1, dtype=np.float64) * (2*np.pi)/(Nx*self.pixel_size),
             np.arange(-Ny/2, Ny/2, 1, dtype=np.float64) * (2*np.pi)/(Ny*self.pixel_size),
@@ -213,10 +180,66 @@ class PaganinProcessor(Processor):
             kW = np.abs(kx.max()*self.pixel_size)       
             if (kW > np.pi): 
                 logging.warning("This algorithm is valid for |k*W| <= pi, found np.abs(kx.max()*self.pixel_size) = {}, results may not be accurate".format(kW))
-            self.filter =  (1. - (2*self.alpha/self.pixel_size**2)*(np.cos(self.pixel_size*kx) + np.cos(self.pixel_size*ky) -2)/self.magnification)
+            self.filter =  ifftshift(1/(1. - (2*self.alpha/self.pixel_size**2)*(np.cos(self.pixel_size*kx) + np.cos(self.pixel_size*ky) -2)/self.magnification))
         else:
             raise ValueError("filter_type not recognised: got {0} expected one of 'paganin_method' or 'generalised_paganin_method' or 'phase'"\
-                            .format(self.output_type))
+                            .format(self.filter_type))
+        
+    def process(self, out=None):
+
+        data  = self.get_input()
+
+        self.create_filter(data.get_dimension_size('vertical'), data.get_dimension_size('horizontal'))
+
+        must_return = False        
+        if out is None:
+            out = data.geometry.allocate(None)
+            must_return = True
+
+        if self.output_type == 'attenuation':
+            self.scaling_factor = -1
+        elif self.output_type == 'thickness':
+            self.scaling_factor = -(1/self.mu)
+        elif self.output_type == 'phase':
+            self.scaling_factor = (-self.delta*2*np.pi/self.wavelength)*(-1/self.mu)
+        
+        for i in tqdm(range(len(data.geometry.angles))):
+            projection = data.get_slice(angle=i).as_array()
+
+            fI = fft2(self.magnification**2*projection)
+            iffI = ifft2(fI*self.filter)
+            processed_projection = self.scaling_factor*np.log(iffI)
+            out.fill(processed_projection, angle = i)
+ 
+        if must_return:
+            return out
+        
+    def get_output(self, out=None, output_type = 'thickness'):
+        '''
+        Runs the configured processor and returns the processed data
+
+        Parameters
+        ----------
+        out : DataContainer, optional
+           Fills the referenced DataContainer with the processed data and suppresses the return
+        
+        output_type: string, optional
+            if 'attenuation', returns the attenuation of the sample corrected for phase effects, without scaling by mu, attenuation = µT 
+            if 'thickness' (default), returns the projected thickness T of the sample projected onto the image plane 
+            if 'phase', returns the phase of the beam at the material exit, phase ϕ(r⊥) = −δ T(r⊥) · 2π/λ
+        
+        Returns
+        -------
+        DataContainer
+            The processed data. Suppressed if `out` is passed
+
+        '''
+        if output_type == 'attenuation' or output_type == 'thickness' or output_type == 'phase':
+            self.output_type = output_type
+        else:
+            raise ValueError("output_type not recognised: got {0} expected one of 'attenuation', 'thickness' or 'phase'"\
+                            .format(output_type))
+        return super().get_output(out)
         
     def __calculate_mu(self):
         """
@@ -245,87 +268,4 @@ class PaganinProcessor(Processor):
 
         """
         return (constants.h*constants.speed_of_light)/(energy_eV*constants.electron_volt)
-
-class PaganinPhaseRetrieval(PaganinProcessor):
-    '''
-    Class for retrieving phase information
-    '''
-    def process_projection(self, projection):
-
-        fI = fft2(self.magnification**2*projection)
-        iffI = ifft2(fI*self.filter)
-        return self.scaling_factor*np.log(iffI)
-
-    def check_input(self, data):
-        
-        if self.propagation_distance_user is None: 
-            if data.geometry.dist_center_detector is None:
-                raise ValueError('Propagation distance not found, please provide propagation_distance as an argument or update geometry.dist_center_detector')
-            elif data.geometry.dist_center_detector == 0:
-                raise ValueError('Found geometry.dist_center_detector = 0, phase retrieval is not compatible with virtual magnification\
-                                 please provide a real propagation_distance as an argument or update geometry.dist_center_detector')
-            else:
-                propagation_distance = data.geometry.dist_center_detector
-                self.propagation_distance = (propagation_distance)*self.unit_multiplier
-        else:
-            self.propagation_distance = self.propagation_distance_user
-        
-        return super().check_input(data)
-    
-    def get_output(self, out=None, output_type = 'phase'):
-        '''
-        Runs the configured processor and returns the processed data
-
-        Parameters
-        ----------
-        out : DataContainer, optional
-           Fills the referenced DataContainer with the processed data and suppresses the return
-        
-        output_type: string, optional
-            if 'attenuation', returns the attenuation of the sample corrected for phase effects, without scaling by mu, attenuation = µT 
-            if 'thickness' (default), returns the projected thickness T of the sample projected onto the image plane 
-            if 'phase', returns the phase of the beam at the material exit, phase ϕ(r⊥) = −δ T(r⊥) · 2π/λ
-        
-        Returns
-        -------
-        DataContainer
-            The processed data. Suppressed if `out` is passed
-
-        '''
-        if output_type == 'attenuation':
-            self.scaling_factor = -1
-        elif output_type == 'thickness':
-            self.scaling_factor = -(1/self.mu)
-        elif output_type == 'phase':
-            self.scaling_factor = (-self.delta*2*np.pi/self.wavelength)*(-1/self.mu)
-        else:
-            raise ValueError("output_type not recognised: got {0} expected one of 'attenuation', 'thickness' or 'phase'"\
-                            .format(output_type))
-        return super().get_output(out)
-    
-class PaganinPhaseFilter(PaganinProcessor):
-    '''
-    Class for Paganin filter
-    '''
-    def process_projection(self, projection):
-
-        fI = fft2(self.magnification**2*projection)
-        iffI = ifft2(fI*self.filter)
-        return iffI
-        
-    def check_input(self, data):
-        
-        if self.propagation_distance_user is None: 
-            if data.geometry.dist_center_detector is None:
-                self.propagation_distance = 1
-            elif data.geometry.dist_center_detector == 0:
-                self.propagation_distance = 1
-            else:
-                propagation_distance = data.geometry.dist_center_detector
-                self.propagation_distance = (propagation_distance)*self.unit_multiplier
-        else:
-            self.propagation_distance = self.propagation_distance_user
-        
-        return super().check_input(data)
-        
         

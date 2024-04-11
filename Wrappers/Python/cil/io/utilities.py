@@ -18,10 +18,9 @@
 
 import numpy as np
 import json
-import logging
 import h5py
+from warnings import warn
 
-logger = logging.getLogger(__name__)
 
 def get_compress(compression=None):
     '''Returns whether the data needs to be compressed and to which numpy type
@@ -42,7 +41,7 @@ def get_compress(compression=None):
 
     '''
     if isinstance(compression, int):
-        logger.warning("get_compress: The use of int is deprecated and will be removed in the future. Use string instead.")
+        warn("Use string instead of int", DeprecationWarning, stacklevel=2)
 
     if compression is None or compression == 0:
         compress = False
@@ -72,7 +71,7 @@ def get_compressed_dtype(data, compression=None):
     dtype : numpy type, the numpy type to be used for compression
     '''
     if isinstance(compression, int):
-        logger.warning("get_compressed_dtype: The use of int is deprecated and will be removed in the future. Use string instead.")
+        warn("Use string instead of int", DeprecationWarning, stacklevel=2)
     if compression is None or compression == 0:
         dtype = data.dtype
     elif compression in [ 8, 'uint8']:
@@ -99,9 +98,8 @@ def get_compression_scale_offset(data, compression=0):
     scale : float, the scale to be applied to the data for compression to the specified number of bits
     offset : float, the offset to be applied to the data for compression to the specified number of bits
     '''
-
     if isinstance(compression, int):
-        logger.warning("get_compression_scale_offset: The use of int is deprecated and will be removed in the future. Use string instead.")
+        warn("Use string instead of int", DeprecationWarning, stacklevel=2)
 
     if compression is None or compression == 0:
         # no compression

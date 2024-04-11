@@ -19,8 +19,10 @@
 from cil.framework import DataProcessor, ImageData
 from cil.framework import DataOrder
 from cil.plugins.tigre import CIL2TIGREGeometry
-import logging
+import warnings
 import numpy as np
+import contextlib
+import io
 
 try:
     from tigre.algorithms import fdk, fbp
@@ -47,26 +49,14 @@ class FBP(DataProcessor):
     >>> from cil.plugins.tigre import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
+    >>> reconstruction = fbp.get_output()
 
     '''
 
     def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs):
 
-
-        sinogram_geometry = kwargs.get('sinogram_geometry', None)
-        volume_geometry = kwargs.get('volume_geometry', None)
-
-        if sinogram_geometry is not None:
-            acquisition_geometry = sinogram_geometry
-            logging.warning("sinogram_geometry has been deprecated. Please use acquisition_geometry instead.")
-
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
-        if volume_geometry is not None:
-            image_geometry = volume_geometry
-            logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
 
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
@@ -99,7 +89,9 @@ class FBP(DataProcessor):
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 
             if self.acquisition_geometry.geom_type == 'cone':
-                arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
+                # suppress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
+                with contextlib.redirect_stdout(io.StringIO()):
+                    arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             else:
                 arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)

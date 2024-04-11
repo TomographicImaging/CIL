@@ -30,6 +30,8 @@ C = 'c'
 NUMPY = 'numpy'
 CORRELATION_SPACE = "Space"
 CORRELATION_SPACECHANNEL = "SpaceChannels"
+log = logging.getLogger(__name__)
+
 
 class GradientOperator(LinearOperator):
 
@@ -100,13 +102,13 @@ class GradientOperator(LinearOperator):
         if backend == C:
             if self.correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
                 backend = NUMPY
-                logging.warning("C backend cannot use correlation='Space' on multi-channel dataset - defaulting to `numpy` backend")
+                log.warning("C backend cannot use correlation='Space' on multi-channel dataset - defaulting to `numpy` backend")
             elif domain_geometry.dtype != np.float32:
                 backend = NUMPY
-                logging.warning("C backend is only for arrays of datatype float32 - defaulting to `numpy` backend")
+                log.warning("C backend is only for arrays of datatype float32 - defaulting to `numpy` backend")
             elif method != 'forward':
                 backend = NUMPY
-                logging.warning("C backend is only implemented for forward differences - defaulting to `numpy` backend")
+                log.warning("C backend is only implemented for forward differences - defaulting to `numpy` backend")
         if backend == NUMPY:
             self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
         else:
@@ -229,7 +231,7 @@ class Gradient_numpy(LinearOperator):
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry,
                                              range_geometry = range_geometry)
 
-        logging.info("Initialised GradientOperator with numpy backend")
+        log.info("Initialised GradientOperator with numpy backend")
 
     def direct(self, x, out=None):
          if out is not None:
@@ -372,7 +374,7 @@ class Gradient_C(LinearOperator):
 
         super(Gradient_C, self).__init__(domain_geometry=domain_geometry,
                                          range_geometry=range_geometry)
-        logging.info("Initialised GradientOperator with C backend running with {} threads".format(cilacc.openMPtest(self.num_threads)))
+        log.info("Initialised GradientOperator with C backend running with %d threads", cilacc.openMPtest(self.num_threads))
 
     @staticmethod
     def datacontainer_as_c_pointer(x):

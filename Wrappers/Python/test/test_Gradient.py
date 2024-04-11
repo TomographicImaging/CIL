@@ -17,16 +17,16 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+import logging
 import numpy
 from cil.framework import ImageGeometry
-
 from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
+from utils import initialise_tests
 
-import logging
-
+log = logging.getLogger(__name__)
 initialise_tests()
+
 
 class TestGradientOperator(unittest.TestCase):
 
@@ -63,14 +63,14 @@ class TestGradientOperator(unittest.TestCase):
 
     def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
 
-        logging.info( " Test Failed ")
-        logging.info( " ImageGeometry {} \n".format(geom))
-        logging.info( " Bnd Cond {} ".format(bnd))
-        logging.info( " Backend {} ".format(backend))
-        logging.info( " Method {} ".format(method))
-        logging.info( " Correlation {} ".format(corr))
+        log.info("Test Failed")
+        log.info("ImageGeometry %s", geom)
+        log.info("Bnd Cond %s", bnd)
+        log.info("Backend %s", backend)
+        log.info("Method %s", method)
+        log.info("Correlation %s", corr)
         if split is not None:
-            logging.info( " Split {} ".format(split))
+            log.info("Split %s", split)
 
 
     def test_GradientOperator_linearity(self):

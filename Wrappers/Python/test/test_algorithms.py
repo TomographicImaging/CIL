@@ -60,10 +60,12 @@ from cil.optimisation.functions import TotalVariation
 from testclass import CCPiTestClass
 from utils import has_astra, initialise_tests
 
+log = logging.getLogger(__name__)
 initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
+
 
 class TestAlgorithms(CCPiTestClass):
     def test_GD(self):
@@ -193,7 +195,7 @@ class TestAlgorithms(CCPiTestClass):
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
-        logging.info ("initial objective {}".format(norm2sq(initial)))
+        log.info("initial objective %s", norm2sq(initial))
 
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction())
         alg.max_iteration = 2
@@ -294,7 +296,7 @@ class TestAlgorithms(CCPiTestClass):
         norm2sq = LeastSquares(identity, b)
 
         opt = {'tol': 1e-4, 'memopt':False}
-        logging.info ("initial objective {}".format(norm2sq(initial)))
+        log.info("initial objective %s", norm2sq(initial))
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction())
         alg.max_iteration = 2
         alg.run(20, verbose=0)
@@ -318,12 +320,12 @@ class TestAlgorithms(CCPiTestClass):
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
-        logging.info('Lipschitz {}'.format(norm2sq.L))
+        log.info('Lipschitz %s', norm2sq.L)
         # norm2sq.L = None
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         #norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
-        logging.info ("initial objective".format(norm2sq(initial)))
+        log.info("initial objective %s", norm2sq(initial))
         with self.assertRaises(ValueError):
             alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
 
@@ -387,7 +389,7 @@ class TestAlgorithms(CCPiTestClass):
         pdhg1.run(1000, verbose=0)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        logging.info ("RMSE {}".format(rmse))
+        log.info("RMSE %F", rmse)
         self.assertLess(rmse, 2e-4)
 
         which_noise = 1
@@ -411,7 +413,7 @@ class TestAlgorithms(CCPiTestClass):
         pdhg1.run(1000, verbose=0)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        logging.info("RMSE {}".format(rmse))
+        log.info("RMSE %f", rmse)
         self.assertLess(rmse, 2e-4)
 
 
@@ -436,7 +438,7 @@ class TestAlgorithms(CCPiTestClass):
         pdhg1.run(1000, verbose=0)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        logging.info("RMSE {}".format(rmse))
+        log.info("RMSE %f", rmse)
         self.assertLess(rmse, 2e-4)
 
 
@@ -567,14 +569,14 @@ class TestAlgorithms(CCPiTestClass):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                 max_iteration=5, gamma_fconj=-0.5)
         except ValueError as ve:
-            logging.info(str(ve))
+            log.info(str(ve))
 
         # check strongly convex constant not a number
         try:
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                 max_iteration=5, gamma_fconj="-0.5")
         except ValueError as ve:
-            logging.info(str(ve))
+            log.info(str(ve))
 
     def test_PDHG_strongly_convex_both_fconj_and_g(self):
 
@@ -590,7 +592,7 @@ class TestAlgorithms(CCPiTestClass):
                         gamma_g = 0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
         except ValueError as err:
-            logging.info(str(err))
+            log.info(str(err))
 
     def test_FISTA_Denoising(self):
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
@@ -616,7 +618,7 @@ class TestAlgorithms(CCPiTestClass):
         fista.update_objective_interval = 500
         fista.run(verbose=0)
         rmse = (fista.get_output() - data).norm() / data.as_array().size
-        logging.info("RMSE {}".format(rmse))
+        log.info("RMSE %f", rmse)
         self.assertLess(rmse, 4.2e-4)
 
 
@@ -768,7 +770,7 @@ class TestSIRT(CCPiTestClass):
         fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
         fista.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
-        
+
     def test_SIRT_with_TV_warm_start(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
@@ -779,8 +781,8 @@ class TestSIRT(CCPiTestClass):
         sirt.run(25, verbose=0)
 
         self.assertNumpyArrayAlmostEqual(sirt.x.as_array(), ig.allocate(0.25).as_array(),3)
-        
-    
+
+
 class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
@@ -869,7 +871,7 @@ class TestSPDHG(unittest.TestCase):
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
             )
-        logging.info ("Quality measures {}".format(qm))
+        log.info("Quality measures %r", qm)
 
         np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
                                             0.000335, decimal=3)
@@ -971,7 +973,7 @@ class TestSPDHG(unittest.TestCase):
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
             )
-        logging.info("Quality measures {}".format(qm))
+        log.info("Quality measures: %r", qm)
         np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
          0.00150 , decimal=3)
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()),

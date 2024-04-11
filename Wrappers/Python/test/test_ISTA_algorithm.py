@@ -34,7 +34,7 @@ if has_cvxpy:
 class TestISTA(unittest.TestCase):
 
     def setUp(self):
-        
+
         np.random.seed(10)
         n = 50
         m = 500
@@ -43,7 +43,7 @@ class TestISTA(unittest.TestCase):
         b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
 
         self.Aop = MatrixOperator(A)
-        self.bop = VectorData(b) 
+        self.bop = VectorData(b)
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
         self.g = ZeroFunction()
@@ -52,9 +52,9 @@ class TestISTA(unittest.TestCase):
         self.ig = self.Aop.domain
 
         self.initial = self.ig.allocate()
-  
+
     def tearDown(self):
-        pass   
+        pass
 
     def test_signature(self):
 
@@ -63,109 +63,109 @@ class TestISTA(unittest.TestCase):
             ista = ISTA(f = self.f, g = self.g)
 
         with np.testing.assert_raises(TypeError):
-            ista = ISTA(initial = self.initial, f = self.f)            
+            ista = ISTA(initial = self.initial, f = self.f)
 
         with np.testing.assert_raises(TypeError):
-            ista = ISTA(initial = self.initial, g = self.g) 
+            ista = ISTA(initial = self.initial, g = self.g)
 
         # ista no step-size
-        ista = ISTA(initial = self.initial, f = self.f, g = self.g)  
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g)
         np.testing.assert_equal(ista.step_size, 0.99*2./self.f.L)
 
         # ista step-size
         tmp_step_size = 10.
-        ista = ISTA(initial = self.initial, f = self.f, g = self.g, step_size=tmp_step_size)  
-        np.testing.assert_equal(ista.step_size, tmp_step_size)    
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, step_size=tmp_step_size)
+        np.testing.assert_equal(ista.step_size, tmp_step_size)
 
         # check initialisation
-        self.assertTrue( id(ista.x)!=id(ista.initial) )   
-        self.assertTrue( id(ista.x_old)!=id(ista.initial))              
+        self.assertTrue( id(ista.x)!=id(ista.initial) )
+        self.assertTrue( id(ista.x_old)!=id(ista.initial))
 
     def test_update(self):
 
         # ista run 10 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=1)  
+        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=1)
         ista.run()
 
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
-        for _ in range(1):         
+        for _ in range(1):
             x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
             x_old.fill(x)
 
-        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
-    
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
         # check objective
         res1 = ista.objective[-1]
         res2 = self.f(x) + self.g(x)
-        self.assertTrue( res1==res2) 
-        
+        self.assertTrue( res1==res2)
+
     def test_update_g_none(self):
 
         # ista run 10 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial = tmp_initial, f = self.f, g = None,  max_iteration=1)  
+        ista = ISTA(initial = tmp_initial, f = self.f, g = None,  max_iteration=1)
         ista.run()
 
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
-              
+
         x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
         x_old.fill(x)
 
-        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
-    
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
         # check objective
         res1 = ista.objective[-1]
         res2 = self.f(x) + self.g(x)
-        self.assertTrue( res1==res2) 
-        
+        self.assertTrue( res1==res2)
+
     def test_update_f_none(self):
 
         # ista run 1 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial = tmp_initial, f = None, g = self.h,  max_iteration=1)  
+        ista = ISTA(initial = tmp_initial, f = None, g = self.h,  max_iteration=1)
         ista.run()
 
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
-        for _ in range(1):         
+        for _ in range(1):
             x = ista.g.proximal(x_old,ista.step_size)
             x_old.fill(x)
 
-        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
-    
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
         # check objective
         res1 = ista.objective[-1]
         res2 = self.h(x)
-        self.assertTrue( res1==res2) 
+        self.assertTrue( res1==res2)
 
     def test_f_and_g_none(self):
         tmp_initial = self.ig.allocate()
         with self.assertRaises(ValueError):
-            ista = ISTA(initial = tmp_initial, f = None, g = None,  max_iteration=1)  
-        
-        
+            ista = ISTA(initial = tmp_initial, f = None, g = None,  max_iteration=1)
+
+
 
     def test_provable_condition(self):
 
         tmp_initial = self.ig.allocate()
-        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10) 
+        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10)
         self.assertTrue(ista1.is_provably_convergent())
 
-        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10, step_size=30.0) 
-        self.assertFalse(ista1.is_provably_convergent())        
+        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10, step_size=30.0)
+        self.assertFalse(ista1.is_provably_convergent())
 
 
-    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def test_with_cvxpy(self):
 
-        ista = ISTA(initial = self.initial, f = self.f, g = self.g, max_iteration=2000)  
-        ista.run(verbose=0)        
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, max_iteration=2000)
+        ista.run(verbose=0)
 
         u_cvxpy = cvxpy.Variable(self.ig.shape[0])
         objective = cvxpy.Minimize(0.5 * cvxpy.sum_squares(self.Aop.A @ u_cvxpy - self.bop.array))
@@ -174,6 +174,3 @@ class TestISTA(unittest.TestCase):
 
         np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
         np.testing.assert_allclose(u_cvxpy.value, ista.solution.array, atol=1e-3)
-
-
-

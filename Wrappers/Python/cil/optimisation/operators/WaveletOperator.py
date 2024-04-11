@@ -263,3 +263,11 @@ class WaveletOperator(LinearOperator):
         else:
             norm = LinearOperator.calculate_norm(self)
         return norm
+
+    def is_orthogonal(self):
+        '''Returns if the operator is orthogonal
+        Returns
+        -------
+        `Bool`
+        '''
+        return self._wavelet.orthogonal 

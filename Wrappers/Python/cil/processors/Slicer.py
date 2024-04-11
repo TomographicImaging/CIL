@@ -22,6 +22,9 @@ import numpy as np
 import weakref
 import logging
 
+log = logging.getLogger(__name__)
+
+
 # Note to developers: Binner and Slicer share a lot of common code
 # so Binner has been implemented as a child of Slicer.  This makes use
 # of commonality and redefines only the methods that differ. These methods
@@ -29,7 +32,7 @@ import logging
 class Slicer(DataProcessor):
 
     """This creates a Slicer processor.
-    
+
     The processor will crop the data, and then return every n input pixels along a dimension from the starting index.
 
     The output will be a data container with the data, and geometry updated to reflect the operation.
@@ -38,7 +41,7 @@ class Slicer(DataProcessor):
     ----------
 
     roi : dict
-        The region-of-interest to bin {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
+        The region-of-interest to slice {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
         The `key` being the axis name to apply the processor to, the `value` holding a tuple containing the ROI description
 
         Start: Starting index of input data. Must be an integer, or `None` defaults to index 0.
@@ -48,7 +51,7 @@ class Slicer(DataProcessor):
 
     Example
     -------
-    
+
     >>> from cil.processors import Slicer
     >>> roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}
     >>> processor = Slicer(roi)
@@ -70,14 +73,14 @@ class Slicer(DataProcessor):
     The indices provided are start inclusive, stop exclusive.
 
     All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {'axis_name',-1}
-    
+
     If only one number is provided, then it is interpreted as Stop. i.e. {'axis_name1':(stop)}
     If two numbers are provided, then they are interpreted as Start and Stop  i.e. {'axis_name1':(start, stop)}
 
     Negative indexing can be used to specify the index. i.e. {'axis_name1':(10, -10)} will crop the dimension symmetrically
-    
-    If Stop - Start is not multiple of Step, then 
-    the resulted dimension will have (Stop - Start) // Step 
+
+    If Stop - Start is not multiple of Step, then
+    the resulted dimension will have (Stop - Start) // Step
     elements, i.e. (Stop - Start) % Step elements will be ignored
 
     """
@@ -87,12 +90,12 @@ class Slicer(DataProcessor):
 
         kwargs = {
             '_roi_input': roi,
-            '_roi_ordered':None, 
-            '_data_array': False, 
-            '_geometry': None, 
-            '_processed_dims':None, 
-            '_shape_in':None, 
-            '_shape_out':None, 
+            '_roi_ordered':None,
+            '_data_array': False,
+            '_geometry': None,
+            '_processed_dims':None,
+            '_shape_in':None,
+            '_shape_out':None,
             'shape_out':None,
             'labels_out':None,
             '_labels_in':None,
@@ -101,7 +104,7 @@ class Slicer(DataProcessor):
             }
 
         super(Slicer, self).__init__(**kwargs)
-    
+
 
     def set_input(self, dataset):
         """
@@ -155,7 +158,7 @@ class Slicer(DataProcessor):
 
         self._set_up_processor(data)
 
-        return True 
+        return True
 
 
     def _set_up_processor(self, data):
@@ -169,7 +172,7 @@ class Slicer(DataProcessor):
         # set boolean of dimensions to process
         self._processed_dims = [0 if self._shape_out[i] == self._shape_in[i] else 1 for i in range(4)]
         self.shape_out = tuple([i for i in self._shape_out if i > 1])
-        self.labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out) if x > 1]      
+        self.labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out) if x > 1]
 
     def _parse_roi(self, ndim, shape, dimension_labels):
         '''
@@ -187,7 +190,7 @@ class Slicer(DataProcessor):
         for i in range(ndim):
 
             roi = self._roi_input.get(dimension_labels[i],None)
-            
+
             if roi == None or roi == -1:
                 continue
 
@@ -200,7 +203,7 @@ class Slicer(DataProcessor):
                 roi = [roi.start, roi.stop, roi.step]
             except AttributeError:
                 roi = list(roi)
-                
+
             length = len(roi)
 
             if length == 1:
@@ -224,14 +227,17 @@ class Slicer(DataProcessor):
                 stop += shape_in[offset + i]
 
             if stop > shape_in[offset+i]:
-                logging.warning("ROI for axis {0} has 'stop' out of bounds. Using axis length as stop value. Got stop index: {1}, using {2}".format(dimension_labels[i],stop, shape_in[offset+i]))
+                log.warning(f"ROI for axis {dimension_labels[i]} has 'stop' out of bounds. Using axis length as stop value."
+                            f" Got stop index: {stop}, using {shape_in[offset+i]}")
                 stop = shape_in[offset+i]
 
             if start > shape_in[offset+i]:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1} for axis length {2}".format(dimension_labels[i]),start, shape_in[offset+i])
+                raise ValueError(f"ROI for axis {dimension_labels[i]} has 'start' out of bounds."
+                                 f" Got start index: {start} for axis length {shape_in[offset+i]}")
 
             if start >= stop:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1}, stop index {2}".format(dimension_labels[i]),start, stop)
+                raise ValueError(f"ROI for axis {dimension_labels[i]} has 'start' out of bounds."
+                                 f" Got start index: {start}, stop index {stop}")
 
             # set values
             range_list[offset+ i] = range(int(start), int(stop), int(step))
@@ -244,7 +250,7 @@ class Slicer(DataProcessor):
 
     def _configure(self):
         """
-        Once the ROI has been parsed this configure the input specifically for use with Slicer        
+        Once the ROI has been parsed this configure the input specifically for use with Slicer
         """
         self._shape_out = [len(x) for x in self._roi_ordered]
         self._pixel_indices = [(x[0],x[-1]) for x in self._roi_ordered]
@@ -288,7 +294,7 @@ class Slicer(DataProcessor):
                         position = self._get_slice_position(roi)
                         geometry_new = geometry_new.get_slice(vertical = position)
                     except ValueError:
-                        logging.warn("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
+                        log.warning("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
                         return None
 
                 geometry_new.config.panel.pixel_size[1] *= roi.step
@@ -299,7 +305,7 @@ class Slicer(DataProcessor):
 
             if not processed_dims[i]:
                 continue
-            
+
             roi = self._roi_ordered[i]
             n_elements = len(roi)
 
@@ -396,7 +402,7 @@ class Slicer(DataProcessor):
         elif isinstance(self._geometry, AcquisitionGeometry):
             new_geometry = self._process_acquisition_geometry()
         else:
-            new_geometry = None           
+            new_geometry = None
 
         # return if just acting on geometry
         if not self._data_array:
@@ -418,7 +424,7 @@ class Slicer(DataProcessor):
             if new_geometry is not None:
                 if out.geometry != new_geometry:
                     raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, new_geometry))
-            
+
             data_out = out
 
 

@@ -4,7 +4,7 @@ import warnings
 import pywt
 
 from cil.framework import ImageGeometry, VectorGeometry
-from cil.optimisation.functions import L1Norm, WaveletNorm
+from cil.optimisation.functions import L1Norm, L1Sparsity
 from cil.optimisation.operators import WaveletOperator
 
 from testclass import CCPiTestClass
@@ -25,9 +25,14 @@ class TestWavelets(CCPiTestClass):
         self.assertEqual(W.bnd_cond, 'symmetric')
         self.assertEqual(W._trueAdj, True )
         self.assertEqual(W.level,int(np.log2(min(n,m))))
-        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)
+        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)    
+                
+        #Check is_linear
+        self.assertTrue(W.is_linear())
         
-
+        #Check is_orthogonal
+        self.assertEqual(W.is_orthogonal(), W._wavelet.orthogonal)
+    
         dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
         rg = ImageGeometry(voxel_num_x=n, voxel_num_y=m)
         with self.assertRaises(AttributeError):
@@ -53,11 +58,11 @@ class TestWavelets(CCPiTestClass):
         m, n=11,13
         dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n)
         W = WaveletOperator(dg)
-        Wnorm=WaveletNorm(W)
+        Wnorm=L1Sparsity(W)
         from cil.optimisation.functions.L1Norm import _L1Norm, _WeightedL1Norm
         self.assertTrue(issubclass(Wnorm.l1norm.function.__class__, _L1Norm))
         
-        Wnorm=WaveletNorm(W, weight=np.ones((13,11)))
+        Wnorm=L1Sparsity(W, weight=np.ones((13,11)))
         self.assertTrue(issubclass(Wnorm.l1norm.function.__class__, _WeightedL1Norm))
         self.assertNumpyArrayEqual(Wnorm.l1norm.function.weight, np.ones((13,11)))
     
@@ -124,6 +129,9 @@ class TestWavelets(CCPiTestClass):
 
                     self.assertEqual(Wx.shape, rg.shape, msg="Coefficient array shape should match range_geometry")
                     self.assertEqual(y.shape, dg.shape, msg="Adjoint array shape should match domain_geometry")
+                    
+                    #Check is_not_orthogonal
+                    self.assertEqual(W.is_orthogonal(), False)
 
                     # Reconstruction should be imperfect
                     self.assertLess(0, (x - y).norm(), msg="Biorthogonal wavelets with true adjoint should no longer produce perfect reconstructions")
@@ -239,19 +247,19 @@ class TestWavelets(CCPiTestClass):
                 W = WaveletOperator(dg, wname=wname, level=2, bnd_cond='periodization') # Need to set bnd_cond for most faithful adjoint
                 self.assertLess(0.9, W.norm())
 
-    def test_WaveletNorm(self):
+    def test_L1Sparsity(self):
         n = 20
         wname = 'db2'
         level = 2
 
         dg = VectorGeometry(n)
         W = WaveletOperator(dg, wname=wname, level=level)
-        WN = WaveletNorm(W)
+        WN = L1Sparsity(W)
 
         x = dg.allocate('random')
         Wx = W.direct(x)
 
-        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients", places=5)
+        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="L1Sparsity should be the sum of absolute values of the wavelet coefficients", places=5)
 
         y = W.adjoint(Wx)
         tau = 0.0
@@ -282,21 +290,23 @@ class TestWavelets(CCPiTestClass):
         for true_adjoint in [True, False]:
             with self.subTest(msg=f"Failed for biorthogonal wavelet with true_adjoint set to {true_adjoint}"):
                 W = WaveletOperator(dg, wname='bior3.5', level=1, true_adjoint=true_adjoint)
-                self.assertRaises(AttributeError, WaveletNorm, W) # This should always give error no matter which adjoint setting
+                self.assertEqual(W.is_orthogonal(), False)
+                self.assertRaises(AttributeError, L1Sparsity, W) # This should always give error no matter which adjoint setting
     
-    def test_WaveletNorm_complex_input(self):
+    def test_L1Sparsity_complex_input(self):
         n = 20
         wname = 'db2'
         level = 2
 
         dg = VectorGeometry(n)
         W = WaveletOperator(dg, wname=wname, level=level)
-        WN = WaveletNorm(W)
+        self.assertEqual(W.is_orthogonal(), True)
+        WN = L1Sparsity(W)
 
         x = dg.allocate('random', dtype='complex64')
         Wx = W.direct(x)
 
-        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="WaveletNorm should be the sum of absolute values of the wavelet coefficients", places =5 )
+        self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="L1Sparsity should be the sum of absolute values of the wavelet coefficients", places =5 )
 
         y = W.adjoint(Wx)
         tau = 0.0

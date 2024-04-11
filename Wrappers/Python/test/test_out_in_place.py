@@ -23,9 +23,11 @@ import numpy as np
 
 from cil.utilities.errors import InPlaceError
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
+
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
-from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, WaveletNorm
+from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity
 from cil.optimisation.operators import LinearOperator, MatrixOperator  
+
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator,  DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
@@ -108,7 +110,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL21Norm(), bg),
             (SmoothMixedL21Norm(epsilon=0.3), bg),
             (MixedL11Norm(), bg),
-            (WaveletNorm(WaveletOperator(ig)), ig)
+            (L1Sparsity(WaveletOperator(ig)), ig)
 
         ]
 
@@ -117,7 +119,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
 
     def get_result(self, function, method, x, *args):
         try:
-            input=x.copy() #To check that it isn't changed after function calls 
+            input=x.copy() #To check that it isn't changed after function calls
             if method == 'proximal':
                 out= function.proximal(x, *args)
             elif method == 'proximal_conjugate':
@@ -128,8 +130,8 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             return out
         except NotImplementedError:
             return None
-        
-    def in_place_test(self,desired_result, function, method,   x, *args, ): 
+
+    def in_place_test(self,desired_result, function, method,   x, *args, ):
             out3 = x.copy()
             try:
                 if method == 'proximal':
@@ -139,11 +141,11 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 elif method == 'gradient':
                     function.gradient(out3, *args, out=out3)
                 self.assertDataArraysInContainerAllClose(desired_result, out3, rtol=1e-5, msg= "In place calculation failed for func."+method+'(data, *args, out=data) where func is  ' + function.__class__.__name__+ '. ')
-      
+
             except (InPlaceError, NotImplementedError):
                 pass
- 
-        
+
+
     def out_test(self, desired_result, function, method,  x, *args, ):
         input = x.copy()
         out2=0*(x.copy())
@@ -156,12 +158,12 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 function.gradient(input, *args, out=out2)
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in func."+method+'(x, *args, out=data) where func is  ' + function.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case func."+method+'(data, *args, out=out) where func is  ' + function.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
-      
+
         except (InPlaceError, NotImplementedError):
             pass
-            
-            
-   
+
+
+
     def test_proximal_conjugate_out(self):
         for func, geom in self.func_geom_test_list:
             for data_array in self.data_arrays:
@@ -170,7 +172,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 result=self.get_result(func, 'proximal_conjugate', data, 0.5)
                 self.out_test(result, func,  'proximal_conjugate',  data, 0.5)
                 self.in_place_test(result, func, 'proximal_conjugate',  data, 0.5)
-    
+
     def test_proximal_out(self):
         for func, geom in self.func_geom_test_list:
             for data_array in self.data_arrays:
@@ -179,7 +181,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 result=self.get_result(func, 'proximal', data, 0.5)
                 self.out_test(result, func, 'proximal',  data, 0.5)
                 self.in_place_test(result,func,  'proximal',  data, 0.5)
-                
+
     def test_gradient_out(self):
         for func, geom in self.func_geom_test_list:
                 for data_array in self.data_arrays:
@@ -189,28 +191,28 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                     result=self.get_result(func, 'gradient', data)
                     self.out_test(result, func, 'gradient',   data)
                     self.in_place_test(result, func, 'gradient',   data)
-                
-    
+
+
 
 class TestOperatorOutAndInPlace(CCPiTestClass):
     def setUp(self):
-       
+
         ig = ImageGeometry(10,10,channels=3)
         ig_2D=ImageGeometry(10,10)
         vg = VectorGeometry(10)
-        
+
         mask = ig.allocate(True,dtype=bool)
         amask = mask.as_array()
         amask[2,1:3,:] = False
         amask[0,0,:] = False
-    
 
 
-        
+
+
         # Parameters for point spread function PSF (size and std)
-        ks          = 10; 
+        ks          = 10;
         ksigma      = 5.0
-        
+
         # Create 1D PSF and 2D as outer product, then normalise.
         w           = numpy.exp(-numpy.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
         w.shape     = (ks,1)
@@ -220,7 +222,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
         PSF         = np.array([PSF]*3)
 
         np.random.seed(5)
-        
+
         self.operator_geom_test_list = [
             (MatrixOperator(numpy.random.randn(10, 10)), vg),
             (ZeroOperator(ig), ig),
@@ -234,18 +236,18 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             (FiniteDifferenceOperator(ig, direction = 0) , ig)]
             
 
-        
+
         self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.array(range(0,65400, 218), dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]
         self.vector_data_arrays=[np.random.normal(0,1, (10)).astype(np.float32),  np.array(range(0,65400, 6540), dtype=np.uint16), np.random.uniform(-0.1,1,(10)).astype(np.float32)]
- 
 
-               
-        
-        
-        
+
+
+
+
+
     def get_result(self, operator, method, x, *args):
         try:
-            input=x.copy() #To check that it isn't changed after function calls 
+            input=x.copy() #To check that it isn't changed after function calls
             if method == 'direct':
                 out= operator.direct(x, *args)
             elif method == 'adjoint':
@@ -255,8 +257,8 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             return out
         except NotImplementedError:
             return None
-        
-    def in_place_test(self,desired_result, operator, method,   x, *args, ): 
+
+    def in_place_test(self,desired_result, operator, method,   x, *args, ):
             out3 = x.copy()
             try:
                 if method == 'direct':
@@ -265,11 +267,11 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                     operator.adjoint(out3, *args, out=out3)
 
                 self.assertDataArraysInContainerAllClose(desired_result, out3, rtol=1e-5, msg= "In place calculation failed for operator."+method+'(data, *args, out=data) where operator is  ' + operator.__class__.__name__+ '. ')
-      
+
             except (InPlaceError, NotImplementedError):
                 pass
- 
-        
+
+
     def out_test(self, desired_result, operator, method,  x, *args, ):
         input = x.copy()
         out2=0*(x.copy())
@@ -278,13 +280,13 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 operator.direct(input, *args, out=out2)
             elif method == 'adjoint':
                 operator.adjoint(input, *args, out=out2)
-            
+
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case operator."+method+'(data, *args, out=out) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
-      
+
         except (InPlaceError, NotImplementedError):
             pass
-            
+
     def test_direct_out(self):
         for operator, geom in self.operator_geom_test_list:
             for data_array in self.data_arrays:
@@ -296,7 +298,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 result=self.get_result(operator, 'direct', data)
                 self.out_test(result, operator,  'direct',  data)
                 self.in_place_test(result, operator, 'direct',  data)
-    
+
     def test_proximal_out(self):
         for operator, geom in self.operator_geom_test_list:
             for data_array in self.data_arrays:

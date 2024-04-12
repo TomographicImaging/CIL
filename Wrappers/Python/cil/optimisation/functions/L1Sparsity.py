@@ -30,7 +30,7 @@ class L1Sparsity(Function):
     a) .. math:: F(x) = ||Qx||_{1}
     b) .. math:: F(x) = ||Qx - b||_{1}
 
-    In the weighted case, :math:`w` is an array of positive weights.
+    In the weighted case, `weight` = :math:`w` is an array of positive weights.
 
     a) .. math:: F(x) = ||Qx||_{L^1(w)}
     b) .. math:: F(x) = ||Qx - b||_{L^1(w)}
@@ -45,7 +45,7 @@ class L1Sparsity(Function):
         Note that for the correct calculation of the proximal the provided operator must be orthogonal 
     b : Data, DataContainer, defualt is None 
     weight: array, optional, default=None
-        weight array matching the size of the range of operator :math:`Q`.
+        positive weight array matching the size of the range of operator :math:`Q`.
     """
 
     def __init__(self, Q, b=None, weight=None):
@@ -69,7 +69,7 @@ class L1Sparsity(Function):
         a) .. math:: F(x) = ||Qx||_{1}
         b) .. math:: F(x) = ||Qx - b||_{1}
 
-        In the weighted case, :math:`w` is an array of positive weights.
+        In the weighted case, `weight` = :math:`w` is an array of positive weights.
 
         a) .. math:: F(x) = ||Qx||_{L^1(w)}
         b) .. math:: F(x) = ||Qx - b||_{L^1(w)}

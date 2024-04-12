@@ -161,14 +161,14 @@ VectorData
 BlockDataContainer
 ------------------
 
-A :code:`BlockDataContainer` can be instantiated from a number of :code:`DataContainer` and subclasses
-represents a column vector of :code:`DataContainer`s.
+A :code:`BlockDataContainer` can be instantiated from a number of `DataContainer`_ and subclasses
+represents a column vector of :code:`DataContainer` s.
 
 .. code:: python
 
   bdc = BlockDataContainer(DataContainer0, DataContainer1)
 
-This provide a base class that will behave as normal ``DataContainer``.
+This provide a base class that will behave as normal :code:`DataContainer`.
 
 .. autoclass:: cil.framework.BlockDataContainer
    :members:

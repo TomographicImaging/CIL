@@ -45,7 +45,7 @@ class WaveletOperator(LinearOperator):
             Default = `None`, meaning all dimensions are transformed. Same as axes = range(ndim)
 
 
-        **kwargs:
+        **kwargs
         ---------
         correlation: str, default 'All'. Note: Only applied if `axes = None`!
             'All' will compute the wavelet decomposition on every possible dimension.
@@ -266,6 +266,7 @@ class WaveletOperator(LinearOperator):
 
     def is_orthogonal(self):
         '''Returns if the operator is orthogonal
+        
         Returns
         -------
         `Bool`

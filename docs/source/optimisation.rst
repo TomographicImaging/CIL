@@ -320,7 +320,7 @@ GradientOperator
 
 WaveletOperator
 ---------------
-We utilise [PyWavelets](https://pywavelets.readthedocs.io/en/latest/index.html) to build wavelet operators in CIL:
+We utilise PyWavelets (https://pywavelets.readthedocs.io/en/latest/index.html) to build wavelet operators in CIL:
 
 .. autoclass:: cil.optimisation.operators.WaveletOperator
    :members:

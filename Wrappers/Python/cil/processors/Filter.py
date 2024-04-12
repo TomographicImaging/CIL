@@ -21,31 +21,12 @@
 from cil.framework import Processor
 from cil.processors import PhaseRetriever
 
+import numpy as np
 from tqdm import tqdm
 from scipy.fft import fft2
 from scipy.fft import ifft2
 
-class Filter(Processor):
-
-    def process(self, out=None):
-
-        data = self.get_input()
-
-        self.create_filter(data.get_dimension_size('vertical'), data.get_dimension_size('horizontal'))
-
-        must_return = False        
-        if out is None:
-            out = data.geometry.allocate(None)
-            must_return = True
-        
-        for i in tqdm(range(len(data.geometry.angles))):
-            projection = data.get_slice(angle=i).as_array()
-            iffI = ifft2(fft2(projection)*self.filter)
-            out.fill(iffI, angle = i)
- 
-        if must_return:
-            return out
-    
+class Filter(Processor): 
 
     @staticmethod
     def Paganin(delta_beta):
@@ -85,10 +66,43 @@ class PaganinFilter(Filter):
 
         super(PaganinFilter, self).__init__(**kwargs)
 
+    def check_input(self, data):
+        if not isinstance(self.delta_beta, (int, float)):
+            raise TypeError('delta_beta must be a real number, got type '.format(type(self.data_beta)))
+        
+        return True
+
     def create_filter(self, Nx, Ny):
         processor = PhaseRetriever.Paganin(energy_eV = 1, delta = 1, beta = 1/self.delta_beta, unit_multiplier = 1, propagation_distance = 1, magnification = 1, filter_type='paganin_method')
-        self.filter = processor.create_filter(Nx, Ny)
+        processor.set_input(self.get_input())
+        processor.create_filter(Nx, Ny)
+        self.filter = processor.filter
     
+    def process(self, out=None):
+
+        data = self.get_input()
+
+        must_return = False        
+        if out is None:
+            out = data.geometry.allocate(None)
+            must_return = True
+
+        filter_shape = np.shape(data.get_slice(angle=0).as_array())
+        if data.geometry.dimension == '2D':
+            data = np.expand_dims(data.as_array(),2)
+        else:
+            data = data.as_array()
+
+        filter_shape = np.shape(data.take(indices = 0, axis = out.get_dimension_axis('angle')))
+        self.create_filter(filter_shape[0], filter_shape[1])
+
+        for i in tqdm(range(len(out.geometry.angles))):
+            projection = data.take(indices = i, axis = out.get_dimension_axis('angle'))
+            iffI = ifft2(fft2(projection)*self.filter)
+            out.fill(np.squeeze(iffI), angle = i)
+ 
+        if must_return:
+            return out
         
 
     

@@ -30,8 +30,7 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinPhaseProcessor
-from cil.processors import PhaseRetriever
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PhaseRetriever, Filter
 import gc
 
 from scipy import constants
@@ -2803,11 +2802,6 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
-    
-    # 'mu'
-    # 4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt))
-
-    # 4.0*numpy.pi*3/((constants.h*constants.speed_of_light)/(1*constants.electron_volt))
 
     def test_PaganinPhaseRetriever_check_input(self):
         # check the propagation distance can be found from the geometry if there is no user input
@@ -2909,6 +2903,24 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         output = processor.get_output(output_type = 'phase')
         self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
 
+    def test_PaganinPhaseRetriever_2D(self):
+        data_slice = self.data_parallel.get_slice(vertical=10)
+        absorption = -1*numpy.log(data_slice)
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data_slice)
+        phase = (-1*2*numpy.pi/wavelength)*((-1/mu)*numpy.log(data_slice))
+
+        processor = PhaseRetriever.Paganin(propagation_distance = 1)
+        
+        processor.set_input(data_slice)
+        output = processor.get_output(output_type = 'attenuation')
+        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
+        output = processor.get_output(output_type = 'thickness')
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+        output = processor.get_output(output_type = 'phase')
+        self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
+
         # # check filter processor returns filtered image without scaling
         # processor = PaganinPhaseProcessor.filter()
         # processor.set_input(self.data_parallel)
@@ -2919,6 +2931,17 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         # output = processor.get_output()
         # self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
 
+class TestFilter(unittest.TestCase):       
+
+    def setUp(self):      
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+
+    def test_PaganinFilter(self):
+        
+        processor = Filter.Paganin(delta_beta = 0.01)
+        processor.set_input(self.data_parallel)
+        processor.get_output()
         
 if __name__ == "__main__":
 

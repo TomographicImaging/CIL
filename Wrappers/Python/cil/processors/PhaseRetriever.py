@@ -143,14 +143,12 @@ class PaganinPhaseRetriever(PhaseRetriever):
 
         if (geometry.pixel_size_h - geometry.pixel_size_v ) / \
             (geometry.pixel_size_h + geometry.pixel_size_v ) < 1e-5:
-            self.pixel_size = (data.geometry.pixel_size_h*self.unit_multiplier)/self.magnification
+            self.pixel_size = (data.geometry.pixel_size_h*self.unit_multiplier)
         else:
             raise ValueError('Panel pixel size is not homogeneous up to 1e-5: got {} {}'\
                     .format( geometry.pixel_size_h, geometry.pixel_size_v )
                 )
         
-        self.propagation_distance = self.propagation_distance
-
         return True
         
     def create_filter(self, Nx, Ny):
@@ -189,13 +187,20 @@ class PaganinPhaseRetriever(PhaseRetriever):
 
         data  = self.get_input()
 
-        self.create_filter(data.get_dimension_size('vertical'), data.get_dimension_size('horizontal'))
-
         must_return = False        
         if out is None:
             out = data.geometry.allocate(None)
             must_return = True
 
+        filter_shape = np.shape(data.get_slice(angle=0).as_array())
+        if data.geometry.dimension == '2D':
+            data = np.expand_dims(data.as_array(),2)
+        else:
+            data = data.as_array()
+
+        filter_shape = np.shape(data.take(indices = 0, axis = out.get_dimension_axis('angle')))
+        self.create_filter(filter_shape[0], filter_shape[1])
+    
         if self.output_type == 'attenuation':
             self.scaling_factor = -1
         elif self.output_type == 'thickness':
@@ -203,13 +208,12 @@ class PaganinPhaseRetriever(PhaseRetriever):
         elif self.output_type == 'phase':
             self.scaling_factor = (-self.delta*2*np.pi/self.wavelength)*(-1/self.mu)
         
-        for i in tqdm(range(len(data.geometry.angles))):
-            projection = data.get_slice(angle=i).as_array()
-
+        for i in tqdm(range(len(out.geometry.angles))):
+            projection = data.take(indices = i, axis = out.get_dimension_axis('angle'))
             fI = fft2(self.magnification**2*projection)
             iffI = ifft2(fI*self.filter)
             processed_projection = self.scaling_factor*np.log(iffI)
-            out.fill(processed_projection, angle = i)
+            out.fill(np.squeeze(processed_projection), angle = i)
  
         if must_return:
             return out

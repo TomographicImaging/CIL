@@ -238,8 +238,8 @@ class _WeightedL1Norm(Function):
         self.weight = weight
         self.b = b
 
-        if np.min(weight) <= 0:
-            raise ValueError("Weights should be strictly positive!")
+        if np.min(weight) < 0:
+            raise ValueError("Weights should be non-negative!")
 
     def __call__(self, x):
         y = x*self.weight
@@ -250,7 +250,10 @@ class _WeightedL1Norm(Function):
         return y.abs().sum()
 
     def convex_conjugate(self,x):
-        tmp = (x.abs()/self.weight).max() - 1
+        if np.any(x.abs() > self.weight): # This handles weight being zero problems
+            return np.inf
+        # Avoid division by the weight
+        tmp = (x.abs() - self.weight).max()
 
         if tmp<=1e-5:
             if self.b is not None:
@@ -260,9 +263,7 @@ class _WeightedL1Norm(Function):
         return np.inf
 
     def proximal(self, x, tau, out=None):
-        tau *= self.weight
-        ret = _L1Norm.proximal(self, x, tau, out=out)
-        tau /= self.weight
+        ret = _L1Norm.proximal(self, x, tau*self.weight, out=out)
         return ret
 
 class MixedL11Norm(Function):

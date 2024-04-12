@@ -996,6 +996,23 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(f2(x), w)
         np.testing.assert_allclose(f2(x), f1(weights))
 
+    def test_ZeroWeights_L1Norm(self):
+        weight = VectorData(np.array([0., 1.]))
+        tau = 0.2
+
+        x = VectorData(np.array([0., 1.]))
+        y = VectorData(np.array([1., 0.]))
+        f = L1Norm(weight=weight)
+
+        np.testing.assert_almost_equal(f(x), 1.)
+        np.testing.assert_almost_equal(f(y), 0.)
+
+        np.testing.assert_allclose(f.proximal(x, tau=tau).as_array(), 0.8*x.as_array())
+        np.testing.assert_allclose(f.proximal(y, tau=tau).as_array(), y.as_array())
+
+        np.testing.assert_almost_equal(f.convex_conjugate(x), 0.)
+        np.testing.assert_almost_equal(f.convex_conjugate(y), np.inf)
+
     def test_L1Norm_input(self):
         N, M = 2,3
         geom = ImageGeometry(N, M)

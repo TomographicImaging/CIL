@@ -74,7 +74,7 @@ class L1Sparsity(Function):
         a) .. math:: F(x) = ||Qx||_{L^1(w)}
         b) .. math:: F(x) = ||Qx - b||_{L^1(w)}
 
-        with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
+        with :math:`||x||_{L^1(w)} = || x w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
             
         """
         y = self.Q.direct(x)
@@ -108,7 +108,7 @@ class L1Sparsity(Function):
         a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*})
         b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*}) + \langle Qx^{*},b\rangle
 
-        with :math:`\|x\|_{L^\infty(w^{-1})} = \mQx_{i} \frac{|x_i|}{w_i}`.
+        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}`.
     
     
         """
@@ -122,18 +122,18 @@ class L1Sparsity(Function):
 
         Consider the following cases:
 
-        a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau}(Qx)
-        b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(Qx) + b
+        a) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau}(Qx)
+        b) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_\tau(Qx) + b
 
         where,
 
-        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \mQx\{ |x| - \tau, 0 \}
+        .. math :: \mathrm{prox}_{\tau | \cdot |}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
 
         The weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
         by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
 
-        a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)
-        b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b
+        a) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau*w}(Qx)
+        b) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau*w}(Qx) + b
 
 
         Parameters

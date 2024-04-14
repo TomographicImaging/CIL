@@ -69,19 +69,18 @@ class SPDHG(Algorithm):
 
     .. math::
 
-    \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
+      \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
 
     Note
     ----
 
-    Notation for primal and dual step-sizes are reversed with comparison
-        to PDHG.py
+    Notation for primal and dual step-sizes are reversed with comparison to PDHG.py
 
     Note
     ----
 
     this code implements serial sampling only, as presented in [2]
-        (to be extended to more general case of [1] as future work)
+    (to be extended to more general case of [1] as future work)
 
     References
     ----------
@@ -111,6 +110,7 @@ class SPDHG(Algorithm):
                initial=None, prob=None, gamma=1., norms=None):
 
         '''set-up of the algorithm
+        
         Parameters
         ----------
         f : BlockFunction

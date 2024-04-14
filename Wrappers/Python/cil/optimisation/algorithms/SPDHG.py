@@ -69,7 +69,7 @@ class SPDHG(Algorithm):
 
     .. math::
 
-      \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
+      \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i \textrm{for all} i
 
     Note
     ----

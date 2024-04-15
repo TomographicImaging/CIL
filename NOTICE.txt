@@ -32,6 +32,8 @@ Institutions Key:
 9 - Swansea University
 10 - University of Warwick
 11 - University of Helsinki
+12 - Australian e-Health Research, Australia
+13 - KU Leuven 
 
 CIL Developers in date order:
 Edoardo Pasca (2017 – present) - 1
@@ -49,7 +51,7 @@ Srikanth Nagella (2017-2018) - 1
 Daniil Kazantsev (2018) - 3
 Ryan Warr (2019) - 3
 Tomas Kulhanek (2019) - 1
-Claire Delplancke (2019 - 2022) - 7
+Claire Delplancke (2019 - 2022) - 7 
 Matthias Ehrhardt (2019 - 2023) - 7
 Richard Brown (2020-2021) - 5
 Sam Tygier (2022) - 1
@@ -57,6 +59,10 @@ Andrew Sharits (2022) - 8
 Kyle Pidgeon (2023) - 1
 Letizia Protopapa (2023) - 1
 Tommi Heikkilä (2023) - 11
+Ashley Gillman (2024) -12 
+Zeljko Kerata (2024) - 5
+Evgueni Ovtchinnikov (2024) -1 
+Georg Schramm (2024) - 13
 
 CIL Advisory Board:
 Llion Evans - 9

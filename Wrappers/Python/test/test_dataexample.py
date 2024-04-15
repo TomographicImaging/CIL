@@ -21,10 +21,15 @@ from utils import initialise_tests
 from cil.framework.framework import ImageGeometry,AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
-import os, sys
+import os, sys, shutil
 from testclass import CCPiTestClass
 import platform
 import numpy as np
+from unittest.mock import patch, MagicMock 
+from urllib import request
+from zipfile import ZipFile
+from io import StringIO
+from tempfile import NamedTemporaryFile
 
 initialise_tests()
 
@@ -147,4 +152,121 @@ class TestTestData(CCPiTestClass):
                                          .set_panel((128,128),(64,64))\
                                          .set_angles(np.linspace(0,360,300,False))
 
-        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")
+        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+
+class TestRemoteData(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.data_list = ['WALNUT','USB','KORN','SANDSTONE']
+        self.shapes_path = os.path.join(dataexample.CILDATA.data_dir, dataexample.TestData.SHAPES)
+
+    def mock_urlopen(self, mock_urlopen, zipped_bytes):
+        mock_response = MagicMock()
+        mock_response.read.return_value = zipped_bytes
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+    @unittest.skipIf(platform.system() == 'Windows', "Skip on Windows")   
+    @patch('cil.utilities.dataexample.urlopen')
+    def test_unzip_remote_data(self, mock_urlopen):
+        '''
+        Test the _download_and_extract_data_from_url function correctly extracts files from a byte string
+        The zipped byte string is mocked using a temporary local zip file
+        '''
+        
+        # create a temporary zip file to test the function
+        with NamedTemporaryFile(suffix = '.zip') as tf:
+            tmp_path = os.path.dirname(tf.name)
+            tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
+            with ZipFile(tf.name, mode='w') as zip_file:
+                zip_file.write(self.shapes_path, arcname=dataexample.TestData.SHAPES)
+                
+            with open(tf.name, 'rb') as zip_file:
+                zipped_bytes = zip_file.read()
+        
+        self.mock_urlopen(mock_urlopen, zipped_bytes)
+        dataexample.REMOTEDATA._download_and_extract_from_url(os.path.join(tmp_path, tmp_dir))
+
+        self.assertTrue(os.path.isfile(os.path.join(tmp_path, tmp_dir, dataexample.TestData.SHAPES)))
+
+        if os.path.exists(os.path.join(tmp_path,tmp_dir)):
+            shutil.rmtree(os.path.join(tmp_path,tmp_dir)) 
+        
+    @unittest.skipIf(platform.system() == 'Windows', "Skip on Windows")   
+    @patch('cil.utilities.dataexample.input', return_value='n')    
+    @patch('cil.utilities.dataexample.urlopen')
+    def test_download_data_input_n(self, mock_urlopen, input):
+        '''
+        Test the download_data function, when the user input is 'n' to 'are you sure you want to download data'
+        The zipped byte string is mocked using a temporary local zip file
+        '''
+        
+        # create a temporary zip file to test the function
+        with NamedTemporaryFile(suffix = '.zip') as tf:
+            tmp_path = os.path.dirname(tf.name)
+            tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
+            with ZipFile(tf.name, mode='w') as zip_file:
+                zip_file.write(self.shapes_path, arcname=dataexample.TestData.SHAPES)
+                
+            with open(tf.name, 'rb') as zip_file:
+                    zipped_bytes = zip_file.read()
+
+        self.mock_urlopen(mock_urlopen, zipped_bytes)
+
+        for data in self.data_list:
+            # redirect print output
+            capturedOutput = StringIO()                 
+            sys.stdout = capturedOutput 
+            test_func = getattr(dataexample, data)
+            test_func.download_data(os.path.join(tmp_path, tmp_dir))
+            self.assertFalse(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)), msg = "Failed with dataset " + data)
+            self.assertEqual(capturedOutput.getvalue(),'Download cancelled\n', msg = "Failed with dataset " + data)
+            # return to standard print output
+            sys.stdout = sys.__stdout__ 
+
+        if os.path.exists(os.path.join(tmp_path,tmp_dir)):
+            shutil.rmtree(os.path.join(tmp_path,tmp_dir)) 
+
+    @unittest.skipIf(platform.system() == 'Windows', "Skip on Windows")   
+    @patch('cil.utilities.dataexample.input', return_value='y')    
+    @patch('cil.utilities.dataexample.urlopen')
+    def test_download_data_input_y(self, mock_urlopen, input):
+        '''
+        Test the download_data function, when the user input is 'y' to 'are you sure you want to download data'
+        The zipped byte string is mocked using a temporary local zip file
+        '''
+        
+        with NamedTemporaryFile(suffix = '.zip') as tf:
+            tmp_path = os.path.dirname(tf.name)
+            tmp_dir = os.path.splitext(os.path.basename(tf.name))[0]
+            with ZipFile(tf.name, mode='w') as zip_file:
+                zip_file.write(self.shapes_path, arcname=dataexample.TestData.SHAPES)
+                
+            with open(tf.name, 'rb') as zip_file:
+                    zipped_bytes = zip_file.read()
+
+        self.mock_urlopen(mock_urlopen, zipped_bytes)
+
+        # redirect print output
+        capturedOutput = StringIO()                 
+        sys.stdout = capturedOutput         
+
+        for data in self.data_list:
+            test_func = getattr(dataexample, data)
+            test_func.download_data(os.path.join(tmp_path, tmp_dir))
+            self.assertTrue(os.path.isfile(os.path.join(tmp_path, tmp_dir, test_func.FOLDER, dataexample.TestData.SHAPES)), msg = "Failed with dataset " + data)
+        
+        # return to standard print output
+        sys.stdout = sys.__stdout__ 
+        
+        if os.path.exists(os.path.join(tmp_path,tmp_dir)):
+            shutil.rmtree(os.path.join(tmp_path,tmp_dir))
+
+
+    def test_download_data_bad_URL(self):
+        '''
+        Test an error is raised when _download_and_extract_from_url has an empty URL
+        '''
+        with self.assertRaises(ValueError):
+            dataexample.REMOTEDATA._download_and_extract_from_url('.')

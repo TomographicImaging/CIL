@@ -19,10 +19,10 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
 import numpy
-import warnings
 import logging
 from numbers import Number
 
+log = logging.getLogger(__name__)
 
 
 class ISTA(Algorithm):
@@ -124,11 +124,8 @@ class ISTA(Algorithm):
         self.set_up(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
 
     def set_up(self, initial, f, g, step_size, **kwargs):
-        """ Set up of the algorithm
-        """
-
-        logging.info("{} setting up".format(self.__class__.__name__, ))
-
+        """Set up of the algorithm"""
+        log.info("%s setting up", self.__class__.__name__)
         # set up ISTA
         self.initial = initial
         self.x_old = initial.copy()
@@ -150,8 +147,7 @@ class ISTA(Algorithm):
         # set step_size
         self.set_step_size(step_size=step_size)
         self.configured = True
-
-        logging.info("{} configured".format(self.__class__.__name__, ))
+        log.info("%s configured", self.__class__.__name__)
 
 
     def update(self):

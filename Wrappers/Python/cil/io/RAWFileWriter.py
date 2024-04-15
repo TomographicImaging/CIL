@@ -23,6 +23,8 @@ import configparser
 
 import logging
 
+log = logging.getLogger(__name__)
+
 
 def compress_and_save(data, compress, scale, offset, dtype, fname):
     '''Compress and save numpy array to file
@@ -45,7 +47,7 @@ def compress_and_save(data, compress, scale, offset, dtype, fname):
     else:
         d = data
 
-    logging.info(
+    log.info(
         "Data is always written in ‘C’ order, independent of the order of d.")
     d.tofile(fname)
 
@@ -140,8 +142,8 @@ class RAWFileWriter(object):
         self.file_name = os.path.splitext(os.path.basename(file_name))[0]
 
         self.dir_name = os.path.dirname(file_name)
-        logging.info("dir_name {}".format(self.dir_name))
-        logging.info("file_name {}".format(self.file_name))
+        log.info("dir_name %s", self.dir_name)
+        log.info("file_name %s", self.file_name)
 
         # Deal with compression
         self.compress = utilities.get_compress(compression)
@@ -180,8 +182,8 @@ class RAWFileWriter(object):
                 'scale': self.scale,
                 'offset': self.offset,
             }
-        logging.info("Saving to {}".format(self.file_name))
-        logging.info(str(config))
+        log.info("Saving to %s", self.file_name)
+        log.info(str(config))
         # write the configuration to an ini file
         with open(os.path.join(self.dir_name, self.file_name + '.ini'),
                   'w') as configfile:

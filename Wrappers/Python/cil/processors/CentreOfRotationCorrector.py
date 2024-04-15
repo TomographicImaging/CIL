@@ -84,7 +84,7 @@ class CentreOfRotationCorrector(DataProcessor):
 
 
     @staticmethod
-    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None):
         """This creates a CentreOfRotationCorrector processor.
 
         The processor will find the centre offset by maximising the sharpness of a reconstructed slice.
@@ -108,11 +108,6 @@ class CentreOfRotationCorrector(DataProcessor):
 
         initial_binning : int
             The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
-
-        Other Parameters
-        ----------------
-        **kwargs : dict
-            FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
 
 
         Example
@@ -139,5 +134,5 @@ class CentreOfRotationCorrector(DataProcessor):
         This method is unreliable on half-scan data with 'tuning-fork' style artifacts.
 
         """
-        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning, **kwargs)
+        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
         return processor

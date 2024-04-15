@@ -1,3 +1,4 @@
+
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -162,12 +163,9 @@ class Function(object):
 
         """
 
-        if isinstance(other, Function):
-            return SumFunction(self, other)
-        elif isinstance(other, (SumScalarFunction, ConstantFunction, Number)):
+        if isinstance(other,  Number):
             return SumScalarFunction(self, other)
-        else:
-            raise ValueError('Not implemented')
+        return SumFunction(self, other)
 
     def __radd__(self, other):
         """ Making addition commutative. """
@@ -379,6 +377,9 @@ class SumFunction(Function):
         else:
             return super(SumFunction, self).__add__(other)
 
+    @property
+    def num_functions(self):
+        return len(self.functions)
 
 class ScaledFunction(Function):
 

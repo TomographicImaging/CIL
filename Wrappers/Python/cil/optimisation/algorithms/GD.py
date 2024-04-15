@@ -18,9 +18,11 @@
 
 import numpy
 from cil.optimisation.algorithms import Algorithm
-import warnings
 import logging
 from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSize, AdaptiveSensitivity, Sensitivity
+
+log = logging.getLogger(__name__)
+
 
 class GD(Algorithm):
     """Gradient Descent algorithm
@@ -71,7 +73,9 @@ class GD(Algorithm):
             This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
 
         '''
-        logging.info("%s setting up", self.__class__.__name__)
+
+        log.info("%s setting up", self.__class__.__name__)
+
 
         self.x = initial.copy()
         self.objective_function = objective_function
@@ -95,7 +99,9 @@ class GD(Algorithm):
         
         self.preconditioner = preconditioner 
         
-        logging.info("{} configured".format(self.__class__.__name__, ))
+
+        log.info("%s configured", self.__class__.__name__)
+
 
     def update(self):
         '''Performs a single iteration of the gradient descent algorithm'''

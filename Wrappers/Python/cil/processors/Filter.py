@@ -29,7 +29,7 @@ from scipy.fft import ifft2
 class Filter(Processor): 
 
     @staticmethod
-    def Paganin(delta_beta):
+    def Paganin(delta_beta=1e-2):
         '''
         Method to filter a set of projections using the Paganin phase filter
         described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
@@ -55,10 +55,10 @@ class Filter(Processor):
         >>> processor.get_output()
 
         '''
-        return PaganinFilter(delta_beta)
+        return PaganinFilter(delta_beta=delta_beta)
     
 class PaganinFilter(Filter):
-    def __init__(self, delta_beta=1e-2):
+    def __init__(self, delta_beta):
         
         kwargs = {
         'delta_beta': delta_beta,
@@ -68,12 +68,12 @@ class PaganinFilter(Filter):
 
     def check_input(self, data):
         if not isinstance(self.delta_beta, (int, float)):
-            raise TypeError('delta_beta must be a real number, got type '.format(type(self.data_beta)))
+            raise TypeError('delta_beta must be a real number, got type '.format(type(self.delta_beta)))
         
         return True
 
     def create_filter(self, Nx, Ny):
-        processor = PhaseRetriever.Paganin(energy_eV = 1, delta = 1, beta = 1/self.delta_beta, unit_multiplier = 1, propagation_distance = 1, magnification = 1, filter_type='paganin_method')
+        processor = PhaseRetriever.Paganin(energy_eV = 40000, delta = 1, beta = 1/self.delta_beta, unit_multiplier = 1, propagation_distance = 1, magnification = 1, filter_type='paganin_method')
         processor.set_input(self.get_input())
         processor.create_filter(Nx, Ny)
         self.filter = processor.filter

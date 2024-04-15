@@ -2812,11 +2812,6 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         # for PaganinPhaseProcessor.retrieve check there is a value error when the data geometry does not have dist_center_detector
         with self.assertRaises(ValueError):
             processor.check_input(self.data_parallel)
-
-        # for PaganinPhaseProcessor.filter check a default value of 1 is used when the data geometry does not have dist_center_detector
-        # processor = PaganinPhaseProcessor.filter()
-        # processor.check_input(self.data_parallel)
-        # self.assertEqual(processor.propagation_distance, 1, msg=self.error_message(processor, 'propagation_distance'))
         
         # test propagation distance user input over-rides the distance value from geometry
         processor =  PhaseRetriever.Paganin(propagation_distance=1)
@@ -2872,9 +2867,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         # check generalised_paganin_method
         processor =  PhaseRetriever.Paganin(propagation_distance=1, filter_type='generalised_paganin_method')
         processor.set_input(self.data_cone)
-        # check does not raise warning
-        with self.assertNoLogs(level='WARNING') as log:
-            processor.create_filter(Nx, Ny)
+        processor.create_filter(Nx, Ny)
         expected_filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)/self.data_cone.geometry.magnification))
         numpy.testing.assert_allclose(processor.filter, expected_filter)
 
@@ -2921,27 +2914,73 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         output = processor.get_output(output_type = 'phase')
         self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
 
-        # # check filter processor returns filtered image without scaling
-        # processor = PaganinPhaseProcessor.filter()
-        # processor.set_input(self.data_parallel)
-        # output = processor.get_output()
-        # self.assertLessEqual(quality_measures.mse(output, self.data_parallel), 0.05)
-
-        # processor.set_input(absorption)
-        # output = processor.get_output()
-        # self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
-
 class TestFilter(unittest.TestCase):       
 
     def setUp(self):      
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
 
-    def test_PaganinFilter(self):
+    def test_PaganinFilter_init(self):
+        # test default values are initialised
+        processor = Filter.Paganin()
+        self.assertEqual(processor.delta_beta, 1e-2)
+
+        # test non-default values are initialised
+        processor = Filter.Paganin(1)
+        self.assertEqual(processor.delta_beta, 1)
+
+    def test_PaganinFilter_check_input(self):
+        # check type error when delta_beta is specified as a string
+        processor = Filter.Paganin('1')
+        with self.assertRaises(TypeError):
+            processor.check_input(self.data_parallel)
+
+    def test_PaganinFilter_create_filter(self):
         
+        alpha = 1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
+        image = self.data_cone.get_slice(angle=0).as_array()
+        Nx, Ny = image.shape
+        kx,ky = numpy.meshgrid( 
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            sparse=False, 
+            indexing='ij'
+            )
+        
+        # check default filter is created
+        processor = Filter.Paganin()
+        processor.set_input(self.data_cone)
+        # check raises warning where k*W < 1
+        with self.assertLogs(level='WARNING') as log:
+            processor.create_filter(Nx, Ny)
+        self.assertEqual(len(log.output), 1)
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)*self.data_cone.geometry.magnification))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+    def test_PaganinFilter(self):
+        # check filter processor returns filtered image without scaling
         processor = Filter.Paganin(delta_beta = 0.01)
         processor.set_input(self.data_parallel)
-        processor.get_output()
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, self.data_parallel), 0.05)
+
+        absorption = -1*numpy.log(self.data_parallel)
+        processor.set_input(absorption)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
+
+    def test_PaganinFilter_2D(self):
+        data_slice = self.data_parallel.get_slice(vertical=10)
+        absorption = -1*numpy.log(data_slice)
+
+        processor = Filter.Paganin()
+        processor.set_input(data_slice)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, data_slice), 0.05)
+
+        processor.set_input(absorption)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
         
 if __name__ == "__main__":
 

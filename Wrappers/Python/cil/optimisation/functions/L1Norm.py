@@ -149,7 +149,7 @@ class L1Norm(Function):
     Consider the following cases:
 
     a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x) + b
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x - b) + b
 
     where,
 
@@ -159,7 +159,7 @@ class L1Norm(Function):
     by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
 
     a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x - b) + b
 
 
     Parameters
@@ -245,7 +245,7 @@ class _WeightedL1Norm(Function):
         y = x*self.weight
 
         if self.b is not None:
-            y -= self.b
+            y -= self.b*self.weight
 
         return y.abs().sum()
 

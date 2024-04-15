@@ -123,7 +123,7 @@ class L1Sparsity(Function):
         Consider the following cases:
 
         a) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau}(Qx)
-        b) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_\tau(Qx) + b
+        b) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \left( \mathrm{ShinkOperator}_\tau(Qx- b) + b \right)
 
         where,
 
@@ -133,7 +133,7 @@ class L1Sparsity(Function):
         by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
 
         a) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau*w}(Qx)
-        b) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau*w}(Qx) + b
+        b) .. math:: \mathrm{prox}_{\tau F}(x) = Q^T \left( \mathrm{ShinkOperator}_{\tau*w}(Qx-b) + b \right)
 
 
         Parameters

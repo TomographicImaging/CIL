@@ -1,29 +1,29 @@
 ..    Copyright 2019 United Kingdom Research and Innovation
       Copyright 2019 The University of Manchester
-    
+
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
       You may obtain a copy of the License at
-    
+
           http://www.apache.org/licenses/LICENSE-2.0
-    
+
       Unless required by applicable law or agreed to in writing, software
       distributed under the License is distributed on an "AS IS" BASIS,
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
       See the License for the specific language governing permissions and
       limitations under the License.
-    
+
      Authors:
      CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-Framework 
+Framework
 *********
 
 
 AcquisitionGeometry
 ===================
 
-The :code:`AcquisitionGeometry` class holds the system acquisition parameters. 
+The :code:`AcquisitionGeometry` class holds the system acquisition parameters.
 
 .. autoclass:: cil.framework.AcquisitionGeometry
 
@@ -91,10 +91,10 @@ BlockGeometry
 Data Containers
 ===============
 
-:code:`AcquisitionData` and :code:`ImageData` inherit from the same parent :code:`DataContainer` class, 
+:code:`AcquisitionData` and :code:`ImageData` inherit from the same parent :code:`DataContainer` class,
 therefore they largely behave the same way.
 
-There are algebraic operations defined for both :code:`AcquisitionData` and :code:`ImageData`. 
+There are algebraic operations defined for both :code:`AcquisitionData` and :code:`ImageData`.
 Following operations are defined:
 
 * binary operations (between two DataContainers or scalar and DataContainer)
@@ -161,14 +161,14 @@ VectorData
 BlockDataContainer
 ------------------
 
-A :code:`BlockDataContainer` can be instantiated from a number of :code:`DataContainer` and subclasses
-represents a column vector of :code:`DataContainer`s.
+A :code:`BlockDataContainer` can be instantiated from a number of `DataContainer`_ and subclasses
+represents a column vector of :code:`DataContainer` s.
 
 .. code:: python
 
   bdc = BlockDataContainer(DataContainer0, DataContainer1)
 
-This provide a base class that will behave as normal ``DataContainer``.
+This provide a base class that will behave as normal :code:`DataContainer`.
 
 .. autoclass:: cil.framework.BlockDataContainer
    :members:
@@ -179,7 +179,7 @@ DataOrder
 .. autoclass:: cil.framework.DataOrder
    :members:
    :inherited-members:
-   
+
 DataProcessor
 =============
 .. autoclass:: cil.framework.DataProcessor
@@ -191,4 +191,3 @@ DataProcessor
    :inherited-members:
 
 :ref:`Return Home <mastertoc>`
-

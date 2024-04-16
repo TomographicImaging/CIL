@@ -38,12 +38,12 @@ class AstraForwardProjector2D(DataProcessor):
 
     proj_id : the ASTRA projector ID
         For advances ASTRA users only. The astra_mex_projector ID of the projector, use `astra.astra_create_projector()`
-        
+
     device : string, default='gpu'
         The device to run on 'gpu' or 'cpu'
 
-    """  
-    
+    """
+
     def __init__(self,
                  volume_geometry=None,
                  sinogram_geometry=None,
@@ -55,15 +55,15 @@ class AstraForwardProjector2D(DataProcessor):
                   'proj_id'  : proj_id,
                   'device'  : device
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(AstraForwardProjector2D, self).__init__(**kwargs)
-        
+
         self.set_ImageGeometry(volume_geometry)
         self.set_AcquisitionGeometry(sinogram_geometry)
-        
+
         vol_geom, proj_geom = convert_geometry_to_astra_vec_2D(self.volume_geometry, self.sinogram_geometry)
-        
+
         # ASTRA projector, to be stored
         if device == 'cpu':
             # Note that 'line' only one option
@@ -72,12 +72,12 @@ class AstraForwardProjector2D(DataProcessor):
             elif self.sinogram_geometry.geom_type == 'cone':
                 self.set_projector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
             else:
-                NotImplemented    
+                NotImplemented
         elif device == 'gpu':
             self.set_projector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:
             NotImplemented
-    
+
     def check_input(self, dataset):
         if dataset.number_of_dimensions == 1 or\
            dataset.number_of_dimensions == 2:
@@ -85,16 +85,16 @@ class AstraForwardProjector2D(DataProcessor):
         else:
             raise ValueError("Expected input dimensions is 1 or 2, got {0}"\
                              .format(dataset.number_of_dimensions))
-    
+
     def set_projector(self, proj_id):
         self.proj_id = proj_id
-    
+
     def set_ImageGeometry(self, volume_geometry):
         self.volume_geometry = volume_geometry
-    
+
     def set_AcquisitionGeometry(self, sinogram_geometry):
         self.sinogram_geometry = sinogram_geometry
-        
+
     def process(self, out=None):
 
         IM = self.get_input()
@@ -107,7 +107,7 @@ class AstraForwardProjector2D(DataProcessor):
 
         sinogram_id, arr_out = astra.create_sino(IM_data_temp, self.proj_id)
         astra.data2d.delete(sinogram_id)
-        
+
         arr_out = np.squeeze(arr_out)
         if out is None:
             out = AcquisitionData(arr_out, deep_copy=False, geometry=self.sinogram_geometry.copy(), suppress_warning=True)

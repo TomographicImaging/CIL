@@ -1,0 +1,16 @@
+# https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks#handling-skipped-but-required-checks
+name: skip
+on:
+  pull_request:
+    branches: [master]
+    paths: # same list as build.yml:on.pull_request.paths-ignore
+    - 'CHANGELOG.md'
+    - 'CITATION.cff'
+    - 'LICENSE'
+    - 'scripts/**'
+    - 'NOTICE.txt'
+    - 'README.md'
+jobs:
+  pass:
+    runs-on: ubuntu-latest
+    steps: [{run: echo success}]

@@ -14,5 +14,5 @@ labels: bug
 
 ```python
 import cil, sys
-print(cil.version.commit_hash, sys.version, sys.platform)
+print(cil.version.version, cil.version.commit_hash, sys.version, sys.platform)
 ```

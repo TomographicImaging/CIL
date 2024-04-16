@@ -23,7 +23,7 @@ dependencies:
   - numpy=1.24
   - cil-data
   - tigre=2.4
-  - ccpi-regulariser=22.0.0
+  - ccpi-regulariser=24.0.0
   - tomophantom=2.0.0
   - astra-toolbox >=1.9.9.dev5,<2.1
   - cvxpy

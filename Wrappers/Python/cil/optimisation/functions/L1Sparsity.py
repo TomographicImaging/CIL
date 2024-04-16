@@ -18,7 +18,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.functions import Function, L1Norm
-
+import warnings
 
 class L1Sparsity(Function):
 
@@ -41,9 +41,9 @@ class L1Sparsity(Function):
     
     Parameters
     ---------
-    Q: orthogonal Operator, default = Identity operator 
+    Q: orthogonal Operator 
         Note that for the correct calculation of the proximal the provided operator must be orthogonal 
-    b : Data, DataContainer, defualt is None 
+    b : Data, DataContainer, default is None 
     weight: array, optional, default=None
         positive weight array matching the size of the range of operator :math:`Q`.
     """
@@ -52,9 +52,9 @@ class L1Sparsity(Function):
         '''creator
         '''
 
-        if not Q.is_orthogonal():
-            raise AttributeError(
-                f"Invalid operator: `{Q}`. L1Sparsity is only defined for orthogonal operators!")
+        if not Q.is_orthogonal(): 
+            warnings.warn(
+                f"Invalid operator: `{Q}`. L1Sparsity is only defined for orthogonal operators!", UserWarning)
 
         super(L1Sparsity, self).__init__()
         self.Q = Q

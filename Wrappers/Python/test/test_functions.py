@@ -995,6 +995,18 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
         np.testing.assert_allclose(f2(x), f1(weights))
+        
+        np.random.seed(1)
+        weights= geom.allocate('random')
+        w = weights.abs().sum()
+        x=geom.allocate(2)
+        b=geom.allocate(1)
+        f1 = L1Norm(b=b)
+        f2 = L1Norm(weight=weights, b=b)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        
 
     def test_ZeroWeights_L1Norm(self):
         weight = VectorData(np.array([0., 1.]))

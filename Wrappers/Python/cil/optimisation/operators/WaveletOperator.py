@@ -32,11 +32,11 @@ class WaveletOperator(LinearOperator):
 
         Parameters
         ----------
-        param domain_geometry: cil geometry 
+        domain_geometry: cil geometry 
             Domain geometry for the WaveletOperator
-        param range_geometry: cil geometry, optional
+        range_geometry: cil geometry, optional
             Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywavelets
-        param level: int, optional, default= log_2(min(shape(axes)))
+        level: int, optional, default= log_2(min(shape(axes)))
             integer for decomposition level. Default = log_2(min(shape(axes))), i.e. the maximum number of accurate downsamplings possible
         wname: string, optional, default='haar'
             label for wavelet used.

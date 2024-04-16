@@ -245,7 +245,7 @@ class _WeightedL1Norm(Function):
         y = x*self.weight
 
         if self.b is not None:
-            y -= self.b*self.weight
+            y -= self.b*self.weight 
 
         return y.abs().sum()
 

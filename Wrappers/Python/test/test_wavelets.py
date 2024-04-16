@@ -288,10 +288,11 @@ class TestWavelets(CCPiTestClass):
 
         dg = VectorGeometry(48)
         for true_adjoint in [True, False]:
-            with self.subTest(msg=f"Failed for biorthogonal wavelet with true_adjoint set to {true_adjoint}"):
                 W = WaveletOperator(dg, wname='bior3.5', level=1, true_adjoint=true_adjoint)
                 self.assertEqual(W.is_orthogonal(), False)
-                self.assertRaises(AttributeError, L1Sparsity, W) # This should always give error no matter which adjoint setting
+                self.assertWarns(UserWarning, L1Sparsity, W)
+
+
     
     def test_L1Sparsity_complex_input(self):
         n = 20

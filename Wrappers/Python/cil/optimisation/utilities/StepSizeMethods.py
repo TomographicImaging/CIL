@@ -74,7 +74,8 @@ class ArmijoStepSize(StepSizeMethod):
         kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
 
         '''
-        self.alpha=alpha
+        self.alpha_orig=alpha
+        
         self.beta=beta
         self.kmax=kmax
         if self.kmax is None:
@@ -85,6 +86,7 @@ class ArmijoStepSize(StepSizeMethod):
         """
         """
         k = 0
+        self.alpha=self.alpha_orig
         f_x = algorithm.objective_function(algorithm.x)
         
         self.x_update = algorithm.x_update

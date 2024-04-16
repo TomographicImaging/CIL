@@ -71,7 +71,8 @@ class GD(Algorithm):
             Step size for gradient descent iteration if you want to use a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. 
         step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
             This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-
+        preconditioner: 
+        
         '''
 
         log.info("%s setting up", self.__class__.__name__)

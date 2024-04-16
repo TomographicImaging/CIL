@@ -118,10 +118,10 @@ class Sensitivity(Preconditioner):
         Parameters
         ----------
         algorithm : object
-            The algorithmrithm object.
+            The algorithm object.
         """
         
-        algorithm.x.multiply(self.array, out=algorithm.x)
+        algorithm.x_update.multiply(self.array, out=algorithm.x_update)
 
 class AdaptiveSensitivity(Sensitivity):
 
@@ -154,8 +154,8 @@ class AdaptiveSensitivity(Sensitivity):
     
         if algorithm.iteration<=self.iterations:
             self.array.multiply(algorithm.x_old + self.delta, self.freezing_point)
-            algorithm.x.multiply(self.freezing_point, out=algorithm.x)            
+            algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)            
         else:  
-            algorithm.x.multiply(self.freezing_point, out=algorithm.x)
+            algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)
 
         

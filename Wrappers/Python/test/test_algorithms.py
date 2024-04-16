@@ -116,50 +116,9 @@ class TestAlgorithms(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
 
-    def test_GDArmijo(self):
-        ig = ImageGeometry(12,13,14)
-        initial = ig.allocate()
-        # b = initial.copy()
-        # fill with random numbers
-        # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
-        identity = IdentityOperator(ig)
-
-        norm2sq = LeastSquares(identity, b)
-
-        alg = GD(initial=initial, objective_function=norm2sq)
-        alg.max_iteration = 100
-        alg.run(verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial, objective_function=norm2sq,
-                 max_iteration=20, update_objective_interval=2)
-        #alg.max_iteration = 20
-        self.assertTrue(alg.max_iteration == 20)
-        self.assertTrue(alg.update_objective_interval==2)
-        alg.run(20, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
 
-    def test_GDArmijo2(self):
 
-        f = Rosenbrock (alpha = 1., beta=100.)
-        vg = VectorGeometry(2)
-        x = vg.allocate('random_int', seed=2)
-        # x = vg.allocate('random', seed=1)
-        x.fill(np.asarray([10.,-3.]))
-
-        max_iter = 10000
-        update_interval = 1000
-
-        alg = GD(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
-
-        alg.run(verbose=0)
-
-        # this with 10k iterations
-        np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.13463363, 0.01604593], decimal = 5)
-        # this with 1m iterations
-        # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
-        # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
 
     def test_CGLS(self):

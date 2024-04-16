@@ -22,7 +22,7 @@ dependencies:
   - numpy=1.24
   - ccpi::cil-data
   - ccpi::tigre=2.6
-  - ccpi::ccpi-regulariser=22.0.0
+  - ccpi::ccpi-regulariser=24.0.0
   - ccpi::tomophantom=2.0.0
   - astra-toolbox=2.1=cuda*
   - cvxpy

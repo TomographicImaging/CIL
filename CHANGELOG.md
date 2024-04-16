@@ -1,6 +1,5 @@
-
 * x.x.x
-
+  - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
   - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
@@ -51,7 +50,6 @@
     - `TXRMDataReader`
   - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
   - CIL plugin support for TIGRE version v2.6
-
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

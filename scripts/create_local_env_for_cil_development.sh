@@ -75,7 +75,7 @@ if test $test_deps = 0; then
 else
   conda_args+=(
     astra-toolbox=2.1=cuda*
-    ccpi-regulariser=22.0.0
+    ccpi-regulariser=24.0.0
     cil-data
     cvxpy
     ipywidgets

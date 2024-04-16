@@ -31,7 +31,6 @@ import numpy
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 
 from cil.utilities import dataexample
-import logging
 from testclass import CCPiTestClass
 import scipy
 

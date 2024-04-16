@@ -24,7 +24,7 @@ import numpy as np
 import os
 import sys
 from cil.framework import ImageGeometry
-from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
@@ -79,28 +79,26 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
 logging.basicConfig(level=logging.WARNING)
-
-logging.info ("has_astra {}".format(has_astra))
-logging.info ("has_wget {}".format(has_wget))
-logging.info ("has_olefile {}".format(has_olefile))
-logging.info ("has_dxchange {}".format(has_dxchange))
-logging.info ("has_file {}".format(has_file))
-
+log = logging.getLogger(__name__)
+log.info("has_astra %s", has_astra)
+log.info("has_wget %s", has_wget)
+log.info("has_olefile %s", has_olefile)
+log.info("has_dxchange %s", has_dxchange)
+log.info("has_file %s", has_file)
 if not has_file:
-    logging.info("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+    log.info("This unittest requires the walnut Zeiss dataset saved in %s", data_dir)
 
 
-class TestTXRMDataReader(unittest.TestCase):
-
+class TestZeissDataReader(unittest.TestCase):
 
     def setUp(self):
-        logging.info ("has_astra {}".format(has_astra))
-        logging.info ("has_wget {}".format(has_wget))
-        logging.info ("has_olefile {}".format(has_olefile))
-        logging.info ("has_dxchange {}".format(has_dxchange))
-        logging.info ("has_file {}".format(has_file))
+        log.info("has_astra %s", has_astra)
+        log.info("has_wget %s", has_wget)
+        log.info("has_olefile %s", has_olefile)
+        log.info("has_dxchange %s", has_dxchange)
+        log.info("has_file %s", has_file)
         if has_file:
-            self.reader = TXRMDataReader()
+            self.reader = ZEISSDataReader()
             angle_unit = AcquisitionGeometry.RADIAN
 
             self.reader.set_up(file_name=filename,
@@ -169,11 +167,15 @@ class TestTXRMDataReader(unittest.TestCase):
         gt = reader.read()
 
         qm = mse(gt, recfbp)
-        logging.info ("MSE {}".format(qm) )
+        log.info("MSE %r", qm)
 
         np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         os.remove(fname)
+    
+    def test_file_not_found_error(self):
+        with self.assertRaises(FileNotFoundError):
+            reader = ZEISSDataReader(file_name='no-file')
 
 
 class TestTIFF(unittest.TestCase):
@@ -549,13 +551,3 @@ class TestNikonReader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             reader = NikonDataReader(file_name='no-file')
 
-
-class TestZeissReader(unittest.TestCase):
-
-    def test_setup(self):
-
-        reader = ZEISSDataReader()
-        self.assertEqual(reader.file_name, None)
-
-        with self.assertRaises(FileNotFoundError):
-            reader = ZEISSDataReader(file_name='no-file')

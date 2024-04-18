@@ -986,7 +986,7 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
         np.random.seed(1)
-        weights= geom.allocate('random')
+        weights= geom.allocate('random').abs()
         w = weights.abs().sum()
         x=geom.allocate(1)
         f1 = L1Norm()
@@ -997,7 +997,7 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(f2(x), f1(weights))
         
         np.random.seed(1)
-        weights= geom.allocate('random')
+        weights= geom.allocate('random').abs()
         w = weights.abs().sum()
         x=geom.allocate(2)
         b=geom.allocate(1)
@@ -1008,6 +1008,16 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(f2(x), w)
         
 
+        np.random.seed(1)
+        w = 1
+        x=geom.allocate(1+1e-7)
+        f1 = L1Norm()
+        f2 = L1Norm(weight=w)
+
+        np.testing.assert_allclose(f1(x), f2(x))
+
+        
+        
     def test_ZeroWeights_L1Norm(self):
         weight = VectorData(np.array([0., 1.]))
         tau = 0.2
@@ -1029,7 +1039,7 @@ class TestFunction(CCPiTestClass):
         N, M = 2,3
         geom = ImageGeometry(N, M)
 
-        weights = geom.allocate('random').as_array()
+        weights = geom.allocate('random').abs().as_array()
         f2 = L1Norm(weight=weights)
 
         w = np.abs(weights).sum()

@@ -226,7 +226,7 @@ class _L1Norm(Function):
 
     def convex_conjugate(self,x):
         tmp = x.abs().max() - 1
-        if tmp<=1e-5:
+        if tmp<=1e-8:
             if self.b is not None:
                 return self.b.dot(x)
             else:
@@ -271,14 +271,14 @@ class _WeightedL1Norm(Function):
         if np.any(x.abs() > self.weight): # This handles weight being zero problems
             return np.inf
         # Avoid division by the weight
-        tmp = (x.abs() - self.weight).max()
-
-        if tmp<=1e-5:
+        if np.any((x.abs() - self.weight) > 1e-8*self.weight):
+            return np.inf
+        else:
             if self.b is not None:
                 return self.b.dot(x)
             else:
                 return 0.
-        return np.inf
+        
 
     def proximal(self, x, tau, out=None):
         ret = _L1Norm.proximal(self, x, tau*self.weight, out=out)

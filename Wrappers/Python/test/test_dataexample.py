@@ -167,6 +167,7 @@ class TestRemoteData(unittest.TestCase):
         mock_response.__enter__.return_value = mock_response
         mock_urlopen.return_value = mock_response
 
+    @unittest.skipIf(platform.system() == 'Windows', "Skip on Windows")   
     @patch('cil.utilities.dataexample.urlopen')
     def test_unzip_remote_data(self, mock_urlopen):
         '''
@@ -192,7 +193,7 @@ class TestRemoteData(unittest.TestCase):
         if os.path.exists(os.path.join(tmp_path,tmp_dir)):
             shutil.rmtree(os.path.join(tmp_path,tmp_dir)) 
         
-
+    @unittest.skipIf(platform.system() == 'Windows', "Skip on Windows")   
     @patch('cil.utilities.dataexample.input', return_value='n')    
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_n(self, mock_urlopen, input):
@@ -227,6 +228,7 @@ class TestRemoteData(unittest.TestCase):
         if os.path.exists(os.path.join(tmp_path,tmp_dir)):
             shutil.rmtree(os.path.join(tmp_path,tmp_dir)) 
 
+    @unittest.skipIf(platform.system() == 'Windows', "Skip on Windows")   
     @patch('cil.utilities.dataexample.input', return_value='y')    
     @patch('cil.utilities.dataexample.urlopen')
     def test_download_data_input_y(self, mock_urlopen, input):

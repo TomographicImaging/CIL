@@ -21,7 +21,8 @@ from cil.framework import DataOrder
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
-import logging
+import warnings
+
 
 class FBP(DataProcessor):
 
@@ -48,7 +49,7 @@ class FBP(DataProcessor):
     >>> from cil.plugins.astra import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
+    >>> reconstruction = fbp.get_output()
 
 
     Notes
@@ -60,22 +61,10 @@ class FBP(DataProcessor):
     """
 
 
-    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs):
-
-
-        sinogram_geometry = kwargs.get('sinogram_geometry', None)
-        volume_geometry = kwargs.get('volume_geometry', None)
-
-        if sinogram_geometry is not None:
-            acquisition_geometry = sinogram_geometry
-            logging.warning("sinogram_geometry has been deprecated. Please use acquisition_geometry instead.")
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
 
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
-        if volume_geometry is not None:
-            image_geometry = volume_geometry
-            logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
 
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()

@@ -30,7 +30,7 @@ class L1Sparsity(Function):
     a) .. math:: F(x) = ||Qx||_{1}
     b) .. math:: F(x) = ||Qx - b||_{1}
 
-    In the weighted case, `weight` = :math:`w` is an array of positive weights.
+    In the weighted case, `weight` = :math:`w` is an array of non-negative weights.
 
     a) .. math:: F(x) = ||Qx||_{L^1(w)}
     b) .. math:: F(x) = ||Qx - b||_{L^1(w)}
@@ -45,7 +45,7 @@ class L1Sparsity(Function):
         Note that for the correct calculation of the proximal the provided operator must be orthogonal 
     b : Data, DataContainer, default is None 
     weight: array, optional, default=None
-        positive weight array matching the size of the range of operator :math:`Q`.
+        non-negative weight array matching the size of the range of operator :math:`Q`.
     """
 
     def __init__(self, Q, b=None, weight=None):
@@ -54,7 +54,7 @@ class L1Sparsity(Function):
 
         if not Q.is_orthogonal(): 
             warnings.warn(
-                f"Invalid operator: `{Q}`. L1Sparsity is only defined for orthogonal operators!", UserWarning)
+                f"Invalid operator: `{Q}`. L1Sparsity is properly defined only for orthogonal operators!", UserWarning)
 
         super(L1Sparsity, self).__init__()
         self.Q = Q
@@ -69,12 +69,12 @@ class L1Sparsity(Function):
         a) .. math:: F(x) = ||Qx||_{1}
         b) .. math:: F(x) = ||Qx - b||_{1}
 
-        In the weighted case, `weight` = :math:`w` is an array of positive weights.
+        In the weighted case, `weight` = :math:`w` is an array of non-negative weights.
 
         a) .. math:: F(x) = ||Qx||_{L^1(w)}
         b) .. math:: F(x) = ||Qx - b||_{L^1(w)}
 
-        with :math:`||x||_{L^1(w)} = || x w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
+        with :math:`|| y ||_{L^1(w)} = || y w ||_1 = \sum_{i=1}^{n} | y_i | w_i`. 
             
         """
         y = self.Q.direct(x)
@@ -83,7 +83,7 @@ class L1Sparsity(Function):
     def convex_conjugate(self, x):
         r"""Returns the value of the convex conjugate of the L1Sparsity function at x.
         Here, we need to use the convex conjugate of L1Sparsity, which is the Indicator of the unit 
-        :math:`\ell^{\infty}` norm on the operator domain. (Since Q is a basis of L^2).
+        :math:`\ell^{\infty}` norm on the range of the (bijective) operator Q.
 
 
         Consider the non-weighted case: 
@@ -100,7 +100,7 @@ class L1Sparsity(Function):
             \end{cases}
 
         In the weighted case the convex conjugate is the indicator of the unit
-        :math:`L^{\infty}` norm.
+        :math:`L^{\infty}( w^{-1} )` norm.
 
         See:
         https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
@@ -108,7 +108,7 @@ class L1Sparsity(Function):
         a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*})
         b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*}) + \langle Qx^{*},b\rangle
 
-        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}`.
+        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of 0 / 0 are defined to be 1.
     
     
         """

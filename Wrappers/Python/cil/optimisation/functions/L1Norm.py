@@ -22,7 +22,16 @@ import numpy as np
 
 def soft_shrinkage(x, tau, out=None):
 
-    r"""Returns the value of the soft-shrinkage operator at x.
+    r"""Returns the value of the soft-shrinkage operator at x. This is used for the calculation of the proximal. 
+    
+    .. math:: soft_shrinkage (x) = \begin{cases}
+                x-\tau, \mbox{if } x > \tau \
+                    x+\tau, \mbox{if } x < -\tau \
+                0, \mbox{otherwise}
+                \end{cases}.
+   
+
+
 
     Parameters
     -----------
@@ -35,6 +44,15 @@ def soft_shrinkage(x, tau, out=None):
     Returns
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
+    
+    Note
+    ------
+    Note that this function can deal with complex inputs, defining the `sgn` function as: 
+    .. math:: sgn (z) = \begin{cases}
+                0, \mbox{if } z = 0 \
+                \frac{z}{|z|}, \mbox{otherwise}
+                \end{cases}.
+                
     """
     should_return = False
     # get the sign of the input
@@ -71,18 +89,18 @@ class L1Norm(Function):
     a) .. math:: F(x) = ||x||_{1}
     b) .. math:: F(x) = ||x - b||_{1}
 
-    In the weighted case, :math:`w` is an array of positive weights.
+    In the weighted case, :math:`w` is an array of non-negative weights.
 
     a) .. math:: F(x) = ||x||_{L^1(w)}
     b) .. math:: F(x) = ||x - b||_{L^1(w)}
 
-    with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
+    with :math:`||x||_{L^1(w)} = || x  w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
 
     Parameters
     -----------
 
         weight: DataContainer, numpy ndarray, default None
-            Array of positive weights. If :code:`None` returns the L1 Norm.
+            Array of non-negative weights. If :code:`None` returns the L1 Norm.
         b: DataContainer, default None
             Translation of the function.
 
@@ -119,7 +137,7 @@ class L1Norm(Function):
         \end{cases}
 
     In the weighted case the convex conjugate is the indicator of the unit
-    :math:`L^{\infty}` norm.
+    :math:`L^{\infty}(w^{-1})` norm.
 
     See:
     https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
@@ -127,7 +145,7 @@ class L1Norm(Function):
     a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})
     b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle
 
-    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}`.
+    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of 0/0 are defined to be 1..
 
     Parameters
     -----------

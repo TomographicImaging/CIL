@@ -94,7 +94,7 @@ requirements:
     - astra-toolbox>=1.9.9.dev5,<=2.1
     - tigre>=2.4,<=2.6
     - ccpi-regulariser=24.0.0
-    - ipywidgets <8
+    - ipywidgets
 
 about:
   home: http://www.ccpi.ac.uk/cil

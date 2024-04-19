@@ -948,6 +948,9 @@ class TestFunction(CCPiTestClass):
             np.testing.assert_allclose(a.as_array(), b.as_array(),
                                     rtol=1e-5, atol=1e-5)
 
+
+class TestL1Norm (CCPiTestClass):
+    
     def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
         f2 = L1Norm(weight=None)
@@ -1015,7 +1018,34 @@ class TestFunction(CCPiTestClass):
         f2 = L1Norm(weight=w)
 
         np.testing.assert_allclose(f1(x), f2(x))
+        
+    
+        with self.assertRaises(ValueError):
+            a=3+4j
+            f2 = L1Norm(weight=a)
 
+
+        geom = ImageGeometry(N, M, dtype=np.complex64)
+        np.random.seed(1)
+        weights= geom.allocate('random').abs()
+        w = weights.abs().sum()
+        x=geom.allocate(2+3j)
+        b=geom.allocate(1+3j)
+        f1 = L1Norm(b=b)
+        f2 = L1Norm(weight=weights, b=b)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        
+        x=geom.allocate(3j)
+        b=geom.allocate(2j)
+        f1 = L1Norm(b=b)
+        np.testing.assert_allclose(f1(x), M*N)
+        
+        x=geom.allocate(1+1j)
+        b=geom.allocate(1)
+        f1 = L1Norm(b=b)
+        np.testing.assert_allclose(f1(x), M*N)
         
         
     def test_ZeroWeights_L1Norm(self):
@@ -1083,6 +1113,8 @@ class TestFunction(CCPiTestClass):
 
         xc = geom.allocate(1, dtype=np.complex64)
         self.soft_shrinkage_test(xc)
+        
+
 
 
     def soft_shrinkage_test(self, x):
@@ -1146,7 +1178,10 @@ class TestFunction(CCPiTestClass):
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 
+        
 
+    def test_L1_prox_init(self):
+        pass
 
     def test_L1Sparsity(self):    
         from cil.optimisation.operators import WaveletOperator

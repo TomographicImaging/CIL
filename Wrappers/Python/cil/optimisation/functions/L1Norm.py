@@ -37,7 +37,7 @@ def soft_shrinkage(x, tau, out=None):
     -----------
     x : DataContainer
         where to evaluate the soft-shrinkage operator.
-    tau : float, numpy ndarray, DataContainer
+    tau : float, real,  numpy ndarray, DataContainer
     out : DataContainer, default None
         where to store the result. If None, a new DataContainer is created.
 
@@ -54,7 +54,9 @@ def soft_shrinkage(x, tau, out=None):
                 \end{cases}.
                 
     """
-    should_return = False
+    should_return = False       
+
+
     # get the sign of the input
     dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
 
@@ -183,7 +185,7 @@ class L1Norm(Function):
     Parameters
     -----------
     x: DataContainer
-    tau: float, ndarray, DataContainer
+    tau: float, real,  ndarray, DataContainer
     out: DataContainer, default None
         If not None, the result will be stored in this object.
 
@@ -192,6 +194,7 @@ class L1Norm(Function):
     The value of the proximal operator of the L1 norm function at x: DataContainer.
 
         """
+            
         return self.function.proximal(x, tau, out=out)
 
 
@@ -258,6 +261,9 @@ class _WeightedL1Norm(Function):
 
         if np.min(weight) < 0:
             raise ValueError("Weights should be non-negative!")
+        
+        if np.iscomplexobj(weight):
+            raise ValueError("Weights should be real!")
 
     def __call__(self, x):
         y = x*self.weight

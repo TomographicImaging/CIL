@@ -1,5 +1,7 @@
-* x.x.x
+* 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
+  - CIL plugin support for TIGRE version v2.6
+  - CIL plugin support for ASTRA-TOOLBOX version v2.1
   - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
@@ -31,7 +33,6 @@
     - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
     - Deprecated `Algorithm.run(callback: Callable)`
     - Added `Algorithm.run(callbacks: list[Callback])`
-  - CIL plugin support for ASTRA-TOOLBOX version v2.1
   - Allow `CentreOfRotationCorrector.xcorrelation` to accept a list of two values in `projection_index` to use for the correlation
   - Bug fix in `CentreOfRotationCorrector.xcorrelation` finding correlation angles for limited angle data
   - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
@@ -49,7 +50,6 @@
     - `FBP` kwarg (and thus all kwargs) in `cil.processors.CentreOfRotationCorrector` and `cil.processors.CofR_image_sharpness`
     - `TXRMDataReader`
   - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
-  - CIL plugin support for TIGRE version v2.6
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

@@ -19,6 +19,7 @@
 from cil.optimisation.functions import Function
 from cil.framework import BlockDataContainer
 import numpy as np
+import warnings
 
 def soft_shrinkage(x, tau, out=None):
 
@@ -37,7 +38,7 @@ def soft_shrinkage(x, tau, out=None):
     -----------
     x : DataContainer
         where to evaluate the soft-shrinkage operator.
-    tau : float, real,  numpy ndarray, DataContainer
+    tau : float, non-negative real,  numpy ndarray, DataContainer
     out : DataContainer, default None
         where to store the result. If None, a new DataContainer is created.
 
@@ -55,6 +56,13 @@ def soft_shrinkage(x, tau, out=None):
                 
     """
     should_return = False       
+    
+    if np.min(tau) < 0:
+        warnings.warn(
+                "tau should be non-negative!", UserWarning)
+    if np.linalg.norm(np.imag(tau))>0:
+        raise ValueError("tau should be real!")
+        
 
 
     # get the sign of the input
@@ -262,7 +270,7 @@ class _WeightedL1Norm(Function):
         if np.min(weight) < 0:
             raise ValueError("Weights should be non-negative!")
         
-        if np.iscomplexobj(weight):
+        if np.linalg.norm(np.imag(weight))>0:
             raise ValueError("Weights should be real!")
 
     def __call__(self, x):

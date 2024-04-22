@@ -1134,8 +1134,13 @@ class TestL1Norm (CCPiTestClass):
         ret = soft_shrinkage(-0.5 *x, tau)
         np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
         tau = -1.
-        ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        with self.assertWarns(UserWarning):
+            ret = soft_shrinkage(-0.5 *x, tau)
+            np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        tau = -3j
+        with self.assertRaises(ValueError):
+            ret = soft_shrinkage(-0.5 *x, tau)
+            
         # tau np.ndarray
         tau = 1. * np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)

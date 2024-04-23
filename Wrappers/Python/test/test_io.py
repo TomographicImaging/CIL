@@ -475,7 +475,7 @@ class Test_HDF5_utilities(unittest.TestCase):
         dset_dict = HDF5_utilities.get_dataset_metadata(self.path, self.dset_path)
 
         dict_by_hand  ={'ndim': 3, 'shape': (91, 135, 160), 'size': 1965600, 'dtype': np.float32, 'compression': None, 'chunks': None, 'is_virtual': False}
-        self.assertDictContainsSubset(dict_by_hand,dset_dict)
+        self.assertEqual(dset_dict, dict_by_hand | dset_dict)
 
 
     def test_read(self):

@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 
 # CUDA-specific packages
-ARG CIL_EXTRA_PACKAGES="tigre=2.4 astra-toolbox<2.1"
+ARG CIL_EXTRA_PACKAGES="tigre=2.6 astra-toolbox=2.1.0=cuda*"
 # build & runtime dependencies
 # TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng _openmp_mutex pip)?
 # vis. https://github.com/TomographicImaging/CIL/pull/1590
@@ -20,7 +20,7 @@ COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
 RUN sed -ri '/tigre|astra-toolbox/d' environment.yml \
   && for pkg in jupyter-server-proxy $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
   && conda config --env --set channel_priority strict \
-  && for ch in defaults ccpi intel conda-forge; do conda config --env --add channels $ch; done \
+  && for ch in defaults nvidia ccpi intel conda-forge; do conda config --env --add channels $ch; done \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \

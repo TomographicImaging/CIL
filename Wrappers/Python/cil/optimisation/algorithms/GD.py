@@ -37,8 +37,9 @@ class GD(Algorithm):
         Step size for gradient descent iteration if you want to use a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. 
     step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
         This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-    precondition: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies se
-    
+    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.x_update` in the Gradient descent algorithm
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.x_update` will remain unmodified. 
+        
     rtol: positive float, default 1e-5
         optional parameter defining the relative tolerance comparing the current objective function to 0, default 1e-5, see numpy.isclose
     atol: positive float, default 1e-8
@@ -71,7 +72,8 @@ class GD(Algorithm):
             Step size for gradient descent iteration if you want to use a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. 
         step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
             This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-        preconditioner: 
+        preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.x_update` in the Gradient descent algorithm
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.x_update` will remain unmodified. 
         
         '''
 

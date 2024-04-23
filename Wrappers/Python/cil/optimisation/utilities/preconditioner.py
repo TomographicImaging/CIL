@@ -36,8 +36,8 @@ class Preconditioner(ABC):
     """
     
     
-    def __init__(self, array=None):
-        self.array = array    
+    def __init__(self):
+        pass   
 
     @abstractmethod
     def __call__(self, algorithm):
@@ -62,24 +62,16 @@ class Sensitivity(Preconditioner):
         The operator used for sensitivity computation.
     reference : object, optional
         The reference data.
-    array : numpy.ndarray, optional
-        The preconditioner array.
     """
             
 
-    def __init__(self, operator, reference = None, array = None): 
+    def __init__(self, operator, reference = None): 
         
-        super(Sensitivity, self).__init__(array=array)
+        super(Sensitivity, self).__init__()
         self.operator = operator
         self.reference = reference
-        
-        if self.array is None:
-            self.array = self.operator.domain_geometry().allocate(0)
-        else:
-            self.array = array
             
-        self.compute_sensitivity()
-        self.safe_division()
+        self.compute_preconditioner_matrix()
         
     def compute_sensitivity(self):
         
@@ -89,12 +81,12 @@ class Sensitivity(Preconditioner):
         
         self.sensitivity = self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
  
-    def safe_division(self):
+    def compute_preconditioner_matrix(self):
         
         """
         Perform safe division by the sensitivity.
         """
-        
+        self.compute_sensitivity()
         sensitivity_np = self.sensitivity.as_array()
         self.pos_ind = sensitivity_np>0
         array_np = np.zeros(self.operator.domain_geometry().allocate().shape)
@@ -103,7 +95,7 @@ class Sensitivity(Preconditioner):
             array_np[self.pos_ind ] = self.reference.as_array()[self.pos_ind ]/sensitivity_np[self.pos_ind ]
         else:            
             array_np[self.pos_ind ] = (1./sensitivity_np[self.pos_ind])
-            
+        self.array = self.operator.domain_geometry().allocate(0)
         self.array.fill(array_np) 
                                         
     def __call__(self, algorithm): 
@@ -137,19 +129,18 @@ class AdaptiveSensitivity(Sensitivity):
 
     """
     
-    def __init__(self, operator, delta = 1e-6, iterations = 10, array = None): 
+    def __init__(self, operator, delta = 1e-6, iterations = 100, reference=None): 
 
-        self.operator = operator
         self.iterations = iterations 
         self.delta = delta
-        self.freezing_point = self.operator.domain_geometry().allocate()  
+        self.freezing_point = operator.domain_geometry().allocate(0)  
         
-        super(AdaptiveSensitivity, self).__init__(operator=operator, array=array)
+        super(AdaptiveSensitivity, self).__init__(operator=operator, reference=reference)
     
     def __call__(self, algorithm):
     
         if algorithm.iteration<=self.iterations:
-            self.array.multiply(algorithm.x_old + self.delta, self.freezing_point)
+            self.array.multiply(algorithm.x + self.delta, out=self.freezing_point)
             algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)            
         else:  
             algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)

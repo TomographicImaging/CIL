@@ -54,7 +54,7 @@ class Preconditioner(ABC):
 class Sensitivity(Preconditioner):
     
     """
-    Sensitivity preconditioner class.
+    Sensitivity preconditioner class. TODO: need a reference for this! 
 
     Parameters
     ----------
@@ -74,7 +74,7 @@ class Sensitivity(Preconditioner):
         self.reference = reference
         
         if self.array is None:
-            self.array = self.operator.domain_geometry().allocate()
+            self.array = self.operator.domain_geometry().allocate(0)
         else:
             self.array = array
             
@@ -84,7 +84,7 @@ class Sensitivity(Preconditioner):
     def compute_sensitivity(self):
         
         """
-        Compute the sensitivity.
+        Compute the sensitivity. :math:` A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones. 
         """        
         
         self.sensitivity = self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
@@ -92,13 +92,9 @@ class Sensitivity(Preconditioner):
     def safe_division(self):
         
         """
-        Perform safe division.
+        Perform safe division by the sensitivity.
         """
         
-        # np.where does not work, why???
-        # power(-1) only implemented in SIRF
-        # TODO use numba for the division
-        # as_array() is used for CIL/SIRF compat
         sensitivity_np = self.sensitivity.as_array()
         self.pos_ind = sensitivity_np>0
         array_np = np.zeros(self.operator.domain_geometry().allocate().shape)
@@ -126,7 +122,7 @@ class Sensitivity(Preconditioner):
 class AdaptiveSensitivity(Sensitivity):
 
     """
-    Adaptive Sensitivity preconditioner class.
+    Adaptive Sensitivity preconditioner class. TODO: need a reference for this 
 
     Parameters
     ----------

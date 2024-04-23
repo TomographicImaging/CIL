@@ -90,7 +90,6 @@ class GD(Algorithm):
             if step_size is not None:
                 raise TypeError('You have passed both a `step_size` and a `step_size_rule`, please pass one or the other')
 
-        self.update_objective()
 
         self.x_update = initial.copy()
 

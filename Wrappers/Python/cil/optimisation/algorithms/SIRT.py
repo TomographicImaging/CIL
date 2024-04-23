@@ -206,4 +206,4 @@ class SIRT(Algorithm):
         .. math:: \frac{1}{2}\|A x - b\|^{2}
 
         """
-        self.loss.append(0.5*self.r.squared_norm())
+        self.loss.append(0.5*(self.operator.direct(self.x)-self.data).squared_norm())

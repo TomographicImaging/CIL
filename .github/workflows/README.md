@@ -23,7 +23,7 @@ Details on some of these jobs are given below.
 
 ## conda
 
-When opening or modifying a pull request to `master`, a single variant is built and tested. This variant is for linux with `python=3.9` and `numpy=1.22`.
+When opening or modifying a pull request to `master`, a single variant is built and tested. This variant is for linux with `python=3.11` and `numpy=1.25`.
 
 > [!NOTE]
 > The action does not publish to conda, instead this is done by jenkins. We will eventually move from jenkins to conda-forge instead.

@@ -161,7 +161,7 @@ class TestGD(CCPiTestClass):
         np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.13463363, 0.01604593], decimal = 5)
         # this with 1m iterations
         # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
-        # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6))
+        # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
 class TestAlgorithms(CCPiTestClass):
    

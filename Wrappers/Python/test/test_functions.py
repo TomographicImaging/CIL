@@ -1121,16 +1121,16 @@ class TestTotalVariation(unittest.TestCase):
         self.alpha_arr = self.ig_real.allocate(0.15)
 
     def test_configure_tv_defaults(self):
-        self.assertEquals(self.tv.warm_start, True)
-        self.assertEquals(self.tv.iterations, 10)
-        self.assertEquals(self.tv.correlation, "Space")
-        self.assertEquals(self.tv.backend, "c")
-        self.assertEquals(self.tv.lower, -np.inf)
-        self.assertEquals(self.tv.upper, np.inf)
-        self.assertEquals(self.tv.isotropic, True)
-        self.assertEquals(self.tv.split, False)
-        self.assertEquals(self.tv.strong_convexity_constant, 0)
-        self.assertEquals(self.tv.tolerance, None)
+        self.assertEqual(self.tv.warm_start, True)
+        self.assertEqual(self.tv.iterations, 10)
+        self.assertEqual(self.tv.correlation, "Space")
+        self.assertEqual(self.tv.backend, "c")
+        self.assertEqual(self.tv.lower, -np.inf)
+        self.assertEqual(self.tv.upper, np.inf)
+        self.assertEqual(self.tv.isotropic, True)
+        self.assertEqual(self.tv.split, False)
+        self.assertEqual(self.tv.strong_convexity_constant, 0)
+        self.assertEqual(self.tv.tolerance, None)
 
     def test_configure_tv_not_defaults(self):
         tv=TotalVariation( max_iteration=100,
@@ -1143,16 +1143,16 @@ class TestTotalVariation(unittest.TestCase):
                  split = True,
                  strong_convexity_constant = 1.,
                  warm_start=False)
-        self.assertEquals(tv.warm_start, False)
-        self.assertEquals(tv.iterations, 100)
-        self.assertEquals(tv.correlation, "SpaceChannels")
-        self.assertEquals(tv.backend, "numpy")
-        self.assertEquals(tv.lower, 0.)
-        self.assertEquals(tv.upper, 1.)
-        self.assertEquals(tv.isotropic, False)
-        self.assertEquals(tv.split, True)
-        self.assertEquals(tv.strong_convexity_constant, 1.)
-        self.assertEquals(tv.tolerance, 1e-5)
+        self.assertEqual(tv.warm_start, False)
+        self.assertEqual(tv.iterations, 100)
+        self.assertEqual(tv.correlation, "SpaceChannels")
+        self.assertEqual(tv.backend, "numpy")
+        self.assertEqual(tv.lower, 0.)
+        self.assertEqual(tv.upper, 1.)
+        self.assertEqual(tv.isotropic, False)
+        self.assertEqual(tv.split, True)
+        self.assertEqual(tv.strong_convexity_constant, 1.)
+        self.assertEqual(tv.tolerance, 1e-5)
 
 
 
@@ -1407,7 +1407,7 @@ class TestTotalVariation(unittest.TestCase):
     def test_get_p2_with_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warm_start=True, max_iteration=10)
-        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        self.assertEqual(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
@@ -1424,7 +1424,7 @@ class TestTotalVariation(unittest.TestCase):
     def test_get_p2_without_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warm_start=False)
-        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        self.assertEqual(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):

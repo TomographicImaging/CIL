@@ -105,7 +105,7 @@ class TestPlugin(unittest.TestCase):
         fcil = FGP_TV()
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.FGP_TV(datarr, fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0, 1, 'cpu' )
+        outrgl = regularisers.FGP_TV(datarr, fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0, 1, device='cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
 
@@ -118,7 +118,7 @@ class TestPlugin(unittest.TestCase):
         fcil = TGV()
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, 'cpu' )
+        outrgl = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, device='cpu' )
 
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
@@ -133,7 +133,7 @@ class TestPlugin(unittest.TestCase):
         fcil = FGP_dTV(ref)
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.FGP_dTV(datarr, ref.as_array(), fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0.01, 0, 1, 'cpu' )
+        outrgl = regularisers.FGP_dTV(datarr, ref.as_array(), fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0.01, 0, 1, device='cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
 

@@ -236,8 +236,7 @@ class _L1Norm(Function):
         return y.abs().sum()
 
     def convex_conjugate(self,x):
-        tmp = x.abs().max() - 1
-        if tmp<=1e-8:
+        if x.abs().max() - 1 <=0:
             if self.b is not None:
                 return self.b.dot(x)
             else:
@@ -285,7 +284,7 @@ class _WeightedL1Norm(Function):
         if np.any(x.abs() > self.weight): # This handles weight being zero problems
             return np.inf
         # Avoid division by the weight
-        if np.any((x.abs() - self.weight) > 1e-8*self.weight):
+        if np.any((x.abs() - self.weight) > 0):
             return np.inf
         else:
             if self.b is not None:

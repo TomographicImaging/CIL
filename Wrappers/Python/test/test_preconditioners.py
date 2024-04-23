@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
-from cil.utilities.display import show2D
-from cil.recon import FDK
-from cil.optimisation.algorithms import  GD, SIRT
+
+from cil.optimisation.algorithms import SIRT
 from cil.optimisation.functions import  LeastSquares
 from cil.framework import ImageGeometry
 from cil.optimisation.operators import IdentityOperator
@@ -31,14 +29,16 @@ class TestPreconditioners(CCPiTestClass):
         f = LeastSquares(A=A, b=data, c=0.5, weight=M)
         step_size = 1.
         preconditioner = Sensitivity(A)
-        def update_objective(self):
+        def update_objective(alg):
             # SIRT computes |Ax_{k} - b|_2^2
             # GD with weighted LeastSquares computes the objective included the weight, so we remove the weight
-            self.loss.append(0.5*(self.objective_function.A.direct(self.x) - self.objective_function.b).squared_norm())
+            alg.loss.append(0.5*(alg.objective_function.A.direct(alg.x) - alg.objective_function.b).squared_norm())
             
-        GD.update_objective = update_objective
-        precond_pwls = GD(initial=ig.allocate(0), objective_function=f,   preconditioner = preconditioner,
+        from cil.optimisation.algorithms import  GD as test_GD
+        
+        test_GD.update_objective = update_objective
+        
+        precond_pwls = test_GD(initial=ig.allocate(0), objective_function=f,   preconditioner = preconditioner,
                max_iteration=100, update_objective_interval=1, step_size = step_size)       
-
         precond_pwls.run(10)
         np.testing.assert_allclose(sirt.solution.array, precond_pwls.solution.array, atol=1e-4)

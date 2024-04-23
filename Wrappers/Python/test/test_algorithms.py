@@ -722,7 +722,7 @@ class TestSIRT(CCPiTestClass):
         np.testing.assert_array_almost_equal(alg.x.array, self.b2.array)
 
         np.testing.assert_almost_equal(0.5 *alg.D.array, alg._Dscaled.array)
-
+        self.assertAlmostEqual(alg.get_last_loss(), 0.5*np.linalg.norm(alg.x.as_array()-self.b2.as_array())**2, 5)
 
     def test_SIRT_nan_inf_values(self):
         Aop_nan_inf = self.Aop
@@ -770,7 +770,8 @@ class TestSIRT(CCPiTestClass):
         fista=FISTA(initial=initial,f=f, g=constraint, max_iteration=1000)
         fista.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
-
+        self.assertAlmostEqual(sirt.get_last_loss(), 0.5*np.linalg.norm(sirt.x.as_array()-data.as_array())**2, 5)
+        
     def test_SIRT_with_TV_warm_start(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
@@ -781,6 +782,7 @@ class TestSIRT(CCPiTestClass):
         sirt.run(25, verbose=0)
 
         self.assertNumpyArrayAlmostEqual(sirt.x.as_array(), ig.allocate(0.25).as_array(),3)
+        self.assertAlmostEqual(sirt.get_last_loss(), 0.5*np.linalg.norm(sirt.x.as_array()-data.as_array())**2, 5)
 
 
 class TestSPDHG(unittest.TestCase):

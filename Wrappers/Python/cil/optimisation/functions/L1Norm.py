@@ -283,9 +283,6 @@ class _WeightedL1Norm(Function):
     def convex_conjugate(self,x):
         if np.any(x.abs() > self.weight): # This handles weight being zero problems
             return np.inf
-        # Avoid division by the weight
-        if np.any((x.abs() - self.weight) > 0):
-            return np.inf
         else:
             if self.b is not None:
                 return self.b.dot(x)

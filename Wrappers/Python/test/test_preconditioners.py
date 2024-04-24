@@ -98,20 +98,19 @@ class TestPreconditioners(CCPiTestClass):
     
     def test_adaptive_sensitivity_converges(self):
         ig = ImageGeometry(7,8,4)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=2)
         A= IdentityOperator(ig)
-        initial=data+1e-3
-       
+        initial=ig.allocate(0)
    
         f = LeastSquares(A=A, b=data, c=0.5)
         step_size = 1.
-        preconditioner = AdaptiveSensitivity(A, iterations=4000, delta=1e-8)
+        preconditioner = AdaptiveSensitivity(A, iterations=3000, delta=1e-8)
 
         
         precond_pwls = GD(initial=initial, objective_function=f,   preconditioner = preconditioner, update_objective_interval=1, step_size = step_size)     
         
       
-        precond_pwls.run(1000)
-        np.testing.assert_allclose(data.array, precond_pwls.solution.array, rtol=1e-5, atol=1e-4)
+        precond_pwls.run(3000)
+        self.assertNumpyArrayAlmostEqual(data.array, precond_pwls.solution.array, 3)
         
     

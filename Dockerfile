@@ -18,7 +18,7 @@ ARG CIL_EXTRA_PACKAGES="tigre=2.6 astra-toolbox=2.1.0=cuda*"
 COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
 # channel_priority: https://stackoverflow.com/q/58555389
 RUN sed -ri '/tigre|astra-toolbox/d' environment.yml \
-  && for pkg in jupyter-server-proxy $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
+  && for pkg in 'jupyter-server-proxy>4.1.0' $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
   && conda config --env --set channel_priority strict \
   && for ch in defaults nvidia ccpi intel conda-forge; do conda config --env --add channels $ch; done \
   && mamba env update -n base \

@@ -4,7 +4,7 @@ from cil.optimisation.functions import  LeastSquares
 from cil.framework import ImageGeometry, VectorGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator
 
-from cil.optimisation.utilities import  Sensitivity, AdaptiveSensitivity
+from cil.optimisation.utilities import  Sensitivity, AdaptiveSensitivity, Adam, AdaGrad
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -96,6 +96,7 @@ class TestPreconditioners(CCPiTestClass):
         pass
     
     
+    
     def test_adaptive_sensitivity_converges(self):
         ig = ImageGeometry(7,8,4)
         data = ig.allocate('random', seed=2)
@@ -113,4 +114,44 @@ class TestPreconditioners(CCPiTestClass):
         precond_pwls.run(3000)
         self.assertNumpyArrayAlmostEqual(data.array, precond_pwls.solution.array, 3)
         
+    def test_Adam_init(self):
+        pass
+    def test_Adam_converges(self):
+            ig = ImageGeometry(7,8,4)
+            data = ig.allocate('random', seed=2)
+            A= IdentityOperator(ig)
+            initial=ig.allocate(0)
+    
+            f = LeastSquares(A=A, b=data, c=0.5)
+            step_size = 0.001
+            preconditioner = Adam(gamma=0.5, beta=0.5 )
+
+            
+            ls_adam = GD(initial=initial, objective_function=f,   preconditioner = preconditioner, update_objective_interval=1, step_size = step_size)     
+            
+        
+            ls_adam.run(1000)
+            self.assertNumpyArrayAlmostEqual(data.array, ls_adam.solution.array, 3)
+    
+    def test_AdaGrad_init(self):
+        pass
+    
+      
+    def test_AdaGrad_converges(self):
+            ig = ImageGeometry(7,8,4)
+            data = ig.allocate('random', seed=2)
+            A= IdentityOperator(ig)
+            initial=ig.allocate(0)
+    
+            f = LeastSquares(A=A, b=data, c=0.5)
+            step_size = 0.001
+            preconditioner = AdaGrad()
+
+            
+            ls_ada = GD(initial=initial, objective_function=f,   preconditioner = preconditioner, update_objective_interval=1, step_size = step_size)     
+            
+        
+            ls_ada.run(1500)
+            self.assertNumpyArrayAlmostEqual(data.array, ls_ada.solution.array, 3)
+            
     

@@ -24,10 +24,6 @@ class Preconditioner(ABC):
     """
     Abstract base class for Preconditioner objects.
 
-    Parameters
-    ----------
-    array : numpy.ndarray, optional
-        The preconditioner array.
 
     Methods
     -------
@@ -88,13 +84,13 @@ class Sensitivity(Preconditioner):
         """
         self.compute_sensitivity()
         sensitivity_np = self.sensitivity.as_array()
-        self.pos_ind = sensitivity_np>0
+        pos_ind = sensitivity_np>0
         array_np = np.zeros(self.operator.domain_geometry().allocate().shape)
 
         if self.reference is not None:
-            array_np[self.pos_ind ] = self.reference.as_array()[self.pos_ind ]/sensitivity_np[self.pos_ind ]
+            array_np[pos_ind ] = self.reference.as_array()[pos_ind ]/sensitivity_np[pos_ind ]
         else:            
-            array_np[self.pos_ind ] = (1./sensitivity_np[self.pos_ind])
+            array_np[pos_ind ] = (1./sensitivity_np[pos_ind])
         self.array = self.operator.domain_geometry().allocate(0)
         self.array.fill(array_np) 
                                         
@@ -146,3 +142,75 @@ class AdaptiveSensitivity(Sensitivity):
             algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)
 
         
+        
+class AdaGrad(Preconditioner):
+
+    """
+    TODO:
+
+    """
+    
+    
+    def __init__(self, epsilon=1e-4):
+        self.epsilon=epsilon  
+
+    def __call__(self, algorithm):
+        """
+        Method to __call__ the preconditioner. #TODO:
+
+        Parameters
+        ----------
+        algorithm : Algorithm
+            The algorithm object.
+        """    
+              
+        
+        gradient_np = algorithm.x_update.as_array().copy()
+        array_np=np.ones_like(gradient_np)/np.sqrt( np.square(gradient_np)+self.epsilon)
+        self.array = algorithm.x.geometry.allocate(0)
+        self.array.fill(array_np) 
+        
+        algorithm.x_update.multiply(self.array, out=algorithm.x_update)
+        
+        
+class Adam(Preconditioner):
+
+    """
+    TODO:
+
+    """
+    
+    
+    def __init__(self, gamma=0.9, beta =0.999):
+        self.gamma=gamma
+        self.beta=beta 
+        self.gradient_accumulator=None
+        self.scaling_factor_accumulator=None
+
+    def __call__(self, algorithm):
+        """
+        Method to __call__ the preconditioner. #TODO:
+
+        Parameters
+        ----------
+        algorithm : Algorithm
+            The algorithm object.
+        """    
+        
+        if self.gradient_accumulator is None:
+            self.gradient_accumulator = algorithm.x_update.copy()
+            self.scaling_factor_accumulator=  algorithm.x_update.multiply(algorithm.x_update)
+        
+        else: 
+            self.gradient_accumulator.sapyb(self.gamma, algorithm.x_update, (1-self.gamma), out=self.gradient_accumulator)
+            self.scaling_factor_accumulator.sapyb(self.beta,  algorithm.x_update.multiply(algorithm.x_update), (1-self.beta), out=self.scaling_factor_accumulator)
+        
+        sensitivity_np = np.sqrt(self.scaling_factor_accumulator.as_array())
+        pos_ind = sensitivity_np>0
+        array_np = np.zeros(algorithm.x.geometry.allocate().shape)
+
+        array_np[pos_ind ] = (1./sensitivity_np[pos_ind])
+        self.array = algorithm.x.geometry.allocate(0)
+        self.array.fill(array_np) 
+        
+        self.gradient_accumulator.multiply(self.array, out=algorithm.x_update)

@@ -49,9 +49,8 @@ if has_ipp:
     from cil.processors.cilacc_binner import Binner_IPP
 
 
+@unittest.skipUnless(has_ipp, "Requires IPP libraries")
 class TestBinner_cillacc(unittest.TestCase):
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp(self):
 
         shape_in = [4,12,16,32]
@@ -73,8 +72,6 @@ class TestBinner_cillacc(unittest.TestCase):
         with self.assertRaises(ValueError):
             binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_2D_data(self):
 
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -104,8 +101,6 @@ class TestBinner_cillacc(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_4D(self):
 
         shape_in = [9,21,40,92]
@@ -137,8 +132,6 @@ class TestBinner_cillacc(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_2D(self):
 
         shape_in = [1,1,3,3]
@@ -172,9 +165,7 @@ class TestBinner_cillacc(unittest.TestCase):
 
 
 class TestBinner(unittest.TestCase):
-
     def test_set_up_processor(self):
-
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
 
@@ -581,21 +572,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -615,21 +606,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -666,7 +657,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_imagedata_full(self):
+    def test_imagedata_full_tigre(self):
         """
         This test bins a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
 
@@ -697,7 +688,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full(self):
+    def test_aqdata_full_astra(self):
         """
         This test bins a sinogram. It then uses that geometry for the forward projection.
 
@@ -732,7 +723,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full_origin(self):
+    def test_aqdata_full_origin_astra(self):
         """
         This test bins a sinogram. It then uses that geometry for the forward projection.
 
@@ -1067,9 +1058,7 @@ class TestSlicer(unittest.TestCase):
 
                  # slice to single element
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None, None,8),'horizontal_y':(None,None,16)},
-
         ]
-
 
         offset_x =0.1*(8-1-1*4)/2
         offset_y =0.2*(16-1-3 * 5)/2
@@ -1200,7 +1189,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_imagedata_full(self):
+    def test_imagedata_full_tigre(self):
         """
         This test slices a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
 
@@ -1230,7 +1219,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full(self):
+    def test_aqdata_full_astra(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
 
@@ -1266,7 +1255,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full_origin(self):
+    def test_aqdata_full_origin_astra(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
 
@@ -1352,21 +1341,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1384,21 +1373,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1779,7 +1768,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag_padded,
+        self.assertEqual(geometry_padded, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
 
 
@@ -1793,7 +1782,7 @@ class TestPaddder(unittest.TestCase):
             0.,   90.,  180.,  270.,\
             360., 450.,  540., 630., 720.]
 
-        self.assertEquals(geometry_padded, geometry_gold,
+        self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
@@ -1804,7 +1793,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag2_padded,
+        self.assertEqual(geometry_padded, self.ag2_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
 
 
@@ -1816,7 +1805,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_image_geometry()
 
-        self.assertEquals(geometry_padded, self.ig_padded,
+        self.assertEqual(geometry_padded, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
 
 
@@ -1855,21 +1844,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ag_padded,
+        self.assertEqual(geometry_out, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ag_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
 
@@ -1889,21 +1878,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ig_padded,
+        self.assertEqual(geometry_out, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ig_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
 
@@ -2126,7 +2115,7 @@ class TestPaddder(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_pad_ad_full(self):
+    def test_pad_ad_full_tigre(self):
         """
         This test pads a acquisition data asymmetrically.
         It then compares the FBP of the padded and unpadded data on the same ImageGeometry.
@@ -2168,7 +2157,7 @@ class TestPaddder(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_pad_id_full(self):
+    def test_pad_id_full_astra(self):
         """
         This test pads an image data asymmetrically.
         It then compares the forward projection of the padded and unpadded phantom on the same AcquisitionGeometry.

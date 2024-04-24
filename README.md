@@ -29,15 +29,16 @@ conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```sh
-conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
+conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipywidgets
 ```
 
 where:
-
-- `astra-toolbox` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) projectors (GPLv3 license)
+- `astra-toolbox` enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) CPU projector (2D Parallel beam only) (GPLv3 license)
+- `astra-toolbox=*=cuda*` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) GPU projectors (GPLv3 license)
 - `tigre` (requires an NVIDIA GPU) enables support for [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license)
-- `ccpi-regulariser` is the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit)
+- `ccpi-regulariser` is the [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit)
 - `tomophantom` can generate phantoms to use as test data [Tomophantom](https://github.com/dkazanc/TomoPhantom)
+- `ipywidgets` enables visulisation tools within jupyter noteboooks
 
 ### Dependencies
 
@@ -166,6 +167,17 @@ In the repository root, simply update submodules and run `docker build`:
 git submodule update --init --recursive
 docker build . -t ghcr.io/tomographicimaging/cil
 ```
+
+
+### Testing
+
+One installed, CIL functionality can be tested using the following command:
+
+```sh
+export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
+python -m unittest discover -v ./Wrappers/Python/test
+```
+
 
 ## Citing CIL
 

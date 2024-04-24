@@ -2,70 +2,54 @@
 
 There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml)
 
-## Building the Conda Package: conda job
+The jobs are:
 
-This github action builds and tests the conda package, by using the [conda-package-publish-action](https://github.com/TomographicImaging/conda-package-publish-action)
+- `test-cuda`
+  + uses our self-hosted (STFC Cloud) CUDA-enabled runners to run GPU tests
+  + `TESTS_FORCE_GPU=1 python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test`
+- `test`
+  + uses default (GitHub-hosted) runners to run tests on the min & max supported Python & NumPy versions
+  + `python -m unittest discover -v ./Wrappers/Python/test`
+- conda
+  + uses `mambabuild` to build the conda package (saved as a build artifact named `cil-package`)
+- docs
+  + uses `docs/docs_environment.yml` plus `make -C docs` to build the documentation (saved as a build artifact named `DocumentationHTML`)
+  + renders to the `gh-pages` branch on `master` (nightly) pushes or on tag (release) pushes
+    * this in turn is hosted at <https://tomographicimaging.github.io/CIL> as per <https://github.com/TomographicImaging/CIL/settings/pages>
+- docker
+  + builds a docker image from [`Dockerfile`](../../Dockerfile) (pushed to `ghcr.io/tomographicimaging/cil` as per [the CIL README section on Docker](../../README.md#docker))
 
-When pushing to master or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
+Details on some of these jobs are given below.
 
-When opening or modifying a pull request to master, a single variant is built and tested. This variant is for linux with `python=3.9` and `numpy=1.22`.
+## conda
 
-The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
+When opening or modifying a pull request to `master`, a single variant is built and tested. This variant is for linux with `python=3.11` and `numpy=1.25`.
 
-It looks for conda-build dependencies in the channels listed [here](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L49). If you add any new dependencies, the appropriate channels need to be added to this line.
+> [!NOTE]
+> The action does not publish to conda, instead this is done by jenkins. We will eventually move from jenkins to conda-forge instead.
+> When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
 
-An artifact of the resulting tar.bz2 file is made available in the 'Summary' section of the action. It is called `cil-package`. This is used by the **docs** job. It can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page. Clicking on `cil-package` allows you to download a zip folder containing the tar.bz2 file.
+It looks for conda-build dependencies in the channels listed [here](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
 
-## Building/Publishing Documentation: docs job
+> [!TIP]
+> The `conda` job builds the `*.tar.bz2` package and uploads it as an artifact called `cil-package`.
+> It can be found by going to the "Actions" tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the "Summary" for the run of the action, there is an "Artifact" section at the bottom of the page.
+> Clicking on `cil-package` allows you to download a zip folder containing the `*.tar.bz2` file.
+
+## docs
 
 This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). To do this it uses a forked version of the [build-sphinx-action](https://github.com/lauramurgatroyd/build-sphinx-action).
 
-The [docs](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L59) job:
+The [docs](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L124) job:
 
-- creates a miniconda environment from [docs_environment.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs/docs_environment.yml)
-- installs cil into the miniconda environment, using the tar.bz2 artifact (cil-package) created in the **conda** job
-- builds the documentation with sphinx
-- uses upload-artifact to upload the html files: `HTMLDocumentation`, which can be downloaded to view
-- pushes the html files to the `nightly` folder on the gh-pages branch
+- creates a `miniconda` environment from [requirements-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml) and [docs_environment.yml](https://github.com/TomographicImaging/CIL/blob/master/docs/docs_environment.yml)
+- `cmake` builds & installs CIL into the `miniconda` environment
+- builds the HTML documentation with `sphinx`
+- uploads a `DocumentationHTML` artifact (which can be downloaded to view locally for debugging)
+- pushes the HTML documentation to the `gh-pages` branch
+  + only if pushing to `master` or tagging (skipped if pushing to a branch or a PR)
 
-If opening or modifying a pull request to master, `docs` is run, but the final gh-pages step is skipped.
-If pushing to master or tagging, the documentation is built *and* published to gh-pages.
-
-### Viewing Built Documentation
-
-The `docs` job builds the documentation and uploads it as an artifact, in a folder named `DocumentationHTML`.
-This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR.
-
-When viewing the `Summary` for the run of the action, there is an `Artifact` section at the bottom of the page.
-Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview the documentation site before it is published.
-
-### Publication of the Documentation
-
-The documentation is hosted on the [github site](https://tomographicimaging.github.io/CIL/) associated with the repository.
-This is built from the [gh-pages branch](https://github.com/TomographicImaging/CIL/tree/gh-pages).
-
-If you are an admin of the CIL repository you are able to see the settings for the site by going to `Settings->Pages`.
-
-To publish the documentation, the publish job of the gh-action pushes the documentation changes to the `gh-pages` branch.
-Any push to this branch automatically updates the github site.
-
-### Initial Setup of the Docs Site & Action
-
-To get the action to work I first had to:
-
-1. [Create a gh-pages branch](https://gist.github.com/ramnathv/2227408) - note this only worked in bash, not windows command line.
-2. [Set the source](https://github.com/TomographicImaging/CIL/settings/pages) for our github pages to be the gh-pages branch.
-
-I followed the examples on the [sphinx build action page](https://github.com/marketplace/actions/sphinx-build), specifically this [example workflow](https://github.com/ammaraskar/sphinx-action-test/blob/master/.github/workflows/default.yml)
-
-## Building/Pushing the Docker Image: docker job
-
-This builds a docker image using the `Dockerfile` at the root of this repository.
-
-The image is also pushed to `ghcr.io/tomographicimaging/cil:TAG` (https://github.com/TomographicImaging/CIL/pkgs/container/cil), where `TAG` is given by:
-
-git ref | docker tag(s)
---|--
-`master` branch | `master`
-`vM.m.p` tag | `M.m.p`, `M.m`, `latest`
-anything else | not pushed (only built)
+> [!TIP]
+> The `docs` job builds the documentation and uploads it as an artifact called `DocumentationHTML`.
+> It can be found by going to the "Actions" tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the "Summary" for the run of the action, there is an "Artifact" section at the bottom of the page.
+> Clicking on `DocumentationHTML` allows you to download a zip folder containing the built HTML files. This allows you to preview the documentation site before it is published.

@@ -22,12 +22,6 @@ try:
     import ipywidgets as widgets
 except ImportError as ie:
     raise ImportError("please conda/pip install ipywidgets") from ie
-
-from packaging import version
-from warnings import warn
-if version.parse(widgets.__version__) >= version.parse('8'):
-    warn(f'requires ipywidgets<8, found {widgets.__version__}', ImportWarning, stacklevel=2)
-
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy

@@ -367,6 +367,9 @@ class SumFunction(Function):
         else:
             return super(SumFunction, self).__add__(other)
 
+    @property
+    def num_functions(self):
+        return len(self.functions)
 
 class ScaledFunction(Function):
 

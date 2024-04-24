@@ -22,6 +22,8 @@ import numba
 from cil.utilities import multiprocessing as cil_mp
 import logging
 
+log = logging.getLogger(__name__)
+
 
 class IndicatorBox(Function):
     r'''Indicator function for box constraint
@@ -87,10 +89,10 @@ class IndicatorBox(Function):
 
     def __new__(cls, lower=None, upper=None, accelerated=True):
         if accelerated:
-            logging.info("Numba backend is used.")
+            log.info("Numba backend is used.")
             return super(IndicatorBox, cls).__new__(IndicatorBox_numba)
         else:
-            logging.info("Numpy backend is used.")
+            log.info("Numpy backend is used.")
             return super(IndicatorBox, cls).__new__(IndicatorBox_numpy)
 
     def __init__(self, lower=None, upper=None, accelerated=True):
@@ -304,7 +306,7 @@ def _get_as_nparray_or_number(x):
     except AttributeError:
         # In this case we trust that it will be either a numpy ndarray
         # or a number as described in the docstring
-        logging.info('Assuming that x is a numpy array or a number')
+        log.info('Assuming that x is a numpy array or a number')
         return x
 
 

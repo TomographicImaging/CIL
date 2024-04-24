@@ -44,6 +44,9 @@ cilacc = ctypes.cdll.LoadLibrary(dll)
 
 from cil.framework.BlockGeometry import BlockGeometry
 
+log = logging.getLogger(__name__)
+
+
 class Partitioner(object):
     '''Interface for AcquisitionData to be able to partition itself in a number of batches.
 
@@ -2375,7 +2378,7 @@ class AcquisitionGeometry(object):
 
         if self.dimension == '2D':
             if offset2 is not None:
-                logging.WARNING("Only offset1 is being used")
+                log.warning("Only offset1 is being used")
             self.set_centre_of_rotation(offset1)
 
         if offset2 is None or offset1 == offset2:
@@ -3444,7 +3447,7 @@ class DataContainer(object):
             Default is to accumulate and return data as float64 or complex128
         """
         if kwargs.get('dtype') is not None:
-            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+            log.warning("dtype argument is ignored, using float64 or complex128")
 
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64
@@ -3523,7 +3526,7 @@ class DataContainer(object):
         """
 
         if kwargs.get('dtype', None) is not None:
-            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+            log.warning("dtype argument is ignored, using float64 or complex128")
 
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64

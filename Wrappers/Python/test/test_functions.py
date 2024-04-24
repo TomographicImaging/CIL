@@ -90,7 +90,7 @@ class TestFunction(CCPiTestClass):
         # Compare call of g
         a2 = alpha * (d - noisy_data).power(2).sum()
 
-        self.assertEqual(a2, g(d))
+        self.assertAlmostEqual(a2, g(d))
 
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
@@ -1121,17 +1121,16 @@ class TestTotalVariation(unittest.TestCase):
         self.alpha_arr = self.ig_real.allocate(0.15)
 
     def test_configure_tv_defaults(self):
-        self.assertEquals(self.tv.warm_start, True)
-        self.assertEquals(self.tv.iterations, 10)
-        self.assertEquals(self.tv.correlation, "Space")
-        self.assertEquals(self.tv.backend, "c")
-        self.assertEquals(self.tv.lower, -np.inf)
-        self.assertEquals(self.tv.upper, np.inf)
-        self.assertEquals(self.tv.isotropic, True)
-        self.assertEquals(self.tv.split, False)
-        self.assertEquals(self.tv.info, False)
-        self.assertEquals(self.tv.strong_convexity_constant, 0)
-        self.assertEquals(self.tv.tolerance, None)
+        self.assertEqual(self.tv.warm_start, True)
+        self.assertEqual(self.tv.iterations, 10)
+        self.assertEqual(self.tv.correlation, "Space")
+        self.assertEqual(self.tv.backend, "c")
+        self.assertEqual(self.tv.lower, -np.inf)
+        self.assertEqual(self.tv.upper, np.inf)
+        self.assertEqual(self.tv.isotropic, True)
+        self.assertEqual(self.tv.split, False)
+        self.assertEqual(self.tv.strong_convexity_constant, 0)
+        self.assertEqual(self.tv.tolerance, None)
 
     def test_configure_tv_not_defaults(self):
         tv=TotalVariation( max_iteration=100,
@@ -1142,20 +1141,18 @@ class TestTotalVariation(unittest.TestCase):
                  upper = 1.,
                  isotropic = False,
                  split = True,
-                 info = True,
                  strong_convexity_constant = 1.,
                  warm_start=False)
-        self.assertEquals(tv.warm_start, False)
-        self.assertEquals(tv.iterations, 100)
-        self.assertEquals(tv.correlation, "SpaceChannels")
-        self.assertEquals(tv.backend, "numpy")
-        self.assertEquals(tv.lower, 0.)
-        self.assertEquals(tv.upper, 1.)
-        self.assertEquals(tv.isotropic, False)
-        self.assertEquals(tv.split, True)
-        self.assertEquals(tv.info, True)
-        self.assertEquals(tv.strong_convexity_constant, 1.)
-        self.assertEquals(tv.tolerance, 1e-5)
+        self.assertEqual(tv.warm_start, False)
+        self.assertEqual(tv.iterations, 100)
+        self.assertEqual(tv.correlation, "SpaceChannels")
+        self.assertEqual(tv.backend, "numpy")
+        self.assertEqual(tv.lower, 0.)
+        self.assertEqual(tv.upper, 1.)
+        self.assertEqual(tv.isotropic, False)
+        self.assertEqual(tv.split, True)
+        self.assertEqual(tv.strong_convexity_constant, 1.)
+        self.assertEqual(tv.tolerance, 1e-5)
 
 
 
@@ -1273,7 +1270,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(
-            iters, tolerance=None, lower=0, info=True, warm_start=False)
+            iters, tolerance=None, lower=0, warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1353,7 +1350,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=False)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=False)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
@@ -1384,7 +1381,7 @@ class TestTotalVariation(unittest.TestCase):
 
         #with warm start
         iters=10
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=True)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=True)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         for i in range(4):
@@ -1410,7 +1407,7 @@ class TestTotalVariation(unittest.TestCase):
     def test_get_p2_with_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warm_start=True, max_iteration=10)
-        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        self.assertEqual(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
@@ -1427,7 +1424,7 @@ class TestTotalVariation(unittest.TestCase):
     def test_get_p2_without_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warm_start=False)
-        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        self.assertEqual(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
         checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
@@ -1844,7 +1841,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [ig.allocate(2), -2 * mask]):
-            # logging.info("test1", val, res)
+            # log.info("test1", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1852,7 +1849,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
-            # logging.info("test1", val, res)
+            # log.info("test1", val, res)
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(

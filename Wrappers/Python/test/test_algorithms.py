@@ -164,8 +164,6 @@ class TestGD(CCPiTestClass):
         # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
 class TestAlgorithms(CCPiTestClass):
-   
-
 
     def test_CGLS(self):
         ig = ImageGeometry(10,2)

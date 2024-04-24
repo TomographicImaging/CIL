@@ -1269,6 +1269,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__format__">
 <span class="sig-name descname"><span class="pre">__format__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_spec</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__format__" title="Permalink to this definition">#</a></dt>
 <dd><p>Default object formatter.</p>
+<p>Return str(self) if format_spec is empty. Raise TypeError otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1281,6 +1282,12 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__getattribute__">
 <span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__getattribute__" title="Permalink to this definition">#</a></dt>
 <dd><p>Return getattr(self, name).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__getstate__">
+<span class="sig-name descname"><span class="pre">__getstate__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__getstate__" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper for pickle.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1388,7 +1395,7 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
+<dd><p>list of weak references to the object</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1569,6 +1576,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__format__">
 <span class="sig-name descname"><span class="pre">__format__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_spec</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__format__" title="Permalink to this definition">#</a></dt>
 <dd><p>Default object formatter.</p>
+<p>Return str(self) if format_spec is empty. Raise TypeError otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1581,6 +1589,12 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__getattribute__">
 <span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__getattribute__" title="Permalink to this definition">#</a></dt>
 <dd><p>Return getattr(self, name).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__getstate__">
+<span class="sig-name descname"><span class="pre">__getstate__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__getstate__" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper for pickle.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1688,7 +1702,7 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
+<dd><p>list of weak references to the object</p>
 </dd></dl>
 
 <dl class="py method">
@@ -7281,7 +7295,7 @@ the class constant __array_priority__ must be set &gt; 0
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.BlockDataContainer.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#cil.framework.BlockDataContainer.__weakref__" title="Permalink to this definition">#</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
+<dd><p>list of weak references to the object</p>
 </dd></dl>
 
 </dd></dl>

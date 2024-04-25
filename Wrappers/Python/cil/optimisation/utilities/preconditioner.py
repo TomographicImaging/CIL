@@ -146,17 +146,23 @@ class AdaptiveSensitivity(Sensitivity):
 class AdaGrad(Preconditioner):
 
     """
-    TODO:
-
+    This Adaptive Gradient method multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epislon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)``. 
+    
+   
+    
+    Reference
+    ---------
+    Duchi, J., Hazan, E. and Singer, Y., 2011. Adaptive subgradient methods for online learning and stochastic optimization. Journal of machine learning research, 12(7).
     """
     
     
-    def __init__(self, epsilon=1e-4):
+    def __init__(self, epsilon=1e-8):
         self.epsilon=epsilon  
+        self.gradient_accumulator=None
 
     def __call__(self, algorithm):
         """
-        Method to __call__ the preconditioner. #TODO:
+        Method to __call__ the preconditioner. This multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epislon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)`. 
 
         Parameters
         ----------
@@ -164,28 +170,42 @@ class AdaGrad(Preconditioner):
             The algorithm object.
         """    
               
+        if self.gradient_accumulator is None:
+            self.gradient_accumulator = algorithm.x_update.multiply(algorithm.x_update)
+            
         
-        gradient_np = algorithm.x_update.as_array().copy()
-        array_np=np.ones_like(gradient_np)/np.sqrt( np.square(gradient_np)+self.epsilon)
-        self.array = algorithm.x.geometry.allocate(0)
-        self.array.fill(array_np) 
-        
-        algorithm.x_update.multiply(self.array, out=algorithm.x_update)
-        
+        else: 
+            self.gradient_accumulator.add(  algorithm.x_update.multiply(algorithm.x_update), out=self.gradient_accumulator)
+            
+
+        algorithm.x_update.divide(( self.gradient_accumulator+self.epsilon).sqrt(), out=algorithm.x_update)
+
         
 class Adam(Preconditioner):
 
     """
-    TODO:
+    This ADAM method combines the adaptive learning rate of AdaGrad with the idea of moomentum. 
+    
+    ADAM keeps track of the momentum :math:`g_k=\gamma g_{k-1} +(1-\gamma)\nabla f(x_k).
+    
+    It also updates the scaling factors  :math:`s_k^2=\beta s^2_{k-1}+(1-\beta) diag((\nabla f(x_k))(\nabla x_k)^T)`. 
+    
+    The returned `new` gradient is :math:`g_k/\sqrt(s_k^2+\epsilon)`
+
+    
+    Reference
+    ---------
+    Kingma, D.P. and Ba, J., 2014. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
 
     """
     
     
-    def __init__(self, gamma=0.9, beta =0.999):
+    def __init__(self, gamma=0.9, beta =0.999, epsilon=1e-8):
         self.gamma=gamma
         self.beta=beta 
         self.gradient_accumulator=None
         self.scaling_factor_accumulator=None
+        self.epsilon=epsilon 
 
     def __call__(self, algorithm):
         """
@@ -205,12 +225,6 @@ class Adam(Preconditioner):
             self.gradient_accumulator.sapyb(self.gamma, algorithm.x_update, (1-self.gamma), out=self.gradient_accumulator)
             self.scaling_factor_accumulator.sapyb(self.beta,  algorithm.x_update.multiply(algorithm.x_update), (1-self.beta), out=self.scaling_factor_accumulator)
         
-        sensitivity_np = np.sqrt(self.scaling_factor_accumulator.as_array())
-        pos_ind = sensitivity_np>0
-        array_np = np.zeros(algorithm.x.geometry.allocate().shape)
-
-        array_np[pos_ind ] = (1./sensitivity_np[pos_ind])
-        self.array = algorithm.x.geometry.allocate(0)
-        self.array.fill(array_np) 
+        self.gradient_accumulator.divide(( self.gradient_accumulator+self.epsilon).sqrt(), out=algorithm.x_update)
         
-        self.gradient_accumulator.multiply(self.array, out=algorithm.x_update)
+        

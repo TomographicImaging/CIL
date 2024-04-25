@@ -123,8 +123,8 @@ class TestPreconditioners(CCPiTestClass):
             initial=ig.allocate(0)
     
             f = LeastSquares(A=A, b=data, c=0.5)
-            step_size = 0.001
-            preconditioner = Adam(gamma=0.5, beta=0.5 )
+            step_size = 1
+            preconditioner = Adam()
 
             
             ls_adam = GD(initial=initial, objective_function=f,   preconditioner = preconditioner, update_objective_interval=1, step_size = step_size)     
@@ -144,7 +144,7 @@ class TestPreconditioners(CCPiTestClass):
             initial=ig.allocate(0)
     
             f = LeastSquares(A=A, b=data, c=0.5)
-            step_size = 0.001
+            step_size = 1
             preconditioner = AdaGrad()
 
             

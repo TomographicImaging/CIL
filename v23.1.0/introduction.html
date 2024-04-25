@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Introduction &#8212; CIL 23.0.1 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles/pydata-sphinx-theme.css" type="text/css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Framework" href="framework.html" />
+    <link rel="prev" title="Welcome to CIL’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">CIL</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="framework.html">
+  Framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="io.html">
+  Read/ write AcquisitionData and ImageData
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="optimisation.html">
+  Optimisation framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="processors.html">
+  Processors
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="recon.html">
+  Recon
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="utilities.html">
+  Utilities
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="plugins.html">
+  CIL Plugins
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="developer_guide.html">
+  Developers’ Guide
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ct-geometry">CT Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parallel-geometry">Parallel geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fan-beam-geometry">Fan-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cone-beam-geometry">Cone-beam geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#multi-channel-data">Multi channel data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#block-framework">Block Framework</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developers’ Guide</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ct-geometry">
+   CT Geometry
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#parallel-geometry">
+     Parallel geometry
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#fan-beam-geometry">
+     Fan-beam geometry
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#cone-beam-geometry">
+     Cone-beam geometry
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multi-channel-data">
+   Multi channel data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#block-framework">
+   Block Framework
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h1>
+<p>The goal of the Core Imaging Library is to allow the user to simply create iterative reconstruction methods which
+go beyond the standard filter back projection technique and which better suit the data characteristics.
+The framework comprises:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.framework</span></code> module gives the building blocks used to describe and handle the data</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.io</span></code> module which provides a number of loaders for real CT machines, e.g. Nikon. It also provides reader and writer to save to NeXuS file format.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.optimisation</span></code> module allows the user to create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.plugins</span></code> module which allows CIL to use selected functionality from ASTRA, TIGRE, TomoPhantom and the Regularisation Toolkit</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.processors</span></code> module contains tools for data manipulation and common CT pre-processing steps</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.recon</span></code> module contains an optimised FDK/FBP reconstructors, making using the both CIL accelerated libraries and the Tigre/ASTRA back-projectors</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cil.utilities</span></code> module contains a selection of display tools for 2D and 3D data, as well as real and simulated test datasets</p></li>
+</ul>
+<div class="section" id="ct-geometry">
+<h2>CT Geometry<a class="headerlink" href="#ct-geometry" title="Permalink to this headline">#</a></h2>
+<p>Please refer to <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/demos/1_Introduction/00_CIL_geometry.ipynb">this</a> notebook on the CIL-Demos
+repository for full description.</p>
+<p>In conventional CT systems, an object is placed between a source emitting X-rays and a detector array
+measuring the X-ray transmission images of the incident X-rays. Typically, either the object is placed
+on a rotating sample stage and rotates with respect to the source-detector assembly, or the
+source-detector gantry rotates with respect to the stationary object.
+This arrangement results in so-called circular scanning trajectory. Depending on source and detector
+types, there are three conventional data acquisition geometries:</p>
+<ul class="simple">
+<li><p>parallel geometry (2D or 3D),</p></li>
+<li><p>fan-beam geometry, and</p></li>
+<li><p>cone-beam geometry.</p></li>
+</ul>
+<div class="section" id="parallel-geometry">
+<h3>Parallel geometry<a class="headerlink" href="#parallel-geometry" title="Permalink to this headline">#</a></h3>
+<p>Parallel beams of X-rays are emitted onto 1D (single pixel row) or 2D detector array. This geometry
+is common for synchrotron sources. 2D parallel geometry is illustrated below.</p>
+<div class="align-center figure" id="id1">
+<img alt="alternate text" src="_images/parallel.png" />
+<p class="caption"><span class="caption-text">2D Parallel geometry</span><a class="headerlink" href="#id1" title="Permalink to this image">#</a></p>
+</div>
+<div class="align-center figure" id="id2">
+<img alt="alternate text" src="_images/parallel3d.png" />
+<p class="caption"><span class="caption-text">3D Parallel geometry</span><a class="headerlink" href="#id2" title="Permalink to this image">#</a></p>
+</div>
+</div>
+<div class="section" id="fan-beam-geometry">
+<h3>Fan-beam geometry<a class="headerlink" href="#fan-beam-geometry" title="Permalink to this headline">#</a></h3>
+<dl class="simple">
+<dt>A single point-like X-ray source emits a cone beam onto 1D detector pixel row. Cone-beam is typically</dt><dd><p>collimated to imaging field of view. Collimation allows greatly reduce amount of scatter radiation
+reaching the detector. Fan-beam geometry is used when scattering has significant influence on image
+quality or single-slice reconstruction is sufficient.</p>
+</dd>
+</dl>
+<div class="align-center figure" id="id3">
+<img alt="alternate text" src="_images/fan.png" />
+<p class="caption"><span class="caption-text">Fan beam geometry</span><a class="headerlink" href="#id3" title="Permalink to this image">#</a></p>
+</div>
+</div>
+<div class="section" id="cone-beam-geometry">
+<h3>Cone-beam geometry<a class="headerlink" href="#cone-beam-geometry" title="Permalink to this headline">#</a></h3>
+<p>A single point-like X-ray source emits a cone beam onto 2D detector array.
+Cone-beam geometry is mainly used in lab-based CT instruments. Depending on where the sample
+is placed between the source and the detector one can achieve a different magnification factor <span class="math notranslate nohighlight">\(F\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[F = \frac{r_1 + r_2}{r_1}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r_1\)</span> and <span class="math notranslate nohighlight">\(r_2\)</span> are the distance from the source to the center of the sample and
+the distance from the center of the sample to the detector, respectively.</p>
+<div class="align-center figure" id="id4">
+<img alt="alternate text" src="_images/cone.png" />
+<p class="caption"><span class="caption-text">Cone beam geometry</span><a class="headerlink" href="#id4" title="Permalink to this image">#</a></p>
+</div>
+</div>
+</div>
+<div class="section" id="multi-channel-data">
+<h2>Multi channel data<a class="headerlink" href="#multi-channel-data" title="Permalink to this headline">#</a></h2>
+<p>CIL is designed to work with 4D data.</p>
+<p>Both <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and <code class="code docutils literal notranslate"><span class="pre">ImageGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">ImageData</span></code>
+can be defined for multi-channel (spectral/time) CT data using <code class="code docutils literal notranslate"><span class="pre">channels</span></code> attribute.</p>
+</div>
+<div class="section" id="block-framework">
+<h2>Block Framework<a class="headerlink" href="#block-framework" title="Permalink to this headline">#</a></h2>
+<p>The block framework allows writing more advanced <a href="#id5"><span class="problematic" id="id6">`optimisation problems`_</span></a>. Consider the typical
+<a class="reference external" href="https://en.wikipedia.org/wiki/Tikhonov_regularization">Tikhonov regularisation</a>:</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}A u - b \end{Vmatrix}^2_2 + \alpha^2\|Lu\|^2_2\]</div>
+<p>where,</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is the projection operator</p></li>
+<li><p><span class="math notranslate nohighlight">\(b\)</span> is the acquired data</p></li>
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is the unknown image to be solved for</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the regularisation parameter</p></li>
+<li><p><span class="math notranslate nohighlight">\(L\)</span> is a regularisation operator</p></li>
+</ul>
+<p>The first term measures the fidelity of the solution to the data. The second term measures the
+fidelity to the prior knowledge we have imposed on the system, operator <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p>This can be re-written equivalently in the block matrix form:</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}\binom{A}{\alpha L} u - \binom{b}{0}\end{Vmatrix}^2_2\]</div>
+<p>With the definitions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tilde{A} = \binom{A}{\alpha L}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{b} = \binom{b}{0}\)</span></p></li>
+</ul>
+<p>this can now be recognised as a least squares problem which can be solved by any algorithm in the <code class="code docutils literal notranslate"><span class="pre">cil.optimisation</span></code>
+which can solve least squares problem, e.g. CGLS.</p>
+<div class="math notranslate nohighlight">
+\[\underset{u}{\mathrm{argmin}}\begin{Vmatrix}\tilde{A} u - \tilde{b}\end{Vmatrix}^2_2\]</div>
+<p>To be able to express our optimisation problems in the matrix form above, we developed the so-called,
+Block Framework comprising 4 main actors: <code class="code docutils literal notranslate"><span class="pre">BlockGeometry</span></code>, <code class="code docutils literal notranslate"><span class="pre">BlockDataContainer</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">BlockFunction</span></code> and <code class="code docutils literal notranslate"><span class="pre">BlockOperator</span></code>.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Welcome to CIL’s documentation!</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="framework.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Framework</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2021 UKRI-STFC, University of Manchester.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

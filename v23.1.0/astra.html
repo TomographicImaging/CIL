@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Astra plugin &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet">
+  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CIL Plugins" href="plugins.html" />
+    <link rel="prev" title="Utilities" href="utilities.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">CIL</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="framework.html">
+  Framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="io.html">
+  Read/ write AcquisitionData and ImageData
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="optimisation.html">
+  Optimisation framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="processors.html">
+  Processors
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="recon.html">
+  Recon
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="utilities.html">
+  Utilities
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Astra plugin
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="plugins.html">
+  CIL Plugins
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="developer_guide.html">
+  Developer’s guide
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Astra plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#processors">Processors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#operators">Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/astra.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#processors">
+   Processors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#operators">
+   Operators
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="astra-plugin">
+<h1>Astra plugin<a class="headerlink" href="#astra-plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="processors">
+<h2>Processors<a class="headerlink" href="#processors" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cil.plugins.astra.processors.AstraBackProjector3D">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.processors.</span></code><code class="sig-name descname"><span class="pre">AstraBackProjector3D</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraBackProjector3D.html#AstraBackProjector3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraBackProjector3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back project AcquisitionData to ImageData using ASTRA proj_geom, vol_geom.</p>
+<p>Input: AcquisitionData
+Parameter: proj_geom, vol_geom
+Output: ImageData</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraBackProjector3D.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraBackProjector3D.html#AstraBackProjector3D.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraBackProjector3D.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraBackProjector3D.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraBackProjector3D.html#AstraBackProjector3D.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraBackProjector3D.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters of the input DataContainer</p>
+<p>Should raise an Error if the DataContainer does not match expectation, e.g.
+if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraBackProjector3D.create_backprojection3d_gpu">
+<code class="sig-name descname"><span class="pre">create_backprojection3d_gpu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returnData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraBackProjector3D.html#AstraBackProjector3D.create_backprojection3d_gpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraBackProjector3D.create_backprojection3d_gpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a backprojection of a sinogram (3D) using CUDA.
+:param data: Sinogram data or ID.
+:type data: <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:param proj_geom: Projection geometry.
+:type proj_geom: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>
+:param vol_geom: Volume geometry.
+:type vol_geom: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>
+:param returnData: If False, only return the ID of the backprojection.
+:type returnData: <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
+:param vol_id: ID of the np array linked with astra
+:type vol_id: int, default None
+:returns: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – If <code class="docutils literal notranslate"><span class="pre">returnData=False</span></code>, returns the ID of the backprojection. Otherwise, returns a tuple containing the ID of the backprojection and the backprojection itself, in that order.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.astra.processors.AstraBackProjectorMC">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.processors.</span></code><code class="sig-name descname"><span class="pre">AstraBackProjectorMC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraBackProjectorMC.html#AstraBackProjectorMC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraBackProjectorMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>AstraBackProjector2D Multi channel</p>
+<p>Back project AcquisitionData to ImageData using ASTRA proj_id.</p>
+<p>Input: AcquisitionData
+Parameter: proj_id
+Output: ImageData</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraBackProjectorMC.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraBackProjectorMC.html#AstraBackProjectorMC.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraBackProjectorMC.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters of the input DataContainer</p>
+<p>Should raise an Error if the DataContainer does not match expectation, e.g.
+if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.astra.processors.AstraForwardProjector3D">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.processors.</span></code><code class="sig-name descname"><span class="pre">AstraForwardProjector3D</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraForwardProjector3D.html#AstraForwardProjector3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraForwardProjector3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward project ImageData to AcquisitionData using ASTRA projector.</p>
+<p>Input: ImageData
+Output: AcquisitionData</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraForwardProjector3D.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraForwardProjector3D.html#AstraForwardProjector3D.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraForwardProjector3D.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraForwardProjector3D.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraForwardProjector3D.html#AstraForwardProjector3D.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraForwardProjector3D.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters of the input DataContainer</p>
+<p>Should raise an Error if the DataContainer does not match expectation, e.g.
+if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraForwardProjector3D.create_sino3d_gpu">
+<code class="sig-name descname"><span class="pre">create_sino3d_gpu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vol_geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returnData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpuIndex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sino_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraForwardProjector3D.html#AstraForwardProjector3D.create_sino3d_gpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraForwardProjector3D.create_sino3d_gpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a forward projection of an image (3D).
+:param data: Image data or ID.
+:type data: <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:param proj_geom: Projection geometry.
+:type proj_geom: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>
+:param vol_geom: Volume geometry.
+:type vol_geom: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>
+:param returnData: If False, only return the ID of the forward projection.
+:type returnData: <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
+:param gpuIndex: Optional GPU index.
+:type gpuIndex: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:returns: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – If <code class="docutils literal notranslate"><span class="pre">returnData=False</span></code>, returns the ID of the forward projection. Otherwise, returns a tuple containing the ID of the forward projection and the forward projection itself, in that order.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.astra.processors.AstraForwardProjectorMC">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.processors.</span></code><code class="sig-name descname"><span class="pre">AstraForwardProjectorMC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraForwardProjectorMC.html#AstraForwardProjectorMC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraForwardProjectorMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>AstraForwardProjector2D Multi channel</p>
+<p>Forward project ImageData to AcquisitionDataSet using ASTRA proj_id.</p>
+<p>Input: ImageDataSet
+Parameter: proj_id
+Output: AcquisitionData</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.AstraForwardProjectorMC.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/AstraForwardProjectorMC.html#AstraForwardProjectorMC.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.AstraForwardProjectorMC.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters of the input DataContainer</p>
+<p>Should raise an Error if the DataContainer does not match expectation, e.g.
+if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="operators">
+<h2>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cil.plugins.astra.operators.AstraProjectorMC">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.operators.</span></code><code class="sig-name descname"><span class="pre">AstraProjectorMC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geomv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geomp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/AstraProjectorMC.html#AstraProjectorMC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.AstraProjectorMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>ASTRA Multichannel projector</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.AstraProjectorMC.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geomv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geomp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/AstraProjectorMC.html#AstraProjectorMC.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.AstraProjectorMC.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
+<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.AstraProjectorMC.adjoint">
+<code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DATA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/AstraProjectorMC.html#AstraProjectorMC.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.AstraProjectorMC.adjoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the adjoint/inverse operation</p>
+<p>only available to linear operators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.AstraProjectorMC.calculate_norm">
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/AstraProjectorMC.html#AstraProjectorMC.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.AstraProjectorMC.calculate_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
+<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
+<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.AstraProjectorMC.direct">
+<code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/AstraProjectorMC.html#AstraProjectorMC.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.AstraProjectorMC.direct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the application of the Operator on x</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="utilities.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Utilities</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="plugins.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CIL Plugins</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2021 UKRI-STFC, University of Manchester.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

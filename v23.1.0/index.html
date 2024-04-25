@@ -1,0 +1,502 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to CIL’s documentation! &#8212; CIL 23.0.1 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles/pydata-sphinx-theme.css" type="text/css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction" href="introduction.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="#">
+<p class="title">CIL</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="framework.html">
+  Framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="io.html">
+  Read/ write AcquisitionData and ImageData
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="optimisation.html">
+  Optimisation framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="processors.html">
+  Processors
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="recon.html">
+  Recon
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="utilities.html">
+  Utilities
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="plugins.html">
+  CIL Plugins
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="developer_guide.html">
+  Developers’ Guide
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">
+<h3><a href="#">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developers’ Guide</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#demos-and-examples">
+   Demos and Examples
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cite-this-work">
+   Cite this work
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#software-documentation-index">
+     Software documentation Index
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#contacts">
+   Contacts
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="welcome-to-cil-s-documentation">
+<h1>Welcome to CIL’s documentation!<a class="headerlink" href="#welcome-to-cil-s-documentation" title="Permalink to this headline">#</a></h1>
+<p>The aim of this package is to enable rapid prototyping of optimisation-based
+reconstruction problems, i.e. defining and solving different optimization problems to enforce different properties on the reconstructed image, while being
+powerful enough to be employed on real scale problems.</p>
+<p>Firstly, it provides a framework to handle acquisition and reconstruction
+data and metadata; it also provides a basic input/output package to read data
+from different sources, e.g. Nikon X-Radia, NeXus.</p>
+<p>Secondly, it provides an object-oriented framework for defining mathematical
+operators and functions as well a collection of useful example operators and
+functions. Both smooth and non-smooth functions can be used.</p>
+<p>Further, it provides a number of high-level generic implementations of
+optimisation algorithms to solve generically formulated optimisation problems
+constructed from operator and function objects.</p>
+<div class="section" id="demos-and-examples">
+<h2>Demos and Examples<a class="headerlink" href="#demos-and-examples" title="Permalink to this headline">#</a></h2>
+<p>A number of demos can be found in the <a class="reference external" href="https://github.com/vais-ral/CIL-Demos">CIL-Demos</a> repository.</p>
+<p>For detailed information refer to our articles and the repositories
+with the code to reproduce the article’s results.</p>
+<p>1. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging
+<a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">https://doi.org/10.1098/rsta.2020.0192</a> . Phil. Trans. R. Soc. A 20200192.
+The code to reproduce the article results. <a class="reference external" href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I">https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I</a></p>
+<p>2. Papoutsellis E et al. 2021 Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
+tomography <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">https://doi.org/10.1098/rsta.2020.0193</a> Phil. Trans. R. Soc. A 20200193.
+The code to reproduce the article results. <a class="reference external" href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II">https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II</a></p>
+</div>
+<div class="section" id="cite-this-work">
+<h2>Cite this work<a class="headerlink" href="#cite-this-work" title="Permalink to this headline">#</a></h2>
+<p>If you use this software please consider citing one or both of the articles above.</p>
+<div class="section" id="software-documentation-index">
+<h3>Software documentation Index<a class="headerlink" href="#software-documentation-index" title="Permalink to this headline">#</a></h3>
+<div class="toctree-wrapper compound" id="mastertoc">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#ct-geometry">CT Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#parallel-geometry">Parallel geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#fan-beam-geometry">Fan-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#cone-beam-geometry">Cone-beam geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#multi-channel-data">Multi channel data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#block-framework">Block Framework</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#acquisitiongeometry">AcquisitionGeometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#parallel2d-geometry">Parallel2D Geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#parallel3d-geometry">Parallel3D Geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#cone2d-geometry-fanbeam">Cone2D Geometry (Fanbeam)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#cone3d-geometry">Cone3D Geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#configure-the-geometry">Configure the geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#use-the-geometry">Use the geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#imagegeometry">ImageGeometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#blockgeometry">BlockGeometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#data-containers">Data Containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#datacontainer">DataContainer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#acquisitiondata">AcquisitionData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#imagedata">ImageData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#vectordata">VectorData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#blockdatacontainer">BlockDataContainer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#dataorder">DataOrder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#dataprocessor">DataProcessor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="io.html#nexus">NeXuS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#nikon">Nikon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#zeiss">ZEISS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#tiff-reader-writer">TIFF Reader/Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#raw-file-writer">RAW File Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#hdf5-utilities">HDF5 Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#base-class">Base class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#gd">GD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#cgls">CGLS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#sirt">SIRT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#ista">ISTA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#fista">FISTA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#pdhg">PDHG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#ladmm">LADMM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#spdhg">SPDHG</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#operators">Operators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#operator-base-classes">Operator base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#trivial-operators">Trivial operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#gradientoperator">GradientOperator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#base-classes">Base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#simple-functions">Simple functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#composition-of-operator-and-a-function">Composition of operator and a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#indicator-box">Indicator box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#kullbackleibler">KullbackLeibler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#l1-norm">L1 Norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#squared-l2-norm-squared">Squared L2 norm squared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#least-squares">Least Squares</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#mixed-l21-norm">Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#mixed-l11-norm">Mixed L11 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#total-variation">Total variation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#blockdatacontainer">BlockDataContainer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#block-function">Block Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#block-operator">Block Operator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processors.html#data-manipulation">Data Manipulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-slicer">Data Slicer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-binner">Data Binner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-padder">Data Padder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#mask-generator-from-data">Mask Generator from Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-masking">Data Masking</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processors.html#pre-processors">Pre-processors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#centre-of-rotation-corrector">Centre Of Rotation Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-normaliser">Data Normaliser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#ring-remover">Ring Remover</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recon.html#analytical-reconstruction">Analytical Reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recon.html#fbp-reconstructor-for-parallel-beam-geometry">FBP - Reconstructor for parallel-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recon.html#fdk-reconstructor-for-cone-beam-geometry">FDK - Reconstructor for cone-beam geometry</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#test-datasets">Test datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#a-set-of-simulated-volumes-and-ct-data">A set of simulated volumes and CT data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#a-ct-dataset-from-the-diamond-light-source">A CT dataset from the Diamond Light Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#simulated-image-data">Simulated image data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-cil.utilities.quality_measures">Image Quality metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#visualisation">Visualisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#show2d-display-2d-slices">show2D - Display 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#show1d-display-1d-slices">show1D - Display 1D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#show-geometry-display-system-geometry">show_geometry - Display system geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#islicer-interactive-display-of-2d-slices">islicer - interactive display of 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#link-islicer-link-islicer-objects-by-index">link_islicer - link islicer objects by index</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#ccpi-regularisation">CCPi Regularisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#total-variation">Total variation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#other-regularisation-functions">Other regularisation functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#tomophantom">TomoPhantom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#tigre">TIGRE</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#fbp">FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#projection-operator">Projection Operator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#astra">ASTRA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#id6">FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#id7">Projection Operator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developers’ Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide.html#conventions-on-new-cil-objects">Conventions on new CIL objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide.html#creator">Creator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide.html#setter-methods-and-properties">Setter methods and properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide.html#other-methods">Other methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide.html#documentation">Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide.html#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide.html#building-documentation-locally">Building documentation locally</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide.html#contributions-guidelines">Contributions guidelines</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="contacts">
+<h2>Contacts<a class="headerlink" href="#contacts" title="Permalink to this headline">#</a></h2>
+<p>Please refer to the main <a class="reference external" href="https://www.ccpi.ac.uk">CCPi website</a> for up-to-date information.</p>
+<p>The CCPi developers may be contacted:</p>
+<ul class="simple">
+<li><p>by joining the <a class="reference external" href="https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL">devel mailing list</a></p></li>
+<li><p>on the CIL’s GitHub repository page <a class="reference external" href="https://github.com/TomographicImaging/CIL.git">https://github.com/TomographicImaging/CIL.git</a> or</p></li>
+<li><p>on the CIL Discord channel <a class="reference external" href="https://discord.gg/9NTWu9MEGq">https://discord.gg/9NTWu9MEGq</a></p></li>
+</ul>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='right-next' id="next-link" href="introduction.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Introduction</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2021 UKRI-STFC, University of Manchester.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

@@ -109,7 +109,10 @@ jobs:
         numpy-version: [1.25]
     steps:
     - uses: actions/checkout@v4
-      with: {fetch-depth: 0, submodules: recursive}
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -130,7 +133,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with: {fetch-depth: 0, submodules: recursive}
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
       with: {python-version: 3.11}
     - name: install dependencies

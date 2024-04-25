@@ -1,0 +1,821 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Developers’ Guide &#8212; CIL 24.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'developer_guide';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        </script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Tutorials" href="../demos/" />
+    <link rel="prev" title="CIL Plugins" href="../plugins/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      24.0.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers’ Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-on-new-cil-objects">Conventions on new CIL objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creator">Creator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setter-methods-and-properties">Setter methods and properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-methods">Other methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-documentation-locally">Building documentation locally</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notebooks-gallery">Notebooks gallery</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#contributions-guidelines">Contributions guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/developer_guide.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Developers’ Guide</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="developers-guide">
+<h1>Developers’ Guide<a class="headerlink" href="#developers-guide" title="Permalink to this headline">#</a></h1>
+<p>CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with
+the following.</p>
+<section id="conventions-on-new-cil-objects">
+<h2>Conventions on new CIL objects<a class="headerlink" href="#conventions-on-new-cil-objects" title="Permalink to this headline">#</a></h2>
+<p>For each class there are <strong>essential</strong>, and <strong>non-essential</strong> parameters. The non-essential can be further be divided in <strong>often configured</strong> and <strong>advanced</strong> parameters:</p>
+<ul class="simple">
+<li><p>essential</p></li>
+<li><p>non-essential</p>
+<ul>
+<li><p>often-configured</p></li>
+<li><p>advanced</p></li>
+</ul>
+</li>
+</ul>
+<p>The definition of what are the essential, often-configured and advanced parameters depends on the actual class.</p>
+<section id="creator">
+<h3>Creator<a class="headerlink" href="#creator" title="Permalink to this headline">#</a></h3>
+<p>To create an instance of a class, the creator of a class should require the <strong>essential</strong> and <strong>often-configured</strong> parameters as named parameters.</p>
+<p>It should not accept positional arguments <cite>*args</cite> or key-worded arguments <cite>**kwargs</cite> so that the user can clearly understand what parameters are necessary to
+create the instance.</p>
+</section>
+<section id="setter-methods-and-properties">
+<h3>Setter methods and properties<a class="headerlink" href="#setter-methods-and-properties" title="Permalink to this headline">#</a></h3>
+<p>Use of <cite>property</cite> is favoured instead of class members to store parameters so that the parameters can be protected.</p>
+<p>The class should provide setter methods to change all the parameters at any time. Setter methods to set multiple parameters at the same time is also accepted.
+Setter methods should be named <cite>set_&lt;parameter&gt;</cite>. The use of <cite>set_</cite> helps IDEs and user to find what they should change in an instance of a class.</p>
+</section>
+<section id="other-methods">
+<h3>Other methods<a class="headerlink" href="#other-methods" title="Permalink to this headline">#</a></h3>
+<p>Methods that are not meant to be used by the user should have a <cite>_</cite> (underscore) at the beginning of the name.
+All methods should follow the convention of small caps underscore separated words.</p>
+</section>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">#</a></h2>
+<section id="docstrings">
+<h3>Docstrings<a class="headerlink" href="#docstrings" title="Permalink to this headline">#</a></h3>
+<p>The Core Imaging Library (CIL) follows the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumpyDoc</a>
+style with the <a class="reference external" href="https://pydata-sphinx-theme.readthedocs.io/en/latest/">PyData Sphinx HTML theme</a>.
+When contributing your code please refer to <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">this</a> link
+for docstring formatting and this rendered <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/example.html#example">example</a>.</p>
+<section id="example-from-cil">
+<h4>Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code><a class="headerlink" href="#example-from-cil" title="Permalink to this headline">#</a></h4>
+<p>The following provides an example of the docstring format used within <code class="docutils literal notranslate"><span class="pre">cil</span></code>, and the rendered documentation generated from it.</p>
+<section id="source">
+<h5>Source<a class="headerlink" href="#source" title="Permalink to this headline">#</a></h5>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text"><cite>FBP.run method from cil.io.recon.FBP</cite></span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out : ImageData, optional</span>
+<span class="sd">           Fills the referenced ImageData with the reconstructed volume and suppresses the return</span>
+
+<span class="sd">        verbose : int, default=1</span>
+<span class="sd">           Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageData</span>
+<span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">==</span> <span class="s1">&#39;advanced&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only default image geometries can be processed in chunks `set_split_processing`&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">out</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+
+            <span class="n">tot_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">pixel_num_v</span>
+            <span class="n">remainder</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
+            <span class="n">num_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">num_chunks</span><span class="p">)</span>
+
+            <span class="c1">#process dataset by requested chunk size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span> <span class="o">-</span> <span class="n">i</span>
+
+                <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">#process excess rows</span>
+            <span class="k">if</span> <span class="n">remainder</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">remainder</span>
+
+                <span class="n">ret</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">remainder</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
+
+            <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="rendered">
+<h5>Rendered<a class="headerlink" href="#rendered" title="Permalink to this headline">#</a></h5>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.FBP.run">
+<span class="sig-prename descclassname"><span class="pre">FBP.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FBP.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.FBP.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the configured FBP recon and returns the reconstruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><em>optional</em>) – Fills the referenced ImageData with the reconstructed volume and suppresses the return</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reconstructed volume. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+<section id="building-documentation-locally">
+<h3>Building documentation locally<a class="headerlink" href="#building-documentation-locally" title="Permalink to this headline">#</a></h3>
+<p>The easiest way to test changes to documentation is to build the docs locally. To do this, you will need a working <code class="docutils literal notranslate"><span class="pre">cil</span></code> installation.
+For development of the documentation embedded within the source code itself (e.g. docstrings), you should build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source.</p>
+<p>The following steps can be used to create an environment that is suitable for building <code class="docutils literal notranslate"><span class="pre">cil</span></code> and its documentation, and to start
+a HTTP server to view the documentation.</p>
+<ol class="arabic simple">
+<li><p>Clone <code class="docutils literal notranslate"><span class="pre">cil</span></code> repo</p></li>
+<li><p>Update conda with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">update</span> <span class="pre">-n</span> <span class="pre">base</span> <span class="pre">-c</span> <span class="pre">defaults</span> <span class="pre">conda</span></code></p></li>
+<li><p>Follow the instructions <a class="reference external" href="https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code">here</a> to create a conda environment and build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source</p></li>
+<li><p>Go to <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder</p></li>
+<li><p>Install packages from <code class="docutils literal notranslate"><span class="pre">docs/docs_environment.yml</span></code> (with ‘name’ changed to ENVIRONMENT_NAME) using <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">update</span> <span class="pre">-f</span> <span class="pre">docs_environment.yml</span></code></p></li>
+<li><p>Download the notebooks for rendering in the documentation with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">mkdemos.py</span></code></p></li>
+<li><p>Build the documentation <code class="docutils literal notranslate"><span class="pre">sphinx-build</span> <span class="pre">-b</span> <span class="pre">dirhtml</span> <span class="pre">source</span> <span class="pre">build</span></code></p></li>
+<li><p>Start a HTTP server to serve documentation with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span> <span class="pre">--directory</span> <span class="pre">build</span></code></p></li>
+</ol>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+cd CIL
+sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+conda activate ENVIRONMENT_NAME
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+cmake --build ./build --target install
+cd docs
+conda update -n base -c defaults conda
+conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
+python mkdemos.py
+sphinx-build -b dirhtml source build
+python -m http.server -d build
+</pre></div>
+</div>
+</section>
+<section id="notebooks-gallery">
+<h3>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Permalink to this headline">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">mkdemos.py</span></code> script:</p>
+<ul class="simple">
+<li><p>downloads notebooks from external URLs to <code class="docutils literal notranslate"><span class="pre">source/demos/*.ipynb</span></code></p></li>
+<li><p>uses the <code class="docutils literal notranslate"><span class="pre">demos-template.rst</span></code> file to generate the gallery in <code class="docutils literal notranslate"><span class="pre">source/demos.rst</span></code></p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">nbsphinx</span></code> extension will convert the <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> files to HTML.</p>
+</section>
+</section>
+<section id="contributions-guidelines">
+<h2>Contributions guidelines<a class="headerlink" href="#contributions-guidelines" title="Permalink to this headline">#</a></h2>
+<p>Make sure that each contributed file contains the following text enclosed in the appropriate comment syntax for the file format. Please replace <cite>[yyyy]</cite> and <cite>[name of copyright owner]</cite> with your own identifying information. Optionally you may add author name and email.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span><span class="n">Copyright</span> <span class="mi">2022</span> <span class="n">United</span> <span class="n">Kingdom</span> <span class="n">Research</span> <span class="ow">and</span> <span class="n">Innovation</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Copyright 2022 The University of Manchester
+Copyright [yyyy] [name of copyright owner]</p>
+<p>Author(s): [Author name, Author email (optional)]</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+</div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+</div></blockquote>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../plugins/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">CIL Plugins</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../demos/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overview: module code &#8212; CIL 24.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/index';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        </script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      24.0.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Overview: module code</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>All modules for which code is available</h1>
+<ul><li><a href="cil/framework/BlockDataContainer/">cil.framework.BlockDataContainer</a></li>
+<li><a href="cil/framework/BlockGeometry/">cil.framework.BlockGeometry</a></li>
+<li><a href="cil/framework/framework/">cil.framework.framework</a></li>
+<li><a href="cil/io/NEXUSDataReader/">cil.io.NEXUSDataReader</a></li>
+<li><a href="cil/io/NEXUSDataWriter/">cil.io.NEXUSDataWriter</a></li>
+<li><a href="cil/io/NikonDataReader/">cil.io.NikonDataReader</a></li>
+<li><a href="cil/io/RAWFileWriter/">cil.io.RAWFileWriter</a></li>
+<li><a href="cil/io/TIFF/">cil.io.TIFF</a></li>
+<li><a href="cil/io/ZEISSDataReader/">cil.io.ZEISSDataReader</a></li>
+<li><a href="cil/io/utilities/">cil.io.utilities</a></li>
+<li><a href="cil/optimisation/algorithms/ADMM/">cil.optimisation.algorithms.ADMM</a></li>
+<li><a href="cil/optimisation/algorithms/Algorithm/">cil.optimisation.algorithms.Algorithm</a></li>
+<li><a href="cil/optimisation/algorithms/CGLS/">cil.optimisation.algorithms.CGLS</a></li>
+<li><a href="cil/optimisation/algorithms/FISTA/">cil.optimisation.algorithms.FISTA</a></li>
+<li><a href="cil/optimisation/algorithms/GD/">cil.optimisation.algorithms.GD</a></li>
+<li><a href="cil/optimisation/algorithms/PDHG/">cil.optimisation.algorithms.PDHG</a></li>
+<li><a href="cil/optimisation/algorithms/SIRT/">cil.optimisation.algorithms.SIRT</a></li>
+<li><a href="cil/optimisation/algorithms/SPDHG/">cil.optimisation.algorithms.SPDHG</a></li>
+<li><a href="cil/optimisation/functions/ApproximateGradientSumFunction/">cil.optimisation.functions.ApproximateGradientSumFunction</a></li>
+<li><a href="cil/optimisation/functions/BlockFunction/">cil.optimisation.functions.BlockFunction</a></li>
+<li><a href="cil/optimisation/functions/Function/">cil.optimisation.functions.Function</a></li>
+<li><a href="cil/optimisation/functions/IndicatorBox/">cil.optimisation.functions.IndicatorBox</a></li>
+<li><a href="cil/optimisation/functions/KullbackLeibler/">cil.optimisation.functions.KullbackLeibler</a></li>
+<li><a href="cil/optimisation/functions/L1Norm/">cil.optimisation.functions.L1Norm</a></li>
+<li><a href="cil/optimisation/functions/L2NormSquared/">cil.optimisation.functions.L2NormSquared</a></li>
+<li><a href="cil/optimisation/functions/LeastSquares/">cil.optimisation.functions.LeastSquares</a></li>
+<li><a href="cil/optimisation/functions/MixedL21Norm/">cil.optimisation.functions.MixedL21Norm</a></li>
+<li><a href="cil/optimisation/functions/OperatorCompositionFunction/">cil.optimisation.functions.OperatorCompositionFunction</a></li>
+<li><a href="cil/optimisation/functions/Rosenbrock/">cil.optimisation.functions.Rosenbrock</a></li>
+<li><a href="cil/optimisation/functions/SGFunction/">cil.optimisation.functions.SGFunction</a></li>
+<li><a href="cil/optimisation/functions/TotalVariation/">cil.optimisation.functions.TotalVariation</a></li>
+<li><a href="cil/optimisation/operators/BlockOperator/">cil.optimisation.operators.BlockOperator</a></li>
+<li><a href="cil/optimisation/operators/ChannelwiseOperator/">cil.optimisation.operators.ChannelwiseOperator</a></li>
+<li><a href="cil/optimisation/operators/DiagonalOperator/">cil.optimisation.operators.DiagonalOperator</a></li>
+<li><a href="cil/optimisation/operators/FiniteDifferenceOperator/">cil.optimisation.operators.FiniteDifferenceOperator</a></li>
+<li><a href="cil/optimisation/operators/GradientOperator/">cil.optimisation.operators.GradientOperator</a></li>
+<li><a href="cil/optimisation/operators/IdentityOperator/">cil.optimisation.operators.IdentityOperator</a></li>
+<li><a href="cil/optimisation/operators/MaskOperator/">cil.optimisation.operators.MaskOperator</a></li>
+<li><a href="cil/optimisation/operators/MatrixOperator/">cil.optimisation.operators.MatrixOperator</a></li>
+<li><a href="cil/optimisation/operators/Operator/">cil.optimisation.operators.Operator</a></li>
+<li><a href="cil/optimisation/operators/SparseFiniteDifferenceOperator/">cil.optimisation.operators.SparseFiniteDifferenceOperator</a></li>
+<li><a href="cil/optimisation/operators/SymmetrisedGradientOperator/">cil.optimisation.operators.SymmetrisedGradientOperator</a></li>
+<li><a href="cil/optimisation/operators/ZeroOperator/">cil.optimisation.operators.ZeroOperator</a></li>
+<li><a href="cil/optimisation/utilities/callbacks/">cil.optimisation.utilities.callbacks</a></li>
+<li><a href="cil/optimisation/utilities/sampler/">cil.optimisation.utilities.sampler</a></li>
+<li><a href="cil/plugins/TomoPhantom/">cil.plugins.TomoPhantom</a></li>
+<li><a href="cil/plugins/astra/operators/ProjectionOperator/">cil.plugins.astra.operators.ProjectionOperator</a></li>
+<li><a href="cil/plugins/astra/processors/FBP/">cil.plugins.astra.processors.FBP</a></li>
+<li><a href="cil/plugins/ccpi_regularisation/functions/regularisers/">cil.plugins.ccpi_regularisation.functions.regularisers</a></li>
+<li><a href="cil/plugins/tigre/FBP/">cil.plugins.tigre.FBP</a></li>
+<li><a href="cil/plugins/tigre/ProjectionOperator/">cil.plugins.tigre.ProjectionOperator</a></li>
+<li><a href="cil/processors/AbsorptionTransmissionConverter/">cil.processors.AbsorptionTransmissionConverter</a></li>
+<li><a href="cil/processors/Binner/">cil.processors.Binner</a></li>
+<li><a href="cil/processors/CentreOfRotationCorrector/">cil.processors.CentreOfRotationCorrector</a></li>
+<li><a href="cil/processors/MaskGenerator/">cil.processors.MaskGenerator</a></li>
+<li><a href="cil/processors/Masker/">cil.processors.Masker</a></li>
+<li><a href="cil/processors/Normaliser/">cil.processors.Normaliser</a></li>
+<li><a href="cil/processors/Padder/">cil.processors.Padder</a></li>
+<li><a href="cil/processors/RingRemover/">cil.processors.RingRemover</a></li>
+<li><a href="cil/processors/Slicer/">cil.processors.Slicer</a></li>
+<li><a href="cil/processors/TransmissionAbsorptionConverter/">cil.processors.TransmissionAbsorptionConverter</a></li>
+<li><a href="cil/recon/FBP/">cil.recon.FBP</a></li>
+<li><a href="cil/utilities/dataexample/">cil.utilities.dataexample</a></li>
+<li><a href="cil/utilities/display/">cil.utilities.display</a></li>
+<li><a href="cil/utilities/jupyter/">cil.utilities.jupyter</a></li>
+<li><a href="cil/utilities/quality_measures/">cil.utilities.quality_measures</a></li>
+</ul>
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

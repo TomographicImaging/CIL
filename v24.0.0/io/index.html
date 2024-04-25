@@ -1,0 +1,1225 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 24.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'io';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        </script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Optimisation framework" href="../optimisation/" />
+    <link rel="prev" title="Framework" href="../framework/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      24.0.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Read/ write AcquisitionData and ImageData</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nexus">NeXuS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nikon">Nikon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zeiss">ZEISS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tiff-reader-writer">TIFF Reader/Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#raw-file-writer">RAW File Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hdf5-utilities">HDF5 Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/io.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Read/ write AcquisitionData and ImageData</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="read-write-acquisitiondata-and-imagedata">
+<h1>Read/ write AcquisitionData and ImageData<a class="headerlink" href="#read-write-acquisitiondata-and-imagedata" title="Permalink to this headline">#</a></h1>
+<section id="nexus">
+<h2>NeXuS<a class="headerlink" href="#nexus" title="Permalink to this headline">#</a></h2>
+<p>The CCPi Framework provides classes to read and write <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and <code class="code docutils literal notranslate"><span class="pre">ImageData</span></code>
+as NeXuS files.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">NEXUSDataWriter</span><span class="p">,</span> <span class="n">NEXUSDataReader</span>
+
+<span class="c1"># initialise NEXUS Writer</span>
+<span class="n">writer</span> <span class="o">=</span> <span class="n">NEXUSDataWriter</span><span class="p">()</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">my_data</span><span class="p">,</span>
+            <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;tmp_nexus.nxs&#39;</span><span class="p">)</span>
+<span class="c1"># write data</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+
+<span class="c1"># read data</span>
+<span class="c1"># initialize NEXUS reader</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
+<span class="n">reader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;tmp_nexus.nxs&#39;</span><span class="p">)</span>
+<span class="c1"># load data</span>
+<span class="n">ad1</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="c1"># get AcquisitionGeometry</span>
+<span class="n">ag1</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">get_geometry</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">NEXUSDataReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a reader for NeXus files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<em>str</em>) – the full path to the NeXus file to read.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.set_up">
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.set_up" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialise reader.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<em>str</em>) – Full path to NeXus file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.get_geometry">
+<span class="sig-name descname"><span class="pre">get_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_geometry" title="Permalink to this definition">#</a></dt>
+<dd><p>Parse NEXUS file and return acquisition or reconstructed volume
+parameters, depending on file type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Acquisition or reconstructed volume parameters. Exact type
+depends on file content.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a> or <a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry">ImageGeometry</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.get_data_scale">
+<span class="sig-name descname"><span class="pre">get_data_scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.get_data_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_scale" title="Permalink to this definition">#</a></dt>
+<dd><p>Parse NEXUS file and return the scale factor applied to compress
+the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>scale</strong> – The scale factor applied to compress the dataset</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.get_data_offset">
+<span class="sig-name descname"><span class="pre">get_data_offset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.get_data_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_offset" title="Permalink to this definition">#</a></dt>
+<dd><p>Parse NEXUS file and return the offset factor applied to compress
+the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>offset</strong> – The offset factor applied to compress the dataset</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.read_as_original">
+<span class="sig-name descname"><span class="pre">read_as_original</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.read_as_original"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read_as_original" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the compressed data from the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>output</strong> – The raw, compressed data. Exact type depends on file content.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a> or <a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the uncompressed data as numpy.float32.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>output</strong> – The uncompressed data. Exact type depends on file content.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a> or <a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataReader.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataReader/#NEXUSDataReader.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.load_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Alias of <cite>read</cite>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#cil.io.NEXUSDataReader.read" title="cil.io.NEXUSDataReader.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">NEXUSDataWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataWriter/#NEXUSDataWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a writer for NEXUS files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>,</em>) – The dataset to write to file</p></li>
+<li><p><strong>file_name</strong> (<em>os.path</em><em> or </em><em>string</em><em>, </em><em>default None</em>) – The file name to write</p></li>
+<li><p><strong>compression</strong> (<em>str</em><em>, </em><em>{'uint8'</em><em>, </em><em>'uint16'</em><em>, </em><em>None}</em><em>, </em><em>default None</em>) – The lossy compression to apply, default None will not compress data.
+uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataWriter.set_up">
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataWriter/#NEXUSDataWriter.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.set_up" title="Permalink to this definition">#</a></dt>
+<dd><p>Set up the writer</p>
+<dl class="simple">
+<dt>data: AcquisitionData, ImageData,</dt><dd><p>The dataset to write to file</p>
+</dd>
+<dt>file_name: os.path or string, default None</dt><dd><p>The file name to write</p>
+</dd>
+<dt>compression: int, default 0</dt><dd><p>The lossy compression to apply, default 0 will not compress data.
+8 or 16 will compress to 8 and 16 bit dtypes respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NEXUSDataWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NEXUSDataWriter/#NEXUSDataWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.write" title="Permalink to this definition">#</a></dt>
+<dd><p>write dataset to disk</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="nikon">
+<h2>Nikon<a class="headerlink" href="#nikon" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.NikonDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">NikonDataReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fliplr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NikonDataReader/#NikonDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader" title="Permalink to this definition">#</a></dt>
+<dd><p>Basic reader for xtekct files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – full path to .xtekct file</p></li>
+<li><p><strong>roi</strong> (<em>dict</em><em>, </em><em>default=None</em>) – <p>dictionary with roi to load:
+{‘angle’: (start, end, step),</p>
+<blockquote>
+<div><p>’horizontal’: (start, end, step),
+‘vertical’: (start, end, step)}</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>normalise</strong> (<em>bool</em><em>, </em><em>default=True</em>) – normalises loaded projections by detector white level (I_0)</p></li>
+<li><p><strong>fliplr</strong> (<em>bool</em><em>, </em><em>default = False</em><em>,</em>) – flip projections in the left-right direction (about vertical axis)</p></li>
+<li><p><strong>mode</strong> (<em>str: {'bin'</em><em>, </em><em>'slice'}</em><em>, </em><em>default='bin'</em>) – In bin mode, ‘step’ number of pixels is binned together,
+values of resulting binned pixels are calculated as average.
+In ‘slice’ mode ‘step’ defines standard numpy slicing.
+Note: in general output array size in bin mode != output array size in slice mode</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl>
+<dt><cite>roi</cite> behaviour:</dt><dd><p>Files are stacked along axis_0. axis_1 and axis_2 correspond
+to row and column dimensions, respectively.</p>
+<p>Files are stacked in alphabetic order.</p>
+<p>To skip projections or to change number of projections to load,
+adjust ‘angle’. For instance, ‘angle’: (100, 300)
+will skip first 100 projections and will load 200 projections.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'angle':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis.</p>
+<p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
+to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.
+Start and end also can be negative.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NikonDataReader.get_geometry">
+<span class="sig-name descname"><span class="pre">get_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NikonDataReader/#NikonDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.get_geometry" title="Permalink to this definition">#</a></dt>
+<dd><p>Return AcquisitionGeometry object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NikonDataReader.get_roi">
+<span class="sig-name descname"><span class="pre">get_roi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NikonDataReader/#NikonDataReader.get_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.get_roi" title="Permalink to this definition">#</a></dt>
+<dd><p>returns the roi</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NikonDataReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NikonDataReader/#NikonDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads projections and returns AcquisitionData with corresponding geometry,
+arranged as [‘angle’, horizontal’] if a single slice is loaded
+and [‘vertical, ‘angle’, horizontal’] if more than 1 slice is loaded.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.NikonDataReader.load_projections">
+<span class="sig-name descname"><span class="pre">load_projections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/NikonDataReader/#NikonDataReader.load_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.load_projections" title="Permalink to this definition">#</a></dt>
+<dd><p>alias of read for backward compatibility</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="zeiss">
+<h2>ZEISS<a class="headerlink" href="#zeiss" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.ZEISSDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">ZEISSDataReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/ZEISSDataReader/#ZEISSDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.ZEISSDataReader" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a reader for ZEISS files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – file name to read</p></li>
+<li><p><strong>roi</strong> (<em>dict</em><em>, </em><em>default None</em>) – dictionary with roi to load for each axis:
+<code class="docutils literal notranslate"><span class="pre">{'axis_labels_1':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step),'axis_labels_2':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)}</span></code>.
+<code class="docutils literal notranslate"><span class="pre">axis_labels</span></code> are defined by ImageGeometry and AcquisitionGeometry dimension labels.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl>
+<dt><cite>roi</cite> behaviour:</dt><dd><p>For ImageData to skip files or to change number of files to load,
+adjust <code class="docutils literal notranslate"><span class="pre">vertical</span></code>. E.g. <code class="docutils literal notranslate"><span class="pre">'vertical':</span> <span class="pre">(100,</span> <span class="pre">300)</span></code> will skip first 100 files
+and will load 200 files.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'axis_label':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis.</p>
+<p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
+to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.ZEISSDataReader.set_up">
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/ZEISSDataReader/#ZEISSDataReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.ZEISSDataReader.set_up" title="Permalink to this definition">#</a></dt>
+<dd><p>Set up the reader</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – file name to read</p></li>
+<li><p><strong>roi</strong> (<em>dict</em><em>, </em><em>default None</em>) – dictionary with roi to load for each axis:
+<code class="docutils literal notranslate"><span class="pre">{'axis_labels_1':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step),'axis_labels_2':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)}</span></code>.
+<code class="docutils literal notranslate"><span class="pre">axis_labels</span></code> are defined by ImageGeometry and AcquisitionGeometry dimension labels.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl>
+<dt><cite>roi</cite> behaviour:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">'axis_label':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis.</p>
+<p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
+to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.</p>
+<p><strong>Acquisition Data</strong></p>
+<p>The axis labels in the <cite>roi</cite> dict for <cite>AcquisitionData</cite> will be:
+<code class="docutils literal notranslate"><span class="pre">{'angle':(...),'vertical':(...),'horizontal':(...)}</span></code></p>
+<p><strong>Image Data</strong></p>
+<p>The axis labels in the <cite>roi</cite> dict for <cite>ImageData</cite> will be:
+<code class="docutils literal notranslate"><span class="pre">{'angle':(...),'vertical':(...),'horizontal':(...)}</span></code></p>
+<p>To skip files or to change number of files to load,
+adjust <code class="docutils literal notranslate"><span class="pre">vertical</span></code>. E.g. <code class="docutils literal notranslate"><span class="pre">'vertical':</span> <span class="pre">(100,</span> <span class="pre">300)</span></code> will skip first 100 files
+and will load 200 files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.ZEISSDataReader.slice_metadata">
+<span class="sig-name descname"><span class="pre">slice_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/ZEISSDataReader/#ZEISSDataReader.slice_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.ZEISSDataReader.slice_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Slices metadata to configure geometry before reading data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.ZEISSDataReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/ZEISSDataReader/#ZEISSDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.ZEISSDataReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads projections and return Acquisition (TXRM) or Image (TXM) Data container</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.ZEISSDataReader.get_geometry">
+<span class="sig-name descname"><span class="pre">get_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/ZEISSDataReader/#ZEISSDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.ZEISSDataReader.get_geometry" title="Permalink to this definition">#</a></dt>
+<dd><p>Return Acquisition (TXRM) or Image (TXM) Geometry object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.ZEISSDataReader.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/ZEISSDataReader/#ZEISSDataReader.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.ZEISSDataReader.get_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>return the metadata of the file</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="tiff-reader-writer">
+<h2>TIFF Reader/Writer<a class="headerlink" href="#tiff-reader-writer" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.TIFFStackReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">TIFFStackReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode='bin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Permalink to this definition">#</a></dt>
+<dd><p>Basic TIFF reader which loops through all tiff files in a specific
+folder and loads them in alphabetic order</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – Path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
+<li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – <p>dictionary with roi to load:
+<a href="#id1"><span class="problematic" id="id2">``</span></a>{‘axis_0’: (start, end, step),</p>
+<blockquote>
+<div><p>’axis_1’: (start, end, step),
+‘axis_2’: (start, end, step)}``</p>
+</div></blockquote>
+<p>roi is specified for axes before transpose.</p>
+</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – Whether to transpose loaded images</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>{'bin'</em><em>, </em><em>'slice'}</em><em>, </em><em>default 'bin'.</em>) – <p>Defines the ‘step’ in the roi parameter:</p>
+<p>In bin mode, ‘step’ number of pixels
+are binned together, values of resulting binned pixels are calculated as average.</p>
+<p>In ‘slice’ mode ‘step’ defines standard numpy slicing.</p>
+<p>Note: in general output array size in bin mode != output array size in slice mode</p>
+</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to the type of the saved file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>roi behaviour:</dt><dd><p>Files are stacked along <code class="docutils literal notranslate"><span class="pre">axis_0</span></code>, in alphabetical order.</p>
+<p><code class="docutils literal notranslate"><span class="pre">axis_1</span></code> and <code class="docutils literal notranslate"><span class="pre">axis_2</span></code> correspond
+to row and column dimensions, respectively.</p>
+<p>To skip files or to change number of files to load,
+adjust <code class="docutils literal notranslate"><span class="pre">axis_0</span></code>. For instance, <code class="docutils literal notranslate"><span class="pre">'axis_0':</span> <span class="pre">(100,</span> <span class="pre">300)</span></code>
+will skip first 100 files and will load 200 files.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'axis_0':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis 0.</p>
+<p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
+to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.</p>
+<p>Start and end also can be negative.</p>
+<p>roi is specified for axes before transpose.</p>
+</dd>
+</dl>
+<p>You can rescale the read data as <cite>rescaled_data = (read_data - offset)/scale</cite> with the following code:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rescaled_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
+read data to approximately the original data with the following code:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">TIFFWriter</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">original_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">about_original_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.TIFFStackReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads images and return numpy array</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.TIFFStackReader.read_as_ImageData">
+<span class="sig-name descname"><span class="pre">read_as_ImageData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader.read_as_ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_as_ImageData" title="Permalink to this definition">#</a></dt>
+<dd><p>reads the TIFF stack as an ImageData with the provided geometry</p>
+<p>Notice that the data will be reshaped to what requested in the geometry but there is
+no warranty that the data will be read in the right order!
+In facts you can reshape a (2,3,4) array as (3,4,2), however we do not check if the reshape
+leads to sensible data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.TIFFStackReader.read_as_AcquisitionData">
+<span class="sig-name descname"><span class="pre">read_as_AcquisitionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader.read_as_AcquisitionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_as_AcquisitionData" title="Permalink to this definition">#</a></dt>
+<dd><p>reads the TIFF stack as an AcquisitionData with the provided geometry</p>
+<p>Notice that the data will be reshaped to what requested in the geometry but there is
+no warranty that the data will be read in the right order!
+In facts you can reshape a (2,3,4) array as (3,4,2), however we do not check if the reshape
+leads to sensible data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.TIFFStackReader.read_scale_offset">
+<span class="sig-name descname"><span class="pre">read_scale_offset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader.read_scale_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_scale_offset" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the scale and offset from a json file in the same folder as the tiff stack</p>
+<p>This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter</p>
+<p>tuple: (scale, offset)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.TIFFStackReader.read_rescaled">
+<span class="sig-name descname"><span class="pre">read_rescaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader.read_rescaled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_rescaled" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the TIFF stack and rescales it with the provided scale and offset, or with the ones in the json file if not provided</p>
+<p>This is a courtesy method that will work only if the tiff stack is saved with the TIFFWriter</p>
+<dl class="simple">
+<dt>scale: float, default None</dt><dd><p>scale to apply to the data. If None, the scale will be read from the json file saved by TIFFWriter.</p>
+</dd>
+<dt>offset: float, default None</dt><dd><p>offset to apply to the data. If None, the offset will be read from the json file saved by TIFFWriter.</p>
+</dd>
+</dl>
+<p>numpy.ndarray in float32</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.TIFFWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">TIFFWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter" title="Permalink to this definition">#</a></dt>
+<dd><p>Write a DataSet to disk as a TIFF file or stack of TIFF files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em> or </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – This represents the data to save to TIFF file(s)</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – This defines the file name prefix, i.e. the file name without the extension.</p></li>
+<li><p><strong>counter_offset</strong> (<em>int</em><em>, </em><em>default 0.</em>) – counter_offset indicates at which number the ordinal index should start.
+For instance, if you have to save 10 files the index would by default go from 0 to 9.
+By counter_offset you can offset the index: from <cite>counter_offset</cite> to <cite>9+counter_offset</cite></p></li>
+<li><p><strong>compression</strong> (<em>str</em><em>, </em><em>default None. Accepted values None</em><em>, </em><em>'uint8'</em><em>, </em><em>'uint16'</em>) – The lossy compression to apply. The default None will not compress data.
+‘uint8’ or ‘unit16’ will compress to unsigned int 8 and 16 bit respectively.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If compression <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">unit16</span></code> are used, the scale and offset used to compress the data are saved
+in a file called <code class="docutils literal notranslate"><span class="pre">scaleoffset.json</span></code> in the same directory as the TIFF file(s).</p>
+<p>The original data can be obtained by: <code class="docutils literal notranslate"><span class="pre">original_data</span> <span class="pre">=</span> <span class="pre">(compressed_data</span> <span class="pre">-</span> <span class="pre">offset)</span> <span class="pre">/</span> <span class="pre">scale</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case of 3D or 4D data this writer will save the data as a stack of multiple TIFF files,
+not as a single multi-page TIFF file.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.TIFFWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Write data to disk</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="raw-file-writer">
+<h2>RAW File Writer<a class="headerlink" href="#raw-file-writer" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.RAWFileWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">RAWFileWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/RAWFileWriter/#RAWFileWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.RAWFileWriter" title="Permalink to this definition">#</a></dt>
+<dd><p>Writer to write DataContainer (or subclass AcquisitionData, ImageData) to disk as a binary blob</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em> or </em><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – This represents the data to save to TIFF file(s)</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – This defines the file name prefix, i.e. the file name without the extension.</p></li>
+<li><p><strong>compression</strong> (<em>str</em><em>, </em><em>default None. Accepted values None</em><em>, </em><em>'uint8'</em><em>, </em><em>'uint16'</em>) – The lossy compression to apply. The default None will not compress data.
+‘uint8’ or ‘unit16’ will compress to unsigned int 8 and 16 bit respectively.</p></li>
+</ul>
+</dd>
+</dl>
+<p>This writer will also write a text file with the minimal information necessary to
+read the data back in. This text file will need to reside in the same directory as the raw file.</p>
+<p>The text file will look something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">MINIMAL</span> <span class="n">INFO</span><span class="p">]</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">raw</span>
+<span class="n">data_type</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">u2</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">is_fortran</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="p">[</span><span class="n">COMPRESSION</span><span class="p">]</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="mf">550.7142857142857</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">data_type</span></code> describes the data layout when packing and unpacking data. This can be
+read as numpy dtype with <code class="docutils literal notranslate"><span class="pre">np.dtype('&lt;u2')</span></code>.</p>
+<p class="rubric">Example</p>
+<p>Example of using the writer with compression to <code class="docutils literal notranslate"><span class="pre">uint8</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">RAWFileWriter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<p>Example of reading the data from the ini file:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inifname</span> <span class="o">=</span> <span class="s2">&quot;file_name.ini&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">inifname</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_dtype</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">read_dtype</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fname</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">read_dtype</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_shape</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">][</span><span class="s1">&#39;scale&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">][</span><span class="s1">&#39;offset&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If compression <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">unit16</span></code> are used, the scale and offset used to compress the data are saved
+in the <code class="docutils literal notranslate"><span class="pre">ini</span></code> file in the same directory as the raw file, in the “COMPRESSION” section .</p>
+<p>The original data can be obtained by: <code class="docutils literal notranslate"><span class="pre">original_data</span> <span class="pre">=</span> <span class="pre">(compressed_data</span> <span class="pre">-</span> <span class="pre">offset)</span> <span class="pre">/</span> <span class="pre">scale</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Data is always written in ‘C’ order independent of the order of the original data,
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile">https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile</a>,</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.RAWFileWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/RAWFileWriter/#RAWFileWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.RAWFileWriter.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Write data to disk</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</section>
+<section id="hdf5-utilities">
+<h2>HDF5 Utilities<a class="headerlink" href="#hdf5-utilities" title="Permalink to this headline">#</a></h2>
+<p>Utility functions to browse HDF5 files. These allow you to browse groups and read in datasets as numpy.ndarrays.</p>
+<p>A CIL geometry and dataset must be constructed manually from the array and metadata.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.io.utilities.HDF5_utilities">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.utilities.</span></span><span class="sig-name descname"><span class="pre">HDF5_utilities</span></span><a class="reference internal" href="../_modules/cil/io/utilities/#HDF5_utilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities" title="Permalink to this definition">#</a></dt>
+<dd><p>Utility methods to read in from a generic HDF5 file and extract the relevant data</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.utilities.HDF5_utilities.print_metadata">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">print_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/utilities/#HDF5_utilities.print_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.print_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Prints the file metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>group</strong> (<em>(</em><em>str</em><em>)</em><em>, </em><em>default: '/'</em>) – a specific group to print the metadata for, this defaults to the root group</p></li>
+<li><p><strong>depth</strong> (<em>int</em><em>, </em><em>default -1</em>) – depth of group to output the metadata for, -1 is fully recursive</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.utilities.HDF5_utilities.get_dataset_metadata">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_dataset_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dset_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/utilities/#HDF5_utilities.get_dataset_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.get_dataset_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the dataset metadata as a dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>dset_path</strong> (<em>str</em>) – The internal path to the requested dataset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ndim, shape, size, dtype, nbytes, compression, chunks, is_virtual</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A dictionary containing keys, values are <cite>None</cite> if attribute can’t be read.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.utilities.HDF5_utilities.read">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_sel=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/utilities/#HDF5_utilities.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a dataset entry and returns a numpy array with the requested data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>dset_path</strong> (<em>str</em>) – The internal path to the requested dataset</p></li>
+<li><p><strong>source_sel</strong> (<em>tuple of slice objects</em><em>, </em><em>optional</em>) – The selection of slices in each source dimension to return</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default np.float32</em>) – the numpy data type for the returned array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The requested data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>source_sel takes a tuple of slice objects to defining crop and slicing behaviour</p>
+<p>This can be constructed using numpy indexing, i.e. the following lines are equivalent.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">s_</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.io.utilities.HDF5_utilities.read_to">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/utilities/#HDF5_utilities.read_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.utilities.HDF5_utilities.read_to" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a dataset entry and directly fills a numpy array with the requested data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full path to the HDF5 file</p></li>
+<li><p><strong>dset_path</strong> (<em>str</em>) – The internal path to the requested dataset</p></li>
+<li><p><strong>out</strong> (<em>numpy.ndarray</em>) – The output array to be filled</p></li>
+<li><p><strong>source_sel</strong> (<em>tuple of slice objects</em><em>, </em><em>optional</em>) – The selection of slices in each source dimension to return</p></li>
+<li><p><strong>dest_sel</strong> (<em>tuple of slice objects</em><em>, </em><em>optional</em>) – The selection of slices in each destination dimension to fill</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>source_sel and dest_sel take a tuple of slice objects to defining crop and slicing behaviour</p>
+<p>This can be constructed using numpy indexing, i.e. the following lines are equivalent.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_sel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">s_</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../framework/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Framework</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../optimisation/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Optimisation framework</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

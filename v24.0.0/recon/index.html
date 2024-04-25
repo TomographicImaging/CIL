@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Recon &#8212; CIL 24.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'recon';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        </script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Utilities" href="../utilities/" />
+    <link rel="prev" title="Processors" href="../processors/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../demos/">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      24.0.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Recon</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#analytical-reconstruction">Analytical Reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fbp-reconstructor-for-parallel-beam-geometry">FBP - Reconstructor for parallel-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fdk-reconstructor-for-cone-beam-geometry">FDK - Reconstructor for cone-beam geometry</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/recon.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Recon</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="recon">
+<h1>Recon<a class="headerlink" href="#recon" title="Permalink to this headline">#</a></h1>
+<p>This module allows the user to run pre-configured reconstruction algorithms on their data.</p>
+<section id="analytical-reconstruction">
+<h2>Analytical Reconstruction<a class="headerlink" href="#analytical-reconstruction" title="Permalink to this headline">#</a></h2>
+<p>The CIL analytical reconstructions use CIL to filter and prepare the data using highly optimised routines. The filtered data is then
+backprojected using projectors from TIGRE or ASTRA-TOOLBOX.</p>
+<p>Standard FBP (filtered-backprojection) should be used for parallel-beam data. FDK (Feldkamp, Davis, and Kress) is a filtered-backprojection
+algorithm for reconstruction of cone-beam data measured with a standard circular orbit.</p>
+<p>The filter can be set to a predefined function, or a custom filter can be set. The predefined filters take the following forms:</p>
+<figure class="align-center">
+<img alt="FBP Filters" src="../_images/FBP_filters1.png" />
+</figure>
+<section id="fbp-reconstructor-for-parallel-beam-geometry">
+<h3>FBP - Reconstructor for parallel-beam geometry<a class="headerlink" href="#fbp-reconstructor-for-parallel-beam-geometry" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.recon.FBP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.recon.</span></span><span class="sig-name descname"><span class="pre">FBP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates an FBP reconstructor based on your parallel-beam acquisition data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: {’<cite>ram-lak</cite>’, ‘<cite>shepp-logan</cite>’, ‘<cite>cosine</cite>’, ‘<cite>hamming</cite>’, ‘<cite>hann</cite>’}, or a numpy array.</p></li>
+<li><p><strong>backend</strong> (<em>string</em>) – The backend to use, can be ‘astra’ or ‘tigre’. Data must be in the correct order for requested backend.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.dataexample</span> <span class="kn">import</span> <span class="n">SIMULATED_PARALLEL_BEAM_DATA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">FBP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">fbp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The reconstructor can be further customised using additional ‘set’ methods provided.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.set_split_processing">
+<span class="sig-name descname"><span class="pre">set_split_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_per_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FBP.set_split_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.set_split_processing" title="Permalink to this definition">#</a></dt>
+<dd><p>Splits the processing in to chunks. Default, 0 will process the data in a single call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<em>slices_per_chunk</em><em>, </em><em>optional</em>) – Process the data in chunks of n slices. It is recommended to use value of power-of-two.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This will reduce memory use but may increase computation time.
+It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.</p>
+<p>This can only be used on simple and offset data-geometries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FBP.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the configured FBP recon and returns the reconstruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><em>optional</em>) – Fills the referenced ImageData with the reconstructed volume and suppresses the return</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reconstructed volume. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FBP.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.reset" title="Permalink to this definition">#</a></dt>
+<dd><p>Resets all optional configuration parameters to their default values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.get_filter_array">
+<span class="sig-name descname"><span class="pre">get_filter_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.get_filter_array" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the filter array in the frequency domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An array containing the filter values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The filter length N is 2^self.fft_order.</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+<p>The array can be modified and passed back using set_filter()</p>
+<p class="rubric">Notes</p>
+<p>Filter reference in frequency domain:
+Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.</p>
+<p>Plantagie, L. Algebraic filters for filtered backprojection, 2017
+<a class="reference external" href="https://hdl.handle.net/1887/48289">https://hdl.handle.net/1887/48289</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.set_fft_order">
+<span class="sig-name descname"><span class="pre">set_fft_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_fft_order" title="Permalink to this definition">#</a></dt>
+<dd><p>The width of the fourier transform N=2^order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of the fft N=2^order</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <cite>None</cite> the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater
+Higher orders will yield more accurate results but increase computation time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.set_filter">
+<span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_filter" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the filter used by the reconstruction.</p>
+<p>Pre-set filters are constructed in the frequency domain.
+Pre-set filters are: ‘ram-lak’, ‘shepp-logan’, ‘cosine’, ‘hamming’, ‘hann’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em><em>, </em><em>default = 1</em>) – The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a numpy array the filter must have length N = 2^self.fft_order</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.set_filter_inplace">
+<span class="sig-name descname"><span class="pre">set_filter_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_filter_inplace" title="Permalink to this definition">#</a></dt>
+<dd><p>False (default) will allocate temporary memory for filtered projections.
+True will filter projections in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inplace</strong> (<em>boolean</em>) – Sets the inplace filtering of projections</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.set_image_geometry">
+<span class="sig-name descname"><span class="pre">set_image_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_image_geometry" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets a custom image geometry to be used by the reconstructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FBP.set_input">
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Update the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – A dataset with a compatible geometry</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="fdk-reconstructor-for-cone-beam-geometry">
+<h3>FDK - Reconstructor for cone-beam geometry<a class="headerlink" href="#fdk-reconstructor-for-cone-beam-geometry" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.recon.FDK">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.recon.</span></span><span class="sig-name descname"><span class="pre">FDK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FDK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FDK" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: {’<cite>ram-lak</cite>’, ‘<cite>shepp-logan</cite>’, ‘<cite>cosine</cite>’, ‘<cite>hamming</cite>’, ‘<cite>hann</cite>’}, or a numpy array.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.dataexample</span> <span class="kn">import</span> <span class="n">SIMULATED_CONE_BEAM_DATA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">FDK</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">SIMULATED_CONE_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fdk</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The reconstructor can be futher customised using additional ‘set’ methods provided.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FDK.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FDK.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the configured FDK recon and returns the reconstruction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><em>optional</em>) – Fills the referenced ImageData with the reconstructed volume and suppresses the return</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – Controls the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reconstructed volume. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.get_filter_array">
+<span class="sig-name descname"><span class="pre">get_filter_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.get_filter_array" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the filter array in the frequency domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An array containing the filter values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The filter length N is 2^self.fft_order.</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+<p>The array can be modified and passed back using set_filter()</p>
+<p class="rubric">Notes</p>
+<p>Filter reference in frequency domain:
+Eq. 1.12 - 1.15 T. M. Buzug. Computed Tomography: From Photon Statistics to Modern Cone-Beam CT. Berlin: Springer, 2008.</p>
+<p>Plantagie, L. Algebraic filters for filtered backprojection, 2017
+<a class="reference external" href="https://hdl.handle.net/1887/48289">https://hdl.handle.net/1887/48289</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.reset" title="Permalink to this definition">#</a></dt>
+<dd><p>Resets all optional configuration parameters to their default values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.set_fft_order">
+<span class="sig-name descname"><span class="pre">set_fft_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_fft_order" title="Permalink to this definition">#</a></dt>
+<dd><p>The width of the fourier transform N=2^order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of the fft N=2^order</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <cite>None</cite> the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater
+Higher orders will yield more accurate results but increase computation time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.set_filter">
+<span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_filter" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the filter used by the reconstruction.</p>
+<p>Pre-set filters are constructed in the frequency domain.
+Pre-set filters are: ‘ram-lak’, ‘shepp-logan’, ‘cosine’, ‘hamming’, ‘hann’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em><em>, </em><em>default = 1</em>) – The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a numpy array the filter must have length N = 2^self.fft_order</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.set_filter_inplace">
+<span class="sig-name descname"><span class="pre">set_filter_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_filter_inplace" title="Permalink to this definition">#</a></dt>
+<dd><p>False (default) will allocate temporary memory for filtered projections.
+True will filter projections in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inplace</strong> (<em>boolean</em>) – Sets the inplace filtering of projections</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.set_image_geometry">
+<span class="sig-name descname"><span class="pre">set_image_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_image_geometry" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets a custom image geometry to be used by the reconstructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.recon.FDK.set_input">
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_input" title="Permalink to this definition">#</a></dt>
+<dd><p>Update the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – A dataset with a compatible geometry</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../processors/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Processors</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../utilities/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Utilities</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

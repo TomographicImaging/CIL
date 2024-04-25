@@ -1,3 +1,7 @@
+* XX.X.X
+  - Added wavelet operator, wrapping PyWavelets operator as a CIL operator
+  - Added L1Sparsity function, allowing calculations of |Ax-b|_1 and its proximal, in the case of orthogonal operators, A
+
 * 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
   - CIL plugin support for TIGRE version v2.6

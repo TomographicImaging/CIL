@@ -222,7 +222,7 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
 
    #define the sampler and the stochastic gradient function 
-   sampler = Sampler.staggered(len(list_of_functions))
+   sampler = Sampler.staggered(len(list_of_functions), stride=2)
    f = SGFunction(list_of_functions, sampler=sampler)  
    
    #set up and run the gradient descent algorithm 

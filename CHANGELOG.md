@@ -1,4 +1,11 @@
-* x.x.x
+* 24.0.0
+  - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
+  - CIL plugin support for TIGRE version v2.6
+  - CIL plugin support for ASTRA-TOOLBOX version v2.1
+  - Dropped support for python 3.8 and 3.9
+  - Added support for python 3.11 and 3.12
+  - Dropped support for numpy 1.21 and 1.22
+  - Added support for numpy 1.25 and 1.26
   - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
@@ -40,9 +47,13 @@
   - Improved import error/warning messages
   - New adjoint operator
   - Bug fix for complex matrix adjoint
+  - Removed the following code which was deprecated since v22.0.0:
+    - `info` parameter in `cil.optimisation.functions.TotalVariation`
+    - `sinogram_geometry` and `volume_geometry` parameters in `cil.plugins.astra.processors.FBP` and in `cil.plugins.tigre.processors.FBP`
+    - `aquisition_geometry` (misspelled) parameter in `cil.plugins.tigre.processors.ProjectionOperator`
+    - `FBP` kwarg (and thus all kwargs) in `cil.processors.CentreOfRotationCorrector` and `cil.processors.CofR_image_sharpness`
+    - `TXRMDataReader`
   - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
-
-
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

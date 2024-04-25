@@ -1,6 +1,6 @@
 # GitHub Actions
 
-There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml)
+There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [build](./build.yml)
 
 The jobs are:
 
@@ -29,7 +29,7 @@ When opening or modifying a pull request to `master`, a single variant is built 
 > The action does not publish to conda, instead this is done by jenkins. We will eventually move from jenkins to conda-forge instead.
 > When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
 
-It looks for conda-build dependencies in the channels listed [here](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
+It looks for conda-build dependencies in the channels listed [here](./build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
 
 > [!TIP]
 > The `conda` job builds the `*.tar.bz2` package and uploads it as an artifact called `cil-package`.
@@ -38,11 +38,11 @@ It looks for conda-build dependencies in the channels listed [here](https://gith
 
 ## docs
 
-This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). To do this it uses a forked version of the [build-sphinx-action](https://github.com/lauramurgatroyd/build-sphinx-action).
+This github action builds and optionally publishes the documentation located in [docs/source](../../docs/source).
 
-The [docs](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L124) job:
+The [docs](./build.yml#L124) job:
 
-- creates a `miniconda` environment from [requirements-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml) and [docs_environment.yml](https://github.com/TomographicImaging/CIL/blob/master/docs/docs_environment.yml)
+- creates a `miniconda` environment from [requirements-test.yml](../../scripts/requirements-test.yml) and [docs_environment.yml](../../docs/docs_environment.yml)
 - `cmake` builds & installs CIL into the `miniconda` environment
 - builds the HTML documentation with `sphinx`
 - uploads a `DocumentationHTML` artifact (which can be downloaded to view locally for debugging)

@@ -572,21 +572,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -606,21 +606,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1058,9 +1058,7 @@ class TestSlicer(unittest.TestCase):
 
                  # slice to single element
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None, None,8),'horizontal_y':(None,None,16)},
-
         ]
-
 
         offset_x =0.1*(8-1-1*4)/2
         offset_y =0.2*(16-1-3 * 5)/2
@@ -1343,21 +1341,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1375,21 +1373,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1770,7 +1768,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag_padded,
+        self.assertEqual(geometry_padded, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
 
 
@@ -1784,7 +1782,7 @@ class TestPaddder(unittest.TestCase):
             0.,   90.,  180.,  270.,\
             360., 450.,  540., 630., 720.]
 
-        self.assertEquals(geometry_padded, geometry_gold,
+        self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
@@ -1795,7 +1793,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag2_padded,
+        self.assertEqual(geometry_padded, self.ag2_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
 
 
@@ -1807,7 +1805,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_image_geometry()
 
-        self.assertEquals(geometry_padded, self.ig_padded,
+        self.assertEqual(geometry_padded, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
 
 
@@ -1846,21 +1844,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ag_padded,
+        self.assertEqual(geometry_out, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ag_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
 
@@ -1880,21 +1878,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ig_padded,
+        self.assertEqual(geometry_out, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ig_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
 

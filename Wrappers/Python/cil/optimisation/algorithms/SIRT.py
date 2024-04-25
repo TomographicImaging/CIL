@@ -20,9 +20,11 @@ from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
 from cil.framework import BlockDataContainer
 from cil.utilities.errors import InPlaceError
-from numpy import inf
 import numpy
 import logging
+
+log = logging.getLogger(__name__)
+
 
 class SIRT(Algorithm):
 
@@ -96,13 +98,8 @@ class SIRT(Algorithm):
         self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)
 
     def set_up(self, initial, operator, data, lower=None, upper=None, constraint=None):
-
-        """
-        Initialisation of the algorithm
-        """
-
-        logging.info("{} setting up".format(self.__class__.__name__, ))
-
+        """Initialisation of the algorithm"""
+        log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.tmp_x = self.x * 0.0
         self.operator = operator
@@ -122,8 +119,7 @@ class SIRT(Algorithm):
         self._set_up_weights()
 
         self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
-
+        log.info("%s configured", self.__class__.__name__)
 
     @property
     def relaxation_parameter(self):

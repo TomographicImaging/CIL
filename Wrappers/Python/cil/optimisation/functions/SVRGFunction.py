@@ -18,7 +18,7 @@
 # - Daniel Deidda (National Physical Laboratory, UK)
 # - Claire Delplancke (Electricite de France, Research and Development)
 # - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
-# - Zeljko Kerata (Department of Computer Science, University College London, UK)
+# - Zeljko Kereta (Department of Computer Science, University College London, UK)
 # - Evgueni Ovtchinnikov (STFC - UKRI)
 # - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
@@ -181,7 +181,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
 class LSVRGFunction(SVRGFunction):
     """""
-    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a "snapshot"  is calculated at random rather than at fixed numbers of iterations. 
+    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a "snapshot"  is calculated at random  intervals rather than at fixed numbers of iterations. 
     
     
     Reference: D. Kovalev et al., “Don’t jump through hoops and remove those loops: SVRG and Katyusha are better without the outer loop,” in Algo Learn Theo, PMLR, 2020.

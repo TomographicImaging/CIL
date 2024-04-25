@@ -88,7 +88,9 @@ Rendered
 Building documentation locally
 ------------------------------
 
-The easiest way to test changes to documentation is to build the docs locally. To do this, you will need a working ``cil`` installation.
+The easiest way to test documentation changes is to open a pull request and `download the rendered documentation from the CI <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
+
+Alternatively, to build the docs locally, you will need a working ``cil`` installation.
 For development of the documentation embedded within the source code itself (e.g. docstrings), you should build ``cil`` from source.
 
 The following steps can be used to create an environment that is suitable for building ``cil`` and its documentation, and to start
@@ -98,8 +100,10 @@ a HTTP server to view the documentation.
 #. Update conda with ``conda update -n base -c defaults conda``
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
-#. Install packages from ``docs/docs_environment.yml``
-#. Build the documentation with ``make dirhtml``
+#. Install packages from ``docs_environment.yml``
+#. [Install Ruby version 3.2](https://www.ruby-lang.org/en/documentation/installation/#installers)
+#. Install the web dependencies with ``make web-deps``
+#. Build the documentation with ``make dirhtml web``
 #. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
 
 Example:
@@ -114,7 +118,8 @@ Example:
   cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-  make dirhtml serve
+  make web-deps  # install dependencies (requires ruby 3.2)
+  make dirhtml web serve
 
 Notebooks gallery
 -----------------

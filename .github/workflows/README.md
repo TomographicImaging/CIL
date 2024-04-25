@@ -44,12 +44,23 @@ The [docs](./build.yml#L124) job:
 
 - creates a `miniconda` environment from [requirements-test.yml](../../scripts/requirements-test.yml) and [docs_environment.yml](../../docs/docs_environment.yml)
 - `cmake` builds & installs CIL into the `miniconda` environment
-- builds the HTML documentation with `sphinx`
+  + builds the HTML documentation with `sphinx`
+- installs ruby dependencies from [`Gemfile`](../../docs/Gemfile)
+  + builds the HTML landing page with `jekyll`
 - uploads a `DocumentationHTML` artifact (which can be downloaded to view locally for debugging)
-- pushes the HTML documentation to the `gh-pages` branch
-  + only if pushing to `master` or tagging (skipped if pushing to a branch or a PR)
+  + pushes the HTML documentation to the `gh-pages` branch
+    * only if pushing to `master` or tagging (skipped if pushing to a branch or a PR)
 
 > [!TIP]
 > The `docs` job builds the documentation and uploads it as an artifact called `DocumentationHTML`.
 > It can be found by going to the "Actions" tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the "Summary" for the run of the action, there is an "Artifact" section at the bottom of the page.
-> Clicking on `DocumentationHTML` allows you to download a zip folder containing the built HTML files. This allows you to preview the documentation site before it is published.
+> Click on `DocumentationHTML` to download a zip archive of the built HTML files.
+> It must be extracted into a `CIL` subfolder to properly render locally:
+>
+> ```sh
+> mkdir CIL
+> unzip -d CIL DocumentationHTML.zip
+> python -m http.server
+> ```
+>
+> Then open a browser and navigate to <http://localhost:8000/CIL/> to view the documentation.

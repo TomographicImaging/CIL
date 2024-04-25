@@ -19,6 +19,7 @@ help:
 serve:
 	@python -m http.server -d "$(BUILDDIR)"
 web-deps:
+	@gem install bundler
 	@bundle install
 web:
 	@$(JEKYLLBUILD) -s "$(JEKYLLSRCDIR)" $(JEKYLLOPTS)

@@ -23,13 +23,8 @@ from tempfile import NamedTemporaryFile
 import numpy as np
 import logging
 
-from cil.framework import VectorData
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
-from cil.framework import AcquisitionGeometry
-from cil.framework import BlockDataContainer
-from cil.framework import BlockGeometry
+from cil.framework import (ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry,
+                           BlockDataContainer, BlockGeometry, VectorData, image_labels)
 
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
@@ -52,7 +47,6 @@ from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 from cil.optimisation.functions import Rosenbrock
 from cil.optimisation.utilities import callbacks
-from cil.framework import VectorData, VectorGeometry
 from cil.utilities.quality_measures import mae, mse, psnr
 
 # Fast Gradient Projection algorithm for Total Variation(TV)
@@ -190,7 +184,7 @@ class TestAlgorithms(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(image_labels["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
@@ -288,9 +282,9 @@ class TestAlgorithms(CCPiTestClass):
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127,139,149)
-        b = ig.allocate(ImageGeometry.RANDOM)
+        b = ig.allocate(image_labels["RANDOM"])
         # fill with random numbers
-        initial = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(image_labels["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -316,7 +310,7 @@ class TestAlgorithms(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(image_labels["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)

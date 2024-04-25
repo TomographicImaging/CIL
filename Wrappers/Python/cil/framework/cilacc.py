@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  Copyright 2024 United Kingdom Research and Innovation
 #  Copyright 2024 The University of Manchester
 #
@@ -17,13 +18,19 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Joshua DM Hellier (University of Manchester) [refactorer]
 
-from .cilacc import cilacc
-from .acquisition_data import AcquisitionData
-from .acquisition_geometry import AcquisitionGeometry
-from .system_configuration import SystemConfiguration
-from .data_container import message, ImageGeometry, DataContainer, ImageData, VectorData, VectorGeometry
-from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer, find_key
-from .block_data_container import BlockDataContainer
-from .block_geometry import BlockGeometry
-from .partitioner import Partitioner
-from .label import acquisition_labels, image_labels, data_order, get_order_for_engine, check_order_for_engine
+import ctypes
+import platform
+from ctypes import util
+# check for the extension
+
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll_file = 'cilacc.dll'
+    dll = util.find_library(dll_file)
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+cilacc = ctypes.cdll.LoadLibrary(dll)

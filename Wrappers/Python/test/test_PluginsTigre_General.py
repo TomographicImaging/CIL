@@ -17,8 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from cil.framework import AcquisitionGeometry
-from cil.framework.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
 from cil.utilities.display import show2D
 from cil.utilities import dataexample

@@ -15,13 +15,12 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import warnings
 
-from cil.framework import DataProcessor
-from cil.framework import DataOrder
+from cil.framework import DataProcessor, check_order_for_engine
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
-import warnings
 
 
 class FBP(DataProcessor):
@@ -59,9 +58,15 @@ class FBP(DataProcessor):
     This uses the ram-lak filter only.
 
     """
-
-
-    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs):
+        sinogram_geometry = kwargs.get('sinogram_geometry', None)
+        if sinogram_geometry is not None:
+            acquisition_geometry = sinogram_geometry
+            warnings.warn("Use acquisition_geometry instead of sinogram_geometry", DeprecationWarning, stacklevel=2)
+        volume_geometry = kwargs.get('volume_geometry', None)
+        if volume_geometry is not None:
+            image_geometry = volume_geometry
+            warnings.warn("Use image_geometry instead of volume_geometry", DeprecationWarning, stacklevel=2)
 
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
@@ -69,8 +74,8 @@ class FBP(DataProcessor):
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
-        DataOrder.check_order_for_engine('astra', image_geometry)
-        DataOrder.check_order_for_engine('astra', acquisition_geometry)
+        check_order_for_engine('astra', image_geometry)
+        check_order_for_engine('astra', acquisition_geometry)
 
         if device == 'gpu':
             if acquisition_geometry.geom_type == 'parallel':

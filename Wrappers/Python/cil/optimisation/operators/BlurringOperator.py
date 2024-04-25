@@ -17,6 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import numpy as np
+
+from cil.framework import ImageGeometry, AcquisitionGeometry
 from cil.optimisation.operators import LinearOperator
 import cil
 
@@ -41,8 +43,8 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
 
-        if not (isinstance(geometry,cil.framework.framework.ImageGeometry) or \
-                isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
+        if not (isinstance(geometry, ImageGeometry) or \
+                isinstance(geometry, AcquisitionGeometry)):
             raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
 
 

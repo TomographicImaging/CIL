@@ -19,7 +19,7 @@
 import unittest
 from unittest.mock import Mock
 from utils import initialise_tests
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer, image_labels
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
@@ -45,8 +45,6 @@ def dt(steps):
 
 
 class TestOperator(CCPiTestClass):
-
-
     def test_MatrixOperator(self):
         m = 30
         n = 20
@@ -81,9 +79,6 @@ class TestOperator(CCPiTestClass):
         Amat = numpy.random.randn(m, n) + 1j*numpy.random.randn(m, n)
         A = MatrixOperator(Amat)
         self.assertTrue(A.dot_test(A))
-
-
-
 
     def test_ZeroOperator(self):
         ig = ImageGeometry(10,20,30)
@@ -211,7 +206,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(100,100)
 
         # Parameters for point spread function PSF (size and std)
-        ks          = 11;
+        ks          = 11
         ksigma      = 5.0
 
         # Create 1D PSF and 2D as outer product, then normalise.
@@ -248,14 +243,13 @@ class TestOperator(CCPiTestClass):
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
-
-        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM)
+        res = FD.domain_geometry().allocate(image_labels["RANDOM"])
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM)
+        res = Id.domain_geometry().allocate(image_labels["RANDOM"])
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -264,14 +258,14 @@ class TestOperator(CCPiTestClass):
 
         G = GradientOperator(ig)
 
-        u = G.range_geometry().allocate(ImageGeometry.RANDOM)
+        u = G.range_geometry().allocate(image_labels["RANDOM"])
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
+        u = G.domain_geometry().allocate(image_labels["RANDOM"])
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)
@@ -671,7 +665,7 @@ class TestBlockOperator(CCPiTestClass):
 
         self.assertBlockDataContainerEqual(z1, res)
 
-        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM)
+        z1 = B.range_geometry().allocate(image_labels["RANDOM"])
 
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
@@ -772,7 +766,7 @@ class TestBlockOperator(CCPiTestClass):
             )
 
         B1 = BlockOperator(G, Id)
-        U = ig.allocate(ImageGeometry.RANDOM)
+        U = ig.allocate(image_labels["RANDOM"])
         #U = BlockDataContainer(u,u)
         RES1 = B1.range_geometry().allocate()
 
@@ -855,7 +849,7 @@ class TestBlockOperator(CCPiTestClass):
         B = BlockOperator(G, Id)
         # Nx1 case
         u = ig.allocate('random', seed=2)
-        w = B.range_geometry().allocate(ImageGeometry.RANDOM, seed=3)
+        w = B.range_geometry().allocate(image_labels["RANDOM"], seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
         self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)

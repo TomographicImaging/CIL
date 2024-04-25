@@ -16,13 +16,14 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import DataProcessor, ImageData
-from cil.framework import DataOrder
-from cil.plugins.tigre import CIL2TIGREGeometry
-import warnings
-import numpy as np
 import contextlib
 import io
+import warnings
+
+import numpy as np
+
+from cil.framework import DataProcessor, ImageData, check_order_for_engine
+from cil.plugins.tigre import CIL2TIGREGeometry
 
 try:
     from tigre.algorithms import fdk, fbp
@@ -52,9 +53,15 @@ class FBP(DataProcessor):
     >>> reconstruction = fbp.get_output()
 
     '''
-
-    def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs):
-
+    def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs): 
+        sinogram_geometry = kwargs.get('sinogram_geometry', None)
+        if sinogram_geometry is not None:
+            acquisition_geometry = sinogram_geometry
+            warnings.warn("Use acquisition_geometry instead of sinogram_geometry", DeprecationWarning, stacklevel=2)
+        volume_geometry = kwargs.get('volume_geometry', None)
+        if volume_geometry is not None:
+            image_geometry = volume_geometry
+            warnings.warn("Use image_geometry instead of volume_geometry", DeprecationWarning, stacklevel=2)
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
 
@@ -65,8 +72,8 @@ class FBP(DataProcessor):
         if device != 'gpu':
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
-        DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry)
+        check_order_for_engine('tigre', image_geometry)
+        check_order_for_engine('tigre', acquisition_geometry)
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -80,7 +87,7 @@ class FBP(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.acquisition_geometry.channels))
 
-        DataOrder.check_order_for_engine('tigre', dataset.geometry)
+        check_order_for_engine('tigre', dataset.geometry)
         return True
 
     def process(self, out=None):

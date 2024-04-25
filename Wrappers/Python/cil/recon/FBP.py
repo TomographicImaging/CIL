@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import cilacc
-from cil.framework import AcquisitionGeometry
+from cil.framework import acquisition_labels
 from cil.recon import Reconstructor
 from scipy.fft import fftfreq
 
@@ -350,7 +350,7 @@ class FDK(GenericFilteredBackProjection):
         #call parent initialiser
         super().__init__(input, image_geometry, filter, backend='tigre')
 
-        if  input.geometry.geom_type != AcquisitionGeometry.CONE:
+        if  input.geometry.geom_type != acquisition_labels["CONE"]:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
 
@@ -459,7 +459,7 @@ class FBP(GenericFilteredBackProjection):
         super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 
-        if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
+        if  input.geometry.geom_type != acquisition_labels["PARALLEL"]:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
 

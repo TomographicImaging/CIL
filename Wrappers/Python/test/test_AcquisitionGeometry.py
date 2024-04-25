@@ -23,9 +23,7 @@ import math
 import re
 import io
 import sys
-from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry, AcquisitionData
-from cil.framework.framework import SystemConfiguration
-from cil.framework import Partitioner
+from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
 
 initialise_tests()
 

@@ -18,10 +18,9 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import BlockGeometry
+from cil.framework import BlockGeometry, ImageGeometry
 import logging
 from cil.utilities.multiprocessing import NUM_THREADS
-from cil.framework import ImageGeometry
 import numpy as np
 
 NEUMANN = 'Neumann'

@@ -21,9 +21,8 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.utilities.errors import InPlaceError
-from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, DataContainer, AcquisitionGeometry
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels, ImageGeometry, \
+    AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -38,7 +37,7 @@ from cil.optimisation.functions import BlockFunction
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
@@ -79,9 +78,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        noisy_data = ag.allocate(image_labels["RANDOM"], dtype=numpy.float64)
 
-        d = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        d = ag.allocate(image_labels["RANDOM"], dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -96,15 +95,13 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
-
-
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM)
-        b = ig.allocate(ImageGeometry.RANDOM)
+        u = ig.allocate(image_labels["RANDOM"])
+        b = ig.allocate(image_labels["RANDOM"])
 
         # check grad/call no data
         f = L2NormSquared()
@@ -214,8 +211,8 @@ class TestFunction(CCPiTestClass):
 
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM, seed=1)
-        b = ig.allocate(ImageGeometry.RANDOM, seed=2)
+        u = ig.allocate(image_labels["RANDOM"], seed=1)
+        b = ig.allocate(image_labels["RANDOM"], seed=2)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -899,7 +896,6 @@ class TestFunction(CCPiTestClass):
         assert f4.L == 2 * f2.L
 
     def test_proximal_conjugate(self):
-        from cil.framework import AcquisitionGeometry, BlockGeometry
         ag = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
 
@@ -1104,8 +1100,6 @@ class TestFunction(CCPiTestClass):
         np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
-
-
 
 
 class TestTotalVariation(unittest.TestCase):
@@ -1841,7 +1835,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [ig.allocate(2), -2 * mask]):
-            # log.info("test1", val, res)
+            # log.info("test1 %r %r", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1849,7 +1843,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
-            # log.info("test1", val, res)
+            # log.info("test1 %r %r", val, res)
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(

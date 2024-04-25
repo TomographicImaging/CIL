@@ -16,22 +16,18 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import unittest
-from utils import initialise_tests
-import numpy as np
-from numpy.linalg import norm
 import os
 import shutil
+import unittest
+
+import numpy as np
+
 from cil.framework import BlockDataContainer
-from cil.optimisation.operators import GradientOperator, LinearOperator
-from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
 from cil.optimisation.algorithms import FISTA
-
-import os
-from cil.utilities.display import show2D
-
+from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
+from cil.optimisation.operators import GradientOperator, LinearOperator
 from testclass import CCPiTestClass
-from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
+from utils import has_ccpi_regularisation, initialise_tests
 
 initialise_tests()
 
@@ -46,7 +42,6 @@ except ImportError as ie:
     has_sirf = False
 
 if has_ccpi_regularisation:
-    from ccpi.filters import regularisers
     from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, FGP_dTV, TNV
 
 
@@ -262,10 +257,6 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
         fista = FISTA(initial=self.image1*0.0, f=f, g=TV, max_iteration=10, update_objective_interval=10)
         fista.run(verbose=0)
         np.testing.assert_array_almost_equal(fista.solution.as_array(), res2.as_array(), decimal=3)
-
-
-
-
 
 
 class TestSIRFCILIntegration(CCPiTestClass):

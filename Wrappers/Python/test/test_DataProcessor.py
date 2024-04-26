@@ -2775,7 +2775,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
 
     def test_PaganinPhaseRetriever_init(self):        
         # test default values are initialised
-        processor = PhaseRetriever.low_pass_Paganin()
+        processor = PhaseRetriever.Paganin()
         test_parameter = ['energy', 'wavelength', 'delta', 'beta','geometry_unit_multiplier', 'propagation_distance', 'propagation_distance_user',
                           'magnification', 'magnification_user', 'filter_type']
         test_value = [40000, (constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2, 1, None, None, 
@@ -2785,7 +2785,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processor = PhaseRetriever.low_pass_Paganin(1, 2, 3, 4, 5, 6, 7, 'string')
+        processor = PhaseRetriever.Paganin(1, 2, 3, 4, 5, 6, 7, 'string')
         test_value = [3, (constants.h*constants.speed_of_light)/(3*constants.electron_volt), 1, 2, 7, None, 4, 
                       None, 5, 'string']
         for i in numpy.arange(len(test_value)):
@@ -2794,7 +2794,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
 
     def test_PaganinPhaseRetriever_check_input(self):
         # check the propagation distance can be found from the geometry if there is no user input
-        processor = PhaseRetriever.low_pass_Paganin()
+        processor = PhaseRetriever.Paganin()
         processor.check_input(self.data_cone)
         self.assertEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector, msg=self.error_message(processor, 'propagation_distance'))
 
@@ -2803,27 +2803,27 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             processor.check_input(self.data_parallel)
         
         # test propagation distance user input over-rides the distance value from geometry
-        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1)
+        processor =  PhaseRetriever.Paganin(propagation_distance=1)
         data_array = [self.data_cone, self.data_parallel]
         for data in data_array:
             processor.check_input(data)
             self.assertEqual(processor.propagation_distance, 1, msg=self.error_message(processor, 'propagation_distance'))
 
         # test magnification user input over-rides the distance value from geometry
-        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1, magnification=1)
+        processor =  PhaseRetriever.Paganin(propagation_distance=1, magnification=1)
         data_array = [self.data_cone, self.data_parallel]
         for data in data_array:
             processor.check_input(data)
             self.assertEqual(processor.magnification, 1, msg=self.error_message(processor, 'magnification'))
 
         # test no magnification value provided by user input or geometry, gives a default value = 1
-        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1)
+        processor =  PhaseRetriever.Paganin(propagation_distance=1)
         data = self.data_parallel
         processor.check_input(data)
         self.assertEqual(processor.magnification, 1, msg=self.error_message(processor, 'magnification'))
 
     def test_PaganinPhaseRetriever_create_filter(self):
-        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1)
+        processor =  PhaseRetriever.Paganin(propagation_distance=1)
 
         # check alpha and mu are calculated correctly
         alpha = 1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
@@ -2851,14 +2851,14 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         numpy.testing.assert_allclose(processor.filter, filter)
 
         # check generalised_paganin_method
-        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1, filter_type='generalised_paganin_method')
+        processor =  PhaseRetriever.Paganin(propagation_distance=1, filter_type='generalised_paganin_method')
         processor.set_input(self.data_cone)
         processor.create_filter(Nx, Ny)
         expected_filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)/self.data_cone.geometry.magnification))
         numpy.testing.assert_allclose(processor.filter, expected_filter)
 
         # check unknown method raises error
-        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1, filter_type='unknown_method')
+        processor =  PhaseRetriever.Paganin(propagation_distance=1, filter_type='unknown_method')
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
             processor.create_filter(Nx, Ny)
@@ -2870,7 +2870,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         thickness = -(1/mu)*numpy.log(self.data_parallel)
 
         # check retrieve processor returns filtered image with correct scaling
-        processor = PhaseRetriever.low_pass_Paganin(propagation_distance = 1)
+        processor = PhaseRetriever.Paganin(propagation_distance = 1)
         processor.set_input(self.data_parallel)
         
         output = processor.get_output()
@@ -2883,7 +2883,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
         thickness = -(1/mu)*numpy.log(data_slice)
 
-        processor = PhaseRetriever.low_pass_Paganin(propagation_distance = 1)
+        processor = PhaseRetriever.Paganin(propagation_distance = 1)
         
         processor.set_input(data_slice)
         output = processor.get_output()

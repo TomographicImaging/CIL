@@ -434,6 +434,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#operator-base-classes">Operator base classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#trivial-operators">Trivial operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gradientoperator">GradientOperator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#waveletoperator">WaveletOperator</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a><ul>
@@ -445,6 +446,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#l1-norm">L1 Norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#l2-norm-squared">L2 Norm Squared</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#least-squares">Least Squares</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#l1-sparsity">L1 Sparsity</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mixed-l21-norm">Mixed L21 norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mixed-l11-norm">Mixed L11 norm</a></li>
@@ -2551,6 +2553,13 @@ A <code class="code docutils literal notranslate"><span class="pre">ScaledOperat
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.Operator.is_orthogonal">
+<span class="sig-name descname"><span class="pre">is_orthogonal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#Operator.is_orthogonal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.is_orthogonal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns if the operator is orthogonal
+:rtype: <cite>Bool</cite></p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.Operator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#Operator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.direct" title="Permalink to this definition">#</a></dt>
 <dd><p>Calls the operator</p>
@@ -3021,6 +3030,13 @@ Y : gm_range ( Default: Y = X )</p>
 <dd><p>Evaluates operator norm of IdentityOperator</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.IdentityOperator.is_orthogonal">
+<span class="sig-name descname"><span class="pre">is_orthogonal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/IdentityOperator/#IdentityOperator.is_orthogonal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.IdentityOperator.is_orthogonal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns if the operator is orthogonal
+:rtype: <cite>Bool</cite></p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -3352,6 +3368,106 @@ out: BlockDataContainer, default None</p>
 <blockquote>
 <div><p>If out is not None the output of adjoint will be filled in out, otherwise a new object is instantiated and returned.</p>
 </div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="waveletoperator">
+<h3>WaveletOperator<a class="headerlink" href="#waveletoperator" title="Permalink to this headline">#</a></h3>
+<p>We utilise PyWavelets (<a class="reference external" href="https://pywavelets.readthedocs.io/en/latest/index.html">https://pywavelets.readthedocs.io/en/latest/index.html</a>) to build wavelet operators in CIL:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.operators.WaveletOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></span><span class="sig-name descname"><span class="pre">WaveletOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'haar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/WaveletOperator/#WaveletOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.WaveletOperator" title="Permalink to this definition">#</a></dt>
+<dd><p>Computes forward or inverse (adjoint) discrete wavelet transform (DWT) of the input</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_geometry</strong> (<em>cil geometry</em>) – Domain geometry for the WaveletOperator</p></li>
+<li><p><strong>range_geometry</strong> (<em>cil geometry</em><em>, </em><em>optional</em>) – Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywavelets</p></li>
+<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default= log_2</em><em>(</em><em>min</em><em>(</em><em>shape</em><em>(</em><em>axes</em><em>)</em><em>)</em><em>)</em>) – integer for decomposition level. Default = log_2(min(shape(axes))), i.e. the maximum number of accurate downsamplings possible</p></li>
+<li><p><strong>wname</strong> (<em>string</em><em>, </em><em>optional</em><em>, </em><em>default='haar'</em>) – label for wavelet used.</p></li>
+<li><p><strong>axes</strong> (<em>list of ints</em><em>, </em><em>optional</em><em>, </em><em>default=`None`</em>) – Defines the dimensions to decompose along. Note that channel is the first dimension: for example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
+Default = <cite>None</cite>, meaning all dimensions are transformed. Same as axes = range(ndim)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>correlation: str, default ‘All’. Note: Only applied if <cite>axes = None</cite>!</dt><dd><p>‘All’ will compute the wavelet decomposition on every possible dimension.
+‘Space’ will compute the wavelet decomposition on only the spatial dimensions. If there are multiple channels, each channel is decomposed independently.
+‘Channels’ will compute the wavelet decomposition on only the channels, independently for every spatial point.</p>
+</dd>
+<dt>bnd_cond: str, default ‘symmetric’. More commonly known as the padding or extension method used in discrete convolutions. All options supported by PyWavelets are valid.</dt><dd><p>Most common examples are ‘symmetric’ (padding by mirroring edge values), ‘zero’ (padding with zeros), ‘periodic’ (wrapping values around as in circular convolution).
+Some padding methods can have unexpected effect on the wavelet coefficients at the edges.
+See <a class="reference external" href="https://pywavelets.readthedocs.io/en/latest/ref/signal-extension-modes.html">https://pywavelets.readthedocs.io/en/latest/ref/signal-extension-modes.html</a> for more details and all options.</p>
+</dd>
+</dl>
+<p>true_adjoint: bool, default <cite>True</cite>. For biorthogonal wavelets the true mathematical adjoint should no longer produce perfect reconstructions, setting <cite>true_adjoint`as `False</cite> the reconstruction (using the adjoint) should be (almost) the original input.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default decomposition level is the theoretical maximum: log_2(min(input.shape)).  However, this is not always recommended and pywavelets should give a warning if the coarsest scales are too small to be meaningful.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We currently do not support wavelets that are not orthogonal or bi-orthogonal.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.WaveletOperator.direct">
+<span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/WaveletOperator/#WaveletOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.WaveletOperator.direct" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the WaveletOperator applied to <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer, the value of the WaveletOperator applied to <span class="math notranslate nohighlight">\(x\)</span> or <cite>None</cite> if <cite>out</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.WaveletOperator.adjoint">
+<span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Wx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/WaveletOperator/#WaveletOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.WaveletOperator.adjoint" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the adjoint of the WaveletOperator applied to <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer, the value of the adjoint of the WaveletOperator applied to <span class="math notranslate nohighlight">\(x\)</span> or <cite>None</cite> if <cite>out</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.WaveletOperator.calculate_norm">
+<span class="sig-name descname"><span class="pre">calculate_norm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/WaveletOperator/#WaveletOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.WaveletOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the norm of WaveletOperator, which is equal to 1.0 if the wavelet is orthogonal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>norm</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.WaveletOperator.is_orthogonal">
+<span class="sig-name descname"><span class="pre">is_orthogonal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/WaveletOperator/#WaveletOperator.is_orthogonal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.WaveletOperator.is_orthogonal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns if the operator is orthogonal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>Bool</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -4781,7 +4897,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 \[F(x) = ||x - b||_{1}\]</div>
 </li>
 </ol>
-<p>In the weighted case, <span class="math notranslate nohighlight">\(w\)</span> is an array of positive weights.</p>
+<p>In the weighted case, <span class="math notranslate nohighlight">\(w\)</span> is an array of non-negative weights.</p>
 <ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
 \[F(x) = ||x||_{L^1(w)}\]</div>
@@ -4790,11 +4906,11 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 \[F(x) = ||x - b||_{L^1(w)}\]</div>
 </li>
 </ol>
-<p>with <span class="math notranslate nohighlight">\(||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i\)</span>.</p>
+<p>with <span class="math notranslate nohighlight">\(||x||_{L^1(w)} = || x  w||_1 = \sum_{i=1}^{n} |x_i| w_i\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weight</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy ndarray</em><em>, </em><em>default None</em>) – Array of positive weights. If <code class="code docutils literal notranslate"><span class="pre">None</span></code> returns the L1 Norm.</p></li>
+<li><p><strong>weight</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy ndarray</em><em>, </em><em>default None</em>) – Array of non-negative weights. If <code class="code docutils literal notranslate"><span class="pre">None</span></code> returns the L1 Norm.</p></li>
 <li><p><strong>b</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default None</em>) – Translation of the function.</p></li>
 </ul>
 </dd>
@@ -4819,7 +4935,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 \infty, \mbox{otherwise}
 \end{cases}\end{split}\]</div>
 <p>In the weighted case the convex conjugate is the indicator of the unit
-<span class="math notranslate nohighlight">\(L^{\infty}\)</span> norm.</p>
+<span class="math notranslate nohighlight">\(L^{\infty}(w^{-1})\)</span> norm.</p>
 <p>See:
 <a class="reference external" href="https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight">https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight</a></p>
 <ol class="loweralpha">
@@ -4830,7 +4946,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 \[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle\]</div>
 </li>
 </ol>
-<p>with <span class="math notranslate nohighlight">\(\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}\)</span>.</p>
+<p>with <span class="math notranslate nohighlight">\(\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}\)</span> and possible cases of 0/0 are defined to be 1..</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – where to evaluate the convex conjugate of the L1 Norm function.</p>
@@ -4851,10 +4967,10 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 <p>Consider the following cases:</p>
 <ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x - b) + b\]</div>
 </li>
 </ol>
 <p>where,</p>
@@ -4867,14 +4983,14 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 \[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x - b) + b\]</div>
 </li>
 </ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
-<li><p><strong>tau</strong> (<em>float</em><em>, </em><em>ndarray</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>tau</strong> (<em>float</em><em>, </em><em>real</em><em>,  </em><em>ndarray</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
 <li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default None</em>) – If not None, the result will be stored in this object.</p></li>
 </ul>
 </dd>
@@ -5264,6 +5380,189 @@ where <span class="math notranslate nohighlight">\(W=\text{diag}(weight)\)</span
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.functions.LeastSquares.proximal_conjugate">
 <span class="sig-name descname"><span class="pre">proximal_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.proximal_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> evaluated at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>) – </p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer, the value of the proximal operator of the convex conjugate at point <span class="math notranslate nohighlight">\(x\)</span> for scalar <span class="math notranslate nohighlight">\(\tau\)</span> or None if <cite>out</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="l1-sparsity">
+<h3>L1 Sparsity<a class="headerlink" href="#l1-sparsity" title="Permalink to this headline">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></span><span class="sig-name descname"><span class="pre">L1Sparsity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/L1Sparsity/#L1Sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity" title="Permalink to this definition">#</a></dt>
+<dd><p>L1Sparsity function</p>
+<p>Calculates the following cases, depending on if the optional parameter <cite>weight</cite>  or data <cite>b</cite> is passed. For <cite>weight=None</cite>:</p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[F(x) = ||Qx||_{1}\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[F(x) = ||Qx - b||_{1}\]</div>
+</li>
+</ol>
+<p>In the weighted case, <cite>weight</cite> = <span class="math notranslate nohighlight">\(w\)</span> is an array of non-negative weights.</p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[F(x) = ||Qx||_{L^1(w)}\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[F(x) = ||Qx - b||_{L^1(w)}\]</div>
+</li>
+</ol>
+<p>with <span class="math notranslate nohighlight">\(||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i\)</span>.</p>
+<p>In all cases <span class="math notranslate nohighlight">\(Q\)</span> is an orthogonal operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Q</strong> (<em>orthogonal Operator</em>) – Note that for the correct calculation of the proximal the provided operator must be orthogonal</p></li>
+<li><p><strong>b</strong> (<em>Data</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default is None</em>) – </p></li>
+<li><p><strong>weight</strong> (<em>array</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – non-negative weight array matching the size of the range of operator <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity.convex_conjugate">
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/L1Sparsity/#L1Sparsity.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the convex conjugate of the L1Sparsity function at x.
+Here, we need to use the convex conjugate of L1Sparsity, which is the Indicator of the unit
+<span class="math notranslate nohighlight">\(\ell^{\infty}\)</span> norm on the range of the (bijective) operator Q.</p>
+<p>Consider the non-weighted case:</p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(Qx^{*})\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(Qx^{*}) + \langle Qx^{*},b\rangle\]</div>
+</li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
+= \begin{cases}
+0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+\infty, \mbox{otherwise}
+\end{cases}\end{split}\]</div>
+<p>In the weighted case the convex conjugate is the indicator of the unit
+<span class="math notranslate nohighlight">\(L^{\infty}( w^{-1} )\)</span> norm.</p>
+<p>See:
+<a class="reference external" href="https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight">https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight</a></p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*})\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*}) + \langle Qx^{*},b\rangle\]</div>
+</li>
+</ol>
+<p>with <span class="math notranslate nohighlight">\(\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}\)</span> and possible cases of 0 / 0 are defined to be 1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity.proximal">
+<span class="sig-name descname"><span class="pre">proximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/L1Sparsity/#L1Sparsity.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity.proximal" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter <cite>tau</cite>.</p>
+<p>Consider the following cases:</p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau}(Qx)\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = Q^T \left( \mathrm{ShinkOperator}_\tau(Qx- b) + b \right)\]</div>
+</li>
+</ol>
+<p>where,</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau | \cdot |}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
+<p>The weighted case follows from Example 6.23 in Chapter 6 of “First-Order Methods in Optimization”
+by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam.org/books/mo25/mo25_ch6.pdf">https://archive.siam.org/books/mo25/mo25_ch6.pdf</a></p>
+<ol class="loweralpha">
+<li><div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = Q^T \mathrm{ShinkOperator}_{\tau*w}(Qx)\]</div>
+</li>
+<li><div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\tau F}(x) = Q^T \left( \mathrm{ShinkOperator}_{\tau*w}(Qx-b) + b \right)\]</div>
+</li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>tau</strong> (<em>float</em><em>, </em><em>ndarray</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default None</em>) – If not None, the result will be stored in this object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>The value of the proximal operator of the L1 norm function at x</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataContainer.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity.L">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity.L" title="Permalink to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity.centered_at">
+<span class="sig-name descname"><span class="pre">centered_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity.centered_at" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.</dt><dd><p>TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>center</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The point to center the function at.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>The translated function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity.gradient">
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity.gradient" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the value of the gradient of function <span class="math notranslate nohighlight">\(F\)</span>  evaluated at <span class="math notranslate nohighlight">\(x\)</span>, if it is differentiable</p>
+<div class="math notranslate nohighlight">
+\[F'(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataContainer, the value of the gradient of the function at x or <cite>None</cite> if <cite>out</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.L1Sparsity.proximal_conjugate">
+<span class="sig-name descname"><span class="pre">proximal_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.L1Sparsity.proximal_conjugate" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> evaluated at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
 <div class="math notranslate nohighlight">
 \[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>

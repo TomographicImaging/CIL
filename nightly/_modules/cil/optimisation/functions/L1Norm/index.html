@@ -493,24 +493,52 @@ document.write(`
 <span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockDataContainer</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="k">def</span> <span class="nf">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the soft-shrinkage operator at x.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the soft-shrinkage operator at x. This is used for the calculation of the proximal. </span>
+<span class="sd">    </span>
+<span class="sd">    .. math:: soft_shrinkage (x) = \begin{cases}</span>
+<span class="sd">                x-\tau, \mbox{if } x &gt; \tau \</span>
+<span class="sd">                    x+\tau, \mbox{if } x &lt; -\tau \</span>
+<span class="sd">                0, \mbox{otherwise}</span>
+<span class="sd">                \end{cases}.</span>
+<span class="sd">   </span>
+
+
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 <span class="sd">    x : DataContainer</span>
 <span class="sd">        where to evaluate the soft-shrinkage operator.</span>
-<span class="sd">    tau : float, numpy ndarray, DataContainer</span>
+<span class="sd">    tau : float, non-negative real,  numpy ndarray, DataContainer</span>
 <span class="sd">    out : DataContainer, default None</span>
 <span class="sd">        where to store the result. If None, a new DataContainer is created.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    --------</span>
 <span class="sd">    the value of the soft-shrinkage operator at x: DataContainer.</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ------</span>
+<span class="sd">    Note that this function can deal with complex inputs, defining the `sgn` function as: </span>
+<span class="sd">    .. math:: sgn (z) = \begin{cases}</span>
+<span class="sd">                0, \mbox{if } z = 0 \</span>
+<span class="sd">                \frac{z}{|z|}, \mbox{otherwise}</span>
+<span class="sd">                \end{cases}.</span>
+<span class="sd">                </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>       
+    
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;tau should be non-negative!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tau should be real!&quot;</span><span class="p">)</span>
+        
+
+
     <span class="c1"># get the sign of the input</span>
     <span class="n">dsign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
 
@@ -545,18 +573,18 @@ document.write(`
 <span class="sd">    a) .. math:: F(x) = ||x||_{1}</span>
 <span class="sd">    b) .. math:: F(x) = ||x - b||_{1}</span>
 
-<span class="sd">    In the weighted case, :math:`w` is an array of positive weights.</span>
+<span class="sd">    In the weighted case, :math:`w` is an array of non-negative weights.</span>
 
 <span class="sd">    a) .. math:: F(x) = ||x||_{L^1(w)}</span>
 <span class="sd">    b) .. math:: F(x) = ||x - b||_{L^1(w)}</span>
 
-<span class="sd">    with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.</span>
+<span class="sd">    with :math:`||x||_{L^1(w)} = || x  w||_1 = \sum_{i=1}^{n} |x_i| w_i`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 
 <span class="sd">        weight: DataContainer, numpy ndarray, default None</span>
-<span class="sd">            Array of positive weights. If :code:`None` returns the L1 Norm.</span>
+<span class="sd">            Array of non-negative weights. If :code:`None` returns the L1 Norm.</span>
 <span class="sd">        b: DataContainer, default None</span>
 <span class="sd">            Translation of the function.</span>
 
@@ -593,7 +621,7 @@ document.write(`
 <span class="sd">        \end{cases}</span>
 
 <span class="sd">    In the weighted case the convex conjugate is the indicator of the unit</span>
-<span class="sd">    :math:`L^{\infty}` norm.</span>
+<span class="sd">    :math:`L^{\infty}(w^{-1})` norm.</span>
 
 <span class="sd">    See:</span>
 <span class="sd">    https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight</span>
@@ -601,7 +629,7 @@ document.write(`
 <span class="sd">    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})</span>
 <span class="sd">    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle</span>
 
-<span class="sd">    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}`.</span>
+<span class="sd">    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of 0/0 are defined to be 1..</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
@@ -622,8 +650,8 @@ document.write(`
 
 <span class="sd">    Consider the following cases:</span>
 
-<span class="sd">    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)</span>
-<span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b</span>
+<span class="sd">    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)</span>
+<span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x - b) + b</span>
 
 <span class="sd">    where,</span>
 
@@ -633,13 +661,13 @@ document.write(`
 <span class="sd">    by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf</span>
 
 <span class="sd">    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)</span>
-<span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b</span>
+<span class="sd">    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x - b) + b</span>
 
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 <span class="sd">    x: DataContainer</span>
-<span class="sd">    tau: float, ndarray, DataContainer</span>
+<span class="sd">    tau: float, real,  ndarray, DataContainer</span>
 <span class="sd">    out: DataContainer, default None</span>
 <span class="sd">        If not None, the result will be stored in this object.</span>
 
@@ -648,6 +676,7 @@ document.write(`
 <span class="sd">    The value of the proximal operator of the L1 norm function at x: DataContainer.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+            
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div></div>
 
 
@@ -681,8 +710,7 @@ document.write(`
         <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;=</span><span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -712,31 +740,32 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
 
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights should be strictly positive!&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights should be non-negative!&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">weight</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights should be real!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+            <span class="n">y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span> 
 
         <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
-
-        <span class="k">if</span> <span class="n">tmp</span><span class="o">&lt;=</span><span class="mf">1e-5</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">):</span> <span class="c1"># This handles weight being zero problems</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="mf">0.</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        
 
     <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">tau</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">_L1Norm</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-        <span class="n">tau</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">_L1Norm</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
 
 <div class="viewcode-block" id="MixedL11Norm"><a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL11Norm">[docs]</a><span class="k">class</span> <span class="nc">MixedL11Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>

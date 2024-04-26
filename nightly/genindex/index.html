@@ -729,6 +729,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator.adjoint">(cil.optimisation.operators.SymmetrisedGradientOperator method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.operators.WaveletOperator.adjoint">(cil.optimisation.operators.WaveletOperator method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.adjoint">(cil.optimisation.operators.ZeroOperator method)</a>
 </li>
       </ul></li>
@@ -809,6 +811,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.operators.Operator.calculate_norm">(cil.optimisation.operators.Operator method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.operators.WaveletOperator.calculate_norm">(cil.optimisation.operators.WaveletOperator method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.calculate_norm">(cil.optimisation.operators.ZeroOperator method)</a>
 </li>
       </ul></li>
@@ -826,6 +830,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.centered_at">(cil.optimisation.functions.KullbackLeibler method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.centered_at">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity.centered_at">(cil.optimisation.functions.L1Sparsity method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.centered_at">(cil.optimisation.functions.L2NormSquared method)</a>
 </li>
@@ -917,6 +923,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.convex_conjugate">(cil.optimisation.functions.KullbackLeibler method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.convex_conjugate">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity.convex_conjugate">(cil.optimisation.functions.L1Sparsity method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.convex_conjugate">(cil.optimisation.functions.L2NormSquared method)</a>
 </li>
@@ -1029,6 +1037,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.operators.SumOperator.direct">(cil.optimisation.operators.SumOperator method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.operators.SymmetrisedGradientOperator.direct">(cil.optimisation.operators.SymmetrisedGradientOperator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.WaveletOperator.direct">(cil.optimisation.operators.WaveletOperator method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.direct">(cil.optimisation.operators.ZeroOperator method)</a>
 </li>
@@ -1342,6 +1352,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.gradient">(cil.optimisation.functions.L1Norm method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity.gradient">(cil.optimisation.functions.L1Sparsity method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.gradient">(cil.optimisation.functions.L2NormSquared method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.gradient">(cil.optimisation.functions.LeastSquares method)</a>
@@ -1423,6 +1435,14 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.operators.SumOperator.is_linear">(cil.optimisation.operators.SumOperator method)</a>
 </li>
       </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.operators.IdentityOperator.is_orthogonal">is_orthogonal() (cil.optimisation.operators.IdentityOperator method)</a>
+
+      <ul>
+        <li><a href="../optimisation/#cil.optimisation.operators.Operator.is_orthogonal">(cil.optimisation.operators.Operator method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.operators.WaveletOperator.is_orthogonal">(cil.optimisation.operators.WaveletOperator method)</a>
+</li>
+      </ul></li>
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.is_provably_convergent">is_provably_convergent() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
@@ -1498,6 +1518,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.L">(cil.optimisation.functions.L1Norm property)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity.L">(cil.optimisation.functions.L1Sparsity property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.L">(cil.optimisation.functions.L2NormSquared property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.L">(cil.optimisation.functions.LeastSquares property)</a>
@@ -1531,12 +1553,14 @@ document.write(`
       </ul></li>
       <li><a href="../optimisation/#cil.optimisation.functions.L1Norm">L1Norm (class in cil.optimisation.functions)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared">L2NormSquared (class in cil.optimisation.functions)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity">L1Sparsity (class in cil.optimisation.functions)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM">LADMM (class in cil.optimisation.algorithms)</a>
+      <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared">L2NormSquared (class in cil.optimisation.functions)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.LADMM">LADMM (class in cil.optimisation.algorithms)</a>
+</li>
       <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares">LeastSquares (class in cil.optimisation.functions)</a>
 </li>
       <li><a href="../processors/#cil.processors.Padder.linear_ramp">linear_ramp() (cil.processors.Padder static method)</a>
@@ -1831,6 +1855,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.proximal">(cil.optimisation.functions.L1Norm method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity.proximal">(cil.optimisation.functions.L1Sparsity method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.proximal">(cil.optimisation.functions.L2NormSquared method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.proximal">(cil.optimisation.functions.LeastSquares method)</a>
@@ -1878,6 +1904,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.KullbackLeibler.proximal_conjugate">(cil.optimisation.functions.KullbackLeibler method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L1Norm.proximal_conjugate">(cil.optimisation.functions.L1Norm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.L1Sparsity.proximal_conjugate">(cil.optimisation.functions.L1Sparsity method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.L2NormSquared.proximal_conjugate">(cil.optimisation.functions.L2NormSquared method)</a>
 </li>
@@ -2380,6 +2408,8 @@ document.write(`
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.operators.WaveletOperator">WaveletOperator (class in cil.optimisation.operators)</a>
+</li>
       <li><a href="../optimisation/#cil.optimisation.functions.WeightedL2NormSquared">WeightedL2NormSquared (class in cil.optimisation.functions)</a>
 </li>
       <li><a href="../processors/#cil.processors.Padder.wrap">wrap() (cil.processors.Padder static method)</a>

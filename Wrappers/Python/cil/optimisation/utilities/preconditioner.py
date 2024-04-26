@@ -225,6 +225,6 @@ class Adam(Preconditioner):
             self.gradient_accumulator.sapyb(self.gamma, algorithm.x_update, (1-self.gamma), out=self.gradient_accumulator)
             self.scaling_factor_accumulator.sapyb(self.beta,  algorithm.x_update.multiply(algorithm.x_update), (1-self.beta), out=self.scaling_factor_accumulator)
         
-        self.gradient_accumulator.divide(( self.gradient_accumulator+self.epsilon).sqrt(), out=algorithm.x_update)
+        self.gradient_accumulator.divide(( self.scaling_factor_accumulator+self.epsilon).sqrt(), out=algorithm.x_update)
         
         

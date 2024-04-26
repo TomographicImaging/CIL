@@ -115,7 +115,21 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(data.array, precond_pwls.solution.array, 3)
         
     def test_Adam_init(self):
-        pass
+        preconditioner = Adam()
+        self.assertEqual(preconditioner.epsilon, 1e-8)
+        self.assertEqual(preconditioner.gamma, 0.9)
+        self.assertEqual(preconditioner.beta, 0.999)
+        self.assertEqual(preconditioner.gradient_accumulator, None)
+        self.assertEqual(preconditioner.scaling_factor_accumulator, None)
+        
+        preconditioner = Adam(epsilon=1e-4, gamma=4, beta=5)
+        self.assertEqual(preconditioner.epsilon, 1e-4)
+        self.assertEqual(preconditioner.gamma, 4)
+        self.assertEqual(preconditioner.beta, 5)
+        self.assertEqual(preconditioner.gradient_accumulator, None)
+        self.assertEqual(preconditioner.scaling_factor_accumulator, None)
+        #TODO: any more unit tests? 
+        
     def test_Adam_converges(self):
             ig = ImageGeometry(7,8,4)
             data = ig.allocate('random', seed=2)
@@ -130,12 +144,18 @@ class TestPreconditioners(CCPiTestClass):
             ls_adam = GD(initial=initial, objective_function=f,   preconditioner = preconditioner, update_objective_interval=1, step_size = step_size)     
             
         
-            ls_adam.run(1000)
+            ls_adam.run(200)
             self.assertNumpyArrayAlmostEqual(data.array, ls_adam.solution.array, 3)
     
     def test_AdaGrad_init(self):
-        pass
-    
+        preconditioner = AdaGrad()
+        self.assertEqual(preconditioner.epsilon, 1e-8)
+        self.assertEqual(preconditioner.gradient_accumulator, None)
+        
+        preconditioner = AdaGrad(1e-4)
+        self.assertEqual(preconditioner.epsilon, 1e-4)
+        self.assertEqual(preconditioner.gradient_accumulator, None)
+        #TODO: any more unit tests? 
       
     def test_AdaGrad_converges(self):
             ig = ImageGeometry(7,8,4)

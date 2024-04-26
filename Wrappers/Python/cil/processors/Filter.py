@@ -29,19 +29,33 @@ from scipy.fft import ifft2
 class Filter(Processor): 
 
     @staticmethod
-    def Paganin(delta_beta=1e-2):
+    def low_pass_Paganin(delta_beta = 1e2, energy = 40000, propagation_distance=None, magnification=None, pixel_size=None, geometry_unit_multiplier=1):
         '''
-        Method to filter a set of projections using the Paganin phase filter
-        described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
-        In this implmemntation, the strength of the filter is set using the delta_beta ratio alone. To retrieve quantitative information 
-        from phase contrast images with other physical parameters, use the `PhaseRetriever.Paganin() method` instead
+        Method to filter a set of projections using a low pass filter based on Paganin phase retrieval described in https://doi.org/10.1046/j.1365-2818.2002.01010.x 
+        In this implmemntation, the strength of the filter can be set using the delta_beta ratio alone. To retrieve thickness information from phase contrast 
+        images use the `PhaseRetriever.Paganin() method` instead
 
         Parameters
         ----------           
         delta_beta: float
-            Filter strength, can be given by the ratio of the real and complex part of the material refractive index, where refractive 
-            index n = (1 - delta) + i beta (energy-dependent refractive index information can be found at https://refractiveindex.info/ )
-            default is 1e-2
+            Filter strength, can be given by the ratio of the real and complex part of the material refractive index, where refractive index n = (1 - delta) + i beta 
+            (energy-dependent refractive index information for x-ray wavelengths can be found at https://henke.lbl.gov/optical_constants/getdb2.html ) default is 1e2
+
+        energy: float (optional)
+            Energy of the incident photon in eV, default is 40000
+
+        propagation_distance: float (optional)
+            The sample to detector distance in meters. If not specified, either the value in data.geometry.dist_center_detector will be used or a defeault of 1
+
+        magnification: float (optional)
+            The optical magnification at the detector. If not specified, either the value in data.geometry.magnification will be used or a default of 1
+
+        pixel_size: float (optional)
+            The detector pixel size. If not specified, either values in data.geometry.pixel_size_h and pixel_size_v will be used or a default of 1e-6
+
+        geometry_unit_multiplier: float (optional)
+            Multiplier to convert units stored in geometry to metres, conversion applies to pixel size or propagation distance (only if the geometry value is used not 
+            if user specified), default is 1
 
         Returns
         -------
@@ -55,14 +69,22 @@ class Filter(Processor):
         >>> processor.get_output()
 
         '''
-        return PaganinFilter(delta_beta=delta_beta)
+        return PaganinFilter(delta_beta=delta_beta, energy=energy, propagation_distance=propagation_distance, magnification=magnification, pixel_size=pixel_size, geometry_unit_multiplier=geometry_unit_multiplier)
     
 class PaganinFilter(Filter):
-    def __init__(self, delta_beta):
+    def __init__(self, delta_beta, energy, propagation_distance, magnification, pixel_size, geometry_unit_multiplier):
         
         kwargs = {
         'delta_beta': delta_beta,
-        'filter' : None}
+        'filter' : None,
+        'energy' : energy,
+        'propagation_distance_user' : propagation_distance,
+        'magnification_user' : magnification,
+        'pixel_size' : None,
+        'propagation_distance' : None,
+        'magnification' : None,
+        'pixel_size_user' : pixel_size,
+        'geometry_unit_multiplier' : geometry_unit_multiplier}
 
         super(PaganinFilter, self).__init__(**kwargs)
 
@@ -70,10 +92,50 @@ class PaganinFilter(Filter):
         if not isinstance(self.delta_beta, (int, float)):
             raise TypeError('delta_beta must be a real number, got type '.format(type(self.delta_beta)))
         
+        # if propagation_distance is not specified by the user, use the value in geometry, or default = 1
+        if self.propagation_distance_user is None: 
+            if data.geometry.dist_center_detector is None:
+                self.propagation_distance = 1
+            elif data.geometry.dist_center_detector == 0:
+                self.propagation_distance = 1
+            else:
+                self.propagation_distance = data.geometry.dist_center_detector*self.geometry_unit_multiplier
+        else:
+            if not isinstance(self.propagation_distance_user, (int, float)):
+                raise TypeError('propagation_distance must be a real number, got type '.format(type(self.propagation_distance_user)))
+            self.propagation_distance = self.propagation_distance_user
+
+        # if magnification is not specified by the user, use the value in geometry, or default = 1
+        if self.magnification_user is None:
+            if data.geometry.magnification == None:
+                self.magnification = 1
+            else:
+                self.magnification = data.geometry.magnification
+        else:
+            self.magnification = self.magnification_user
+
+        # if pixel_size is not specified by the user, use the value in geometry, or default = 1e-6
+        if self.pixel_size_user is None:
+            if (data.geometry.pixel_size_h == None) | (data.geometry.pixel_size_v == None):
+                self.pixel_size = 1e-6
+            else:
+                if (data.geometry.pixel_size_h - data.geometry.pixel_size_v ) / \
+                    (data.geometry.pixel_size_h + data.geometry.pixel_size_v ) < 1e-5:
+                    self.pixel_size = (data.geometry.pixel_size_h*self.geometry_unit_multiplier)
+                else:
+                    raise ValueError('Panel pixel size is not homogeneous up to 1e-5: got {} {}'\
+                            .format( data.geometry.pixel_size_h, data.geometry.pixel_size_v )
+                        )
+        else:
+            if not isinstance(self.pixel_size_user, (int, float)):
+                raise TypeError('pixel_size must be a real number, got type '.format(type(self.pixel_size_user)))
+            self.pixel_size = self.pixel_size_user
+
         return True
 
     def create_filter(self, Nx, Ny):
-        processor = PhaseRetriever.Paganin(energy_eV = 40000, delta = 1, beta = 1/self.delta_beta, unit_multiplier = 1, propagation_distance = 1, magnification = 1, filter_type='paganin_method')
+        processor = PhaseRetriever.Paganin(delta = 1, beta = 1/self.delta_beta, energy = self.energy, propagation_distance = self.propagation_distance, magnification = self.magnification, 
+                                           pixel_size=self.pixel_size, geometry_unit_multiplier = self.geometry_unit_multiplier, filter_type='paganin_method')
         processor.set_input(self.get_input())
         processor.create_filter(Nx, Ny)
         self.filter = processor.filter

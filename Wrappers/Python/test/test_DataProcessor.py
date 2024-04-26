@@ -2777,8 +2777,8 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
 
     def test_PaganinPhaseRetriever_init(self):        
         # test default values are initialised
-        processor = PhaseRetriever.Paganin()
-        test_parameter = ['energy', 'wavelength', 'delta', 'beta','unit_multiplier', 'propagation_distance', 'propagation_distance_user',
+        processor = PhaseRetriever.low_pass_Paganin()
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta','geometry_unit_multiplier', 'propagation_distance', 'propagation_distance_user',
                           'magnification', 'magnification_user', 'filter_type']
         test_value = [40000, (constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2, 1, None, None, 
                       None, None, 'paganin_method']
@@ -2787,16 +2787,16 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processor = PhaseRetriever.Paganin(1, 2, 3, 4, 5, 6, 'string')
-        test_value = [1, (constants.h*constants.speed_of_light)/(1*constants.electron_volt), 2, 3, 4, None, 5, 
-                      None, 6, 'string']
+        processor = PhaseRetriever.low_pass_Paganin(1, 2, 3, 4, 5, 6, 7, 'string')
+        test_value = [3, (constants.h*constants.speed_of_light)/(3*constants.electron_volt), 1, 2, 7, None, 4, 
+                      None, 5, 'string']
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
 
     def test_PaganinPhaseRetriever_check_input(self):
         # check the propagation distance can be found from the geometry if there is no user input
-        processor = PhaseRetriever.Paganin()
+        processor = PhaseRetriever.low_pass_Paganin()
         processor.check_input(self.data_cone)
         self.assertEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector, msg=self.error_message(processor, 'propagation_distance'))
 
@@ -2805,27 +2805,27 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             processor.check_input(self.data_parallel)
         
         # test propagation distance user input over-rides the distance value from geometry
-        processor =  PhaseRetriever.Paganin(propagation_distance=1)
+        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1)
         data_array = [self.data_cone, self.data_parallel]
         for data in data_array:
             processor.check_input(data)
             self.assertEqual(processor.propagation_distance, 1, msg=self.error_message(processor, 'propagation_distance'))
 
         # test magnification user input over-rides the distance value from geometry
-        processor =  PhaseRetriever.Paganin(propagation_distance=1, magnification=1)
+        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1, magnification=1)
         data_array = [self.data_cone, self.data_parallel]
         for data in data_array:
             processor.check_input(data)
             self.assertEqual(processor.magnification, 1, msg=self.error_message(processor, 'magnification'))
 
         # test no magnification value provided by user input or geometry, gives a default value = 1
-        processor =  PhaseRetriever.Paganin(propagation_distance=1)
+        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1)
         data = self.data_parallel
         processor.check_input(data)
         self.assertEqual(processor.magnification, 1, msg=self.error_message(processor, 'magnification'))
 
     def test_PaganinPhaseRetriever_create_filter(self):
-        processor =  PhaseRetriever.Paganin(propagation_distance=1)
+        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1)
 
         # check alpha and mu are calculated correctly
         alpha = 1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
@@ -2848,62 +2848,49 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         
         # check default filter is created with paganin_method
         processor.set_input(self.data_cone)
-        # check raises warning where k*W < 1
-        with self.assertLogs(level='WARNING') as log:
-            processor.create_filter(Nx, Ny)
-        self.assertEqual(len(log.output), 1)
+        processor.create_filter(Nx, Ny)
         filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)*self.data_cone.geometry.magnification))
         numpy.testing.assert_allclose(processor.filter, filter)
 
         # check generalised_paganin_method
-        processor =  PhaseRetriever.Paganin(propagation_distance=1, filter_type='generalised_paganin_method')
+        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1, filter_type='generalised_paganin_method')
         processor.set_input(self.data_cone)
         processor.create_filter(Nx, Ny)
         expected_filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)/self.data_cone.geometry.magnification))
         numpy.testing.assert_allclose(processor.filter, expected_filter)
 
         # check unknown method raises error
-        processor =  PhaseRetriever.Paganin(propagation_distance=1, filter_type='unknown_method')
+        processor =  PhaseRetriever.low_pass_Paganin(propagation_distance=1, filter_type='unknown_method')
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
             processor.create_filter(Nx, Ny)
 
     def test_PaganinPhaseRetriever(self): 
 
-        absorption = -1*numpy.log(self.data_parallel)
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
         thickness = -(1/mu)*numpy.log(self.data_parallel)
-        phase = (-1*2*numpy.pi/wavelength)*((-1/mu)*numpy.log(self.data_parallel))
 
         # check retrieve processor returns filtered image with correct scaling
-        processor = PhaseRetriever.Paganin(propagation_distance = 1)
+        processor = PhaseRetriever.low_pass_Paganin(propagation_distance = 1)
         processor.set_input(self.data_parallel)
         
-        output = processor.get_output(output_type = 'attenuation')
-        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
-        output = processor.get_output(output_type = 'thickness')
+        output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
-        output = processor.get_output(output_type = 'phase')
-        self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
+
 
     def test_PaganinPhaseRetriever_2D(self):
         data_slice = self.data_parallel.get_slice(vertical=10)
-        absorption = -1*numpy.log(data_slice)
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
         thickness = -(1/mu)*numpy.log(data_slice)
-        phase = (-1*2*numpy.pi/wavelength)*((-1/mu)*numpy.log(data_slice))
 
-        processor = PhaseRetriever.Paganin(propagation_distance = 1)
+        processor = PhaseRetriever.low_pass_Paganin(propagation_distance = 1)
         
         processor.set_input(data_slice)
-        output = processor.get_output(output_type = 'attenuation')
-        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
-        output = processor.get_output(output_type = 'thickness')
+        output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
-        output = processor.get_output(output_type = 'phase')
-        self.assertLessEqual(quality_measures.mse(output, phase), 0.05)
+
 
 class TestFilter(unittest.TestCase):       
 
@@ -2913,44 +2900,97 @@ class TestFilter(unittest.TestCase):
 
     def test_PaganinFilter_init(self):
         # test default values are initialised
-        processor = Filter.Paganin()
-        self.assertEqual(processor.delta_beta, 1e-2)
+        processor = Filter.low_pass_Paganin()
+        self.assertEqual(processor.delta_beta, 1e2)
 
         # test non-default values are initialised
-        processor = Filter.Paganin(1)
+        processor = Filter.low_pass_Paganin(1, 2, 3, 4, 5, 6)
         self.assertEqual(processor.delta_beta, 1)
+        self.assertEqual(processor.energy, 2)
+        self.assertEqual(processor.propagation_distance_user, 3)
+        self.assertEqual(processor.magnification_user, 4)
+        self.assertEqual(processor.pixel_size_user, 5)
+        self.assertEqual(processor.geometry_unit_multiplier, 6)
+        self.assertEqual(processor.propagation_distance, None)
+        self.assertEqual(processor.pixel_size, None)
+        self.assertEqual(processor.magnification, None)
+
 
     def test_PaganinFilter_check_input(self):
         # check type error when delta_beta is specified as a string
-        processor = Filter.Paganin('1')
+        processor = Filter.low_pass_Paganin('1')
         with self.assertRaises(TypeError):
             processor.check_input(self.data_parallel)
 
+        processor = Filter.low_pass_Paganin()
+        processor.check_input(self.data_cone)
+        # check geometry values are used when there is no value specified
+        self.assertEqual(processor.pixel_size, self.data_cone.geometry.pixel_size_h)
+        self.assertEqual(processor.magnification, self.data_cone.geometry.magnification)
+        self.assertEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector)
+
+        processor = Filter.low_pass_Paganin()
+        processor.check_input(self.data_parallel)
+        self.assertEqual(processor.pixel_size, self.data_parallel.geometry.pixel_size_h)
+        # check default values are used when there is no value specified or in geometry
+        self.assertEqual(processor.magnification, 1)
+        self.assertEqual(processor.propagation_distance, 1)
+
     def test_PaganinFilter_create_filter(self):
-        
-        alpha = 1/(4.0*numpy.pi*1e-2/((constants.h*constants.speed_of_light)/(40000*constants.electron_volt)))
+        # check default filter is created with cone beam data
+        delta_beta = 1e2
+        delta = 1
+        beta = delta/delta_beta
+        energy_eV = 40000
+        wavelength = (constants.h*constants.speed_of_light)/(energy_eV*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/wavelength
+        propagation_distance = self.data_cone.geometry.dist_center_detector
+        pixel_size = self.data_cone.geometry.pixel_size_h
+        magnification = self.data_cone.geometry.magnification
+        alpha = propagation_distance*delta/mu
         image = self.data_cone.get_slice(angle=0).as_array()
         Nx, Ny = image.shape
         kx,ky = numpy.meshgrid( 
-            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
-            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*pixel_size),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*pixel_size),
             sparse=False, 
             indexing='ij'
             )
-        
-        # check default filter is created
-        processor = Filter.Paganin()
+        processor = Filter.low_pass_Paganin()
         processor.set_input(self.data_cone)
-        # check raises warning where k*W < 1
-        with self.assertLogs(level='WARNING') as log:
-            processor.create_filter(Nx, Ny)
-        self.assertEqual(len(log.output), 1)
-        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)*self.data_cone.geometry.magnification))
+        processor.create_filter(Nx, Ny)
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)/1))
         numpy.testing.assert_allclose(processor.filter, filter)
+
+        # check default filter is created with parallel beam data
+        delta_beta = 1e2
+        delta = 1
+        beta = delta/delta_beta
+        energy_eV = 40000
+        wavelength = (constants.h*constants.speed_of_light)/(energy_eV*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/wavelength
+        propagation_distance = 1
+        pixel_size = self.data_cone.geometry.pixel_size_h
+        magnification = 1
+        alpha = propagation_distance*delta/mu
+        image = self.data_cone.get_slice(angle=0).as_array()
+        Nx, Ny = image.shape
+        kx,ky = numpy.meshgrid( 
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*pixel_size),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*pixel_size),
+            sparse=False, 
+            indexing='ij'
+            )
+        processor = Filter.low_pass_Paganin()
+        processor.set_input(self.data_cone)
+        processor.create_filter(Nx, Ny)
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)/magnification))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
 
     def test_PaganinFilter(self):
         # check filter processor returns filtered image without scaling
-        processor = Filter.Paganin(delta_beta = 0.01)
+        processor = Filter.low_pass_Paganin(delta_beta = 1e2)
         processor.set_input(self.data_parallel)
         output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, self.data_parallel), 0.05)
@@ -2960,11 +3000,21 @@ class TestFilter(unittest.TestCase):
         output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
 
+        processor = Filter.low_pass_Paganin(delta_beta = 1e2)
+        processor.set_input(self.data_cone)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, self.data_parallel), 0.05)
+
+        absorption = -1*numpy.log(self.data_cone)
+        processor.set_input(absorption)
+        output = processor.get_output()
+        self.assertLessEqual(quality_measures.mse(output, absorption), 0.05)
+
     def test_PaganinFilter_2D(self):
         data_slice = self.data_parallel.get_slice(vertical=10)
         absorption = -1*numpy.log(data_slice)
 
-        processor = Filter.Paganin()
+        processor = Filter.low_pass_Paganin()
         processor.set_input(data_slice)
         output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, data_slice), 0.05)

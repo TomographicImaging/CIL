@@ -318,7 +318,12 @@ GradientOperator
    :members:
 
 
+WaveletOperator
+---------------
+We utilise PyWavelets (https://pywavelets.readthedocs.io/en/latest/index.html) to build wavelet operators in CIL:
 
+.. autoclass:: cil.optimisation.operators.WaveletOperator
+   :members:
 
 
 
@@ -445,6 +450,14 @@ Least Squares
 .. autoclass:: cil.optimisation.functions.LeastSquares
    :members:
    :inherited-members:
+
+
+L1 Sparsity
+----------
+.. autoclass:: cil.optimisation.functions.L1Sparsity
+   :members:
+   :inherited-members:
+
 
 Mixed L21 norm
 --------------

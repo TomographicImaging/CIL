@@ -1,5 +1,9 @@
-*XX.X.X
+
+* XX.X.X
+  - Added wavelet operator, wrapping PyWavelets operator as a CIL operator
+  - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, A
   - Bug fix in gradient descent `update_objective` called twice on the initial point. 
+
 
 * 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
